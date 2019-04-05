@@ -1,0 +1,101 @@
+<div class="filter-form">
+	<div [hidden]="isCsvSupportedLayer || isWCSDownloadSupported">
+		<div class="alert alert-danger fade in">
+			<i class="ti-bell pull-left" aria-hidden="true"></i>
+			<p>CSV download are not supported by the portal for WMS and complex WFS layers. You may wish to download directly from the server by referring to the documentation on Geoserver
+			for <a href="http://docs.geoserver.org/stable/en/user/services/wms/reference.html#getmap">getMap</a> and <a href="http://docs.geoserver.org/stable/en/user/services/wfs/reference.html#getfeature">getFeature</a>.
+			The service endpoint can be found on the infopanel beside the download tab.</p>
+		</div>
+	</div>
+	<div [hidden]='!isCsvSupportedLayer' class="form-group">
+		<div *ngIf="!bbox&&drawStarted==false">
+			 <div class="alert alert-warning fade in">
+                <i class="ti-bell pull-left"></i>
+                <p>Selecting the appropriate area of your interest will reduce the time it requires to download.</p>
+            </div>
+		</div>
+		<div *ngIf="drawStarted==true">
+			 <div class="alert alert-success fade in">
+                <i class="ti-bell pull-left"></i>
+                <p>Click on the map to select bounding box</p>
+            </div>
+		</div>
+		<div *ngIf="bbox" class="container">
+			<div class="standard-title row">
+				<h4><span>Bounding Box</span></h4>
+			</div>
+			<div class="row">
+				<span class="label label-default col-xs-4 col-xs-offset-4 line-height-1-8">North: {{bbox.northBoundLatitude | number:'1.0-4'}}</span>
+			</div>
+			<div class="row">
+				<span class="label label-default col-xs-4 line-height-1-8">West: {{bbox.westBoundLongitude | number:'1.0-4'}}</span>
+				<span class="label label-default col-xs-4 col-xs-offset-4 line-height-1-8">East: {{bbox.eastBoundLongitude | number:'1.0-4'}}</span>
+			</div>
+			<div class="row">
+				<span class="label label-default col-xs-4 col-xs-offset-4 line-height-1-8">South: {{bbox.southBoundLatitude | number:'1.0-4'}}</span>
+			</div>
+			<hr>
+		</div>
+
+		<p *ngIf="!bbox" class="small text-danger">Downloads without specifying boundaries may time out after 5 minutes due to the size of the data.</p>
+
+		<button *ngIf="!bbox" type="button" class="btn btn-info btn-xs" (click)="drawBound()"><i class="fa fa-object-ungroup"></i> Select Bounds</button>
+		<button *ngIf="bbox" type="button" class="btn btn-danger btn-xs" (click)="clearBound()"><i class="fa fa-refresh"></i> Clear Bounds</button>
+		<button type="button" class="btn btn-info btn-xs pull-right" (click)="download()"><i *ngIf="downloadStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!downloadStarted" class="fa fa-cloud-download"></i> Download</button>
+	</div>
+
+	<div [hidden]='!isWCSDownloadSupported' class="form-group">
+		<div *ngIf="!bbox&&drawStarted==false">
+			 <div class="alert alert-warning fade in">
+                <i class="ti-bell pull-left"></i>
+                <p>Select an area to download not exceeding {{downloadSizeLimit}} m<sup>2</sup></p>
+            </div>
+		</div>
+		<div *ngIf="drawStarted==true">
+			 <div class="alert alert-success fade in">
+                <i class="ti-bell pull-left"></i>
+                <p>Click on the map to select bounding box</p>
+            </div>
+		</div>
+		<div *ngIf="bbox" class="container">
+			<div class="standard-title row">
+				<h4><span>Bounding Box</span></h4>
+			</div>
+			<div class="row">
+				<span class="label label-default col-xs-4 col-xs-offset-4 line-height-1-8">North: {{bbox.northBoundLatitude | number:'1.0-4'}}</span>
+			</div>
+			<div class="row">
+				<span class="label label-default col-xs-4 line-height-1-8">West: {{bbox.westBoundLongitude | number:'1.0-4'}}</span>
+				<span class="label label-default col-xs-4 col-xs-offset-4 line-height-1-8">East: {{bbox.eastBoundLongitude | number:'1.0-4'}}</span>
+			</div>
+			<div class="row">
+				<span class="label label-default col-xs-4 col-xs-offset-4 line-height-1-8">South: {{bbox.southBoundLatitude | number:'1.0-4'}}</span>
+			</div>
+			<hr>
+		</div>
+
+		<div *ngIf="wcsDownloadListOption" class="form-group  form-group-sm">
+			<label>Reference System:</label>
+			<select class="form-control input-sm" [(ngModel)]="wcsDownloadForm.inputCrs">
+				<option *ngFor="let inputCrs of wcsDownloadListOption.inputCrsList">{{inputCrs}}</option>
+			</select>
+		</div>
+		<div *ngIf="wcsDownloadListOption" class="form-group  form-group-sm">
+			<label>Format:</label>
+			<select class="form-control input-sm" [(ngModel)]="wcsDownloadForm.downloadFormat">
+				<option *ngFor="let downloadFormat of wcsDownloadListOption.downloadFormatList">{{downloadFormat}}</option>
+			</select>
+		</div>
+		<div *ngIf="wcsDownloadListOption" class="form-group  form-group-sm">
+			<label>Output CRS:</label>
+			<select class="form-control input-sm" [(ngModel)]="wcsDownloadForm.outputCrs">
+				<option *ngFor="let outputCrs of wcsDownloadListOption.outputCrsList">{{outputCrs}}</option>
+			</select>
+		</div>
+
+		<button *ngIf="!bbox" type="button" class="btn btn-info btn-xs" (click)="drawBound()"><i class="fa fa-object-ungroup"></i> Select Bounds</button>
+		<button *ngIf="bbox" type="button" class="btn btn-danger btn-xs" (click)="clearBound()"><i class="fa fa-refresh"></i> Clear</button>
+		<button type="button" class="btn btn-info btn-xs pull-right" (click)="download()"><i *ngIf="downloadStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!downloadStarted" class="fa fa-cloud-download"></i> Download</button>
+	</div>
+
+</div>

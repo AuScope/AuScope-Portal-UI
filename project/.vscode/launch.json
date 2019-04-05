@@ -1,0 +1,24 @@
+{
+    // Chrome debug configuration for Visual Studio Code
+    // 1. Install Chrome and the "Debugger for Chrome" extension from the extensions menu
+    // 2. Run "ng serve" from the terminal window
+    // 3. push the "> start debugging" button from the debugging menu
+    // once started the debugger will continue through rebuilds as long as you dont close chrome or press the stop button.
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Chrome Debug(run ng serve first)",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:4200/",
+            "webRoot": "${workspaceRoot}"
+        },
+        {
+            "type": "chrome",
+            "request": "attach",
+            "name": "Attach to Chrome",
+            "port": 9222,
+            "webRoot": "${workspaceRoot}"
+        }
+    ]
+}

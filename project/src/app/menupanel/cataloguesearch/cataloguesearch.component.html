@@ -1,0 +1,130 @@
+<div>
+	<br>
+	<div *ngIf="searchMode" class="form-group" style=" left: -20px;position: relative; font-size:11px;">
+
+		<div class="form-group  form-group-sm">
+			<label class="white">Geonetwork Registries</label>
+			<select class="form-control input-sm" [(ngModel)]="form.cswService" (change) = "setkeywords(form.cswService)">
+				<option *ngFor="let cswRegistry of cswRegistries" [ngValue]="cswRegistry">{{cswRegistry.title}}</option>
+			</select>
+		</div>
+		<div class="form-group  form-group-sm">
+		    <label class="white">Keywords</label>
+			<ng-select [items] = "ngSelectiveOptions" [multiple]="true" bindLabel="label" bindValue="value" placeholder="Select Keywords" [(ngModel)]="form.keywords"></ng-select>
+		</div>
+
+		<div>
+			<div class="form-group  form-group-sm">
+				<label class="white">Text Search</label>
+				<input type="text" class="form-control input-sm" [(ngModel)]="form.anyText">
+			</div>
+		</div>
+
+		<div>
+			<div class="form-group  form-group-sm">
+				<label class="white">Title Search</label>
+				<input type="text" class="form-control input-sm" [(ngModel)]="form.title">
+			</div>
+		</div>
+
+		<div>
+			<div class="form-group  form-group-sm">
+				<label class="white">Abstract Search</label>
+				<input type="text" class="form-control input-sm" [(ngModel)]="form.abstract">
+			</div>
+		</div>
+
+		<div *ngIf="!bbox&&drawStarted==false">
+			 <div class="alert alert-warning fade in">
+	               <i class="ti-bell pull-left"></i>
+	               <p>Click on 'Select Bounds' to filter your area of interest</p>
+	           </div>
+		</div>
+		<div *ngIf="drawStarted==true">
+			 <div class="alert alert-success fade in">
+	               <i class="ti-bell pull-left"></i>
+	               <p>Click on the map to select bounding box</p>
+	           </div>
+		</div>
+		<div *ngIf="bbox" class="container">
+			<div class='standard-title row'>
+				<h4 class="white"><span>Bounding Box</span></h4>
+			</div>
+			<div class="row">
+				<span class="label label-default col-xs-4 col-xs-offset-4 line-height-1-8">North: {{bbox.northBoundLatitude | number:'1.0-4'}}</span>
+			</div>
+			<div class="row">
+				<span class="label label-default col-xs-4 line-height-1-8">West: {{bbox.westBoundLongitude | number:'1.0-4'}}</span>
+				<span class="label label-default col-xs-4 col-xs-offset-4 line-height-1-8">East: {{bbox.eastBoundLongitude | number:'1.0-4'}}</span>
+			</div>
+			<div class="row">
+				<span class="label label-default col-xs-4 col-xs-offset-4 line-height-1-8">South: {{bbox.southBoundLatitude | number:'1.0-4'}}</span>
+			</div>
+			<hr>
+		</div>
+
+
+
+		<button *ngIf="!bbox" type="button" class="btn btn-info btn-xs" (click)="drawBound()"><i class="fa fa-object-ungroup"></i> Select Bounds</button>
+		<button *ngIf="bbox" type="button" class="btn btn-danger btn-xs" (click)="clearBound()"><i class="fa fa-refresh"></i> Clear Bounds</button>
+		<button type="button" class="btn btn-info btn-xs pull-right" (click)="search()"><i *ngIf="downloadStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!downloadStarted" class="fa fa-cloud-download"></i> Search</button>
+
+	</div>
+
+	<div *ngIf="loading && !searchMode"><p class="wip text-danger">Please wait while we search through the catalogue <i class="fa fa-circle small"></i><i class="fa fa-circle small"></i><i class="fa fa-circle small"></i></p></div>
+
+	<div *ngIf="!searchMode" style="position: relative; font-size:11px;">
+		<div class="pull-right" (click)="closeResult()"><i class="fa fa-window-close white"></i></div>
+		<li class="active" *ngFor="let layerGroup of layerGroups | getKey">
+		  		<div class="white">
+		             {{layerGroup.key}}
+		       </div>
+			<ul>
+				<li *ngFor="let layer of layerGroup.value" [ngClass]="{'active': layer.expanded}">
+					<a (click)="layer.expanded = !layer.expanded">
+						<div>
+							<span *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="pull-right project-percentage hasEvent light-blue"><u (click)="openStatusReport(uiLayerModels[layer.id]); $event.stopPropagation();">{{uiLayerModels[layer.id].statusMap.completePercentage}}<i *ngIf="!uiLayerModels[layer.id].statusMap.containsError" class="fa fa-warning text-warning"></i></u></span>
+							<div>
+								<i *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="fa fa-ban red" (click) = "removeLayer(layer);$event.stopPropagation();"></i>
+									<i class="fa fa-arrow-right light-blue"></i> {{layer.name}}
+									<i *ngIf="layer.expanded && !uiLayerModels[layer.id].statusMap.renderStarted" class="fa fa-arrow-circle-down"></i>
+							</div>
+							<div *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="progress progress-xs">
+								<div class="progress-bar bg-gradient-blue-purple" [style.width]="uiLayerModels[layer.id].statusMap.completePercentage" role="progressbar"></div>
+							</div>
+						</div>
+					</a>
+					<div [hidden]="!layer.expanded" class="sidebar-panel-menu-show">
+						 <div class="panel panel-info panel-with-tabs layer-panel animated  slideInRight">
+							<div class="panel-heading">
+								<ul id="panel-tab" class="nav nav-tabs pull-right">
+									<li (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': uiLayerModels[layer.id].tabpanel.filterpanel.expanded}"><a data-toggle="tab"><i class="fa fa-filter"></i> <span class="hidden-xs">Filter</span></a></li>
+									<li (click)="selectTabPanel(layer.id,'infopanel')" [ngClass]="{'active': uiLayerModels[layer.id].tabpanel.infopanel.expanded}"><a data-toggle="tab"><i class="fa fa-info-circle"></i> <span class="hidden-xs">Info</span></a></li>
+								</ul>
+							</div>
+							<div id="panel-tab-content" class="tab-content">
+								<div class="tab-pane fade" [ngClass]="{'in active': uiLayerModels[layer.id].tabpanel.filterpanel.expanded}">
+									<app-filter-panel *ngIf="uiLayerModels[layer.id].tabpanel.filterpanel.expanded "[layer]=layer></app-filter-panel>
+								</div>
+								<div class="tab-pane fade" [ngClass]="{'in active': uiLayerModels[layer.id].tabpanel.infopanel.expanded}">
+									<info-panel *ngIf="uiLayerModels[layer.id].tabpanel.infopanel.expanded" [expanded]="uiLayerModels[layer.id].tabpanel.infopanel.expanded" [cswRecords]=layer.cswRecords [layer]=layer ></info-panel>
+								</div>
+							</div>
+						</div>
+					</div>
+				</li>
+			</ul>
+		</li>
+		<div class="pagination dark">
+			<a  class="page dark gradient" (click)="currentPage=currentPage-1;search()">Last</a>
+			<a  class="page dark gradient" (click)="currentPage=currentPage+1;search()">Next</a>
+			<select class="page dark gradient" [(ngModel)]="currentPage" (change)="search()">
+				<option *ngFor="let idx of totalResults">{{idx}}</option>
+			</select>
+		</div>
+	</div>
+
+
+
+
+</div>

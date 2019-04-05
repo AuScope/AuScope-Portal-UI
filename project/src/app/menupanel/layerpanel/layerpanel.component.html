@@ -1,0 +1,84 @@
+
+	<div class="form-group">
+		<div class="input-group">
+            <input type="text" class="form-control" [(ngModel)]="searchText" [disabled]="searchMode">
+            <span class="input-group-btn width-100pc">
+                <button *ngIf="!searchMode" tabindex="-1" class="btn btn-default" type="button" (click)="search()"><i class="fa fa-search"></i></button>
+                <button *ngIf="searchMode" tabindex="-1" class="btn btn-default" type="button" (click)="clearSearch()"><i class="fa fa-ban"></i></button>
+                <button tabindex="-1" data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button">
+                    <i class="fa fa-ellipsis-h"></i>
+                </button>
+                <ul id="menu-option-dropdown" class="dropdown-menu">
+                    <li>
+                        <a (click)="searchActive()"><i class="fa fa-eye"></i> View Active</a>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
+                        <a (click)="searchImage()"><i class="fa fa-image"></i> Image Layer</a>
+                    </li>
+                    <li>
+                        <a (click)="searchData()"><i class="fa fa-sliders"></i> Data Layer</a>
+                    </li>
+                </ul>
+            </span>
+          </div>
+	</div>
+	<li *ngFor="let layerGroup of layerGroups | getKey" >
+
+	   		<a [hidden]="layerGroup.value.hide" (click) = "layerGroup.value.loaded=layerGroup.value;layerGroup.value.expanded = !layerGroup.value.expanded;"
+			    [ngClass]="{'highlight': isLayerGroupVisible(layerGroup.value)}">
+                {{layerGroup.key}}
+				<i class="fa fa-arrow-circle-down" [ngClass]="{'submenu-open-inline':isLayerGroupVisible(layerGroup.value), 'hidden':!isLayerGroupVisible(layerGroup.value) }" ></i>
+	        </a>
+			<ul *ngIf="layerGroup.value.loaded" [ngClass]="{'submenu-open-block':layerGroup.value.expanded, 'hidden':!layerGroup.value.expanded}">
+				<li *ngFor="let layer of layerGroup.value.loaded" [ngClass]="{'active': layer.expanded}">
+					<a [hidden]="layer.hide" (click)="layer.expanded = !layer.expanded;" [ngClass]="{'highlight': layer.expanded}">
+						<div class="layerLoadCtrl">
+							<span *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="pull-right project-percentage hasEvent light-blue">
+								<u (click)="openStatusReport(uiLayerModels[layer.id]); $event.stopPropagation();">{{uiLayerModels[layer.id].statusMap.completePercentage}}</u>
+							</span>
+							<div>
+								<i *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="fa fa-ban red" (click) = "removeLayer(layer);$event.stopPropagation();"></i>
+								{{layer.name}}
+								<i *ngIf="layer.expanded && !uiLayerModels[layer.id].statusMap.renderStarted" class="fa fa-arrow-circle-down"></i>
+							</div>
+							<div *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="progress progress-xs">
+								<div class="progress-bar bg-gradient-blue-purple" [style.width]="uiLayerModels[layer.id].statusMap.completePercentage" role="progressbar"></div>
+							</div>
+						</div>
+
+					</a>
+					<div  [hidden]="!layer.expanded || layer.hide" class="sidebar-panel-menu-show">
+
+						 <div class="panel panel-info panel-with-tabs layer-panel animated  slideInRight">
+
+							<div class="panel-heading">
+								<ul id="panel-tab" class="nav nav-tabs pull-right">
+									<li (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': uiLayerModels[layer.id].tabpanel.filterpanel.expanded}"><a data-toggle="tab"><i class="fa fa-filter"></i> <span class="hidden-xs">Filter</span></a></li>
+									<li (click)="selectTabPanel(layer.id,'infopanel')" [ngClass]="{'active': uiLayerModels[layer.id].tabpanel.infopanel.expanded}"><a data-toggle="tab"><i class="fa fa-info-circle"></i> <span class="hidden-xs">Info</span></a></li>
+									<li (click)="selectTabPanel(layer.id,'downloadpanel')" [ngClass]="{'active': uiLayerModels[layer.id].tabpanel.downloadpanel.expanded}" class="desktop-only"><a data-toggle="tab"><i class="fa fa-download"></i> <span class="hidden-xs">Download</span></a></li>
+								</ul>
+
+							</div>
+
+							<div id="panel-tab-content" class="tab-content ">
+
+								<div class="tab-pane fade" [ngClass]="{'in active': uiLayerModels[layer.id].tabpanel.filterpanel.expanded}">
+									<app-filter-panel *ngIf="uiLayerModels[layer.id].tabpanel.filterpanel.expanded "[layer]=layer></app-filter-panel>
+								</div>
+
+								<div class="tab-pane fade" [ngClass]="{'in active': uiLayerModels[layer.id].tabpanel.infopanel.expanded}">
+									<info-panel *ngIf="uiLayerModels[layer.id].tabpanel.infopanel.expanded" [expanded]="uiLayerModels[layer.id].tabpanel.infopanel.expanded" [cswRecords]=layer.cswRecords [layer]=layer ></info-panel>
+								</div>
+								<div class="tab-pane fade" [ngClass]="{'in active': uiLayerModels[layer.id].tabpanel.downloadpanel.expanded}">
+									<app-download-panel *ngIf="uiLayerModels[layer.id].tabpanel.downloadpanel.expanded" [layer]=layer></app-download-panel>
+								</div>
+
+							</div>
+
+						</div>
+					</div>
+				</li>
+			</ul>
+
+	</li>

@@ -1,0 +1,82 @@
+<!-- Modal for querier-->
+<div class="modal-header">
+	<h1 class="page-header">
+		Capricorn distal footprint <small>Hydrogeochemistry</small>
+	</h1>
+</div>
+<div class="modal-body">
+	<div class="panel panel-default">
+		<!-- END panel-heading -->
+		<!-- BEGIN panel-body -->
+
+		<div class="panel-heading">
+			<h4 class="panel-title">{{layer.name}}</h4>
+		</div>
+		<div class="panel-body">
+			<fieldset class="show-fieldset-borders-whitebg" style="padding-bottom: 75px;">
+				<legend>
+					<small>Enter parameter</small>
+				</legend>
+
+				<div class="form-horizontal">
+					<div class="row">
+						<div class="col-md-6">
+							<div class="form-group  form-group-sm">
+								<label class="col-sm-3">Group of Interest</label>
+								<div class="col-sm-9">
+									<select class="form-control input-sm" [(ngModel)]="param.featureType" (change)="getAOIParam(param.featureType)">
+										<option *ngFor="let groupOfInterest of groupOfInterests" [ngValue]="groupOfInterest[1]">{{groupOfInterest[0]}}</option>
+									</select>
+								</div>
+							</div>
+							<div *ngIf="aoiParams" class="form-group  form-group-sm">
+								<label class="col-sm-3">X-AXIS</label>
+								<div class="col-sm-9">
+									<select class="form-control input-sm" [(ngModel)]="param.xaxis">
+										<option *ngFor="let aoiParam of aoiParams" [ngValue]="aoiParam[0]">{{aoiParam[0]}}
+											{{aoiParam[1]!=''?'('+aoiParam[1]+')':''}}</option>
+									</select>
+								</div>
+							</div>
+							<div *ngIf="aoiParams" class="form-group  form-group-sm">
+								<label class="col-sm-3">Y-AXIS</label>
+								<div class="col-sm-9">
+									<select class="form-control input-sm" [(ngModel)]="param.yaxis">
+										<option *ngFor="let aoiParam of aoiParams" [ngValue]="aoiParam[0]">{{aoiParam[0]}}
+											{{aoiParam[1]!=''?'('+aoiParam[1]+')':''}}</option>
+									</select>
+								</div>
+							</div>
+							<div  *ngIf="param.yaxis && param.xaxis" class="form-group  form-group-sm">
+								<label class="col-sm-3">Select Bounds</label>
+								<div class="col-sm-9">
+									<app-map-bbox (selectedbbox)="onselectedBox($event)" [layer]="layer" [defaultzoom]=5 [defaultlatlon]="[13183789.93,-2974331.10]"></app-map-bbox>
+								</div>
+							</div>
+							<div *ngIf="param.bbox" class="col-sm-offset-3">
+								<div class="hidden-xs">
+				                	<a href="#" class="btn btn-default btn-sm" (click)="drawScatter()">Scatter Plot</a>
+				                	<a href="#" class="btn btn-default btn-sm" (click)="drawBox()">Box Plot</a>
+				                	<a href="#" class="btn btn-default btn-sm" (click)="downloadCSV()"><i class="ti-download"></i></a>
+				                	<a href="#" class="btn btn-default btn-sm" (click)="refresh()"><i class="ti-reload"></i></a>
+				                </div>
+				                <br>
+				                <div *ngIf="rendering"><p class="wip text-danger">Please wait while we prepare the data <i class="fa fa-circle small"></i><i class="fa fa-circle small"></i><i class="fa fa-circle small"></i></p></div>
+							</div>
+						</div>
+						<div class="col-sm-9 col-sm-offset-3 col-md-6 col-md-offset-0">
+							<div id="capdf-graph-analytic" style="width:100%;height:400px;"></div>
+						</div>
+					</div>
+
+				</div>
+
+			</fieldset>
+
+
+
+
+
+		</div>
+	</div>
+</div>

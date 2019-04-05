@@ -1,0 +1,11 @@
+#map-theme-text {
+    z-index: 2;
+}
+
+/* Filter Clipboard */
+.panel .panel-body .btn {
+    background-color: #31c55680;
+    margin-right: 3px;
+    margin-left: 3px;
+
+}

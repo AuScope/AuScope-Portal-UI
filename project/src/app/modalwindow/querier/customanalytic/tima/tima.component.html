@@ -1,0 +1,45 @@
+<div class="panel-group" id="tima-analytic-accordion">
+	<!-- BEGIN panel -->
+	<div class="panel panel-default panel-bordered">
+		
+		<!-- BEGIN panel-collapse -->
+		<div id="tima-analytic" class="panel-collapse collapse" class="in" >
+			<div class="panel panel-default panel-with-tabs">
+				<!-- BEGIN panel-heading -->
+				<div class="panel-heading">
+					<ul id="nvcl-panel-tab" class="nav nav-tabs pull-right">
+						<li [ngClass]="{'active':!ClassificationActive}" (click)="ClassificationActive=false;" ><a href="#tima-piechart" data-toggle="tab"><i class="fa fa-home"></i> <span class="hidden-xs">Graph</span></a></li>						
+						<li [ngClass]="{'active':ClassificationActive}" (click)="ClassificationActive=true;"><a href="#tima-panorama" data-toggle="tab"><i class="fa fa-user"></i> <span class="hidden-xs">Classification</span></a></li>
+					</ul>
+					<h4 class="panel-title">Tima</h4>
+				</div>
+				<!-- END panel-heading -->
+				<!-- BEGIN tab-content -->
+				<div id="panel-tab-content" class="tab-content">
+					<!-- BEGIN tab-pane -->										
+					<div class="tab-pane fade in active" [ngClass]="{'active in':!ClassificationActive}" id="#tima-piechart">
+						<div class="modal-panel-size">
+					
+							<ngx-charts-pie-chart [view]="view" [scheme]="colorScheme" [results]="ngxdata" [legend]="true" [explodeSlices]="false"
+							 [labels]="true" [doughnut]="false" [gradient]="true">
+							</ngx-charts-pie-chart>
+					
+						</div>
+					</div>
+					<!-- END tab-pane -->
+					<!-- BEGIN tab-pane -->
+					<div class="tab-pane fade" [ngClass]="{'active in':ClassificationActive}" id="#tima-panorama">
+						<div class="modal-panel-size">						
+							<a target="_BLANK" href={{imageUrl}}><img src={{imageUrl}} style="height: 100%;"/></a>
+						</div>
+					</div>
+					<!-- END tab-pane -->
+					
+				</div>
+				<!-- END tab-content -->
+			</div>
+		</div>
+		<!-- END panel-collapse -->
+	</div>
+	<!-- END panel -->
+</div>

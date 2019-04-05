@@ -1,0 +1,62 @@
+
+<div class="form-group">
+	<label class="control-label" for="inputSuccess1"><small class="white">WMS Service URL</small></label>
+	<div class="input-group ">
+		<input type="text" class="form-control input-sm" [(ngModel)] = "searchUrl" >
+		<span class="input-group-addon" (click)="search()">
+			<i *ngIf="!loading" class="fa fa-search"></i>
+			<i *ngIf="loading" class="fa fa-spinner fa-spin fa-fw"></i>
+		</span>
+	</div>
+	 <span class="help-block small" [innerHTML]="statusmsg">
+	</span>
+</div>
+
+
+
+<li class="active" *ngFor="let layerGroup of layerGroups | getKey">
+  		<a href="javascript:;">
+           <i class="ti-angle-down pull-right"></i>
+             {{layerGroup.key}}
+        </a>
+	<ul>
+		<li *ngFor="let layer of layerGroup.value" [ngClass]="{'active': layer.expanded}">
+			<a (click)="layer.expanded = !layer.expanded">
+				<div>
+					<span *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="pull-right project-percentage hasEvent light-blue">
+						<u (click)="openStatusReport(uiLayerModels[layer.id]); $event.stopPropagation();">{{uiLayerModels[layer.id].statusMap.completePercentage}}
+							<i *ngIf="!uiLayerModels[layer.id].statusMap.containsError" class="fa fa-warning text-warning"></i>
+						</u>
+					</span>
+					<div>
+						<i *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="fa fa-ban red" (click) = "removeLayer(layer);$event.stopPropagation();"></i>
+							{{layer.name}}
+							<i *ngIf="layer.expanded && !uiLayerModels[layer.id].statusMap.renderStarted" class="fa fa-arrow-circle-down"></i>
+					</div>
+					<div *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="progress progress-xs">
+						<div class="progress-bar bg-gradient-blue-purple" [style.width]="uiLayerModels[layer.id].statusMap.completePercentage" role="progressbar"></div>
+					</div>
+				</div>
+			</a>
+			<div [hidden]="!layer.expanded" class="sidebar-panel-menu-show">
+				 <div class="panel panel-info panel-with-tabs layer-panel animated  slideInRight">
+					<div class="panel-heading">
+						<ul id="panel-tab" class="nav nav-tabs pull-right">
+							<li (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': uiLayerModels[layer.id].tabpanel.filterpanel.expanded}"><a data-toggle="tab"><i class="fa fa-filter"></i> <span class="hidden-xs">Filter</span></a></li>
+							<li (click)="selectTabPanel(layer.id,'infopanel')" [ngClass]="{'active': uiLayerModels[layer.id].tabpanel.infopanel.expanded}"><a data-toggle="tab"><i class="fa fa-info-circle"></i> <span class="hidden-xs">Info</span></a></li>
+						</ul>
+					</div>
+					<div id="panel-tab-content" class="tab-content">
+						<div class="tab-pane fade" [ngClass]="{'in active': uiLayerModels[layer.id].tabpanel.filterpanel.expanded}">
+							<app-filter-panel *ngIf="uiLayerModels[layer.id].tabpanel.filterpanel.expanded" [layer]=layer></app-filter-panel>
+						</div>
+						<div class="tab-pane fade" [ngClass]="{'in active': uiLayerModels[layer.id].tabpanel.infopanel.expanded}">
+							<info-panel *ngIf="uiLayerModels[layer.id].tabpanel.infopanel.expanded" [expanded]="uiLayerModels[layer.id].tabpanel.infopanel.expanded" [cswRecords]=layer.cswRecords [layer]=layer ></info-panel>
+						</div>
+					</div>
+				</div>
+			</div>
+		</li>
+	</ul>
+</li>
+<hr [hidden]="!layerGroups">

@@ -1,0 +1,134 @@
+
+	<!-- Modal for querier-->
+                <div class="modal-header">
+                	<h1 class="page-header">Response: <small>Feature Info result</small></h1>
+                </div>
+				<div class="modal-body">
+
+					<div class="panel panel-default">
+						<!-- END panel-heading -->
+						<!-- BEGIN panel-body -->
+
+						<div class="panel-body">
+							<!-- BEGIN panel-group -->
+							<div class="form-inline">
+								<div class="form-group  form-group-sm">
+				                    <label><i class="fa fa-filter" aria-hidden="true"></i> Filter: </label>
+									<select class="form-control input-sm" [(ngModel)]="selectLayerNameFilter">
+										<option value="ALL" selected="selected">ALL</option>
+										<option *ngFor="let uniqueLayerName of uniqueLayerNames">{{uniqueLayerName}}</option>
+									</select>
+				                </div>
+			                </div>
+							<div *ngIf="downloading"><h2 class="wip">Downloading <i class="fa fa-circle small"></i><i class="fa fa-circle small"></i><i class="fa fa-circle small"></i></h2></div>
+							<div class="panel-group" id="querier-accordion">
+								<!-- BEGIN panel -->
+								<div *ngFor="let doc of docs | querierFeatureSearchPipe:selectLayerNameFilter" class="panel panel-default panel-bordered">
+									<!-- BEGIN panel-heading -->
+									<div class="panel-heading">
+										<h4 class="panel-title">
+											<a (click)="collapse[doc.key]=!collapse[doc.key];parseTree(doc);" class="accordion-link"  data-parent="#querier-accordion">
+												{{doc.key}}
+											</a>
+										</h4>
+									</div>
+									<!-- END panel-heading -->
+									<!-- BEGIN panel-collapse -->
+									<div id="{{doc.key}}" class="panel-body panel-collapse collapse" [ngClass]="{'in' :collapse[doc.key]}">
+										<div class="panel panel-default panel-with-tabs">
+											<!-- BEGIN panel-heading -->
+											<div class="panel-heading">
+												<ul id="querier-panel-tab" class="nav nav-tabs pull-right">
+													<li (click)="doc.home=true;doc.analytic=false;" [ngClass]="{'active':doc.home}"><a href="#{{doc.key}}-panel-tab-home" data-toggle="tab"><i class="fa fa-home"></i> <span class="hidden-xs">WFS</span></a></li>
+													<li (click)="doc.home=false;doc.analytic=true" [ngClass]="{'active':doc.analytic}" *ngIf="analyticMap[doc.layer.id]" ><a href="#{{doc.key}}-panel-tab-profile" data-toggle="tab"><i class="fa fa-user"></i> <span class="hidden-xs">Analytic</span></a></li>
+												</ul>
+												<h4 *ngIf="doc.home" class="panel-title">Feature Detail</h4>
+                                                <h4 *ngIf="doc.analytic" class="panel-title">NVCL</h4>
+											</div>
+											<!-- END panel-heading -->
+
+											<!-- BEGIN tab-content -->
+											<div id="panel-tab-content" class="tab-content" style="max-height:calc(60vh);">
+												<!-- BEGIN tab-pane -->
+												<div *ngIf="doc.key !== 'Server Error'" class="tab-pane fade" [ngClass]="{'active in':doc.home}" id="{{doc.key}}-panel-tab-home">
+													<div *ngIf="bToClipboard || supportOpenInNewWindow(doc)" class="desktop-only" style="position: inherit;padding-top: unset;margin-bottom: 20px;">
+														<div class="pull-left hidden-xs clipboard-area">
+															<div *ngIf="bToClipboard" data-toggle="tooltip" title="Copy to Clipboard" (click)="CopyToClipboard(doc)" class="btn btn-default btn-sm">
+																<span><i class="ti-clip"></i>Add to Clipboard</span>
+															</div>
+														</div>
+													</div>
+													<!-- NEW Tree -->
+													<mat-tree *ngIf="nestedDataSource[doc.key]" [dataSource]="nestedDataSource[doc.key]" [treeControl]="nestedTreeControl[doc.key]"
+													 class="example-tree">
+														<dl>
+															<mat-tree-node *matTreeNodeDef="let node" style="font-size: 12px !important;padding: 3px; min-height: 0px">
+																<dt style="flex: auto;">{{node.filename}}</dt>
+																<dd>{{node.type}}
+																	<a *ngIf="node.type.toString().startsWith('http')" target="_blank" href="{{node.type}}">
+																		<i class="fa fa-external-link-square" aria-hidden="true"></i>
+																	</a>
+																</dd>
+															</mat-tree-node>
+															<mat-nested-tree-node *matTreeNodeDef="let node; when: hasNestedChild">
+																<dt style="flex: auto;">
+																	<button mat-icon-button matTreeNodeToggle [attr.aria-label]="'toggle ' + node.filename">
+																		<mat-icon class="mat-icon-rtl-mirror">
+																			{{nestedTreeControl[doc.key].isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+																		</mat-icon>
+																	</button>{{node.filename}}</dt>
+																<dd>
+																	<dl [class.feature-tree-invisible]="!nestedTreeControl[doc.key].isExpanded(node)" style="margin-left:10px">
+																		<ng-container matTreeNodeOutlet></ng-container>
+																	</dl>
+																</dd>
+															</mat-nested-tree-node>
+														</dl>
+													</mat-tree>
+
+													<!-- END NEW Tree -->
+												</div>
+												<div *ngIf="doc.key === 'Server Error'" class="tab-pane fade" [ngClass]="{'active in':doc.home}" id="{{doc.key}}-panel-tab-home">
+													<p>Sorry - {{doc.onlineResource.url}} server has returned an error message. See browser console for more information</p>
+												</div>
+
+												<!-- END tab-pane -->
+												<!-- BEGIN tab-pane -->
+												<div *ngIf="analyticMap[doc.layer.id]" class="tab-pane fade" [ngClass]="{'active in':doc.analytic}" id="{{doc.key}}-panel-tab-profile">
+													<app-custom-analytic [layer]="doc.layer" [load]="doc.loadSubComponent" [onlineResource] = "doc.onlineResource" [featureId]="doc.key" [doc] = "doc"></app-custom-analytic>
+												</div>
+												<!-- END tab-pane -->
+											</div>
+											<!-- END tab-content -->
+										</div>
+									</div>
+									<!-- END panel-collapse -->
+								</div>
+								<!-- END panel -->
+
+								<!-- BEGIN panel -->
+								<div *ngFor="let html of htmls | querierFeatureSearchPipe:selectLayerNameFilter" class="panel panel-default panel-bordered">
+									<!-- BEGIN panel-heading -->
+									<div class="panel-heading">
+										<h4 class="panel-title">
+											<a (click)="collapse[html.key]=!collapse[html.key]" class="accordion-link"  data-parent="#querier-accordion">
+												{{html.key}}
+											</a>
+										</h4>
+									</div>
+									<!-- END panel-heading -->
+									<!-- BEGIN panel-collapse -->
+									<div id="{{html.key}}" class="panel-body panel-collapse collapse" [ngClass]="{'in' :collapse[html.key]}">
+										<div [innerHTML] = "html.value | trustResourceHtml"></div>
+									</div>
+									<!-- END panel-collapse -->
+								</div>
+							</div>
+							<!-- END panel-group -->
+						</div>
+						<!-- END panel-body -->
+					</div>
+				</div>
+				<div class="modal-footer">
+                    <button type="button" class="btn btn-default" (click)="bsModalRef.hide()">Close</button>
+				</div>

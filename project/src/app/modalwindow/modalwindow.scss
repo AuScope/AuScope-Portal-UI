@@ -1,0 +1,164 @@
+
+.panel, .panel-body {
+    --modal-tab-border-colour: #aaa;
+    --modal-background-colour: #fff;
+    --modal-text-colour: #000;
+    background-color: var(--modal-background-colour)!important;
+    color: var(--modal-text-colour)!important;
+    font-size: 12px;
+}
+
+.panel-heading {
+    background-color: var(--modal-background-colour);
+}
+
+.panel.panel-with-tabs > .panel-heading {
+    border-bottom: 1px solid var(--modal-tab-border-colour)!important;
+}
+
+.nav.nav-tabs {
+    margin-top: -17px;
+    border-bottom-color: var(--modal-background-colour);
+}
+
+.nav-tabs > li.show > a,
+.nav-tabs > li.show >a:focus,
+.nav-tabs> li.show > a:hover,
+.nav-tabs > li.active > a,
+.nav-tabs > li.active >a:focus,
+.nav-tabs> li.active > a:hover {
+    color: var(--modal-text-colour);
+    background-color: var(--modal-background-colour);
+    border-color: var(--modal-tab-border-colour) var(--modal-tab-border-colour) #fff var(--modal-tab-border-colour);
+}
+
+.nav-tabs > li.show > a > i + span {
+    color: var(--modal-text-colour);
+}
+
+.nav-tabs > li > a:hover {
+    border-bottom-color: transparent;
+}
+
+.nav-tabs > li > a {
+    top: 3px;
+}
+
+.fa.fa-external-link-square {
+    color: #2c7cd2;
+}
+
+div.pull-left {
+    margin-top: 30px;
+}
+
+.tab-content {
+    padding: 5px;
+}
+
+.modal-panel-size {
+	width: 100%;
+	height: 430px;
+}
+
+select {
+    margin-bottom: 5px;
+}
+
+/* WFS feature tree display rules */
+
+.mat-tree-node:nth-of-type(odd){
+    background-color: #eee;
+}
+.mat-tree-node:nth-of-type(even){
+    background-color: var(--modal-background-colour);
+}
+
+.feature-tree-invisible {
+    display: none;
+}
+
+button.mat-icon-button[mattreenodetoggle] .mat-icon, button.mat-icon-button {
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+    line-height: 20px;
+}
+
+.mat-nested-tree-node {
+    font-size: 12px;
+}
+
+/* Separate label from text */
+dt {
+    margin-right: 10px;
+}
+/* END WFS feature tree display rules */
+
+/* START NVCL core image display */
+.loading-iframe {
+	background:url(../../extension/images/loader.gif) center center no-repeat;
+}
+
+.loading-iframe iframe {
+    overflow:auto;
+    width:100%;
+    height:92%;
+}
+
+.loading-iframe > ng-select {
+    float:right;
+    width:300px;
+    margin: 3px;
+}
+
+/* Make space for the second set of tabs */
+#nvcl-dataset .panel-heading {
+    margin-top: 30px;
+}
+
+div.modal-panel-size button {
+    margin: 3px;
+}
+
+div.modal-panel-size .btn {
+    font-size: 14px;
+}
+/* END NVCL core image display */
+
+/* NVCL Scalar table */
+.col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8,
+.col-lg-9, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7,
+.col-md-8, .col-md-9, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6,
+.col-sm-7, .col-sm-8, .col-sm-9, .col-xs-1, .col-xs-10, .col-xs-11, .col-xs-12, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5,
+.col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9 {
+    margin-bottom: 5px;
+}
+
+/* NVCL Analytic download email input box */
+input[name="email"] {
+    width: 97%
+}
+
+/* NVCL definition link */
+.fake-link {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* NVCL definition */
+.definition {
+    font-style: italic;
+}
+
+/* NVCL job buttons */
+.lightgray-bg {
+	background: #e4e4e4;
+}
+
+/* Area used by "add to clipboard" button in the querier panel */
+.clipboard-area {
+    width: 100%;
+    margin-top: 0px !important;
+}

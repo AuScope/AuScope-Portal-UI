@@ -1,0 +1,39 @@
+								<div>
+							        <app-ol-preview-map></app-ol-preview-map>
+								</div>
+								<div *ngIf="layer.name != undefined">
+								    <h4><span class="text-primary">Abstract</span></h4>
+								    <p>{{layer.name}}</p>
+								</div>
+								<div *ngIf="layer.description != undefined">
+								    <h4><span class="text-primary">Summary</span></h4>
+								    <p>{{layer.description}}</p>
+								</div>
+								<div *ngIf="layer.iconUrl != undefined">
+								    <h4><span class="text-primary">Icon</span></h4>
+								    <img src="{{layer.iconUrl}}" width="20" height="20">
+								</div>
+								<div *ngIf="cswRecords.length > 0">
+								    <h4><span class="text-primary">Details</span></h4>
+								    <div class="panel">
+									    <div class="panel-body" style="padding-left: 0px;padding-right: 0px;">
+										    <div class="panel-group" id="accordion">
+										       <div *ngFor="let cswRecord of cswRecords.slice(0,10)" class="panel panel-bordered">
+												   <div class="panel-heading">
+													    <h4 class="panel-title">
+														    <a class="accordion-link" data-parent="#accordion" (click)="cswRecord.expanded = !cswRecord.expanded" (mouseenter)="highlightOnPreviewMap(layer.name, cswRecord.adminArea)" (mouseleave)="lowlightOnPreviewMap(layer.name, cswRecord.adminArea)">
+															<i *ngIf='isEndpointFailing(layer.nagiosFailingHosts, cswRecord)' class="fa fa-warning text-warning"> </i>{{cswRecord.adminArea !='' && cswRecord.adminArea!=null ? cswRecord.adminArea : 'More Information'}}
+														</a>
+													    </h4>
+												   </div>
+												   <div class="panel-body panel-collapse collapse" [ngClass]="{'in': cswRecord.expanded}">
+													    <div *ngIf="cswRecord.expanded" class="panel-body">
+													    	<p *ngIf='isEndpointFailing(layer.nagiosFailingHosts, cswRecord)' class='text-danger small'><i class="fa fa-warning text-warning"> </i>This service is currently experiencing some problem and may not work as expected</p>
+														    <info-sub-panel [cswRecord]=cswRecord [layer]=layer [expanded]=cswRecord.expanded ></info-sub-panel>
+													    </div>
+												    </div>
+											    </div>
+										    </div>
+									    </div>
+								    </div>
+							   </div>

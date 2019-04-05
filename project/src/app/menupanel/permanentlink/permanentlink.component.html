@@ -1,0 +1,17 @@
+<a class="popup" (click)="showPermanentLink=!showPermanentLink;generatePermanentLink()"><i class="ti-link"></i><span>Permanent Link</span>
+	<div class="popuptext" [ngClass]="{'show':showPermanentLink}"  style="z-index: 10;">
+		<div class="form-group">
+			<div class="col-xs-2">
+				<button for="permanentlink-text-copy" class="btn btn-grey" ngxClipboard [cbContent]="permanentlink" type="button">
+					<i class="glyphicon glyphicon-duplicate"></i>
+				</button>
+			</div>
+			<div class="col-xs-10" appStopPropagation>
+				<input type="text" readonly class="form-control" id="permanentlink-text-copy" [(ngModel)]=permanentlink>
+			</div>
+		</div>
+        <div class="form-group">
+			<div class="col-xs-12" *ngIf="shorteningMode" class="small text-warning">URL shortening in progress ...</div>
+		</div>
+	</div>
+</a>

@@ -1,0 +1,936 @@
+
+@import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
+
+[hidden] { display: none !important;}
+
+/* START global variables  */
+:root {
+    --navbar-height: 52px;
+    --sidebar-width: 335px;
+    --panel-width: calc(var(--sidebar-width) - 25px);
+    --background-colour: #222;
+    --text-highlight-colour: #eee;
+    --text-colour: #aaa;
+    --border-colour: #eaeaea;
+    --blue-hover-colour: #3280f3;
+}
+/* END global variables */
+
+/* START general rules for index.html */
+
+html, body { height: 100%; }
+body {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    text-align: left;
+    background-color: #fff;
+    list-style: none;
+    overflow: hidden;
+}
+
+body, div, p, span, td, h1, dt, dd {
+    font-family: "Open Sans", sans-serif !important;
+}
+
+i {
+    margin-left: 3px;
+}
+
+ul > li {
+    margin: 5px 0px 5px 0px;
+    font-size: 12px;
+}
+
+li { list-style-type: none; }
+
+a, a:link, a:active, a:visited, a:hover { text-decoration: none }
+button, a, a:link, a:visited { color: var(--text-colour);  }
+button:hover, button:active, a:active, a:hover {color: var(--text-highlight-colour); }
+
+
+label {
+    font-weight: 400;
+}
+
+.width-100pc {
+    width: 100% !important;
+}
+
+.height-100pc {
+    height: 100% !important;
+}
+
+.small, small {
+    font-size: 11px !important;
+}
+
+/* END general rules for index.html */
+
+
+/* START general colours */
+
+.highlight {
+    color: var(--text-highlight-colour);
+}
+
+.text-primary {
+    color: #6ca5e4 !important;
+}
+
+.text-warning {
+	color: #e8c232!important;
+}
+
+.text-danger {
+	color: #e89f32!important;
+}
+
+.alert-danger {
+    color: #CC6868;
+    background-color: #F6E7E7;
+    border-color: #CC6868;
+}
+
+.alert-warning {
+    color: #7B780B;
+    background-color: #F2F0B8;
+    border-color: #DBD404;
+}
+
+.light-blue {
+	color: #7a7ae6;
+}
+
+.red {
+	 color: #ec5661;
+}
+
+.white {
+	 color: white;
+}
+
+/* END general colours */
+
+
+
+/* START navbar rules */
+
+.navbar {
+    min-height: var(--navbar-height);
+    background-color: var(--background-colour);
+    margin-bottom: 20px;
+    width: 100%;
+    position: fixed;
+    z-index: 12;
+}
+
+.navbar .navbar-brand {
+    color: #eee;
+    padding: 10px;
+}
+
+.navbar-brand > img {
+    display: inline;
+}
+
+.navbar-header {
+	height: var(--navbar-height);
+    overflow-y: hidden;
+}
+
+.navbar .navbar-notify {
+    min-width: 50px;
+    font-size: 20px;
+    padding-right: 10px;
+}
+
+.navbar .navbar-notify i {
+    line-height: 20px;
+    margin-right: 50px;
+    position: relative;
+    top: 8px;
+}
+
+.navbar-notify {
+    display: inline !important;
+}
+
+.nav > li >a:hover, .nav > li >a:focus {
+    background-color: var(--background-colour);
+    text-decoration: none;
+}
+
+li.dropdown.show > a.dropdown-toggle > i {
+     color: var(--text-highlight-colour);
+}
+
+.navbar-nav {
+	margin-bottom: 10px;
+}
+
+/* position the twitter feed dropdown */
+.navbar-nav > li >.dropdown-menu {
+    right: 20px;
+    left: auto;
+    top: calc(var(--navbar-height) + 8px);
+    min-width: 310px;
+}
+
+/* Organisation logo */
+#org-logo {
+    background-color: transparent;
+    width: 33px;
+    height: 33px;
+    border: none;
+}
+
+/* Sidebar menu toggle button */
+.icon-bar {
+    background-color: var(--text-highlight-colour);
+}
+
+.nav-map-btn {
+    font-size: 24px;
+    position: relative!important;
+    top: -4px;
+    left: -4px;
+}
+
+button.nav.navbar-toggle {
+    margin-bottom: 0px;
+}
+
+/* END navbar rules */
+
+
+
+/* START sidebar rules */
+
+.sidebar-heading {
+    color: #496480!important;
+    font-weight: 700;
+    margin-left: 18px;
+    font-style: oblique 20deg;
+    font-size: 12px;
+}
+
+.sidebar {
+    border-radius: 0;
+    position: fixed;
+    z-index: 11;
+    top: var(--navbar-height);
+    left: var(--sidebar-width);
+    width: var(--sidebar-width);
+    margin-left: calc(-1.0 * var(--sidebar-width));
+    border: none;
+    overflow-y: auto;
+    background-color: var(--background-colour);
+    bottom: 0;
+    overflow-x: hidden !important;
+    padding-bottom: 40px;
+    transition: all .2s ease-in-out;
+}
+
+.sidebar > li,
+.sidebar > h5 > label {
+    color: #fff;
+    font-size: 12px;
+    line-height: 20px;
+    margin-left: 4px;
+}
+
+i + span, .sidebar > h5 > label {
+    font-size: 14px;
+    color: var(--text-colour);
+    margin-left: 4px;
+}
+
+.sidebar h5 > a {
+    margin-left: 4px;
+}
+
+/* "permanent link" & "polgon filter" highlight */
+a:hover > i + span {
+    color: var(--text-highlight-colour);
+}
+
+/* "about" & "contact us" highlight */
+.sidebar > h5 > a > span:hover {
+    color: var(--text-highlight-colour);
+}
+
+/* menu highlight */
+.sidebar > h5 > label:hover,
+.menuBtn:checked + h5 > label {
+    color: var(--text-highlight-colour);
+}
+
+/* spacing between menu links */
+h5 + li {
+    margin-bottom: 5px;
+}
+
+/* top level menu control in sidebar */
+
+.menuBtn + h5 > ul {
+    /*opacity: 0.01; max-height: 0px; transition: opacity 1s, max-height 1s;*/
+    display: none;
+}
+
+.menuBtn:checked + h5 > ul {
+    /*opacity: 1; max-height: 999px; transition: opacity 1s, max-height 1s;*/
+    display: block;
+}
+
+.menuBtn:checked + h5 > label > i.fa.fa-arrow-circle-down {
+    display: inline;
+}
+
+.menuBtn,
+.menuBtn + h5 > label > i.fa.fa-arrow-circle-down {
+    display: none;
+}
+
+/* The bell icon in the alert panels used when adding various layers */
+.alert .ti-bell {
+    font-size: 30px;
+    margin-right: 10px;
+    top: -7px;
+    position: relative;
+}
+
+/* END sidebar rules */
+
+
+
+/* START map area rules */
+
+.map-area {
+    overflow: hidden;
+    margin-left: var(--sidebar-width);
+    padding: 25px;
+    position: relative;
+    height: calc(100% - var(--navbar-height));
+    top: var(--navbar-height);
+}
+
+.map-area-olmap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.map-area-controls {
+    position: relative;
+    z-index: 10;
+}
+
+.ol-scale-line, .ol-control button {
+    background-color: #7aa5c5 !important;
+}
+
+/* Map buttons */
+.map-area-controls button {
+    color: white;
+    background-color: #7aa5c5;
+    box-shadow: none !important;
+}
+
+.map-area-controls button:hover, .map-area-controls button:focus {
+    color: white;
+    background-color: #6c82b3;
+}
+
+/* END map area rules */
+
+.input-group {
+    padding-right: 8px;
+}
+
+.nav-tabs {
+    border-bottom-color: var(--text-highlight-colour);
+}
+
+.nav-tabs > li > a {
+    line-height: 0.428571;
+}
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active >a:focus,
+.nav-tabs> li.active > a:hover {
+    color: var(--text-highlight-colour);
+    cursor: default;
+    border: 1px solid var(--border-colour);
+    background-color: var(--background-colour);
+    border-bottom-color: var(--background-colour);
+}
+
+.nav-tabs > li > a:hover, .nav-tabs > li > a:focus {
+    color: var(--text-colour);
+    background-color: var(--background-colour);
+    border-color: var(--background-colour);
+    border-bottom-color: var(--text-highlight-colour);
+}
+
+.nav-tabs > li > a:hover span {
+    color: var(--text-colour);
+}
+
+.nav-tabs > li.active > a span {
+    color: var(--text-highlight-colour);
+}
+
+.panel.panel-info {
+    box-shadow: 0 0 0 2px #ccc;
+}
+
+.layer-panel {
+    left: -100px;
+    width: var(--panel-width);
+}
+
+.panel {
+    position: relative;
+    margin-bottom: 12px;
+    border-radius: 0;
+    border-color: var(--border-colour);
+    box-shadow: none;
+    border: none;
+    color: #fff;
+    background-color: var(--background-colour);
+}
+
+.panel-title {
+    font-size: 12px;
+}
+
+.panel-info > .panel-heading {
+    color: #fff;
+    background-color: var(--background-colour);
+    border-color: var(--border-colour);
+}
+
+.panel.panel-with-tabs .panel-heading {
+    border-bottom: none;
+}
+
+.panel .accordion-link {
+    margin: -6px -12px;
+    padding: 6px 12px;
+    text-decoration: none;
+    display: block;
+}
+
+.panel.panel-bordered {
+    border: 1px solid var(--border-colour);
+}
+
+.panel-sub .panel .panel-heading {
+	height:43px;
+}
+
+.panel.panel-bordered a:hover {
+    color: var(--blue-hover-colour);
+}
+
+.infopanel-legend {
+	max-width: 260px;
+}
+
+.sidebar-panel-menu-show {
+	list-style-type: none;
+	margin: 0;
+	padding: 5px 0;
+	margin-left: 25px;
+	font-size: 12px;
+}
+
+.form-control {
+    margin: 0 1.0em 0 0.5em;
+    width: 100%;
+}
+
+.form-group > label {
+    margin-left: 0.5em;
+}
+
+.btn-sm {
+    margin: 0 0 0.5em 1.5em;
+}
+
+.btn-xs {
+    margin: 0 0 0.5em 0.5em;
+}
+
+.btn-sm.pull-right {
+    margin: 0 1.5em 0.5em 0;
+}
+
+.btn-xs.pull-right {
+    margin: 0 0.5em 0.5em 0;
+}
+
+.tab-content {
+    padding: 15px;
+}
+
+div.alert.alert-danger p > a:hover {
+	color: var(--blue-hover-colour);
+}
+
+div.alert.alert-danger p > a {
+	color: #e80b0b;
+}
+
+/* HACK to bring scalar legend dialog to the top (@angular/material)*/
+.cdk-overlay-container {
+    z-index: 10000 !important;
+}
+
+.hasEvent {
+	pointer-events: auto;
+	cursor: pointer;
+}
+
+.content-break-word {
+	word-wrap: break-word;       /* Internet Explorer 5.5+ */
+	word-break: break-all;
+	white-space: normal;
+}
+
+/* Disclaimer link */
+app-disclaimer-modal-window a:hover, app-disclaimer-modal-window a:hover > i + span {
+    color: var(--blue-hover-colour);
+}
+
+/* 'line-height-1-8' is used for displaying bounding box coords */
+.line-height-1-8 {
+	line-height:1.8
+}
+
+fieldset.show-fieldset-borders {
+	border: 1px solid #c4c4c4;
+    padding: 0 1.4em 1.4em 1.4em;
+    margin: 0 1em 1em 1em;
+}
+
+fieldset legend{
+	border-bottom:	0px;
+	color: #fff;
+	width: 70%;
+	padding-left:10px;
+}
+
+fieldset.show-fieldset-borders-whitebg {
+	border: 1px solid #c4c4c4;
+    padding: 0 1.4em 1.4em 1.4em;
+}
+
+fieldset.show-fieldset-borders-whitebg legend{
+	border-bottom:	0px;
+	color: #000000;
+	width: 20%;
+	padding-left:10px;
+}
+
+
+/**
+ * Start of animation for working in progress
+ */
+@keyframes blink {
+    /**
+     * At the start of the animation the dot
+     * has an opacity of .2
+     */
+    0% {
+      opacity: .2;
+    }
+    /**
+     * At 20% the dot is fully visible and
+     * then fades out slowly
+     */
+    20% {
+      opacity: 1;
+    }
+    /**
+     * Until it reaches an opacity of .2 and
+     * the animation can start again
+     */
+    100% {
+      opacity: .2;
+    }
+}
+
+.wip span {
+    /**
+     * Use the blink animation, which is defined above
+     */
+    animation-name: blink;
+    /**
+     * The animation should take 1.4 seconds
+     */
+    animation-duration: 1.4s;
+    /**
+     * It will repeat itself forever
+     */
+    animation-iteration-count: infinite;
+    /**
+     * This makes sure that the starting style (opacity: .2)
+     * of the animation is applied before the animation starts.
+     * Otherwise we would see a short flash or would have
+     * to set the default styling of the dots to the same
+     * as the animation. Same applies for the ending styles.
+     */
+    animation-fill-mode: both;
+
+    margin-right: 5px;
+}
+
+.wip span:nth-child(2) {
+    /**
+     * Starts the animation of the third dot
+     * with a delay of .2s, otherwise all dots
+     * would animate at the same time
+     */
+    animation-delay: .2s;
+}
+
+.wip span:nth-child(3) {
+    /**
+     * Starts the animation of the third dot
+     * with a delay of .4s, otherwise all dots
+     * would animate at the same time
+     */
+    animation-delay: .4s;
+}
+
+/**
+ * End of animation for working in progress
+ */
+
+
+/*
+ * width < 768px (small screen)
+*/
+@media (max-width: 768px) {
+	.layer-panel {
+		left: -60px;
+		width: calc(100% + 50px);
+	}
+
+	.layer-panel > .panel-heading li > a {
+		height: 30px;
+	}
+
+    .panel-body .form-group > label + select {
+        margin-left: 0px;
+    }
+
+	.desktop-only {
+		display: none!important
+	}
+
+	.mobile-only {
+		display:block;
+	}
+
+    .map-area {
+        margin-left: 0;
+    }
+
+    .sidebar {
+        top: calc(2.0 * var(--navbar-height));
+    }
+
+    :root {
+        --sidebar-width: 100vw;
+    }
+
+    button.nav.navbar-toggle .nav-index-btn {
+        opacity: 0;
+        height: 0;
+        transition: opacity 0.8s, height 0.8s;
+    }
+
+    #menu-option-dropdown {
+        transform: translate3d(114px,34px,0px)!important;
+    }
+
+    button.nav.navbar-toggle.collapsed .nav-index-btn {
+        opacity: 1;
+        transition: opacity 0.8s;
+    }
+
+    button.nav.navbar-toggle.collapsed .nav-map-btn {
+        opacity: 1;
+        transition: opacity 0.8s;
+    }
+
+    button.nav.navbar-toggle.collapsed .nav-map-btn {
+        opacity: 0;
+        height: 0;
+        transition: opacity 0.8s, height 0.8s;
+    }
+
+    /* Notifications dropdown */
+    .navbar-nav > li >.dropdown-menu {
+        max-width: 90vw;
+        left: 20px;
+        right: auto;
+    }
+
+    /* In the sidebar, under info tab, openlayers map */
+    #previewMapElement {
+        height: 270px!important;
+        width: 270px!important;
+    }
+
+}
+
+/*
+ * width > 768px (larger screen)
+ */
+@media (min-width: 768px) {
+
+	.mobile-only {
+		display: none!important
+	}
+
+	.desktop-only, .sidebar {
+		display: block;
+	}
+}
+
+@media (min-width: 1100px) {
+    .modal-lg {
+        width: 1100px;
+        height: 900px; /* control height here */
+    }
+}
+
+@media (min-width: 900px) and (max-width: 1100px) {
+    .modal-lg {
+        width: 900px;
+        height: 900px; /* control height here */
+    }
+}
+
+@media (min-width: 750px) and (max-width: 900px) {
+    .modal-lg {
+        width: 760px;
+        height: 900px; /* control height here */
+    }
+}
+
+/* Add animation (fade in the popup) */
+@-webkit-keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity:1 ;}
+}
+
+/*
+ * Start of 'slimscroll' scrollbar customisation
+ */
+
+.slimscroll::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 6px;
+	background-color: #222;
+}
+
+.slimscroll::-webkit-scrollbar
+{
+	width: 8px;
+	background-color: #6c6c6c;
+}
+
+.slimscroll::-webkit-scrollbar-thumb
+{
+	border-radius: 6px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: #707070;
+}
+
+/*
+ * End of 'slimscroll' scrollbar customisation
+ */
+
+
+/** Start of range slider css used in capdf filters */
+.noUi-horizontal {
+    height: 8px! important;
+}
+
+.noUi-horizontal .noUi-handle {
+    width: 17px !important;
+    height: 14px !important;
+    top: -4px !important;
+}
+
+.noUi-handle:after, .noUi-handle:before {
+    content: unset !important;
+}
+/** End of range slider css */
+
+/*
+ * Start of OpenLayers map settings
+ */
+
+.ol-mouse-position {
+	position: unset !important;
+}
+
+.ol-zoom {
+	bottom: .5em;
+	right: .5em;
+	top: unset !important;
+	left: unset !important;
+}
+
+/*
+ * End of OpenLayers map settings
+ */
+
+
+/* START  modal dialog rules */
+.modal-dialog .panel, .modal-dialog .panel-body {
+    background-color: #fff !important;
+    color: #000 !important;
+}
+
+.modal-dialog .nav-tabs > li.active > a span {
+    color: #000;
+}
+
+.modal-dialog .nav-tabs i.fa {
+    font-size: 16px;
+}
+
+.modal-dialog .nav-tabs > li {
+    margin-top: 0px;
+}
+
+.modal-dialog .nav-tabs > li.active > a {
+    border-bottom-color: #fff;
+}
+
+.modal-dialog .nav-tabs > li > a:hover {
+    background-color: transparent;
+    border-color: #fff;
+    color: var(--text-colour);
+}
+/* END modal dialog rules */
+
+
+/*
+ * START pace spinner settings
+ * Copied from pace website  https://github.hubspot.com/pace/docs/welcome/
+ */
+.pace {
+  -webkit-pointer-events: none;
+  pointer-events: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+.pace-inactive {
+  display: none;
+}
+
+.pace .pace-progress {
+  background: #29d;
+  position: fixed;
+  z-index: 2000;
+  top: 0;
+  right: 100%;
+  width: 100%;
+  height: 2px;
+}
+
+.pace .pace-progress-inner {
+  display: block;
+  position: absolute;
+  right: 0px;
+  width: 100px;
+  height: 100%;
+  box-shadow: 0 0 10px #29d, 0 0 5px #29d;
+  opacity: 1.0;
+  -webkit-transform: rotate(3deg) translate(0px, -4px);
+  -moz-transform: rotate(3deg) translate(0px, -4px);
+  -ms-transform: rotate(3deg) translate(0px, -4px);
+  -o-transform: rotate(3deg) translate(0px, -4px);
+  transform: rotate(3deg) translate(0px, -4px);
+}
+
+.pace .pace-activity {
+  display: block;
+  position: fixed;
+  z-index: 2000;
+  top: 15px;
+  right: 15px;
+  width: 14px;
+  height: 14px;
+  border: solid 2px transparent;
+  border-top-color: #29d;
+  border-left-color: #29d;
+  border-radius: 10px;
+  -webkit-animation: pace-spinner 400ms linear infinite;
+  -moz-animation: pace-spinner 400ms linear infinite;
+  -ms-animation: pace-spinner 400ms linear infinite;
+  -o-animation: pace-spinner 400ms linear infinite;
+  animation: pace-spinner 400ms linear infinite;
+}
+
+@-webkit-keyframes pace-spinner {
+  0% { -webkit-transform: rotate(0deg); transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); transform: rotate(360deg); }
+}
+@-moz-keyframes pace-spinner {
+  0% { -moz-transform: rotate(0deg); transform: rotate(0deg); }
+  100% { -moz-transform: rotate(360deg); transform: rotate(360deg); }
+}
+@-o-keyframes pace-spinner {
+  0% { -o-transform: rotate(0deg); transform: rotate(0deg); }
+  100% { -o-transform: rotate(360deg); transform: rotate(360deg); }
+}
+@-ms-keyframes pace-spinner {
+  0% { -ms-transform: rotate(0deg); transform: rotate(0deg); }
+  100% { -ms-transform: rotate(360deg); transform: rotate(360deg); }
+}
+@keyframes pace-spinner {
+  0% { transform: rotate(0deg); transform: rotate(0deg); }
+  100% { transform: rotate(360deg); transform: rotate(360deg); }
+}
+/* END pace spinner settings */
+
+/* START Rickshaw settings that work from here */
+.rickshaw_smoother_tick_mark {
+    display:inline-block;
+    width:1px;
+    background-color: #808080;
+    height:4px;
+    position:absolute;
+    top:-4px;
+}
+
+.rickshaw_smoother_tick_num {
+    display:inline-block;
+    width:5px;
+    height:5px;
+    position:absolute;
+    top:-20px;
+    font-size: xx-small;
+}
+/* END Rickshaw settings that work from here */

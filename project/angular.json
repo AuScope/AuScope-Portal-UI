@@ -1,0 +1,197 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "project": {
+      "root": "",
+      "sourceRoot": "src",
+      "projectType": "application",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "../ng",
+            "index": "src/index.htm",
+            "main": "src/main.ts",
+            "tsConfig": "src/tsconfig.app.json",
+            "polyfills": "src/polyfills.ts",
+            "assets": [
+              "src/template",
+              "src/extension",
+              "src/favicon-16x16.png",
+              "src/favicon-32x32.png"
+            ],
+            "styles": [
+              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+              "src/styles.css",
+              "node_modules/rickshaw/rickshaw.min.css",
+              "src/extension/css/extensions.css",
+              "node_modules/nouislider/distribute/nouislider.min.css",
+              "src/extension/css/d3.css",
+              "src/extension/css/ol.css",
+              "node_modules/@ng-select/ng-select/themes/default.theme.css"
+            ],
+            "scripts": [
+              "node_modules/d3/d3.min.js",
+              "node_modules/rickshaw/rickshaw.min.js",
+              "src/extension/js/extensions.js",
+              "src/extension/js/Rickshaw.Graph.RangeSlider.MultiPreview.min.js",
+              "src/extension/js/Rickshaw.Graph.SmootherPlus.min.js",
+              "node_modules/lzma/src/lzma_worker.js",
+              "src/extension/js/box.js",
+              "src/extension/js/d3.legend.js",
+              "node_modules/pace-js/pace.min.js",
+              "src/extension/js/no-ie-support.js"
+            ]
+          },
+          "configurations": {
+            "audev": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.dev.ts"
+                }
+              ]
+            },
+            "production": {
+              "optimization": false,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ]
+            },
+            "au2": {
+              "optimization": false,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.au2.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "project:build"
+          },
+          "configurations": {
+            "audev": {
+              "browserTarget": "project:build:audev"
+            },
+            "production": {
+              "browserTarget": "project:build:production"
+            },
+            "au2": {
+              "browserTarget": "project:build:au2"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "project:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "src/test.ts",
+            "karmaConfig": "./karma.conf.js",
+            "polyfills": "src/polyfills.ts",
+            "tsConfig": "src/tsconfig.spec.json",
+            "scripts": [
+              "node_modules/d3/d3.min.js",
+              "node_modules/rickshaw/rickshaw.min.js",
+              "src/extension/js/extensions.js",
+              "src/extension/js/Rickshaw.Graph.RangeSlider.MultiPreview.min.js",
+              "src/extension/js/Rickshaw.Graph.SmootherPlus.min.js",
+              "node_modules/lzma/src/lzma_worker-min.js",
+              "src/extension/js/box.js",
+              "src/extension/js/d3.legend.js",
+              "node_modules/pace-js/pace.min.js"
+            ],
+            "styles": [
+              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+              "src/styles.css",
+              "node_modules/rickshaw/rickshaw.min.css",
+              "src/extension/css/extensions.css",
+              "node_modules/nouislider/distribute/nouislider.min.css",
+              "src/extension/css/d3.css",
+              "src/extension/css/ol.css"
+            ],
+            "assets": [
+              "src/template",
+              "src/extension",
+              "src/favicon-16x16.png",
+              "src/favicon-32x32.png"
+            ]
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "src/tsconfig.app.json",
+              "src/tsconfig.spec.json"
+            ],
+            "exclude": []
+          }
+        }
+      }
+    },
+    "project-e2e": {
+      "root": "",
+      "sourceRoot": "",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "./protractor.conf.js",
+            "devServerTarget": "project:serve"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "e2e/tsconfig.e2e.json"
+            ],
+            "exclude": []
+          }
+        }
+      }
+    }
+  },
+  "defaultProject": "project",
+  "schematics": {
+    "@schematics/angular:component": {
+      "prefix": "app",
+      "styleext": "css"
+    },
+    "@schematics/angular:directive": {
+      "prefix": "app"
+    }
+  }
+}

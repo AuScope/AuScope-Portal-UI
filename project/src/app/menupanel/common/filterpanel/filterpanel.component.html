@@ -1,0 +1,124 @@
+<div class="filter-form">
+
+    	<div *ngIf="layer.filterCollection">
+	        <div  *ngFor="let mandatoryFilter of layer.filterCollection.mandatoryFilters">
+	            <div *ngIf="mandatoryFilter.type == 'MANDATORY.CHECKBOX'">
+	                <div class="form-group  form-group-sm">
+	                	<div>
+							<input class="input-sm" id="{{ 'filter-MANDATORY.CHECKBOX-' + mandatoryFilter.label }}" type="checkbox" [(ngModel)]="mandatoryFilter.value"/>
+							<label for="{{ 'filter-MANDATORY.CHECKBOX-' + mandatoryFilter.label }}">
+								{{mandatoryFilter.label}}
+							</label>
+						</div>
+
+	                </div>
+	            </div>
+	            <div *ngIf="mandatoryFilter.type == 'MANDATORY.DROPDOWNSELECTLIST'">
+	                <div class="form-group  form-group-sm">
+	                    <label>{{mandatoryFilter.label}}</label>
+						<select class="form-control input-sm" [(ngModel)]="mandatoryFilter.value">
+							<option value="" selected="selected">-- choose a {{mandatoryFilter.label}} --</option>
+							<option *ngFor="let option of mandatoryFilter.options" [ngValue]="getValue(option)">{{getKey(option)}}</option>
+						</select>
+	                </div>
+	            </div>
+	            <div *ngIf="mandatoryFilter.type == 'MANDATORY.TEXTBOX'">
+	                <div class="form-group  form-group-sm">
+	                    <label>{{mandatoryFilter.label}}</label>
+						<input type="text" class="form-control input-sm"  [(ngModel)]="mandatoryFilter.value">
+	                </div>
+	            </div>
+	        </div>
+
+        </div>
+
+        <div *ngIf="!layer.filterCollection">
+	        <div class="alert alert-warning fade in">
+
+                <i class="ti-bell pull-left"></i>
+                <p>There are no filters associated with this layer</p>
+            </div>
+
+    	</div>
+
+    	<fieldset *ngIf="layer.filterCollection && layer.filterCollection.optionalFilters" class="show-fieldset-borders">
+        	<legend><h5>Optional Filters</h5></legend>
+        	<div class="form-group  form-group-sm">
+	            <label><i class="fa fa-refresh hasEvent red" (click)="refreshFilter()"></i> Select Filter:</label>
+                <select class="form-control input-sm" [ngModel]="selectedFilter" (ngModelChange)="addFilter($event)">
+					<option [ngValue]="filt" *ngFor="let filt of layer.filterCollection.optionalFilters">{{filt.label}}</option>
+				</select>
+		    </div>
+		    <hr class="nav-divider">
+		    <div *ngFor="let optionalFilter of optionalFilters">
+	            <div *ngIf="optionalFilter.type=='OPTIONAL.TEXT'">
+	                <div class="form-group  form-group-sm">
+					    <label>{{optionalFilter.label}}:</label>
+					    <input type="text" class="form-control input-sm"  [(ngModel)]="optionalFilter.value">
+					</div>
+	            </div>
+	            <div *ngIf="optionalFilter.type=='OPTIONAL.DATE'">
+	                <div class="form-group">
+						<label class="control-label">{{optionalFilter.label}}:</label>
+						<input type="date" class="form-control input-sm" [(ngModel)]="optionalFilter.value"/>
+					</div>
+	            </div>
+	            <div *ngIf="optionalFilter.type=='OPTIONAL.DROPDOWNSELECTLIST'">
+                    <div class="form-group  form-group-sm">
+	                    <label>{{optionalFilter.label}}</label>
+						<select class="form-control input-sm" [(ngModel)]="optionalFilter.value">
+							<option value="" selected="selected">-- choose a {{optionalFilter.label}} --</option>
+							<option *ngFor="let option of optionalFilter.options">{{getKey(option)}}</option>
+						</select>
+	                </div>
+	            </div>
+	            <div *ngIf="optionalFilter.type=='OPTIONAL.DROPDOWNREMOTE'">
+	                <div class="form-group  form-group-sm">
+	                    <label>{{optionalFilter.label}}</label>
+						<select class="form-control input-sm" [(ngModel)]="optionalFilter.value">
+							<option value="" selected="selected">-- choose a {{optionalFilter.label}} --</option>
+							<option *ngFor="let option of optionalFilter.options" [ngValue]="option.value">{{option.key}}</option>
+						</select>
+	                </div>
+	            </div>
+	            <div *ngIf="optionalFilter.type=='OPTIONAL.PROVIDER'">
+	                <div class="form-group">
+						<div *ngFor="let provider of providers;let idx = index">
+							<input class="input-sm" id="{{ 'filter-OPTIONAL.PROVIDER-' + idx + '-' + layer.id }}" type="checkbox" [(ngModel)]="optionalFilter.value[provider.value]"/>
+							<label for="{{ 'filter-OPTIONAL.PROVIDER-' + idx + '-' + layer.id }}">
+								{{provider.label}}
+							</label>
+						</div>
+					</div>
+				</div>
+
+	            <div  class="desktop-only" *ngIf="optionalFilter.type=='OPTIONAL.POLYGONBBOX'">
+	                <div class="form-group  form-group-sm">
+						<div class="checkbox" >
+								<input class="input-sm" id="{{ 'filter-OPTIONAL.POLYGONBBOX-' + idx + '-' + layer.id }}" type="checkbox" [(ngModel)]="bApplyClipboardBBox"/>
+								<label for="{{ 'filter-OPTIONAL.POLYGONBBOX-' + idx + '-' + layer.id }}">Apply clipboard BBox</label>
+						</div>
+					</div>
+	            </div>
+	            <div  class="mobile-only" *ngIf="optionalFilter.type=='OPTIONAL.POLYGONBBOX'">
+	                <div class="alert alert-warning fade in">
+		                <i class="ti-bell pull-left"></i>
+		                <p>This filter is not supported on a small screen and would not return any results.</p>
+		            </div>
+	            </div>
+	        </div>
+	    </fieldset>
+
+	    <div *ngIf="advanceFilterMap[layer.id]" class="hasEvent red" (click)="showAdvanceFilter=!showAdvanceFilter;">{{showAdvanceFilter?'Hide Advanced Filters':'Show Advanced Filters'}}</div>
+
+	    <app-advance-filter *ngIf="showAdvanceFilter" [layer]="layer" (advanceparam)="onAdvanceParamChange($event)"></app-advance-filter>
+
+
+	    <p *ngIf="layer.nagiosFailingHosts" class='small text-danger'><i class="fa fa-warning text-warning"></i> One or more of the services used by this layer are reported to be experiencing issues at the moment. Click on the info panel for more information.</p>
+	    <div class="row">
+	    	<button type="button" class="btn btn-info btn-sm pull-right" (click)="addLayer(layer)"><i class="fa fa-plus-circle" aria-hidden="true"></i> Add Layer</button>
+	    	<button *ngIf="analyticMap[layer.id]" type="button" class="btn btn-warning btn-sm" (click)="processLayerAnalytic(layer)"><i class="fa fa-bar-chart" aria-hidden="true"></i> Analytic</button>
+    	</div>
+
+
+</div>

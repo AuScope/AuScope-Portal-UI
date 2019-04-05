@@ -1,0 +1,199 @@
+<div class="panel-group" id="nvcl-dataset">
+	<!-- BEGIN panel -->
+	<div *ngFor="let nvclDataset of nvclDatasets;let i = index" class="panel panel-default panel-bordered">
+			<div class="panel panel-default panel-with-tabs">
+				<!-- BEGIN panel-heading -->
+				<div class="panel-heading">
+					<ul id="nvcl-panel-tab" class="nav nav-tabs pull-right">
+						<li (click)="nvclDataset.image=true;nvclDataset.scalar=false;nvclDataset.download=false;" [ngClass]="{'show':nvclDataset.image}"><a
+							 href="#{{nvclDataset.datasetName}}-nvcl-panel-tab-image" data-toggle="tab"><i class="fa fa-home"></i> <span class="hidden-xs">Image</span></a></li>
+						<li class="desktop-only" (click)="nvclDataset.image=false;nvclDataset.scalar=true;nvclDataset.download=false;" [ngClass]="{'show':nvclDataset.scalar}"><a
+							 href="#{{nvclDataset.datasetName}}-nvcl-panel-tab-scalar" data-toggle="tab"><i class="fa fa-user"></i> <span class="hidden-xs">Scalar</span></a></li>
+						<li class="desktop-only" (click)="nvclDataset.image=false;nvclDataset.scalar=false;nvclDataset.download=true;" [ngClass]="{'show':nvclDataset.download}"><a
+							 href="#{{nvclDataset.datasetName}}-nvcl-panel-tab-download" data-toggle="tab"><i class="fa fa-user"></i> <span class="hidden-xs">Download</span></a></li>
+					</ul>
+					<h4 class="panel-title">Dataset Name: {{nvclDataset.datasetName}}</h4>
+				</div>
+				<!-- END panel-heading -->
+				<!-- BEGIN tab-content -->
+				<div id="panel-tab-content" class="tab-content">
+					<!-- BEGIN tab-pane -->
+					<div class="tab-pane fade in show" [ngClass]="{'in show':nvclDataset.image}" id="{{nvclDataset.datasetName}}-nvcl-panel-tab-image">
+						<div class="modal-panel-size loading-iframe">
+							<button class="pull-right" mat-stroked-button (click)="openLegend(nvclDataset.datasetId)">Show Legend</button>
+							<ng-select *ngIf="nvclDataset.datasetId" [items] = "datasetScalars[nvclDataset.datasetId]" [multiple]="false" bindLabel="logName" bindValue="logId" placeholder="Select Scalar" (change)="changeScalarSelection(nvclDataset.datasetId)" [(ngModel)]="selectedScalar"></ng-select>
+							<iframe *ngIf="datasetImages[nvclDataset.datasetId]" frameborder="0" [src]="datasetImages[nvclDataset.datasetId] | trustResourceUrl"></iframe>
+						</div>
+					</div>
+					<!-- END tab-pane -->
+					<!-- BEGIN tab-pane -->
+					<div class="tab-pane fade" [ngClass]="{'in show':nvclDataset.scalar}" id="{{nvclDataset.datasetName}}-nvcl-panel-tab-scalar">
+						<div class="modal-panel-size">
+							<div *ngIf="drawGraphMode==false;" style="overflow: auto; width: 100%; height: 100%;">
+								<div>
+									<!-- BEGIN toolbar -->
+									<div class="container-fluid">
+										<div class="row hidden-xs">
+											<div class="col-sm-3">
+												<div *ngIf="jobList[featureId].length > 0" data-toggle="tooltip" title="Job View" (click)="jobView=true;" class="btn btn-default btn-sm"
+												 [ngClass]="{'lightgray-bg':jobView}">
+													<span><i class="ti-flag-alt"></i>Job</span>
+												</div>
+												<div data-toggle="tooltip" title="Scalar View" (click)="jobView=false;" class="btn btn-default btn-sm" [ngClass]="{'lightgray-bg':!jobView}">
+													<span><i class="ti-panel"></i> Scalar</span>
+												</div>
+											</div>
+											<div class="col-sm-4 col-sm-offset-5">
+												<div  *ngIf="!jobView" data-toggle="tooltip" title="Download csv" (click)="downloadCSV(nvclDataset.datasetId)" class="btn btn-default btn-sm">
+													<i class="ti-download"></i>
+												</div>
+												<div data-toggle="tooltip" title="Plot Analytic Graph" (click)="changeDrawGraphMode(true, nvclDataset.datasetId)" class="btn btn-default btn-sm">
+													<i class="ti-bar-chart-alt"></i>
+												</div>
+												<div data-toggle="tooltip" title="Reset Selection" (click)="clearCheckBox(nvclDataset.datasetId)" class="btn btn-default btn-sm">
+													<i class="ti-loop"></i>
+												</div>
+											</div>
+										</div>
+									</div>
+									<!-- END toolbar -->
+
+									<!-- BEGIN jobView==false -->
+									<div *ngIf="jobView==false">
+										<!-- BEGIN container -->
+										<div class="container-fluid">
+											<!-- BEGIN row -->
+											<div class="row" *ngFor="let datasetScalar of datasetScalars[nvclDataset.datasetId]">
+												<div class="col-xs-1 col-xs-offset-1 checkbox">
+													<input type="checkbox" value="10" id="log-checkbox-{{nvclDataset.datasetName}}-{{datasetScalar.logName}}" [(ngModel)]="datasetScalar.value"/>
+													<label for="log-checkbox-{{nvclDataset.datasetName}}-{{datasetScalar.logName}}"></label>
+												</div>
+												<div class="col-xs-8">
+													<div>{{datasetScalar.logName}}</div>
+													<div>LogId: {{datasetScalar.logId}}</div>
+													<div class="definition" *ngIf="datasetScalarDefinition[datasetScalar.logName]">{{datasetScalarDefinition[datasetScalar.logName].definition}}</div>
+												</div>
+												<div class="col-xs-2">
+													<span><div class="fake-link" (click)="getDefinition(datasetScalar.logName)">Definition</div></span>
+												</div>
+											</div>
+											<!-- END row -->
+										</div>
+										<!-- END container -->
+									</div>
+									<!-- END jobView==false -->
+
+                                    <!-- BEGIN jobView==true -->
+									<div *ngIf="jobView==true">
+										<!-- BEGIN container -->
+										<div class="container-fluid">
+											<!-- BEGIN row -->
+											<div class="row" *ngFor="let job of jobList[featureId]">
+												<div class="col-sm-1 checkbox">
+													<input type="checkbox" value="10" id="job-checkbox-{{nvclDataset.datasetName}}-{{job.jobName}}" [(ngModel)]="job.value" />
+													<label for="job-checkbox-{{nvclDataset.datasetName}}-{{job.jobName}}"></label>
+												</div>
+												<div class="col-sm-11">
+													<div>
+														{{job.jobName}}
+													</div>
+													<div>Job ID: {{job.jobId}}</div>
+												</div>
+											</div>
+											<!-- END row -->
+										</div>
+										<!-- END container -->
+									</div>
+									<!-- END jobView==true -->
+								</div>
+							</div>
+
+							<div *ngIf="drawGraphMode==true;" class="modal-panel-size">
+								<div style="overflow: auto; width: 100%; height: 100%;">
+									<div class="hasEvent light-blue" (click)="changeDrawGraphMode(false)" style="position: fixed;z-index: 10;right: 10%;">
+										<i class="fa fa-window-close" aria-hidden="true"></i> close</div>
+									<div id="rickshawChart_outer">
+										<div *ngFor="let selectedLogName of selectedLogNames[nvclDataset.datasetId]; let j = index">
+											<div id="content_{{j}}" [ngClass]="{'loading-iframe': processingGraph}">
+												<form id="left_side_panel_{{j}}">
+													<h1>{{selectedLogName}}</h1>
+													<section>
+														<div id="legend_{{j}}" class="rickshaw_legend"></div>
+													</section>
+													<section>
+														<div id="renderer_form_{{j}}" class="toggler">
+															<input type="radio" name="renderer" id="area_{{j}}" value="area"> <label for="area_{{j}}">area</label> <input
+															 type="radio" name="renderer" id="bar_{{j}}" value="bar" checked> <label for="bar_{{j}}">bar</label> <input
+															 type="radio" name="renderer" id="line_{{j}}" value="line"> <label for="line_{{j}}">line</label> <input type="radio"
+															 name="renderer" id="scatter_{{j}}" value="scatterplot"> <label for="scatter_{{j}}">scatter</label>
+														</div>
+													</section>
+													<section>
+														<div id="offset_form_{{j}}" class="toggler">
+															<label for="stack_{{j}}"> <input type="radio" name="offset" id="stack_{{j}}" value="zero" checked=""><span>stack</span></label>
+															<label for="pct_{{j}}"> <input type="radio" name="offset" id="pct_{{j}}" value="expand"> <span>pct</span></label>
+															<label for="value_{{j}}"> <input type="radio" name="offset" id="value_{{j}}" value="value"> <span>value</span></label>
+														</div>
+														<div id="interpolation_form_{{j}}" style="display: none;">
+															<label for="cardinal_{{j}}"> <input type="radio" name="interpolation" id="cardinal-{{j}}" value="cardinal"
+																 checked=""> <span>cardinal</span>
+															</label> <label for="linear_{{j}}"> <input type="radio" name="interpolation" id="linear_{{j}}" value="linear">
+																<span>linear</span>
+															</label> <label for="step_{{j}}"> <input type="radio" name="interpolation" id="step_{{j}}" value="step-after">
+																<span>step</span>
+															</label>
+														</div>
+													</section>
+													<section>
+														<h6>Smoothing</h6>
+														<div id="smoother_{{j}}"></div>
+													</section>
+												</form>
+												<div id="chartcontainer_{{j}}">
+													<div id="y_axis_{{j}}"></div>
+													<div id="chart_{{j}}"></div>
+													<div id="x_axis_{{j}}"></div>
+												</div>
+												<hr>
+											</div>
+											<hr>
+										</div>
+										<div id="preview_last"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- END tab-pane -->
+					<!-- BEGIN tab-pane -->
+					<div class="tab-pane fade" [ngClass]="{'in show':nvclDataset.download}" id="{{nvclDataset.datasetName}}-nvcl-panel-tab-download">
+						<p>This data is best viewed with the free TSG Base. Available from <a href="https://research.csiro.au/thespectralgeologist/tsg/pricing/purchase-tsg/">here</a></p>
+						<form >
+							<div class="form-group  form-group-sm">
+								<label>EMAIL:</label>
+								<input type="text" class="form-control input-sm" [(ngModel)]="downloadEmail" name="email" ngModel #email="ngModel" required
+								 pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$">
+								<span class="validity" *ngIf="!email.valid && email.touched"></span>
+							</div>
+						</form>
+						<div class="pull-left">
+							<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+								<div class="btn-group">
+									<button type="button" class="btn btn-info btn-xs" (click)="downloadTSG(nvclDataset.datasetId)"><i *ngIf="downloadingTSG"
+										class="fa fa-spinner fa-spin fa-fw"></i>Download TSG Dataset</button>
+								</div>
+								<div class="btn-group">
+									<button type="button" class="btn btn-info btn-xs" (click)="checkStatus()" [disabled]="!downloadEmail"><i *ngIf="checkingTSG"
+										class="fa fa-spinner fa-spin fa-fw"></i>Check status</button>
+								</div>
+							</div>
+							<div [innerHTML]="downloadResponse | trustResourceHtml"></div>
+						</div>
+					</div>
+					<!-- BEGIN tab-pane -->
+				</div>
+				<!-- END tab-content -->
+			</div>
+	</div>
+	<!-- END panel -->
+</div>

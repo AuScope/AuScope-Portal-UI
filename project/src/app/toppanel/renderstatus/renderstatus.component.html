@@ -1,0 +1,27 @@
+<div class="modal-body">
+  <div class="panel panel-default panel-with-tabs">
+      <!-- BEGIN panel-heading -->
+      <div class="panel-heading">
+          <h4 class="panel-title">Status report</h4>
+      </div>
+     	<div class="panel-body">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>URL</th>
+						<th>Status</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let resourceStatus of resourceMap | getKey">
+						<td class="content-break-word">{{resourceStatus.key}}</td>
+						<td>{{resourceStatus.value.status}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-default" (click)="bsModalRef.hide()">Close</button>
+</div>

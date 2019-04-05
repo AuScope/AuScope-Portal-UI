@@ -1,0 +1,79 @@
+#rickshawChart_outer [id^=content_] [id^=chartcontainer_] {
+	width: 74%;
+	display: inline-block;
+}
+
+#rickshawChart_outer [id^=content_] [id^=chartcontainer_] * {
+    font-family:  Tahoma, Arial, Helvetica, sans-serif;
+    font-size: 10pt;
+}
+
+#rickshawChart_outer [id^=content_] [id^=chart_] {
+	display: inline-block;
+}
+
+#rickshawChart_outer [id^=content_] .rickshaw_graph .y_ticks {
+    left: 0;
+}
+
+#rickshawChart_outer [id^=content_] [id^=y_axis_] {
+	position: relative;
+    font-family:  Tahoma, Arial, Helvetica, sans-serif;
+    font-size: 10pt;
+    opacity: 0.7;
+    z-index: 1;
+    height: 300px;
+    width: 100px;
+	display: inline-block;
+	top: 30px;
+}
+
+#rickshawChart_outer [id^=content_] [id^=x_axis_] {
+    position: relative;
+    font-family:  Tahoma, Arial, Helvetica, sans-serif;
+    font-size: 10pt;
+    opacity: 0.7;
+	width:520px;
+}
+
+#rickshawChart_outer [id^=content_] [id^=x_axis_] {
+	position: relative;
+	left: 105px;
+}
+
+#rickshawChart_outer [id^=content_] [id^=left_side_panel_] {
+    width: 25%;
+    padding: 0px 0px 0px 0px;
+	position: relative;
+}
+
+#rickshawChart_outer [id^=content_] [id^=left_side_panel_] * {
+    font-family:  Tahoma, Arial, Helvetica, sans-serif;
+    font-size: 10pt;
+}
+
+
+#rickshawChart_outer [id^=content_] h6 {
+    font-size: 10pt;
+    font-weight: 400;
+}
+
+#rickshawChart_outer [id^=content_] {
+   width: 900px;
+   display: inline-flex;
+}
+
+#rickshawChart_outer [id^=preview_] {
+    position: relative;
+	left: 325px;
+	width:500px
+}
+
+.rickshaw_legend {
+	background: #FFFFFF;
+	color: #000000;
+}
+
+[id^=smoother_] a.ui-slider-handle {
+    margin-left: -1px !important;
+}

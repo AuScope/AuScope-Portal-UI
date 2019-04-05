@@ -1,0 +1,179 @@
+div, span, p, td {
+	font-family: Arial, sans-serif;
+}
+[id^=content_] {
+	width: 1200px;
+}
+[id^=chart_] {
+	display: inline-block;
+}
+[id^=chart_] path {
+	-webkit-transition: opacity 0.2s linear;
+}
+[id^=preview_] {
+	margin-top: 10px;
+}
+[id^=legend_] {
+	display: inline-block;
+	position: relative;
+	left: 8px;
+}
+[id^=legend_container_] {
+	position: absolute;
+	right: 0;
+	bottom: 26px;
+	width: 0;
+}
+[id^=chart_container_] {
+	position: relative;
+	display: inline-block;
+}
+[id^=smoother_] {
+	margin: 20px 0 0 10px;
+	width: 90%;
+}
+.rickshaw_graph .detail {
+	left: -1000;
+}
+
+[id^=chart_] {
+	border: 1px solid #f0f0f0;
+}
+[id*=_side_panel_] {
+	padding: 0 20px 20px 0;
+	width: 240px;
+	display: inline-block;
+	vertical-align: top;
+}
+[id*=_side_panel_] section {
+	color: #505050;
+	font-size: 12px;
+}
+[id*=_side_panel_] section h6 {
+	margin: 0 0 1em 0;
+	font-size: 12px;
+	font-weight: normal;
+}
+[id*=_side_panel_] .ui-slider-horizontal {
+	height: 1px !important;
+	border-color: #e0e0e0;
+	margin-bottom: 10px;
+}
+[id*=_side_panel_] .ui-slider-handle {
+	border-color: #a0a0a0;
+	height: 9px !important;
+	width: 9px !important;
+	top: -5px !important;
+	border-radius: 6px;
+	outline: none;
+	cursor: pointer;
+}
+[id^=legend_] {
+	background-color: white;
+	margin-left: 0;
+	padding: 0;
+	left: 0;
+}
+[id^=legend_] .label {
+	color: #404040;
+}
+[id^=legend_] .action {
+	color: black;
+	opacity: 0.5;
+}
+[id^=legend_] ul {
+	padding: 0;
+}
+h1 {
+	font-family: Franklin Gothic Medium, UnDotum, Helvetica, Arial;
+	font-weight: normal;
+	font-size: 20px;
+}
+section {
+	border: none;
+	border-top: 1px solid #eaeaea;
+	padding: 15px 0;
+}
+label.disabled span {
+	opacity: 0.4;
+}
+[id*=_form_].toggler {
+	display: block;
+	margin: 0;
+}
+[id*=_form_].toggler input[type=radio]:checked {
+	outline: 2px solid steelblue;
+}
+[id*=_form_].toggler input[type=radio] {
+	-moz-appearance: button;
+	background: white;
+	margin: 0 7px;
+	width: 30px;
+	height: 30px;
+	position: absolute;
+}
+[id*=_form_].toggler label {
+	display: inline-block;
+	padding: 0;
+	width: 30px;
+	height: 13px;
+	padding-top: 30px;
+	text-align: center;
+	font-size: 10px;
+	color: #808080;
+	background-repeat: no-repeat;
+	position: relative;
+	margin: 0 7px;
+	cursor: pointer;
+}
+div[id^=interpolation_form_].toggler input[type=radio],
+div[id^=offset_form_].toggler input[type=radio]{
+  right: -6.5px;
+  top: 0.5px;
+  z-index: -1;
+}
+
+label[for^=area_] {
+	background: url(../images/om_stack30.png);
+	background-size: 100% 100%;
+}
+label[for^=line_] {
+	background: url(../images/om_lines30.png);
+	background-size: 100% 100%;
+}
+label[for^=bar_] {
+	background: url(../images/om_bar30.png);
+	background-size: 100% 100%;
+}
+label[for^=scatter_] {
+	background: url(../images/om_scatter30.png);
+	background-size: 100% 100%;
+}
+label[for^=stack_] {
+	background: url(../images/offs_stack30.png);
+	background-size: 100% 100%;
+}
+label[for^=pct_] {
+	background: url(../images/om_percent30.png);
+	background-size: 100% 100%;
+}
+label[for=stream_] {
+	background: url(../images/om_stream30.png);
+	background-size: 100% 100%;
+}
+label[for^=value_] {
+	background: url(../images/offset_value30.png);
+	background-size: 100% 100%;
+}
+label[for^=cardinal_] {
+	background: url(../images/interp_cardinal30.png);
+	background-size: 100% 100%;
+}
+label[for^=linear_] {
+	background: url(../images/interp_linear30.png);
+	background-size: 100% 100%;
+}
+label[for^=step_] {
+	background: url(../images/interp_step30.png);
+	background-size: 100% 100%;
+}

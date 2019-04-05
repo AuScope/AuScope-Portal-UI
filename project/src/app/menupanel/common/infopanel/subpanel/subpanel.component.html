@@ -1,0 +1,15 @@
+<p><b>Contact org: </b>{{cswRecord.contactOrg}}</p>
+<p><b>Description: </b>{{cswRecord.description}}</p>
+<p><b>Name: </b>{{cswRecord.name}}</p>
+<p><b>Info Url: </b><a target="_blank" href="{{cswRecord.recordInfoUrl}}">Link to Geonetwork Record</a></p>
+<div *ngFor="let onlineResource of cswRecord.onlineResources">
+	<p *ngIf="onlineResource.type!='Unsupported'"><a target="_blank" href="{{onlineResource.url}}">{{onlineResource.type}} endpoint url</a>
+		<span class="label label-default">{{onlineResource.type}} </span>
+	</p>
+</div>
+<p *ngIf="wmsUrl!=undefined">
+	<b>WMS Preview: </b><img appImgLoading src="{{wmsUrl}}" height="100" width="100"/>
+</p>
+<p *ngIf="legendUrl!=undefined">
+	<b>Legend: </b><img appImgLoading src="{{legendUrl}}" class="infopanel-legend"/>
+</p>

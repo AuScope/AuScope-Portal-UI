@@ -1,0 +1,11 @@
+<div class="btn-group btn-sm btn-inverse active" role="group" >
+  <div class="btn-group btn-xsm">  
+  <label for="BaseMapLayerSelector">Base Layer :</label>
+  </div>
+  <select id="BaseMapLayerSelector"  [(ngModel)]="selectedLayer" (change)="updateBaseMap(selectedLayer)" class="btn-group btn-xsm btn-inverse" >
+    <option *ngFor="let baseMap of this.baseMapLayers" [value]="baseMap.value">
+      {{baseMap.viewValue}}
+    </option>
+  </select>
+</div>
+

@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Auscope Discovery Portal</title>
+    <base href="./">
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+    <meta content="Auscope Portal" name="description" />
+    <meta content="CSIRO" name="author" />
+
+    <!-- ================== BEGIN BASE CSS STYLE ================== -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/themify-icons/0.1.2/css/themify-icons.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <!-- ================== END BASE CSS STYLE ================== -->
+
+    <!-- ================== BEGIN BASE JS ================== -->
+    <script src="https://use.fontawesome.com/9f193e7fa1.js"></script>
+    <script src="https://apis.google.com/js/client.js"></script>
+    <!-- ================== END BASE JS ================== -->
+
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+</head>
+  <body>
+		<!-- BEGIN navbar -->
+		<div id="header" class="navbar navbar-fixed-top">
+            <!-- BEGIN navbar-header -->
+            <div class="navbar-header">
+                <!-- BEGIN organisation logo -->
+                <span class="navbar-brand">
+                    <img id="org-logo" src="extension/img/auscope_single-colour-1.png">
+                    <span><b>Au</b>Scope Discovery Portal</span>
+                </span>
+                <!-- END organisation logo -->
+
+                <!-- START sidebar toggle -->
+                <button id="sidebar-toggle-btn" class="nav navbar-toggle" data-toggle="collapse" data-target=".sidebar-collapse">
+                    <div class="nav-index-btn">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </div>
+                    <div class="nav-map-btn">
+                        <i class="ti-world"></i>
+                    </div>
+                </button>
+                <!-- END sidebar toggle -->
+            </div>
+            <!-- END navbar-header -->
+
+            <!-- BEGIN notification dropdown -->
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown" app-notification></li>
+            </ul>
+            <!-- END notification dropdown -->
+		</div>
+		<!-- END navbar -->
+
+		<!-- BEGIN sidebar -->
+		<nav id="sidebar" class="sidebar slimscroll sidebar-collapse show" style="overflow: auto;" >
+			<h6 class="sidebar-heading">Menu</h6>
+			<h5><a href="http://www.auscope.org.au/"><i class="ti-home"></i><span>About</span></a></h5>
+			<h5><a href="mailto:cg-admin@csiro.au?Subject=Auscope-portal"><i class="ti-email"></i><span>Contact us</span></a></h5>
+			<li class="hasEvent" appPermanentLink></li>
+			<li class="hasEvent desktop-only" appFilterClipboard></li>
+			<h6 class="sidebar-heading">Layer Selection</h6>
+            <!-- BEGIN All Layers -->
+            <input type="checkbox" class="menuBtn" id="allLayersBtn"/>
+			<h5>
+				<label for="allLayersBtn">
+				    <i class="ti-layers"></i>
+				    All Layers
+                    <i class="fa fa-arrow-circle-down"></i>
+				</label>
+				<ul class="panel-sub" appLayerPanel></ul>
+			</h5>
+            <!-- END All Layers -->
+
+            <!-- BEGIN Custom Layers -->
+            <input type="checkbox" class="menuBtn" id="customLayersBtn"/>
+			<h5>
+				<label for="customLayersBtn">
+				    <i class="ti-pencil-alt"></i>
+				    Custom Layer
+                    <i class="fa fa-arrow-circle-down"></i>
+				</label>
+				<ul class="panel-sub" appCustomPanel></ul>
+			</h5>
+            <!-- END Custom Layers -->
+
+            <!-- BEGIN Catalogue Search -->
+            <input type="checkbox" class="menuBtn" id="catalogueBtn"/>
+			<h5>
+				<label for="catalogueBtn">
+                    <i class="ti-book"></i>
+				    Catalogue Search
+                    <i class="fa fa-arrow-circle-down"></i>
+				</label>
+				<ul class="panel-sub" appCatalogueSearchPanel></ul>
+			</h5>
+            <!-- END Catalogue Search -->
+
+			<li appPortalDetailsPanel></li>
+		</nav>
+		<!-- END sidebar -->
+
+		<!-- BEGIN #map-area -->
+		<div id="map-area" class="map-area">
+			<!-- BEGIN map-area-controlsr -->
+			<div class="map-area-controls">
+
+                <div class="btn-group pull-right desktop-only">
+					<app-olmap-baselayerselector class="pull-right" style="margin-bottom:10px"></app-olmap-baselayerselector>
+					<br>
+					<app-ol-map-zoom class="pull-right" style="margin-bottom:10px"></app-ol-map-zoom>
+					<br>
+					<app-ol-clipboard class="btn-inverse pull-right" style="margin-bottom:10px"></app-ol-clipboard>
+                </div>
+
+                <div class="btn-group pull-left">
+                    <button type="button" class="btn btn-sm btn-inverse active desktop-only" id="mouse-position" style="cursor: default;" >Coordinate: Lon/Lat</button>
+                </div>
+
+			</div>
+			<!-- BEGIN map-area-controls -->
+
+			<!-- BEGIN map-area-olmap -->
+            <div class="map-area-olmap">
+				 <app-ol-map class="height-100pc width-100pc"></app-ol-map>
+            </div>
+			<!-- END map-area-olmap -->
+		</div>
+		<!-- END #content -->
+
+		<!-- BEGIN btn-scroll-top -->
+		<a href="#" data-click="scroll-top" class="btn-scroll-top fade"><i class="ti-arrow-up"></i></a>
+		<!-- END btn-scroll-top -->
+
+    <!-- Modal window used as a popup when map querying -->
+    <app-querier-modal-window></app-querier-modal-window>
+	<app-layer-modal-window></app-layer-modal-window>
+	<app-disclaimer-modal-window></app-disclaimer-modal-window>
+
+    <!-- ================== BEGIN BASE JS ================== -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-migrate/3.0.1/jquery-migrate.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-slimScroll/1.3.8/jquery.slimscroll.min.js"></script>
+	<!-- ================== END BASE JS ================== -->
+
+	<script async src="http://platform.twitter.com/widgets.js"></script>
+  </body>
+</html>
