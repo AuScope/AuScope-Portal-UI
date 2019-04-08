@@ -24,4 +24,6 @@ export class LayerModel {
   iconUrl: string;
   filterCollection: any;
   nagiosFailingHosts: string[];
+  ogcFilter: String;
+  wfsUrls: String[];
 }
