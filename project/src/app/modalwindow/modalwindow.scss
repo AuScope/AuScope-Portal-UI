@@ -85,6 +85,10 @@ button.mat-icon-button[mattreenodetoggle] .mat-icon, button.mat-icon-button {
     line-height: 20px;
 }
 
+button.mat-icon-button:hover, button.mat-icon-button:active {
+    color: #000;
+}
+
 .mat-nested-tree-node {
     font-size: 12px;
 }
