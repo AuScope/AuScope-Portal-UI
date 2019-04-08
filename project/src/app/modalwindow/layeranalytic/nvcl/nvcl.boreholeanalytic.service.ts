@@ -101,8 +101,8 @@ export class NVCLBoreholeAnalyticService {
     let httpParams = new HttpParams();
 
     const wfsResources = this.layerHandlerService.getWFSResource(layer);
-    for (const wfsResource of wfsResources) {
-      httpParams = httpParams.append('wfsUrl', wfsResource.url);
+    for (const wfsUrl of layer.wfsUrls) {
+      httpParams = httpParams.append('wfsUrl', wfsUrl.toString());
     }
 
     httpParams = httpParams.append('email', parameters.email);
@@ -116,6 +116,7 @@ export class NVCLBoreholeAnalyticService {
 
     httpParams = httpParams.append('classification', parameters.classification);
     if (parameters.logName) { httpParams = httpParams.append('logName', parameters.logName); }
+    httpParams = httpParams.append('ogcFilter', parameters.ogcFilter);
     httpParams = httpParams.append('startDepth', parameters.startDepth);
     httpParams = httpParams.append('endDepth', parameters.endDepth);
     httpParams = httpParams.append('operator', parameters.operator);
@@ -142,9 +143,8 @@ export class NVCLBoreholeAnalyticService {
   public submitSF0NVCLProcessingTsgJob(parameters: any, layer: LayerModel): Observable<any> {
     let httpParams = new HttpParams();
 
-    const wfsResources = this.layerHandlerService.getWFSResource(layer);
-    for (const wfsResource of wfsResources) {
-      httpParams = httpParams.append('wfsUrl', wfsResource.url);
+    for (const wfsUrl of layer.wfsUrls) {
+      httpParams = httpParams.append('wfsUrl', wfsUrl.toString());
     }
 
     httpParams = httpParams.append('email', parameters.email);
@@ -153,7 +153,7 @@ export class NVCLBoreholeAnalyticService {
 
     httpParams = httpParams.append('tsgAlgName', parameters.tsgAlgName);
     httpParams = httpParams.append('tsgAlgorithm', parameters.tsgAlgorithm);
-
+    httpParams = httpParams.append('ogcFilter', parameters.ogcFilter);
     httpParams = httpParams.append('startDepth', parameters.startDepth);
     httpParams = httpParams.append('endDepth', parameters.endDepth);
     httpParams = httpParams.append('operator', parameters.operator);
