@@ -1,17 +1,18 @@
+@import '../globals';
 
 .submenu-open-block {
 	display: block !important;
-	color: var(--text-highlight-colour);
+	color: $text-highlight-colour;
 }
 
 .submenu-open-inline {
     display: inline !important;
-	color: var(--text-highlight-colour);
+	color: $text-highlight-colour;
 }
 
 .nav-tabs > li.active >a:focus,
 .nav-tabs> li.active > a:hover {
-	color: var(--text-hightlight-colour)
+	color: $text-highlight-colour;
 }
 
 .nav-tabs > li > a > i {
@@ -216,7 +217,7 @@ input + div.input-group-btn  > button {
 
 /* For "Bounding Box" labels */
 .container {
-	width: var(--panel-width);
+	width: $panel-width;
 	margin-left: -10px;
 }
 
@@ -236,6 +237,6 @@ input + div.input-group-btn  > button {
 /* Info Panel has an openlayers map */
 #previewMapElement {
 	display: block;
-	height: calc(var(--panel-width) - 30px);
-	width: calc(var(--panel-width) - 30px);
+	height: calc(#{$panel-width} - 30px);
+	width: calc(#{$panel-width} - 30px);
 }

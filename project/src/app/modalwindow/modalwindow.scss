@@ -1,24 +1,24 @@
+$modal-tab-border-colour: #aaa;
+$modal-background-colour: #fff;
+$modal-text-colour: #000;
 
 .panel, .panel-body {
-    --modal-tab-border-colour: #aaa;
-    --modal-background-colour: #fff;
-    --modal-text-colour: #000;
-    background-color: var(--modal-background-colour)!important;
-    color: var(--modal-text-colour)!important;
+    background-color: $modal-background-colour !important;
+    color: $modal-text-colour !important;
     font-size: 12px;
 }
 
 .panel-heading {
-    background-color: var(--modal-background-colour);
+    background-color: $modal-background-colour;
 }
 
 .panel.panel-with-tabs > .panel-heading {
-    border-bottom: 1px solid var(--modal-tab-border-colour)!important;
+    border-bottom: 1px solid $modal-tab-border-colour !important;
 }
 
 .nav.nav-tabs {
     margin-top: -17px;
-    border-bottom-color: var(--modal-background-colour);
+    border-bottom-color: $modal-background-colour;
 }
 
 .nav-tabs > li.show > a,
@@ -27,13 +27,13 @@
 .nav-tabs > li.active > a,
 .nav-tabs > li.active >a:focus,
 .nav-tabs> li.active > a:hover {
-    color: var(--modal-text-colour);
-    background-color: var(--modal-background-colour);
-    border-color: var(--modal-tab-border-colour) var(--modal-tab-border-colour) #fff var(--modal-tab-border-colour);
+    color: $modal-text-colour;
+    background-color: $modal-background-colour;
+    border-color: $modal-tab-border-colour $modal-tab-border-colour #fff $modal-tab-border-colour;
 }
 
 .nav-tabs > li.show > a > i + span {
-    color: var(--modal-text-colour);
+    color: $modal-text-colour;
 }
 
 .nav-tabs > li > a:hover {
@@ -54,6 +54,7 @@ div.pull-left {
 
 .tab-content {
     padding: 5px;
+    overflow-y: auto;
 }
 
 .modal-panel-size {
@@ -71,7 +72,7 @@ select {
     background-color: #eee;
 }
 .mat-tree-node:nth-of-type(even){
-    background-color: var(--modal-background-colour);
+    background-color: $modal-background-colour;
 }
 
 .feature-tree-invisible {
@@ -83,6 +84,10 @@ button.mat-icon-button[mattreenodetoggle] .mat-icon, button.mat-icon-button {
     height: 20px;
     width: 20px;
     line-height: 20px;
+}
+
+button.mat-icon-button:hover, button.mat-icon-button:active {
+    color: #000;
 }
 
 .mat-nested-tree-node {
