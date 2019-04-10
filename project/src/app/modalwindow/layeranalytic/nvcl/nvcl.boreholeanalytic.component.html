@@ -12,7 +12,7 @@
 			<h4 class="panel-title">{{layer.name}}</h4>
 		</div>
 		<div class="panel-body">
-		<form (ngSubmit)="onSubmit()" #f="ngForm">
+		<form #f="ngForm">
 			<div class="alert alert-inverse fade in">
                 <p>National Virtual Core Library analytics are run remotely and may take some time to complete. By entering an email and a job name you can come back to this form later to collect your results.</p>
             </div>
@@ -214,7 +214,7 @@
 					    </fieldset>
 
 						<div class="pull-left">
-							<button class="btn btn-primary" type="submit" [disabled]="!f.valid">Submit</button>
+							<button class="btn btn-primary" (click) = "onSubmit()" [disabled]="!f.valid">Submit</button>
 						</div>
 					</div>
 					<!-- END tab-pane -->
