@@ -16,11 +16,19 @@
 }
 
 .nav-tabs > li > a > i {
-	font-size: 16px;
+	font-size: 1.2em;
 }
 
 .nav > li > a {
 	padding: 10px;
+}
+
+h5 {
+	font-size: 1rem;
+}
+
+h6 {
+	font-size: 0.9rem;
 }
 
 /* START pagination */
@@ -199,13 +207,7 @@ input[type=checkbox] + label {
 }
 
 /* "All Layers" and "Custom Layers" search filter boxes */
-.input-group input.form-control {
-	margin-left: 0px;
-	margin-right: 0px;
-	min-width: 200px;
-}
-
-input + div.input-group-btn  > button {
+input + div.input-group-append  > button {
 	margin-right: 0px;
 }
 
@@ -217,7 +219,7 @@ input + div.input-group-btn  > button {
 
 /* For "Bounding Box" labels */
 .container {
-	width: $panel-width;
+	width: $card-width;
 	margin-left: -10px;
 }
 
@@ -237,6 +239,6 @@ input + div.input-group-btn  > button {
 /* Info Panel has an openlayers map */
 #previewMapElement {
 	display: block;
-	height: calc(#{$panel-width} - 30px);
-	width: calc(#{$panel-width} - 30px);
+	height: calc(#{$card-width} - 30px);
+	width: calc(#{$card-width} - 30px);
 }

@@ -2,17 +2,17 @@ $modal-tab-border-colour: #aaa;
 $modal-background-colour: #fff;
 $modal-text-colour: #000;
 
-.panel, .panel-body {
+.card, .card-body {
     background-color: $modal-background-colour !important;
     color: $modal-text-colour !important;
     font-size: 12px;
 }
 
-.panel-heading {
+.card-header {
     background-color: $modal-background-colour;
 }
 
-.panel.panel-with-tabs > .panel-heading {
+.card.card-with-tabs > .card-header {
     border-bottom: 1px solid $modal-tab-border-colour !important;
 }
 
@@ -48,7 +48,7 @@ $modal-text-colour: #000;
     color: #2c7cd2;
 }
 
-div.pull-left {
+div.float-left {
     margin-top: 30px;
 }
 
@@ -57,7 +57,7 @@ div.pull-left {
     overflow-y: auto;
 }
 
-.modal-panel-size {
+.modal-card-size {
 	width: 100%;
 	height: 430px;
 }
@@ -118,15 +118,15 @@ dt {
 }
 
 /* Make space for the second set of tabs */
-#nvcl-dataset .panel-heading {
+#nvcl-dataset .card-header {
     margin-top: 30px;
 }
 
-div.modal-panel-size button {
+div.modal-card-size button {
     margin: 3px;
 }
 
-div.modal-panel-size .btn {
+div.modal-card-size .btn {
     font-size: 14px;
 }
 /* END NVCL core image display */
@@ -162,7 +162,7 @@ input[name="email"] {
 	background: #e4e4e4;
 }
 
-/* Area used by "add to clipboard" button in the querier panel */
+/* Area used by "add to clipboard" button in the querier card */
 .clipboard-area {
     width: 100%;
     margin-top: 0px !important;

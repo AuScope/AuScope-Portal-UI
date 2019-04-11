@@ -10,7 +10,7 @@
     <meta content="CSIRO" name="author" />
 
     <!-- ================== BEGIN BASE CSS STYLE ================== -->
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/themify-icons/0.1.2/css/themify-icons.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css" rel="stylesheet" />
@@ -28,7 +28,7 @@
 </head>
   <body>
 		<!-- BEGIN navbar -->
-		<div id="header" class="navbar navbar-fixed-top">
+		<div id="header" class="navbar fixed-top">
             <!-- BEGIN navbar-header -->
             <div class="navbar-header">
                 <!-- BEGIN organisation logo -->
@@ -39,7 +39,7 @@
                 <!-- END organisation logo -->
 
                 <!-- START sidebar toggle -->
-                <button id="sidebar-toggle-btn" class="nav navbar-toggle" data-toggle="collapse" data-target=".sidebar-collapse">
+                <button id="sidebar-toggle-btn" class="nav navbar-toggler mobile-only" data-toggle="collapse" data-target=".sidebar-collapse">
                     <div class="nav-index-btn">
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
@@ -79,7 +79,7 @@
 				    All Layers
                     <i class="fa fa-arrow-circle-down"></i>
 				</label>
-				<ul class="panel-sub" appLayerPanel></ul>
+				<ul class="card-sub" appLayerPanel></ul>
 			</h5>
             <!-- END All Layers -->
 
@@ -91,7 +91,7 @@
 				    Custom Layer
                     <i class="fa fa-arrow-circle-down"></i>
 				</label>
-				<ul class="panel-sub" appCustomPanel></ul>
+				<ul class="card-sub" appCustomPanel></ul>
 			</h5>
             <!-- END Custom Layers -->
 
@@ -103,7 +103,7 @@
 				    Catalogue Search
                     <i class="fa fa-arrow-circle-down"></i>
 				</label>
-				<ul class="panel-sub" appCatalogueSearchPanel></ul>
+				<ul class="card-sub" appCatalogueSearchPanel></ul>
 			</h5>
             <!-- END Catalogue Search -->
 
@@ -116,15 +116,15 @@
 			<!-- BEGIN map-area-controlsr -->
 			<div class="map-area-controls">
 
-                <div class="btn-group pull-right desktop-only">
-					<app-olmap-baselayerselector class="pull-right" style="margin-bottom:10px"></app-olmap-baselayerselector>
+                <div class="btn-group float-right desktop-only">
+					<app-olmap-baselayerselector class="float-right" style="margin-bottom:10px"></app-olmap-baselayerselector>
 					<br>
-					<app-ol-map-zoom class="pull-right" style="margin-bottom:10px"></app-ol-map-zoom>
+					<app-ol-map-zoom class="float-right" style="margin-bottom:10px"></app-ol-map-zoom>
 					<br>
-					<app-ol-clipboard class="btn-inverse pull-right" style="margin-bottom:10px"></app-ol-clipboard>
+					<app-ol-clipboard class="btn-inverse float-right" style="margin-bottom:10px"></app-ol-clipboard>
                 </div>
 
-                <div class="btn-group pull-left">
+                <div class="btn-group float-left">
                     <button type="button" class="btn btn-sm btn-inverse active desktop-only" id="mouse-position" style="cursor: default;" >Coordinate: Lon/Lat</button>
                 </div>
 

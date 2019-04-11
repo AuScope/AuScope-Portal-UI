@@ -1,28 +1,28 @@
-import { LayerModel } from "../../../portal-core-ui/model/data/layer.model";
-import { LayerHandlerService } from "../../../portal-core-ui/service/cswrecords/layer-handler.service";
-import { FilterPanelService } from "../../../portal-core-ui/service/filterpanel/filterpanel-service";
-import { OlMapService } from "../../../portal-core-ui/service/openlayermap/ol-map.service";
-import { OlClipboardService } from "../../../portal-core-ui/service/openlayermap/ol-clipboard.service";
-import * as $ from "jquery";
-import { UtilitiesService } from "../../../portal-core-ui/utility/utilities.service";
-import { Component, Input, OnInit } from "@angular/core";
-import * as _ from "lodash";
-import { environment } from "../../../../environments/environment";
-import { ref } from "../../../../environments/ref";
-import { LayerAnalyticModalComponent } from "../../../modalwindow/layeranalytic/layer.analytic.modal.component";
-import { ManageStateService } from "../../../portal-core-ui/service/permanentlink/manage-state.service";
-import { AuMapService } from "../../../services/wcustom/au-map.service";
-import { OlIrisService } from "../../../services/wcustom/iris/ol-iris.service";
-import { BsModalService } from "ngx-bootstrap/modal";
-import { OlWMSService } from "../../../portal-core-ui/service/wms/ol-wms.service";
+import { LayerModel } from '../../../portal-core-ui/model/data/layer.model';
+import { LayerHandlerService } from '../../../portal-core-ui/service/cswrecords/layer-handler.service';
+import { FilterPanelService } from '../../../portal-core-ui/service/filterpanel/filterpanel-service';
+import { OlMapService } from '../../../portal-core-ui/service/openlayermap/ol-map.service';
+import { OlClipboardService } from '../../../portal-core-ui/service/openlayermap/ol-clipboard.service';
+import * as $ from 'jquery';
+import { UtilitiesService } from '../../../portal-core-ui/utility/utilities.service';
+import { Component, Input, OnInit } from '@angular/core';
+import * as _ from 'lodash';
+import { environment } from '../../../../environments/environment';
+import { ref } from '../../../../environments/ref';
+import { LayerAnalyticModalComponent } from '../../../modalwindow/layeranalytic/layer.analytic.modal.component';
+import { ManageStateService } from '../../../portal-core-ui/service/permanentlink/manage-state.service';
+import { AuMapService } from '../../../services/wcustom/au-map.service';
+import { OlIrisService } from '../../../services/wcustom/iris/ol-iris.service';
+import { BsModalService } from 'ngx-bootstrap/modal';
+import { OlWMSService } from '../../../portal-core-ui/service/wms/ol-wms.service';
 
 declare var gtag: Function;
 
 @Component({
-  selector: "app-filter-panel",
-  templateUrl: "./filterpanel.component.html",
+  selector: 'app-filter-panel',
+  templateUrl: './filterpanel.component.html',
   providers: [AuMapService, OlIrisService],
-  styleUrls: ["./filterpanel.component.scss", "../../menupanel.scss"]
+  styleUrls: ['./filterpanel.component.scss', '../../menupanel.scss']
 })
 export class FilterPanelComponent implements OnInit {
   @Input() layer: LayerModel;
@@ -54,19 +54,19 @@ export class FilterPanelComponent implements OnInit {
   ngOnInit(): void {
     if (
       this.layer.filterCollection &&
-      this.layer.filterCollection["mandatoryFilters"]
+      this.layer.filterCollection['mandatoryFilters']
     ) {
-      const mandatoryFilters = this.layer.filterCollection["mandatoryFilters"];
+      const mandatoryFilters = this.layer.filterCollection['mandatoryFilters'];
 
       for (const mandatoryFilter of mandatoryFilters) {
-        if (mandatoryFilter["type"] === "MANDATORY.CHECKBOX") {
-          mandatoryFilter["value"] = mandatoryFilter["value"] === "true";
+        if (mandatoryFilter['type'] === 'MANDATORY.CHECKBOX') {
+          mandatoryFilter['value'] = mandatoryFilter['value'] === 'true';
         }
       }
     }
 
     // VT: permanent link
-    const state = UtilitiesService.getUrlParameterByName("state");
+    const state = UtilitiesService.getUrlParameterByName('state');
     if (state) {
       const me = this;
       this.manageStateService.getUnCompressedString(state, function(result) {
@@ -88,10 +88,10 @@ export class FilterPanelComponent implements OnInit {
    */
   public addLayer(layer): void {
     this.onApplyClipboardBBox();
-    if (environment.googleAnalyticsKey && typeof gtag === "function") {
-      gtag("event", "Addlayer", {
-        event_category: "Addlayer",
-        event_action: "AddLayer:" + layer.id
+    if (environment.googleAnalyticsKey && typeof gtag === 'function') {
+      gtag('event', 'Addlayer', {
+        event_category: 'Addlayer',
+        event_action: 'AddLayer:' + layer.id
       });
     }
     const param = {
@@ -99,8 +99,8 @@ export class FilterPanelComponent implements OnInit {
     };
 
     for (const optFilter of param.optionalFilters) {
-      if (optFilter["options"]) {
-        optFilter["options"] = [];
+      if (optFilter['options']) {
+        optFilter['options'] = [];
       }
     }
 
@@ -131,14 +131,14 @@ export class FilterPanelComponent implements OnInit {
         this.auscopeMapService.addLayer(layer, param);
       } catch (error) {
         alert(
-          "Unable to render layer as this layer is missing vital information required for rendering"
+          'Unable to render layer as this layer is missing vital information required for rendering'
         );
       }
     }
 
     // If on a small screen, when a new layer is added, roll up the sidebar to expose the map */
-    if ($("#sidebar-toggle-btn").css("display") !== "none") {
-      $("#sidebar-toggle-btn").click();
+    if ($('#sidebar-toggle-btn').css('display') !== 'none') {
+      $('#sidebar-toggle-btn').click();
     }
   }
   /**
@@ -170,7 +170,7 @@ export class FilterPanelComponent implements OnInit {
         layer.ogcFilter = response;
       });
     } catch (error) {
-      alert("Unable to getNvclFilter");
+      alert('Unable to getNvclFilter');
     }
   }
   /**
@@ -182,16 +182,16 @@ export class FilterPanelComponent implements OnInit {
       this.olClipboardService.polygonsBS.subscribe(polygonBBoxs => {
         if (!UtilitiesService.isEmpty(polygonBBoxs)) {
           for (const optFilter of this.optionalFilters) {
-            if (optFilter["type"] === "OPTIONAL.POLYGONBBOX") {
-              optFilter["value"] = polygonBBoxs.coordinates;
+            if (optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
+              optFilter['value'] = polygonBBoxs.coordinates;
             }
           }
         }
       });
     } else {
       for (const optFilter of this.optionalFilters) {
-        if (optFilter["type"] === "OPTIONAL.POLYGONBBOX") {
-          optFilter["value"] = null;
+        if (optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
+          optFilter['value'] = null;
         }
       }
     }
@@ -219,23 +219,23 @@ export class FilterPanelComponent implements OnInit {
       return;
     }
     for (const filterobject of this.optionalFilters) {
-      if (filterobject["label"] === filter["label"]) {
+      if (filterobject['label'] === filter['label']) {
         return;
       }
     }
     if (
       UtilitiesService.isEmpty(this.providers) &&
-      filter.type === "OPTIONAL.PROVIDER"
+      filter.type === 'OPTIONAL.PROVIDER'
     ) {
       this.getProvider();
       filter.value = {};
       for (const provider of this.providers) {
-        filter.value[provider["value"]] = false;
+        filter.value[provider['value']] = false;
       }
     }
     if (
       UtilitiesService.isEmpty(filter.options) &&
-      filter.type === "OPTIONAL.DROPDOWNREMOTE"
+      filter.type === 'OPTIONAL.DROPDOWNREMOTE'
     ) {
       this.filterPanelService
         .getFilterRemoteParam(filter.url)
@@ -246,7 +246,7 @@ export class FilterPanelComponent implements OnInit {
       return;
     }
 
-    if (filter.type === "OPTIONAL.POLYGONBBOX") {
+    if (filter.type === 'OPTIONAL.POLYGONBBOX') {
       this.olClipboardService.toggleClipboard(true);
     }
     this.optionalFilters.push(filter);
@@ -298,7 +298,7 @@ export class FilterPanelComponent implements OnInit {
   public processLayerAnalytic(layer: LayerModel) {
     this.getNvclFilter(layer);
     const bsModalRef = this.modalService.show(LayerAnalyticModalComponent, {
-      class: "modal-lg"
+      class: 'modal-lg'
     });
     bsModalRef.content.layer = layer;
   }
