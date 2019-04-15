@@ -33,6 +33,22 @@ h6 {
 	font-size: 0.9rem;
 }
 
+.infopanel-legend {
+	max-width: 220px;
+}
+
+/* The bell icon in the alert panels used when adding various layers */
+.alert .ti-bell {
+	font-size: 2rem;
+	margin-right: 10px;
+	position: relative;
+}
+
+.alert, p.small.text-danger {
+	margin-right: 10px;
+	margin-left: 10px;
+}
+
 /* START pagination */
 
 .pagination {

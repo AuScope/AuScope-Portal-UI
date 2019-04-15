@@ -8,7 +8,8 @@ import { UtilitiesService } from '../../../../portal-core-ui/utility/utilities.s
 
 @Component({
     selector: 'info-sub-panel',
-    templateUrl: './subpanel.component.html'
+    templateUrl: './subpanel.component.html',
+    styleUrls: ['../../../menupanel.scss']
 })
 
 export class InfoPanelSubComponent implements OnChanges {

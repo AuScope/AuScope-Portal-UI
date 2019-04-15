@@ -327,13 +327,6 @@ label {
         display: none;
     }
 
-    /* The bell icon in the alert panels used when adding various layers */
-    .alert .ti-bell {
-        font-size: 2rem;
-        margin-right: 10px;
-        position: relative;
-    }
-
    /* Do not display sidebar menu subtitles and items when 'hidden' */
     i.hidden, ul.hidden {
         display: none;
@@ -344,7 +337,6 @@ label {
 
 
 /* START map area rules */
-
 .map-area {
     overflow: hidden;
     margin-left: $sidebar-width;

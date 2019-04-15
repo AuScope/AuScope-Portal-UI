@@ -6,11 +6,11 @@
 				<div class="card-header">
 					<ul id="nvcl-card-tab" class="nav nav-tabs float-right">
 						<li (click)="nvclDataset.image=true;nvclDataset.scalar=false;nvclDataset.download=false;" [ngClass]="{'show':nvclDataset.image}"><a
-							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-image" data-toggle="tab"><i class="fa fa-home"></i> <span class="hidden-xs">Image</span></a></li>
+							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-image" data-toggle="tab"><i class="fa fa-home"></i> <span class="d-none d-sm-inline">Image</span></a></li>
 						<li class="desktop-only" (click)="nvclDataset.image=false;nvclDataset.scalar=true;nvclDataset.download=false;" [ngClass]="{'show':nvclDataset.scalar}"><a
-							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-scalar" data-toggle="tab"><i class="fa fa-user"></i> <span class="hidden-xs">Scalar</span></a></li>
+							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-scalar" data-toggle="tab"><i class="fa fa-user"></i> <span class="d-none d-sm-inline">Scalar</span></a></li>
 						<li class="desktop-only" (click)="nvclDataset.image=false;nvclDataset.scalar=false;nvclDataset.download=true;" [ngClass]="{'show':nvclDataset.download}"><a
-							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-download" data-toggle="tab"><i class="fa fa-user"></i> <span class="hidden-xs">Download</span></a></li>
+							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-download" data-toggle="tab"><i class="fa fa-user"></i> <span class="d-none d-sm-inline">Download</span></a></li>
 					</ul>
 					<h4 class="card-title">Dataset Name: {{nvclDataset.datasetName}}</h4>
 				</div>
@@ -33,7 +33,7 @@
 								<div>
 									<!-- BEGIN toolbar -->
 									<div class="container-fluid">
-										<div class="row hidden-xs">
+										<div class="row d-none d-sm-inline">
 											<div class="col-sm-3">
 												<div *ngIf="jobList[featureId].length > 0" data-toggle="tooltip" title="Job View" (click)="jobView=true;" class="btn btn-light btn-sm"
 												 [ngClass]="{'lightgray-bg':jobView}">

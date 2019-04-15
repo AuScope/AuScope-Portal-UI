@@ -38,8 +38,8 @@
 											<!-- BEGIN card-header -->
 											<div class="card-header">
 												<ul id="querier-card-tab" class="nav nav-tabs float-right">
-													<li (click)="doc.home=true;doc.analytic=false;" [ngClass]="{'active':doc.home}"><a href="#{{doc.key}}-card-tab-home" data-toggle="tab"><i class="fa fa-home"></i> <span class="hidden-xs">WFS</span></a></li>
-													<li (click)="doc.home=false;doc.analytic=true" [ngClass]="{'active':doc.analytic}" *ngIf="analyticMap[doc.layer.id]" ><a href="#{{doc.key}}-card-tab-profile" data-toggle="tab"><i class="fa fa-user"></i> <span class="hidden-xs">Analytic</span></a></li>
+													<li (click)="doc.home=true;doc.analytic=false;" [ngClass]="{'active':doc.home}"><a href="#{{doc.key}}-card-tab-home" data-toggle="tab"><i class="fa fa-home"></i> <span class="d-none d-sm-inline">WFS</span></a></li>
+													<li (click)="doc.home=false;doc.analytic=true" [ngClass]="{'active':doc.analytic}" *ngIf="analyticMap[doc.layer.id]" ><a href="#{{doc.key}}-card-tab-profile" data-toggle="tab"><i class="fa fa-user"></i> <span class="d-none d-sm-inline">Analytic</span></a></li>
 												</ul>
 												<h4 *ngIf="doc.home" class="card-title">Feature Detail</h4>
                                                 <h4 *ngIf="doc.analytic" class="card-title">NVCL</h4>
@@ -51,7 +51,7 @@
 												<!-- BEGIN tab-pane -->
 												<div *ngIf="doc.key !== 'Server Error'" class="tab-pane fade" [ngClass]="{'active show':doc.home}" id="{{doc.key}}-card-tab-home">
 													<div *ngIf="bToClipboard || supportOpenInNewWindow(doc)" class="desktop-only" style="position: inherit;padding-top: unset;margin-bottom: 20px;">
-														<div class="float-left hidden-xs clipboard-area">
+														<div class="float-left d-none d-sm-inline clipboard-area">
 															<div *ngIf="bToClipboard" data-toggle="tooltip" title="Copy to Clipboard" (click)="CopyToClipboard(doc)" class="btn btn-light btn-sm">
 																<span><i class="ti-clip"></i>Add to Clipboard</span>
 															</div>
