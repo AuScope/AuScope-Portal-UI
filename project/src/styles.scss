@@ -42,7 +42,6 @@ a, a:link, a:active, a:visited, a:hover { text-decoration: none }
 button, a, a:link, a:visited { color: $text-colour;  }
 button:hover, button:active, a:active, a:hover {color: $text-highlight-colour; }
 
-
 label {
     font-weight: 400;
 }
@@ -118,7 +117,6 @@ label {
     z-index: 12;
     padding: 0;
 
-
     .navbar-brand {
         color: #eee;
         padding: 10px;
@@ -130,7 +128,6 @@ label {
 
     .navbar-header {
     	height: $navbar-height;
-        /*overflow-y: hidden;*/
     }
 
     .navbar-notify {
@@ -207,7 +204,9 @@ label {
 
 
 
-/* START sidebar rules */
+/* START sidebar rules
+ * NB: For filter, info, download panel rules, see "menupanel.scss"
+ */
 .sidebar {
     border-radius: 0;
     position: fixed;
@@ -242,15 +241,13 @@ label {
         color: $text-colour;
     }
 
-    a:hover {
-        color: $text-highlight-colour;
-    }
+
 
     a > i {
         color: $text-colour;
     }
 
-    a:hover > i {
+    a:hover > i, a.active > i {
         color: $text-highlight-colour;
     }
 
@@ -272,6 +269,10 @@ label {
         font-size: 0.85rem;
         color: $text-colour;
         margin: 0;
+    }
+
+    ul > li:hover {
+        color: $text-highlight-colour;
     }
 
     h5 > a {
@@ -330,8 +331,12 @@ label {
     .alert .ti-bell {
         font-size: 2rem;
         margin-right: 10px;
-        top: -7px;
         position: relative;
+    }
+
+   /* Do not display sidebar menu subtitles and items when 'hidden' */
+    i.hidden, ul.hidden {
+        display: none;
     }
 }
 /* END sidebar rules */

@@ -10,6 +10,7 @@ $modal-text-colour: #000;
 
 .card-header {
     background-color: $modal-background-colour;
+    padding-bottom: 0;
 }
 
 .card.card-with-tabs > .card-header {
@@ -17,7 +18,7 @@ $modal-text-colour: #000;
 }
 
 .nav.nav-tabs {
-    margin-top: -17px;
+    padding-bottom: 3px;
     border-bottom-color: $modal-background-colour;
 }
 
@@ -42,6 +43,15 @@ $modal-text-colour: #000;
 
 .nav-tabs > li > a {
     top: 4px;
+    border: 1px solid transparent;
+}
+
+i + span {
+    font-size: 1rem;
+}
+
+.nav > li > a {
+    padding: 0.7rem;
 }
 
 .fa.fa-external-link-square {

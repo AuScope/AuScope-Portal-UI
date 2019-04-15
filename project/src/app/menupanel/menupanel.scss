@@ -10,13 +10,15 @@
 	color: $text-highlight-colour;
 }
 
-.nav-tabs > li.active >a:focus,
-.nav-tabs> li.active > a:hover {
+.nav-tabs > li.active > a:focus,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a > i {
 	color: $text-highlight-colour;
 }
 
 .nav-tabs > li > a > i {
 	font-size: 1.2em;
+    color: $text-colour;
 }
 
 .nav > li > a {
