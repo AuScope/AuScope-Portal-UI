@@ -20,20 +20,21 @@
 			                </div>
                             <!-- END form-inline -->
 							<div *ngIf="downloading"><h2 class="wip">Downloading <i class="fa fa-circle small"></i><i class="fa fa-circle small"></i><i class="fa fa-circle small"></i></h2></div>
-							<div id="querier-accordion">
+                            <!-- BEGIN querier accordion -->
+                            <div id="querier-accordion">
 								<!-- BEGIN card -->
-								<div *ngFor="let doc of docs | querierFeatureSearchPipe:selectLayerNameFilter" class="card card-default card-bordered">
+								<div *ngFor="let doc of docs | querierFeatureSearchPipe:selectLayerNameFilter; let i = index;" class="card card-default card-bordered">
 									<!-- BEGIN card-header -->
 									<div class="card-header">
 										<h4 class="card-title">
-											<a (click)="collapse[doc.key]=!collapse[doc.key];parseTree(doc);" class="accordion-link"  data-parent="#querier-accordion">
+											<a (click)="parseTree(doc);" class="accordion-link" data-toggle="collapse" href="#doc-collapse{{i}}">
 												{{doc.key}}
 											</a>
 										</h4>
 									</div>
 									<!-- END card-header -->
 									<!-- BEGIN card-collapse -->
-									<div id="{{doc.key}}" class="card-body card-collapse collapse" [ngClass]="{'show' :collapse[doc.key]}">
+									<div id="doc-collapse{{i}}" class="card-body card-collapse collapse">
 										<div class="card card-default card-with-tabs">
 											<!-- BEGIN card-header -->
 											<div class="card-header">
@@ -106,23 +107,25 @@
 								<!-- END card -->
 
 								<!-- BEGIN card -->
-								<div *ngFor="let html of htmls | querierFeatureSearchPipe:selectLayerNameFilter" class="card card-default card-bordered">
+								<div *ngFor="let html of htmls | querierFeatureSearchPipe:selectLayerNameFilter; let i = index" class="card card-default card-bordered">
 									<!-- BEGIN card-header -->
 									<div class="card-header">
 										<h4 class="card-title">
-											<a (click)="collapse[html.key]=!collapse[html.key]" class="accordion-link"  data-parent="#querier-accordion">
+											<a class="accordion-link"  data-toggle="collapse" href="#html-collapse{{i}}">
 												{{html.key}}
 											</a>
 										</h4>
 									</div>
 									<!-- END card-header -->
 									<!-- BEGIN card-collapse -->
-									<div id="{{html.key}}" class="card-body card-collapse collapse" [ngClass]="{'in' :collapse[html.key]}">
+									<div id="html-collapse{{i}}" class="card-body card-collapse collapse">
 										<div [innerHTML] = "html.value | trustResourceHtml"></div>
 									</div>
 									<!-- END card-collapse -->
 								</div>
+                                <!-- END card -->
 							</div>
+                            <!-- END querier accordion -->
 						</div>
 						<!-- END card-body -->
 					</div>

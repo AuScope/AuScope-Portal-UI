@@ -217,7 +217,7 @@ input[type=checkbox] + label {
 }
 
 .checkbox input {
-	top: -12px;
+	top: 10px;
 }
 
 .form-group .input-group {
@@ -257,6 +257,7 @@ input + div.input-group-append  > button {
 /* Info Panel has an openlayers map */
 #previewMapElement {
 	display: block;
-	height: calc(#{$card-width} - 30px);
-	width: calc(#{$card-width} - 30px);
+	height: calc(#{$card-width} - 40px);
+	width: calc(#{$card-width} - 40px);
+	margin-left: 5px;
 }

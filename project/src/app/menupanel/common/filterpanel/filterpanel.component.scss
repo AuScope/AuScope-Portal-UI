@@ -3,7 +3,7 @@ div.red {
 }
 
 .checkbox input[type=checkbox], .checkbox-inline input[type=checkbox], .radio input[type=radio], .radio-inline input[type=radio] {
-    position: absolute;
+    position: relative;
     margin-top: 4px;
     margin-left: 0px;
 }

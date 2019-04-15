@@ -473,6 +473,10 @@ label {
 	max-width: 260px;
 }
 
+.table.table-inverse {
+    color: $text-highlight-colour;
+}
+
 .sidebar-card-menu-show {
 	list-style-type: none;
 	margin: 0;

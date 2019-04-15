@@ -27,10 +27,8 @@
 													    </h4>
 												   </div>
 												   <div id="info-link{{i}}" class="card-body card-collapse collapse">
-														<div class="card-body">
-													    	<p *ngIf='isEndpointFailing(layer.nagiosFailingHosts, cswRecord)' class='text-danger small'><i class="fa fa-warning text-warning"> </i>This service is currently experiencing some problem and may not work as expected</p>
-														    <info-sub-panel [cswRecord]=cswRecord [layer]=layer [expanded]=cswRecord.expanded ></info-sub-panel>
-													    </div>
+												    	<p *ngIf='isEndpointFailing(layer.nagiosFailingHosts, cswRecord)' class='text-danger small'><i class="fa fa-warning text-warning"> </i>This service is currently experiencing some problem and may not work as expected</p>
+													    <info-sub-panel [cswRecord]=cswRecord [layer]=layer [expanded]=cswRecord.expanded ></info-sub-panel>
 												    </div>
 											    </div>
 										    </div>
