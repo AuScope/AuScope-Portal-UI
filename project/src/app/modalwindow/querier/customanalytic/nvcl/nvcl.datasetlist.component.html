@@ -6,13 +6,13 @@
 				<div class="card-header">
 					<ul id="nvcl-card-tab" class="nav nav-tabs float-right">
 						<li (click)="nvclDataset.image=true;nvclDataset.scalar=false;nvclDataset.download=false;" [ngClass]="{'show':nvclDataset.image}"><a
-							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-image" data-toggle="tab"><i class="fa fa-home"></i> <span class="d-none d-sm-inline">Image</span></a></li>
-						<li class="desktop-only" (click)="nvclDataset.image=false;nvclDataset.scalar=true;nvclDataset.download=false;" [ngClass]="{'show':nvclDataset.scalar}"><a
-							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-scalar" data-toggle="tab"><i class="fa fa-user"></i> <span class="d-none d-sm-inline">Scalar</span></a></li>
-						<li class="desktop-only" (click)="nvclDataset.image=false;nvclDataset.scalar=false;nvclDataset.download=true;" [ngClass]="{'show':nvclDataset.download}"><a
-							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-download" data-toggle="tab"><i class="fa fa-user"></i> <span class="d-none d-sm-inline">Download</span></a></li>
+							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-image" data-toggle="tab"><i class="fa fa-file-image-o"></i> <span class="d-none d-sm-none d-md-inline"> Image</span></a></li>
+						<li class="d-none d-sm-none d-md-block" (click)="nvclDataset.image=false;nvclDataset.scalar=true;nvclDataset.download=false;" [ngClass]="{'show':nvclDataset.scalar}"><a
+							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-scalar" data-toggle="tab"><i class="fa fa-signal"></i> <span class="d-none d-sm-none d-md-inline"> Scalar</span></a></li>
+						<li class="d-none d-sm-none d-md-block" (click)="nvclDataset.image=false;nvclDataset.scalar=false;nvclDataset.download=true;" [ngClass]="{'show':nvclDataset.download}"><a
+							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-download" data-toggle="tab"><i class="fa fa-download"></i> <span class="d-none d-sm-none d-md-inline"> Download</span></a></li>
 					</ul>
-					<h4 class="card-title">Dataset Name: {{nvclDataset.datasetName}}</h4>
+					<h4 class="card-title"><span class="d-none d-sm-block">Dataset Name: </span>{{nvclDataset.datasetName}}</h4>
 				</div>
 				<!-- END card-header -->
 				<!-- BEGIN tab-content -->
@@ -33,8 +33,8 @@
 								<div>
 									<!-- BEGIN toolbar -->
 									<div class="container-fluid">
-										<div class="row d-none d-sm-inline">
-											<div class="col-sm-3">
+										<div class="row justify-content-between d-none d-sm-none d-md-flex">
+											<div class="col-3">
 												<div *ngIf="jobList[featureId].length > 0" data-toggle="tooltip" title="Job View" (click)="jobView=true;" class="btn btn-light btn-sm"
 												 [ngClass]="{'lightgray-bg':jobView}">
 													<span><i class="ti-flag-alt"></i>Job</span>
@@ -43,7 +43,7 @@
 													<span><i class="ti-panel"></i> Scalar</span>
 												</div>
 											</div>
-											<div class="col-sm-4 offset-sm-5">
+											<div class="col-5">
 												<div  *ngIf="!jobView" data-toggle="tooltip" title="Download csv" (click)="downloadCSV(nvclDataset.datasetId)" class="btn btn-light btn-sm">
 													<i class="ti-download"></i>
 												</div>
@@ -64,16 +64,16 @@
 										<div class="container-fluid">
 											<!-- BEGIN row -->
 											<div class="row" *ngFor="let datasetScalar of datasetScalars[nvclDataset.datasetId]">
-												<div class="col-xs-1 offset-xs-1 checkbox">
+												<div class="col-1 checkbox">
 													<input type="checkbox" value="10" id="log-checkbox-{{nvclDataset.datasetName}}-{{datasetScalar.logName}}" [(ngModel)]="datasetScalar.value"/>
 													<label for="log-checkbox-{{nvclDataset.datasetName}}-{{datasetScalar.logName}}"></label>
 												</div>
-												<div class="col-xs-8">
+												<div class="col-8">
 													<div>{{datasetScalar.logName}}</div>
 													<div>LogId: {{datasetScalar.logId}}</div>
 													<div class="definition" *ngIf="datasetScalarDefinition[datasetScalar.logName]">{{datasetScalarDefinition[datasetScalar.logName].definition}}</div>
 												</div>
-												<div class="col-xs-2">
+												<div class="col-2">
 													<span><div class="fake-link" (click)="getDefinition(datasetScalar.logName)">Definition</div></span>
 												</div>
 											</div>
