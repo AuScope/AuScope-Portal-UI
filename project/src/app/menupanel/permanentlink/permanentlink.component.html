@@ -1,17 +1,19 @@
 <a class="popup" (click)="showPermanentLink=!showPermanentLink;generatePermanentLink()"><i class="ti-link"></i><span>Permanent Link</span>
-	<div class="popuptext" [ngClass]="{'show':showPermanentLink}"  style="z-index: 10;">
-		<div class="form-group">
-			<div class="col-xs-2">
-				<button for="permanentlink-text-copy" class="btn btn-grey" ngxClipboard [cbContent]="permanentlink" type="button">
-					<i class="glyphicon glyphicon-duplicate"></i>
-				</button>
-			</div>
-			<div class="col-xs-10" appStopPropagation>
-				<input type="text" readonly class="form-control" id="permanentlink-text-copy" [(ngModel)]=permanentlink>
+	<div class="popuptext container-fluid" [ngClass]="{'show':showPermanentLink}"  style="z-index: 10;">
+		<div class="row ml-3 mb-3">
+			<div class="input-group ">
+				<div class="input-group-prepend">
+					<button for="permanentlink-text-copy" class="btn btn-gray" ngxClipboard [cbContent]="permanentlink" type="button">
+						<i class="fa fa-files-o"></i>
+					</button>
+				</div>
+				<div appStopPropagation>
+					<input type="text" readonly class="form-control" id="permanentlink-text-copy" [(ngModel)]=permanentlink>
+				</div>
 			</div>
 		</div>
-        <div class="form-group">
-			<div class="col-xs-12" *ngIf="shorteningMode" class="small text-warning">URL shortening in progress ...</div>
+        <div class="row ml-3">
+			<div *ngIf="shorteningMode" class="small text-warning">URL shortening in progress ...</div>
 		</div>
 	</div>
 </a>

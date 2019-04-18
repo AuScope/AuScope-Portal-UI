@@ -160,15 +160,6 @@ h6 {
     user-select: none;
 }
 
-.popup .popuptext .form-group button {
-	background-color: #deb887;
-	color: #efebeb;
-}
-
-.popup .popuptext .form-group button:hover {
-	color: #fff;
-}
-
 /* The actual popup */
 .popup .popuptext {
     visibility: hidden;
@@ -183,6 +174,13 @@ h6 {
     top: 125%;
     left: 100%;
     margin-left: -80px;
+	button {
+		background-color: #deb887;
+		color: #efebeb;
+	}
+	button:hover {
+		color: #fff;
+	}
 }
 
 /* Popup arrow */
