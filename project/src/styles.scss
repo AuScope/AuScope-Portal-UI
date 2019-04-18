@@ -331,6 +331,13 @@ label {
     i.hidden, ul.hidden {
         display: none;
     }
+
+    /* "All layers" filter dropdown box */
+    #menu-option-dropdown {
+        i, i:hover, a, a:hover {
+            color: black;
+        }
+    }
 }
 /* END sidebar rules */
 
@@ -684,10 +691,6 @@ fieldset.show-fieldset-borders-whitebg legend{
         opacity: 0;
         height: 0;
         transition: opacity 0.8s, height 0.8s;
-    }
-
-    #menu-option-dropdown {
-        transform: translate3d(114px,34px,0px)!important;
     }
 
     button.nav.navbar-toggler.collapsed .nav-index-btn {
