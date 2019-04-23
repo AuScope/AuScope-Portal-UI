@@ -7,8 +7,8 @@
 					<ul id="nvcl-card-tab" class="nav nav-tabs float-right">
 						<li (click)="nvclDataset.image=true;nvclDataset.scalar=false;nvclDataset.download=false;" [ngClass]="{'show':nvclDataset.image}"><a
 							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-image" data-toggle="tab"><i class="fa fa-file-image-o"></i> <span class="d-none d-sm-none d-md-inline"> Image</span></a></li>
-						<li class="d-none d-sm-none d-md-block" (click)="nvclDataset.image=false;nvclDataset.scalar=true;nvclDataset.download=false;" [ngClass]="{'show':nvclDataset.scalar}"><a
-							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-scalar" data-toggle="tab"><i class="fa fa-signal"></i> <span class="d-none d-sm-none d-md-inline"> Scalar</span></a></li>
+						<li class="d-none d-xl-inline" (click)="nvclDataset.image=false;nvclDataset.scalar=true;nvclDataset.download=false;" [ngClass]="{'show':nvclDataset.scalar}"><a
+							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-scalar" data-toggle="tab"><i class="fa fa-signal"></i> <span class="d-none d-xl-inline"> Scalar</span></a></li>
 						<li class="d-none d-sm-none d-md-block" (click)="nvclDataset.image=false;nvclDataset.scalar=false;nvclDataset.download=true;" [ngClass]="{'show':nvclDataset.download}"><a
 							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-download" data-toggle="tab"><i class="fa fa-download"></i> <span class="d-none d-sm-none d-md-inline"> Download</span></a></li>
 					</ul>
@@ -110,7 +110,7 @@
 
 							<div *ngIf="drawGraphMode==true;" class="modal-card-size">
 								<div style="overflow: auto; width: 100%; height: 100%;">
-									<div class="hasEvent light-blue" (click)="changeDrawGraphMode(false)" style="position: fixed;z-index: 10;right: 10%;">
+									<div class="hasEvent light-blue window-close" (click)="changeDrawGraphMode(false)">
 										<i class="fa fa-window-close" aria-hidden="true"></i> close</div>
 									<div id="rickshawChart_outer">
 										<div *ngFor="let selectedLogName of selectedLogNames[nvclDataset.datasetId]; let j = index">
@@ -158,7 +158,7 @@
 											</div>
 											<hr>
 										</div>
-										<div id="preview_last"></div>
+                                        <div id="preview_last"></div>
 									</div>
 								</div>
 							</div>

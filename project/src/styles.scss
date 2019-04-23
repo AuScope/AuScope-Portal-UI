@@ -767,17 +767,17 @@ fieldset.show-fieldset-borders-whitebg legend{
 
 @media (min-width: 900px) and (max-width: 1100px) {
     .modal-lg {
-        max-width: 800px;
-        width: 800px;
+        max-width: 850px;
+        width: 850px;
         height: 900px; /* control height here */
     }
 }
 
 @media (min-width: 1100px) {
     .modal-lg {
-        max-width: 1000px;
-        width: 1000px;
-        height: 1000px; /* control height here */
+        max-width: 1050px;
+        width: 1050px;
+        height: 1100px; /* control height here */
     }
 }
 
@@ -983,7 +983,7 @@ fieldset.show-fieldset-borders-whitebg legend{
 
 .rickshaw_smoother_tick_num {
     display:inline-block;
-    width:5px;
+    width:20px;
     height:5px;
     position:absolute;
     top:-20px;
