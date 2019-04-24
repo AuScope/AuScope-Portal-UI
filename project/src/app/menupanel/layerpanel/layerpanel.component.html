@@ -56,7 +56,7 @@
 								<ul id="card-tab" class="nav nav-tabs">
 									<li (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': uiLayerModels[layer.id].tabpanel.filterpanel.expanded}"><a data-toggle="tab"><i class="fa fa-filter"></i> <span class="d-none d-sm-inline">Filter</span></a></li>
 									<li (click)="selectTabPanel(layer.id,'infopanel')" [ngClass]="{'active': uiLayerModels[layer.id].tabpanel.infopanel.expanded}"><a data-toggle="tab"><i class="fa fa-info-circle"></i> <span class="d-none d-sm-inline">Info</span></a></li>
-									<li (click)="selectTabPanel(layer.id,'downloadpanel')" [ngClass]="{'active': uiLayerModels[layer.id].tabpanel.downloadpanel.expanded}" class="desktop-only"><a data-toggle="tab"><i class="fa fa-download"></i> <span class="d-none d-sm-inline">Download</span></a></li>
+									<li (click)="selectTabPanel(layer.id,'downloadpanel')" [ngClass]="{'active': uiLayerModels[layer.id].tabpanel.downloadpanel.expanded}" class="d-none d-md-block"><a data-toggle="tab"><i class="fa fa-download"></i> <span>Download</span></a></li>
 								</ul>
 
 							</div>

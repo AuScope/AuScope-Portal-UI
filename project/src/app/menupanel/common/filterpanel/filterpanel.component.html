@@ -92,7 +92,7 @@
 					</div>
 				</div>
 
-	            <div  class="desktop-only" *ngIf="optionalFilter.type=='OPTIONAL.POLYGONBBOX'">
+	            <div  class="d-none d-md-block" *ngIf="optionalFilter.type=='OPTIONAL.POLYGONBBOX'">
 	                <div class="form-group  form-group-sm">
 						<div class="checkbox" >
 								<input class="form-control-sm" id="{{ 'filter-OPTIONAL.POLYGONBBOX-' + idx + '-' + layer.id }}" type="checkbox" [(ngModel)]="bApplyClipboardBBox"/>
@@ -100,7 +100,7 @@
 						</div>
 					</div>
 	            </div>
-	            <div  class="mobile-only" *ngIf="optionalFilter.type=='OPTIONAL.POLYGONBBOX'">
+	            <div  class="d-block d-md-none" *ngIf="optionalFilter.type=='OPTIONAL.POLYGONBBOX'">
 	                <div class="alert alert-warning fade show">
 		                <i class="ti-bell float-left"></i>
 		                <p>This filter is not supported on a small screen and would not return any results.</p>

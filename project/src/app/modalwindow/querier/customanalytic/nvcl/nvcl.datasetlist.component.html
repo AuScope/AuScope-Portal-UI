@@ -6,11 +6,11 @@
 				<div class="card-header">
 					<ul id="nvcl-card-tab" class="nav nav-tabs float-right">
 						<li (click)="nvclDataset.image=true;nvclDataset.scalar=false;nvclDataset.download=false;" [ngClass]="{'show':nvclDataset.image}"><a
-							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-image" data-toggle="tab"><i class="fa fa-file-image-o"></i> <span class="d-none d-sm-none d-md-inline"> Image</span></a></li>
+							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-image" data-toggle="tab"><i class="fa fa-file-image-o"></i> <span class="d-none d-md-inline"> Image</span></a></li>
 						<li class="d-none d-xl-inline" (click)="nvclDataset.image=false;nvclDataset.scalar=true;nvclDataset.download=false;" [ngClass]="{'show':nvclDataset.scalar}"><a
 							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-scalar" data-toggle="tab"><i class="fa fa-signal"></i> <span class="d-none d-xl-inline"> Scalar</span></a></li>
-						<li class="d-none d-sm-none d-md-block" (click)="nvclDataset.image=false;nvclDataset.scalar=false;nvclDataset.download=true;" [ngClass]="{'show':nvclDataset.download}"><a
-							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-download" data-toggle="tab"><i class="fa fa-download"></i> <span class="d-none d-sm-none d-md-inline"> Download</span></a></li>
+						<li class="d-none d-md-block" (click)="nvclDataset.image=false;nvclDataset.scalar=false;nvclDataset.download=true;" [ngClass]="{'show':nvclDataset.download}"><a
+							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-download" data-toggle="tab"><i class="fa fa-download"></i> <span class="d-none d-md-inline"> Download</span></a></li>
 					</ul>
 					<h4 class="card-title"><span class="d-none d-sm-block">Dataset Name: </span>{{nvclDataset.datasetName}}</h4>
 				</div>
@@ -33,7 +33,7 @@
 								<div>
 									<!-- BEGIN toolbar -->
 									<div class="container-fluid">
-										<div class="row justify-content-between d-none d-sm-none d-md-flex">
+										<div class="row justify-content-between d-none d-md-flex">
 											<div class="col-3">
 												<div *ngIf="jobList[featureId].length > 0" data-toggle="tooltip" title="Job View" (click)="jobView=true;" class="btn btn-light btn-sm"
 												 [ngClass]="{'lightgray-bg':jobView}">
