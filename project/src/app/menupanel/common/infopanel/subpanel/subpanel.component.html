@@ -3,8 +3,8 @@
 <p><b>Name: </b>{{cswRecord.name}}</p>
 <p><b>Info Url: </b><a target="_blank" href="{{cswRecord.recordInfoUrl}}">Link to Geonetwork Record</a></p>
 <div *ngFor="let onlineResource of cswRecord.onlineResources">
-	<p *ngIf="onlineResource.type!='Unsupported'"><a target="_blank" href="{{onlineResource.url}}">{{onlineResource.type}} endpoint url</a>
-		<span class="label label-default">{{onlineResource.type}} </span>
+	<p *ngIf="onlineResource.type!='Unsupported'"><span class="label label-default">{{onlineResource.type}}: </span>
+		<a target="_blank" href="{{onlineResource.url}}">{{onlineResource.type}} endpoint url</a>
 	</p>
 </div>
 <p *ngIf="wmsUrl!=undefined">

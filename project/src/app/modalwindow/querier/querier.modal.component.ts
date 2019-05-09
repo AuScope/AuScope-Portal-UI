@@ -28,7 +28,6 @@ export class QuerierModalComponent {
   public downloading: boolean;
   public docs: QuerierInfoModel[] = [];
   public htmls: QuerierInfoModel[] = [];
-  public collapse: any[] = [];
   public uniqueLayerNames: string[] = [];
   public selectLayerNameFilter = 'ALL';
   public analyticMap;

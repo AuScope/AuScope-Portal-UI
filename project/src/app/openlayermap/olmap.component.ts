@@ -22,7 +22,7 @@ import olCoordinate from 'ol/coordinate';
 @Component({
   selector: 'app-ol-map',
   template: `
-    <div #mapElement id="map" class="height-100pc width-100pc"> </div>
+    <div #mapElement id="map" class="h-100 w-100"> </div>
     `,
   styleUrls: ['./olmap.component.css']
   // The "#" (template reference variable) matters to access the map element with the ViewChild decorator!

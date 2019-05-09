@@ -2,22 +2,24 @@ $modal-tab-border-colour: #aaa;
 $modal-background-colour: #fff;
 $modal-text-colour: #000;
 
-.panel, .panel-body {
+.card, .card-body {
     background-color: $modal-background-colour !important;
     color: $modal-text-colour !important;
     font-size: 12px;
 }
 
-.panel-heading {
+.card-header {
     background-color: $modal-background-colour;
+    padding-bottom: 0;
+    max-height: 50px;
 }
 
-.panel.panel-with-tabs > .panel-heading {
+.card.card-with-tabs > .card-header {
     border-bottom: 1px solid $modal-tab-border-colour !important;
 }
 
 .nav.nav-tabs {
-    margin-top: -17px;
+    padding-bottom: 3px;
     border-bottom-color: $modal-background-colour;
 }
 
@@ -41,14 +43,24 @@ $modal-text-colour: #000;
 }
 
 .nav-tabs > li > a {
-    top: 4px;
+    position: relative;
+    top: 1px;
+    border: 1px solid transparent;
+}
+
+i + span {
+    font-size: 1rem;
+}
+
+.nav > li > a {
+    padding: 0.7rem;
 }
 
 .fa.fa-external-link-square {
     color: #2c7cd2;
 }
 
-div.pull-left {
+div.float-left {
     margin-top: 30px;
 }
 
@@ -57,7 +69,7 @@ div.pull-left {
     overflow-y: auto;
 }
 
-.modal-panel-size {
+.modal-card-size {
 	width: 100%;
 	height: 430px;
 }
@@ -106,27 +118,27 @@ dt {
 }
 
 .loading-iframe iframe {
-    overflow:auto;
-    width:100%;
-    height:92%;
+    overflow: auto;
+    width: 100%;
+    height: 88%;
 }
 
 .loading-iframe > ng-select {
-    float:right;
-    width:300px;
+    float: right;
+    width: 200px;
     margin: 3px;
 }
 
 /* Make space for the second set of tabs */
-#nvcl-dataset .panel-heading {
+#nvcl-dataset .card-header {
     margin-top: 30px;
 }
 
-div.modal-panel-size button {
+div.modal-card-size button {
     margin: 3px;
 }
 
-div.modal-panel-size .btn {
+div.modal-card-size .btn {
     font-size: 14px;
 }
 /* END NVCL core image display */
@@ -138,11 +150,6 @@ div.modal-panel-size .btn {
 .col-sm-7, .col-sm-8, .col-sm-9, .col-xs-1, .col-xs-10, .col-xs-11, .col-xs-12, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5,
 .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9 {
     margin-bottom: 5px;
-}
-
-/* NVCL Analytic download email input box */
-input[name="email"] {
-    width: 97%
 }
 
 /* NVCL definition link */
@@ -160,10 +167,4 @@ input[name="email"] {
 /* NVCL job buttons */
 .lightgray-bg {
 	background: #e4e4e4;
-}
-
-/* Area used by "add to clipboard" button in the querier panel */
-.clipboard-area {
-    width: 100%;
-    margin-top: 0px !important;
 }

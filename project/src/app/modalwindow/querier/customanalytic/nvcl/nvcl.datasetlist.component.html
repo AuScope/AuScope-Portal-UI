@@ -1,56 +1,56 @@
-<div class="panel-group" id="nvcl-dataset">
-	<!-- BEGIN panel -->
-	<div *ngFor="let nvclDataset of nvclDatasets;let i = index" class="panel panel-default panel-bordered">
-			<div class="panel panel-default panel-with-tabs">
-				<!-- BEGIN panel-heading -->
-				<div class="panel-heading">
-					<ul id="nvcl-panel-tab" class="nav nav-tabs pull-right">
+<div id="nvcl-dataset">
+	<!-- BEGIN card -->
+	<div *ngFor="let nvclDataset of nvclDatasets;let i = index" class="card card-default card-bordered">
+			<div class="card card-default card-with-tabs">
+				<!-- BEGIN card-header -->
+				<div class="card-header">
+					<ul id="nvcl-card-tab" class="nav nav-tabs float-right">
 						<li (click)="nvclDataset.image=true;nvclDataset.scalar=false;nvclDataset.download=false;" [ngClass]="{'show':nvclDataset.image}"><a
-							 href="#{{nvclDataset.datasetName}}-nvcl-panel-tab-image" data-toggle="tab"><i class="fa fa-home"></i> <span class="hidden-xs">Image</span></a></li>
-						<li class="desktop-only" (click)="nvclDataset.image=false;nvclDataset.scalar=true;nvclDataset.download=false;" [ngClass]="{'show':nvclDataset.scalar}"><a
-							 href="#{{nvclDataset.datasetName}}-nvcl-panel-tab-scalar" data-toggle="tab"><i class="fa fa-user"></i> <span class="hidden-xs">Scalar</span></a></li>
-						<li class="desktop-only" (click)="nvclDataset.image=false;nvclDataset.scalar=false;nvclDataset.download=true;" [ngClass]="{'show':nvclDataset.download}"><a
-							 href="#{{nvclDataset.datasetName}}-nvcl-panel-tab-download" data-toggle="tab"><i class="fa fa-user"></i> <span class="hidden-xs">Download</span></a></li>
+							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-image" data-toggle="tab"><i class="fa fa-file-image-o"></i> <span class="d-none d-md-inline"> Image</span></a></li>
+						<li class="d-none d-xl-inline" (click)="nvclDataset.image=false;nvclDataset.scalar=true;nvclDataset.download=false;" [ngClass]="{'show':nvclDataset.scalar}"><a
+							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-scalar" data-toggle="tab"><i class="fa fa-signal"></i> <span class="d-none d-xl-inline"> Scalar</span></a></li>
+						<li class="d-none d-md-block" (click)="nvclDataset.image=false;nvclDataset.scalar=false;nvclDataset.download=true;" [ngClass]="{'show':nvclDataset.download}"><a
+							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-download" data-toggle="tab"><i class="fa fa-download"></i> <span class="d-none d-md-inline"> Download</span></a></li>
 					</ul>
-					<h4 class="panel-title">Dataset Name: {{nvclDataset.datasetName}}</h4>
+					<h4 class="card-title"><span class="d-none d-sm-block">Dataset Name: </span>{{nvclDataset.datasetName}}</h4>
 				</div>
-				<!-- END panel-heading -->
+				<!-- END card-header -->
 				<!-- BEGIN tab-content -->
-				<div id="panel-tab-content" class="tab-content">
+				<div id="card-tab-content" class="tab-content">
 					<!-- BEGIN tab-pane -->
-					<div class="tab-pane fade in show" [ngClass]="{'in show':nvclDataset.image}" id="{{nvclDataset.datasetName}}-nvcl-panel-tab-image">
-						<div class="modal-panel-size loading-iframe">
-							<button class="pull-right" mat-stroked-button (click)="openLegend(nvclDataset.datasetId)">Show Legend</button>
+					<div class="tab-pane fade" [ngClass]="{'show':nvclDataset.image}" id="{{nvclDataset.datasetName}}-nvcl-card-tab-image">
+						<div class="modal-card-size loading-iframe">
+							<button class="float-right" mat-stroked-button (click)="openLegend(nvclDataset.datasetId)">Show Legend</button>
 							<ng-select *ngIf="nvclDataset.datasetId" [items] = "datasetScalars[nvclDataset.datasetId]" [multiple]="false" bindLabel="logName" bindValue="logId" placeholder="Select Scalar" (change)="changeScalarSelection(nvclDataset.datasetId)" [(ngModel)]="selectedScalar"></ng-select>
 							<iframe *ngIf="datasetImages[nvclDataset.datasetId]" frameborder="0" [src]="datasetImages[nvclDataset.datasetId] | trustResourceUrl"></iframe>
 						</div>
 					</div>
 					<!-- END tab-pane -->
 					<!-- BEGIN tab-pane -->
-					<div class="tab-pane fade" [ngClass]="{'in show':nvclDataset.scalar}" id="{{nvclDataset.datasetName}}-nvcl-panel-tab-scalar">
-						<div class="modal-panel-size">
+					<div class="tab-pane fade" [ngClass]="{'show':nvclDataset.scalar}" id="{{nvclDataset.datasetName}}-nvcl-card-tab-scalar">
+						<div class="modal-card-size">
 							<div *ngIf="drawGraphMode==false;" style="overflow: auto; width: 100%; height: 100%;">
 								<div>
 									<!-- BEGIN toolbar -->
 									<div class="container-fluid">
-										<div class="row hidden-xs">
-											<div class="col-sm-3">
-												<div *ngIf="jobList[featureId].length > 0" data-toggle="tooltip" title="Job View" (click)="jobView=true;" class="btn btn-default btn-sm"
+										<div class="row justify-content-between d-none d-md-flex">
+											<div class="col-3">
+												<div *ngIf="jobList[featureId].length > 0" data-toggle="tooltip" title="Job View" (click)="jobView=true;" class="btn btn-light btn-sm"
 												 [ngClass]="{'lightgray-bg':jobView}">
 													<span><i class="ti-flag-alt"></i>Job</span>
 												</div>
-												<div data-toggle="tooltip" title="Scalar View" (click)="jobView=false;" class="btn btn-default btn-sm" [ngClass]="{'lightgray-bg':!jobView}">
+												<div data-toggle="tooltip" title="Scalar View" (click)="jobView=false;" class="btn btn-light btn-sm" [ngClass]="{'lightgray-bg':!jobView}">
 													<span><i class="ti-panel"></i> Scalar</span>
 												</div>
 											</div>
-											<div class="col-sm-4 col-sm-offset-5">
-												<div  *ngIf="!jobView" data-toggle="tooltip" title="Download csv" (click)="downloadCSV(nvclDataset.datasetId)" class="btn btn-default btn-sm">
+											<div class="col-5">
+												<div  *ngIf="!jobView" data-toggle="tooltip" title="Download csv" (click)="downloadCSV(nvclDataset.datasetId)" class="btn btn-light btn-sm">
 													<i class="ti-download"></i>
 												</div>
-												<div data-toggle="tooltip" title="Plot Analytic Graph" (click)="changeDrawGraphMode(true, nvclDataset.datasetId)" class="btn btn-default btn-sm">
+												<div data-toggle="tooltip" title="Plot Analytic Graph" (click)="changeDrawGraphMode(true, nvclDataset.datasetId)" class="btn btn-light btn-sm">
 													<i class="ti-bar-chart-alt"></i>
 												</div>
-												<div data-toggle="tooltip" title="Reset Selection" (click)="clearCheckBox(nvclDataset.datasetId)" class="btn btn-default btn-sm">
+												<div data-toggle="tooltip" title="Reset Selection" (click)="clearCheckBox(nvclDataset.datasetId)" class="btn btn-light btn-sm">
 													<i class="ti-loop"></i>
 												</div>
 											</div>
@@ -64,16 +64,16 @@
 										<div class="container-fluid">
 											<!-- BEGIN row -->
 											<div class="row" *ngFor="let datasetScalar of datasetScalars[nvclDataset.datasetId]">
-												<div class="col-xs-1 col-xs-offset-1 checkbox">
+												<div class="col-1 checkbox">
 													<input type="checkbox" value="10" id="log-checkbox-{{nvclDataset.datasetName}}-{{datasetScalar.logName}}" [(ngModel)]="datasetScalar.value"/>
 													<label for="log-checkbox-{{nvclDataset.datasetName}}-{{datasetScalar.logName}}"></label>
 												</div>
-												<div class="col-xs-8">
+												<div class="col-8">
 													<div>{{datasetScalar.logName}}</div>
 													<div>LogId: {{datasetScalar.logId}}</div>
 													<div class="definition" *ngIf="datasetScalarDefinition[datasetScalar.logName]">{{datasetScalarDefinition[datasetScalar.logName].definition}}</div>
 												</div>
-												<div class="col-xs-2">
+												<div class="col-2">
 													<span><div class="fake-link" (click)="getDefinition(datasetScalar.logName)">Definition</div></span>
 												</div>
 											</div>
@@ -108,9 +108,9 @@
 								</div>
 							</div>
 
-							<div *ngIf="drawGraphMode==true;" class="modal-panel-size">
+							<div *ngIf="drawGraphMode==true;" class="modal-card-size">
 								<div style="overflow: auto; width: 100%; height: 100%;">
-									<div class="hasEvent light-blue" (click)="changeDrawGraphMode(false)" style="position: fixed;z-index: 10;right: 10%;">
+									<div class="hasEvent light-blue window-close" (click)="changeDrawGraphMode(false)">
 										<i class="fa fa-window-close" aria-hidden="true"></i> close</div>
 									<div id="rickshawChart_outer">
 										<div *ngFor="let selectedLogName of selectedLogNames[nvclDataset.datasetId]; let j = index">
@@ -122,17 +122,17 @@
 													</section>
 													<section>
 														<div id="renderer_form_{{j}}" class="toggler">
-															<input type="radio" name="renderer" id="area_{{j}}" value="area"> <label for="area_{{j}}">area</label> <input
-															 type="radio" name="renderer" id="bar_{{j}}" value="bar" checked> <label for="bar_{{j}}">bar</label> <input
-															 type="radio" name="renderer" id="line_{{j}}" value="line"> <label for="line_{{j}}">line</label> <input type="radio"
-															 name="renderer" id="scatter_{{j}}" value="scatterplot"> <label for="scatter_{{j}}">scatter</label>
+															<input type="radio" name="renderer" id="area_{{j}}" value="area"> <label for="area_{{j}}">area</label>
+															<input type="radio" name="renderer" id="bar_{{j}}" value="bar" checked> <label for="bar_{{j}}">bar</label>
+															<input type="radio" name="renderer" id="line_{{j}}" value="line"> <label for="line_{{j}}">line</label>
+															<input type="radio" name="renderer" id="scatter_{{j}}" value="scatterplot"> <label for="scatter_{{j}}">scatter</label>
 														</div>
 													</section>
 													<section>
 														<div id="offset_form_{{j}}" class="toggler">
-															<label for="stack_{{j}}"> <input type="radio" name="offset" id="stack_{{j}}" value="zero" checked=""><span>stack</span></label>
-															<label for="pct_{{j}}"> <input type="radio" name="offset" id="pct_{{j}}" value="expand"> <span>pct</span></label>
-															<label for="value_{{j}}"> <input type="radio" name="offset" id="value_{{j}}" value="value"> <span>value</span></label>
+															<input type="radio" name="offset" id="stack_{{j}}" value="zero" checked><label for="stack_{{j}}">stack</label>
+															<input type="radio" name="offset" id="pct_{{j}}" value="expand"><label for="pct_{{j}}">pct</label>
+															<input type="radio" name="offset" id="value_{{j}}" value="value"><label for="value_{{j}}">value</label>
 														</div>
 														<div id="interpolation_form_{{j}}" style="display: none;">
 															<label for="cardinal_{{j}}"> <input type="radio" name="interpolation" id="cardinal-{{j}}" value="cardinal"
@@ -158,7 +158,7 @@
 											</div>
 											<hr>
 										</div>
-										<div id="preview_last"></div>
+                                        <div id="preview_last"></div>
 									</div>
 								</div>
 							</div>
@@ -166,17 +166,17 @@
 					</div>
 					<!-- END tab-pane -->
 					<!-- BEGIN tab-pane -->
-					<div class="tab-pane fade" [ngClass]="{'in show':nvclDataset.download}" id="{{nvclDataset.datasetName}}-nvcl-panel-tab-download">
+					<div class="tab-pane fade" [ngClass]="{'show':nvclDataset.download}" id="{{nvclDataset.datasetName}}-nvcl-card-tab-download">
 						<p>This data is best viewed with the free TSG Base. Available from <a href="https://research.csiro.au/thespectralgeologist/tsg/pricing/purchase-tsg/">here</a></p>
 						<form >
 							<div class="form-group  form-group-sm">
 								<label>EMAIL:</label>
-								<input type="text" class="form-control input-sm" [(ngModel)]="downloadEmail" name="email" ngModel #email="ngModel" required
+								<input type="text" class="form-control form-control-sm" [(ngModel)]="downloadEmail" name="email" ngModel #email="ngModel" required
 								 pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$">
 								<span class="validity" *ngIf="!email.valid && email.touched"></span>
 							</div>
 						</form>
-						<div class="pull-left">
+						<div class="float-left">
 							<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
 								<div class="btn-group">
 									<button type="button" class="btn btn-info btn-xs" (click)="downloadTSG(nvclDataset.datasetId)"><i *ngIf="downloadingTSG"
@@ -195,5 +195,5 @@
 				<!-- END tab-content -->
 			</div>
 	</div>
-	<!-- END panel -->
+	<!-- END card -->
 </div>

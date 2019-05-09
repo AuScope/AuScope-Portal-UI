@@ -2,17 +2,17 @@
 	<legend>
 		<h5>Advanced Filters</h5>
 	</legend>
-	<h6 class="filter-panel">Enable color coding by the group and parameter of interest.</h6>
+	<h6 class="filter-card">Enable color coding by the group and parameter of interest.</h6>
 	<div class="form-group  form-group-sm">
 		<label>Group of Interest</label>
-		<select class="form-control input-sm" [(ngModel)]="param.featureType" (change)="getAOIParam(param.featureType)">
+		<select class="form-control form-control-sm" [(ngModel)]="param.featureType" (change)="getAOIParam(param.featureType)">
 			<option *ngFor="let groupOfInterest of groupOfInterests" [ngValue]="groupOfInterest[1]">{{groupOfInterest[0]}}</option>
 		</select>
 	</div>
 
 	<div *ngIf="param.featureType" class="form-group  form-group-sm">
 		<label>Parameter of Interest</label>
-		<select class="form-control input-sm" [(ngModel)]="selectedPOI" (change)="setPOI(selectedPOI)">
+		<select class="form-control form-control-sm" [(ngModel)]="selectedPOI" (change)="setPOI(selectedPOI)">
 			<option *ngFor="let aoiParam of aoiParams" [ngValue]="aoiParam">{{aoiParam[0]}} {{aoiParam[1]!=''?'('+aoiParam[1]+')':''}}</option>
 		</select>
 	</div>

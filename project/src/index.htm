@@ -10,7 +10,7 @@
     <meta content="CSIRO" name="author" />
 
     <!-- ================== BEGIN BASE CSS STYLE ================== -->
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/themify-icons/0.1.2/css/themify-icons.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css" rel="stylesheet" />
@@ -28,7 +28,7 @@
 </head>
   <body>
 		<!-- BEGIN navbar -->
-		<div id="header" class="navbar navbar-fixed-top">
+		<div id="header" class="navbar fixed-top">
             <!-- BEGIN navbar-header -->
             <div class="navbar-header">
                 <!-- BEGIN organisation logo -->
@@ -39,7 +39,7 @@
                 <!-- END organisation logo -->
 
                 <!-- START sidebar toggle -->
-                <button id="sidebar-toggle-btn" class="nav navbar-toggle" data-toggle="collapse" data-target=".sidebar-collapse">
+                <button id="sidebar-toggle-btn" class="nav navbar-toggler d-inline d-md-none p-0 mb-0 mt-1" data-toggle="collapse" data-target=".sidebar-collapse">
                     <div class="nav-index-btn">
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
@@ -56,7 +56,7 @@
             <!-- END navbar-header -->
 
             <!-- BEGIN notification dropdown -->
-            <ul class="nav navbar-nav navbar-right">
+            <ul class="nav navbar-nav mb-1 mr-3">
                 <li class="dropdown" app-notification></li>
             </ul>
             <!-- END notification dropdown -->
@@ -69,41 +69,41 @@
 			<h5><a href="http://www.auscope.org.au/"><i class="ti-home"></i><span>About</span></a></h5>
 			<h5><a href="mailto:cg-admin@csiro.au?Subject=Auscope-portal"><i class="ti-email"></i><span>Contact us</span></a></h5>
 			<li class="hasEvent" appPermanentLink></li>
-			<li class="hasEvent desktop-only" appFilterClipboard></li>
+			<li class="hasEvent d-none d-md-block" appFilterClipboard></li>
 			<h6 class="sidebar-heading">Layer Selection</h6>
             <!-- BEGIN All Layers -->
             <input type="checkbox" class="menuBtn" id="allLayersBtn"/>
-			<h5>
-				<label for="allLayersBtn">
+			<h5 class="mb-1">
+				<label for="allLayersBtn" class="mb-0">
 				    <i class="ti-layers"></i>
 				    All Layers
                     <i class="fa fa-arrow-circle-down"></i>
 				</label>
-				<ul class="panel-sub" appLayerPanel></ul>
+				<ul class="card-sub" appLayerPanel></ul>
 			</h5>
             <!-- END All Layers -->
 
             <!-- BEGIN Custom Layers -->
             <input type="checkbox" class="menuBtn" id="customLayersBtn"/>
-			<h5>
-				<label for="customLayersBtn">
+			<h5 class="mb-1">
+				<label for="customLayersBtn" class="mb-0">
 				    <i class="ti-pencil-alt"></i>
 				    Custom Layer
                     <i class="fa fa-arrow-circle-down"></i>
 				</label>
-				<ul class="panel-sub" appCustomPanel></ul>
+				<ul class="card-sub" appCustomPanel></ul>
 			</h5>
             <!-- END Custom Layers -->
 
             <!-- BEGIN Catalogue Search -->
             <input type="checkbox" class="menuBtn" id="catalogueBtn"/>
-			<h5>
-				<label for="catalogueBtn">
+			<h5 class="mb-1">
+				<label for="catalogueBtn" class="mb-0">
                     <i class="ti-book"></i>
 				    Catalogue Search
                     <i class="fa fa-arrow-circle-down"></i>
 				</label>
-				<ul class="panel-sub" appCatalogueSearchPanel></ul>
+				<ul class="card-sub" appCatalogueSearchPanel></ul>
 			</h5>
             <!-- END Catalogue Search -->
 
@@ -116,16 +116,16 @@
 			<!-- BEGIN map-area-controlsr -->
 			<div class="map-area-controls">
 
-                <div class="btn-group pull-right desktop-only">
-					<app-olmap-baselayerselector class="pull-right" style="margin-bottom:10px"></app-olmap-baselayerselector>
+                <div class="btn-group float-right d-none d-md-block">
+					<app-olmap-baselayerselector class="float-right mb-3"></app-olmap-baselayerselector>
 					<br>
-					<app-ol-map-zoom class="pull-right" style="margin-bottom:10px"></app-ol-map-zoom>
+					<app-ol-map-zoom class="float-right mb-3"></app-ol-map-zoom>
 					<br>
-					<app-ol-clipboard class="btn-inverse pull-right" style="margin-bottom:10px"></app-ol-clipboard>
+					<app-ol-clipboard class="btn-inverse float-right mb-3"></app-ol-clipboard>
                 </div>
 
-                <div class="btn-group pull-left">
-                    <button type="button" class="btn btn-sm btn-inverse active desktop-only" id="mouse-position" style="cursor: default;" >Coordinate: Lon/Lat</button>
+                <div class="btn-group float-left">
+                    <button type="button" class="btn btn-sm btn-inverse active d-none d-md-block" id="mouse-position" style="cursor: default;" >Coordinate: Lon/Lat</button>
                 </div>
 
 			</div>
@@ -133,15 +133,11 @@
 
 			<!-- BEGIN map-area-olmap -->
             <div class="map-area-olmap">
-				 <app-ol-map class="height-100pc width-100pc"></app-ol-map>
+				 <app-ol-map class="h-100 w-100"></app-ol-map>
             </div>
 			<!-- END map-area-olmap -->
 		</div>
 		<!-- END #content -->
-
-		<!-- BEGIN btn-scroll-top -->
-		<a href="#" data-click="scroll-top" class="btn-scroll-top fade"><i class="ti-arrow-up"></i></a>
-		<!-- END btn-scroll-top -->
 
     <!-- Modal window used as a popup when map querying -->
     <app-querier-modal-window></app-querier-modal-window>

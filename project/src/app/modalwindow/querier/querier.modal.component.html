@@ -5,55 +5,55 @@
                 </div>
 				<div class="modal-body">
 
-					<div class="panel panel-default">
-						<!-- END panel-heading -->
-						<!-- BEGIN panel-body -->
-
-						<div class="panel-body">
-							<!-- BEGIN panel-group -->
+					<div class="card card-default">
+						<!-- BEGIN card-body -->
+						<div class="card-body">
+							<!-- BEGIN form-inline -->
 							<div class="form-inline">
 								<div class="form-group  form-group-sm">
 				                    <label><i class="fa fa-filter" aria-hidden="true"></i> Filter: </label>
-									<select class="form-control input-sm" [(ngModel)]="selectLayerNameFilter">
+									<select class="form-control form-control-sm" [(ngModel)]="selectLayerNameFilter">
 										<option value="ALL" selected="selected">ALL</option>
 										<option *ngFor="let uniqueLayerName of uniqueLayerNames">{{uniqueLayerName}}</option>
 									</select>
 				                </div>
 			                </div>
+                            <!-- END form-inline -->
 							<div *ngIf="downloading"><h2 class="wip">Downloading <i class="fa fa-circle small"></i><i class="fa fa-circle small"></i><i class="fa fa-circle small"></i></h2></div>
-							<div class="panel-group" id="querier-accordion">
-								<!-- BEGIN panel -->
-								<div *ngFor="let doc of docs | querierFeatureSearchPipe:selectLayerNameFilter" class="panel panel-default panel-bordered">
-									<!-- BEGIN panel-heading -->
-									<div class="panel-heading">
-										<h4 class="panel-title">
-											<a (click)="collapse[doc.key]=!collapse[doc.key];parseTree(doc);" class="accordion-link"  data-parent="#querier-accordion">
+                            <!-- BEGIN querier accordion -->
+                            <div id="querier-accordion">
+								<!-- BEGIN card -->
+								<div *ngFor="let doc of docs | querierFeatureSearchPipe:selectLayerNameFilter; let i = index;" class="card card-default card-bordered">
+									<!-- BEGIN card-header -->
+									<div class="card-header">
+										<h4 class="card-title">
+											<a (click)="parseTree(doc);" class="accordion-link" data-toggle="collapse" href="#doc-collapse{{i}}">
 												{{doc.key}}
 											</a>
 										</h4>
 									</div>
-									<!-- END panel-heading -->
-									<!-- BEGIN panel-collapse -->
-									<div id="{{doc.key}}" class="panel-body panel-collapse collapse" [ngClass]="{'in' :collapse[doc.key]}">
-										<div class="panel panel-default panel-with-tabs">
-											<!-- BEGIN panel-heading -->
-											<div class="panel-heading">
-												<ul id="querier-panel-tab" class="nav nav-tabs pull-right">
-													<li (click)="doc.home=true;doc.analytic=false;" [ngClass]="{'active':doc.home}"><a href="#{{doc.key}}-panel-tab-home" data-toggle="tab"><i class="fa fa-home"></i> <span class="hidden-xs">WFS</span></a></li>
-													<li (click)="doc.home=false;doc.analytic=true" [ngClass]="{'active':doc.analytic}" *ngIf="analyticMap[doc.layer.id]" ><a href="#{{doc.key}}-panel-tab-profile" data-toggle="tab"><i class="fa fa-user"></i> <span class="hidden-xs">Analytic</span></a></li>
+									<!-- END card-header -->
+									<!-- BEGIN card-collapse -->
+									<div id="doc-collapse{{i}}" class="card-body card-collapse collapse">
+										<div class="card card-default card-with-tabs">
+											<!-- BEGIN card-header -->
+											<div class="card-header">
+												<ul id="querier-card-tab" class="nav nav-tabs float-right">
+													<li (click)="doc.home=true;doc.analytic=false;" [ngClass]="{'active':doc.home}"><a href="#{{doc.key}}-card-tab-home" data-toggle="tab"><i class="fa fa-list"></i><span class="d-none d-md-inline"> WFS</span></a></li>
+													<li (click)="doc.home=false;doc.analytic=true" [ngClass]="{'active':doc.analytic}" *ngIf="analyticMap[doc.layer.id]" ><a href="#{{doc.key}}-card-tab-profile" data-toggle="tab"><i class="fa fa-line-chart"></i><span class="d-none d-md-inline"> Analytic</span></a></li>
 												</ul>
-												<h4 *ngIf="doc.home" class="panel-title">Feature Detail</h4>
-                                                <h4 *ngIf="doc.analytic" class="panel-title">NVCL</h4>
+												<h4 *ngIf="doc.home" class="card-title">Feature Detail</h4>
+                                                <h4 *ngIf="doc.analytic" class="card-title">NVCL</h4>
 											</div>
-											<!-- END panel-heading -->
+											<!-- END card-header -->
 
 											<!-- BEGIN tab-content -->
-											<div id="panel-tab-content" class="tab-content" style="max-height:calc(60vh);">
+											<div id="card-tab-content" class="tab-content" style="max-height:calc(60vh);">
 												<!-- BEGIN tab-pane -->
-												<div *ngIf="doc.key !== 'Server Error'" class="tab-pane fade" [ngClass]="{'active in':doc.home}" id="{{doc.key}}-panel-tab-home">
-													<div *ngIf="bToClipboard || supportOpenInNewWindow(doc)" class="desktop-only" style="position: inherit;padding-top: unset;margin-bottom: 20px;">
-														<div class="pull-left hidden-xs clipboard-area">
-															<div *ngIf="bToClipboard" data-toggle="tooltip" title="Copy to Clipboard" (click)="CopyToClipboard(doc)" class="btn btn-default btn-sm">
+												<div *ngIf="doc.key !== 'Server Error'" class="tab-pane fade" [ngClass]="{'active show':doc.home}" id="{{doc.key}}-card-tab-home">
+													<div *ngIf="bToClipboard || supportOpenInNewWindow(doc)" style="position: inherit;padding-top: unset;margin-bottom: 20px;">
+														<div class="float-left d-none d-md-inline mt-0 w-100">
+															<div *ngIf="bToClipboard" data-toggle="tooltip" title="Copy to Clipboard" (click)="CopyToClipboard(doc)" class="btn btn-light btn-sm">
 																<span><i class="ti-clip"></i>Add to Clipboard</span>
 															</div>
 														</div>
@@ -88,13 +88,13 @@
 
 													<!-- END NEW Tree -->
 												</div>
-												<div *ngIf="doc.key === 'Server Error'" class="tab-pane fade" [ngClass]="{'active in':doc.home}" id="{{doc.key}}-panel-tab-home">
+												<div *ngIf="doc.key === 'Server Error'" class="tab-pane fade" [ngClass]="{'active show':doc.home}" id="{{doc.key}}-card-tab-home">
 													<p>Sorry - {{doc.onlineResource.url}} server has returned an error message. See browser console for more information</p>
 												</div>
 
 												<!-- END tab-pane -->
 												<!-- BEGIN tab-pane -->
-												<div *ngIf="analyticMap[doc.layer.id]" class="tab-pane fade" [ngClass]="{'active in':doc.analytic}" id="{{doc.key}}-panel-tab-profile">
+												<div *ngIf="analyticMap[doc.layer.id]" class="tab-pane fade" [ngClass]="{'active show':doc.analytic}" id="{{doc.key}}-card-tab-profile">
 													<app-custom-analytic [layer]="doc.layer" [load]="doc.loadSubComponent" [onlineResource] = "doc.onlineResource" [featureId]="doc.key" [doc] = "doc"></app-custom-analytic>
 												</div>
 												<!-- END tab-pane -->
@@ -102,33 +102,34 @@
 											<!-- END tab-content -->
 										</div>
 									</div>
-									<!-- END panel-collapse -->
+									<!-- END card-collapse -->
 								</div>
-								<!-- END panel -->
+								<!-- END card -->
 
-								<!-- BEGIN panel -->
-								<div *ngFor="let html of htmls | querierFeatureSearchPipe:selectLayerNameFilter" class="panel panel-default panel-bordered">
-									<!-- BEGIN panel-heading -->
-									<div class="panel-heading">
-										<h4 class="panel-title">
-											<a (click)="collapse[html.key]=!collapse[html.key]" class="accordion-link"  data-parent="#querier-accordion">
+								<!-- BEGIN card -->
+								<div *ngFor="let html of htmls | querierFeatureSearchPipe:selectLayerNameFilter; let i = index" class="card card-default card-bordered">
+									<!-- BEGIN card-header -->
+									<div class="card-header">
+										<h4 class="card-title">
+											<a class="accordion-link"  data-toggle="collapse" href="#html-collapse{{i}}">
 												{{html.key}}
 											</a>
 										</h4>
 									</div>
-									<!-- END panel-heading -->
-									<!-- BEGIN panel-collapse -->
-									<div id="{{html.key}}" class="panel-body panel-collapse collapse" [ngClass]="{'in' :collapse[html.key]}">
+									<!-- END card-header -->
+									<!-- BEGIN card-collapse -->
+									<div id="html-collapse{{i}}" class="card-body card-collapse collapse">
 										<div [innerHTML] = "html.value | trustResourceHtml"></div>
 									</div>
-									<!-- END panel-collapse -->
+									<!-- END card-collapse -->
 								</div>
+                                <!-- END card -->
 							</div>
-							<!-- END panel-group -->
+                            <!-- END querier accordion -->
 						</div>
-						<!-- END panel-body -->
+						<!-- END card-body -->
 					</div>
 				</div>
 				<div class="modal-footer">
-                    <button type="button" class="btn btn-default" (click)="bsModalRef.hide()">Close</button>
+                    <button type="button" class="btn btn-light" (click)="bsModalRef.hide()">Close</button>
 				</div>

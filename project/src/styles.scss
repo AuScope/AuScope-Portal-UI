@@ -6,6 +6,10 @@
 
 /* START general rules for index.html */
 
+:root {
+    font-size: 14px;
+}
+
 html, body { height: 100%; }
 body {
     margin: 0;
@@ -38,17 +42,8 @@ a, a:link, a:active, a:visited, a:hover { text-decoration: none }
 button, a, a:link, a:visited { color: $text-colour;  }
 button:hover, button:active, a:active, a:hover {color: $text-highlight-colour; }
 
-
 label {
     font-weight: 400;
-}
-
-.width-100pc {
-    width: 100% !important;
-}
-
-.height-100pc {
-    height: 100% !important;
 }
 
 .small, small {
@@ -61,7 +56,7 @@ label {
 /* START general colours */
 
 .highlight {
-    color: $text-highlight-colour;
+    color: $text-highlight-colour !important;
 }
 
 .text-primary {
@@ -105,106 +100,104 @@ label {
 
 
 /* START navbar rules */
-
 .navbar {
     min-height: $navbar-height;
+    height: $navbar-height;
     background-color: $background-colour;
     margin-bottom: 20px;
     width: 100%;
     position: fixed;
     z-index: 12;
-}
+    padding: 0;
 
-.navbar .navbar-brand {
-    color: #eee;
-    padding: 10px;
-}
+    .navbar-brand {
+        color: #eee;
+        padding: 10px;
+    }
 
-.navbar-brand > img {
-    display: inline;
-}
+    .navbar-brand > img {
+        display: inline;
+    }
 
-.navbar-header {
-	height: $navbar-height;
-    overflow-y: hidden;
-}
+    .navbar-header {
+    	height: $navbar-height;
+    }
 
-.navbar .navbar-notify {
-    min-width: 50px;
-    font-size: 20px;
-    padding-right: 10px;
-}
+    .navbar-notify {
+        min-width: 50px;
+        font-size: 20px;
+        display: inline !important;
+    }
 
-.navbar .navbar-notify i {
-    line-height: 20px;
-    margin-right: 50px;
-    position: relative;
-    top: 8px;
-}
+    .navbar-notify i {
+        line-height: 20px;
+        position: relative;
+        top: 8px;
+    }
 
-.navbar-notify {
-    display: inline !important;
-}
+    .nav > li >a:hover, .nav > li >a:focus {
+        background-color: $background-colour;
+        text-decoration: none;
+    }
 
-.nav > li >a:hover, .nav > li >a:focus {
-    background-color: $background-colour;
-    text-decoration: none;
-}
+    li.dropdown.show > a.dropdown-toggle > i {
+         color: $text-highlight-colour;
+    }
 
-li.dropdown.show > a.dropdown-toggle > i {
-     color: $text-highlight-colour;
-}
+    button:focus {
+        outline: none;
+    }
 
-.navbar-nav {
-	margin-bottom: 10px;
-}
+    .navbar-nav {
+        width: 50px;
+    }
 
-/* position the twitter feed dropdown */
-.navbar-nav > li >.dropdown-menu {
-    right: 20px;
-    left: auto;
-    top: $navbar-height + 8px;
-    min-width: 310px;
-}
+    /* position the twitter feed dropdown */
+    .navbar-nav > li > .dropdown-menu {
+        position: absolute;
+        right: 20px;
+        left: auto;
+        top: $navbar-height + 8px;
+        min-width: 310px;
+    }
 
-/* Organisation logo */
-#org-logo {
-    background-color: transparent;
-    width: 33px;
-    height: 33px;
-    border: none;
-}
+    /* Organisation logo */
+    #org-logo {
+        background-color: transparent;
+        width: 33px;
+        height: 33px;
+        border: none;
+    }
 
-/* Sidebar menu toggle button */
-.icon-bar {
-    background-color: $text-highlight-colour;
-}
+    /* Sidebar menu toggle button */
+    .navbar-toggler {
+        .icon-bar {
+            background-color: $text-highlight-colour;
+            display: block;
+            width: 22px;
+            height: 2px;
+            border-radius: 1px;
+          }
 
-.nav-map-btn {
-    font-size: 24px;
-    position: relative!important;
-    top: -4px;
-    left: -4px;
-}
+          .icon-bar + .icon-bar {
+            margin-top: 4px;
+          }
 
-button.nav.navbar-toggle {
-    margin-bottom: 0px;
+          .nav-map-btn {
+              font-size: 24px;
+              position: relative !important;
+              left: -4px;
+              color: $text-highlight-colour;
+          }
+    }
 }
-
 /* END navbar rules */
 
 
 
-/* START sidebar rules */
-
-.sidebar-heading {
-    color: #496480!important;
-    font-weight: 700;
-    margin-left: 18px;
-    font-style: italic;
-    font-size: 12px;
-}
-
+/* START sidebar rules
+ * NB: For filter, info, download panel rules, see "menupanel.scss"
+ */
 .sidebar {
     border-radius: 0;
     position: fixed;
@@ -220,82 +213,132 @@ button.nav.navbar-toggle {
     overflow-x: hidden !important;
     padding-bottom: 40px;
     transition: all .2s ease-in-out;
+
+    .red {
+    	 color: #ec5661;
+    }
+
+    .sidebar-heading {
+        color: #496480!important;
+        font-weight: 700;
+        margin-left: 1.5rem;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+        font-style: italic;
+        font-size: 1rem;
+    }
+
+    h5 i {
+        font-size: 1rem;
+    }
+
+    a {
+        color: $text-colour;
+    }
+
+
+
+    a > i {
+        color: $text-colour;
+    }
+
+    a:hover > i, a.active > i {
+        color: $text-highlight-colour;
+    }
+
+    .input-group {
+        /* Colours of dropdowns */
+        ul a {
+            color: black;
+        }
+    }
+
+    li, h5 > label {
+        color: #fff;
+        font-size: 1rem;
+        line-height: 20px;
+        margin-left: 4px;
+    }
+
+    ul > li {
+        font-size: 0.85rem;
+        color: $text-colour;
+        margin: 0;
+    }
+
+    ul > li:hover {
+        color: $text-highlight-colour;
+    }
+
+    h5 > a {
+        margin-left: 4px;
+    }
+
+    /* "about" & "contact us" highlight */
+    h5 > a > span:hover {
+        color: $text-highlight-colour;
+    }
+
+    /* menu highlight */
+    h5 > label:hover,
+    .menuBtn:checked + h5 > label {
+        color: $text-highlight-colour;
+    }
+
+    i + span, h5 > label {
+        font-size: 1rem;
+        color: $text-colour;
+        margin-left: 4px;
+    }
+
+    /* "permanent link" & "polgon filter" highlight */
+    a:hover > i + span {
+        color: $text-highlight-colour;
+    }
+
+    /* spacing between menu links */
+    h5 + li {
+        margin-bottom: 5px;
+    }
+
+    /* top level menu control in sidebar */
+
+    .menuBtn + h5 > ul {
+        /*opacity: 0.01; max-height: 0px; transition: opacity 1s, max-height 1s;*/
+        display: none;
+    }
+
+    .menuBtn:checked + h5 > ul {
+        /*opacity: 1; max-height: 999px; transition: opacity 1s, max-height 1s;*/
+        display: block;
+    }
+
+    .menuBtn:checked + h5 > label > i.fa.fa-arrow-circle-down {
+        display: inline;
+    }
+
+    .menuBtn,
+    .menuBtn + h5 > label > i.fa.fa-arrow-circle-down {
+        display: none;
+    }
+
+   /* Do not display sidebar menu subtitles and items when 'hidden' */
+    i.hidden, ul.hidden {
+        display: none;
+    }
+
+    /* "All layers" filter dropdown box */
+    #menu-option-dropdown {
+        i, i:hover, a, a:hover {
+            color: black;
+        }
+    }
 }
-
-.sidebar > li,
-.sidebar > h5 > label {
-    color: #fff;
-    font-size: 12px;
-    line-height: 20px;
-    margin-left: 4px;
-}
-
-i + span, .sidebar > h5 > label {
-    font-size: 14px;
-    color: $text-colour;
-    margin-left: 4px;
-}
-
-.sidebar h5 > a {
-    margin-left: 4px;
-}
-
-/* "permanent link" & "polgon filter" highlight */
-a:hover > i + span {
-    color: $text-highlight-colour;
-}
-
-/* "about" & "contact us" highlight */
-.sidebar > h5 > a > span:hover {
-    color: $text-highlight-colour;
-}
-
-/* menu highlight */
-.sidebar > h5 > label:hover,
-.menuBtn:checked + h5 > label {
-    color: $text-highlight-colour;
-}
-
-/* spacing between menu links */
-h5 + li {
-    margin-bottom: 5px;
-}
-
-/* top level menu control in sidebar */
-
-.menuBtn + h5 > ul {
-    /*opacity: 0.01; max-height: 0px; transition: opacity 1s, max-height 1s;*/
-    display: none;
-}
-
-.menuBtn:checked + h5 > ul {
-    /*opacity: 1; max-height: 999px; transition: opacity 1s, max-height 1s;*/
-    display: block;
-}
-
-.menuBtn:checked + h5 > label > i.fa.fa-arrow-circle-down {
-    display: inline;
-}
-
-.menuBtn,
-.menuBtn + h5 > label > i.fa.fa-arrow-circle-down {
-    display: none;
-}
-
-/* The bell icon in the alert panels used when adding various layers */
-.alert .ti-bell {
-    font-size: 30px;
-    margin-right: 10px;
-    top: -7px;
-    position: relative;
-}
-
 /* END sidebar rules */
 
 
 
 /* START map area rules */
-
 .map-area {
     overflow: hidden;
     margin-left: $sidebar-width;
@@ -303,37 +346,37 @@ h5 + li {
     position: relative;
     height: calc(100% - #{$navbar-height});
     top: $navbar-height;
-}
 
-.map-area-olmap {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-}
+    .map-area-olmap {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
 
-.map-area-controls {
-    position: relative;
-    z-index: 10;
-}
+    .map-area-controls {
+        position: relative;
+        z-index: 10;
+    }
 
-.ol-scale-line, .ol-control button {
-    background-color: #7aa5c5 !important;
-}
+    .ol-scale-line, .ol-control button {
+        background-color: #7aa5c5 !important;
+        color: white !important;
+    }
 
-/* Map buttons */
-.map-area-controls button {
-    color: white;
-    background-color: #7aa5c5;
-    box-shadow: none !important;
-}
+    /* Map buttons */
+    .map-area-controls button {
+        color: white !important;
+        background-color: #7aa5c5;
+        box-shadow: none !important;
+    }
 
-.map-area-controls button:hover, .map-area-controls button:focus {
-    color: white;
-    background-color: #6c82b3;
+    .map-area-controls button:hover, .map-area-controls button:focus {
+        color: white;
+        background-color: #6c82b3;
+    }
 }
-
 /* END map area rules */
 
 .input-group {
@@ -342,6 +385,8 @@ h5 + li {
 
 .nav-tabs {
     border-bottom-color: $text-highlight-colour;
+    padding-bottom: 7px;
+    margin-top: 10px;
 }
 
 .nav-tabs > li > a {
@@ -360,7 +405,7 @@ h5 + li {
 
 .nav-tabs > li > a:hover, .nav-tabs > li > a:focus {
     color: $text-colour;
-    background-color: $background-colour;
+    /* background-color: $background-colour; */
     border-color: $background-colour;
     border-bottom-color: $text-highlight-colour;
 }
@@ -373,16 +418,16 @@ h5 + li {
     color: $text-highlight-colour;
 }
 
-.panel.panel-info {
+.card.card-info {
     box-shadow: 0 0 0 2px #ccc;
 }
 
-.layer-panel {
+.layer-card {
     left: -100px;
-    width: $panel-width;
+    width: $card-width;
 }
 
-.panel {
+.card {
     position: relative;
     margin-bottom: 12px;
     border-radius: 0;
@@ -393,54 +438,53 @@ h5 + li {
     background-color: $background-colour;
 }
 
-.panel-title {
+.card-title {
     font-size: 12px;
 }
 
-.panel-info > .panel-heading {
+.card-info > .card-header {
     color: #fff;
     background-color: $background-colour;
     border-color: $border-colour;
 }
 
-.panel.panel-with-tabs .panel-heading {
+.card.card-with-tabs .card-header {
     border-bottom: none;
 }
 
-.panel .accordion-link {
+.card .accordion-link {
     margin: -6px -12px;
     padding: 6px 12px;
     text-decoration: none;
     display: block;
 }
 
-.panel.panel-bordered {
+.card.card-bordered {
     border: 1px solid $border-colour;
 }
 
-.panel-sub .panel .panel-heading {
+.card-sub .card .card-header {
 	height:43px;
 }
 
-.panel.panel-bordered a:hover {
+.card.card-bordered a:hover {
     color: $blue-hover-colour;
 }
 
-.infopanel-legend {
+.infocard-legend {
 	max-width: 260px;
 }
 
-.sidebar-panel-menu-show {
+.table.table-inverse {
+    color: $text-highlight-colour;
+}
+
+.sidebar-card-menu-show {
 	list-style-type: none;
 	margin: 0;
 	padding: 5px 0;
 	margin-left: 25px;
 	font-size: 12px;
-}
-
-.form-control {
-    margin: 0 1.0em 0 0.5em;
-    width: 100%;
 }
 
 .form-group > label {
@@ -455,11 +499,11 @@ h5 + li {
     margin: 0 0 0.5em 0.5em;
 }
 
-.btn-sm.pull-right {
+.btn-sm.float-right {
     margin: 0 1.5em 0.5em 0;
 }
 
-.btn-xs.pull-right {
+.btn-xs.float-right {
     margin: 0 0.5em 0.5em 0;
 }
 
@@ -605,27 +649,19 @@ fieldset.show-fieldset-borders-whitebg legend{
 /*
  * width < 768px (small screen)
 */
-@media (max-width: 768px) {
-	.layer-panel {
+@media (max-width: 767px) {
+	.layer-card {
 		left: -60px;
 		width: calc(100% + 50px);
 	}
 
-	.layer-panel > .panel-heading li > a {
+	.layer-card > .card-header li > a {
 		height: 30px;
 	}
 
-    .panel-body .form-group > label + select {
+    .card-body .form-group > label + select {
         margin-left: 0px;
     }
-
-	.desktop-only {
-		display: none!important
-	}
-
-	.mobile-only {
-		display:block;
-	}
 
     .map-area {
         margin-left: 0;
@@ -635,33 +671,33 @@ fieldset.show-fieldset-borders-whitebg legend{
         left: $sidebar-width-folded;
         width: $sidebar-width-folded;
         margin-left: calc(-1.0 * #{$sidebar-width-folded});
-        top: calc(2.0 * #{$navbar-height});
+        top: $navbar-more-height;
     }
 
-    button.nav.navbar-toggle .nav-index-btn {
+    button.nav.navbar-toggler .nav-index-btn {
         opacity: 0;
         height: 0;
         transition: opacity 0.8s, height 0.8s;
     }
 
-    #menu-option-dropdown {
-        transform: translate3d(114px,34px,0px)!important;
-    }
-
-    button.nav.navbar-toggle.collapsed .nav-index-btn {
+    button.nav.navbar-toggler.collapsed .nav-index-btn {
         opacity: 1;
         transition: opacity 0.8s;
     }
 
-    button.nav.navbar-toggle.collapsed .nav-map-btn {
+    button.nav.navbar-toggler.collapsed .nav-map-btn {
         opacity: 1;
         transition: opacity 0.8s;
     }
 
-    button.nav.navbar-toggle.collapsed .nav-map-btn {
+    button.nav.navbar-toggler.collapsed .nav-map-btn {
         opacity: 0;
         height: 0;
         transition: opacity 0.8s, height 0.8s;
+    }
+
+    .navbar {
+        height: $navbar-more-height;
     }
 
     /* Notifications dropdown */
@@ -680,37 +716,41 @@ fieldset.show-fieldset-borders-whitebg legend{
 } /* End of width < 768px */
 
 /*
- * width > 768px (larger screen)
+ * width > 576px (small screen)
  */
-@media (min-width: 768px) {
-
-	.mobile-only {
-		display: none!important
-	}
-
-	.desktop-only, .sidebar {
-		display: block;
-	}
+@media (min-width: 576px) and (max-width: 768px){
+    .modal-dialog {
+        max-width: 550px;
+        width: 550px;
+        height: 900px; /* control height here */
+        margin: 1.75rem auto;
+    }
 }
 
-@media (min-width: 1100px) {
+/*
+ * width > 768px & width < 900 (larger screen)
+ */
+@media (min-width: 768px) and (max-width: 900px) {
     .modal-lg {
-        width: 1100px;
+        max-width: 720px;
+        width: 720px;
         height: 900px; /* control height here */
     }
 }
 
 @media (min-width: 900px) and (max-width: 1100px) {
     .modal-lg {
-        width: 900px;
+        max-width: 850px;
+        width: 850px;
         height: 900px; /* control height here */
     }
 }
 
-@media (min-width: 750px) and (max-width: 900px) {
+@media (min-width: 1100px) {
     .modal-lg {
-        width: 760px;
-        height: 900px; /* control height here */
+        max-width: 1050px;
+        width: 1050px;
+        height: 1100px; /* control height here */
     }
 }
 
@@ -791,31 +831,33 @@ fieldset.show-fieldset-borders-whitebg legend{
 
 
 /* START  modal dialog rules */
-.modal-dialog .panel, .modal-dialog .panel-body {
-    background-color: #fff !important;
-    color: #000 !important;
-}
+.modal-dialog {
+    .card, .card-body {
+        background-color: #fff !important;
+        color: #000 !important;
+    }
 
-.modal-dialog .nav-tabs > li.active > a span {
-    color: #000;
-}
+    .nav-tabs > li.active > a span {
+        color: #000;
+    }
 
-.modal-dialog .nav-tabs i.fa {
-    font-size: 16px;
-}
+    .nav-tabs i.fa {
+        font-size: 16px;
+    }
 
-.modal-dialog .nav-tabs > li {
-    margin-top: 0px;
-}
+    .nav-tabs > li {
+        margin-top: 0px;
+    }
 
-.modal-dialog .nav-tabs > li.active > a {
-    border-bottom-color: #fff;
-}
+    .nav-tabs > li.active > a {
+        border-bottom-color: #fff;
+    }
 
-.modal-dialog .nav-tabs > li > a:hover {
-    background-color: transparent;
-    border-color: #fff;
-    color: $text-colour;
+    .nav-tabs > li > a:hover {
+        background-color: transparent;
+        border-color: #fff;
+        color: $text-colour;
+    }
 }
 /* END modal dialog rules */
 
@@ -914,7 +956,7 @@ fieldset.show-fieldset-borders-whitebg legend{
 
 .rickshaw_smoother_tick_num {
     display:inline-block;
-    width:5px;
+    width:20px;
     height:5px;
     position:absolute;
     top:-20px;

@@ -10,17 +10,43 @@
 	color: $text-highlight-colour;
 }
 
-.nav-tabs > li.active >a:focus,
-.nav-tabs> li.active > a:hover {
+.nav-tabs > li.active > a:focus,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a > i {
 	color: $text-highlight-colour;
 }
 
 .nav-tabs > li > a > i {
-	font-size: 16px;
+	font-size: 1.2em;
+    color: $text-colour;
 }
 
 .nav > li > a {
 	padding: 10px;
+}
+
+h5 {
+	font-size: 1rem;
+}
+
+h6 {
+	font-size: 0.9rem;
+}
+
+.infopanel-legend {
+	max-width: 220px;
+}
+
+/* The bell icon in the alert panels used when adding various layers */
+.alert .ti-bell {
+	font-size: 2rem;
+	margin-right: 10px;
+	position: relative;
+}
+
+.alert, p.small.text-danger {
+	margin-right: 10px;
+	margin-left: 10px;
 }
 
 /* START pagination */
@@ -106,7 +132,6 @@
 	box-shadow: none;
 	padding: 10px 0;
 	right: auto;
-	margin-top: 0;
 	border-radius: 9px;
 	font-size: 12px;
 }
@@ -114,7 +139,7 @@
 
 #menu-option-dropdown.dropdown-menu:after {
 	top: -18px;
-	left: 125px;
+	left: 105px;
 	border: 9px solid transparent;
 	border-bottom-color: #fff;
 	content: '';
@@ -134,15 +159,6 @@
     user-select: none;
 }
 
-.popup .popuptext .form-group button {
-	background-color: #deb887;
-	color: #efebeb;
-}
-
-.popup .popuptext .form-group button:hover {
-	color: #fff;
-}
-
 /* The actual popup */
 .popup .popuptext {
     visibility: hidden;
@@ -157,6 +173,13 @@
     top: 125%;
     left: 100%;
     margin-left: -80px;
+	button {
+		background-color: #deb887;
+		color: #efebeb;
+	}
+	button:hover {
+		color: #fff;
+	}
 }
 
 /* Popup arrow */
@@ -191,7 +214,7 @@ input[type=checkbox] + label {
 }
 
 .checkbox input {
-	top: -12px;
+	top: 10px;
 }
 
 .form-group .input-group {
@@ -199,13 +222,7 @@ input[type=checkbox] + label {
 }
 
 /* "All Layers" and "Custom Layers" search filter boxes */
-.input-group input.form-control {
-	margin-left: 0px;
-	margin-right: 0px;
-	min-width: 200px;
-}
-
-input + div.input-group-btn  > button {
+input + div.input-group-append  > button {
 	margin-right: 0px;
 }
 
@@ -217,7 +234,7 @@ input + div.input-group-btn  > button {
 
 /* For "Bounding Box" labels */
 .container {
-	width: $panel-width;
+	width: $card-width;
 	margin-left: -10px;
 }
 
@@ -237,6 +254,7 @@ input + div.input-group-btn  > button {
 /* Info Panel has an openlayers map */
 #previewMapElement {
 	display: block;
-	height: calc(#{$panel-width} - 30px);
-	width: calc(#{$panel-width} - 30px);
+	height: calc(#{$card-width} - 40px);
+	width: calc(#{$card-width} - 40px);
+	margin-left: 5px;
 }
