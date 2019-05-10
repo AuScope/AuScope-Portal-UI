@@ -1,6 +1,6 @@
 import {RenderStatusService} from './renderstatus/render-status.service';
 import {Constants} from '../../utility/constants.service';
-import {Injectable} from '@angular/core';
+import {Injectable , Inject} from '@angular/core';
 import olMap from 'ol/map';
 import olTile from 'ol/layer/tile';
 import olOSM from 'ol/source/osm';
@@ -24,8 +24,6 @@ import olFeature from 'ol/feature';
 import olEasing from 'ol/easing';
 import olObservable from 'ol/observable';
 import { Subject , BehaviorSubject} from 'rxjs';
-import { environment } from '../../../../environments/environment';
-
 
 export interface BaseMapLayerOption {
   value: string;
@@ -43,44 +41,46 @@ export class OlMapObject {
   private clickHandlerList: ((p: any) => void )[] = [];
   private ignoreMapClick = false;
   private baseLayers = [];
+  private baseMapLayers = [{ value: 'OSM', viewValue: 'OpenStreetMap', layerType: 'OSM' }];
+  constructor(private renderStatusService: RenderStatusService , @Inject('env') private env) {
+    if (env !== null) {
+      this.baseMapLayers = env.baseMapLayers;
+    }
 
-
-  constructor(private renderStatusService: RenderStatusService) {
-
-    for (let i = 0; i < environment.baseMapLayers.length; ++i) {
-      if ( environment.baseMapLayers[i].layerType === 'OSM') {
+    for (let i = 0; i < this.baseMapLayers.length; ++i) {
+      if ( this.baseMapLayers[i].layerType === 'OSM') {
         this.baseLayers.push(new olTile({
           visible: true,
           source: new olOSM()
         }));
-      } else if ( environment.baseMapLayers[i].layerType === 'Bing') {
+      } else if ( this.baseMapLayers[i].layerType === 'Bing') {
         this.baseLayers.push(new TileLayer({
           visible: false,
           preload: Infinity,
           source: new BingMaps({
             key: 'AgfoWboIfoy68Vu38c2RE83rEEuvWKjQWV37g7stRUAPcDiGALCEKHefrDyWn1zM',
-            imagerySet: environment.baseMapLayers[i].value,
+            imagerySet: this.baseMapLayers[i].value,
             // use maxZoom 19 to see stretched tiles instead of the BingMaps
             // "no photos at this zoom level" tiles
              maxZoom: 19
           })
         }));
-      } else if (environment.baseMapLayers[i].layerType === 'ESRI') {
+      } else if (this.baseMapLayers[i].layerType === 'ESRI') {
         this.baseLayers.push(new TileLayer({
           visible: false,
           preload: Infinity,
           source: new XYZ({
-            attributions: 'Tiles © <a href="https://services.arcgisonline.com/ArcGIS/rest/services/' + environment.baseMapLayers[i].value + '/MapServer">ArcGIS</a>',
-            url: 'https://server.arcgisonline.com/ArcGIS/rest/services/' + environment.baseMapLayers[i].value + '/MapServer/tile/{z}/{y}/{x}',
+            attributions: 'Tiles © <a href="https://services.arcgisonline.com/ArcGIS/rest/services/' + this.baseMapLayers[i].value + '/MapServer">ArcGIS</a>',
+            url: 'https://server.arcgisonline.com/ArcGIS/rest/services/' + this.baseMapLayers[i].value + '/MapServer/tile/{z}/{y}/{x}',
             maxZoom: 18
           })
         }));
-      } else if (environment.baseMapLayers[i].layerType === 'Google') {
+      } else if (this.baseMapLayers[i].layerType === 'Google') {
         this.baseLayers.push(new TileLayer({
           visible: false,
           preload: Infinity,
           source: new XYZ({
-            url: 'http://mt1.google.com/vt/lyrs=' + environment.baseMapLayers[i].value + '&x={x}&y={y}&z={z}'
+            url: 'http://mt1.google.com/vt/lyrs=' + this.baseMapLayers[i].value + '&x={x}&y={y}&z={z}'
           })
         }));
       }
@@ -111,8 +111,8 @@ export class OlMapObject {
 
   public switchBaseMap(newstyle: string): void {
       for (let i = 0; i < this.baseLayers.length; ++i) {
-        this.baseLayers[i].setVisible(environment.baseMapLayers[i].value === newstyle);
-        if (environment.baseMapLayers[i].value === 'World_Imagery' && newstyle === 'Reference/World_Boundaries_and_Places') {
+        this.baseLayers[i].setVisible(this.baseMapLayers[i].value === newstyle);
+        if (this.baseMapLayers[i].value === 'World_Imagery' && newstyle === 'Reference/World_Boundaries_and_Places') {
           this.baseLayers[i].setVisible(true);
         }
       }
