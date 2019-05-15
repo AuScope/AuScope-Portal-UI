@@ -22,7 +22,9 @@ body {
     list-style: none;
     overflow: hidden;
 }
-
+hr {
+    border-color:#333;
+}
 body, div, p, span, td, h1, dt, dd {
     font-family: "Open Sans", sans-serif !important;
 }
