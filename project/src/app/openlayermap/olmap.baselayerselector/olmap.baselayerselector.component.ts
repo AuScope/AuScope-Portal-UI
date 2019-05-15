@@ -4,7 +4,9 @@ import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-olmap-baselayerselector',
-  templateUrl: './olmap.baselayerselector.component.html'
+  templateUrl: './olmap.baselayerselector.component.html',
+  styleUrls: ['./olmap.baselayerselector.component.css']
+
 })
 export class OlmapBaselayerselectorComponent implements OnInit {
   public selectedLayer = 'OSM';
