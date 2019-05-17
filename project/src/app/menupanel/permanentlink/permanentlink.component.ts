@@ -2,8 +2,7 @@ import {ManageStateService} from '../../portal-core-ui/service/permanentlink/man
 import { UtilitiesService } from '../../portal-core-ui/utility/utilities.service';
 import { environment } from '../../../environments/environment';
 import {Component} from '@angular/core';
-
-declare var gapi: any;
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 @Component({
   selector: '[appPermanentLink]',
@@ -18,7 +17,10 @@ export class PermanentLinkComponent {
   public showPermanentLink = false;
   public shorteningMode = false;
 
-  constructor(private manageStateService: ManageStateService) {}
+  constructor(private http: HttpClient, private manageStateService: ManageStateService) {
+
+  }
+
   /**
    * generate the permanent link
    */
@@ -32,22 +34,21 @@ export class PermanentLinkComponent {
         const stateStr = UtilitiesService.encode_base64(String.fromCharCode.apply(String, result));
         me.permanentlink = environment.hostUrl + '?state=' + stateStr
         me.shorteningMode = true;
-        gapi.client.setApiKey('AIzaSyAwkIjU4nCPyditqP31L-W_h96FPT-TpyY');
-        gapi.client.load('urlshortener', 'v1', function() {
-          const Url = me.permanentlink
-          const request = gapi.client.urlshortener.url.insert({
-            'resource': {
-              'longUrl': Url
-            }
-          });
-          request.execute(function(response) {
-            if (response.id != null) {
-              setTimeout(() => {
-                me.permanentlink = response.id;
-                me.shorteningMode = false;
-              }, 0)
-            }
-          });
+        // Shorten url by bitly
+        let httpParams = new HttpParams();
+        httpParams = httpParams.append('format', 'json');
+        httpParams = httpParams.append('apiKey', 'R_c8a26bd1b5294388873f7d5adb79192b');
+        httpParams = httpParams.append('login', 'lingbojiang');
+        httpParams = httpParams.append('longUrl', me.permanentlink);
+        const me_ = me;
+        me.http.post('http://api.bitly.com/v3/shorten?', httpParams.toString(), {
+          headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'), responseType: 'json'
+        }).subscribe((response: any) => {
+          console.log(response.data.url);
+          if (response.status_txt === 'OK') {
+            me_.permanentlink = response.data.url;
+            me_.shorteningMode = false;
+          }
         });
       });
     }
