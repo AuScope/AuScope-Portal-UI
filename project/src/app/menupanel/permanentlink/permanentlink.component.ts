@@ -31,8 +31,8 @@ export class PermanentLinkComponent {
       this.manageStateService.getCompressedString(uncompStateStr, function(result) {
 
         // Encode state in base64 so it can be used in a URL
-        const stateStr = UtilitiesService.encode_base64(String.fromCharCode.apply(String, result));
-        me.permanentlink = environment.hostUrl + '?state=' + stateStr
+        const stateStr = encodeURIComponent(UtilitiesService.encode_base64(String.fromCharCode.apply(String, result)));
+        me.permanentlink = environment.hostUrl + '?state=' + stateStr;
         me.shorteningMode = true;
         // Shorten url by bitly
         let httpParams = new HttpParams();
@@ -44,11 +44,10 @@ export class PermanentLinkComponent {
         me.http.post('http://api.bitly.com/v3/shorten?', httpParams.toString(), {
           headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'), responseType: 'json'
         }).subscribe((response: any) => {
-          console.log(response.data.url);
           if (response.status_txt === 'OK') {
             me_.permanentlink = response.data.url;
-            me_.shorteningMode = false;
           }
+          me_.shorteningMode = false;
         });
       });
     }
