@@ -80,6 +80,19 @@ export class FilterPanelComponent implements OnInit {
         }
       });
     }
+
+    // LJ: nvclAnalyticalJob external link
+    const nvclanid = UtilitiesService.getUrlParameterByName('nvclanid');
+    if (nvclanid) {
+      const me = this;
+      if (me.layer.id === 'nvcl-v2-borehole') {
+        if (UtilitiesService.isEmpty(me.providers)) {
+          me.getProvider();
+        }
+        me.layer.filterCollection['mandatoryFilters'][0].value = nvclanid;
+        me.addLayer(me.layer);
+      }
+    }
   }
 
   /**

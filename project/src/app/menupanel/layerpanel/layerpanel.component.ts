@@ -179,7 +179,8 @@ export class LayerPanelComponent implements OnInit {
     }
 
     public ngOnInit() {
-
+        const nvclanid = UtilitiesService.getUrlParameterByName('nvclanid');
+        const nvclanemail = UtilitiesService.getUrlParameterByName('nvclanemail');
         const state = UtilitiesService.getUrlParameterByName('state');
         const me = this;
         this.manageStateService.getUnCompressedString(state, function(result) {
@@ -200,6 +201,12 @@ export class LayerPanelComponent implements OnInit {
                     me.layerGroups[key][i].expanded = true;
                     me.layerGroups[key][i].filterCollection.hiddenParams = layerStateObj[uiLayerModel.id].filterCollection.hiddenParams
                     me.layerGroups[key][i].filterCollection.mandatoryFilters = layerStateObj[uiLayerModel.id].filterCollection.mandatoryFilters
+                  }
+                  // LJ: nvclAnalyticalJob link
+                  if ( nvclanid && uiLayerModel.id === 'nvcl-v2-borehole') {
+                    me.layerGroups[key].expanded = true;
+                    me.layerGroups[key].loaded = me.layerGroups[key];
+                    me.layerGroups[key][i].expanded = true;
                   }
                   me.uiLayerModels[me.layerGroups[key][i].id] = uiLayerModel;
 
