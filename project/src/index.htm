@@ -76,7 +76,7 @@
             <!-- BEGIN All Layers -->
             <input type="checkbox" class="menuBtn" id="allLayersBtn"/>
 			<h5 class="mb-1">
-				<label for="allLayersBtn" class="mb-0">
+				<label id="allLayersLink" for="allLayersBtn" class="mb-0">
 				    <i class="ti-layers"></i>
 				    All Layers
                     <i class="fa fa-arrow-circle-down"></i>
@@ -153,6 +153,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-slimScroll/1.3.8/jquery.slimscroll.min.js"></script>
+    <script> $(document).ready(function(){$('#allLayersLink').click();});</script>
 	<!-- ================== END BASE JS ================== -->
 
 	<script async src="http://platform.twitter.com/widgets.js"></script>
