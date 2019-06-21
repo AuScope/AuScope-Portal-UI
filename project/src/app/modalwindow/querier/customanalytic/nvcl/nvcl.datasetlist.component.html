@@ -61,16 +61,16 @@
 									<!-- BEGIN jobView==false -->
 									<div *ngIf="jobView==false">
 										<!-- BEGIN container -->
-										<div class="container-fluid">
+										<div class="container-fluid card">
 											<!-- BEGIN row -->
-											<div class="row" *ngFor="let datasetScalar of datasetScalars[nvclDataset.datasetId]">
+											<div class="row card-body border" *ngFor="let datasetScalar of datasetScalars[nvclDataset.datasetId]">
 												<div class="col-1 checkbox">
 													<input type="checkbox" value="10" id="log-checkbox-{{nvclDataset.datasetName}}-{{datasetScalar.logName}}" [(ngModel)]="datasetScalar.value"/>
 													<label for="log-checkbox-{{nvclDataset.datasetName}}-{{datasetScalar.logName}}"></label>
 												</div>
 												<div class="col-8">
 													<div>{{datasetScalar.logName}}</div>
-													<div>LogId: {{datasetScalar.logId}}</div>
+													<!--<div>LogId: {{datasetScalar.logId}}</div>-->
 													<div class="definition" *ngIf="datasetScalarDefinition[datasetScalar.logName]">{{datasetScalarDefinition[datasetScalar.logName].definition}}</div>
 												</div>
 												<div class="col-2">
