@@ -4,21 +4,20 @@
 			<div class="card card-default card-with-tabs">
 				<!-- BEGIN card-header -->
 				<div class="card-header">
-					<ul id="nvcl-card-tab" class="nav nav-tabs float-right">
-						<li (click)="nvclDataset.image=true;nvclDataset.scalar=false;nvclDataset.download=false;" [ngClass]="{'show':nvclDataset.image}"><a
-							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-image" data-toggle="tab"><i class="fa fa-file-image-o"></i> <span class="d-none d-md-inline"> Image</span></a></li>
-						<li class="d-none d-xl-inline" (click)="nvclDataset.image=false;nvclDataset.scalar=true;nvclDataset.download=false;" [ngClass]="{'show':nvclDataset.scalar}"><a
-							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-scalar" data-toggle="tab"><i class="fa fa-signal"></i> <span class="d-none d-xl-inline"> Scalar</span></a></li>
-						<li class="d-none d-md-block" (click)="nvclDataset.image=false;nvclDataset.scalar=false;nvclDataset.download=true;" [ngClass]="{'show':nvclDataset.download}"><a
-							 href="#{{nvclDataset.datasetName}}-nvcl-card-tab-download" data-toggle="tab"><i class="fa fa-download"></i> <span class="d-none d-md-inline"> Download</span></a></li>
-					</ul>
+				<nav>				
+					<div class="nav nav-tabs float-right" role="tablist" id="nvcl-card-tab">
+						<a class="nav-item nav-link active"  data-toggle="tab" attr.href="#nvcl-card-tab-image-{{nvclDataset.datasetId}}" role="tab" attr.aria-controls="nvcl-card-tab-image-{{nvclDataset.datasetId}}" aria-selected="true"><i class="fa fa-file-image-o small"></i> <span class="d-none d-sm-inline"> Image</span></a>
+						<a class="nav-item nav-link"  data-toggle="tab" attr.href="#nvcl-card-tab-scalar-{{nvclDataset.datasetId}}" role="tab" attr.aria-controls="nvcl-card-tab-scalar-{{nvclDataset.datasetId}}" aria-selected="false">><i class="fa fa-signal small"></i> <span class="d-none d-sm-inline"> Scalar</span></a>
+						<a class="nav-item nav-link"  data-toggle="tab" attr.href="#nvcl-card-tab-download-{{nvclDataset.datasetId}}" role="tab" attr.aria-controls="nvcl-card-tab-download-{{nvclDataset.datasetId}}" aria-selected="false"><i class="fa fa-download small"></i> <span class="d-none d-sm-inline"> Download</span></a>
+					</div>
 					<h4 class="card-title"><span class="d-none d-sm-block">Dataset Name: </span>{{nvclDataset.datasetName}}</h4>
+				</nav>
 				</div>
 				<!-- END card-header -->
 				<!-- BEGIN tab-content -->
-				<div id="card-tab-content" class="tab-content">
+				<div class="tab-content" id="card-tab-content">
 					<!-- BEGIN tab-pane -->
-					<div class="tab-pane fade" [ngClass]="{'show':nvclDataset.image}" id="{{nvclDataset.datasetName}}-nvcl-card-tab-image">
+					<div class="tab-pane fade show active" id="nvcl-card-tab-image-{{nvclDataset.datasetId}}" role="tabpanel">
 						<div class="modal-card-size loading-iframe">
 							<button class="float-right" mat-stroked-button (click)="openLegend(nvclDataset.datasetId)">Show Legend</button>
 							<ng-select *ngIf="nvclDataset.datasetId" [items] = "datasetScalars[nvclDataset.datasetId]" [multiple]="false" bindLabel="logName" bindValue="logId" placeholder="Select Scalar" (change)="changeScalarSelection(nvclDataset.datasetId)" [(ngModel)]="selectedScalar"></ng-select>
@@ -27,7 +26,7 @@
 					</div>
 					<!-- END tab-pane -->
 					<!-- BEGIN tab-pane -->
-					<div class="tab-pane fade" [ngClass]="{'show':nvclDataset.scalar}" id="{{nvclDataset.datasetName}}-nvcl-card-tab-scalar">
+					<div class="tab-pane fade " id="nvcl-card-tab-scalar-{{nvclDataset.datasetId}}" role="tabpanel">
 						<div class="modal-card-size">
 							<div *ngIf="drawGraphMode==false;" style="overflow: auto; width: 100%; height: 100%;">
 								<div>
@@ -158,7 +157,7 @@
 											</div>
 											<hr>
 										</div>
-                                        <div id="preview_last"></div>
+                    <div id="preview_last"></div>
 									</div>
 								</div>
 							</div>
@@ -166,7 +165,7 @@
 					</div>
 					<!-- END tab-pane -->
 					<!-- BEGIN tab-pane -->
-					<div class="tab-pane fade" [ngClass]="{'show':nvclDataset.download}" id="{{nvclDataset.datasetName}}-nvcl-card-tab-download">
+					<div class="tab-pane fade" id="nvcl-card-tab-download-{{nvclDataset.datasetId}}" role="tabpanel">
 						<p>This data is best viewed with the free TSG Base. Available from <a href="https://research.csiro.au/thespectralgeologist/tsg/pricing/purchase-tsg/">here</a></p>
 						<form >
 							<div class="form-group  form-group-sm">

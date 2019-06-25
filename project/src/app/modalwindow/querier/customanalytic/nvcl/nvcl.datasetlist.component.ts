@@ -2,7 +2,7 @@ import { RickshawService } from '../../../../portal-core-ui/widget/chart/ricksha
 import { LayerModel } from '../../../../portal-core-ui/model/data/layer.model';
 import { OnlineResourceModel } from '../../../../portal-core-ui/model/data/onlineresource.model';
 import { NVCLService } from './nvcl.service';
-import { Component, Inject, Input, AfterViewInit } from '@angular/core';
+import { Component, Inject, Input, AfterViewInit, OnInit } from '@angular/core';
 import {HttpParams} from '@angular/common/http';
 import { DomSanitizer } from '@angular/platform-browser';
 import {saveAs} from 'file-saver/FileSaver';
@@ -22,7 +22,7 @@ export interface DialogData {
   providers: [NVCLService, RickshawService, NVCLBoreholeAnalyticService],
   styleUrls: ['../../../../portal-core-ui/widget/chart/rickshaw/rickshaw.service.scss', '../../../modalwindow.scss']
 })
-export class NVCLDatasetListComponent implements AfterViewInit {
+export class NVCLDatasetListComponent implements OnInit {
 
   @Input() layer: LayerModel;
   @Input() onlineResource: OnlineResourceModel;
@@ -68,7 +68,7 @@ export class NVCLDatasetListComponent implements AfterViewInit {
     public dialog: MatDialog) {}
 
 
-  ngAfterViewInit(): void {
+    ngOnInit(): void {
 
     this.nvclService.getNVCLDatasets(this.onlineResource.url, this.featureId).subscribe(result => {
       for (const nvclDataset of result) {
