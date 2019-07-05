@@ -1,32 +1,13 @@
-	<div *ngIf="bShowClipboard" class="card">
-		<div class="card-header ">
-			<h4 class="card-title ">Filter Clipboard</h4>
-		</div>
-		<div class="card-body">
+	<div *ngIf="bShowClipboard" class="container" style="background-color:#7aa5c5 ; color: #ffffff;">
+			<p >Polygon Filter Clipboard:</p>
 			<table class="table table-inverse">
-				<thead>
-					<tr>
-						<th>Name</th>
-					</tr>
-				</thead>
 				<tbody>
 					<tr *ngIf="polygonBBox">
 						<td class="content-break-word">{{polygonBBox.name}}</td>
 					</tr>
 				</tbody>
 			</table>
-			<button (click)='clearClipboard()' type="button" class="btn btn-xsm btn-inverse active">
-				<i class="fa fa-times-circle" aria-hidden="true"></i>
-				clear
-			</button>
-			<button (click)='drawPolygon()' type="button" [ngClass]="{'btn-inverse': !isDrawingPolygon, 'btn-active': isDrawingPolygon}" class="btn btn-xsm btn-inverse active">
-				<i class="fa fa-edit" aria-hidden="true"></i>
-				draw
-			</button>
-			<button (click)='toggleFilterLayers()' type="button" [ngClass]="{'btn-inverse': !isFilterLayerShown, 'btn-active': isFilterLayerShown}" class="btn btn-xsm btn-inverse active">
-				<i class="fa fa-mouse-pointer" aria-hidden="true"></i>
-				select
-			</button>
-
-		</div>
+			<button (click)='clearClipboard()' type="button" class="btn btn-sm btn-inverse active"><i class="fa fa-times-circle" aria-hidden="true"></i>Clear</button>
+			<button (click)='drawPolygon()' type="button" [ngClass]="{'btn-inverse': !isDrawingPolygon, 'btn-active': isDrawingPolygon}" class="btn btn-sm btn-inverse active"><i class="fa fa-edit" aria-hidden="true"></i>Draw</button>
+			<button (click)='toggleFilterLayers()' type="button" [ngClass]="{'btn-inverse': !isFilterLayerShown, 'btn-active': isFilterLayerShown}" class="btn btn-sm btn-inverse active"><i class="fa fa-mouse-pointer" aria-hidden="true"></i>Select</button>
 	</div>
