@@ -44,7 +44,7 @@
     	<fieldset *ngIf="layer.filterCollection && layer.filterCollection.optionalFilters" class="show-fieldset-borders">
         	<legend><h5>Optional Filters</h5></legend>
         	<div class="form-group  form-group-sm">
-	            <label><i class="fa fa-refresh hasEvent red" (click)="refreshFilter()"></i> Select Filter:</label>
+	            <label><i class="fa fa-times hasEvent red" (click)="refreshFilter()"></i> Select Filter:</label>
                 <select class="form-control form-control-sm" [ngModel]="selectedFilter" (ngModelChange)="addFilter($event)">
 					<option [ngValue]="filt" *ngFor="let filt of layer.filterCollection.optionalFilters">{{filt.label}}</option>
 				</select>
