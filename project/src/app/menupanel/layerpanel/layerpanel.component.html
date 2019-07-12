@@ -42,7 +42,7 @@
 								{{layer.name}}
 								<i *ngIf="layer.expanded && !uiLayerModels[layer.id].statusMap.renderStarted" class="fa fa-arrow-circle-down"></i>
 							</div>
-							<div *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="progress-sm progress-xs" style="height: 5px">
+							<div *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="progress progress-xs" style="height: 5px">
 								<div class="progress-bar bg-gradient-blue-purple" [style.width]="uiLayerModels[layer.id].statusMap.completePercentage" role="progressbar"></div>
 							</div>
 						</div>
