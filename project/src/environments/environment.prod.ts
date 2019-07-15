@@ -22,20 +22,5 @@ export const environment = {
     { value: 'Road', viewValue: 'Bing Roads', layerType: 'Bing' },
     { value: 'Aerial', viewValue: 'Bing Aerial', layerType: 'Bing' },
     { value: 'AerialWithLabels', viewValue: 'Bing Aerial With Labels', layerType: 'Bing' },
-    { value: 'World_Topo_Map', viewValue: 'ESRI World Topographic', layerType: 'ESRI' },
-    { value: 'World_Imagery', viewValue: 'ESRI World Imagery', layerType: 'ESRI' },
-    { value: 'Reference/World_Boundaries_and_Places', viewValue: 'ESRI World Imagery With Labels', layerType: 'ESRI' },
-    { value: 'NatGeo_World_Map', viewValue: 'ESRI National Geographic Map', layerType: 'ESRI' },
-    { value: 'World_Terrain_Base', viewValue: 'ESRI Terrain Base', layerType: 'ESRI' },
-    { value: 'World_Street_Map', viewValue: 'ESRI Street Map', layerType: 'ESRI' },
-    { value: 'Canvas/World_Dark_Gray_Base', viewValue: 'ESRI Dark Gray', layerType: 'ESRI' },
-    { value: 'Canvas/World_Light_Gray_Base', viewValue: 'ESRI Light Gray', layerType: 'ESRI' },
-    { value: 'h', viewValue: 'Google Road Names', layerType: 'Google' },
-    { value: 'm', viewValue: 'Google Road Map', layerType: 'Google' },
-    { value: 's', viewValue: 'Google Satellite', layerType: 'Google' },
-    { value: 'y', viewValue: 'Google Satellite & Roads', layerType: 'Google' },
-    { value: 't', viewValue: 'Google Terrain', layerType: 'Google' },
-    { value: 'p', viewValue: 'Google Terrain & Roads', layerType: 'Google' },
-    { value: 'r', viewValue: 'Google Road without Building', layerType: 'Google' }
   ]
 };
