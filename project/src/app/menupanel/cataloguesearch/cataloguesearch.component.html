@@ -85,11 +85,11 @@
 						<div>
 							<span *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="float-right project-percentage hasEvent light-blue"><u (click)="openStatusReport(uiLayerModels[layer.id]); $event.stopPropagation();">{{uiLayerModels[layer.id].statusMap.completePercentage}}<i *ngIf="!uiLayerModels[layer.id].statusMap.containsError" class="fa fa-warning text-warning"></i></u></span>
 							<div>
-								<i *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="fa fa-ban red" (click) = "removeLayer(layer);$event.stopPropagation();"></i>
+								<i *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="fa fa-times red" (click) = "removeLayer(layer);$event.stopPropagation();"></i>
 									<i class="fa fa-arrow-right light-blue"></i> {{layer.name}}
 									<i *ngIf="layer.expanded && !uiLayerModels[layer.id].statusMap.renderStarted" class="fa fa-arrow-circle-down"></i>
 							</div>
-							<div *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="progress progress-xs">
+							<div *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="progress progress-xs" style="height: 5px">
 								<div class="progress-bar bg-gradient-blue-purple" [style.width]="uiLayerModels[layer.id].statusMap.completePercentage" role="progressbar"></div>
 							</div>
 						</div>
