@@ -137,12 +137,20 @@ export class OlWMSService {
         onlineResource: OnlineResourceModel,
         param: any
     ): Observable<any> {
+
         // For ArcGIS mineral tenements layer we can get SLD_BODY parameter locally
         if (UtilitiesService.isArcGIS(onlineResource) && onlineResource.name === 'MineralTenement') {
             return Observable.create(observer => {
                 param.styles = 'mineralTenementStyle';
                 const x = MinTenemStyleService.getMineralTenementsSld(onlineResource.name, param.styles, param.ccProperty);
                 observer.next(x);
+                observer.complete();
+            });
+        }
+
+        if (!sldUrl) {
+            return Observable.create(observer => {
+                observer.next(null);
                 observer.complete();
             });
         }
