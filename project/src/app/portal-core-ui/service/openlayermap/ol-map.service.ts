@@ -1,10 +1,10 @@
 
 import { CSWRecordModel } from '../../model/data/cswrecord.model';
 import { Injectable, Inject } from '@angular/core';
-import olLayerVector from 'ol/layer/vector';
-import olLayer from 'ol/layer/layer';
-import olFeature from 'ol/feature';
-import olProj from 'ol/proj';
+import olLayerVector from 'ol/layer/Vector';
+import olLayer from 'ol/layer/Layer';
+import olFeature from 'ol/Feature';
+import * as olProj from 'ol/proj';
 import {BehaviorSubject,  Subject } from 'rxjs';
 import { point } from '@turf/helpers';
 import * as inside from '@turf/inside';
@@ -71,7 +71,7 @@ export class OlMapService {
                    for (const activeLayer of activeLayers[layerId]) {
                        if (layer === activeLayer) {
                            const layerModel = me.getLayerModel(layerId);
-                           if (!this.layerHandlerService.containsWMS(layerModel)) {
+                           if (!me.layerHandlerService.containsWMS(layerModel)) {
                              continue;
                            }
                            for (const cswRecord of layerModel.cswRecords) {

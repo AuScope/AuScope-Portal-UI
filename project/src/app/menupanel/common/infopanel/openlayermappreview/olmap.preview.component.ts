@@ -6,13 +6,13 @@ import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { point, Geoms, polygon } from '@turf/helpers';
 import * as inside from '@turf/inside';
 import * as bbox from '@turf/bbox';
-import olStyle from 'ol/style/style';
-import olView from 'ol/view';
-import olStroke from 'ol/style/stroke';
-import olFill from 'ol/style/fill';
-import olGeoJSON from 'ol/format/geojson';
-import olSourceVector from 'ol/source/vector';
-import olLayerVector from 'ol/layer/vector';
+import olStyle from 'ol/style/Style';
+import olView from 'ol/View';
+import olStroke from 'ol/style/Stroke';
+import olFill from 'ol/style/Fill';
+import olGeoJSON from 'ol/format/GeoJSON';
+import olSourceVector from 'ol/source/Vector';
+import olLayerVector from 'ol/layer/Vector';
 
 
 @Component({

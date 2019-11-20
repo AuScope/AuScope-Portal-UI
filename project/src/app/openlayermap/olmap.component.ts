@@ -3,8 +3,8 @@ import { ref } from '../../environments/ref';
 import {QuerierModalComponent} from '../modalwindow/querier/querier.modal.component';
 import { CSWRecordModel } from '../portal-core-ui/model/data/cswrecord.model';
 import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
-import olZoom from 'ol/control/zoom';
-import olScaleLine from 'ol/control/scaleline';
+import olZoom from 'ol/control/Zoom';
+import olScaleLine from 'ol/control/ScaleLine';
 import {OlMapObject} from '../portal-core-ui/service/openlayermap/ol-map-object';
 import {OlMapService} from '../portal-core-ui/service/openlayermap/ol-map.service';
 import { ManageStateService } from '../portal-core-ui/service/permanentlink/manage-state.service';
@@ -16,8 +16,8 @@ import {SimpleXMLService} from '../portal-core-ui/utility/simplexml.service';
 import { UtilitiesService } from '../portal-core-ui/utility/utilities.service';
 import {BsModalService} from 'ngx-bootstrap/modal';
 import {BsModalRef} from 'ngx-bootstrap';
-import olControlMousePosition from 'ol/control/mouseposition';
-import olCoordinate from 'ol/coordinate';
+import olControlMousePosition from 'ol/control/MousePosition';
+import * as olCoordinate from 'ol/coordinate';
 
 @Component({
   selector: 'app-ol-map',
@@ -101,6 +101,9 @@ export class OlMapComponent implements AfterViewInit {
     const modalDisplayed = {value: false}
     let featureCount = 0;
     for (const feature of mapClickInfo.clickedFeatureList) {
+      if (feature.id_.indexOf('geocoder') === 0) {
+        continue;
+      }
       // NB: This is just testing that the popup window does display
       this.displayModal(modalDisplayed, mapClickInfo.clickCoord);
 

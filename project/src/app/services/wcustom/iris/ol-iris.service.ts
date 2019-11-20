@@ -10,10 +10,10 @@ import { OnlineResourceModel } from '../../../portal-core-ui/model/data/onlinere
 import { LayerHandlerService } from '../../../portal-core-ui/service/cswrecords/layer-handler.service';
 import { OlMapObject } from '../../../portal-core-ui/service/openlayermap/ol-map-object';
 import {HttpClient, HttpParams} from '@angular/common/http';
-import olMap from 'ol/map';
-import olLayerVector from 'ol/layer/vector';
-import olSourceVector from 'ol/source/vector';
-import olFormatKML from 'ol/format/kml';
+import olMap from 'ol/Map';
+import olLayerVector from 'ol/layer/Vector';
+import olSourceVector from 'ol/source/Vector';
+import olFormatKML from 'ol/format/KML';
 import { Constants } from '../../../portal-core-ui/utility/constants.service';
 import { RenderStatusService } from '../../../portal-core-ui/service/openlayermap/renderstatus/render-status.service';
 
