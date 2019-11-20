@@ -25,7 +25,7 @@ import olOverlay from 'ol/Overlay';
 import * as olEasing from 'ol/easing';
 import olObservable from 'ol/Observable';
 import { Subject , BehaviorSubject} from 'rxjs';
-
+import * as G from 'ol-geocoder';
 export interface BaseMapLayerOption {
   value: string;
   viewValue: string;
@@ -95,7 +95,18 @@ export class OlMapObject {
         zoom: 4
       })
     });
+    // Added ol-geocoder controller into map.
+    const GC = new  G('nominatim', {
+      provider: 'bing',
+      key: 'AgfoWboIfoy68Vu38c2RE83rEEuvWKjQWV37g7stRUAPcDiGALCEKHefrDyWn1zM',
+      lang: 'en',
+      placeholder: 'search',
+      limit: 5,
+      autoComplete: true,
+      keepOpen: true
+    });
 
+    this.map.addControl(GC);
     // Call a list of functions when the map is clicked on
     const me = this;
     this.map.on('click', function(evt) {
