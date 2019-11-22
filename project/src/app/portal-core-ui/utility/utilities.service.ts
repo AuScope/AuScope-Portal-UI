@@ -35,7 +35,7 @@ export class UtilitiesService {
         }
     }
 
-  public static leftPad(str, size, character) {
+    public static leftPad(str, size, character) {
         let result = String(str);
         character = character || ' ';
         while (result.length < size) {
@@ -67,8 +67,6 @@ export class UtilitiesService {
     }
 
 
-
-
     /**
      * Test if string s contains c
      * @method stringContains
@@ -79,7 +77,7 @@ export class UtilitiesService {
             return s.indexOf(c) !== -1;
     }
 
-       /**
+    /**
      * Returns the parameter in a get url request
      * @method getUrlParameters
      * @param url - the get url string to break
@@ -458,6 +456,15 @@ export class UtilitiesService {
         }
       }
       return false;
+    }
+
+
+    /**
+     * Returns true iff (if and only if) this is an ESRI ArcGIS server
+     * @param onlineResource online resource record for service
+     */
+    public static isArcGIS(onlineResource: OnlineResourceModel) {
+        return (onlineResource.applicationProfile && onlineResource.applicationProfile.indexOf('Esri:ArcGIS Server') > -1);
     }
 
 }
