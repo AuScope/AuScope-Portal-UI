@@ -28,6 +28,7 @@
     "@angular/router": "^7.2.3",
     "@ng-select/ng-select": "^2.1.0",
     "@swimlane/ngx-charts": "^9.1.1",
+    "@thi.ng/hiccup": "^3.2.5",
     "@turf/center": "^4.6.1",
     "@turf/envelope": "^4.6.0",
     "@turf/helpers": "^4.5.2",
