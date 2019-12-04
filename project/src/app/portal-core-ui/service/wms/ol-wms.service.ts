@@ -1,22 +1,21 @@
-import { throwError as observableThrowError, Observable } from 'rxjs';
+import { throwError as observableThrowError, Observable } from "rxjs";
 
-import { catchError, map } from 'rxjs/operators';
-import { Injectable, Inject } from '@angular/core';
-import { LayerModel } from '../../model/data/layer.model';
-import { OnlineResourceModel } from '../../model/data/onlineresource.model';
-import { LayerHandlerService } from '../cswrecords/layer-handler.service';
-import { OlMapObject } from '../openlayermap/ol-map-object';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import olMap from 'ol/map';
-import olTile from 'ol/layer/tile';
-import olTileWMS from 'ol/source/tilewms';
-import olProj from 'ol/proj';
-import extent from 'ol/extent';
-import { Constants } from '../../utility/constants.service';
-import { UtilitiesService } from '../../utility/utilities.service';
-import { RenderStatusService } from '../openlayermap/renderstatus/render-status.service';
+import { catchError, map } from "rxjs/operators";
+import { Injectable, Inject } from "@angular/core";
+import { LayerModel } from "../../model/data/layer.model";
+import { OnlineResourceModel } from "../../model/data/onlineresource.model";
+import { LayerHandlerService } from "../cswrecords/layer-handler.service";
+import { OlMapObject } from "../openlayermap/ol-map-object";
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
+import olMap from "ol/Map";
+import olTile from "ol/layer/Tile";
+import olTileWMS from "ol/source/TileWMS";
+import * as olProj from "ol/proj";
+import * as extent from 'ol/extent';
+import { Constants } from "../../utility/constants.service";
+import { UtilitiesService } from "../../utility/utilities.service";
+import { RenderStatusService } from "../openlayermap/renderstatus/render-status.service";
 import { MinTenemStyleService } from '../../../services/style/wms/min-tenem-style.service';
-
 
 /**
 * Use OlMapService to add layer to map. This service class adds wms layer to the map

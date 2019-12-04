@@ -6,18 +6,18 @@ import { OnlineResourceModel } from '../model/data/onlineresource.model';
 import { LayerHandlerService } from '../service/cswrecords/layer-handler.service';
 import { Constants } from '../utility/constants.service';
 import { Component, ElementRef, AfterViewInit, ViewChild, Output, EventEmitter, Input, Inject } from '@angular/core';
-import olMap from 'ol/map';
-import olTile from 'ol/layer/tile';
-import olOSM from 'ol/source/osm';
-import olView from 'ol/view';
-import olSourceVector from 'ol/source/vector';
-import olLayerVector from 'ol/layer/vector';
-import olDraw from 'ol/interaction/draw';
-import olControl from 'ol/control';
-import olProj from 'ol/proj';
+import olMap from 'ol/Map';
+import olTile from 'ol/layer/Tile';
+import olOSM from 'ol/source/OSM';
+import olView from 'ol/View';
+import olSourceVector from 'ol/source/Vector';
+import olLayerVector from 'ol/layer/Vector';
+import olDraw from 'ol/interaction/Draw';
+import * as olControl from 'ol/control';
+import * as olProj from 'ol/proj';
 import {BehaviorSubject,  Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import olTileWMS from 'ol/source/tilewms';
+import olTileWMS from 'ol/source/TileWMS';
 
 @Component({
   selector: 'app-map-bbox',

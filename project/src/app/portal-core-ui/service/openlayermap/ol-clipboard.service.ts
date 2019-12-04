@@ -1,8 +1,8 @@
 import {Injectable, Inject} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
-import olProj from 'ol/proj';
+import * as olProj from 'ol/proj';
 import { OlMapObject } from './ol-map-object';
-import olLayerVector from 'ol/layer/vector';
+import olLayerVector from 'ol/layer/Vector';
 import { Constants } from '../../../portal-core-ui/utility/constants.service';
 
 /**
