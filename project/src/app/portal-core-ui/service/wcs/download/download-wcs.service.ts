@@ -66,24 +66,30 @@ export class DownloadWcsService {
 
   }
 
-   public describeCoverage(serviceUrl: string, layerName: string) {
-    let httpParams = new HttpParams();
-    httpParams = httpParams.append('serviceUrl', serviceUrl);
-    httpParams = httpParams.append('layerName', layerName);
+  /**
+   * Asks the proxy to perform a WCS "DescribeCoverage" request
+   * @param serviceUrl URL of WCS service
+   * @param coverageName coverage name parameter
+   */
+  public describeCoverage(serviceUrl: string, coverageName: string) {
+   let httpParams = new HttpParams();
+   httpParams = httpParams.append('serviceUrl', serviceUrl);
+   httpParams = httpParams.append('coverageName', coverageName);
 
-    return this.http.post(this.env.portalBaseUrl + 'describeCoverage.do', httpParams.toString(), {
-      headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
-      responseType: 'json'
-    }).pipe(map(response => {
-      if (response['success'] === true) {
-        return response['data'][0];
-      } else {
-        return observableThrowError(response['msg']);
-      }
-    }), catchError(
-      (error: Response) => {
-        return observableThrowError(error);
-      }
-      ), );
+   return this.http.post(this.env.portalBaseUrl + 'describeCoverage.do', httpParams.toString(), {
+     headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
+     responseType: 'json'
+   }).pipe(map(response => {
+                             if (response['success'] === true) {
+                               return response['data'][0];
+                             } else {
+                               return observableThrowError(response['msg']);
+                             }
+                           }),
+           catchError( (error: Response) => {
+                                              return observableThrowError(error);
+                                            }
+                     ),
+          );
   }
 }
