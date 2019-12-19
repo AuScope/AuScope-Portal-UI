@@ -13,7 +13,7 @@ import XYZ from 'ol/source/XYZ';
 import TileLayer from 'ol/layer/Tile';
 import olGeomPolygon from 'ol/geom/Polygon';
 import BingMaps from 'ol/source/BingMaps';
-import olDraw from 'ol/interaction/Draw';
+import olDraw, { createBox } from 'ol/interaction/Draw';
 import olControl from 'ol/control';
 import olStyleStyle from 'ol/style/Style';
 import olStyleCircle from 'ol/style/Circle';
@@ -302,7 +302,7 @@ export class OlMapObject {
     const draw = new olDraw({
       source: source,
       type: /** @type {ol.geom.GeometryType} */ ('Circle'),
-      geometryFunction: olDraw.createBox()
+      geometryFunction: createBox()
     });
     const me = this;
     draw.on('drawend', function() {
