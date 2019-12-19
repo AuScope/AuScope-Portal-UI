@@ -393,7 +393,7 @@ export class OlMapObject {
       }
 
       source.on('addfeature', function(e) {
-        flash(e.feature);
+        // LJ removed flash temporarily due to the new openlayer upgrading confliction flash(e.feature);
       });
      source.addFeature(feature);
 
