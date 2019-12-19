@@ -105,10 +105,10 @@ export class OlMapObject {
       autoComplete: true,
       keepOpen: true
     });
-    let geocoderSource = GC.getSource();
+    const geocoderSource = GC.getSource();
     const me = this;
     GC.on('addresschosen', function (evt) {
-      let coord = evt.coordinate;
+      const coord = evt.coordinate;
       if (coord) {
         geocoderSource.clear();
         geocoderSource.addFeature(evt.feature); // add only the last one
