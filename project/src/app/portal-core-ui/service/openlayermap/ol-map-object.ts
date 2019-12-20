@@ -13,7 +13,7 @@ import XYZ from 'ol/source/XYZ';
 import TileLayer from 'ol/layer/Tile';
 import olGeomPolygon from 'ol/geom/Polygon';
 import BingMaps from 'ol/source/BingMaps';
-import olDraw from 'ol/interaction/Draw';
+import olDraw, { createBox } from 'ol/interaction/Draw';
 import olControl from 'ol/control';
 import olStyleStyle from 'ol/style/Style';
 import olStyleCircle from 'ol/style/Circle';
@@ -23,9 +23,10 @@ import olGeomPoint from 'ol/geom/Point';
 import olFeature from 'ol/Feature';
 import olOverlay from 'ol/Overlay';
 import * as olEasing from 'ol/easing';
-import olObservable from 'ol/Observable';
+import {unByKey} from 'ol/Observable';
 import { Subject , BehaviorSubject} from 'rxjs';
 import * as G from 'ol-geocoder';
+import {getVectorContext} from 'ol/render';
 export interface BaseMapLayerOption {
   value: string;
   viewValue: string;
@@ -311,7 +312,7 @@ export class OlMapObject {
     const draw = new olDraw({
       source: source,
       type: /** @type {ol.geom.GeometryType} */ ('Circle'),
-      geometryFunction: olDraw.createBox()
+      geometryFunction: createBox()
     });
     const me = this;
     draw.on('drawend', function() {
@@ -360,7 +361,7 @@ export class OlMapObject {
         let listenerKey;
 
         function animate(event) {
-          const vectorContext = event.vectorContext;
+          const vectorContext = getVectorContext(event);
           const frameState = event.frameState;
           const flashGeom = feature.getGeometry().clone();
           const elapsed = frameState.time - start;
@@ -383,17 +384,17 @@ export class OlMapObject {
           vectorContext.setStyle(style);
           vectorContext.drawGeometry(flashGeom);
           if (elapsed > 3000) {
-            olObservable.unByKey(listenerKey);
+            unByKey(listenerKey);
             return;
           }
           // tell OpenLayers to continue postcompose animation
           me.map.render();
         }
-        listenerKey = me.map.on('postcompose', animate);
+        listenerKey = vector.on('postrender', animate);
       }
 
       source.on('addfeature', function(e) {
-        // LJ removed flash temporarily due to the new openlayer upgrading confliction flash(e.feature);
+        flash(e.feature);
       });
      source.addFeature(feature);
 
