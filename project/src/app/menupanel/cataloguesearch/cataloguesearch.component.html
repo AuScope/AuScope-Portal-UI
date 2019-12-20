@@ -50,20 +50,16 @@
 			<div class='standard-title row'>
 				<h4 class="white"><span>Bounding Box</span></h4>
 			</div>
-			<div class="row">
-				<span class="label label-default col-xs-4 offset-xs-4 line-height-1-8">North: {{bbox.northBoundLatitude | number:'1.0-4'}}</span>
-			</div>
-			<div class="row">
-				<span class="label label-default col-xs-4 line-height-1-8">West: {{bbox.westBoundLongitude | number:'1.0-4'}}</span>
-				<span class="label label-default col-xs-4 offset-xs-4 line-height-1-8">East: {{bbox.eastBoundLongitude | number:'1.0-4'}}</span>
-			</div>
-			<div class="row">
-				<span class="label label-default col-xs-4 offset-xs-4 line-height-1-8">South: {{bbox.southBoundLatitude | number:'1.0-4'}}</span>
-			</div>
+
+		    <h5><span class="badge badge-secondary d-inline ml-5 line-height-1-8">North: {{bbox.northBoundLatitude | number:'1.0-4'}}</span></h5>
+
+			<h5><span class="badge badge-secondary d-inline line-height-1-8">West: {{bbox.westBoundLongitude | number:'1.0-4'}}</span>
+			<span class="badge badge-secondary d-inline ml-3 line-height-1-8">East: {{bbox.eastBoundLongitude | number:'1.0-4'}}</span></h5>
+
+			<h5><span class="badge badge-secondary d-inline ml-5 line-height-1-8">South: {{bbox.southBoundLatitude | number:'1.0-4'}}</span></h5>
+
 			<hr>
 		</div>
-
-
 
 		<button *ngIf="!bbox" type="button" class="btn btn-info btn-xs" (click)="drawBound()"><i class="fa fa-object-ungroup"></i> Select Bounds</button>
 		<button *ngIf="bbox" type="button" class="btn btn-danger btn-xs" (click)="clearBound()"><i class="fa fa-refresh"></i> Clear Bounds</button>
