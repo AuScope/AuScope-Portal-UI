@@ -101,7 +101,7 @@ export class OlMapComponent implements AfterViewInit {
     const modalDisplayed = {value: false}
     let featureCount = 0;
     for (const feature of mapClickInfo.clickedFeatureList) {
-      if (feature.id_.indexOf('geocoder') === 0) {
+      if (feature.id_ && feature.id_.indexOf('geocoder') === 0) {
         continue;
       }
       // NB: This is just testing that the popup window does display
