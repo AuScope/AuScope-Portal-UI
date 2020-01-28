@@ -53,6 +53,8 @@ import { PortalDetailsPanelComponent } from './menupanel/portal-details-panel/po
 import {NgxChartsModule} from '@swimlane/ngx-charts';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { MSCLComponent } from './modalwindow/querier/customanalytic/mscl/mscl.component';
+import { MSCLAnalyticComponent } from './modalwindow/layeranalytic/mscl/mscl.analytic.component';
 
 @NgModule({
   declarations: [
@@ -85,7 +87,9 @@ import {BsDropdownModule } from 'ngx-bootstrap/dropdown';
     CapdfAnalyticComponent,
     OlmapBaselayerselectorComponent,
     DisclaimerModalComponent,
-    PortalDetailsPanelComponent
+    PortalDetailsPanelComponent,
+    MSCLComponent,
+    MSCLAnalyticComponent
   ],
   providers: [],
   imports: [
@@ -116,7 +120,9 @@ import {BsDropdownModule } from 'ngx-bootstrap/dropdown';
     NVCLBoreholeAnalyticComponent,
     CapdfAdvanceFilterComponent,
     CapdfAnalyticComponent,
-    DisclaimerModalComponent
+    DisclaimerModalComponent,
+    MSCLComponent,
+    MSCLAnalyticComponent
   ],
   bootstrap: [
     OlMapComponent,
