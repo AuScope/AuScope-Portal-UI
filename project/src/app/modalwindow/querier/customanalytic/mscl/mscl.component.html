@@ -8,13 +8,18 @@
   		<div class="card-body">
             <fieldset class="show-fieldset-borders-whitebg mb-3">
                 <legend><h6>Select Metrics</h6></legend>
+                <div class="checkbox col">
+                    <input id="mscl-metrics-all" type="checkbox" [(ngModel)]="allTicked" (change)="toggle_all_chkbox()" />
+                    <label for="mscl-metrics-all">ALL</label>
+                </div>
                     <div class="form-row">
-                    <div *ngFor="let metric of allMetricList">
-                            <div class="checkbox col">
-                                <input id="mscl-metrics" type="checkbox" [(ngModel)]="msclform.bMetric[metric]" />
-                                <label for="mscl-metrics">{{metric}}</label>
-                            </div>
-                    </div>
+                        <div *ngFor="let metric of allMetricList">
+                                <div class="checkbox col">
+                                    <input id="mscl-metrics" type="checkbox" [(ngModel)]="msclform.bMetric[metric]" />
+                                    <label for="mscl-metrics">{{metric}}</label>
+                                </div>
+                        </div>
+
                     </div>
             </fieldset>
             <fieldset class="show-fieldset-borders-whitebg mb-3">

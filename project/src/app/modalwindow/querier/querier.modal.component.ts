@@ -17,6 +17,12 @@ import * as _ from 'lodash';
 import { NgxXml2jsonService } from 'ngx-xml2json';
 
 
+export class FileNode {
+  children: FileNode[];
+  filename: string;
+  type: any;
+}
+
 @Component({
   selector: 'app-querier-modal-window',
   templateUrl: './querier.modal.component.html',
@@ -176,8 +182,4 @@ export class QuerierModalComponent {
 
 }
 
-export class FileNode {
-  children: FileNode[];
-  filename: string;
-  type: any;
-}
+

@@ -20,16 +20,17 @@ export class MSCLComponent implements OnInit {
     @Input() featureId: string;
     @Input() doc: QuerierInfoModel;
 
-    public msclform: any;
-    public metricList: Metric[];
-    public allMetricList: Metric[];
-    public modalDisplayed = false;
+    public msclform: any; // Used to store form data
+    public metricList: Metric[]; // List of metrics selected by user
+    public allMetricList: Metric[];  // List of all possible metrics
+    public modalDisplayed = false; // Is modal dialogue displayed?
+    public allTicked = false; // Are all tickboxes ticked?
 
     private bsModalRef: BsModalRef;
 
     constructor(public msclService: MSCLService, private modalService: BsModalService) {
         this.msclform = {};
-        this.allMetricList = this.msclService.getMetricList()
+        this.allMetricList = this.msclService.getMetricList();
     }
 
     ngOnInit() {
@@ -39,6 +40,15 @@ export class MSCLComponent implements OnInit {
         this.msclform.bMetric = {};
         for (const metric of this.allMetricList) {
             this.msclform.bMetric[metric] = false;
+        }
+    }
+
+    /**
+     * Sets all tickboxes to be same as 'ALL' tickbox
+     */
+    public toggle_all_chkbox() {
+        for (const metric of this.allMetricList) {
+            this.msclform.bMetric[metric] = this.allTicked;
         }
     }
 
@@ -58,7 +68,8 @@ export class MSCLComponent implements OnInit {
                                                                                                                  'endDepth': this.msclform.endDepth,
                                                                                                                  'metricList': this.metricList,
                                                                                                                  'featureId': this.featureId,
-                                                                                                                 'closeGraphModal': this.closeGraphModal.bind(this) }});
+                                                                                                                 'closeGraphModal': this.closeGraphModal.bind(this),
+                                                                                                                 'serviceUrl': this.onlineResource.url }});
             this.modalDisplayed = true;
         }
     }

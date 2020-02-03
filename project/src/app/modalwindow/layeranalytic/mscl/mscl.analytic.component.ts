@@ -1,6 +1,6 @@
-import { Component, OnInit, Input, ViewChild, ElementRef, Renderer2 } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Renderer2 } from '@angular/core';
 import { MSCLService, Metric } from './mscl.service';
-import { newPlot, Data } from 'plotly.js';
+import { newPlot, relayout } from 'plotly.js-basic-dist-min';
 
 @Component({
   selector: 'app-mscl.analytic',
@@ -16,6 +16,7 @@ export class MSCLAnalyticComponent implements OnInit {
         featureId: string;  // Identifier of the borehole
         metricList: Metric[];  // List of metrics to plot
         closeGraphModal: () => null;  // Function to call when the modal dialogue must be closed
+        serviceUrl: string; // URL of MSCL service
 
         @ViewChild('graphing_area') private graphing_area: ElementRef;  // Area used to display plots
 
@@ -23,7 +24,7 @@ export class MSCLAnalyticComponent implements OnInit {
 
         /**
          Create this class and initialize all metric list
-         @param mcslService service used to retrieve MCSL data
+         @param msclService service used to retrieve MCSL data
          */
         constructor(public msclService: MSCLService, private renderer: Renderer2) {
             this.allMetricList = this.msclService.getMetricList();
@@ -39,11 +40,10 @@ export class MSCLAnalyticComponent implements OnInit {
             if (this.metricList.length > 0) {
 
                 // Fetch data from MSCL service
-                this.msclService.getMSCLDownload('http://meiproc.earthsci.unimelb.edu.au:80/geoserver/ows', this.featureId,
-                                                 this.startDepth, this.endDepth, this.metricList).subscribe(valuesList => {
+                this.msclService.getMSCLDownload(this.serviceUrl, this.featureId, this.startDepth, this.endDepth, this.metricList).subscribe(valuesList => {
                     // Compile lists of X and Y values; plots are vertical, Y is common to all plots
-                    const xLists = {};
-                    const yList = [];
+                    const xLists: { Metric: number[] } | {} = {};
+                    const yList: number[] = [];
                     for (const metricEnum of this.metricList) {
                         xLists[metricEnum] = [];
                     }
@@ -54,25 +54,11 @@ export class MSCLAnalyticComponent implements OnInit {
                         }
                         yList.push(values.depth);
                     }
-                    const traceList: Data[] = [];
-                    let metricNum = 1;
-                    for (const metric of this.metricList) {
-                        const trace: Data = {
-                            x: xLists[metric],
-                            y: yList,
-                            xaxis: 'x' + metricNum.toString(),
-                            yaxis: 'y' + metricNum.toString(),
-                            type: 'scatter',
-                            showlegend: false,
-                            name: metric,
-                            hoverinfo: 'x+y+name'
-                        };
-                        traceList.push(trace);
-                        metricNum++;
-                    }
+
                     // Create plots
-                    const layout = this.msclService.getMetricGraphLayout(this.metricList);
-                    newPlot(element, traceList, layout);
+                    const traceList = this.msclService.getGraphTraceList(this.metricList, xLists, yList);
+                    const layout = this.msclService.getGraphLayout(this.metricList, xLists);
+                    newPlot(element, traceList, layout, {responsive: true});
 
                 }, error => {
                     console.error('Error retrieving MSCL data:', error);
