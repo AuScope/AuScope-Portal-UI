@@ -20,22 +20,31 @@ steps:
     command: 'custom'
     workingDir: 'project'
     customCommand: 'install -g @angular/cli'
+  displayName: "npm install angular cli global"
 
 - task: Npm@1
   inputs:
     command: 'install'
     workingDir: 'project'
+  displayName: "npm install"
 
 - task: Npm@1
   inputs:
     command: 'custom'
     workingDir: 'project'
     customCommand: 'run build-prod'
+  displayName: "ng build production"
 
 - task: ArchiveFiles@2
   inputs:
-    rootFolderOrFile: '$(Build.BinariesDirectory)/ng'
+    rootFolderOrFile: '$(Build.SourcesDirectory)/ng'
     includeRootFolder: false
     archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/portal-$(Build.BuildId).zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/portal-UI-$(Build.BuildId).zip'
     replaceExistingArchive: true
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'Portal-UI'
+    publishLocation: 'Container'
