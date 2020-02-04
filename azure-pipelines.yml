@@ -15,11 +15,22 @@ steps:
     versionSpec: '10.x'
   displayName: 'Install Node.js'
 
-- script: |
-    cd project
-    npm install
-    ng build --prod --configuration=production
-  displayName: 'npm install and build'
+- task: Npm@1
+  inputs:
+    command: 'custom'
+    workingDir: 'project'
+    customCommand: 'install -g @angular/cli'
+
+- task: Npm@1
+  inputs:
+    command: 'install'
+    workingDir: 'project'
+
+- task: Npm@1
+  inputs:
+    command: 'custom'
+    workingDir: 'project'
+    customCommand: 'run build-prod'
 
 - task: ArchiveFiles@2
   inputs:
