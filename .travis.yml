@@ -9,6 +9,7 @@ before_script:
 - npm install -g @angular/cli
 
 script:
+- npm install
 - npm run build-prod
 - cd ../ng
 - tar -cvf ../portal2.tar *
