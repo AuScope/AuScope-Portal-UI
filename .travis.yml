@@ -14,6 +14,7 @@ script:
 - tar -cvf ../portal-production.tar *
 - cd ..
 - rm -rf ng
+- cd project
 - npm run build-test
 - cd ../ng
 - tar -cvf ../portal-test.tar *
