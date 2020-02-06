@@ -1,24 +1,30 @@
 language: node_js
 node_js:
-- '10'
-dist: trusty
+- '12'
 sudo: required
 
 before_script:
 - cd project
-- npm install -g @angular/cli
+- npm install -g @angular/cli@7.3.0
 
 script:
 - npm install
 - npm run build-prod
 - cd ../ng
-- tar -cvf ../portal2.tar *
+- tar -cvf ../portal-production.tar *
+- cd ..
+- rm -rf ng
+- npm run build-test
+- cd ../ng
+- tar -cvf ../portal-test.tar *
 
 deploy:
   provider: releases
   api_key:
     secure: Me2zsF5O73s+tldCRKQO6Vkj4KH2eMTij0gRDP2DAlSwCVITbB5ttMSs5xrQe9JuaAwUja2N+KZJwii+nHCQGEP+wCQmxD0ojOfB+dyFMmhBGjRPygt2yKz6Bny+rsFzkLSPDegbyJbgK2CN/usvfhIKLRwgk6GpRe6Rek91JDn5Qn1W0ge3G2LmFlUsKAF2bwy4Tl8N0drspbuf3JiKEm6YotX5NdxjmJYTb70bwR9zDNhsr5T0pK/P62c9/qhSiakpPcho4hBXgK6YASzRSTmELSRT0dJ+PD7gRI7+fAA0Cc+Y+EUZbooUBrSGe0glN6aFZY0AHs8x6pUJqNkoeAM/Vvtlq17fu6ULL9m5TTiBZjJs3Fe8WExVg2/NDO22MECwrtqOKHD9iZ3sq5ZNuVhL/sFENxZLTuWlhKFL/rfHP/XeyRvgxSRXLJG8QyqIZHxwDf3CV75Dkqwfm2yrU9LBEZHsdcVAUKZ2YeqD5+OhAEAxYyVNYYu9LZQns15b6YmWSEKce/eG6rPAeiRK1jb1pJ3eSGOhtQsBrX+0gED97I0oFEkko3blN3nlvRg00rpu82c3b8Gmzi8aNVOPK9SsVEUgsz381wcs7aaA4xH9AJoNhkoJAYJyUTOHBM6fQhuxuV9FNXdef9p8e+wJChRf93bfBUovrTZ7fswQxMs=
-  file: ../portal2.tar
+  file: 
+    - ../portal-production.tar
+    - ../portal-test.tar
   skip_cleanup: true
   on:
     repo: AuScope/AuScope-Portal-UI
