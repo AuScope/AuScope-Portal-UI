@@ -5,7 +5,7 @@ sudo: required
 
 before_script:
 - cd project
-- npm install -g @angular/cli@7.3.0
+- npm install -g @angular/cli
 
 script:
 - npm install
