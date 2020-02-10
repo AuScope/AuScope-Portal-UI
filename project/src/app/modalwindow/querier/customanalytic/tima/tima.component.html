@@ -7,7 +7,7 @@
 			<div class="card card-default card-with-tabs">
 				<!-- BEGIN card-header -->
 				<div class="card-header">
-					<ul id="nvcl-card-tab" class="nav nav-tabs float-right">
+					<ul class="nav nav-tabs float-right">
 						<li [ngClass]="{'active':!ClassificationActive}" (click)="ClassificationActive=false;" ><a href="#tima-piechart" data-toggle="tab"><i class="fa fa-home"></i> <span class="d-none d-sm-inline">Graph</span></a></li>
 						<li [ngClass]="{'active':ClassificationActive}" (click)="ClassificationActive=true;"><a href="#tima-panorama" data-toggle="tab"><i class="fa fa-user"></i> <span class="d-none d-sm-inline">Classification</span></a></li>
 					</ul>

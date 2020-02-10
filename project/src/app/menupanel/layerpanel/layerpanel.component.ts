@@ -180,7 +180,6 @@ export class LayerPanelComponent implements OnInit {
 
     public ngOnInit() {
         const nvclanid = UtilitiesService.getUrlParameterByName('nvclanid');
-        const nvclanemail = UtilitiesService.getUrlParameterByName('nvclanemail');
         const state = UtilitiesService.getUrlParameterByName('state');
         const me = this;
         this.manageStateService.getUnCompressedString(state, function(result) {
