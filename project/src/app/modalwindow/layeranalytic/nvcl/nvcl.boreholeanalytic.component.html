@@ -20,7 +20,7 @@
 	            <div class="form-group form-group-md row justify-content-start">
 				    <label class="col-md-2">Email:</label>
 				    <div class="col-md-6">
-						<input type="text" class="form-control form-control-sm"  [(ngModel)]="nvclform.email" name="email" ngModel #email="ngModel" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$">
+						<input type="text" class="form-control form-control-sm"  [(ngModel)]="nvclform.email" name="email" ngModel #email="ngModel" required pattern="([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$">
 						<span class="validity" *ngIf="!email.valid && email.touched"></span>
 					</div>
 				</div>
