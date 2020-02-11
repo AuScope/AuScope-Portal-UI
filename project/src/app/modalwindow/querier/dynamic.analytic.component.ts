@@ -6,6 +6,7 @@ import {ref} from '../../../environments/ref';
 import { QuerierInfoModel } from '../../portal-core-ui/model/data/querierinfo.model';
 import { RemanentAnomaliesComponent } from './customanalytic/RemanentAnomalies/remanentanomalies.component';
 import { TIMAComponent } from './customanalytic/tima/tima.component';
+import { MSCLComponent } from './customanalytic/mscl/mscl.component';
 
 @Component({
   selector: 'app-custom-analytic',
@@ -56,6 +57,10 @@ export class DynamicAnalyticComponent {
     (<RemanentAnomaliesComponent>componentRef.instance).featureId = this.featureId;
     (<RemanentAnomaliesComponent>componentRef.instance).doc = this.doc;
 
+    (<MSCLComponent>componentRef.instance).layer = this.layer;
+    (<MSCLComponent>componentRef.instance).onlineResource = this.onlineResource;
+    (<MSCLComponent>componentRef.instance).featureId = this.featureId;
+    (<MSCLComponent>componentRef.instance).doc = this.doc;
 
     this.changeDetectorRef.detectChanges();
 

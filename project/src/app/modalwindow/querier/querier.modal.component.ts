@@ -17,6 +17,12 @@ import * as _ from 'lodash';
 import { NgxXml2jsonService } from 'ngx-xml2json';
 
 
+export class FileNode {
+  children: FileNode[];
+  filename: string;
+  type: any;
+}
+
 @Component({
   selector: 'app-querier-modal-window',
   templateUrl: './querier.modal.component.html',
@@ -41,7 +47,7 @@ export class QuerierModalComponent {
 
   nestedDataSource: MatTreeNestedDataSource<FileNode>[] = [];
 
-  constructor(public bsModalRef: BsModalRef, private nvclService: NVCLService, public olClipboardService: OlClipboardService,
+  constructor(public bsModalRef: BsModalRef, public olClipboardService: OlClipboardService,
     private manageStateService: ManageStateService, private gmlParserService: GMLParserService) {
     this.analyticMap = ref.analytic;
 
@@ -72,7 +78,6 @@ export class QuerierModalComponent {
     }
 
     const uncompStateStr = JSON.stringify(state);
-    const me = this;
     this.manageStateService.getCompressedString(uncompStateStr, function(result) {
       // Encode state in base64 so it can be used in a URL
       const stateStr = UtilitiesService.encode_base64(String.fromCharCode.apply(String, result));
@@ -177,8 +182,4 @@ export class QuerierModalComponent {
 
 }
 
-export class FileNode {
-  children: FileNode[];
-  filename: string;
-  type: any;
-}
+
