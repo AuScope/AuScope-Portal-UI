@@ -67,7 +67,9 @@ export class NVCLBoreholeAnalyticService {
   public getTSGAlgorithmList(): Observable<any> {
     let httpParams = new HttpParams();
     httpParams = httpParams.append('outputFormat', 'json');
-    return this.http.get(environment.nVCLAnalyticalUrl + 'listTsgAlgorithms.do', {params: httpParams}).pipe(map(response => {
+    return this.http.get(environment.nVCLAnalyticalUrl + 'listTsgAlgorithms.do', {
+      params: httpParams
+    }).pipe(map(response => {
         return response;
     }), catchError(
       (error: Response) => {
@@ -81,14 +83,11 @@ export class NVCLBoreholeAnalyticService {
 
     let httpParams = new HttpParams();
     httpParams = httpParams.append('tsgAlgName', tsgAlgName);
-    return this.http.get(environment.portalBaseUrl + 'getTsgAlgorithms.do', {
+    httpParams = httpParams.append('outputFormat', 'json');
+    return this.http.get(environment.nVCLAnalyticalUrl + 'getTsgAlgorithms.do', {
       params: httpParams
     }).pipe(map(response => {
-      if (response['success'] === true) {
-        return response['data'];
-      } else {
-        return observableThrowError(response['msg']);
-      }
+        return response;
     }), catchError(
       (error: Response) => {
         return observableThrowError(error);
@@ -96,36 +95,33 @@ export class NVCLBoreholeAnalyticService {
       ), );
   }
 
-
-  public submitSF0NVCLProcessingJob(parameters: any, layer: LayerModel): Observable<any> {
+  public submitNVCLAnalyticalJob(parameters: any, layer: LayerModel): Observable<any> {
     let httpParams = new HttpParams();
 
     const wfsResources = this.layerHandlerService.getWFSResource(layer);
     for (const wfsUrl of layer.wfsUrls) {
-      httpParams = httpParams.append('wfsUrl', wfsUrl.toString());
+      httpParams = httpParams.append('serviceurls', wfsUrl.toString());
     }
 
     httpParams = httpParams.append('email', parameters.email);
-    httpParams = httpParams.append('jobName', parameters.jobName);
-    httpParams = httpParams.append('existingAlg', 'existingAlg');
-    httpParams = httpParams.append('algorithm', parameters.algorithm);
+    httpParams = httpParams.append('jobname', parameters.jobName);
 
     for (const algorithmOutputId of parameters.algorithmOutputIds) {
-      httpParams = httpParams.append('algorithmOutputId', algorithmOutputId);
+      httpParams = httpParams.append('algorithmoutputid', algorithmOutputId);
     }
 
     httpParams = httpParams.append('classification', parameters.classification);
-    if (parameters.logName) { httpParams = httpParams.append('logName', parameters.logName); }
-    httpParams = httpParams.append('ogcFilter', parameters.ogcFilter);
-    httpParams = httpParams.append('startDepth', parameters.startDepth);
-    httpParams = httpParams.append('endDepth', parameters.endDepth);
-    httpParams = httpParams.append('operator', parameters.operator);
+    if (parameters.logName) { httpParams = httpParams.append('logname', parameters.logName); }
+    httpParams = httpParams.append('filter', parameters.ogcFilter);
+    httpParams = httpParams.append('startdepth', parameters.startDepth);
+    httpParams = httpParams.append('enddepth', parameters.endDepth);
+    httpParams = httpParams.append('logicalop', parameters.operator);
     httpParams = httpParams.append('value', parameters.value);
     httpParams = httpParams.append('units', parameters.units);
     httpParams = httpParams.append('span', parameters.span);
 
 
-    return this.http.get(environment.portalBaseUrl + 'submitSF0NVCLProcessingJob.do', {
+    return this.http.get(environment.nVCLAnalyticalUrl + 'submitNVCLAnalyticalJob.do', {
       params: httpParams
     }).pipe(map(response => {
       if (response['success'] === true) {
@@ -140,29 +136,26 @@ export class NVCLBoreholeAnalyticService {
       ), );
   }
 
-  public submitSF0NVCLProcessingTsgJob(parameters: any, layer: LayerModel): Observable<any> {
+  public submitNVCLTSGModJob(parameters: any, layer: LayerModel): Observable<any> {
     let httpParams = new HttpParams();
 
     for (const wfsUrl of layer.wfsUrls) {
-      httpParams = httpParams.append('wfsUrl', wfsUrl.toString());
+      httpParams = httpParams.append('serviceurls', wfsUrl.toString());
     }
-
     httpParams = httpParams.append('email', parameters.email);
-    httpParams = httpParams.append('jobName', parameters.jobName);
-    httpParams = httpParams.append('existingAlg', 'existingAlg');
-
+    httpParams = httpParams.append('jobname', parameters.jobName);
     httpParams = httpParams.append('tsgAlgName', parameters.tsgAlgName);
-    httpParams = httpParams.append('tsgAlgorithm', parameters.tsgAlgorithm);
-    httpParams = httpParams.append('ogcFilter', parameters.ogcFilter);
-    httpParams = httpParams.append('startDepth', parameters.startDepth);
-    httpParams = httpParams.append('endDepth', parameters.endDepth);
-    httpParams = httpParams.append('operator', parameters.operator);
+    httpParams = httpParams.append('tsgScript', parameters.tsgAlgorithm);
+    httpParams = httpParams.append('filter', parameters.ogcFilter);
+    httpParams = httpParams.append('startdepth', parameters.startDepth);
+    httpParams = httpParams.append('enddepth', parameters.endDepth);
+    httpParams = httpParams.append('logicalop', parameters.operator);
     httpParams = httpParams.append('value', parameters.value);
     httpParams = httpParams.append('units', parameters.units);
     httpParams = httpParams.append('span', parameters.span);
 
 
-    return this.http.get(environment.portalBaseUrl + 'submitSF0NVCLProcessingTsgJob.do', {
+    return this.http.get(environment.nVCLAnalyticalUrl + 'submitNVCLTSGModJob.do', {
       params: httpParams
     }).pipe(map(response => {
       if (response['success'] === true) {
@@ -177,19 +170,19 @@ export class NVCLBoreholeAnalyticService {
       ), );
   }
 
-  public checkNVCLProcessingJob(email: string): Observable<any> {
+  public checkNVCLAnalyticalJobStatus(email: string): Observable<any> {
     let httpParams = new HttpParams();
 
     httpParams = httpParams.append('email', email);
 
 
-    return this.http.get(environment.portalBaseUrl + 'checkNVCLProcessingJob.do', {
+    return this.http.get(environment.nVCLAnalyticalUrl + 'checkNVCLAnalyticalJobStatus.do', {
       params: httpParams
     }).pipe(map(response => {
-      if (response['success'] === true) {
-        return response['data'];
-      } else {
+      if (response === null) {
         return observableThrowError(response['msg']);
+      } else {
+        return response;
       }
     }), catchError(
       (error: Response) => {
@@ -229,11 +222,11 @@ export class NVCLBoreholeAnalyticService {
       ), );
   }
 
-  public downloadNVCLProcessingResults(jobId: string): Observable<any> {
+  public getNVCLAnalyticalJobResult(jobId: string): Observable<any> {
     let httpParams = new HttpParams();
-    httpParams = httpParams.append('jobId', jobId);
+    httpParams = httpParams.append('jobid', jobId);
 
-    return this.http.get(environment.portalBaseUrl + 'downloadNVCLProcessingResults.do', {
+    return this.http.get(environment.nVCLAnalyticalUrl + 'getNVCLAnalyticalJobResult.do', {
       params: httpParams,
       responseType: 'blob'
     }).pipe(map((response) => { // download TsgJob json result file
