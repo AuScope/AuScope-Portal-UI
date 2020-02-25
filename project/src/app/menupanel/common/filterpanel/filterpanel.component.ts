@@ -179,6 +179,11 @@ export class FilterPanelComponent implements OnInit {
     const me = this;
     try {
       this.olWMSService.getNvclFilter(layer, param).subscribe(response => {
+        if (response.indexOf('<ogc:Intersects>') >= 0) {
+          const ogcIntersects = response.slice( response.indexOf('<ogc:Intersects>') , response.indexOf('</ogc:Intersects>') + '</ogc:Intersects>'.length);
+          // tslint:disable-next-line:max-line-length
+          response = '<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:gml=\"http://www.opengis.net/gml\">' + ogcIntersects + '</ogc:Filter>';
+        }
         console.log(response);
         layer.ogcFilter = response;
       });
