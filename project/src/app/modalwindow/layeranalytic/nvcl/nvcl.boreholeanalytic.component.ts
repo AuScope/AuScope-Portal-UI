@@ -189,41 +189,41 @@ export class NVCLBoreholeAnalyticComponent
       });
   }
   public ChangePublish(status: any) {
-    const jobId = status.jobid;
+    const jobid = status.jobid;
     const published = status.published;
     status.published = !published;
     this.nvclBoreholeAnalyticService
-      .publishNvclJob(jobId, !published)
+      .publishNvclJob(jobid, !published)
       .subscribe(response => {
-        // console.log('jobid=' + jobId + ' publishStatus=' + response);
+        // console.log('jobid=' + jobid + ' publishStatus=' + response);
       });
   }
-  public download(jobId: string) {
+  public nvclDownload(jobid: string) {
     this.nvclBoreholeAnalyticService
-      .getNVCLAnalyticalJobResult(jobId)
+      .downloadNVCLJobResult(jobid)
       .subscribe(response => {
         const blob = new Blob([response], { type: 'application/zip' });
-        saveAs(blob, 'download.zip');
+        saveAs(blob, 'nvclAnalytical-jobresult-' + jobid + '.zip');
         this.nvclBoreholeAnalyticService.setUserEmail(this.nvclform.email);
       });
   }
 
-  public downloadData(jobId: string) {
+  public nvclDownloadData(jobid: string) {
     this.nvclBoreholeAnalyticService
-      .downloadTsgJobData(jobId)
+      .downloadTsgJobData(jobid)
       .subscribe(response => {
         const blob = new Blob([response], { type: 'application/zip' });
-        saveAs(blob, 'nvclAnalytical-' + jobId + '.zip');
+        saveAs(blob, 'nvclAnalytical-' + jobid + '.zip');
       });
   }
 
-  public viewOnMap(jobId: string) {
+  public viewOnMap(jobid: string) {
     if (
       window.confirm(
         'This action will link you to an external url. Please ensure you have grant access to allow pop up from this domain.'
       )
     ) {
-      this.layer.filterCollection.mandatoryFilters[0].value = jobId;
+      this.layer.filterCollection.mandatoryFilters[0].value = jobid;
       const state = this.manageStateService.generateOneOffState(
         this.layer.id,
         this.layer.filterCollection,

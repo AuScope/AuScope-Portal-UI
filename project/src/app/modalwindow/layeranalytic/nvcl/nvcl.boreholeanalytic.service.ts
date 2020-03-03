@@ -221,15 +221,15 @@ export class NVCLBoreholeAnalyticService {
       }
       ), );
   }
-
-  public getNVCLAnalyticalJobResult(jobId: string): Observable<any> {
+// download TsgJob json result file
+  public downloadNVCLJobResult(jobId: string): Observable<any> {
     let httpParams = new HttpParams();
     httpParams = httpParams.append('jobid', jobId);
 
-    return this.http.get(environment.nVCLAnalyticalUrl + 'getNVCLAnalyticalJobResult.do', {
+    return this.http.get(environment.nVCLAnalyticalUrl + 'downloadNVCLJobResult.do', {
       params: httpParams,
       responseType: 'blob'
-    }).pipe(map((response) => { // download TsgJob json result file
+    }).pipe(map((response) => {
       return response;
     }), catchError((error: Response) => {
       return observableThrowError(error);
