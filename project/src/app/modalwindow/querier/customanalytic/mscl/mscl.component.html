@@ -1,0 +1,51 @@
+  <div class="modal-header">
+  	<h1 class="page-header">
+  		MSCL Analytics: Borehole {{featureId}}
+  	</h1>
+  </div>
+  <div class="modal-body">
+  	<div class="card card-default">
+  		<div class="card-body">
+            <fieldset class="show-fieldset-borders-whitebg mb-3">
+                <legend><h6>Select Metrics</h6></legend>
+                <div class="checkbox col">
+                    <input id="mscl-metrics-all" type="checkbox" [(ngModel)]="allTicked" (change)="toggle_all_chkbox()" />
+                    <label for="mscl-metrics-all">ALL</label>
+                </div>
+                    <div class="form-row">
+                        <div *ngFor="let metric of allMetricList">
+                                <div class="checkbox col">
+                                    <input id="mscl-metrics" type="checkbox" [(ngModel)]="msclform.bMetric[metric]" />
+                                    <label for="mscl-metrics">{{metric}}</label>
+                                </div>
+                        </div>
+
+                    </div>
+            </fieldset>
+            <fieldset class="show-fieldset-borders-whitebg mb-3">
+                <legend><h6>Select Depth Range</h6></legend>
+                <div class="form-row justify-content-start mb-4">
+                    <div class="col-md-3 input-group input-group-sm">
+                        <input id="roi-from" type="number" class="form-control"  [(ngModel)]="msclform.startDepth" name="startDepth" ngModel #startDepth="ngModel"  required min="0" max="9999">
+                        <div class="input-group-append">
+                             <span class="input-group-text">metres</span>
+                        </div>
+                        <span class="validity" *ngIf="!startDepth.valid && startDepth.touched"></span>
+                    </div>
+                    <label for="roi-to" class="col-md-1">to</label>
+                    <div class="col-md-3 input-group input-group-sm">
+                        <input id="roi-to" type="number" class="form-control"  [(ngModel)]="msclform.endDepth" name="endDepth" ngModel #endDepth="ngModel" required min="0" max="9999">
+                        <div class="input-group-append">
+                             <span class="input-group-text">metres</span>
+                        </div>
+                        <span class="validity" *ngIf="!endDepth.valid && endDepth.touched"></span>
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset>
+                <div class="float-left"><button (click)="createGraphModal()" class="btn btn-primary">Draw Graph</button></div>
+            </fieldset>
+
+        </div>
+    </div>
+  </div>

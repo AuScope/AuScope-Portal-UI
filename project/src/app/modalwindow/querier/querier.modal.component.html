@@ -43,7 +43,7 @@
 													<li (click)="doc.home=false;doc.analytic=true" [ngClass]="{'active':doc.analytic}" *ngIf="analyticMap[doc.layer.id]" ><a href="#{{doc.key}}-card-tab-profile" data-toggle="tab"><i class="fa fa-line-chart"></i><span class="d-none d-md-inline"> Analytic</span></a></li>
 												</ul>
 												<h4 *ngIf="doc.home" class="card-title">Feature Detail</h4>
-                                                <h4 *ngIf="doc.analytic" class="card-title">NVCL</h4>
+                                                <h4 *ngIf="doc.analytic" class="card-title">Analytic</h4>
 											</div>
 											<!-- END card-header -->
 

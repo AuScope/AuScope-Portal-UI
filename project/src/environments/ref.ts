@@ -9,13 +9,15 @@ import { RemanentAnomaliesComponent } from '../app/modalwindow/querier/customana
 import {NVCLDatasetListComponent} from '../app/modalwindow/querier/customanalytic/nvcl/nvcl.datasetlist.component';
 import {TIMAComponent} from '../app/modalwindow/querier/customanalytic/tima/tima.component';
 import {IrisQuerierHandler} from '../app/openlayermap/custom-querier-handler/iris-querier-handler.service';
+import {MSCLComponent} from '../app/modalwindow/querier/customanalytic/mscl/mscl.component';
 export const ref = {
   analytic: {
     'nvcl-borehole': NVCLDatasetListComponent,
     'nvcl-v2-borehole': NVCLDatasetListComponent,
     'tima-geosample': TIMAComponent,
     'remanent-anomalies': RemanentAnomaliesComponent,
-    'remanent-anomalies-EMAG': RemanentAnomaliesComponent
+    'remanent-anomalies-EMAG': RemanentAnomaliesComponent,
+    'mscl-borehole': MSCLComponent
   },
   layeranalytic: {
     'nvcl-v2-borehole': NVCLBoreholeAnalyticComponent,

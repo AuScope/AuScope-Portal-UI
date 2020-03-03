@@ -151,7 +151,7 @@ export class NVCLBoreholeAnalyticComponent
         .subscribe(response => {
           if (response === true) {
             alert(
-              'Job have been successfully submitted. The results will be send to your email'
+              'Job has been successfully submitted. The results will be send to your email'
             );
             this.nvclBoreholeAnalyticService.setUserEmail(this.nvclform.email);
           }
@@ -162,7 +162,7 @@ export class NVCLBoreholeAnalyticComponent
         .subscribe(response => {
           if (response === true) {
             alert(
-              'Job have been successfully submitted. The results will be send to your email'
+              'Job has been successfully submitted. The results will be send to your email'
             );
             this.nvclBoreholeAnalyticService.setUserEmail(this.nvclform.email);
           }
@@ -220,7 +220,7 @@ export class NVCLBoreholeAnalyticComponent
   public viewOnMap(jobid: string) {
     if (
       window.confirm(
-        'This action will link you to an external url. Please ensure you have grant access to allow pop up from this domain.'
+        'This action will link you to an external URL. Please ensure you have grant access to allow pop up from this domain.'
       )
     ) {
       this.layer.filterCollection.mandatoryFilters[0].value = jobid;
