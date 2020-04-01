@@ -55,6 +55,8 @@ export class OlMapComponent implements AfterViewInit {
     this.olMapObject.addControlToMap(mousePositionControl);
     this.olMapObject.addControlToMap(new olZoom());
     this.olMapObject.addControlToMap(new olScaleLine('metric'));
+    this.olMapObject.addGeocoderToMap();
+
     this.olMapObject.getMap().setTarget(this.mapElement.nativeElement.id);
 
     // VT: permanent link(open borehole in external window)
