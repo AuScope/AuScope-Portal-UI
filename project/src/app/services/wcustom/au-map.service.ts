@@ -1,7 +1,7 @@
-import { LayerModel } from '../../portal-core-ui/model/data/layer.model';
-import { OlMapObject } from '../../portal-core-ui/service/openlayermap/ol-map-object';
-import { OlMapService } from '../../portal-core-ui/service/openlayermap/ol-map.service';
-import { OlCSWService } from '../../portal-core-ui/service/wcsw/ol-csw.service';
+import { LayerModel } from 'portal-core-ui/model/data/layer.model';
+import { OlMapObject } from 'portal-core-ui/service/openlayermap/ol-map-object';
+import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
+import { OlCSWService } from 'portal-core-ui/service/wcsw/ol-csw.service';
 import { OlIrisService } from './../wcustom/iris/ol-iris.service';
 import { Injectable } from '@angular/core';
 

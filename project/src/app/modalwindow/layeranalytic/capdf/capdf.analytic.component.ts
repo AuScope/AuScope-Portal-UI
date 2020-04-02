@@ -1,6 +1,6 @@
-import { LayerModel } from '../../../portal-core-ui/model/data/layer.model';
-import { LayerHandlerService } from '../../../portal-core-ui/service/cswrecords/layer-handler.service';
-import { UtilitiesService } from '../../../portal-core-ui/utility/utilities.service';
+import { LayerModel } from 'portal-core-ui/model/data/layer.model';
+import { LayerHandlerService } from 'portal-core-ui/service/cswrecords/layer-handler.service';
+import { UtilitiesService } from 'portal-core-ui/utility/utilities.service';
 import { LayerAnalyticInterface } from '../layer.analytic.interface';
 import { CapdfAnalyticService } from './capdf.analytic.service';
 import {saveAs} from 'file-saver/FileSaver';

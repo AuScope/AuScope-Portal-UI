@@ -1,8 +1,8 @@
 import { environment } from '../../../../environments/environment';
 import { saveAs } from 'file-saver/FileSaver';
-import { LayerModel } from '../../../portal-core-ui/model/data/layer.model';
-import { ManageStateService } from '../../../portal-core-ui/service/permanentlink/manage-state.service';
-import { UtilitiesService } from '../../../portal-core-ui/utility/utilities.service';
+import { LayerModel } from 'portal-core-ui/model/data/layer.model';
+import { ManageStateService } from 'portal-core-ui/service/permanentlink/manage-state.service';
+import { UtilitiesService } from 'portal-core-ui/utility/utilities.service';
 import { NVCLBoreholeAnalyticService } from './nvcl.boreholeanalytic.service';
 import {
   Component,

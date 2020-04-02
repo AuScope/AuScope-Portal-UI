@@ -1,7 +1,7 @@
-import { OlMapObject } from '../../../../portal-core-ui/service/openlayermap/ol-map-object';
-import { OlMapService } from '../../../../portal-core-ui/service/openlayermap/ol-map.service';
-import { RenderStatusService } from '../../../../portal-core-ui/service/openlayermap/renderstatus/render-status.service';
-import { Constants } from '../../../../portal-core-ui/utility/constants.service';
+import { OlMapObject } from 'portal-core-ui/service/openlayermap/ol-map-object';
+import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
+import { RenderStatusService } from 'portal-core-ui/service/openlayermap/renderstatus/render-status.service';
+import { Constants } from 'portal-core-ui/utility/constants.service';
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { point, Geoms, polygon } from '@turf/helpers';
 import * as inside from '@turf/inside';

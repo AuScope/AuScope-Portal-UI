@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {NotificationService} from '../../portal-core-ui/service/toppanel/notification.service';
+import {NotificationService} from 'portal-core-ui/service/toppanel/notification.service';
 
 
 @Component({

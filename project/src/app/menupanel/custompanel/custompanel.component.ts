@@ -1,9 +1,9 @@
 import { Component, Output, EventEmitter } from '@angular/core';
-import { LayerHandlerService } from '../../portal-core-ui/service/cswrecords/layer-handler.service';
+import { LayerHandlerService } from 'portal-core-ui/service/cswrecords/layer-handler.service';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
-import { LayerModel } from '../../portal-core-ui/model/data/layer.model';
-import { OlMapService } from '../../portal-core-ui/service/openlayermap/ol-map.service';
-import { RenderStatusService } from '../../portal-core-ui/service/openlayermap/renderstatus/render-status.service';
+import { LayerModel } from 'portal-core-ui/model/data/layer.model';
+import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
+import { RenderStatusService } from 'portal-core-ui/service/openlayermap/renderstatus/render-status.service';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
