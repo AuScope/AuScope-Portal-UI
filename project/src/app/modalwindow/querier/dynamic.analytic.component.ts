@@ -20,7 +20,7 @@ export class DynamicAnalyticComponent {
   @Input() featureId: string;
   @Input() doc: QuerierInfoModel;
   private _load: boolean;
-  @ViewChild('dynamicContentAnalyticPlaceholder', {read: ViewContainerRef})
+  @ViewChild('dynamicContentAnalyticPlaceholder', { read: ViewContainerRef, static: true })
   dyanmicAnalyticHost: ViewContainerRef;
 
 

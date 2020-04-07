@@ -6,7 +6,7 @@ import {timeoutWith, map, catchError} from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { Bbox } from '../../../portal-core-ui/model/data/bbox.model';
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpParams, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpParams, HttpHeaders, HttpResponse} from '@angular/common/http';
 
 declare var d3: any;
 
@@ -33,7 +33,7 @@ export class CapdfAnalyticService {
         return observableThrowError(response['msg']);
       }
     }), catchError(
-      (error: Response) => {
+      (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
       ), );
@@ -54,7 +54,7 @@ export class CapdfAnalyticService {
         return observableThrowError(response['msg']);
       }
     }), catchError(
-      (error: Response) => {
+      (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
       ), );
@@ -79,7 +79,7 @@ export class CapdfAnalyticService {
         return observableThrowError(response['msg']);
       }
     }), catchError(
-      (error: Response) => {
+      (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
       ), );
@@ -105,7 +105,7 @@ export class CapdfAnalyticService {
         return observableThrowError(response['msg']);
       }
     }), catchError(
-      (error: Response) => {
+      (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
       ), );
@@ -483,7 +483,7 @@ export class CapdfAnalyticService {
     }).pipe(timeoutWith(360000, observableThrowError(new Error('Request have timeout out after 5 minutes'))),
       map((response) => { // download file
       return response;
-    }), catchError((error: Response) => {
+    }), catchError((error: HttpResponse<any>) => {
         return observableThrowError(error);
     }), )
   }

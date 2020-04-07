@@ -3,7 +3,7 @@ import {throwError as observableThrowError, Observable} from 'rxjs';
 
 import {catchError, map} from 'rxjs/operators';
 import {Injectable, Inject} from '@angular/core';
-import {HttpClient, HttpParams, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpParams, HttpHeaders, HttpResponse} from '@angular/common/http';
 import {OnlineResourceModel} from '../../model/data/onlineresource.model';
 import { OlMapObject } from '../openlayermap/ol-map-object';
 
@@ -73,7 +73,7 @@ export class QueryWMSService {
     }).pipe(map(response => {
       return response;
     }), catchError(
-        (error: Response) => {
+        (error: HttpResponse<any>) => {
           return observableThrowError(error);
         }
       ), );

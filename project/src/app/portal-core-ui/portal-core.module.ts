@@ -1,7 +1,6 @@
 import { NgModule, Optional, SkipSelf, ModuleWithProviders } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import {HttpModule} from '@angular/http';
 import { BrowserModule } from '@angular/platform-browser';
 
 
@@ -42,11 +41,10 @@ import { SelectMapBoundingComponent } from './widget/selectmap.bounding';
   imports: [
     HttpClientModule,
     BrowserModule,
-    FormsModule,
-    HttpModule
+    FormsModule
   ],
   exports: [ImgLoadingDirective, StopPropagationDirective,
-    HttpClientModule, BrowserModule, FormsModule, HttpModule, SelectMapBoundingComponent],
+    HttpClientModule, BrowserModule, FormsModule, SelectMapBoundingComponent],
   providers: [LayerHandlerService,
     OlWMSService,
     OlMapObject,

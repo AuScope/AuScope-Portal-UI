@@ -18,7 +18,7 @@ export class MSCLAnalyticComponent implements OnInit {
         closeGraphModal: () => null;  // Function to call when the modal dialogue must be closed
         serviceUrl: string; // URL of MSCL service
 
-        @ViewChild('graphing_area') private graphing_area: ElementRef;  // Area used to display plots
+        @ViewChild('graphing_area', { static: true }) private graphing_area: ElementRef;  // Area used to display plots
 
         public allMetricList: Metric[];  // List of all possible metrics
 

@@ -28,7 +28,7 @@ import olTileWMS from 'ol/source/TileWMS';
 })
 export class SelectMapBoundingComponent implements AfterViewInit {
 
-  @ViewChild('mapselectboundingbox') mapElement: ElementRef;
+  @ViewChild('mapselectboundingbox', { static: true }) mapElement: ElementRef;
   public map;
   public vector;
   @Input() layer: LayerModel;

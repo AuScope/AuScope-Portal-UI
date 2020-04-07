@@ -11,7 +11,7 @@ import { LayerAnalyticInterface } from './layer.analytic.interface';
 
 export class DynamicLayerAnalyticComponent {
   private _layer: LayerModel;
-  @ViewChild('dynamicLayerContentAnalyticPlaceholder', {read: ViewContainerRef})
+  @ViewChild('dynamicLayerContentAnalyticPlaceholder', { read: ViewContainerRef, static: true })
   dyanmicAnalyticHost: ViewContainerRef;
 
 

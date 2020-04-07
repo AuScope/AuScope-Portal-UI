@@ -20,8 +20,8 @@ export class InfoPanelComponent implements OnChanges {
     @Input() cswRecords: CSWRecordModel[];
     @Input() layer: LayerModel;
     @Input() expanded: boolean;
-    @ViewChild(OlMapPreviewComponent) private previewMap: OlMapPreviewComponent;
-    @ViewChild('subPanelElement') subPanelElement: ElementRef;
+    @ViewChild(OlMapPreviewComponent, { static: true }) private previewMap: OlMapPreviewComponent;
+    @ViewChild('subPanelElement', { static: false }) subPanelElement: ElementRef;
 
     // legends: any = {};
     featureArr: any = [];

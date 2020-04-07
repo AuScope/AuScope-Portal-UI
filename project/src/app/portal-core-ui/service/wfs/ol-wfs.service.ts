@@ -9,7 +9,7 @@ import { OnlineResourceModel } from '../../model/data/onlineresource.model';
 import { PrimitiveModel } from '../../model/data/primitive.model';
 import { LayerHandlerService } from '../cswrecords/layer-handler.service';
 import { OlMapObject } from '../openlayermap/ol-map-object';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import olMap from 'ol/Map';
 import olPoint from 'ol/geom/Point';
 import * as olProj from 'ol/proj';
@@ -65,7 +65,7 @@ export class OlWFSService {
       }).pipe(map(response => {
         return response['data'];
       }), catchError(
-        (error: Response) => {
+        (error: HttpResponse<any>) => {
           return observableThrowError(error);
         }
       ), );

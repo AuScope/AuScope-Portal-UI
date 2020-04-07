@@ -5,7 +5,7 @@ import {catchError, map, timeoutWith} from 'rxjs/operators';
 import { Bbox } from '../../../model/data/bbox.model';
 import { LayerModel } from '../../../model/data/layer.model';
 import { LayerHandlerService } from '../../cswrecords/layer-handler.service';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import {Injectable, Inject} from '@angular/core';
 import * as $ from 'jquery';
 import { environment } from '../../../../../environments/environment';
@@ -66,7 +66,7 @@ export class DownloadWfsService {
       }).pipe(timeoutWith(360000, observableThrowError(new Error('Request have timeout out after 5 minutes'))),
         map((response) => { // download file
           return response;
-        }), catchError((error: Response) => {
+        }), catchError((error: HttpResponse<any>) => {
           return observableThrowError(error);
         }), );
     } catch (e) {

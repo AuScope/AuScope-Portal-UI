@@ -27,7 +27,7 @@ import olLayerVector from 'ol/layer/Vector';
 })
 
 export class OlMapPreviewComponent implements AfterViewInit {
-    @ViewChild('previewMapElement') mapElement: ElementRef;
+    @ViewChild('previewMapElement', { static: true }) mapElement: ElementRef;
     iDiv: any = null;
     new_id: any = null;
     olMapObject: OlMapObject = null;

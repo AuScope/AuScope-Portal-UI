@@ -12,11 +12,10 @@ export const environment = {
   production: false,
   getCSWRecordUrl: 'getKnownLayers.do',
   getCustomLayers: 'getCustomLayers.do',
-  // portalBaseUrl: 'http://mfg-01-mel.it.csiro.au:8080/', 
-  portalBaseUrl: 'http://localhost:8080/AuScope-Portal/', 
-  //  portalBaseUrl: 'http://au-portal-dev.it.csiro.au/api/',
+  // portalBaseUrl: 'http://au-portal-dev.it.csiro.au/api/',
+  portalBaseUrl: 'http://localhost:8080/AuScope-Portal/',
   hostUrl: 'http://localhost:4200/index.htm',
-  nVCLAnalyticalUrl: 'http://aus-analytical.it.csiro.au/NVCLAnalyticalServices/',
+  msclServiceUrl: 'http://meiproc.earthsci.unimelb.edu.au:80/geoserver/ows',
   googleAnalyticsKey: null,
   baseMapLayers: [
     { value: 'OSM', viewValue: 'OpenStreetMap', layerType: 'OSM' },
@@ -40,5 +39,3 @@ export const environment = {
     { value: 'r', viewValue: 'Google Road without Building', layerType: 'Google' }
   ]
 };
-
-

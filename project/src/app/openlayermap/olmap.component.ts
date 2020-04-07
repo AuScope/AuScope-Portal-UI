@@ -14,8 +14,7 @@ import {QueryWMSService} from '../portal-core-ui/service/wms/query-wms.service';
 import {GMLParserService} from '../portal-core-ui/utility/gmlparser.service';
 import {SimpleXMLService} from '../portal-core-ui/utility/simplexml.service';
 import { UtilitiesService } from '../portal-core-ui/utility/utilities.service';
-import {BsModalService} from 'ngx-bootstrap/modal';
-import {BsModalRef} from 'ngx-bootstrap';
+import {BsModalService, BsModalRef} from 'ngx-bootstrap/modal';
 import olControlMousePosition from 'ol/control/MousePosition';
 import * as olCoordinate from 'ol/coordinate';
 
@@ -30,7 +29,7 @@ import * as olCoordinate from 'ol/coordinate';
 
 export class OlMapComponent implements AfterViewInit {
   // This is necessary to access the html element to set the map target (after view init)!
-  @ViewChild('mapElement') mapElement: ElementRef;
+  @ViewChild('mapElement', { static: true }) mapElement: ElementRef;
 
   private bsModalRef: BsModalRef;
 

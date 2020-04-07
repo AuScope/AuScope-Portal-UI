@@ -8,8 +8,7 @@ import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { RenderStatusService } from '../../portal-core-ui/service/openlayermap/renderstatus/render-status.service';
 import { ManageStateService } from '../../portal-core-ui/service/permanentlink/manage-state.service';
 import { UtilitiesService } from '../../portal-core-ui/utility/utilities.service';
-import { BsModalService } from 'ngx-bootstrap/modal';
-import { BsModalRef } from 'ngx-bootstrap';
+import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import {config} from '../../../environments/config';
 
 

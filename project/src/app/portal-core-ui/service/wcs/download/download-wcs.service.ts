@@ -6,7 +6,7 @@ import { Bbox } from '../../../model/data/bbox.model';
 import { LayerModel } from '../../../model/data/layer.model';
 import { Constants } from '../../../utility/constants.service';
 import { LayerHandlerService } from '../../cswrecords/layer-handler.service';
-import {HttpClient, HttpParams, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpParams, HttpHeaders, HttpResponse} from '@angular/common/http';
 import {Injectable, Inject} from '@angular/core';
 
 
@@ -57,7 +57,7 @@ export class DownloadWcsService {
       }).pipe(timeoutWith(360000, observableThrowError(new Error('Request have timeout out after 5 minutes'))),
         map((response) => { // download file
           return response;
-        }), catchError((error: Response) => {
+        }), catchError((error: HttpResponse<any>) => {
           return observableThrowError(error);
         }), );
     } catch (e) {
@@ -86,7 +86,7 @@ export class DownloadWcsService {
                                return observableThrowError(response['msg']);
                              }
                            }),
-           catchError( (error: Response) => {
+           catchError( (error: HttpResponse<any>) => {
                                               return observableThrowError(error);
                                             }
                      ),

@@ -9,7 +9,7 @@ import {LayerModel} from '../../../portal-core-ui/model/data/layer.model';
 import { OnlineResourceModel } from '../../../portal-core-ui/model/data/onlineresource.model';
 import { LayerHandlerService } from '../../../portal-core-ui/service/cswrecords/layer-handler.service';
 import { OlMapObject } from '../../../portal-core-ui/service/openlayermap/ol-map-object';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import olMap from 'ol/Map';
 import olLayerVector from 'ol/layer/Vector';
 import olSourceVector from 'ol/source/Vector';
@@ -59,7 +59,7 @@ export class OlIrisService {
           return observableThrowError(response['Error retriving IRIS data']);
         }
       }), catchError(
-        (error: Response) => {
+        (error: HttpResponse<any>) => {
           return observableThrowError(error);
         }
       ), );

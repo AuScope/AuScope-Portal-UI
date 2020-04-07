@@ -5,7 +5,7 @@ import { LayerModel } from '../../portal-core-ui/model/data/layer.model';
 import { OlMapService } from '../../portal-core-ui/service/openlayermap/ol-map.service';
 import { RenderStatusService } from '../../portal-core-ui/service/openlayermap/renderstatus/render-status.service';
 import { BsModalService } from 'ngx-bootstrap/modal';
-import { BsModalRef } from 'ngx-bootstrap';
+import { BsModalRef } from 'ngx-bootstrap/modal';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 
 

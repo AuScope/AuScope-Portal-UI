@@ -30,7 +30,7 @@ import { NgForm } from '@angular/forms';
 })
 export class NVCLBoreholeAnalyticComponent
   implements AfterViewInit, OnInit, LayerAnalyticInterface {
-  @ViewChild('f') signupForm: NgForm;
+  @ViewChild('f', { static: true }) signupForm: NgForm;
   @Input() layer: LayerModel;
   public nvclform;
   public algorithms;

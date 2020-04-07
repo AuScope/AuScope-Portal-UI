@@ -3,14 +3,14 @@ import {throwError as observableThrowError } from 'rxjs';
 
 import {catchError, map} from 'rxjs/operators';
 import { Injectable, Inject } from '@angular/core';
-import { Http, Response } from '@angular/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 
 /**
  * Service class for the twitter notification
  */
 @Injectable()
 export class NotificationService {
-  constructor(private http: Http, @Inject('env') private env) {
+  constructor(private http: HttpClient, @Inject('env') private env) {
 
   }
   /**
@@ -20,13 +20,13 @@ export class NotificationService {
   getNotifications() {
     return this.http.get(this.env.portalBaseUrl + 'getNotifications.do').pipe(
       map(
-        (response: Response) => {
-          const data = response.json();
+        (response: HttpResponse<string>) => {
+          const data = JSON.parse(response.body);
           return data;
         }
       ),
       catchError(
-        (error: Response) => {
+        (error: HttpResponse<any>) => {
           return observableThrowError(error);
         }
       ), );

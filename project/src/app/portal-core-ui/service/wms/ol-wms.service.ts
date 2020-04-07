@@ -6,7 +6,7 @@ import { LayerModel } from "../../model/data/layer.model";
 import { OnlineResourceModel } from "../../model/data/onlineresource.model";
 import { LayerHandlerService } from "../cswrecords/layer-handler.service";
 import { OlMapObject } from "../openlayermap/ol-map-object";
-import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
+import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from "@angular/common/http";
 import olMap from "ol/Map";
 import olTile from "ol/layer/Tile";
 import olTileWMS from "ol/source/TileWMS";
@@ -183,7 +183,7 @@ export class OlWMSService {
                 map(response => {
                     return response;
                 }),
-                catchError((error: Response) => {
+                catchError((error: HttpResponse<any>) => {
                     return observableThrowError(error);
                 })
             );
@@ -240,7 +240,7 @@ export class OlWMSService {
                 map(response => {
                     return response;
                 }),
-                catchError((error: Response) => {
+                catchError((error: HttpResponse<any>) => {
                     return observableThrowError(error);
                 })
             );
