@@ -42,7 +42,10 @@ import { PortalCorePipesModule } from './portal-core-ui/uiutilities/portal-core.
 
 import { NgSelectModule } from '@ng-select/ng-select';
 
-import { MatTreeModule, MatIconModule, MatButtonModule, MatDialogModule} from '@angular/material'
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTreeModule } from '@angular/material/tree';
 import { CdkTableModule } from '@angular/cdk/table';
 
 import { StorageServiceModule } from 'ngx-webstorage-service';
