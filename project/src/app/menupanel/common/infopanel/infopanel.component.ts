@@ -21,7 +21,7 @@ export class InfoPanelComponent implements OnChanges {
     @Input() layer: LayerModel;
     @Input() expanded: boolean;
     @ViewChild(OlMapPreviewComponent, { static: true }) private previewMap: OlMapPreviewComponent;
-    @ViewChild('subPanelElement', { static: false }) subPanelElement: ElementRef;
+    @ViewChild('subPanelElement') subPanelElement: ElementRef;
 
     // legends: any = {};
     featureArr: any = [];

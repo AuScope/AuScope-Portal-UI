@@ -66,7 +66,7 @@ import { SelectMapBoundingComponent } from './widget/selectmap.bounding';
 
 export class PortalCoreModule {
 
-  static forRoot(env: any, conf: any): ModuleWithProviders {
+  static forRoot(env: any, conf: any): ModuleWithProviders<PortalCoreModule> {
     return {
       ngModule: PortalCoreModule,
       providers: [
