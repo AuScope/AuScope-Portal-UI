@@ -27,7 +27,7 @@
     "@angular/platform-browser-dynamic": "^8.2.14",
     "@angular/platform-server": "^8.2.14",
     "@angular/router": "^8.2.14",
-    "@ng-select/ng-select": "^2.20.5",
+    "@ng-select/ng-select": "^4.0.0",
     "@swimlane/ngx-charts": "^13.0.2",
     "@thi.ng/hiccup": "^3.2.9",
     "@turf/center": "^4.6.1",
@@ -55,6 +55,7 @@
     "rickshaw": "^1.6.6",
     "rxjs": "^6.5.5",
     "systemjs": "^0.21.6",
+    "tslib": "^1.11.1",
     "x2js": "^3.4.0",
     "zone.js": "~0.9.1"
   },
