@@ -1,8 +1,8 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { CSWRecordModel } from '../../../../portal-core-ui/model/data/cswrecord.model';
-import { LayerModel } from '../../../../portal-core-ui/model/data/layer.model';
-import { LegendService } from '../../../../portal-core-ui/service/wms/legend.service';
-import { UtilitiesService } from '../../../../portal-core-ui/utility/utilities.service';
+import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
+import { LayerModel } from 'portal-core-ui/model/data/layer.model';
+import { LegendService } from 'portal-core-ui/service/wms/legend.service';
+import { UtilitiesService } from 'portal-core-ui/utility/utilities.service';
 
 
 
