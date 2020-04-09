@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, Renderer2 } from '@angular/core';
 import { MSCLService, Metric } from './mscl.service';
-import { newPlot, relayout } from 'plotly.js-basic-dist-min';
 
 @Component({
   selector: 'app-mscl.analytic',
@@ -21,6 +20,8 @@ export class MSCLAnalyticComponent implements OnInit {
         @ViewChild('graphing_area', { static: true }) private graphing_area: ElementRef;  // Area used to display plots
 
         public allMetricList: Metric[];  // List of all possible metrics
+
+        public graphInput = { data: {}, layout: {}, options: {} };
 
         /**
          Create this class and initialize all metric list
@@ -55,10 +56,12 @@ export class MSCLAnalyticComponent implements OnInit {
                         yList.push(values.depth);
                     }
 
-                    // Create plots
+                    // Create plots - Angular will auto update plots when the inputs change
                     const traceList = this.msclService.getGraphTraceList(this.metricList, xLists, yList);
                     const layout = this.msclService.getGraphLayout(this.metricList, xLists);
-                    newPlot(element, traceList, layout, {responsive: true});
+                    this.graphInput.layout = layout;
+                    this.graphInput.data = traceList;
+                    this.graphInput.options = {responsive: true};
 
                 }, error => {
                     console.error('Error retrieving MSCL data:', error);
