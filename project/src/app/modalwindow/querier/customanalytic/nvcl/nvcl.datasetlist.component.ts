@@ -5,7 +5,7 @@ import { NVCLService } from './nvcl.service';
 import { Component, Inject, Input, AfterViewInit, OnInit } from '@angular/core';
 import {HttpParams} from '@angular/common/http';
 import { DomSanitizer } from '@angular/platform-browser';
-import {saveAs} from 'file-saver/FileSaver';
+import {saveAs} from 'file-saver';
 import { NVCLBoreholeAnalyticService } from '../../../layeranalytic/nvcl/nvcl.boreholeanalytic.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { UtilitiesService } from 'app/portal-core-ui/utility/utilities.service';

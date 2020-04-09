@@ -1,7 +1,7 @@
 import { Component, Input, ViewChild, OnChanges, SimpleChanges, ElementRef } from '@angular/core';
 import { point, featureCollection, polygon } from '@turf/helpers';
-import * as center from '@turf/center';
-import * as envelope from '@turf/envelope';
+import center from '@turf/center';
+import envelope from '@turf/envelope';
 import { CSWRecordModel } from '../../../portal-core-ui/model/data/cswrecord.model';
 import { LayerModel } from '../../../portal-core-ui/model/data/layer.model';
 import { LayerHandlerService } from '../../../portal-core-ui/service/cswrecords/layer-handler.service';

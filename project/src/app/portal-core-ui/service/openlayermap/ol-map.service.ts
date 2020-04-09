@@ -7,8 +7,9 @@ import olFeature from 'ol/Feature';
 import * as olProj from 'ol/proj';
 import {BehaviorSubject,  Subject } from 'rxjs';
 import { point } from '@turf/helpers';
-import * as inside from '@turf/inside';
-import * as bboxPolygon from '@turf/bbox-polygon';
+import inside from '@turf/inside';
+import bboxPolygon from '@turf/bbox-polygon';
+import { BBox } from '@turf/helpers';
 import {LayerModel} from '../../model/data/layer.model';
 import { LayerHandlerService } from '../cswrecords/layer-handler.service';
 import { ManageStateService } from '../permanentlink/manage-state.service';
@@ -16,6 +17,7 @@ import { OlCSWService } from '../wcsw/ol-csw.service';
 import { OlWFSService } from '../wfs/ol-wfs.service';
 import { OlMapObject } from './ol-map-object';
 import { OlWMSService } from '../wms/ol-wms.service';
+import { Bbox } from 'app/portal-core-ui/model/data/bbox.model';
 
 
 
@@ -76,8 +78,7 @@ export class OlMapService {
                            }
                            for (const cswRecord of layerModel.cswRecords) {
                                for (const bbox of cswRecord.geographicElements) {
-                                   const tBbox = [bbox.eastBoundLongitude, bbox.southBoundLatitude, bbox.westBoundLongitude, bbox.northBoundLatitude];
-                                   const poly = bboxPolygon(tBbox);
+                                   const poly = bboxPolygon([bbox.eastBoundLongitude, bbox.southBoundLatitude, bbox.westBoundLongitude, bbox.northBoundLatitude]);
                                    if (inside(clickPoint, poly) && !clickedLayerList.includes(activeLayer)) {
                                      // Add to list of clicked layers
                                      clickedLayerList.push(activeLayer);

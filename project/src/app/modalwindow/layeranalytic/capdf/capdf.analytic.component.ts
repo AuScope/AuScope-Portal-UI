@@ -3,7 +3,7 @@ import { LayerHandlerService } from '../../../portal-core-ui/service/cswrecords/
 import { UtilitiesService } from '../../../portal-core-ui/utility/utilities.service';
 import { LayerAnalyticInterface } from '../layer.analytic.interface';
 import { CapdfAnalyticService } from './capdf.analytic.service';
-import {saveAs} from 'file-saver/FileSaver';
+import {saveAs} from 'file-saver';
 import { Component, Input, OnInit } from '@angular/core';
 
 
