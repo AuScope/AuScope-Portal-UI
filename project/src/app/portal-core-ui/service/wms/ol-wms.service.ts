@@ -298,7 +298,7 @@ export class OlWMSService {
             }
             if (
                 UtilitiesService.isEndpointFailing(
-                    layer.nagiosFailingHosts,
+                    layer.stackdriverFailingHosts,
                     wmsOnlineResource
                 )
             ) {

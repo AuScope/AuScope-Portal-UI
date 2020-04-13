@@ -443,14 +443,14 @@ export class UtilitiesService {
 
 
   /**
-     * check if the cswRecord has a entry in the list of failing nagios record
-     * @param nagiosFailingHosts array of the list of host that is experiencing problem
+     * check if the cswRecord has a entry in the list of failing stackdriver record
+     * @param stackdriverFailingHosts array of the list of host that is experiencing problem
      * @param cswRecord the csw we are matching for problem
      */
-    public static isEndpointFailing(nagiosFailingHosts: string[], onlineResource: OnlineResourceModel): boolean {
-      if (nagiosFailingHosts && nagiosFailingHosts.length > 0) {
-        for (const nagiosFailingHost of nagiosFailingHosts) {
-            if (onlineResource.url.indexOf(nagiosFailingHost) > -1) {
+    public static isEndpointFailing(stackdriverFailingHosts: string[], onlineResource: OnlineResourceModel): boolean {
+      if (stackdriverFailingHosts && stackdriverFailingHosts.length > 0) {
+        for (const stackdriverFailingHost of stackdriverFailingHosts) {
+            if (onlineResource.url.indexOf(stackdriverFailingHost) > -1) {
               return true;
             }
         }
