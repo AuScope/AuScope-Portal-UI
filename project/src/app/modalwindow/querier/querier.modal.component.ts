@@ -1,15 +1,15 @@
 
-import {UtilitiesService} from '../../portal-core-ui/utility/utilities.service';
+import {UtilitiesService} from 'portal-core-ui/utility/utilities.service';
 import {Component} from '@angular/core';
 import {environment} from '../../../environments/environment';
 import {config} from '../../../environments/config';
 import {ref} from '../../../environments/ref';
-import {QuerierInfoModel} from '../../portal-core-ui/model/data/querierinfo.model';
+import {QuerierInfoModel} from 'portal-core-ui/model/data/querierinfo.model';
 import {NVCLService} from './customanalytic/nvcl/nvcl.service';
 import {BsModalRef} from 'ngx-bootstrap';
-import {OlClipboardService, Polygon} from '../../portal-core-ui/service/openlayermap/ol-clipboard.service';
-import {ManageStateService} from '../../portal-core-ui/service/permanentlink/manage-state.service';
-import {GMLParserService} from '../../portal-core-ui/utility/gmlparser.service';
+import {OlClipboardService, Polygon} from 'portal-core-ui/service/openlayermap/ol-clipboard.service';
+import {ManageStateService} from 'portal-core-ui/service/permanentlink/manage-state.service';
+import {GMLParserService} from 'portal-core-ui/utility/gmlparser.service';
 import {NestedTreeControl} from '@angular/cdk/tree';
 import {MatTreeNestedDataSource} from '@angular/material/tree';
 import {BehaviorSubject, of as observableOf} from 'rxjs';

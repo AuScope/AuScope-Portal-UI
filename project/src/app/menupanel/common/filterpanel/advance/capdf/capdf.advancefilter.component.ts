@@ -1,5 +1,5 @@
-import {LayerModel} from '../../../../../portal-core-ui/model/data/layer.model';
-import { LayerHandlerService } from '../../../../../portal-core-ui/service/cswrecords/layer-handler.service';
+import {LayerModel} from 'portal-core-ui/model/data/layer.model';
+import { LayerHandlerService } from 'portal-core-ui/service/cswrecords/layer-handler.service';
 import {CapdfFilterService} from './capdf.filter.service';
 import {Component, Input, OnInit, ChangeDetectorRef} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
