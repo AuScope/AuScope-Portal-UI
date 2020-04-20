@@ -38,8 +38,8 @@ import { QuerierModalComponent } from './modalwindow/querier/querier.modal.compo
 import { ClipboardModule } from 'ngx-clipboard';
 
 
-import { PortalCoreModule } from './portal-core-ui/portal-core.module';
-import { PortalCorePipesModule } from './portal-core-ui/uiutilities/portal-core.pipes.module';
+import { PortalCoreModule } from 'portal-core-ui/portal-core.module';
+import { PortalCorePipesModule } from 'portal-core-ui/uiutilities/portal-core.pipes.module';
 
 import { NgSelectModule } from '@ng-select/ng-select';
 

@@ -1,6 +1,6 @@
 
 import { ref } from '../../../../environments/ref';
-import { LayerModel } from '../../../portal-core-ui/model/data/layer.model';
+import { LayerModel } from 'portal-core-ui/model/data/layer.model';
 import { CapdfAdvanceFilterComponent } from './advance/capdf/capdf.advancefilter.component';
 import { Input, Component, ViewChild, ViewContainerRef, ComponentFactoryResolver, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 @Component({

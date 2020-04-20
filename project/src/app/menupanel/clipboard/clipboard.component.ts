@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import { OlClipboardService } from '../../portal-core-ui/service/openlayermap/ol-clipboard.service';
+import { OlClipboardService } from 'portal-core-ui/service/openlayermap/ol-clipboard.service';
 
 
 @Component({

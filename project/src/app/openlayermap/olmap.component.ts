@@ -1,20 +1,20 @@
 import { config } from '../../environments/config';
 import { ref } from '../../environments/ref';
 import {QuerierModalComponent} from '../modalwindow/querier/querier.modal.component';
-import { CSWRecordModel } from '../portal-core-ui/model/data/cswrecord.model';
+import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
 import olZoom from 'ol/control/Zoom';
 import olScaleLine from 'ol/control/ScaleLine';
-import {OlMapObject} from '../portal-core-ui/service/openlayermap/ol-map-object';
-import {OlMapService} from '../portal-core-ui/service/openlayermap/ol-map.service';
-import { ManageStateService } from '../portal-core-ui/service/permanentlink/manage-state.service';
-import { OlCSWService } from '../portal-core-ui/service/wcsw/ol-csw.service';
-import {QueryWFSService} from '../portal-core-ui/service/wfs/query-wfs.service';
-import {QueryWMSService} from '../portal-core-ui/service/wms/query-wms.service';
-import {GMLParserService} from '../portal-core-ui/utility/gmlparser.service';
-import {SimpleXMLService} from '../portal-core-ui/utility/simplexml.service';
-import { UtilitiesService } from '../portal-core-ui/utility/utilities.service';
 import {BsModalService, BsModalRef} from 'ngx-bootstrap/modal';
+import {OlMapObject} from 'portal-core-ui/service/openlayermap/ol-map-object';
+import {OlMapService} from 'portal-core-ui/service/openlayermap/ol-map.service';
+import { ManageStateService } from 'portal-core-ui/service/permanentlink/manage-state.service';
+import { OlCSWService } from 'portal-core-ui/service/wcsw/ol-csw.service';
+import {QueryWFSService} from 'portal-core-ui/service/wfs/query-wfs.service';
+import {QueryWMSService} from 'portal-core-ui/service/wms/query-wms.service';
+import {GMLParserService} from 'portal-core-ui/utility/gmlparser.service';
+import {SimpleXMLService} from 'portal-core-ui/utility/simplexml.service';
+import { UtilitiesService } from 'portal-core-ui/utility/utilities.service';
 import olControlMousePosition from 'ol/control/MousePosition';
 import * as olCoordinate from 'ol/coordinate';
 
@@ -54,6 +54,8 @@ export class OlMapComponent implements AfterViewInit {
     this.olMapObject.addControlToMap(mousePositionControl);
     this.olMapObject.addControlToMap(new olZoom());
     this.olMapObject.addControlToMap(new olScaleLine('metric'));
+    this.olMapObject.addGeocoderToMap();
+
     this.olMapObject.getMap().setTarget(this.mapElement.nativeElement.id);
 
     // VT: permanent link(open borehole in external window)

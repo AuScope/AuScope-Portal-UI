@@ -1,8 +1,8 @@
-import { Bbox } from '../../portal-core-ui/model/data/bbox.model';
-import { LayerModel } from '../../portal-core-ui/model/data/layer.model';
-import { LayerHandlerService } from '../../portal-core-ui/service/cswrecords/layer-handler.service';
-import { OlMapService } from '../../portal-core-ui/service/openlayermap/ol-map.service';
-import { RenderStatusService } from '../../portal-core-ui/service/openlayermap/renderstatus/render-status.service';
+import { Bbox } from 'portal-core-ui/model/data/bbox.model';
+import { LayerModel } from 'portal-core-ui/model/data/layer.model';
+import { LayerHandlerService } from 'portal-core-ui/service/cswrecords/layer-handler.service';
+import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
+import { RenderStatusService } from 'portal-core-ui/service/openlayermap/renderstatus/render-status.service';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { CataloguesearchService } from './cataloguesearch.service';

@@ -1,5 +1,5 @@
-import { OlMapObject } from '../portal-core-ui/service/openlayermap/ol-map-object';
-import { OlClipboardService, Polygon } from '../portal-core-ui/service/openlayermap/ol-clipboard.service';
+import { OlMapObject } from 'portal-core-ui/service/openlayermap/ol-map-object';
+import { OlClipboardService, Polygon } from 'portal-core-ui/service/openlayermap/ol-clipboard.service';
 import { Component, OnInit } from '@angular/core';
 
 @Component({

@@ -58,7 +58,8 @@
     "systemjs": "^6.2.6",
     "tslib": "^1.10.0",
     "x2js": "^3.4.0",
-    "zone.js": "~0.10.2"
+    "zone.js": "~0.10.2",
+    "portal-core-ui": "github:AuScope/portal-core-ui#master"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.901.0",

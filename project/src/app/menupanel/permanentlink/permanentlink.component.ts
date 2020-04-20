@@ -1,5 +1,5 @@
-import {ManageStateService} from '../../portal-core-ui/service/permanentlink/manage-state.service';
-import { UtilitiesService } from '../../portal-core-ui/utility/utilities.service';
+import {ManageStateService} from 'portal-core-ui/service/permanentlink/manage-state.service';
+import { UtilitiesService } from 'portal-core-ui/utility/utilities.service';
 import { environment } from '../../../environments/environment';
 import {Component} from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';

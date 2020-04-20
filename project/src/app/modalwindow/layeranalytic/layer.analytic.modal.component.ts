@@ -1,7 +1,7 @@
 
 import { AfterViewInit, Component } from '@angular/core';
 import { BsModalRef } from 'ngx-bootstrap/modal';
-import { LayerModel } from '../../portal-core-ui/model/data/layer.model';
+import { LayerModel } from 'portal-core-ui/model/data/layer.model';
 
 
 

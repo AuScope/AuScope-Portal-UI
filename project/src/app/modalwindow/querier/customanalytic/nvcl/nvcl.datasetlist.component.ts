@@ -1,6 +1,6 @@
-import { RickshawService } from '../../../../portal-core-ui/widget/chart/rickshaw/rickshaw.service';
-import { LayerModel } from '../../../../portal-core-ui/model/data/layer.model';
-import { OnlineResourceModel } from '../../../../portal-core-ui/model/data/onlineresource.model';
+import { RickshawService } from 'portal-core-ui/widget/chart/rickshaw/rickshaw.service';
+import { LayerModel } from 'portal-core-ui/model/data/layer.model';
+import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
 import { NVCLService } from './nvcl.service';
 import { Component, Inject, Input, AfterViewInit, OnInit } from '@angular/core';
 import { HttpParams } from '@angular/common/http';
@@ -8,7 +8,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import {saveAs} from 'file-saver';
 import { NVCLBoreholeAnalyticService } from '../../../layeranalytic/nvcl/nvcl.boreholeanalytic.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { UtilitiesService } from 'app/portal-core-ui/utility/utilities.service';
+import { UtilitiesService } from 'portal-core-ui/utility/utilities.service';
 
 
 export interface DialogData {
@@ -37,7 +37,7 @@ export class NVCLDatasetListDialogComponent {
   selector: 'app-nvcl-datasetlist-component',
   templateUrl: './nvcl.datasetlist.component.html',
   providers: [NVCLService, RickshawService, NVCLBoreholeAnalyticService],
-  styleUrls: ['../../../../portal-core-ui/widget/chart/rickshaw/rickshaw.service.scss', '../../../modalwindow.scss']
+  styleUrls: ['../../../../../../node_modules/portal-core-ui/widget/chart/rickshaw/rickshaw.service.scss', '../../../modalwindow.scss']
 })
 export class NVCLDatasetListComponent implements OnInit {
 
