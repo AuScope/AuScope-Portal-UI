@@ -63,7 +63,7 @@
 
 		<button *ngIf="!bbox" type="button" class="btn btn-info btn-xs" (click)="drawBound()"><i class="fa fa-object-ungroup"></i> Select Bounds</button>
 		<button *ngIf="bbox" type="button" class="btn btn-danger btn-xs" (click)="clearBound()"><i class="fa fa-refresh"></i> Clear Bounds</button>
-		<button type="button" class="btn btn-info btn-xs float-right" (click)="search()"><i *ngIf="downloadStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!downloadStarted" class="fa fa-cloud-download"></i> Search</button>
+		<button type="button" class="btn btn-info btn-xs float-right" (click)="search()"><i class="fa fa-cloud-download"></i> Search</button>
 
 	</div>
 

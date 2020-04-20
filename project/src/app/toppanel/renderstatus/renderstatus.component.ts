@@ -11,7 +11,7 @@ import { BsModalRef } from 'ngx-bootstrap/modal';
 export class NgbdModalStatusReportComponent {
 
 
-  public resourceMap: Object;
+  public resourceMap = {};
 
 
   constructor(public bsModalRef: BsModalRef) {}

@@ -31,7 +31,7 @@ export class NVCLDatasetListComponent implements OnInit {
   public collapse: any[] = [];
   public datasetImages: any[] = [];
   public datasetScalars: any[] = [];
-  public datasetScalarDefinition: string[] = [];
+  public datasetScalarDefinition = {};
   public drawGraphMode = false;
   public selectedLogNames = [];
   public processingGraph = false;
@@ -288,7 +288,7 @@ export class NVCLDatasetListComponent implements OnInit {
         this.downloadingTSG = false;
       })
   }
-  public checkStatus(datasetId: string) {
+  public checkStatus() {
     if (this.downloadEmail.length === 0 || this.downloadEmail.indexOf('@') < 0) {
       alert('Please enter a valid email address');
       return;
