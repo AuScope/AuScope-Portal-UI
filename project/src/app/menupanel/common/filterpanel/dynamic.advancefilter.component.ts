@@ -12,7 +12,7 @@ import { Input, Component, ViewChild, ViewContainerRef, ComponentFactoryResolver
 export class DynamicAdvancefilterComponent {
   @Input() _layer: LayerModel;
   @Output() advanceparam: EventEmitter<any> = new EventEmitter<any>();
-  @ViewChild('dynamicAdvanceFilterPlaceholder', {read: ViewContainerRef})
+  @ViewChild('dynamicAdvanceFilterPlaceholder', { read: ViewContainerRef, static: true })
   dyanmicAnalyticHost: ViewContainerRef;
 
 

@@ -9,7 +9,9 @@
 			<h4 class="card-title">MSCL Analytics: Borehole {{featureId}}</h4>
 		</div>
 		<div class="card-body">
-	        <div #graphing_area></div>
+			<div #graphing_area>
+			    <plotly-plot [data]="graphInput.data" [layout]="graphInput.layout" [config]="graphInput.options"></plotly-plot>
+			</div>
 		</div>
 	</div>
 </div>

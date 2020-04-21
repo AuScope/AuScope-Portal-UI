@@ -2,9 +2,9 @@
 import {throwError as observableThrowError, Observable } from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpParams, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpParams, HttpHeaders, HttpResponse} from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
-import { Layout, Data } from 'plotly.js-basic-dist-min';
+import { Layout, Data } from 'plotly.js-basic-dist';
 
 // This is the complete list of metrics for MSCL data
 // If you change this, then must also modify 'toMetric()' and 'fromMetric()'
@@ -327,7 +327,7 @@ export class MSCLService {
                 return observableThrowError(response['msg']);
             }
         }), catchError(
-            (error: Response) => {
+            (error: HttpResponse<any>) => {
                 return observableThrowError(error);
             }
         ), );

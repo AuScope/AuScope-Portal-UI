@@ -1,7 +1,7 @@
 import { Component, Input, ViewChild, OnChanges, SimpleChanges, ElementRef } from '@angular/core';
 import { point, featureCollection, polygon } from '@turf/helpers';
-import * as center from '@turf/center';
-import * as envelope from '@turf/envelope';
+import center from '@turf/center';
+import envelope from '@turf/envelope';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { LayerModel } from 'portal-core-ui/model/data/layer.model';
 import { LayerHandlerService } from 'portal-core-ui/service/cswrecords/layer-handler.service';
@@ -20,7 +20,7 @@ export class InfoPanelComponent implements OnChanges {
     @Input() cswRecords: CSWRecordModel[];
     @Input() layer: LayerModel;
     @Input() expanded: boolean;
-    @ViewChild(OlMapPreviewComponent) private previewMap: OlMapPreviewComponent;
+    @ViewChild(OlMapPreviewComponent, { static: true }) private previewMap: OlMapPreviewComponent;
     @ViewChild('subPanelElement') subPanelElement: ElementRef;
 
     // legends: any = {};

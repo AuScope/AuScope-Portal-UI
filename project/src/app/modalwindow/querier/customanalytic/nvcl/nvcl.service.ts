@@ -5,7 +5,7 @@ import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
 import {catchError, map} from 'rxjs/operators';
 import { UtilitiesService } from 'portal-core-ui/utility/utilities.service';
 import { Injectable, Inject} from '@angular/core';
-import {HttpClient, HttpParams, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpParams, HttpHeaders, HttpResponse} from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
 declare var gtag: Function;
 @Injectable()
@@ -31,7 +31,7 @@ export class NVCLService {
         return observableThrowError(response['msg']);
       }
     }), catchError(
-      (error: Response) => {
+      (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
       ), );
@@ -52,7 +52,7 @@ export class NVCLService {
         return observableThrowError(response['msg']);
       }
     }), catchError(
-      (error: Response) => {
+      (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
       ), );
@@ -72,7 +72,7 @@ export class NVCLService {
         return observableThrowError(response['msg']);
       }
     }), catchError(
-      (error: Response) => {
+      (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
       ), );
@@ -91,7 +91,7 @@ export class NVCLService {
     }).pipe(map(response => {
       return response;
     }), catchError(
-      (error: Response) => {
+      (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
       ), );
@@ -108,7 +108,7 @@ export class NVCLService {
     }).pipe(map(response => {
       return response;
     }), catchError(
-      (error: Response) => {
+      (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
       ), );
@@ -127,7 +127,7 @@ export class NVCLService {
     }).pipe(map(response => {
       return response;
     }), catchError(
-      (error: Response) => {
+      (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
       ), );
@@ -147,7 +147,7 @@ export class NVCLService {
         return observableThrowError(response['msg']);
       }
     }), catchError(
-      (error: Response) => {
+      (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
       ), );
@@ -169,7 +169,7 @@ export class NVCLService {
     }).pipe(map(response => {
       return response;
     }), catchError(
-      (error: Response) => {
+      (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
       ), );
@@ -186,7 +186,7 @@ export class NVCLService {
       }).pipe(map(response => {
         return response;
       }), catchError(
-        (error: Response) => {
+        (error: HttpResponse<any>) => {
           return observableThrowError(error);
         }
         ), );
@@ -209,7 +209,7 @@ export class NVCLService {
         return observableThrowError(response['msg']);
       }
     }), catchError(
-      (error: Response) => {
+      (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
       ), );

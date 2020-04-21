@@ -115,7 +115,7 @@
 								<label class="col-md-3">Log Name:</label>
 								<div class="col-md-8">
 									<input type="text" class="form-control form-control-sm" [(ngModel)]="nvclform.logName" name="logName" required ngModel #jobName="ngModel" >
-									<span class="validity" *ngIf="!logName.valid && logName.touched"></span>
+									<span class="validity" *ngIf="!nvclform.logName.valid && nvclform.logName.touched"></span>
 								</div>
 							</div>
 							<div *ngIf="selectedAlgorithm ==='nsa'" class="form-group form-group-md row" >

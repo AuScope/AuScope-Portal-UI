@@ -6,7 +6,7 @@ import {config} from '../../../environments/config';
 import {ref} from '../../../environments/ref';
 import {QuerierInfoModel} from 'portal-core-ui/model/data/querierinfo.model';
 import {NVCLService} from './customanalytic/nvcl/nvcl.service';
-import {BsModalRef} from 'ngx-bootstrap';
+import {BsModalRef} from 'ngx-bootstrap/modal';
 import {OlClipboardService, Polygon} from 'portal-core-ui/service/openlayermap/ol-clipboard.service';
 import {ManageStateService} from 'portal-core-ui/service/permanentlink/manage-state.service';
 import {GMLParserService} from 'portal-core-ui/utility/gmlparser.service';
@@ -14,7 +14,7 @@ import {NestedTreeControl} from '@angular/cdk/tree';
 import {MatTreeNestedDataSource} from '@angular/material/tree';
 import {BehaviorSubject, of as observableOf} from 'rxjs';
 import * as _ from 'lodash';
-import { NgxXml2jsonService } from 'ngx-xml2json';
+import * as X2JS from 'x2js';
 
 
 export class FileNode {
@@ -41,7 +41,6 @@ export class QuerierModalComponent {
   public bToClipboard = false;
   public data: FileNode[][] = [];
   dataChange: BehaviorSubject<FileNode[]>[] = [];
-  private ngxXml2jsonService: NgxXml2jsonService = new NgxXml2jsonService();
 
   nestedTreeControl: NestedTreeControl<FileNode>[] = [];
 
@@ -141,9 +140,16 @@ export class QuerierModalComponent {
         if (geomnode) { this.nestedTreeControl[name].collapse(geomnode); }
       }
     });
-    const data = this.buildFileTree(JSON.parse(`{"${name}":${JSON.stringify(this.ngxXml2jsonService.xmlToJson(doc))}}`), 0);
 
-    this.dataChange[name].next(data);
+    try {
+      // Convert XML to JSON object
+      const x2jsObj = new X2JS();
+      const result = x2jsObj.xml2js(doc.outerHTML);
+      const data = this.buildFileTree(JSON.parse(`{"${name}":${JSON.stringify(result)}}`), 0);
+      this.dataChange[name].next(data);
+    } catch (e) {
+      console.log('XML to JSON conversion error: ', e);
+    }
 
   }
 
@@ -159,23 +165,36 @@ export class QuerierModalComponent {
   buildFileTree(value: any, level: number): FileNode[] {
     const data: any[] = [];
     for (const k in value) {
+      // Remove __prefix
+      if (k === '__prefix') {
+        continue;
+      }
       const v = value[k];
       const node = new FileNode();
       node.filename = `${k}`.substring(`${k}`.indexOf(':') + 1, `${k}`.length);
+      // Remove leading underscores from name (LHS column in popup)
+      while (node.filename.startsWith('_')) {
+        node.filename = node.filename.substring(1);
+      }
       if (v === null || v === undefined) {
         // no action
       } else if (typeof v === 'object') {
-        if (Object.keys(v).length !== 0) {
+        // Use '__text' as value (RHS column in popup)
+        if (Object.keys(v).length === 2 && v.hasOwnProperty('__text')) {
+          node.type = v['__text'];
+        } else if (Object.keys(v).length !== 0) {
           node.children = this.buildFileTree(v, level + 1);
-        } else { node.type = ''; }
+        } else {
+          node.type = '';
+        }
       } else {
         node.type = v;
       }
       if (node.filename === '@attributes') {
         node.children.forEach(child => data.push(child));
       } else {
-       data.push(node);
-       }
+        data.push(node);
+      }
     }
     return data;
   }
