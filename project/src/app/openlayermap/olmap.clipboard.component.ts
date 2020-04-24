@@ -50,7 +50,7 @@ export class OlMapClipboardComponent implements OnInit {
    * Draw a polygon layer to map
    *
    */
-  public drawPolygon(layer): void {
+  public drawPolygon(): void {
     this.isDrawingPolygon = true;
     this.olClipboardService.drawPolygon();
   }

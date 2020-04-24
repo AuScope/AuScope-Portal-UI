@@ -5,7 +5,7 @@ import {catchError, map} from 'rxjs/operators';
 import { LayerModel } from 'portal-core-ui/model/data/layer.model';
 import { LayerHandlerService } from 'portal-core-ui/service/cswrecords/layer-handler.service';
 import { Injectable, Inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
 
@@ -31,7 +31,7 @@ export class NVCLBoreholeAnalyticService {
         return observableThrowError(response['msg']);
       }
     }), catchError(
-      (error: Response) => {
+      (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
       ), );
@@ -58,7 +58,7 @@ export class NVCLBoreholeAnalyticService {
         return observableThrowError(response['msg']);
       }
     }), catchError(
-      (error: Response) => {
+      (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
       ), );
@@ -72,7 +72,7 @@ export class NVCLBoreholeAnalyticService {
     }).pipe(map(response => {
         return response;
     }), catchError(
-      (error: Response) => {
+      (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
       ), );
@@ -89,7 +89,7 @@ export class NVCLBoreholeAnalyticService {
     }).pipe(map(response => {
         return response;
     }), catchError(
-      (error: Response) => {
+      (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
       ), );
@@ -130,7 +130,7 @@ export class NVCLBoreholeAnalyticService {
         return observableThrowError(response['msg']);
       }
     }), catchError(
-      (error: Response) => {
+      (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
       ), );
@@ -164,7 +164,7 @@ export class NVCLBoreholeAnalyticService {
         return observableThrowError(response['msg']);
       }
     }), catchError(
-      (error: Response) => {
+      (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
       ), );
@@ -185,7 +185,7 @@ export class NVCLBoreholeAnalyticService {
         return response;
       }
     }), catchError(
-      (error: Response) => {
+      (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
       ), );
@@ -200,7 +200,7 @@ export class NVCLBoreholeAnalyticService {
     }).pipe(map(response => {
       return response;
     }), catchError(
-      (error: Response) => {
+      (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
       ), );
@@ -216,7 +216,7 @@ export class NVCLBoreholeAnalyticService {
     }).pipe(map(response => {
       return response;
     }), catchError(
-      (error: Response) => {
+      (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
       ), );
@@ -231,7 +231,7 @@ export class NVCLBoreholeAnalyticService {
       responseType: 'blob'
     }).pipe(map((response) => {
       return response;
-    }), catchError((error: Response) => {
+    }), catchError((error: HttpResponse<any>) => {
       return observableThrowError(error);
     }), )
   }
@@ -244,7 +244,7 @@ export class NVCLBoreholeAnalyticService {
       responseType: 'blob'
     }).pipe(map((response) => { // download TsgJob scalar data csv file
       return response;
-    }), catchError((error: Response) => {
+    }), catchError((error: HttpResponse<any>) => {
       return observableThrowError(error);
     }), )
   }

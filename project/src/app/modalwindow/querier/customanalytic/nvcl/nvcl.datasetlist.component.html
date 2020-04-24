@@ -109,7 +109,7 @@
 
 							<div *ngIf="drawGraphMode==true;" class="modal-card-size">
 								<div style="overflow: auto; width: 100%; height: 100%;">
-									<div class="hasEvent light-blue window-close" (click)="changeDrawGraphMode(false)">
+									<div class="hasEvent light-blue window-close" (click)="changeDrawGraphMode(false, nvclDataset.datasetId)">
 										<i class="fa fa-window-close" aria-hidden="true"></i> close</div>
 									<div id="rickshawChart_outer">
 										<div *ngFor="let selectedLogName of selectedLogNames[nvclDataset.datasetId]; let j = index">

@@ -3,17 +3,34 @@ import { LayerModel } from 'portal-core-ui/model/data/layer.model';
 import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
 import { NVCLService } from './nvcl.service';
 import { Component, Inject, Input, AfterViewInit, OnInit } from '@angular/core';
-import {HttpParams} from '@angular/common/http';
+import { HttpParams } from '@angular/common/http';
 import { DomSanitizer } from '@angular/platform-browser';
-import {saveAs} from 'file-saver/FileSaver';
+import {saveAs} from 'file-saver';
 import { NVCLBoreholeAnalyticService } from '../../../layeranalytic/nvcl/nvcl.boreholeanalytic.service';
-import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { UtilitiesService } from 'portal-core-ui/utility/utilities.service';
 
 
 export interface DialogData {
   scalarClasses: any[];
   name: string;
+}
+
+
+@Component({
+  selector: 'app-nvcl-datasetlist-component-dialog',
+  templateUrl: 'nvcl.datasetlist.dialog.component.html',
+})
+export class NVCLDatasetListDialogComponent {
+
+  constructor(
+    public dialogRef: MatDialogRef<NVCLDatasetListDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: DialogData) {}
+
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
+
 }
 
 @Component({
@@ -31,7 +48,7 @@ export class NVCLDatasetListComponent implements OnInit {
   public collapse: any[] = [];
   public datasetImages: any[] = [];
   public datasetScalars: any[] = [];
-  public datasetScalarDefinition: string[] = [];
+  public datasetScalarDefinition = {};
   public drawGraphMode = false;
   public selectedLogNames = [];
   public processingGraph = false;
@@ -81,6 +98,7 @@ export class NVCLDatasetListComponent implements OnInit {
   public jobList: any[] = [];
   public currentStatus = [];
   public checkingTSG = false;
+
   constructor(public nvclService: NVCLService,
     public domSanitizer: DomSanitizer,
     private rickshawService: RickshawService,
@@ -177,7 +195,7 @@ export class NVCLDatasetListComponent implements OnInit {
           // httpParams = httpParams.append('serviceUrl', this.nvclService.getNVCLDataServiceUrl(this.onlineResource.url));
           // httpParams = httpParams.append('logId', trayImage.logId);
           httpParams = httpParams.append('datasetid', datasetId);
-         // httpParams = httpParams.append('width', '3');
+          // httpParams = httpParams.append('width', '3');
           if ( scalarid != null ) {
             httpParams = httpParams.append('scalarids', scalarid);
           }
@@ -288,7 +306,8 @@ export class NVCLDatasetListComponent implements OnInit {
         this.downloadingTSG = false;
       })
   }
-  public checkStatus(datasetId: string) {
+
+  public checkStatus() {
     if (this.downloadEmail.length === 0 || this.downloadEmail.indexOf('@') < 0) {
       alert('Please enter a valid email address');
       return;
@@ -303,6 +322,7 @@ export class NVCLDatasetListComponent implements OnInit {
         this.checkingTSG = false;
       })
   }
+
   public clearCheckBox(datasetId: string) {
      const logs = this.datasetScalars[datasetId];
       for (const log of logs) {
@@ -380,18 +400,4 @@ export class NVCLDatasetListComponent implements OnInit {
   }
 }
 
-@Component({
-  selector: 'app-nvcl-datasetlist-component-dialog',
-  templateUrl: 'nvcl.datasetlist.dialog.component.html',
-})
-export class NVCLDatasetListDialogComponent {
 
-  constructor(
-    public dialogRef: MatDialogRef<NVCLDatasetListDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData) {}
-
-  onNoClick(): void {
-    this.dialogRef.close();
-  }
-
-}

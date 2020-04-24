@@ -3,7 +3,8 @@ import { config } from '../environments/config';
 import { CatalogueSearchComponent } from './menupanel/cataloguesearch/cataloguesearch.component';
 import { NgModule } from '@angular/core';
 import { ModalModule } from 'ngx-bootstrap/modal';
-import { NouisliderModule } from 'ng2-nouislider'
+import { NouisliderModule } from 'ng2-nouislider';
+import { CommonModule } from '@angular/common';
 
 // Components
 import { OlMapComponent } from './openlayermap/olmap.component';
@@ -42,7 +43,10 @@ import { PortalCorePipesModule } from 'portal-core-ui/uiutilities/portal-core.pi
 
 import { NgSelectModule } from '@ng-select/ng-select';
 
-import { MatTreeModule, MatIconModule, MatButtonModule, MatDialogModule} from '@angular/material'
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTreeModule } from '@angular/material/tree';
 import { CdkTableModule } from '@angular/cdk/table';
 
 import { StorageServiceModule } from 'ngx-webstorage-service';
@@ -55,6 +59,14 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { MSCLComponent } from './modalwindow/querier/customanalytic/mscl/mscl.component';
 import { MSCLAnalyticComponent } from './modalwindow/layeranalytic/mscl/mscl.analytic.component';
+
+
+import { PlotlyViaCDNModule } from 'angular-plotly.js';
+
+// Using CDN module to avoid bug https://github.com/plotly/angular-plotly.js/issues/75
+PlotlyViaCDNModule.plotlyVersion = '1.53.0';
+PlotlyViaCDNModule.plotlyBundle = 'basic';
+
 
 @NgModule({
   declarations: [
@@ -107,7 +119,8 @@ import { MSCLAnalyticComponent } from './modalwindow/layeranalytic/mscl/mscl.ana
     StorageServiceModule,
     NgxChartsModule,
     BrowserAnimationsModule,
-    BsDropdownModule.forRoot()
+    BsDropdownModule.forRoot(),
+    CommonModule, PlotlyViaCDNModule
   ],
   entryComponents: [
     NgbdModalStatusReportComponent,

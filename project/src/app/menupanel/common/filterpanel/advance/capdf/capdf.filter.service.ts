@@ -5,7 +5,7 @@ import {catchError, map} from 'rxjs/operators';
 
 import { environment } from '../../../../../../environments/environment';
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpParams, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpParams, HttpHeaders, HttpResponse} from '@angular/common/http';
 
 
 @Injectable()
@@ -31,7 +31,7 @@ export class CapdfFilterService {
         return observableThrowError(response['msg']);
       }
     }),catchError(
-      (error: Response) => {
+      (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
       ),);
@@ -52,7 +52,7 @@ export class CapdfFilterService {
         return observableThrowError(response['msg']);
       }
     }),catchError(
-      (error: Response) => {
+      (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
       ),);
