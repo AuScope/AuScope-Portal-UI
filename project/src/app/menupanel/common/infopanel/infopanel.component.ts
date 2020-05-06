@@ -127,15 +127,15 @@ export class InfoPanelComponent implements OnChanges {
     }
 
     /**
-     * check if the cswRecord has a entry in the list of failing nagios record
-     * @param nagiosFailingHosts array of the list of host that is experiencing problem
+     * check if the cswRecord has a entry in the list of failing stackdriver record
+     * @param stackdriverFailingHosts array of the list of host that is experiencing problem
      * @param cswRecord the csw we are matching for problem
      */
-    isEndpointFailing(nagiosFailingHosts: string[], cswRecord: CSWRecordModel): boolean {
-      if (nagiosFailingHosts && nagiosFailingHosts.length > 0) {
-        for (const nagiosFailingHost of nagiosFailingHosts) {
+    isEndpointFailing(stackdriverFailingHosts: string[], cswRecord: CSWRecordModel): boolean {
+      if (stackdriverFailingHosts && stackdriverFailingHosts.length > 0) {
+        for (const stackdriverFailingHost of stackdriverFailingHosts) {
           for (const onlineResource of this.layerHandlerService.getOnlineResourcesFromCSW(cswRecord)) {
-            if (onlineResource.url.indexOf(nagiosFailingHost) > -1) {
+            if (onlineResource.url.indexOf(stackdriverFailingHost) > -1) {
               return true;
             }
           }
