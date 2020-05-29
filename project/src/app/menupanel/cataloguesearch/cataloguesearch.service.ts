@@ -92,9 +92,6 @@ export class CataloguesearchService {
     if (param.west) {
       httpParams = httpParams.append('value', param.west);
     }
-    if (param.west) {
-      httpParams = httpParams.append('value', param.west);
-    }
     if (param.keywords) {
       httpParams = httpParams.append('value', param.keywords);
     }
