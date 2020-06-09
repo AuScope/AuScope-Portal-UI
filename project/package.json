@@ -12,7 +12,9 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "docs": "npm run typedoc -- --options typedoc.json --out ./src/app/portal-core-ui/docs --exclude '**/*.spec.ts' ./app/portal-core-ui",
-    "typedoc": "typedoc"
+    "typedoc": "typedoc",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "private": true,
   "dependencies": {
@@ -59,7 +61,8 @@
     "tslib": "^1.10.0",
     "x2js": "^3.4.0",
     "zone.js": "~0.10.2",
-    "portal-core-ui": "github:AuScope/portal-core-ui#master"
+    "portal-core-ui": "github:AuScope/portal-core-ui#master",
+    "snyk": "^1.336.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.901.7",
@@ -86,5 +89,6 @@
     "tslint": "^6.1.1",
     "typedoc": "^0.17.4",
     "typescript": "~3.8.3"
-  }
+  },
+  "snyk": true
 }
