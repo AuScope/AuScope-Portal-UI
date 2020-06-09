@@ -30,7 +30,7 @@
     "@angular/router": "^9.1.1",
     "@ng-select/ng-select": "^4.0.0",
     "@swimlane/ngx-charts": "^13.0.2",
-    "@thi.ng/hiccup": "^3.2.9",
+    "@thi.ng/hiccup": "^3.2.23",
     "@turf/center": "^6.0.1",
     "@turf/envelope": "^5.1.5",
     "@turf/helpers": "^6.1.4",
