@@ -13,6 +13,7 @@ import {GMLParserService} from 'portal-core-ui/utility/gmlparser.service';
 import {NestedTreeControl} from '@angular/cdk/tree';
 import {MatTreeNestedDataSource} from '@angular/material/tree';
 import {BehaviorSubject, of as observableOf} from 'rxjs';
+import {TitleCasePipe} from '@angular/common';
 import * as _ from 'lodash';
 import * as X2JS from 'x2js';
 
@@ -40,6 +41,7 @@ export class QuerierModalComponent {
   public tab: {};
   public bToClipboard = false;
   public data: FileNode[][] = [];
+  public titleCase: TitleCasePipe;
   dataChange: BehaviorSubject<FileNode[]>[] = [];
 
   nestedTreeControl: NestedTreeControl<FileNode>[] = [];
@@ -49,6 +51,7 @@ export class QuerierModalComponent {
   constructor(public bsModalRef: BsModalRef, public olClipboardService: OlClipboardService,
     private manageStateService: ManageStateService, private gmlParserService: GMLParserService) {
     this.analyticMap = ref.analytic;
+    this.titleCase = new TitleCasePipe();
 
   }
   public getData() {return this.data}
@@ -166,16 +169,16 @@ export class QuerierModalComponent {
     const data: any[] = [];
     for (const k in value) {
       // Remove __prefix
-      if (k === '__prefix') {
+      // RA: also remove namespace declarations starting with _
+      if (k === '__prefix' || k.startsWith("_")) {
         continue;
       }
       const v = value[k];
       const node = new FileNode();
-      node.filename = `${k}`.substring(`${k}`.indexOf(':') + 1, `${k}`.length);
-      // Remove leading underscores from name (LHS column in popup)
-      while (node.filename.startsWith('_')) {
-        node.filename = node.filename.substring(1);
-      }
+
+      // RA AUS-3342: make popup labels more friendly
+      node.filename = this.formatLabels(`${k}`);
+      
       if (v === null || v === undefined) {
         // no action
       } else if (typeof v === 'object') {
@@ -197,6 +200,32 @@ export class QuerierModalComponent {
       }
     }
     return data;
+  }
+  
+  formatLabels(label: string): string {
+	  // remove prefix
+	  var filename = label.substring(label.indexOf(':') + 1, label.length);
+	  // Remove leading underscores from name (LHS column in popup)
+      while (filename.startsWith('_')) {
+        filename = filename.substring(1);
+      }
+      // separate camel case e.g. observationMethod
+      filename = filename.replace(/([a-z])([A-Z])/g, '$1 $2');
+      // separate . 
+      filename = filename.split(/[.]/).join(" ");
+      // make sure each first letter is capitalised
+      filename = this.titleCase.transform(filename);
+      // separate _
+      var units = filename.split(/[_]/);
+      if (units.length > 1) {
+    	  // put the last word in brackets e.g. elevation (m)
+    	  const lastIndex = units.length - 1;
+    	  units[lastIndex] = "(" + units[lastIndex].toLowerCase() + ")";
+    	  filename = units.join(" ");
+      }
+      
+      return filename;
+	  
   }
 
 }
