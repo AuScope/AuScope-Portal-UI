@@ -169,18 +169,27 @@ export class QuerierModalComponent {
       if (k === '__prefix') {
         continue;
       }
+      // RA: Remove namespace declarations
+      if (k.startsWith('_xmlns')) {
+        continue;
+      }      
+      
       const v = value[k];
       const node = new FileNode();
-      node.filename = `${k}`.substring(`${k}`.indexOf(':') + 1, `${k}`.length);
-      // Remove leading underscores from name (LHS column in popup)
-      while (node.filename.startsWith('_')) {
-        node.filename = node.filename.substring(1);
-      }
+
+      // RA AUS-3342: make popup labels more friendly 
+      if (level > 0) {
+          node.filename = this.formatLabels(`${k}`);
+      } else {
+          // gml:id to stay as is
+          node.filename = `${k}`;
+      }      
+      
       if (v === null || v === undefined) {
         // no action
       } else if (typeof v === 'object') {
         // Use '__text' as value (RHS column in popup)
-        if (Object.keys(v).length === 2 && v.hasOwnProperty('__text')) {
+        if (v.hasOwnProperty('__text')) {
           node.type = v['__text'];
         } else if (Object.keys(v).length !== 0) {
           node.children = this.buildFileTree(v, level + 1);
@@ -197,6 +206,54 @@ export class QuerierModalComponent {
       }
     }
     return data;
+  }
+  
+  formatLabels(label: string): string {
+    // remove prefix
+	var filename = label.substring(label.indexOf(':') + 1, label.length);
+	// Remove leading underscores from name (LHS column in popup)
+	while (filename.startsWith('_')) {
+	  filename = filename.substring(1);
+	}
+	// separate camel case e.g. observationMethod
+	filename = filename.replace(/([a-z])([A-Z])/g, '$1 $2');
+	// separate "_"
+	filename = filename.split(/[_]/).join(" ");    
+    var terms = filename.split(" ");
+    for(var j = 0; j < terms.length; j++) {
+        const term = terms[j];
+        switch(term) {
+            // capitalise abbreviations
+            // i.e. UOM, SRS, URI, HREF
+            case 'uom':
+            case 'uri':
+            case 'srs':
+            case 'nvcl':
+            case 'href': {
+                terms[j] = term.toUpperCase();
+                break;
+            }
+            // put uom in brackets
+            case 'm': {  
+                terms[j] = "(" + term + ")";
+                break;
+            }
+            // handle geom pos and posList
+            case 'pos': { 
+                terms[j] = 'Position';
+                break;
+            }
+            case 'posList': {
+                terms[j] = 'Position List';
+                break;
+            }                          
+            default: {
+                // make sure each first letter is capitalised
+                terms[j] = term[0].toUpperCase() + term.slice(1);
+            }
+        }
+    }
+    return terms.join(" ");  
   }
 
 }
