@@ -13,7 +13,6 @@ import {GMLParserService} from 'portal-core-ui/utility/gmlparser.service';
 import {NestedTreeControl} from '@angular/cdk/tree';
 import {MatTreeNestedDataSource} from '@angular/material/tree';
 import {BehaviorSubject, of as observableOf} from 'rxjs';
-import {TitleCasePipe} from '@angular/common';
 import * as _ from 'lodash';
 import * as X2JS from 'x2js';
 
@@ -41,7 +40,6 @@ export class QuerierModalComponent {
   public tab: {};
   public bToClipboard = false;
   public data: FileNode[][] = [];
-  public titleCase: TitleCasePipe;
   dataChange: BehaviorSubject<FileNode[]>[] = [];
 
   nestedTreeControl: NestedTreeControl<FileNode>[] = [];
@@ -51,7 +49,6 @@ export class QuerierModalComponent {
   constructor(public bsModalRef: BsModalRef, public olClipboardService: OlClipboardService,
     private manageStateService: ManageStateService, private gmlParserService: GMLParserService) {
     this.analyticMap = ref.analytic;
-    this.titleCase = new TitleCasePipe();
 
   }
   public getData() {return this.data}
@@ -169,21 +166,30 @@ export class QuerierModalComponent {
     const data: any[] = [];
     for (const k in value) {
       // Remove __prefix
-      // RA: also remove namespace declarations starting with _
-      if (k === '__prefix' || k.startsWith("_")) {
+      if (k === '__prefix') {
         continue;
       }
+      // RA: Remove namespace declarations
+      if (k.startsWith('_xmlns')) {
+        continue;
+      }      
+      
       const v = value[k];
       const node = new FileNode();
 
-      // RA AUS-3342: make popup labels more friendly
-      node.filename = this.formatLabels(`${k}`);
+      // RA AUS-3342: make popup labels more friendly 
+      if (level > 0) {
+          node.filename = this.formatLabels(`${k}`);
+      } else {
+          // gml:id to stay as is
+          node.filename = `${k}`;
+      }      
       
       if (v === null || v === undefined) {
         // no action
       } else if (typeof v === 'object') {
         // Use '__text' as value (RHS column in popup)
-        if (Object.keys(v).length === 2 && v.hasOwnProperty('__text')) {
+        if (v.hasOwnProperty('__text')) {
           node.type = v['__text'];
         } else if (Object.keys(v).length !== 0) {
           node.children = this.buildFileTree(v, level + 1);
@@ -203,29 +209,51 @@ export class QuerierModalComponent {
   }
   
   formatLabels(label: string): string {
-	  // remove prefix
-	  var filename = label.substring(label.indexOf(':') + 1, label.length);
-	  // Remove leading underscores from name (LHS column in popup)
-      while (filename.startsWith('_')) {
-        filename = filename.substring(1);
-      }
-      // separate camel case e.g. observationMethod
-      filename = filename.replace(/([a-z])([A-Z])/g, '$1 $2');
-      // separate . 
-      filename = filename.split(/[.]/).join(" ");
-      // make sure each first letter is capitalised
-      filename = this.titleCase.transform(filename);
-      // separate _
-      var units = filename.split(/[_]/);
-      if (units.length > 1) {
-    	  // put the last word in brackets e.g. elevation (m)
-    	  const lastIndex = units.length - 1;
-    	  units[lastIndex] = "(" + units[lastIndex].toLowerCase() + ")";
-    	  filename = units.join(" ");
-      }
-      
-      return filename;
-	  
+    // remove prefix
+	var filename = label.substring(label.indexOf(':') + 1, label.length);
+	// Remove leading underscores from name (LHS column in popup)
+	while (filename.startsWith('_')) {
+	  filename = filename.substring(1);
+	}
+	// separate camel case e.g. observationMethod
+	filename = filename.replace(/([a-z])([A-Z])/g, '$1 $2');
+	// separate "_"
+	filename = filename.split(/[_]/).join(" ");    
+    var terms = filename.split(" ");
+    for(var j = 0; j < terms.length; j++) {
+        const term = terms[j];
+        switch(term) {
+            // capitalise abbreviations
+            // i.e. UOM, SRS, URI, HREF
+            case 'uom':
+            case 'uri':
+            case 'srs':
+            case 'nvcl':
+            case 'href': {
+                terms[j] = term.toUpperCase();
+                break;
+            }
+            // put uom in brackets
+            case 'm': {  
+                terms[j] = "(" + term + ")";
+                break;
+            }
+            // handle geom pos and posList
+            case 'pos': { 
+                terms[j] = 'Position';
+                break;
+            }
+            case 'posList': {
+                terms[j] = 'Position List';
+                break;
+            }                          
+            default: {
+                // make sure each first letter is capitalised
+                terms[j] = term[0].toUpperCase() + term.slice(1);
+            }
+        }
+    }
+    return terms.join(" ");  
   }
 
 }
