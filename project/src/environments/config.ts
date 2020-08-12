@@ -2,6 +2,7 @@
 
 
 export const config = {
+  nvclUrl: 'https://nvclwebservices.csiro.au/NVCLDataServices',
   csvSupportedLayer: [
     'mineral-tenements',
     'tima-geosample',

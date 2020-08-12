@@ -7,6 +7,8 @@ import { LayerHandlerService } from 'portal-core-ui/service/cswrecords/layer-han
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
+import {config} from '../../../../environments/config';
+
 import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
 
 @Injectable()
@@ -19,7 +21,7 @@ export class NVCLBoreholeAnalyticService {
 
   public getNVCLAlgorithms(): Observable<any> {
     let httpParams = new HttpParams();
-    const nvclUrl = 'http://nvclwebservices.vm.csiro.au/NVCLDataServices'
+    const nvclUrl = config.nvclUrl;
 
     httpParams = httpParams.append('serviceUrl', nvclUrl);
     return this.http.get(environment.portalBaseUrl + 'getNVCLAlgorithms.do', {
@@ -42,7 +44,7 @@ export class NVCLBoreholeAnalyticService {
       return observableThrowError('No algorithmOUtputId specified');
     }
     let httpParams = new HttpParams();
-    const nvclUrl = 'http://nvclwebservices.vm.csiro.au/NVCLDataServices'
+    const nvclUrl = config.nvclUrl;
 
     for (const algorithmOutputId of algorithmOutputIds) {
       httpParams = httpParams.append('algorithmOutputId', algorithmOutputId);
