@@ -2,11 +2,11 @@
 							        <app-ol-preview-map></app-ol-preview-map>
 								</div>
 								<div *ngIf="layer.name != undefined">
-								    <h4><span class="text-primary">Abstract</span></h4>
+								    <h4><span class="text-primary">Layer Name</span></h4>
 								    <p>{{layer.name}}</p>
 								</div>
 								<div *ngIf="layer.description != undefined">
-								    <h4><span class="text-primary">Summary</span></h4>
+								    <h4><span class="text-primary">Brief Description</span></h4>
 								    <p>{{layer.description}}</p>
 								</div>
 								<div *ngIf="layer.iconUrl != undefined">
@@ -14,7 +14,7 @@
 								    <img src="{{layer.iconUrl}}" width="20" height="20">
 								</div>
 								<div *ngIf="cswRecords.length > 0">
-								    <h4><span class="text-primary">Details</span></h4>
+								    <h4><span class="text-primary">Metadata</span></h4>
 								    <div class="card">
 									    <div class="card-body" style="padding-left: 0px;padding-right: 0px;">
 										    <div>
