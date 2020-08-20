@@ -45,7 +45,7 @@
 		<div *ngIf="!bbox&&drawStarted==false">
 			 <div class="alert alert-warning fade show">
                 <i class="ti-bell float-left"></i>
-                <p>Select an area to download not exceeding {{downloadSizeLimit}} m<sup>2</sup></p>
+                <p>Select an area to download <span *ngIf="downloadSizeLimit > 0">not exceeding {{downloadSizeLimit}} m<sup>2</sup></span></p>
             </div>
 		</div>
 		<div *ngIf="drawStarted==true">
