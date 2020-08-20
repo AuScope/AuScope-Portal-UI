@@ -27,7 +27,7 @@
 									<!-- BEGIN card-header -->
 									<div class="card-header">
 										<h4 class="card-title">
-											<a (click)="parseTree(doc);" class="accordion-link" data-toggle="collapse" href="#doc-collapse{{i}}">
+											<a (click)="transformToHtml(doc)" class="accordion-link" data-toggle="collapse" href="#doc-collapse{{i}}">
 												{{doc.key}}
 											</a>
 										</h4>
@@ -58,7 +58,9 @@
 															</div>
 														</div>
 													</div>
-													<!-- NEW Tree -->
+													<!-- Show HTML if XML is transformed -->
+													<div *ngIf="doc.transformed" [innerHtml]="doc.transformed"></div>
+													<!-- Show default XML Tree if there is no HTML transformation -->
 													<mat-tree *ngIf="nestedDataSource[doc.key]" [dataSource]="nestedDataSource[doc.key]" [treeControl]="nestedTreeControl[doc.key]"
 													 class="example-tree">
 														<dl>
