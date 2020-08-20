@@ -13,8 +13,11 @@ import {GMLParserService} from 'portal-core-ui/utility/gmlparser.service';
 import {NestedTreeControl} from '@angular/cdk/tree';
 import {MatTreeNestedDataSource} from '@angular/material/tree';
 import {BehaviorSubject, of as observableOf} from 'rxjs';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
+import {Injectable, Inject} from '@angular/core';
 import * as _ from 'lodash';
 import * as X2JS from 'x2js';
+import { DomSanitizer } from '@angular/platform-browser';
 
 
 export class FileNode {
@@ -41,15 +44,15 @@ export class QuerierModalComponent {
   public bToClipboard = false;
   public data: FileNode[][] = [];
   dataChange: BehaviorSubject<FileNode[]>[] = [];
-
+  
   nestedTreeControl: NestedTreeControl<FileNode>[] = [];
 
   nestedDataSource: MatTreeNestedDataSource<FileNode>[] = [];
 
   constructor(public bsModalRef: BsModalRef, public olClipboardService: OlClipboardService,
-    private manageStateService: ManageStateService, private gmlParserService: GMLParserService) {
+    private manageStateService: ManageStateService, private gmlParserService: GMLParserService, 
+        private http: HttpClient, @Inject('env') private env, private sanitizer: DomSanitizer) {
     this.analyticMap = ref.analytic;
-
   }
   public getData() {return this.data}
 
@@ -109,8 +112,47 @@ export class QuerierModalComponent {
       this.olClipboardService.toggleClipboard(true);
     }
   }
+  
+  public transformToHtml(document): void {    
+    if (document.transformed) {
+       // this is when you're clicking to close an expanded feature
+       return;
+    }
+    if (!document.raw.includes("gml")) {
+       // We don't care about formatting non gml
+       return this.parseTree(document);
+    }
+    let formdata = new HttpParams();
+    formdata = formdata.append('gml', document.value.outerHTML);
+    
+    this.http
+        .post(this.env.portalBaseUrl + 'transformToHtmlPopup.do', formdata.toString(),
+            {headers: 
+                new HttpHeaders().set('Content-Type','application/x-www-form-urlencoded'),
+                responseType: 'text'
+            })
+        .subscribe(
+            response => { 
+                var bodyHtml = /<body.*?>([\s\S]*)<\/body>/.exec(response)[1];
+                if (bodyHtml.length < 1) {
+                    // if no transformation, fallback to XML tree
+                    return this.parseTree(document);
+                }
+                //sanitizer will make sure the HTML styling is applied
+                document.transformed = this.sanitizer.bypassSecurityTrustHtml(response);
+                if (!document.transformed) {
+                    // fallback to XML tree
+                    return this.parseTree(document);
+                }
+                document.home = true;
+                document.loadSubComponent = true
+            }, 
+            // try default XML tree display
+            error => { this.parseTree(document) }
+        );
+  }
 
-  public parseTree(document): void {
+  public parseTree(document): void {    
     const name = document.key;
     const doc = document.value;
 
@@ -215,45 +257,8 @@ export class QuerierModalComponent {
 	while (filename.startsWith('_')) {
 	  filename = filename.substring(1);
 	}
-	// separate camel case e.g. observationMethod
-	filename = filename.replace(/([a-z])([A-Z])/g, '$1 $2');
-	// separate "_"
-	filename = filename.split(/[_]/).join(" ");    
-    var terms = filename.split(" ");
-    for(var j = 0; j < terms.length; j++) {
-        const term = terms[j];
-        switch(term) {
-            // capitalise abbreviations
-            // i.e. UOM, SRS, URI, HREF
-            case 'uom':
-            case 'uri':
-            case 'srs':
-            case 'nvcl':
-            case 'href': {
-                terms[j] = term.toUpperCase();
-                break;
-            }
-            // put uom in brackets
-            case 'm': {  
-                terms[j] = "(" + term + ")";
-                break;
-            }
-            // handle geom pos and posList
-            case 'pos': { 
-                terms[j] = 'Position';
-                break;
-            }
-            case 'posList': {
-                terms[j] = 'Position List';
-                break;
-            }                          
-            default: {
-                // make sure each first letter is capitalised
-                terms[j] = term[0].toUpperCase() + term.slice(1);
-            }
-        }
-    }
-    return terms.join(" ");  
+	
+	return filename;
   }
 
 }
