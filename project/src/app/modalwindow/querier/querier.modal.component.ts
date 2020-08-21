@@ -90,6 +90,10 @@ export class QuerierModalComponent {
   }
 
 
+  /**
+   * Copy drawn polygon to clipboard
+   * @param document polygon as document
+   */
   public CopyToClipboard(document) {
     const name = document.key;
     const doc = document.value;
@@ -152,7 +156,12 @@ export class QuerierModalComponent {
         );
   }
 
-  public parseTree(document): void {    
+
+  /**
+   * Parses server response and builds a document tree
+   * @param document server response object
+   */
+  public parseTree(document): void {
     const name = document.key;
     const doc = document.value;
 
@@ -183,19 +192,28 @@ export class QuerierModalComponent {
       }
     });
 
-    try {
-      // Convert XML to JSON object
-      const x2jsObj = new X2JS();
-      const result = x2jsObj.xml2js(doc.outerHTML);
-      const data = this.buildFileTree(JSON.parse(`{"${name}":${JSON.stringify(result)}}`), 0);
-      this.dataChange[name].next(data);
-    } catch (e) {
-      console.log('XML to JSON conversion error: ', e);
+    let result = doc;
+    // If it is not JSON then convert to JSON
+    if (document.hasOwnProperty('format') && document.format !== 'JSON') {
+      try {
+        // Convert XML to JSON object
+        const x2jsObj = new X2JS();
+        result = x2jsObj.xml2js(doc.outerHTML);
+      } catch (e) {
+        console.log('XML to JSON conversion error: ', e);
+      }
     }
-
+    const data = this.buildFileTree(JSON.parse(`{"${name}":${JSON.stringify(result)}}`), 0);
+    this.dataChange[name].next(data);
   }
 
-  findtheGeom(Node: FileNode): FileNode {
+
+  /**
+   * Recursively searches for geometry elements
+   * @param Node starts search here
+   * @returns a geometry FileNode or null
+   */
+  private findtheGeom(Node: FileNode): FileNode {
     if (Node.filename === 'the_geom' || Node.filename === 'shape' ) { return Node; }
     for (let i = 0; Node.children && i < Node.children.length; i++) {
       const foundnode = this.findtheGeom(Node.children[i]);
@@ -204,7 +222,12 @@ export class QuerierModalComponent {
     return null;
   }
 
-  buildFileTree(value: any, level: number): FileNode[] {
+  /**
+   * Recursively builds a display tree using 'FileNode' elements
+   * @param value current node value
+   * @param level recursion depth
+   */
+  private buildFileTree(value: any, level: number): FileNode[] {
     const data: any[] = [];
     for (const k in value) {
       // Remove __prefix
@@ -249,16 +272,21 @@ export class QuerierModalComponent {
     }
     return data;
   }
-  
-  formatLabels(label: string): string {
+
+
+  /**
+   * Reformats labels to make them more user-friendly
+   * @param label label string
+   * @returns formatted label string
+   */
+  private formatLabels(label: string): string {
     // remove prefix
-	var filename = label.substring(label.indexOf(':') + 1, label.length);
-	// Remove leading underscores from name (LHS column in popup)
-	while (filename.startsWith('_')) {
-	  filename = filename.substring(1);
-	}
-	
-	return filename;
+    var filename = label.substring(label.indexOf(':') + 1, label.length);
+    // Remove leading underscores from name (LHS column in popup)
+    while (filename.startsWith('_')) {
+      filename = filename.substring(1);
+    }
+    return filename;
   }
 
 }

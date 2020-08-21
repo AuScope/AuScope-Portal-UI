@@ -87,7 +87,7 @@ export class OlIrisService {
         });
         const features = new olFormatKML().readFeatures(response, {
           dataProjection: 'EPSG:4326',
-          featureProjection: 'EPSG:3857'
+          featureProjection: Constants.MAP_PROJ
         });
         features.forEach(feature => {
           feature.layer = layer;

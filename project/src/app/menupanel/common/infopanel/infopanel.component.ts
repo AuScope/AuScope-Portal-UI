@@ -7,6 +7,7 @@ import { LayerModel } from 'portal-core-ui/model/data/layer.model';
 import { LayerHandlerService } from 'portal-core-ui/service/cswrecords/layer-handler.service';
 import { OlMapPreviewComponent } from './openlayermappreview/olmap.preview.component';
 import * as olProj from 'ol/proj';
+import { Constants } from 'portal-core-ui/utility/constants.service';
 
 
 
@@ -72,7 +73,7 @@ export class InfoPanelComponent implements OnChanges {
                     bboxPolygonArr[key].crs = {
                         'type': 'name',
                         'properties': {
-                            'name': 'EPSG:3857'
+                            'name': Constants.MAP_PROJ
                         }
                     };
                 }

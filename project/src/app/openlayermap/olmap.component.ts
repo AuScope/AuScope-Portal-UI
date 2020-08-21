@@ -94,6 +94,11 @@ export class OlMapComponent implements AfterViewInit {
     }
   }
 
+
+  /**
+   * Handles the map click event
+   * @param mapClickInfo object with map click information
+   */
   private handleLayerClick(mapClickInfo) {
     if (UtilitiesService.isEmpty(mapClickInfo)) {
       return;
@@ -125,7 +130,7 @@ export class OlMapComponent implements AfterViewInit {
               });
           } catch (error) {
            this.setModalHTML('<p> ' + error + '</p>',
-            'Error Retriving Data', feature, this.bsModalRef);
+            'Error Retrieving Data', feature, this.bsModalRef);
           }
         } else {
           this.setModalHTML('<p>Too many features to list, zoom in the map to get a more precise location</p>',
@@ -157,6 +162,13 @@ export class OlMapComponent implements AfterViewInit {
 
     }
   }
+
+
+  /**
+   * Convert CSW record to HTML for display
+   * @param cswRecord CSW record to be converted
+   * @returns HTML string
+   */
   private parseCSWtoHTML(cswRecord: CSWRecordModel): string {
     let html =  '<div class="row"><div class="col-md-3">Source</div><div class="col-md-9"><a href="' + cswRecord.recordInfoUrl + '">Full Metadata and download</a></div></div><hr>';
     html +=  '<div class="row"><div class="col-md-3">Title</div><div class="col-md-9">' + cswRecord.name + '</div></div><hr>';
@@ -173,8 +185,12 @@ export class OlMapComponent implements AfterViewInit {
 
     return html;
   }
+
+
   /**
-   * display the querier modal on map click
+   * Display the querier modal on map click
+   * @param modalDisplayed modal dialog to be displayed
+   * @param clickCoord map click coordinates
    */
   private displayModal(modalDisplayed, clickCoord) {
     if (modalDisplayed.value === false) {
@@ -190,8 +206,9 @@ export class OlMapComponent implements AfterViewInit {
     }
   }
 
+
   /**
-   * hide the querier modal
+   * Hide the querier modal
    */
   private hideModal() {
     if (this.bsModalRef) {
@@ -199,12 +216,66 @@ export class OlMapComponent implements AfterViewInit {
     }
   }
 
+
   /**
-   * set the modal with the layers that have been clicked on
+   * Parse JSON response. This is used for responses from GSKY servers
+   * but could be adapted for other servers at a later date
+   * @param result response string to be processed
+   * @param feature map feature object
+   * @returns list of objects; for each object keys are: 'key' 
+   */
+  private parseJSONResponse(result: string, feature: any): any[] {
+    const treeCollections = [];
+    try {
+      // Parse result and check type
+      const jsonObj = JSON.parse(result);
+      const type = Object.prototype.toString.call(jsonObj);
+      // Make sure it is an object or array and not 'null' or 'true' or 'false'
+      if (type === '[object Object]' || type === '[object Array]') {
+        if (jsonObj.type && jsonObj.type === 'FeatureCollection' && jsonObj.features) {
+          for (const jsonFeature of jsonObj.features) {
+            if (jsonFeature.properties) {
+              // Remove GSKY error about 'Requested width/height is too large, max width:512, height:512'
+              // NB: This can be removed once NCI improve the GSKY server so that there is a bigger limit on
+              // WIDTH/HEIGHT parameter for the OGC WMS GetFeatureInfo request
+              if (jsonFeature.properties.error) {
+                delete jsonFeature.properties.error;
+              }
+              // Create a JSON-based feature
+              treeCollections.push({
+                key: feature.layer.name,
+                layer: feature.layer,
+                onlineResource: feature.onlineResource,
+                value: jsonFeature.properties,
+                format: 'JSON'
+              });
+            }
+          }
+        }
+      }
+    } catch (err) {
+        return [];
+    }
+    return treeCollections;
+  }
+
+
+  /**
+   * Set the modal dialog with the layers that have been clicked on
+   * @param result response string
+   * @param feature map feature object
+   * @param bsModalRef modal dialog reference
    * @param gmlid: a optional filter to only display the gmlId specified
    */
   private setModal(result: string, feature: any, bsModalRef: BsModalRef, gmlid?: string) {
-    const treeCollections = SimpleXMLService.parseTreeCollection(this.gmlParserService.getRootNode(result), feature);
+    let treeCollections = [];
+
+    // GSKY only returns JSON, even if you ask for XML & GML
+    if (UtilitiesService.isGSKY(feature.onlineResource)) {
+      treeCollections = this.parseJSONResponse(result, feature);
+    } else {
+      treeCollections = SimpleXMLService.parseTreeCollection(this.gmlParserService.getRootNode(result), feature);
+    }
     let featureCount = 0;
     for (const treeCollection of treeCollections) {
       if (gmlid && gmlid !== treeCollection.key) {
@@ -230,7 +301,11 @@ export class OlMapComponent implements AfterViewInit {
 
 
   /**
-   * set the modal with the layers that have been clicked on
+   * Set the modal dialog with an HTML message
+   * @param html HTML response string
+   * @param key label for the message
+   * @param feature map feature object
+   * @param bsModalRef modal dialog reference
    */
   private setModalHTML(html: string, key: any, feature: any, bsModalRef: BsModalRef) {
       bsModalRef.content.htmls.push({

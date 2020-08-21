@@ -56,13 +56,13 @@ export class InfoPanelSubComponent implements OnChanges {
                             const onlineResources = me.cswRecord.onlineResources;
                             for (let j = 0; j < onlineResources.length; j++) {
                                 if (onlineResources[j].type === 'WMS') {
-                                    let params = 'REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png&HEIGHT=25&BGCOLOR=0xFFFFFF'
+                                    let params = 'SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png&HEIGHT=25&BGCOLOR=0xFFFFFF'
                                     + '&LAYER=' + onlineResources[j].name + '&LAYERS=' + onlineResources[j].name + '&SCALE=1000000';
                                     // If there is a style, then use it
                                     if (sldBody.length > 0) {
                                         params += '&SLD_BODY=' + sldBody + '&LEGEND_OPTIONS=forceLabels:on;minSymbolSize:16';
                                     }
-                                    this.legendUrl = UtilitiesService.addUrlParameters(onlineResources[j].url, params);
+                                    this.legendUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(onlineResources[j].url), params);
                                 }
                             }
                         }
@@ -71,9 +71,9 @@ export class InfoPanelSubComponent implements OnChanges {
                     const onlineResources = this.cswRecord.onlineResources;
                     for (let j = 0; j < onlineResources.length; j++) {
                         if (onlineResources[j].type === 'WMS') {
-                            const params = 'REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png&HEIGHT=25&BGCOLOR=0xFFFFFF'
+                            const params = 'SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png&HEIGHT=25&BGCOLOR=0xFFFFFF'
                             + '&LAYER=' + onlineResources[j].name + '&LAYERS=' + onlineResources[j].name + '&WIDTH=188&SCALE=1000000';
-                            this.legendUrl = UtilitiesService.addUrlParameters(onlineResources[j].url, params);
+                            this.legendUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(onlineResources[j].url), params);
                         }
                     }
                 }
@@ -89,7 +89,7 @@ export class InfoPanelSubComponent implements OnChanges {
                         + encodeURIComponent(onlineResources[j].name) + '&SRS=EPSG:4326&BBOX=' + bbox.westBoundLongitude + ',' + bbox.southBoundLatitude
                         + ',' + bbox.eastBoundLongitude + ',' + bbox.northBoundLatitude
                         + '&WIDTH=400&HEIGHT=400';
-                        this.wmsUrl = UtilitiesService.addUrlParameters(onlineResources[j].url, params);
+                        this.wmsUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(onlineResources[j].url), params);
                     }
                 }
         }

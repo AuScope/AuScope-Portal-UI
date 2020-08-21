@@ -3,6 +3,7 @@ import { LayerModel } from 'portal-core-ui/model/data/layer.model';
 import { LayerHandlerService } from 'portal-core-ui/service/cswrecords/layer-handler.service';
 import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 import { RenderStatusService } from 'portal-core-ui/service/openlayermap/renderstatus/render-status.service';
+import { Constants } from 'portal-core-ui/utility/constants.service';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { CataloguesearchService } from './cataloguesearch.service';
@@ -102,7 +103,7 @@ export class CatalogueSearchComponent implements AfterViewInit {
       features.forEach(function(feature) {
         me.bbox = new Bbox();
         me.bbox.crs = 'EPSG:4326';
-        const bbox4326 = feature.getGeometry().transform('EPSG:3857', 'EPSG:4326');
+        const bbox4326 = feature.getGeometry().transform(Constants.MAP_PROJ, 'EPSG:4326');
         me.bbox.eastBoundLongitude = bbox4326.getExtent()[2];
         me.bbox.westBoundLongitude = bbox4326.getExtent()[0];
         me.bbox.northBoundLatitude = bbox4326.getExtent()[3];

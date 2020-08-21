@@ -5,6 +5,7 @@ import {OlMapService} from 'portal-core-ui/service/openlayermap/ol-map.service';
 import {DownloadWfsService} from 'portal-core-ui/service/wfs/download/download-wfs.service';
 import {Component, Input, OnInit} from '@angular/core';
 import {UtilitiesService} from 'portal-core-ui/utility/utilities.service';
+import {Constants} from 'portal-core-ui/utility/constants.service';
 import {saveAs} from 'file-saver';
 import {config} from '../../../../environments/config';
 import { DownloadWcsService } from 'portal-core-ui/service/wcs/download/download-wcs.service';
@@ -45,7 +46,12 @@ export class DownloadPanelComponent implements OnInit {
       this.isCsvSupportedLayer = config.csvSupportedLayer.indexOf(this.layer.id) >= 0;
       if (config.wcsSupportedLayer[this.layer.id]) {
         this.isWCSDownloadSupported = true;
-        this.downloadSizeLimit = config.wcsSupportedLayer[this.layer.id].downloadAreaMaxSize;
+        // If 'downloadAreaMaxsize' is not set to Number.MAX_SAFE_INTEGER then download limits will apply
+        if (config.wcsSupportedLayer[this.layer.id].downloadAreaMaxSize < Number.MAX_SAFE_INTEGER) {
+          this.downloadSizeLimit = config.wcsSupportedLayer[this.layer.id].downloadAreaMaxSize;
+        } else {
+          this.downloadSizeLimit = 0;
+        }
       } else {
         this.isWCSDownloadSupported = false;
       }
@@ -67,16 +73,20 @@ export class DownloadPanelComponent implements OnInit {
       const me = this;
       // Go through this array and get coordinates of their geometry.
       features.forEach(function(feature) {
-       if (config.wcsSupportedLayer[me.layer.id] && config.wcsSupportedLayer[me.layer.id].downloadAreaMaxSize < feature.getGeometry().getArea()) {
-         alert('The area size you have selected of ' + feature.getGeometry().getArea() + 'm2 exceed the limited size of ' +
-         config.wcsSupportedLayer[me.layer.id].downloadAreaMaxSize + 'm2. Due to the size of the dataset' +
-           ' we have to limit the download area');
-         me.bbox = null;
-         return;
-       }
+        if (config.wcsSupportedLayer[me.layer.id]) {
+          // If 'downloadAreaMaxsize' is not set to Number.MAX_SAFE_INTEGER then download limits will apply
+          const maxSize = config.wcsSupportedLayer[me.layer.id].downloadAreaMaxSize;
+          if (maxSize != Number.MAX_SAFE_INTEGER && maxSize < feature.getGeometry().getArea()) {
+            alert('The area size you have selected of ' + feature.getGeometry().getArea() + 'm2 exceed the limited size of ' +
+            config.wcsSupportedLayer[me.layer.id].downloadAreaMaxSize + 'm2. Due to the size of the dataset' +
+             ' we have to limit the download area');
+            me.bbox = null;
+            return;
+          }
+        }
         me.bbox = new Bbox();
         me.bbox.crs = 'EPSG:4326';
-        const bbox4326 = feature.getGeometry().transform('EPSG:3857', 'EPSG:4326');
+        const bbox4326 = feature.getGeometry().transform(Constants.MAP_PROJ, 'EPSG:4326');
         me.bbox.eastBoundLongitude = bbox4326.getExtent()[2];
         me.bbox.westBoundLongitude = bbox4326.getExtent()[0];
         me.bbox.northBoundLatitude = bbox4326.getExtent()[3];

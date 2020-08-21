@@ -15,51 +15,53 @@ export const config = {
     'erl-mineraloccurrenceview',
     'erl-commodityresourceview'
   ],
+  // Set 'downloadAreaMaxSize' to Number.MAX_SAFE_INTEGER
+  // to disable area download limits
   wcsSupportedLayer: {
     'aster-aloh': {
-      downloadAreaMaxSize: 80000000000
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
     },
     'aster-ferrous': {
-      downloadAreaMaxSize: 80000000000
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
     },
     'aster-opaque': {
-      downloadAreaMaxSize: 80000000000
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
     },
     'aster-ferric-oxide-content': {
-      downloadAreaMaxSize: 80000000000
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
     },
     'aster-feoh': {
-      downloadAreaMaxSize: 80000000000
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
     },
     'aster-ferric-oxide-comp': {
-      downloadAreaMaxSize: 80000000000
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
     },
     'aster-group-index': {
-      downloadAreaMaxSize: 80000000000
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
     },
     'aster-quartz-index': {
-      downloadAreaMaxSize: 80000000000
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
     },
     'aster-mgoh-content': {
-      downloadAreaMaxSize: 80000000000
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
     },
     'aster-green-veg': {
-      downloadAreaMaxSize: 80000000000
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
     },
     'aster-ferr-carb': {
-      downloadAreaMaxSize: 80000000000
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
     },
     'aster-mgoh-group-comp': {
-      downloadAreaMaxSize: 80000000000
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
     },
     'aster-aloh-group-content': {
-      downloadAreaMaxSize: 80000000000
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
     },
     'aster-gypsum-content': {
-      downloadAreaMaxSize: 80000000000
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
     },
     'aster-silica-content': {
-      downloadAreaMaxSize: 80000000000
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
     }
   },
   forceAddLayerViaProxy: [
