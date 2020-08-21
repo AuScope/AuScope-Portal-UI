@@ -25,13 +25,27 @@ export class InfoPanelSubComponent implements OnChanges {
     }
 
     /**
+     * Remove unwanted strings from metadata constraints fields
+     * @param constraints string array of contraints
+     * @return string constraints in string format
+     */
+    public cleanConstraints(constraints: string[]) {
+        let outStr = "";
+        for (const conStr of constraints) {
+            if (conStr != "codeListLocation#MD_RestrictionCode") {
+                outStr += conStr + ", ";
+            }
+        }
+        return outStr.replace(/, $/,"");
+    }
+
+    /**
      * Gets called by Angular framework upon any changes
      * @param changes object which holds the changes
      */
     ngOnChanges(changes: SimpleChanges) {
         // If this subpanel becomes expanded, then load up the legend and preview map
         if (changes.expanded.currentValue === true && !changes.expanded.previousValue) {
-
             const me = this;
             if (this.layer.proxyStyleUrl && this.layer.proxyStyleUrl.length > 0) {
                 this.legendService.getLegendStyle(this.layer.proxyStyleUrl).subscribe(
