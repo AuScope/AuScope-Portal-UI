@@ -24,7 +24,7 @@ COPY docker/make_timestamp.sh make_timestamp.sh
 RUN ./make_timestamp.sh > ./src/app/menupanel/portal-details-panel/portal-details-panel.component.html
 
 # Build Angular's static website files
-RUN npm run build-prod 
+RUN npm run build-test
 
 # Second image, install website
 FROM debian:10
