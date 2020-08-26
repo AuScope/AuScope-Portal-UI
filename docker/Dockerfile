@@ -1,3 +1,9 @@
+# This Dockerfile builds a docker image of AuScope Portal API
+# A static Angular website served by apache2
+#
+# Build type. Can be one of: build-dev, build-prod, build-test
+ARG build-type=build-dev
+
 # First image, build angular app
 FROM node:12.18-alpine as node
 
@@ -21,10 +27,10 @@ COPY project ./
 
 # Alter panel to show build date & time
 COPY docker/make_timestamp.sh make_timestamp.sh
-RUN ./make_timestamp.sh > ./src/app/menupanel/portal-details-panel/portal-details-panel.component.html
+RUN ./make_timestamp.sh $build-type > ./src/app/menupanel/portal-details-panel/portal-details-panel.component.html
 
 # Build Angular's static website files
-RUN npm run build-dev
+RUN npm run $build-type
 
 # Second image, install website
 FROM debian:10
