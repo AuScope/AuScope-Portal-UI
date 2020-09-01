@@ -13,8 +13,8 @@ export const environment = {
   production: false,
   getCSWRecordUrl: 'getKnownLayers.do',
   getCustomLayers: 'getCustomLayers.do',
-  portalBaseUrl: 'http://au-portal-dev.it.csiro.au/api/',
-  hostUrl: 'http://au-portal-dev.it.csiro.au/portal/index.htm',
+  portalBaseUrl: 'https://au-portal-dev.it.csiro.au/api/',
+  hostUrl: 'https://au-portal-dev.it.csiro.au/index.htm',
   nVCLAnalyticalUrl: 'http://aus-analytical.it.csiro.au/NVCLAnalyticalServices/',
   googleAnalyticsKey: 'UA-33658784-3',
   baseMapLayers: [
