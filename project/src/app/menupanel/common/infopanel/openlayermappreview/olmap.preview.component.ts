@@ -3,8 +3,6 @@ import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service
 import { RenderStatusService } from 'portal-core-ui/service/openlayermap/renderstatus/render-status.service';
 import { Constants } from 'portal-core-ui/utility/constants.service';
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { point, polygon } from '@turf/helpers';
-import inside from '@turf/inside';
 import olStyle from 'ol/style/Style';
 import olView from 'ol/View';
 import olStroke from 'ol/style/Stroke';
@@ -13,6 +11,7 @@ import olGeoJSON from 'ol/format/GeoJSON';
 import olSourceVector from 'ol/source/Vector';
 import olLayerVector from 'ol/layer/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
+import Polygon from 'ol/geom/Polygon';
 
 
 @Component({
@@ -51,11 +50,11 @@ export class OlMapPreviewComponent implements AfterViewInit {
         map.on('singleclick', function(event) {
             for (const featureColl of me.bboxGeojsonObjectArr) {
                 for (const feat of featureColl.features) {
-                    const poly = polygon([[feat.geometry.coordinates[0][0],
+                    const poly = new Polygon([[feat.geometry.coordinates[0][0],
                             feat.geometry.coordinates[0][1], feat.geometry.coordinates[0][2],
                             feat.geometry.coordinates[0][3], feat.geometry.coordinates[0][4]]]);
-                    if (inside(point(event.coordinate), poly)) {
-                        me.olMapService.fitView([poly[0], poly[1], poly[2], poly[3]]);
+                    if (poly.intersectsCoordinate(event.coordinate)) {
+                        me.olMapService.fitView(poly.getExtent());
                     }
                 }
             }
