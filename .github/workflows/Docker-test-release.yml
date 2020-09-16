@@ -3,9 +3,9 @@ name: Docker-test-release
 
 on:
   push:
-    # Publish `v1.2.3` tags as releases.
-    tags:
-      - v*
+    # Publish `RELEASE-*` as Docker `latest` test image.
+    branches:
+      - RELEASE-*
 
 env:
   IMAGE_NAME: auscope-portal-ui-test-release
