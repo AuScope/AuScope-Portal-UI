@@ -32,10 +32,11 @@ export class InfoPanelSubComponent implements OnChanges {
     public cleanConstraints(constraints: string[]) {
         let outStr = "";
         for (const conStr of constraints) {
-            if (conStr != "codeListLocation#MD_RestrictionCode") {
+            if (conStr.indexOf("#MD_RestrictionCode") < 0) {
                 outStr += conStr + ", ";
             }
         }
+        // Remove trailing comma
         return outStr.replace(/, $/,"");
     }
 
