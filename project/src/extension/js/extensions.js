@@ -1,3 +1,6 @@
+/* This function is used to manage the controls of Rickshaw graphs
+   used in NVCL Analytic tab in popup
+ */ 
 var RenderControls = function(args) {
 
 	var $ = jQuery;
@@ -14,14 +17,16 @@ var RenderControls = function(args) {
 			offset: this.element.elements.offset
 		};
 
+		/* This is called when the controls' state changes after a click event */
 		this.element.addEventListener('change', function(e) {
-
 			this.settings = this.serialize();
 
+			/* Make sure the default offset is available when the selected renderer changes */
 			if (e.target.name == 'renderer') {
 				this.setDefaultOffset(e.target.value);
 			}
 
+			/* Change the set of offsets available each time the renderer changes */
 			this.syncOptions();
 			this.settings = this.serialize();
 
@@ -60,37 +65,37 @@ var RenderControls = function(args) {
 	};
 
 	this.syncOptions = function() {
-
 		var options = this.rendererOptions[this.settings.renderer];
 
 		Array.prototype.forEach.call(this.inputs.interpolation, function(input) {
 
 			if (options.interpolation) {
 				input.disabled = false;
-				input.parentNode.classList.remove('disabled');
 			} else {
 				input.disabled = true;
-				input.parentNode.classList.add('disabled');
 			}
 		});
 
+		/* When renderer is selected, make sure only the usable offset options are displayed */
 		Array.prototype.forEach.call(this.inputs.offset, function(input) {
-
 			if (options.offset.filter( function(o) { return o == input.value } ).length) {
+				/* Make input & label appear */
 				input.disabled = false;
-				input.parentNode.classList.remove('disabled');
-
+				input.style.display = "inline-block";
+				input.nextSibling.style.display = "inline-block"; 
 			} else {
+				/* Make input & label disappear */
 				input.disabled = true;
-				input.parentNode.classList.add('disabled');
+				input.style.display = "none";
+				input.nextSibling.style.display = "none";
 			}
 
 		}.bind(this));
 
 	};
 
+	/* Enables the default offset each time you change the renderer */
 	this.setDefaultOffset = function(renderer) {
-
 		var options = this.rendererOptions[renderer];
 
 		if (options.defaults && options.defaults.offset) {
@@ -106,6 +111,11 @@ var RenderControls = function(args) {
 		}
 	};
 
+	/* 
+	 * The user selects a renderer, and it will display the data as an 'area', 'bar', 'line' or 'scatter' graph
+     * The 'offset' determines whether the data is displayed as 'stack', 'expand' or 'value'
+     * Obviously not all renderers can display all kinds of offset e.g. 'scatterplot' only has 'value'
+     */
 	this.rendererOptions = {
 
 		area: {

@@ -1,3 +1,5 @@
+/* These definitions are used for Rickshaw graphs */
+
 div, span, p, td {
 	font-family: Arial, sans-serif;
 }
@@ -8,7 +10,7 @@ div, span, p, td {
 	display: inline-block;
 }
 [id^=chart_] path {
-	-webkit-transition: opacity 0.2s linear;
+	transition: opacity 0.2s linear;
 }
 [id^=preview_] {
 	margin-top: 10px;
@@ -35,7 +37,6 @@ div, span, p, td {
 .rickshaw_graph .detail {
 	left: -1000;
 }
-
 [id^=chart_] {
 	border: 1px solid #f0f0f0;
 }
@@ -105,7 +106,7 @@ label.disabled span {
 	outline: 2px solid steelblue;
 }
 [id*=_form_].toggler input[type=radio] {
-	-moz-appearance: button;
+	appearance: button;
 	background: white;
 	margin: 0 7px;
 	width: 30px;
@@ -115,7 +116,7 @@ label.disabled span {
 [id*=_form_].toggler label {
 	display: inline-block;
 	padding: 0;
-	width: 30px;
+	width: 40px;
 	height: 13px;
 	padding-top: 30px;
 	text-align: center;
@@ -126,54 +127,37 @@ label.disabled span {
 	margin: 0 7px;
 	cursor: pointer;
 }
-div[id^=interpolation_form_].toggler input[type=radio],
-div[id^=offset_form_].toggler input[type=radio]{
-  right: -6.5px;
-  top: 0.5px;
-  z-index: -1;
-}
 
 label[for^=area_] {
 	background: url(../images/om_stack30.png);
-	background-size: 100% 100%;
 }
 label[for^=line_] {
 	background: url(../images/om_lines30.png);
-	background-size: 100% 100%;
 }
 label[for^=bar_] {
 	background: url(../images/om_bar30.png);
-	background-size: 100% 100%;
 }
 label[for^=scatter_] {
 	background: url(../images/om_scatter30.png);
-	background-size: 100% 100%;
 }
 label[for^=stack_] {
 	background: url(../images/offs_stack30.png);
-	background-size: 100% 100%;
 }
-label[for^=pct_] {
+label[for^=expand_] {
 	background: url(../images/om_percent30.png);
-	background-size: 100% 100%;
 }
 label[for=stream_] {
 	background: url(../images/om_stream30.png);
-	background-size: 100% 100%;
 }
 label[for^=value_] {
 	background: url(../images/offset_value30.png);
-	background-size: 100% 100%;
 }
 label[for^=cardinal_] {
 	background: url(../images/interp_cardinal30.png);
-	background-size: 100% 100%;
 }
 label[for^=linear_] {
 	background: url(../images/interp_linear30.png);
-	background-size: 100% 100%;
 }
 label[for^=step_] {
 	background: url(../images/interp_step30.png);
-	background-size: 100% 100%;
 }
