@@ -15,7 +15,7 @@ export const environment = {
   //portalBaseUrl: 'http://localhost:8080/AuScope-Portal/', 
   portalBaseUrl: 'https://au-portal-dev.it.csiro.au/api/',
   hostUrl: 'http://localhost:4200/index.htm',
-  nVCLAnalyticalUrl: 'http://aus-analytical.it.csiro.au/NVCLAnalyticalServices/',
+  nVCLAnalyticalUrl: 'https://aus-analytical.it.csiro.au/NVCLAnalyticalServices/',
   googleAnalyticsKey: null,
   baseMapLayers: [
     { value: 'OSM', viewValue: 'OpenStreetMap', layerType: 'OSM' },

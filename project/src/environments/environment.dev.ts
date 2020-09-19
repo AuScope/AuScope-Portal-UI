@@ -15,7 +15,7 @@ export const environment = {
   getCustomLayers: 'getCustomLayers.do',
   portalBaseUrl: 'https://au-portal-dev.it.csiro.au/api/',
   hostUrl: 'https://au-portal-dev.it.csiro.au/index.htm',
-  nVCLAnalyticalUrl: 'http://aus-analytical.it.csiro.au/NVCLAnalyticalServices/',
+  nVCLAnalyticalUrl: 'https://aus-analytical.it.csiro.au/NVCLAnalyticalServices/',
   googleAnalyticsKey: 'UA-33658784-3',
   baseMapLayers: [
     { value: 'OSM', viewValue: 'OpenStreetMap', layerType: 'OSM' },
