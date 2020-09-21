@@ -13,9 +13,9 @@ export const environment = {
   production: true,
   getCSWRecordUrl: 'getKnownLayers.do',
   getCustomLayers: 'getCustomLayers.do',
-  portalBaseUrl: 'http://portal.auscope.org/api/',
-  hostUrl: 'http://portal.auscope.org/index.htm',
-  nVCLAnalyticalUrl: 'http://aus-analytical.it.csiro.au/NVCLAnalyticalServices/',
+  portalBaseUrl: 'https://portal.auscope.org/api/',
+  hostUrl: 'https://portal.auscope.org/index.htm',
+  nVCLAnalyticalUrl: 'https://aus-analytical.it.csiro.au/NVCLAnalyticalServices/',
   googleAnalyticsKey: 'UA-33658784-1',
   baseMapLayers: [
     { value: 'OSM', viewValue: 'OpenStreetMap', layerType: 'OSM' },
