@@ -23,7 +23,7 @@
             </div>
           </div>
 	</div>
-	<li *ngFor="let layerGroup of layerGroups | getKey" >
+	<li class="layerGroup" *ngFor="let layerGroup of layerGroups | getKey" >
 
 	   		<a [hidden]="layerGroup.value.hide" (click) = "layerGroup.value.loaded=layerGroup.value;layerGroup.value.expanded = !layerGroup.value.expanded;"
 			    [ngClass]="{'highlight': isLayerGroupVisible(layerGroup.value)}">
@@ -31,7 +31,7 @@
 				<i class="fa fa-arrow-circle-down" [ngClass]="{'submenu-open-inline':isLayerGroupVisible(layerGroup.value), 'hidden':!isLayerGroupVisible(layerGroup.value) }" ></i>
 	        </a>
 			<ul *ngIf="layerGroup.value.loaded" [ngClass]="{'submenu-open-block':layerGroup.value.expanded, 'hidden':!layerGroup.value.expanded}">
-				<li *ngFor="let layer of layerGroup.value.loaded" [ngClass]="{'active': layer.expanded}">
+				<li class="layer" *ngFor="let layer of layerGroup.value.loaded" [ngClass]="{'active': layer.expanded}">
 					<a [hidden]="layer.hide" (click)="layer.expanded = !layer.expanded;" [ngClass]="{'highlight': layer.expanded}">
 						<div class="layerLoadCtrl">
 							<span *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="float-right project-percentage hasEvent light-blue">
