@@ -284,9 +284,47 @@ export class QuerierModalComponent {
     var filename = label.substring(label.indexOf(':') + 1, label.length);
     // Remove leading underscores from name (LHS column in popup)
     while (filename.startsWith('_')) {
-      filename = filename.substring(1);
+        filename = filename.substring(1);
     }
-    return filename;
+    // separate camel case e.g. observationMethod
+    filename = filename.replace(/([a-z])([A-Z])/g, '$1 $2');
+    // separate "_"
+    filename = filename.split(/[_]/).join(" ");
+    var terms = filename.split(" ");
+    for(var j = 0; j < terms.length; j++) {
+        const term = terms[j];
+        switch(term) {
+            // capitalise abbreviations
+            // i.e. UOM, SRS, URI, HREF
+            case 'uom':
+            case 'uri':
+            case 'srs':
+            case 'nvcl':
+            case 'href': {
+                terms[j] = term.toUpperCase();
+                break;
+            }
+            // put uom in brackets
+            case 'm': {  
+                terms[j] = "(" + term + ")";
+                break;
+            }
+            // handle geom pos and posList
+            case 'pos': { 
+                terms[j] = 'Position';
+                break;
+            }
+            case 'posList': {
+                terms[j] = 'Position List';
+                break;
+            }                          
+            default: {
+                // make sure each first letter is capitalised
+                terms[j] = term[0].toUpperCase() + term.slice(1);
+            }
+        }
+    }
+    return terms.join(" ");  
   }
 
 }
