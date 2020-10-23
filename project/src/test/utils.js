@@ -27,11 +27,10 @@ exports.utils = {
         // This is the point we want to click on
         var dest = this.WGS84ToMercator(long, lat);
         // the centre of the canvas
-        var middle = this.WGS84ToMercator(133.8, -26);
-
+        const middle = this.WGS84ToMercator(132.8467, -25.7603);
         // manual calculation based on the canvas size and map scale
-        // tells us 1m = (110.25/(1000*1000)) px
-        const pixelPerMeter = 105/(1000*1000);
+        // tells us 1m = (171/(1000*1000)) px
+        const pixelPerMeter = 171/(1000*1000);
         // Mouse move is toRight
         var x = (dest.x - middle.x) * pixelPerMeter;
         // and toBottom
