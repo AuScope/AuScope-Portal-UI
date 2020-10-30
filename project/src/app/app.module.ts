@@ -46,6 +46,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSliderModule } from '@angular/material/slider';
 import { MatTreeModule } from '@angular/material/tree';
 import { CdkTableModule } from '@angular/cdk/table';
 
@@ -116,6 +117,7 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     MatIconModule,
     MatButtonModule,
     MatDialogModule,
+    MatSliderModule,
     StorageServiceModule,
     NgxChartsModule,
     BrowserAnimationsModule,
