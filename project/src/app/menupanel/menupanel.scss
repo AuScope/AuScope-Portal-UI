@@ -258,3 +258,22 @@ input + div.input-group-append  > button {
 	width: calc(#{$card-width} - 40px);
 	margin-left: 5px;
 }
+
+/* Layer opacity (Material slider) */
+.opacity-slider-panel {
+    height: 30px;
+    align-items: center;
+    .opacity-label {
+        width: 80px;
+    }
+    .opacity-slider {
+        ::ng-deep {
+            .mat-slider-thumb {
+                background-color: white;
+            }
+            .mat-slider-track-background {
+                background-color: white;
+            }
+        }
+    }
+}

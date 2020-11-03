@@ -45,10 +45,14 @@
 							<div *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="progress progress-xs" style="height: 5px">
 								<div class="progress-bar bg-gradient-blue-purple" [style.width]="uiLayerModels[layer.id].statusMap.completePercentage" role="progressbar"></div>
 							</div>
+							<div *ngIf="uiLayerModels[layer.id].statusMap.renderStarted || uiLayerModels[layer.id].statusMap.renderComplete" class="opacity-slider-panel d-flex" (click)="$event.stopPropagation()">
+								<div class="opacity-label">Opacity {{ uiLayerModels[layer.id].opacity }}%&nbsp;</div>
+								<mat-slider [min]="0" [max]="100" class="opacity-slider flex-grow-1" [(ngModel)]="uiLayerModels[layer.id].opacity" (input)="layerOpacityChange($event, layer.id)"></mat-slider>
+							</div>
 						</div>
 
 					</a>
-					<div  [hidden]="!layer.expanded || layer.hide" class="sidebar-card-menu-show">
+					<div [hidden]="!layer.expanded || layer.hide" class="sidebar-card-menu-show">
 
 						 <div class="card card-info card-with-tabs layer-card animated  slideInRight">
 

@@ -9,16 +9,16 @@ export class UILayerModel {
     expanded: boolean;
     tabpanel: UITabPanel;
     statusMap: StatusMapModel;
+    opacity: number;
 
    constructor(public id: string, public loadingSubject: BehaviorSubject<StatusMapModel>) {
     this.tabpanel = new UITabPanel();
     this.expanded = false;
+    this.opacity = 100;
     loadingSubject.subscribe((value) => {
       this.statusMap = value;
     });
 
    }
-
-
 
 }

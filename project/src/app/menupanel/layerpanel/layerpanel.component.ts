@@ -10,6 +10,7 @@ import { RenderStatusService } from 'portal-core-ui/service/openlayermap/renders
 import { ManageStateService } from 'portal-core-ui/service/permanentlink/manage-state.service';
 import { UtilitiesService } from 'portal-core-ui/utility/utilities.service';
 import {config} from '../../../environments/config';
+import { MatSliderChange } from '@angular/material/slider';
 
 
 @Component({
@@ -237,9 +238,15 @@ export class LayerPanelComponent implements OnInit {
      * remove the layer from the map
      */
     public removeLayer(layer: LayerModel) {
+      this.uiLayerModels[layer.id].opacity = 100;
       this.olMapService.removeLayer(layer);
     }
 
-
+    /**
+     * Layer opacity slider change event
+     */
+    public layerOpacityChange(event: MatSliderChange, layerId: string) {
+      this.olMapService.setLayerOpacity(layerId, (event.value / 100));
+    }
 
 }
