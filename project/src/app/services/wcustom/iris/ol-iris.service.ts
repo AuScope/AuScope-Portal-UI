@@ -14,6 +14,12 @@ import olMap from 'ol/Map';
 import olLayerVector from 'ol/layer/Vector';
 import olSourceVector from 'ol/source/Vector';
 import olFormatKML from 'ol/format/KML';
+import olStyle from 'ol/style/Style';
+import olStyleIcon from 'ol/style/Icon';
+import olStyleCircle from 'ol/style/Circle';
+import olStyleFill from 'ol/style/Fill';
+import olStyleStroke from 'ol/style/Stroke';
+import olStyleText from 'ol/style/Text';
 import { Constants } from 'portal-core-ui/utility/constants.service';
 import { RenderStatusService } from 'portal-core-ui/service/openlayermap/renderstatus/render-status.service';
 
@@ -66,6 +72,39 @@ export class OlIrisService {
     };
   }
 
+  /**
+   * Creates style for the points on the map
+   * 
+   * @param label label attached to data point on map
+   * @returns openlayers style object
+   */
+  private irisStyleFunction(label: string) {
+      var dotStyle = new olStyle({
+        // Makes a circle with white boundary and purple inner
+        image: new olStyleCircle({
+          radius: 5,
+          stroke: new olStyleStroke({
+            color: 'white',
+            width: 2
+          }),
+          fill: new olStyleFill({
+            color: 'purple'
+          })
+        }),
+        // Dark grey writing
+        text: new olStyleText({
+          text: label,
+          textAlign: 'left',
+          font: '12px roboto,sans-serif',
+          fill: new olStyleFill({
+              color: '#33333'
+          }),
+          offsetX: 6,
+          offsetY: 0,
+        })
+      });
+      return dotStyle;
+    }
 
   /**
    * Add the wfs layer
@@ -75,26 +114,27 @@ export class OlIrisService {
   public addLayer(layer: LayerModel, param?: any): void {
     const irisOnlineResources = this.layerHandlerService.getOnlineResources(layer, Constants.resourceType.IRIS);
 
-
     for (const onlineResource of irisOnlineResources) {
 
       this.renderStatusService.addResource(layer, onlineResource);
 
       this.getKMLFeature(layer, onlineResource).subscribe(response => {
         this.renderStatusService.updateComplete(layer, onlineResource);
-        const kmlLayer = new olLayerVector({
-          source: new olSourceVector({features: []})
-        });
-        const features = new olFormatKML().readFeatures(response, {
+        // Set extractStyles = false to disable default style
+        const features = new olFormatKML({extractStyles: false}).readFeatures(response, {
           dataProjection: 'EPSG:4326',
           featureProjection: Constants.MAP_PROJ
         });
+        // Loop over features and apply new style and LayerVector for each feature
         features.forEach(feature => {
+          const kmlLayer = new olLayerVector({
+            source: new olSourceVector({features: []}),
+            style: this.irisStyleFunction(feature.get('name'))
+          });
           feature.layer = layer;
           kmlLayer.getSource().addFeature(feature);
-        })
-        this.olMapObject.addLayerById(kmlLayer, layer.id);
-
+          this.olMapObject.addLayerById(kmlLayer, layer.id);
+        });
       },
         err => {
           this.renderStatusService.updateComplete(layer, onlineResource, true);

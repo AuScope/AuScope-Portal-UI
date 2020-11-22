@@ -62,6 +62,63 @@ export const config = {
     },
     'aster-silica-content': {
       downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+    },
+    'ga-geophys-1': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+    },
+    'ga-geophys-2': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+    },
+    'ga-geophys-3': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+    },
+    'ga-geophys-4': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+    },
+    'ga-geophys-5': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+    },
+    'ga-geophys-6': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+    },
+    'ga-geophys-7': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+    },
+    'ga-geophys-8': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+    },
+    'ga-geophys-9': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+    },
+    'ga-geophys-10': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+    },
+    'ga-geophys-11': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+    },
+    'ga-geophys-12': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+    },
+    'ga-geophys-13': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+    },
+    'ga-geophys-14': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+    },
+    'ga-geophys-15': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+    },
+    'ga-geophys-16': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+    },
+    'ga-geophys-17': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+    },
+    'ga-geophys-18': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+    },
+    'ga-geophys-19': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
     }
   },
   forceAddLayerViaProxy: [
