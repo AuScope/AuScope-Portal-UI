@@ -1,4 +1,5 @@
 import { Bbox } from 'portal-core-ui/model/data/bbox.model';
+import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { LayerModel } from 'portal-core-ui/model/data/layer.model';
 import { LayerHandlerService } from 'portal-core-ui/service/cswrecords/layer-handler.service';
 import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
@@ -8,8 +9,13 @@ import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/rend
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { CataloguesearchService } from './cataloguesearch.service';
 import { Component, AfterViewInit } from '@angular/core';
-import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
+import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import * as Proj from 'ol/proj';
+import { RecordModalComponent } from './record.modal.component';
+import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
 
+// List of valid online resource types that can be added to the map
+const VALID_ONLINE_RESOURCE_TYPES: string[] = ['WMS', 'WFS', 'CSW', 'WWW'];
 
 @Component({
     selector: '[appCatalogueSearchPanel]',
@@ -32,13 +38,36 @@ export class CatalogueSearchComponent implements AfterViewInit {
   searchMode: boolean;
   layerGroups = [];
   uiLayerModels: {};
-  bsModalRef: BsModalRef;
   statusmsg: string;
   totalResults = [];
   currentPage: number;
+  
+  public supportedOnlineResources: any = {
+      'NCSS': {
+          'name': 'NetCDF Subset Service',
+          'expanded': true
+      },
+      'WCS': {
+          'name': 'OGC Web Coverage Service 1.0.0',
+          'expanded': true
+      },
+      'WFS': {
+          'name': 'OGC Web Feature Service 1.1.0',
+          'expanded': true
+      },
+      'WMS': {
+          'name': 'OGC Web Map Service 1.1.1',
+          'expanded': true
+      },
+      // RA: WMS 1.3?
+      'WWW': {
+          'name': 'Web Link',
+          'expanded': true
+      }
+  };
 
   constructor(private olMapService: OlMapService, private cataloguesearchService: CataloguesearchService,
-    private renderStatusService: RenderStatusService,  private modalService: BsModalService, private layerHandlerService: LayerHandlerService) {
+    private renderStatusService: RenderStatusService,  private modalService: NgbModal, private layerHandlerService: LayerHandlerService) {
     this.drawStarted = false;
     this.searchMode = true;
     this.uiLayerModels = {};
@@ -151,21 +180,118 @@ export class CatalogueSearchComponent implements AfterViewInit {
         }
       });
   }
-    /**
-     * open the modal that display the status of the render
-     */
-    public openStatusReport(uiLayerModel: UILayerModel) {
-      this.bsModalRef = this.modalService.show(NgbdModalStatusReportComponent, {class: 'modal-lg'});
-      uiLayerModel.statusMap.getStatusBSubject().subscribe((value) => {
-        this.bsModalRef.content.resourceMap = value.resourceMap;
-      });
-    }
 
   /**
    * remove a layer from the map
    */
     public removeLayer(layer: LayerModel) {
       this.olMapService.removeLayer(layer);
+    }
+
+//================================================================================== 
+//===================== Stu's code from nvgl =======================================
+//==================================================================================    
+   /**
+     * Determine if a CSWRecord meets the criteria to be added to the map.
+     *
+     * Will return true if layer satisfies:
+     *
+     *   1. Has online resource.
+     *   2. Has at least one defined geographicElement.
+     *   3. Layer does not already exist on map.
+     *   4. One online resource is of type WMS, WFS, CSW or WWW.
+     *
+     * @param cswRecord the CSWRecord to verify
+     * @return true is CSWRecord can be added, false otherwise
+     */
+    public isAddableRecord(cswRecord: CSWRecordModel): boolean {
+        let addable: boolean = false;
+        if (cswRecord.hasOwnProperty('onlineResources') &&
+                cswRecord.onlineResources != null &&
+                cswRecord.onlineResources.some(resource => VALID_ONLINE_RESOURCE_TYPES.indexOf(resource.type) > -1) &&
+                cswRecord.geographicElements.length > 0 &&
+                !this.olMapService.layerExists(cswRecord.id)) {
+            addable = true;
+        }
+        return addable;
+    }
+    /**
+     * Display the record information dialog
+     *
+     * @param cswRecord CSW record for information
+     */
+    public displayRecordInformation(cswRecord) {
+        if (cswRecord) {
+            const modelRef = this.modalService.open(RecordModalComponent, { size: 'lg' });
+            modelRef.componentInstance.record = cswRecord;
+        }
+    }
+
+
+    /**
+     *
+     * @param layer
+     */
+    public showCSWRecordBounds(layer: any): void {
+        if (layer.cswRecords) {
+            for(let record of layer.cswRecords) {
+                if(record.geographicElements && record.geographicElements.length > 0) {
+                    let bounds = record.geographicElements.find(i => i.type === 'bbox');
+                    if(bounds) {
+                        const bbox: [number, number, number, number] =
+                            [bounds.westBoundLongitude, bounds.southBoundLatitude, bounds.eastBoundLongitude, bounds.northBoundLatitude];
+                        const extent = Proj.transformExtent(bbox, 'EPSG:4326', 'EPSG:3857');
+                        this.olMapService.displayExtent(extent, 3000);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     *
+     * @param layer
+     */
+    public zoomToCSWRecordBounds(layer: any): void {
+        if (layer.cswRecords) {
+            for(let record of layer.cswRecords) {
+                if(record.geographicElements && record.geographicElements.length > 0) {
+                    let bounds = record.geographicElements.find(i => i.type === 'bbox');
+                    const bbox: [number, number, number, number] =
+                        [bounds.westBoundLongitude, bounds.southBoundLatitude, bounds.eastBoundLongitude, bounds.northBoundLatitude];
+                    const extent = Proj.transformExtent(bbox, 'EPSG:4326', 'EPSG:3857');
+                    this.olMapService.fitView(extent);
+                    return;
+                }
+            }
+        }
+    }    
+    /**
+     * Get all online resources of a particular resource type for a given
+     * CSW record
+     *
+     * @param cswRecord the CSW Record
+     * @param resourceType  the resource type
+     */
+    public getOnlineResourcesByType(cswRecord: CSWRecordModel, resourceType: string): OnlineResourceModel[] {
+        let serviceList: OnlineResourceModel[] = [];
+        for (const onlineResource of cswRecord.onlineResources) {
+            if (onlineResource.type === resourceType) {
+                let res: OnlineResourceModel = onlineResource;
+                serviceList.push(res);
+            }
+        }
+        return serviceList;
+    }
+    
+    /**
+     * Get a list of online resource types for iteration
+     *
+     * TODO: Repeated, better off elsewhere?
+     */
+    public getSupportedOnlineResourceTypes(): string[] {
+        return Object.keys(this.supportedOnlineResources);
     }
 
 }

@@ -1,0 +1,127 @@
+<div class="modal-header" style="background: #EEE">
+    <h5 class="modal-title" id="exampleModalLongTitle">CSW Record Information</h5>
+    <button type="button" class="close" (click)="activeModal.dismiss('Cross click')" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body" style="margin-left:10px;margin-right:10px;">
+    <form>
+        <!-- General Information -->
+        <div class="form-group row" *ngIf="record.recordInfoUrl && record.recordInfoUrl!=''">
+            <label for="csw-source" class="col-3 col-form-label">Source</label>
+            <div class="col-9">
+                <div class="form-control">
+                    <a href="{{ record.recordInfoUrl }}" id="csw-source" target="_blank">Full metadata and downloads</a>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row" *ngIf="record.name && record.name!=''">
+            <label for="csw-name" class="col-3 col-form-label">Title</label>
+            <div class="col-9">
+                <label id="csw-name" class="form-control text-truncate" title="{{ record.name }}">{{ record.name }}</label>
+            </div>
+        </div>
+        <div class="form-group row" *ngIf="record.description && record.description!=''">
+            <label for="csw-abstract" class="col-3 col-form-label">Abstract</label>
+            <div class="col-9">
+                <textarea class="form-control" rows="3" id="csw-abstract">{{ record.description }}</textarea>
+            </div>
+        </div>
+        <div class="form-group row" *ngIf="record.name && record.name!=''">
+            <label for="csw-name" class="col-3 col-form-label">Keywords</label>
+            <div class="col-9">
+                <label id="csw-name" class="form-control text-truncate" title="{{ record.descriptiveKeywords.join(', ') }}">{{ record.descriptiveKeywords.join(", ") }}</label>
+            </div>
+        </div>
+        <div class="form-group row" *ngIf="record.contactOrg && record.contactOrg!=''">
+            <label for="csw-name" class="col-3 col-form-label">Contact Org</label>
+            <div class="col-9">
+                <label id="csw-name" class="form-control text-truncate" title="{{ record.contactOrg }}">{{ record.contactOrg }}</label>
+            </div>
+        </div>
+        <div class="form-group row" *ngIf="(record.constraints && record.constraints!='') && (record.useLimitConstraints && record.useLimitConstraints=='')" >
+            <label for="csw-name" class="col-3 col-form-label">Constraints</label>            
+            <div class="col-9">
+                <label id="csw-name" class="form-control">
+                        <div *ngFor="let constraint of record.constraints">                            
+                            <div *ngIf="!(constraint.startsWith('http'))" >{{ constraint }}</div>                                                           
+                            <div class="text-truncate" *ngIf="(constraint.startsWith('http'))"><a href="{{ constraint }}" target="_blank" title="{{ constraint }}" >{{ constraint }}</a></div>  
+                        </div>
+                </label>              
+            </div>
+        </div>
+        <div class="form-group row" *ngIf="record.useLimitConstraints && record.useLimitConstraints!=''" >
+                <label for="csw-name" class="col-3 col-form-label">Use Limitation</label>                
+                <div class="col-9">
+                    <label id="csw-name" class="form-control">
+                            <div *ngFor="let useLimitConstraints of record.useLimitConstraints">                             
+                                <div class="text-truncate" > <a href="{{ useLimitConstraints }}" target="_blank" title="{{ useLimitConstraints }}">{{ useLimitConstraints }}</a></div>                                      
+                            </div>                         
+                    </label>              
+                </div>
+        </div>
+        <div class="form-group row" *ngIf="record.accessConstraints && record.accessConstraints!=''" >
+            <label for="csw-name" class="col-3 col-form-label" >Access Constraints </label>
+            <div class="col-9">
+                <label id="csw-name" class="form-control">
+                        <div *ngFor="let accessConstraints of record.accessConstraints">
+                                <div class="text-truncate"> <a href="{{ accessConstraints }}" target="_blank" title="{{ accessConstraints }}" >{{ accessConstraints }}</a></div>
+                        </div>
+                </label>
+            </div>
+        </div>
+        <!-- Services -->
+        <div *ngIf="record.hasOwnProperty('onlineResources') && record.onlineResources.length>0">
+            <div *ngFor="let resourceType of getSupportedOnlineResourceTypes()">
+                <div *ngIf="getOnlineResourcesByType(record, resourceType).length>0">
+                    <div style="border: 1px solid; background-color: lightgray;">
+                        <a (click)="onlineResources[resourceType].expanded=!onlineResources[resourceType].expanded" class="panel-header" style="cursor:pointer; margin: 2px;">
+                            <span>&nbsp;{{ onlineResources[resourceType].name }}&nbsp;({{ getOnlineResourcesByType(record, resourceType).length }}&nbsp;item<span *ngIf="getOnlineResourcesByType(record, resourceType).length>1">s</span>)</span>
+                            <i *ngIf="!onlineResources[resourceType].expanded" style="line-height:inherit; margin-right: 2px;" class="fa fa-toggle-down pull-right"></i>
+                            <i *ngIf="onlineResources[resourceType].expanded" style="line-height:inherit; margin-right: 2px;" class="fa fa-toggle-up pull-right"></i>
+                        </a>
+                        <div *ngFor="let resource of getOnlineResourcesByType(record, resourceType)" style="border-top: 1px solid; background-color: white; word-wrap: break-word;">
+                            <div *ngIf="onlineResources[resourceType].expanded" class="container" style="margin: 2px;">
+                                <div class="row">
+                                    <strong class="text-truncate">{{ resource.name }}</strong>
+                                </div>
+                                <div class="row">
+                                    <a href="{{ resource.url }}" title="{{ resource.url }}" class="text-truncate" target="_blank" style="width:95%;">{{ resource.url }}</a>
+                                    <div>
+                                        <button class="btn btn-sm" *ngIf="resourceType=='WWW'" data-toggle="tooltip" title="Add dataset to job" (click)="addDatasetToJob(record, resource)" style="background-color:transparent;float:right;">
+                                            <i class="fa fa-plus-circle" style="color:green;"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- TODO: WCS Describe Coverage, link to XML -->
+                                <!-- TODO: WMS layer preview -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer" style="background: #EEE">
+    <button type="button" class="btn btn-primary" (click)="activeModal.close('Close click')">Close</button>
+</div>
+
+<!-- Capture data success modal -->
+<!-- TODO: Similarly used in datasets map capture, could make a common modal -->
+<ng-template #selectedDatasetsOkModal let-c="close">
+    <div class="modal-header">
+        <h4 class="modal-title">Request Saved</h4>
+        <button type="button" class="close" aria-label="Close" (click)="c('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        Your dataset has been saved. You can either continue selecting more data or create a job
+        to process your existing selections.
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" aria-label="New Job" (click)="c('New click')">New Job</button>
+        <button type="button" class="btn btn-primary" aria-label="Close" (click)="c('Close click')">Close</button>
+    </div>
+</ng-template>
