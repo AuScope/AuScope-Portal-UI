@@ -7,10 +7,36 @@ import { environment } from '../../../environments/environment';
 import { LayerModel } from 'portal-core-ui/model/data/layer.model';
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpParams, HttpHeaders, HttpResponse} from '@angular/common/http';
+import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
+import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 
 
 @Injectable()
 export class CataloguesearchService {
+   
+  public supportedOnlineResources: any = {
+    'NCSS': {
+        'name': 'NetCDF Subset Service',
+        'expanded': true
+    },
+    'WCS': {
+        'name': 'OGC Web Coverage Service 1.0.0',
+        'expanded': true
+    },
+    'WFS': {
+        'name': 'OGC Web Feature Service 1.1.0',
+        'expanded': true
+    },
+    'WMS': {
+        'name': 'OGC Web Map Service 1.1.1',
+        'expanded': true
+    },
+    // RA: WMS 1.3?
+    'WWW': {
+        'name': 'Web Link',
+        'expanded': true
+    }
+  };
 
 
   constructor(private http: HttpClient) {
@@ -154,6 +180,32 @@ export class CataloguesearchService {
         return observableThrowError(error);
       }
       ), );
+  }
+      /**
+     * Get all online resources of a particular resource type for a given
+     * CSW record
+     *
+     * @param cswRecord the CSW Record
+     * @param resourceType  the resource type
+     */
+    public getOnlineResourcesByType(cswRecord: CSWRecordModel, resourceType: string): OnlineResourceModel[] {
+      let serviceList: OnlineResourceModel[] = [];
+      for (const onlineResource of cswRecord.onlineResources) {
+          if (onlineResource.type === resourceType) {
+              let res: OnlineResourceModel = onlineResource;
+              serviceList.push(res);
+          }
+      }
+      return serviceList;
+  }
+  
+  /**
+   * Get a list of online resource types for iteration
+   *
+   * TODO: Repeated, better off elsewhere?
+   */
+  public getSupportedOnlineResourceTypes(): string[] {
+      return Object.keys(this.supportedOnlineResources);
   }
 
 }

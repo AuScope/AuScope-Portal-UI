@@ -1,6 +1,9 @@
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { CataloguesearchService } from './cataloguesearch.service';
 import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 
 @Component({
@@ -19,7 +22,6 @@ export class RecordModalComponent implements OnInit {
 
 
     constructor(private router: Router,
-        private userStateService: UserStateService,
         private cswSearchService: CataloguesearchService,
         private modalService: NgbModal,
         public activeModal: NgbActiveModal) { }

@@ -9,10 +9,9 @@ import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/rend
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { CataloguesearchService } from './cataloguesearch.service';
 import { Component, AfterViewInit } from '@angular/core';
-import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import * as Proj from 'ol/proj';
 import { RecordModalComponent } from './record.modal.component';
-import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
 
 // List of valid online resource types that can be added to the map
 const VALID_ONLINE_RESOURCE_TYPES: string[] = ['WMS', 'WFS', 'CSW', 'WWW'];
@@ -41,31 +40,7 @@ export class CatalogueSearchComponent implements AfterViewInit {
   statusmsg: string;
   totalResults = [];
   currentPage: number;
-  
-  public supportedOnlineResources: any = {
-      'NCSS': {
-          'name': 'NetCDF Subset Service',
-          'expanded': true
-      },
-      'WCS': {
-          'name': 'OGC Web Coverage Service 1.0.0',
-          'expanded': true
-      },
-      'WFS': {
-          'name': 'OGC Web Feature Service 1.1.0',
-          'expanded': true
-      },
-      'WMS': {
-          'name': 'OGC Web Map Service 1.1.1',
-          'expanded': true
-      },
-      // RA: WMS 1.3?
-      'WWW': {
-          'name': 'Web Link',
-          'expanded': true
-      }
-  };
-
+ 
   constructor(private olMapService: OlMapService, private cataloguesearchService: CataloguesearchService,
     private renderStatusService: RenderStatusService,  private modalService: NgbModal, private layerHandlerService: LayerHandlerService) {
     this.drawStarted = false;
@@ -267,31 +242,5 @@ export class CatalogueSearchComponent implements AfterViewInit {
             }
         }
     }    
-    /**
-     * Get all online resources of a particular resource type for a given
-     * CSW record
-     *
-     * @param cswRecord the CSW Record
-     * @param resourceType  the resource type
-     */
-    public getOnlineResourcesByType(cswRecord: CSWRecordModel, resourceType: string): OnlineResourceModel[] {
-        let serviceList: OnlineResourceModel[] = [];
-        for (const onlineResource of cswRecord.onlineResources) {
-            if (onlineResource.type === resourceType) {
-                let res: OnlineResourceModel = onlineResource;
-                serviceList.push(res);
-            }
-        }
-        return serviceList;
-    }
-    
-    /**
-     * Get a list of online resource types for iteration
-     *
-     * TODO: Repeated, better off elsewhere?
-     */
-    public getSupportedOnlineResourceTypes(): string[] {
-        return Object.keys(this.supportedOnlineResources);
-    }
 
 }
