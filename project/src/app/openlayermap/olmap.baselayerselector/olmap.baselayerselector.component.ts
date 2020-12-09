@@ -19,7 +19,7 @@ export class OlmapBaselayerselectorComponent implements OnInit {
   }
 
   public updateBaseMap(selected: string) {
-    this.olMapObject.switchBaseMap(selected);
+    // this.olMapObject.switchBaseMap(selected);
   }
 
 }

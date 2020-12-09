@@ -31,6 +31,7 @@ import { OlMapZoomComponent } from './openlayermap/olmap.zoom.component';
 import { NgbdModalStatusReportComponent } from './toppanel/renderstatus/renderstatus.component';
 import { OlMapClipboardComponent } from './openlayermap/olmap.clipboard.component';
 
+import { AngularCesiumModule } from 'angular-cesium';
 
 
 import { NotificationComponent } from './toppanel/notification/notification.component';
@@ -122,7 +123,8 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     NgxChartsModule,
     BrowserAnimationsModule,
     BsDropdownModule.forRoot(),
-    CommonModule, PlotlyViaCDNModule
+    CommonModule, PlotlyViaCDNModule,
+    AngularCesiumModule.forRoot()
   ],
   entryComponents: [
     NgbdModalStatusReportComponent,

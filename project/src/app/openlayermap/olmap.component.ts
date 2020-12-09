@@ -3,8 +3,8 @@ import { ref } from '../../environments/ref';
 import {QuerierModalComponent} from '../modalwindow/querier/querier.modal.component';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
-import olZoom from 'ol/control/Zoom';
-import olScaleLine from 'ol/control/ScaleLine';
+//import olZoom from 'ol/control/Zoom';
+//import olScaleLine from 'ol/control/ScaleLine';
 import {BsModalService, BsModalRef} from 'ngx-bootstrap/modal';
 import {OlMapObject} from 'portal-core-ui/service/openlayermap/ol-map-object';
 import {OlMapService} from 'portal-core-ui/service/openlayermap/ol-map.service';
@@ -15,15 +15,21 @@ import {QueryWMSService} from 'portal-core-ui/service/wms/query-wms.service';
 import {GMLParserService} from 'portal-core-ui/utility/gmlparser.service';
 import {SimpleXMLService} from 'portal-core-ui/utility/simplexml.service';
 import { UtilitiesService } from 'portal-core-ui/utility/utilities.service';
-import olControlMousePosition from 'ol/control/MousePosition';
-import * as olCoordinate from 'ol/coordinate';
+//import olControlMousePosition from 'ol/control/MousePosition';
+//import * as olCoordinate from 'ol/coordinate';
+import { ViewerConfiguration } from 'angular-cesium';
+declare var Cesium: any;
 
 @Component({
-  selector: 'app-ol-map',
+  selector: 'app-cs-map',
   template: `
-    <div #mapElement id="map" class="h-100 w-100"> </div>
+    <div #mapElement id="map" class="h-100 w-100"> 
+    <ac-map>
+    </ac-map>
+    </div>
     `,
-  styleUrls: ['./olmap.component.css']
+    providers: [ViewerConfiguration], // Don't forget to Provide it 
+  // styleUrls: ['./olmap.component.css']
   // The "#" (template reference variable) matters to access the map element with the ViewChild decorator!
 })
 
@@ -31,32 +37,90 @@ export class OlMapComponent implements AfterViewInit {
   // This is necessary to access the html element to set the map target (after view init)!
   @ViewChild('mapElement', { static: true }) mapElement: ElementRef;
 
+  name = 'Angular';
+  cesiumLoaded = true;
+  Cesium = Cesium;
+  viewer: any;
+  //Viewer viewer;
+
+  ngOnInit() {
+      console.log('load main map')
+  }
+
   private bsModalRef: BsModalRef;
 
   constructor(public olMapObject: OlMapObject, private olMapService: OlMapService, private modalService: BsModalService,
     private queryWFSService: QueryWFSService, private queryWMSService: QueryWMSService, private gmlParserService: GMLParserService,
-    private manageStateService: ManageStateService) {
+    private manageStateService: ManageStateService, private viewerConf: ViewerConfiguration) {
     this.olMapService.getClickedLayerListBS().subscribe(mapClickInfo => {
       this.handleLayerClick(mapClickInfo);
-    })
+    });
+
+    // viewerOptions will be passed the Cesium.Viewer contstuctor 
+    viewerConf.viewerOptions = {
+      selectionIndicator: false,
+      timeline: false,
+      infoBox: false,
+      fullscreenButton: false,
+      baseLayerPicker: false,
+      animation: false,
+      shouldAnimate: false,
+      homeButton: false,
+      geocoder: false,
+      navigationHelpButton: false,
+      navigationInstructionsInitiallyVisible: false,
+      mapMode2D: Cesium.MapMode2D.ROTATE,
+    };
+    // Will be called on viewer initialistion   
+    viewerConf.viewerModifier = (viewer: any) => {
+      // Remove default double click zoom behaviour  
+      viewer.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+      /*viewer.imageryLayers.addImageryProvider(
+        new Cesium.WebMapServiceImageryProvider({
+          url:
+            "https://nationalmap.gov.au/proxy/http://geoserver.nationalmap.nicta.com.au/geotopo_250k/ows",
+          layers: "Hydrography:bores",
+          parameters: {
+            transparent: true,
+            format: "image/png",
+          },
+        })
+      );*/
+      // Look at Australia
+      viewer.camera.setView({
+        destination: Cesium.Rectangle.fromDegrees(
+          114.591,
+          -45.837,
+          148.97,
+          -5.73
+        ),
+      });
+      this.viewer = viewer;
+    };
   }
 
+  getViewer() {
+    return this.viewer;
+  }
 
   // After view init the map target can be set!
   ngAfterViewInit() {
-    const mousePositionControl = new olControlMousePosition({
-      coordinateFormat: olCoordinate.createStringXY(4),
-      projection: 'EPSG:4326',
-      target: document.getElementById('mouse-position'),
-      undefinedHTML: 'Mouse out of range'
-    });
 
-    this.olMapObject.addControlToMap(mousePositionControl);
-    this.olMapObject.addControlToMap(new olZoom());
-    this.olMapObject.addControlToMap(new olScaleLine('metric'));
-    this.olMapObject.addGeocoderToMap();
+    // Add a WMS imagery layer
 
-    this.olMapObject.getMap().setTarget(this.mapElement.nativeElement.id);
+    //const mousePositionControl = new olControlMousePosition({
+    //  coordinateFormat: olCoordinate.createStringXY(4),
+    //  projection: 'EPSG:4326',
+    //  target: document.getElementById('mouse-position'),
+    //  undefinedHTML: 'Mouse out of range'
+    //});
+
+    //this.olMapObject.addControlToMap(mousePositionControl);
+    //this.olMapObject.addControlToMap(new olZoom());
+    //this.olMapObject.addControlToMap(new olScaleLine('metric'));
+    //this.olMapObject.addGeocoderToMap();
+
+    //this.olMapObject.getMap().setTarget(this.mapElement.nativeElement.id);
 
     // VT: permanent link(open borehole in external window)
     const state = UtilitiesService.getUrlParameterByName('state');
