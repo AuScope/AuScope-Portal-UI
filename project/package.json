@@ -57,7 +57,7 @@
     "ol-geocoder": "^4.0.0",
     "pace-js": "^1.0.2",
     "plotly.js-basic-dist": "^1.53.0",
-    "portal-core-ui": "github:AuScope/portal-core-ui#master",
+    "portal-core-ui": "github:vjf/portal-core-ui#cesium-wms-integration",
     "rickshaw": "^1.7.1",
     "rxjs": "^6.5.5",
     "systemjs": "^6.2.6",
