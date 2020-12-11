@@ -5,7 +5,6 @@ import { LayerHandlerService } from 'portal-core-ui/service/cswrecords/layer-han
 import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 import { RenderStatusService } from 'portal-core-ui/service/openlayermap/renderstatus/render-status.service';
 import { Constants } from 'portal-core-ui/utility/constants.service';
-import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { CataloguesearchService } from './cataloguesearch.service';
 import { Component, AfterViewInit } from '@angular/core';
@@ -179,13 +178,9 @@ export class CatalogueSearchComponent implements AfterViewInit {
      * @param cswRecord the CSWRecord to verify
      * @return true is CSWRecord can be added, false otherwise
      */
-    public isAddableRecord(cswRecord: CSWRecordModel): boolean {
+    public isAddableRecord(layer: LayerModel): boolean {
         let addable: boolean = false;
-        if (cswRecord.hasOwnProperty('onlineResources') &&
-                cswRecord.onlineResources != null &&
-                cswRecord.onlineResources.some(resource => VALID_ONLINE_RESOURCE_TYPES.indexOf(resource.type) > -1) &&
-                cswRecord.geographicElements.length > 0 &&
-                !this.olMapService.layerExists(cswRecord.id)) {
+        if (!this.olMapService.layerExists(layer.id)) {
             addable = true;
         }
         return addable;
