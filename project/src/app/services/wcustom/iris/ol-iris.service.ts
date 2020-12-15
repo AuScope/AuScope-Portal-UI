@@ -3,25 +3,24 @@ import {throwError as observableThrowError,  Observable } from 'rxjs';
 
 import {catchError, map} from 'rxjs/operators';
 
-import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
+import { CSWRecordModel } from 'portal-core-ui';
 import { Injectable, Inject } from '@angular/core';
 import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
-import {LayerModel} from 'portal-core-ui/model/data/layer.model';
-import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
-import { LayerHandlerService } from 'portal-core-ui/service/cswrecords/layer-handler.service';
-import { OlMapObject } from 'portal-core-ui/service/openlayermap/ol-map-object';
+import {LayerModel} from 'portal-core-ui';
+import { OnlineResourceModel } from 'portal-core-ui';
+import { LayerHandlerService } from 'portal-core-ui';
+import { OlMapObject } from 'portal-core-ui';
 import olMap from 'ol/Map';
 import olLayerVector from 'ol/layer/Vector';
 import olSourceVector from 'ol/source/Vector';
 import olFormatKML from 'ol/format/KML';
 import olStyle from 'ol/style/Style';
-import olStyleIcon from 'ol/style/Icon';
 import olStyleCircle from 'ol/style/Circle';
 import olStyleFill from 'ol/style/Fill';
 import olStyleStroke from 'ol/style/Stroke';
 import olStyleText from 'ol/style/Text';
-import { Constants } from 'portal-core-ui/utility/constants.service';
-import { RenderStatusService } from 'portal-core-ui/service/openlayermap/renderstatus/render-status.service';
+import { Constants } from 'portal-core-ui';
+import { RenderStatusService } from 'portal-core-ui';
 
 /**
  * Use OlMapService to add layer to map. This service class adds wfs layer to the map

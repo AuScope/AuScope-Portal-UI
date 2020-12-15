@@ -1,4 +1,4 @@
-import { StatusMapModel } from 'portal-core-ui/model/data/statusmap.model';
+import { StatusMapModel } from 'portal-core-ui';
 import { UITabPanel } from './uitabpanel.model';
 import {BehaviorSubject} from 'rxjs';
 
