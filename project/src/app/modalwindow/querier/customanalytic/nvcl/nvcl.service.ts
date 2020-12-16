@@ -3,7 +3,7 @@ import {throwError as observableThrowError, Observable } from 'rxjs';
 
 import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
 import {catchError, map} from 'rxjs/operators';
-import { UtilitiesService } from 'portal-core-ui/utility/utilities.service';
+import { UtilitiesService } from 'portal-core-ui';
 import { Injectable, Inject} from '@angular/core';
 import {HttpClient, HttpParams, HttpHeaders, HttpResponse} from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';

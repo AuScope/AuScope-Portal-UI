@@ -1,20 +1,20 @@
 
-import {UtilitiesService} from 'portal-core-ui/utility/utilities.service';
+import {UtilitiesService} from 'portal-core-ui';
 import {Component} from '@angular/core';
 import {environment} from '../../../environments/environment';
 import {config} from '../../../environments/config';
 import {ref} from '../../../environments/ref';
-import {QuerierInfoModel} from 'portal-core-ui/model/data/querierinfo.model';
+import {QuerierInfoModel} from 'portal-core-ui';
 import {NVCLService} from './customanalytic/nvcl/nvcl.service';
 import {BsModalRef} from 'ngx-bootstrap/modal';
-import {OlClipboardService, Polygon} from 'portal-core-ui/service/openlayermap/ol-clipboard.service';
-import {ManageStateService} from 'portal-core-ui/service/permanentlink/manage-state.service';
-import {GMLParserService} from 'portal-core-ui/utility/gmlparser.service';
+import {OlClipboardService, Polygon} from 'portal-core-ui';
+import {ManageStateService} from 'portal-core-ui';
+import {GMLParserService} from 'portal-core-ui';
 import {NestedTreeControl} from '@angular/cdk/tree';
 import {MatTreeNestedDataSource} from '@angular/material/tree';
 import {BehaviorSubject, of as observableOf} from 'rxjs';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
-import {Injectable, Inject} from '@angular/core';
+import {Inject} from '@angular/core';
 import * as _ from 'lodash';
 import * as X2JS from 'x2js';
 import { DomSanitizer } from '@angular/platform-browser';
