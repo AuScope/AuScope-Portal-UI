@@ -16,7 +16,7 @@ import { OlIrisService } from '../../../services/wcustom/iris/ol-iris.service';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { OlWMSService } from 'portal-core-ui';
 import { MapsManagerService } from 'angular-cesium';
-import { RenderStatusService } from 'portal-core-ui/service/openlayermap/renderstatus/render-status.service';
+import { RenderStatusService } from 'portal-core-ui';
 
 declare var gtag: Function;
 declare var Cesium: any;
