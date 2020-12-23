@@ -1,4 +1,4 @@
-import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
+import { OlMapService } from 'portal-core-ui';
 import { Component } from '@angular/core';
 
 

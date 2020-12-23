@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {OlMapObject} from 'portal-core-ui/service/openlayermap/ol-map-object';
+import {OlMapObject} from 'portal-core-ui';
 import { environment } from '../../../environments/environment';
 
 @Component({

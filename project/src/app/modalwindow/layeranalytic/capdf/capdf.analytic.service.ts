@@ -4,7 +4,7 @@ import {throwError as observableThrowError,  Observable } from 'rxjs';
 import {timeoutWith, map, catchError} from 'rxjs/operators';
 
 import { environment } from '../../../../environments/environment';
-import { Bbox } from 'portal-core-ui/model/data/bbox.model';
+import { Bbox } from 'portal-core-ui';
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpParams, HttpHeaders, HttpResponse} from '@angular/common/http';
 
