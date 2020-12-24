@@ -22,12 +22,12 @@
 												   <div class="card-header">
 													    <h4 class="card-title">
 														    <a class="accordion-link" data-toggle="collapse" href="#info-link{{i}}" (click)="cswRecord.expanded = !cswRecord.expanded" (mouseenter)="highlightOnPreviewMap(layer.name, cswRecord.adminArea)" (mouseleave)="lowlightOnPreviewMap(layer.name, cswRecord.adminArea)">
-															<i *ngIf='isEndpointFailing(layer.stackdriverFailingHosts, cswRecord)' class="fa fa-warning text-warning"> </i>{{cswRecord.adminArea !='' && cswRecord.adminArea!=null ? cswRecord.adminArea : 'More Information'}}
+															<i *ngIf='layerStatus.isEndpointFailing(layer.id, cswRecord)' class="fa fa-warning text-warning"> </i>{{cswRecord.adminArea !='' && cswRecord.adminArea!=null ? cswRecord.adminArea : 'More Information'}}
 														</a>
 													    </h4>
 												   </div>
 												   <div id="info-link{{i}}" class="card-body card-collapse collapse">
-												    	<p *ngIf='isEndpointFailing(layer.stackdriverFailingHosts, cswRecord)' class='text-danger small'><i class="fa fa-warning text-warning"> </i>This service is currently experiencing some problem and may not work as expected</p>
+												    	<p *ngIf='layerStatus.isEndpointFailing(layer.id, cswRecord)' class='text-danger small'><i class="fa fa-warning text-warning"> </i>This service is currently experiencing some problem and may not work as expected</p>
 													    <info-sub-panel [cswRecord]=cswRecord [layer]=layer [expanded]=cswRecord.expanded ></info-sub-panel>
 												    </div>
 											    </div>
