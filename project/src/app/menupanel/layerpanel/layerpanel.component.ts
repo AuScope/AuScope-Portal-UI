@@ -1,14 +1,14 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { LayerHandlerService } from 'portal-core-ui/service/cswrecords/layer-handler.service';
+import { LayerHandlerService } from 'portal-core-ui';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
-import { LayerModel } from 'portal-core-ui/model/data/layer.model';
-import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
-import { OlClipboardService } from 'portal-core-ui/service/openlayermap/ol-clipboard.service';
+import { LayerModel } from 'portal-core-ui';
+import { OlMapService } from 'portal-core-ui';
+import { OlClipboardService } from 'portal-core-ui';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
-import { RenderStatusService } from 'portal-core-ui/service/openlayermap/renderstatus/render-status.service';
-import { ManageStateService } from 'portal-core-ui/service/permanentlink/manage-state.service';
-import { UtilitiesService } from 'portal-core-ui/utility/utilities.service';
+import { RenderStatusService } from 'portal-core-ui';
+import { ManageStateService } from 'portal-core-ui';
+import { UtilitiesService } from 'portal-core-ui';
 import {config} from '../../../environments/config';
 import { MatSliderChange } from '@angular/material/slider';
 

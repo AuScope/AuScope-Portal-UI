@@ -1,5 +1,4 @@
-import { OlMapObject } from 'portal-core-ui/service/openlayermap/ol-map-object';
-import { OlClipboardService, Polygon } from 'portal-core-ui/service/openlayermap/ol-clipboard.service';
+import { OlClipboardService, Polygon } from 'portal-core-ui';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -14,7 +13,7 @@ export class OlMapClipboardComponent implements OnInit {
   bShowClipboard: Boolean;
   public isFilterLayerShown: Boolean;
   public isDrawingPolygon: boolean;
-  constructor(private olMapObject: OlMapObject, private olClipboardService: OlClipboardService) {
+  constructor(private olClipboardService: OlClipboardService) {
     this.polygonBBox = null;
     this.isFilterLayerShown = false;
     this.isDrawingPolygon = false;

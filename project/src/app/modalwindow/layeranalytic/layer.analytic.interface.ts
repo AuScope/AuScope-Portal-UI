@@ -1,4 +1,4 @@
-import { LayerModel } from 'portal-core-ui/model/data/layer.model';
+import { LayerModel } from 'portal-core-ui';
 
 export interface LayerAnalyticInterface {
  layer: LayerModel;
