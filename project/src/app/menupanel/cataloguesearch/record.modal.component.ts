@@ -1,6 +1,6 @@
-import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
+import { CSWRecordModel } from 'portal-core-ui';
 import { CataloguesearchService } from './cataloguesearch.service';
-import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
+import { OnlineResourceModel } from 'portal-core-ui';
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';

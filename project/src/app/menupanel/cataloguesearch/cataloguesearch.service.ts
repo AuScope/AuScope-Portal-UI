@@ -7,8 +7,8 @@ import { environment } from '../../../environments/environment';
 import { LayerModel } from 'portal-core-ui';
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpParams, HttpHeaders, HttpResponse} from '@angular/common/http';
-import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
-import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
+import { OnlineResourceModel } from 'portal-core-ui';
+import { CSWRecordModel } from 'portal-core-ui';
 
 
 @Injectable()
