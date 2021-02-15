@@ -1,9 +1,9 @@
-import {LayerModel} from 'portal-core-ui/model/data/layer.model';
-import {OnlineResourceModel} from 'portal-core-ui/model/data/onlineresource.model';
+import {LayerModel} from 'portal-core-ui';
+import {OnlineResourceModel} from 'portal-core-ui';
 import {Component, Input, AfterViewInit} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
-import {QuerierInfoModel} from 'portal-core-ui/model/data/querierinfo.model';
-import { UtilitiesService } from 'portal-core-ui/utility/utilities.service';
+import {QuerierInfoModel} from 'portal-core-ui';
+import { UtilitiesService } from 'portal-core-ui';
 import {RemanentAnomaliesService} from './remanentanomalies.service';
 
 

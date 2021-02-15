@@ -1,14 +1,14 @@
-import {Bbox} from 'portal-core-ui/model/data/bbox.model';
-import {LayerModel} from 'portal-core-ui/model/data/layer.model';
-import {LayerHandlerService} from 'portal-core-ui/service/cswrecords/layer-handler.service';
-import {OlMapService} from 'portal-core-ui/service/openlayermap/ol-map.service';
-import {DownloadWfsService} from 'portal-core-ui/service/wfs/download/download-wfs.service';
+import {Bbox} from 'portal-core-ui';
+import {LayerModel} from 'portal-core-ui';
+import {LayerHandlerService} from 'portal-core-ui';
+import {OlMapService} from 'portal-core-ui';
+import {DownloadWfsService} from 'portal-core-ui';
 import {Component, Input, OnInit} from '@angular/core';
-import {UtilitiesService} from 'portal-core-ui/utility/utilities.service';
-import {Constants} from 'portal-core-ui/utility/constants.service';
+import {UtilitiesService} from 'portal-core-ui';
+import {Constants} from 'portal-core-ui';
 import {saveAs} from 'file-saver';
 import {config} from '../../../../environments/config';
-import { DownloadWcsService } from 'portal-core-ui/service/wcs/download/download-wcs.service';
+import { DownloadWcsService } from 'portal-core-ui';
 
 @Component({
   selector: 'app-download-panel',
