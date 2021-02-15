@@ -1,21 +1,21 @@
-import { LayerModel } from 'portal-core-ui/model/data/layer.model';
-import { LayerHandlerService } from 'portal-core-ui/service/cswrecords/layer-handler.service';
-import { FilterPanelService } from 'portal-core-ui/service/filterpanel/filterpanel-service';
-import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
-import { OlClipboardService } from 'portal-core-ui/service/openlayermap/ol-clipboard.service';
+import { LayerModel } from 'portal-core-ui';
+import { LayerHandlerService } from 'portal-core-ui';
+import { FilterPanelService } from 'portal-core-ui';
+import { OlMapService } from 'portal-core-ui';
+import { OlClipboardService } from 'portal-core-ui';
 import * as $ from 'jquery';
-import { UtilitiesService } from 'portal-core-ui/utility/utilities.service';
+import { UtilitiesService } from 'portal-core-ui';
 import { Component, Input, OnInit } from '@angular/core';
 import * as _ from 'lodash';
 import { environment } from '../../../../environments/environment';
 import { ref } from '../../../../environments/ref';
 import { LayerAnalyticModalComponent } from '../../../modalwindow/layeranalytic/layer.analytic.modal.component';
-import { ManageStateService } from 'portal-core-ui/service/permanentlink/manage-state.service';
+import { ManageStateService } from 'portal-core-ui';
 import { AuMapService } from '../../../services/wcustom/au-map.service';
 import { OlIrisService } from '../../../services/wcustom/iris/ol-iris.service';
 import { BsModalService } from 'ngx-bootstrap/modal';
-import { OlWMSService } from 'portal-core-ui/service/wms/ol-wms.service';
-import { LayerStatusService } from 'portal-core-ui/utility/layerstatus.service';
+import { OlWMSService } from 'portal-core-ui';
+import { LayerStatusService } from 'portal-core-ui';
 
 declare var gtag: Function;
 
