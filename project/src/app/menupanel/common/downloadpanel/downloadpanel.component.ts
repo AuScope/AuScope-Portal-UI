@@ -1,7 +1,7 @@
 import {Bbox} from 'portal-core-ui';
 import {LayerModel} from 'portal-core-ui';
 import {LayerHandlerService} from 'portal-core-ui';
-import {OlMapService} from 'portal-core-ui';
+import {CsMapService} from 'portal-core-ui';
 import {DownloadWfsService} from 'portal-core-ui';
 import {Component, Input, OnInit} from '@angular/core';
 import {UtilitiesService} from 'portal-core-ui';
@@ -32,7 +32,7 @@ export class DownloadPanelComponent implements OnInit {
   wcsDownloadListOption: any
   wcsDownloadForm: any
 
-  constructor(private layerHandlerService: LayerHandlerService, private olMapService: OlMapService,
+  constructor(private layerHandlerService: LayerHandlerService, private csMapService: CsMapService,
     private downloadWfsService: DownloadWfsService, private downloadWcsService: DownloadWcsService) {
     this.bbox = null;
     this.drawStarted = false;
@@ -67,7 +67,7 @@ export class DownloadPanelComponent implements OnInit {
   public drawBound(): void {
     setTimeout(() => this.drawStarted = true, 0);
 
-    this.olMapService.drawBound().subscribe((vector) => {
+    this.csMapService.drawBound().subscribe((vector) => {
       this.drawStarted = false;
       const features = vector.getSource().getFeatures();
       const me = this;

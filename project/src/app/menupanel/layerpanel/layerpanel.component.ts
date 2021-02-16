@@ -2,7 +2,7 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { LayerHandlerService } from 'portal-core-ui';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
 import { LayerModel } from 'portal-core-ui';
-import { OlMapService } from 'portal-core-ui';
+import { CsMapService } from 'portal-core-ui';
 import { CsClipboardService } from 'portal-core-ui';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
@@ -32,7 +32,7 @@ export class LayerPanelComponent implements OnInit {
 
 
   constructor(private layerHandlerService: LayerHandlerService, private renderStatusService: RenderStatusService,
-    private modalService: BsModalService, private olMapService: OlMapService,
+    private modalService: BsModalService, private csMapService: CsMapService,
     private manageStateService: ManageStateService, private CsClipboardService: CsClipboardService) {
     this.uiLayerModels = {};
     this.searchMode = false;
@@ -240,14 +240,14 @@ export class LayerPanelComponent implements OnInit {
      */
     public removeLayer(layer: LayerModel) {
       this.uiLayerModels[layer.id].opacity = 100;
-      this.olMapService.removeLayer(layer);
+      this.csMapService.removeLayer(layer);
     }
 
     /**
      * Layer opacity slider change event
      */
     public layerOpacityChange(event: MatSliderChange, layerId: string) {
-      this.olMapService.setLayerOpacity(layerId, (event.value / 100));
+      this.csMapService.setLayerOpacity(layerId, (event.value / 100));
     }
 
 }

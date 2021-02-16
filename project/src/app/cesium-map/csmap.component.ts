@@ -13,7 +13,7 @@ declare var Cesium: any;
 import {CsMapObject} from 'portal-core-ui';
 import {CsMapService} from 'portal-core-ui';
 import {ManageStateService } from 'portal-core-ui';
-import {OlCSWService } from 'portal-core-ui';
+import {CsCSWService } from 'portal-core-ui';
 import {QueryWFSService} from 'portal-core-ui';
 import {QueryWMSService} from 'portal-core-ui';
 import {GMLParserService} from 'portal-core-ui';
@@ -49,10 +49,10 @@ export class CsMapComponent implements AfterViewInit {
 
   private bsModalRef: BsModalRef;
 
-  constructor(public csMapObject: CsMapObject, private olMapService: CsMapService, private modalService: BsModalService,
+  constructor(public csMapObject: CsMapObject, private csMapService: CsMapService, private modalService: BsModalService,
     private queryWFSService: QueryWFSService, private queryWMSService: QueryWMSService, private gmlParserService: GMLParserService,
     private manageStateService: ManageStateService, private viewerConf: ViewerConfiguration) {
-    this.olMapService.getClickedLayerListBS().subscribe(mapClickInfo => {
+    this.csMapService.getClickedLayerListBS().subscribe(mapClickInfo => {
       this.handleLayerClick(mapClickInfo);
     });
 
@@ -135,7 +135,7 @@ export class CsMapComponent implements AfterViewInit {
               continue;
             }
             if (layerStateObj[layerKey].raw) {
-              me.olMapService.getAddLayerSubject().subscribe(layer => {
+              me.csMapService.getAddLayerSubject().subscribe(layer => {
                 setTimeout(() => {
                   if (layer.id === layerKey) {
                     const mapLayer = {
@@ -178,7 +178,7 @@ export class CsMapComponent implements AfterViewInit {
       this.displayModal(modalDisplayed, mapClickInfo.clickCoord);
 
       // VT: if it is a csw renderer layer, handling of the click is slightly different
-      if (config.cswrenderer.includes(feature.layer.id) || OlCSWService.cswDiscoveryRendered.includes(feature.layer.id)) {
+      if (config.cswrenderer.includes(feature.layer.id) || CsCSWService.cswDiscoveryRendered.includes(feature.layer.id)) {
         this.setModalHTML(this.parseCSWtoHTML(feature.cswRecord), feature.cswRecord.name, feature, this.bsModalRef);
       } else if (ref.customQuerierHandler[feature.layer.id]) {
           const handler = new ref.customQuerierHandler[feature.layer.id](feature);
@@ -262,9 +262,9 @@ export class CsMapComponent implements AfterViewInit {
       modalDisplayed.value = true;
       this.bsModalRef.content.downloading = true;
       if (clickCoord) {
-        const vector = this.olMapService.drawDot(clickCoord);
+        const vector = this.csMapService.drawDot(clickCoord);
         this.modalService.onHide.subscribe(reason => {
-          this.olMapService.removeVector(vector);
+          this.csMapService.removeVector(vector);
         })
       }
     }

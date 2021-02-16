@@ -1,7 +1,7 @@
 import { LayerModel } from 'portal-core-ui';
 import { LayerHandlerService } from 'portal-core-ui';
 import { FilterPanelService } from 'portal-core-ui';
-import { OlMapService } from 'portal-core-ui';
+import { CsMapService } from 'portal-core-ui';
 import { CsClipboardService } from 'portal-core-ui';
 import * as $ from 'jquery';
 import { UtilitiesService } from 'portal-core-ui';
@@ -12,9 +12,9 @@ import { ref } from '../../../../environments/ref';
 import { LayerAnalyticModalComponent } from '../../../modalwindow/layeranalytic/layer.analytic.modal.component';
 import { ManageStateService } from 'portal-core-ui';
 import { AuMapService } from '../../../services/wcustom/au-map.service';
-import { OlIrisService } from '../../../services/wcustom/iris/ol-iris.service';
+import { CsIrisService } from '../../../services/wcustom/iris/cs-iris.service';
 import { BsModalService } from 'ngx-bootstrap/modal';
-import { OlWMSService } from 'portal-core-ui';
+import { CsWMSService } from 'portal-core-ui';
 import { MapsManagerService } from 'angular-cesium';
 import { RenderStatusService } from 'portal-core-ui';
 
@@ -24,7 +24,7 @@ declare var Cesium: any;
 @Component({
   selector: 'app-filter-panel',
   templateUrl: './filterpanel.component.html',
-  providers: [AuMapService, OlIrisService],
+  providers: [AuMapService, CsIrisService],
   styleUrls: ['./filterpanel.component.scss', '../../menupanel.scss']
 })
 export class FilterPanelComponent implements OnInit {
@@ -39,14 +39,14 @@ export class FilterPanelComponent implements OnInit {
   public bApplyClipboardBBox = true;
 
   constructor(
-    private olMapService: OlMapService,
+    private csMapService: CsMapService,
     private layerHandlerService: LayerHandlerService,
     private auscopeMapService: AuMapService,
     private filterPanelService: FilterPanelService,
     private modalService: BsModalService,
     private manageStateService: ManageStateService,
     private CsClipboardService: CsClipboardService,
-    private olWMSService: OlWMSService,
+    private csWMSService: CsWMSService,
     private mapsManagerService: MapsManagerService,
     private renderStatusService: RenderStatusService
   ) {
@@ -220,7 +220,7 @@ export class FilterPanelComponent implements OnInit {
     }
     const me = this;
     try {
-      this.olWMSService.getNvclFilter(layer, param).subscribe(response => {
+      this.csWMSService.getNvclFilter(layer, param).subscribe(response => {
         if (response.indexOf('<ogc:Intersects>') >= 0) {
           const ogcIntersects = UtilitiesService.getPolygonFilter(response);
           // tslint:disable-next-line:max-line-length

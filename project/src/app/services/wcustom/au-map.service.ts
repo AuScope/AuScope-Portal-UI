@@ -1,8 +1,8 @@
 import { LayerModel } from 'portal-core-ui';
 import { CsMapObject } from 'portal-core-ui';
 import { CsMapService } from 'portal-core-ui';
-import { OlCSWService } from 'portal-core-ui';
-import { OlIrisService } from './../wcustom/iris/ol-iris.service';
+import { CsCSWService } from 'portal-core-ui';
+import { CsIrisService } from './../wcustom/iris/cs-iris.service';
 import { Injectable } from '@angular/core';
 
 /**
@@ -11,7 +11,7 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export class AuMapService {
 
-   constructor(private csMapObject: CsMapObject, private olIrisService: OlIrisService, private csMapService: CsMapService, private olCSWService: OlCSWService) {}
+   constructor(private csMapObject: CsMapObject, private csIrisService: CsIrisService, private csMapService: CsMapService, private csCSWService: CsCSWService) {}
 
 
   /**
@@ -21,11 +21,11 @@ export class AuMapService {
    public addLayer(layer: LayerModel, param: any): void {
      this.csMapObject.removeLayerById(layer.id);
      if (layer.id === 'seismology-in-schools-site') {
-       this.olIrisService.addLayer(layer, param);
+       this.csIrisService.addLayer(layer, param);
        this.csMapService.appendToLayerModelList(layer);
      } else {
        // VT: If all else fail, we render the layer as a csw and point the user to the resource.
-       this.olCSWService.addLayer(layer, param);
+       this.csCSWService.addLayer(layer, param);
        this.csMapService.appendToLayerModelList(layer);
      }
    }

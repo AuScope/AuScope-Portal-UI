@@ -1,7 +1,7 @@
 import { Bbox } from 'portal-core-ui';
 import { LayerModel } from 'portal-core-ui';
 import { LayerHandlerService } from 'portal-core-ui';
-import { OlMapService } from 'portal-core-ui';
+import { CsMapService } from 'portal-core-ui';
 import { RenderStatusService } from 'portal-core-ui';
 import { Constants } from 'portal-core-ui';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
@@ -37,7 +37,7 @@ export class CatalogueSearchComponent implements AfterViewInit {
   totalResults = [];
   currentPage: number;
 
-  constructor(private olMapService: OlMapService, private cataloguesearchService: CataloguesearchService,
+  constructor(private csMapService: CsMapService, private cataloguesearchService: CataloguesearchService,
     private renderStatusService: RenderStatusService,  private modalService: BsModalService, private layerHandlerService: LayerHandlerService) {
     this.drawStarted = false;
     this.searchMode = true;
@@ -95,7 +95,7 @@ export class CatalogueSearchComponent implements AfterViewInit {
   public drawBound(): void {
     setTimeout(() => this.drawStarted = true, 0);
 
-    this.olMapService.drawBound().subscribe((vector) => {
+    this.csMapService.drawBound().subscribe((vector) => {
       this.drawStarted = false;
       const features = vector.getSource().getFeatures();
       const me = this;
@@ -165,7 +165,7 @@ export class CatalogueSearchComponent implements AfterViewInit {
    * remove a layer from the map
    */
     public removeLayer(layer: LayerModel) {
-      this.olMapService.removeLayer(layer);
+      this.csMapService.removeLayer(layer);
     }
 
 }

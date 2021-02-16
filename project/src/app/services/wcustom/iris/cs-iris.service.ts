@@ -9,7 +9,7 @@ import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import {LayerModel} from 'portal-core-ui';
 import { OnlineResourceModel } from 'portal-core-ui';
 import { LayerHandlerService } from 'portal-core-ui';
-import { OlMapObject } from 'portal-core-ui';
+import { CsMapObject } from 'portal-core-ui';
 import olMap from 'ol/Map';
 import olLayerVector from 'ol/layer/Vector';
 import olSourceVector from 'ol/source/Vector';
@@ -23,17 +23,17 @@ import { Constants } from 'portal-core-ui';
 import { RenderStatusService } from 'portal-core-ui';
 
 /**
- * Use open layers to add layer to map. This service class adds vector layer to the map
+ * Use Cesium to add layer to map. This service class adds wfs layer to the map
  */
 @Injectable()
-export class OlIrisService {
+export class CsIrisService {
 
   private map: olMap;
 
-  constructor(private olMapObject: OlMapObject, private layerHandlerService: LayerHandlerService,
+  constructor(private csMapObject: CsMapObject, private layerHandlerService: LayerHandlerService,
                   private http: HttpClient,
                   private renderStatusService: RenderStatusService, @Inject('env') private env) {
-    this.map = this.olMapObject.getMap();
+    this.map = this.csMapObject.getMap();
   }
 
   /**
@@ -132,7 +132,7 @@ export class OlIrisService {
           });
           feature.layer = layer;
           kmlLayer.getSource().addFeature(feature);
-          this.olMapObject.addLayerById(kmlLayer, layer.id);
+          this.csMapObject.addLayerById(kmlLayer, layer.id);
         });
       },
         err => {
