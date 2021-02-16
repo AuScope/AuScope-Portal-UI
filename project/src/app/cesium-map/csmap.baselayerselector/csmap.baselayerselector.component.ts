@@ -1,17 +1,20 @@
 import { Component, OnInit } from '@angular/core';
-import {OlMapObject} from 'portal-core-ui';
+import {CsMapObject} from 'portal-core-ui';
 import { environment } from '../../../environments/environment';
 
+// TODO: Convert to a cesium component
+
 @Component({
-  selector: 'app-olmap-baselayerselector',
-  templateUrl: './olmap.baselayerselector.component.html',
-  styleUrls: ['./olmap.baselayerselector.component.css']
+  selector: 'app-csmap-baselayerselector',
+  templateUrl: './csmap.baselayerselector.component.html',
+  styleUrls: ['./csmap.baselayerselector.component.css']
 
 })
-export class OlmapBaselayerselectorComponent implements OnInit {
+export class CsMapBaseLayerSelectorComponent implements OnInit {
+  
   public selectedLayer = 'OSM';
   baseMapLayers: any = [];
-  constructor(public olMapObject: OlMapObject) {
+  constructor(public csMapObject: CsMapObject) {
    }
 
   ngOnInit() {

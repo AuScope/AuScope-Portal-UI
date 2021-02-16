@@ -7,7 +7,7 @@ import { NouisliderModule } from 'ng2-nouislider';
 import { CommonModule } from '@angular/common';
 
 // Components
-import { OlMapComponent } from './openlayermap/olmap.component';
+import { CsMapComponent } from './cesium-map/csmap.component';
 import { OlMapPreviewComponent } from './menupanel/common/infopanel/openlayermappreview/olmap.preview.component';
 import { LayerPanelComponent } from './menupanel/layerpanel/layerpanel.component';
 import { CustomPanelComponent } from './menupanel/custompanel/custompanel.component';
@@ -27,9 +27,9 @@ import { RemanentAnomaliesComponent } from './modalwindow/querier/customanalytic
 import { DynamicAnalyticComponent } from './modalwindow/querier/dynamic.analytic.component';
 import { NVCLDatasetListComponent, NVCLDatasetListDialogComponent } from './modalwindow/querier/customanalytic/nvcl/nvcl.datasetlist.component';
 import { TIMAComponent } from './modalwindow/querier/customanalytic/tima/tima.component';
-import { OlMapZoomComponent } from './openlayermap/olmap.zoom.component';
+import { CsMapZoomComponent } from './cesium-map/csmap.zoom.component';
 import { NgbdModalStatusReportComponent } from './toppanel/renderstatus/renderstatus.component';
-import { OlMapClipboardComponent } from './openlayermap/olmap.clipboard.component';
+import { CsMapClipboardComponent } from './cesium-map/csmap.clipboard.component';
 
 import { AngularCesiumModule } from 'angular-cesium';
 
@@ -52,7 +52,7 @@ import { MatTreeModule } from '@angular/material/tree';
 import { CdkTableModule } from '@angular/cdk/table';
 
 import { StorageServiceModule } from 'ngx-webstorage-service';
-import { OlmapBaselayerselectorComponent } from './openlayermap/olmap.baselayerselector/olmap.baselayerselector.component';
+import { CsMapBaseLayerSelectorComponent } from './cesium-map/csmap.baselayerselector/csmap.baselayerselector.component';
 import { DisclaimerModalComponent } from './modalwindow/disclaimer/disclaimer.modal.component';
 import { PortalDetailsPanelComponent } from './menupanel/portal-details-panel/portal-details-panel.component';
 
@@ -72,7 +72,7 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
 
 @NgModule({
   declarations: [
-    OlMapComponent,
+    CsMapComponent,
     OlMapPreviewComponent,
     LayerPanelComponent,
     CustomPanelComponent,
@@ -80,11 +80,11 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     FilterPanelComponent,
     DownloadPanelComponent,
     NgbdModalStatusReportComponent,
-    OlMapClipboardComponent,
+    CsMapClipboardComponent,
     InfoPanelComponent,
     NotificationComponent,
     InfoPanelSubComponent,
-    OlMapZoomComponent,
+    CsMapZoomComponent,
     QuerierModalComponent,
     DynamicAnalyticComponent,
     NVCLDatasetListComponent,
@@ -99,7 +99,7 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     DynamicAdvancefilterComponent,
     CapdfAdvanceFilterComponent,
     CapdfAnalyticComponent,
-    OlmapBaselayerselectorComponent,
+    CsMapBaseLayerSelectorComponent,
     DisclaimerModalComponent,
     PortalDetailsPanelComponent,
     MSCLComponent,
@@ -142,16 +142,16 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     MSCLAnalyticComponent
   ],
   bootstrap: [
-    OlMapComponent,
+    CsMapComponent,
     LayerPanelComponent,
     CustomPanelComponent,
     NotificationComponent,
-    OlMapZoomComponent,
+    // OlMapZoomComponent,
     PermanentLinkComponent,
     CatalogueSearchComponent,
     ClipboardComponent,
-    OlMapClipboardComponent,
-    OlmapBaselayerselectorComponent,
+    // OlMapClipboardComponent,
+    // OlmapBaselayerselectorComponent,
     PortalDetailsPanelComponent
   ]
 })

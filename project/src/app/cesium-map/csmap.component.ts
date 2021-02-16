@@ -10,15 +10,15 @@ import {BsModalService, BsModalRef} from 'ngx-bootstrap/modal';
 //import * as olCoordinate from 'ol/coordinate';
 import { ViewerConfiguration } from 'angular-cesium';
 declare var Cesium: any;
-import {OlMapObject} from 'portal-core-ui';
-import {OlMapService} from 'portal-core-ui';
+import {CsMapObject} from 'portal-core-ui';
+import {CsMapService} from 'portal-core-ui';
 import {ManageStateService } from 'portal-core-ui';
 import {OlCSWService } from 'portal-core-ui';
 import {QueryWFSService} from 'portal-core-ui';
 import {QueryWMSService} from 'portal-core-ui';
 import {GMLParserService} from 'portal-core-ui';
 import {SimpleXMLService} from 'portal-core-ui';
-import { UtilitiesService } from 'portal-core-ui';
+import {UtilitiesService} from 'portal-core-ui';
 
 @Component({
   selector: 'app-cs-map',
@@ -29,11 +29,11 @@ import { UtilitiesService } from 'portal-core-ui';
     </div>
     `,
     providers: [ViewerConfiguration], // Don't forget to Provide it 
-  // styleUrls: ['./olmap.component.css']
+  // styleUrls: ['./csmap.component.css']
   // The "#" (template reference variable) matters to access the map element with the ViewChild decorator!
 })
 
-export class OlMapComponent implements AfterViewInit {
+export class CsMapComponent implements AfterViewInit {
   // This is necessary to access the html element to set the map target (after view init)!
   @ViewChild('mapElement', { static: true }) mapElement: ElementRef;
 
@@ -49,14 +49,14 @@ export class OlMapComponent implements AfterViewInit {
 
   private bsModalRef: BsModalRef;
 
-  constructor(public olMapObject: OlMapObject, private olMapService: OlMapService, private modalService: BsModalService,
+  constructor(public csMapObject: CsMapObject, private olMapService: CsMapService, private modalService: BsModalService,
     private queryWFSService: QueryWFSService, private queryWMSService: QueryWMSService, private gmlParserService: GMLParserService,
     private manageStateService: ManageStateService, private viewerConf: ViewerConfiguration) {
     this.olMapService.getClickedLayerListBS().subscribe(mapClickInfo => {
       this.handleLayerClick(mapClickInfo);
     });
 
-    // viewerOptions will be passed the Cesium.Viewer contstuctor 
+    // viewerOptions will be passed the Cesium.Viewer constuctor 
     viewerConf.viewerOptions = {
       selectionIndicator: false,
       timeline: false,

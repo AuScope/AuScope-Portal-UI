@@ -3,7 +3,7 @@ import { LayerHandlerService } from 'portal-core-ui';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
 import { LayerModel } from 'portal-core-ui';
 import { OlMapService } from 'portal-core-ui';
-import { OlClipboardService } from 'portal-core-ui';
+import { CsClipboardService } from 'portal-core-ui';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { RenderStatusService } from 'portal-core-ui';
@@ -11,6 +11,7 @@ import { ManageStateService } from 'portal-core-ui';
 import { UtilitiesService } from 'portal-core-ui';
 import {config} from '../../../environments/config';
 import { MatSliderChange } from '@angular/material/slider';
+import { KeysPipe } from 'portal-core-ui'; // Necessary for 'getKey' pipe in "layerpanel.component.html"
 
 
 @Component({
@@ -32,7 +33,7 @@ export class LayerPanelComponent implements OnInit {
 
   constructor(private layerHandlerService: LayerHandlerService, private renderStatusService: RenderStatusService,
     private modalService: BsModalService, private olMapService: OlMapService,
-    private manageStateService: ManageStateService, private olClipboardService: OlClipboardService) {
+    private manageStateService: ManageStateService, private CsClipboardService: CsClipboardService) {
     this.uiLayerModels = {};
     this.searchMode = false;
    }
@@ -213,7 +214,7 @@ export class LayerPanelComponent implements OnInit {
               }
             });
         });
-        this.olClipboardService.filterLayersBS.subscribe(
+        this.CsClipboardService.filterLayersBS.subscribe(
           (bFilterLayers) => {
             if (bFilterLayers) {
               this.searchFilter();

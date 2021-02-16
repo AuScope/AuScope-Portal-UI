@@ -5,16 +5,17 @@ import { Component } from '@angular/core';
 
 
 @Component({
-  selector: 'app-ol-map-zoom',
+  // TODO: Replace with cesium 
+  selector: 'app-cs-map-zoom',
   template: `
     <button type="button" class="btn btn-sm btn-inverse active" id="map-theme-text" (click)='zoomClick()'>
       <i class="fa fa-search-plus fa-fw" aria-hidden="true"></i> {{buttonText}}</button>
     `,
-  styleUrls: ['./olmap.component.css']
+  styleUrls: ['./csmap.component.css']
   // The "#" (template reference variable) matters to access the map element with the ViewChild decorator!
 })
 
-export class OlMapZoomComponent {
+export class CsMapZoomComponent {
 
   buttonText = 'Magnify';
 

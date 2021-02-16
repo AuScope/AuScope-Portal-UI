@@ -2,7 +2,7 @@ import { LayerModel } from 'portal-core-ui';
 import { LayerHandlerService } from 'portal-core-ui';
 import { FilterPanelService } from 'portal-core-ui';
 import { OlMapService } from 'portal-core-ui';
-import { OlClipboardService } from 'portal-core-ui';
+import { CsClipboardService } from 'portal-core-ui';
 import * as $ from 'jquery';
 import { UtilitiesService } from 'portal-core-ui';
 import { Component, Input, OnInit } from '@angular/core';
@@ -45,7 +45,7 @@ export class FilterPanelComponent implements OnInit {
     private filterPanelService: FilterPanelService,
     private modalService: BsModalService,
     private manageStateService: ManageStateService,
-    private olClipboardService: OlClipboardService,
+    private CsClipboardService: CsClipboardService,
     private olWMSService: OlWMSService,
     private mapsManagerService: MapsManagerService,
     private renderStatusService: RenderStatusService
@@ -239,7 +239,7 @@ export class FilterPanelComponent implements OnInit {
    */
   public onApplyClipboardBBox(): void {
     if (this.bApplyClipboardBBox) {
-      this.olClipboardService.polygonsBS.subscribe(polygonBBoxs => {
+      this.CsClipboardService.polygonsBS.subscribe(polygonBBoxs => {
         if (!UtilitiesService.isEmpty(polygonBBoxs)) {
           for (const optFilter of this.optionalFilters) {
             if (optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
@@ -307,7 +307,7 @@ export class FilterPanelComponent implements OnInit {
     }
 
     if (filter.type === 'OPTIONAL.POLYGONBBOX') {
-      this.olClipboardService.toggleClipboard(true);
+      this.CsClipboardService.toggleClipboard(true);
     }
     this.optionalFilters.push(filter);
   }
