@@ -5,25 +5,26 @@ import { OlMapService } from 'portal-core-ui';
 import { RenderStatusService } from 'portal-core-ui';
 import { Constants } from 'portal-core-ui';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
-import { UILayerModel } from '../common/model/ui/uilayer.model';
+import { UILayerModel } from '../../menupanel/common/model/ui/uilayer.model';
 import { CataloguesearchService } from './cataloguesearch.service';
 import { Component, AfterViewInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import * as Proj from 'ol/proj';
 import { RecordModalComponent } from './record.modal.component';
+import { BsModalRef } from 'ngx-bootstrap/modal';
 
 // List of valid online resource types that can be added to the map
 const VALID_ONLINE_RESOURCE_TYPES: string[] = ['WMS', 'WFS', 'CSW', 'WWW'];
 
 @Component({
-    selector: '[appCatalogueSearchPanel]',
-    templateUrl: './cataloguesearch.component.html',
-    providers : [CataloguesearchService],
-    styleUrls: ['./cataloguesearch.component.scss', '../menupanel.scss']
+    selector: 'app-catalogue-search-modal-window',
+    templateUrl: './cataloguesearch.modal.component.html',
+    providers : [CataloguesearchService, BsModalRef],
+    styleUrls: ['./cataloguesearch.modal.component.scss']
 })
 
 
-export class CatalogueSearchComponent implements AfterViewInit {
+export class CatalogueSearchModalComponent implements AfterViewInit {
 
   drawStarted: boolean;
   bbox: Bbox;
@@ -41,7 +42,8 @@ export class CatalogueSearchComponent implements AfterViewInit {
   currentPage: number;
  
   constructor(private olMapService: OlMapService, private cataloguesearchService: CataloguesearchService,
-    private renderStatusService: RenderStatusService,  private modalService: NgbModal, private layerHandlerService: LayerHandlerService) {
+    private renderStatusService: RenderStatusService,  private modalService: NgbModal, public modalRef: BsModalRef,
+        private layerHandlerService: LayerHandlerService) {    
     this.drawStarted = false;
     this.searchMode = true;
     this.uiLayerModels = {};

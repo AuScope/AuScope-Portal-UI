@@ -98,15 +98,7 @@
             <!-- END Custom Layers -->
 
             <!-- BEGIN Catalogue Search -->
-            <input type="checkbox" class="menuBtn" id="catalogueBtn"/>
-			<h5 class="mb-1">
-				<label for="catalogueBtn" class="mb-0">
-                    <i class="ti-book"></i>
-				    Catalogue Search
-                    <i class="fa fa-arrow-circle-down"></i>
-				</label>
-				<ul class="card-sub" appCatalogueSearchPanel></ul>
-			</h5>
+            <appCatalogueSearchPanel></appCatalogueSearchPanel>        
             <!-- END Catalogue Search -->
             <hr/>
 			<li appPortalDetailsPanel></li>
@@ -145,6 +137,7 @@
     <app-querier-modal-window></app-querier-modal-window>
 	<app-layer-modal-window></app-layer-modal-window>
 	<app-disclaimer-modal-window></app-disclaimer-modal-window>
+	<app-catalogue-search-modal-window></app-catalogue-search-modal-window>
 
     <!-- ================== BEGIN BASE JS ================== -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>

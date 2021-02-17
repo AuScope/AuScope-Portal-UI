@@ -1,4 +1,11 @@
-<div>
+<div class="modal-header" style="background: #EEE">
+    <h5 class="modal-title" id="exampleModalLongTitle">Catalogue Search</h5>
+    <button type="button" class="close" (click)="modalRef.hide()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body" style="margn-left:10px;margin-right:10px;">
+    <form>
 	<br>
 	<div *ngIf="searchMode" class="form-group" style=" left: -20px;position: relative; font-size:11px;">
 
@@ -125,8 +132,8 @@
 			</select>
 		</div>
 	</div>
-
-
-
-
+    </form>
+</div>
+<div class="modal-footer" style="background: #EEE">
+    <button type="button" class="btn btn-primary" (click)="modalRef.hide()">Close</button>
 </div>

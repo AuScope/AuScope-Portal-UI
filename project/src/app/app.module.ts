@@ -1,6 +1,6 @@
 import { environment } from '../environments/environment';
 import { config } from '../environments/config';
-import { CatalogueSearchComponent } from './menupanel/cataloguesearch/cataloguesearch.component';
+import { CatalogueSearchPanelComponent } from './menupanel/cataloguesearch/cataloguesearch.panel.component';
 import { NgModule } from '@angular/core';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { NouisliderModule } from 'ng2-nouislider';
@@ -75,7 +75,7 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     OlMapPreviewComponent,
     LayerPanelComponent,
     CustomPanelComponent,
-    CatalogueSearchComponent,
+    CatalogueSearchPanelComponent,
     FilterPanelComponent,
     DownloadPanelComponent,
     NgbdModalStatusReportComponent,
@@ -146,7 +146,7 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     NotificationComponent,
     OlMapZoomComponent,
     PermanentLinkComponent,
-    CatalogueSearchComponent,
+    CatalogueSearchPanelComponent,
     ClipboardComponent,
     OlMapClipboardComponent,
     OlmapBaselayerselectorComponent,
