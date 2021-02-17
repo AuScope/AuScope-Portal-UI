@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
+import { BsModalService } from 'ngx-bootstrap/modal';
 import { CatalogueSearchModalComponent } from '../../modalwindow/cataloguesearch/cataloguesearch.modal.component';
 
 @Component({

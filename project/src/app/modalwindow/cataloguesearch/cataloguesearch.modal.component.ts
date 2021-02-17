@@ -19,7 +19,7 @@ const VALID_ONLINE_RESOURCE_TYPES: string[] = ['WMS', 'WFS', 'CSW', 'WWW'];
 @Component({
     selector: 'app-catalogue-search-modal-window',
     templateUrl: './cataloguesearch.modal.component.html',
-    providers : [CataloguesearchService, BsModalRef],
+    providers : [CataloguesearchService],
     styleUrls: ['./cataloguesearch.modal.component.scss']
 })
 
@@ -42,7 +42,7 @@ export class CatalogueSearchModalComponent implements AfterViewInit {
   currentPage: number;
  
   constructor(private olMapService: OlMapService, private cataloguesearchService: CataloguesearchService,
-    private renderStatusService: RenderStatusService,  private modalService: NgbModal, public modalRef: BsModalRef,
+    private renderStatusService: RenderStatusService, public modalRef: BsModalRef, private modalService: NgbModal, 
         private layerHandlerService: LayerHandlerService) {    
     this.drawStarted = false;
     this.searchMode = true;
