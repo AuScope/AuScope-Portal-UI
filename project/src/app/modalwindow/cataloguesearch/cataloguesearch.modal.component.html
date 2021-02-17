@@ -11,33 +11,33 @@
 
 		<div class="form-group  form-group-sm">
 			<label class="white">Geonetwork Registries</label>
-			<select class="form-control form-control-sm" [(ngModel)]="form.cswService" (change) = "setkeywords(form.cswService)">
+			<select name="cswRegistry" class="form-control form-control-sm" [(ngModel)]="form.cswService" (change) = "setkeywords(form.cswService)">
 				<option *ngFor="let cswRegistry of cswRegistries" [ngValue]="cswRegistry">{{cswRegistry.title}}</option>
 			</select>
 		</div>
 		<div class="form-group  form-group-sm">
 		    <label class="white">Keywords</label>
-			<ng-select [items] = "ngSelectiveOptions" [multiple]="true" bindLabel="label" bindValue="value" placeholder="Select Keywords" [(ngModel)]="form.keywords"></ng-select>
+			<ng-select name="keywords" [items] = "ngSelectiveOptions" [multiple]="true" bindLabel="label" bindValue="value" placeholder="Select Keywords" [(ngModel)]="form.keywords"></ng-select>
 		</div>
 
 		<div>
 			<div class="form-group  form-group-sm">
 				<label class="white">Text Search</label>
-				<input type="text" class="form-control form-control-sm" [(ngModel)]="form.anyText">
+				<input name="anyText" type="text" class="form-control form-control-sm" [(ngModel)]="form.anyText">
 			</div>
 		</div>
 
 		<div>
 			<div class="form-group  form-group-sm">
 				<label class="white">Title Search</label>
-				<input type="text" class="form-control form-control-sm" [(ngModel)]="form.title">
+				<input name="title" type="text" class="form-control form-control-sm" [(ngModel)]="form.title">
 			</div>
 		</div>
 
 		<div>
 			<div class="form-group  form-group-sm">
 				<label class="white">Abstract Search</label>
-				<input type="text" class="form-control form-control-sm" [(ngModel)]="form.abstract">
+				<input name="abstract" type="text" class="form-control form-control-sm" [(ngModel)]="form.abstract">
 			</div>
 		</div>
 
@@ -127,7 +127,7 @@
 		<div class="pagination dark">
 			<a  class="page dark gradient" (click)="currentPage=currentPage-1;search()">Last</a>
 			<a  class="page dark gradient" (click)="currentPage=currentPage+1;search()">Next</a>
-			<select class="page dark gradient" [(ngModel)]="currentPage" (change)="search()">
+			<select name="pageNumber" class="page dark gradient" [(ngModel)]="currentPage" (change)="search()">
 				<option *ngFor="let idx of totalResults">{{idx}}</option>
 			</select>
 		</div>

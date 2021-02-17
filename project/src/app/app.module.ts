@@ -19,6 +19,8 @@ import { InfoPanelComponent } from './menupanel/common/infopanel/infopanel.compo
 import { InfoPanelSubComponent } from './menupanel/common/infopanel/subpanel/subpanel.component';
 import { PermanentLinkComponent } from './menupanel/permanentlink/permanentlink.component';
 import { ClipboardComponent } from './menupanel/clipboard/clipboard.component';
+import { CatalogueSearchModalComponent } from './modalwindow/cataloguesearch/cataloguesearch.modal.component';
+import { RecordModalComponent } from './modalwindow/cataloguesearch/record.modal.component';
 import { CapdfAnalyticComponent } from './modalwindow/layeranalytic/capdf/capdf.analytic.component';
 import { DynamicLayerAnalyticComponent } from './modalwindow/layeranalytic/dynamic.layer.analytic.component';
 import { LayerAnalyticModalComponent } from './modalwindow/layeranalytic/layer.analytic.modal.component';
@@ -102,7 +104,9 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     DisclaimerModalComponent,
     PortalDetailsPanelComponent,
     MSCLComponent,
-    MSCLAnalyticComponent
+    MSCLAnalyticComponent,
+    CatalogueSearchModalComponent,
+    RecordModalComponent
   ],
   providers: [],
   imports: [
