@@ -1,42 +1,40 @@
 <div class="modal-header" style="background: #EEE">
-    <h5 class="modal-title" id="exampleModalLongTitle">Catalogue Search</h5>
+    <h5 class="modal-title">Catalogue Search</h5>
     <button type="button" class="close" (click)="modalRef.hide()" aria-label="Close">
         <span aria-hidden="true">&times;</span>
     </button>
 </div>
 <div class="modal-body" style="margn-left:10px;margin-right:10px;">
-    <form>
-	<br>
-	<div *ngIf="searchMode" class="form-group" style=" left: -20px;position: relative; font-size:11px;">
+	<div *ngIf="searchMode" class="form-group" style="position: relative; font-size:11px;">
 
 		<div class="form-group  form-group-sm">
-			<label class="white">Geonetwork Registries</label>
+			<label>Geonetwork Registries</label>
 			<select name="cswRegistry" class="form-control form-control-sm" [(ngModel)]="form.cswService" (change) = "setkeywords(form.cswService)">
 				<option *ngFor="let cswRegistry of cswRegistries" [ngValue]="cswRegistry">{{cswRegistry.title}}</option>
 			</select>
 		</div>
 		<div class="form-group  form-group-sm">
-		    <label class="white">Keywords</label>
+		    <label>Keywords</label>
 			<ng-select name="keywords" [items] = "ngSelectiveOptions" [multiple]="true" bindLabel="label" bindValue="value" placeholder="Select Keywords" [(ngModel)]="form.keywords"></ng-select>
 		</div>
 
 		<div>
 			<div class="form-group  form-group-sm">
-				<label class="white">Text Search</label>
+				<label >Text Search</label>
 				<input name="anyText" type="text" class="form-control form-control-sm" [(ngModel)]="form.anyText">
 			</div>
 		</div>
 
 		<div>
 			<div class="form-group  form-group-sm">
-				<label class="white">Title Search</label>
+				<label >Title Search</label>
 				<input name="title" type="text" class="form-control form-control-sm" [(ngModel)]="form.title">
 			</div>
 		</div>
 
 		<div>
 			<div class="form-group  form-group-sm">
-				<label class="white">Abstract Search</label>
+				<label >Abstract Search</label>
 				<input name="abstract" type="text" class="form-control form-control-sm" [(ngModel)]="form.abstract">
 			</div>
 		</div>
@@ -55,7 +53,7 @@
 		</div>
 		<div *ngIf="bbox" class="container">
 			<div class='standard-title row'>
-				<h4 class="white"><span>Bounding Box</span></h4>
+				<h4 ><span>Bounding Box</span></h4>
 			</div>
 
 		    <h5><span class="badge badge-secondary d-inline ml-5 line-height-1-8">North: {{bbox.northBoundLatitude | number:'1.0-4'}}</span></h5>
@@ -76,63 +74,57 @@
 
 	<div *ngIf="loading && !searchMode"><p class="wip text-danger">Please wait while we search through the catalogue <i class="fa fa-circle small"></i><i class="fa fa-circle small"></i><i class="fa fa-circle small"></i></p></div>
 
-	<div *ngIf="!searchMode" style="position: relative; font-size:11px;">
-		<div class="float-right" (click)="closeResult()"><i class="fa fa-window-close white"></i></div>
+	<div *ngIf="!searchMode" style="position: relative; font-size:11px; overflow: auto">
+		<div class="float-right" (click)="closeResult()"><i class="fa fa-window-close black"></i></div>
 		<li class="active" *ngFor="let layerGroup of layerGroups | getKey">
-		  		<div class="white">
+		  		<div >
 		             {{layerGroup.key}}
 		       </div>
-			<ul>
-				<li *ngFor="let layer of layerGroup.value">
-					<a>
-						<div>
-							<span *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="float-right project-percentage hasEvent light-blue"><u (click)="openStatusReport(uiLayerModels[layer.id]); $event.stopPropagation();">{{uiLayerModels[layer.id].statusMap.completePercentage}}<i *ngIf="!uiLayerModels[layer.id].statusMap.containsError" class="fa fa-warning text-warning"></i></u></span>
-							<div>
-								<i *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="fa fa-times red" (click) = "removeLayer(layer);$event.stopPropagation();"></i>
-							    <!-- Record can not be added -->
-                                <button *ngIf="!isAddableRecord(layer) && !olMapService.layerExists(layer.id)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Layer has no appropriate online resources and as such, cannot be added">
-                                    <i class="fa fa-times"></i>
-                                </button>
-                                <!-- Add layer to map -->
-                                <button *ngIf="isAddableRecord(layer)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Add layer to map" (click)="addCSWRecord(layer)">
+			<table>
+				<tr *ngFor="let layer of layerGroup.value">
+						<th><span *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="float-right project-percentage hasEvent light-blue"><u (click)="openStatusReport(uiLayerModels[layer.id]); $event.stopPropagation();">{{uiLayerModels[layer.id].statusMap.completePercentage}}<i *ngIf="!uiLayerModels[layer.id].statusMap.containsError" class="fa fa-warning text-warning"></i></u></span>
+							
+						<i *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="fa fa-times red" (click) = "removeLayer(layer);$event.stopPropagation();"></i>
+						</th>
+						<!-- Record can not be added -->
+                        <th style="width: 10%"><button *ngIf="!isAddableRecord(layer) && !olMapService.layerExists(layer.id)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Layer has no appropriate online resources and as such, cannot be added">
+                            <i class="fa fa-times"></i>
+                            </button>
+                        <!-- Add layer to map -->
+                        <button *ngIf="isAddableRecord(layer)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Add layer to map" (click)="addCSWRecord(layer)">
                                     <i class="fa fa-plus-circle" style="color:green;"></i>
                                 </button>
-							</div>
+						</th>
+						<th>	
 							<!-- Layer displayed, button will remove from map -->
                             <button *ngIf="olMapService.layerExists(layer.id)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Remove layer from map" (click)="removeCSWRecord(layer.id)">
                                 <i class="fa fa-trash" style="color:red;"></i>
                             </button>
-                            <label class="input-group-label text-truncate" data-toggle="tooltip" title="{{ layer.name }}" readonly style="width: 100%;margin-left:4px;margin-right:4px;">
-                            {{ layer.name }}
-                            </label>
-                            <span class="input-group-append" *ngIf="layer.geographicElements != null && layer.geographicElements.length>0">
-                                <button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Display layer bounds, double-click to zoom to bounds" (click)="showCSWRecordBounds(layer)"
-                                (dblclick)="zoomToCSWRecordBounds(layer)">
-                                    <i class="fa fa-search"></i>
-                                </button>
-                            </span>
+                        </th>
+                        <th>{{ layer.name }}</th>
+                        <th>
                             <span class="input-group-append">
                                 <button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Click to display layer information" (click)="displayRecordInformation(layer)">
                                     <i class="fa fa-info-circle" style="color:blue;"></i>
                                 </button>
                             </span>
+                         </th>
+                         <th>
 							<div *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="progress progress-xs" style="height: 5px">
 								<div class="progress-bar bg-gradient-blue-purple" [style.width]="uiLayerModels[layer.id].statusMap.completePercentage" role="progressbar"></div>
 							</div>
-						</div>
-					</a>
-				</li>
-			</ul>
+					     </th>
+				</tr>
+			</table>
 		</li>
 		<div class="pagination dark">
-			<a  class="page dark gradient" (click)="currentPage=currentPage-1;search()">Last</a>
-			<a  class="page dark gradient" (click)="currentPage=currentPage+1;search()">Next</a>
-			<select name="pageNumber" class="page dark gradient" [(ngModel)]="currentPage" (change)="search()">
+			<a  class="page dark gradient" (click)="currentPage=currentPage-1;search()" style="margin-right:10px;">Last</a>
+			<a  class="page dark gradient" (click)="currentPage=currentPage+1;search()" style="margin-right:10px;">Next</a>
+			<select name="pageNumber" class="page gradient" [(ngModel)]="currentPage" (change)="search()">
 				<option *ngFor="let idx of totalResults">{{idx}}</option>
 			</select>
 		</div>
 	</div>
-    </form>
 </div>
 <div class="modal-footer" style="background: #EEE">
     <button type="button" class="btn btn-primary" (click)="modalRef.hide()">Close</button>

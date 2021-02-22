@@ -5,7 +5,7 @@ import { CatalogueSearchModalComponent } from '../../modalwindow/cataloguesearch
 @Component({
   selector: 'appCatalogueSearchPanel',
   templateUrl: './cataloguesearch.panel.component.html',
-  styleUrls: ['./cataloguesearch.panel.component.css', '../menupanel.scss']
+  styleUrls: ['../menupanel.scss']
 })
 export class CatalogueSearchPanelComponent implements OnInit {
   private modalRef;

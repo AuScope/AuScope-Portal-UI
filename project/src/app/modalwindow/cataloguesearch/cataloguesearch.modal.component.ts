@@ -20,7 +20,7 @@ const VALID_ONLINE_RESOURCE_TYPES: string[] = ['WMS', 'WFS', 'CSW', 'WWW'];
     selector: 'app-catalogue-search-modal-window',
     templateUrl: './cataloguesearch.modal.component.html',
     providers : [CataloguesearchService],
-    styleUrls: ['./cataloguesearch.modal.component.scss']
+    styleUrls: ['./cataloguesearch.modal.component.scss', '../../menupanel/menupanel.scss']
 })
 
 
