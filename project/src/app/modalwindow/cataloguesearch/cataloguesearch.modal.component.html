@@ -81,7 +81,7 @@
 			<table>
 				<tr *ngFor="let layer of layerGroup.value">
 					<th>
-					    <span *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="float-right project-percentage hasEvent light-blue"><u (click)="openStatusReport(uiLayerModels[layer.id]); $event.stopPropagation();">{{uiLayerModels[layer.id].statusMap.completePercentage}}<i *ngIf="!uiLayerModels[layer.id].statusMap.containsError" class="fa fa-warning text-warning"></i></u></span>
+					    <span *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="float-right project-percentage hasEvent light-blue"><u (click)="openStatusReport(uiLayerModels[layer.id]); $event.stopPropagation();">{{uiLayerModels[layer.id].statusMap.completePercentage}}<i *ngIf="uiLayerModels[layer.id].statusMap.containsError" class="fa fa-warning text-warning"></i></u></span>
 						<i *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="fa fa-times red" (click) = "removeLayer(layer);$event.stopPropagation();"></i>
 				    </th>
                     <th style="width: 10%">
