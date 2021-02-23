@@ -1,10 +1,10 @@
 import { environment } from '../environments/environment';
 import { config } from '../environments/config';
-import { CatalogueSearchPanelComponent } from './menupanel/cataloguesearch/cataloguesearch.panel.component';
 import { NgModule } from '@angular/core';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { NouisliderModule } from 'ng2-nouislider';
-import { CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';   
+import { RouterModule, Routes } from '@angular/router';
 
 // Components
 import { OlMapComponent } from './openlayermap/olmap.component';
@@ -19,8 +19,6 @@ import { InfoPanelComponent } from './menupanel/common/infopanel/infopanel.compo
 import { InfoPanelSubComponent } from './menupanel/common/infopanel/subpanel/subpanel.component';
 import { PermanentLinkComponent } from './menupanel/permanentlink/permanentlink.component';
 import { ClipboardComponent } from './menupanel/clipboard/clipboard.component';
-import { CatalogueSearchModalComponent } from './modalwindow/cataloguesearch/cataloguesearch.modal.component';
-import { RecordModalComponent } from './modalwindow/cataloguesearch/record.modal.component';
 import { CapdfAnalyticComponent } from './modalwindow/layeranalytic/capdf/capdf.analytic.component';
 import { DynamicLayerAnalyticComponent } from './modalwindow/layeranalytic/dynamic.layer.analytic.component';
 import { LayerAnalyticModalComponent } from './modalwindow/layeranalytic/layer.analytic.modal.component';
@@ -70,6 +68,11 @@ import { PlotlyViaCDNModule } from 'angular-plotly.js';
 PlotlyViaCDNModule.plotlyVersion = '1.53.0';
 PlotlyViaCDNModule.plotlyBundle = 'basic';
 
+// catalogue search
+import { CatalogueSearchPanelComponent } from './menupanel/cataloguesearch/cataloguesearch.panel.component';
+import { CatalogueSearchModalComponent } from './modalwindow/cataloguesearch/cataloguesearch.modal.component';
+import { RecordModalComponent } from './modalwindow/cataloguesearch/record.modal.component';
+import { CataloguesearchService } from './modalwindow/cataloguesearch/cataloguesearch.service';
 
 @NgModule({
   declarations: [
@@ -108,11 +111,12 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     CatalogueSearchModalComponent,
     RecordModalComponent
   ],
-  providers: [],
+  providers: [CataloguesearchService],
   imports: [
     PortalCoreModule.forRoot(environment, config),
     PortalCorePipesModule,
     ClipboardModule,
+    RouterModule.forRoot([]),
     ModalModule.forRoot(),
     NouisliderModule,
     NgSelectModule,

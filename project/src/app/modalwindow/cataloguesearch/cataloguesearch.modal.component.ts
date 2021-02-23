@@ -19,7 +19,6 @@ const VALID_ONLINE_RESOURCE_TYPES: string[] = ['WMS', 'WFS', 'CSW', 'WWW'];
 @Component({
     selector: 'app-catalogue-search-modal-window',
     templateUrl: './cataloguesearch.modal.component.html',
-    providers : [CataloguesearchService],
     styleUrls: ['./cataloguesearch.modal.component.scss', '../../menupanel/menupanel.scss']
 })
 
@@ -181,21 +180,41 @@ export class CatalogueSearchModalComponent implements AfterViewInit {
      * @return true is CSWRecord can be added, false otherwise
      */
     public isAddableRecord(layer: LayerModel): boolean {
+        if (layer.cswRecords.length < 1) {
+            return false;
+        }
         let addable: boolean = false;
-        if (!this.olMapService.layerExists(layer.id)) {
+        const cswRecord = layer.cswRecords[0];
+        if (cswRecord.hasOwnProperty('onlineResources') &&
+                cswRecord.onlineResources != null &&
+                cswRecord.onlineResources.some(resource => VALID_ONLINE_RESOURCE_TYPES.indexOf(resource.type) > -1) &&
+                cswRecord.geographicElements.length > 0 &&
+                !this.olMapService.layerExists(cswRecord.id)) {
             addable = true;
         }
         return addable;
     }
+    
+        /**
+     * Add CSW record layer to the map
+     *
+     * @param cswRecord CSW record to add to map as layer
+     */
+    public addCSWRecord(layer: LayerModel): void {
+        if (layer.cswRecords.length > 0) {
+            this.olMapService.addCSWRecord(layer.cswRecords[0]);
+        }
+    }
+
     /**
      * Display the record information dialog
      *
      * @param cswRecord CSW record for information
      */
-    public displayRecordInformation(cswRecord) {
-        if (cswRecord) {
+    public displayRecordInformation(layer) {
+        if (layer && layer.cswRecords.length > 0) {
             const modelRef = this.modalService.open(RecordModalComponent, { size: 'lg' });
-            modelRef.componentInstance.record = cswRecord;
+            modelRef.componentInstance.record = layer.cswRecords[0];
         }
     }
 

@@ -1,5 +1,5 @@
 <div class="modal-header" style="background: #EEE">
-    <h5 class="modal-title">Catalogue Search</h5>
+    <h1>Catalogue Search</h1>
     <button type="button" class="close" (click)="modalRef.hide()" aria-label="Close">
         <span aria-hidden="true">&times;</span>
     </button>
@@ -77,43 +77,42 @@
 	<div *ngIf="!searchMode" style="position: relative; font-size:11px; overflow: auto">
 		<div class="float-right" (click)="closeResult()"><i class="fa fa-window-close black"></i></div>
 		<li class="active" *ngFor="let layerGroup of layerGroups | getKey">
-		  		<div >
-		             {{layerGroup.key}}
-		       </div>
+		    <h5>{{layerGroup.key}}</h5>
 			<table>
 				<tr *ngFor="let layer of layerGroup.value">
-						<th><span *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="float-right project-percentage hasEvent light-blue"><u (click)="openStatusReport(uiLayerModels[layer.id]); $event.stopPropagation();">{{uiLayerModels[layer.id].statusMap.completePercentage}}<i *ngIf="!uiLayerModels[layer.id].statusMap.containsError" class="fa fa-warning text-warning"></i></u></span>
-							
+					<th>
+					    <span *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="float-right project-percentage hasEvent light-blue"><u (click)="openStatusReport(uiLayerModels[layer.id]); $event.stopPropagation();">{{uiLayerModels[layer.id].statusMap.completePercentage}}<i *ngIf="!uiLayerModels[layer.id].statusMap.containsError" class="fa fa-warning text-warning"></i></u></span>
 						<i *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="fa fa-times red" (click) = "removeLayer(layer);$event.stopPropagation();"></i>
-						</th>
-						<!-- Record can not be added -->
-                        <th style="width: 10%"><button *ngIf="!isAddableRecord(layer) && !olMapService.layerExists(layer.id)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Layer has no appropriate online resources and as such, cannot be added">
+				    </th>
+                    <th style="width: 10%">
+                        <!-- Record can not be added -->
+                        <button *ngIf="!isAddableRecord(layer) && !olMapService.layerExists(layer.id)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Layer has no appropriate online resources and as such, cannot be added">
                             <i class="fa fa-times"></i>
-                            </button>
+                        </button>
                         <!-- Add layer to map -->
                         <button *ngIf="isAddableRecord(layer)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Add layer to map" (click)="addCSWRecord(layer)">
-                                    <i class="fa fa-plus-circle" style="color:green;"></i>
-                                </button>
-						</th>
-						<th>	
-							<!-- Layer displayed, button will remove from map -->
-                            <button *ngIf="olMapService.layerExists(layer.id)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Remove layer from map" (click)="removeCSWRecord(layer.id)">
-                                <i class="fa fa-trash" style="color:red;"></i>
+                            <i class="fa fa-plus-circle" style="color:green;"></i>
+                        </button>
+				    </th>
+					<th>	
+						<!-- Layer displayed, button will remove from map -->
+                        <button *ngIf="olMapService.layerExists(layer.id)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Remove layer from map" (click)="removeCSWRecord(layer.id)">
+                            <i class="fa fa-trash" style="color:red;"></i>
+                        </button>
+                    </th>
+                    <th>{{ layer.name }}</th>
+                    <th>
+                        <span class="input-group-append">
+                            <button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Click to display layer information" (click)="displayRecordInformation(layer)">
+                                <i class="fa fa-info-circle" style="color:blue;"></i>
                             </button>
-                        </th>
-                        <th>{{ layer.name }}</th>
-                        <th>
-                            <span class="input-group-append">
-                                <button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Click to display layer information" (click)="displayRecordInformation(layer)">
-                                    <i class="fa fa-info-circle" style="color:blue;"></i>
-                                </button>
-                            </span>
-                         </th>
-                         <th>
-							<div *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="progress progress-xs" style="height: 5px">
-								<div class="progress-bar bg-gradient-blue-purple" [style.width]="uiLayerModels[layer.id].statusMap.completePercentage" role="progressbar"></div>
-							</div>
-					     </th>
+                        </span>
+                    </th>
+                    <th>
+					    <div *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="progress progress-xs" style="height: 5px">
+						    <div class="progress-bar bg-gradient-blue-purple" [style.width]="uiLayerModels[layer.id].statusMap.completePercentage" role="progressbar"></div>
+					    </div>
+				    </th>
 				</tr>
 			</table>
 		</li>
@@ -129,3 +128,4 @@
 <div class="modal-footer" style="background: #EEE">
     <button type="button" class="btn btn-primary" (click)="modalRef.hide()">Close</button>
 </div>
+
