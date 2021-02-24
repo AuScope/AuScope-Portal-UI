@@ -79,13 +79,17 @@
 		<li class="active" *ngFor="let layerGroup of layerGroups | getKey">
 		    <h5>{{layerGroup.key}}</h5>
 			<table>
-				<tr *ngFor="let layer of layerGroup.value">
-					<th>
-					    <span *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="float-right project-percentage hasEvent light-blue"><u (click)="openStatusReport(uiLayerModels[layer.id]); $event.stopPropagation();">{{uiLayerModels[layer.id].statusMap.completePercentage}}<i *ngIf="uiLayerModels[layer.id].statusMap.containsError" class="fa fa-warning text-warning"></i></u></span>
-						<i *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="fa fa-times red" (click) = "removeLayer(layer);$event.stopPropagation();"></i>
-				    </th>
-                    <th style="width: 10%">
-                        <!-- Record can not be added -->
+				<tr *ngFor="let layer of layerGroup.value" style="margin">
+				    <!-- Layer has been added -->
+					<td *ngIf="uiLayerModels[layer.id].statusMap.renderStarted;else renderNotStarted">
+					    <!-- Layer displayed, button will remove from map -->
+						<button class="btn btn-sm btn-outline-secondary">
+						    <i class="fa fa-trash red" (click) = "removeLayer(layer);$event.stopPropagation();"></i>
+						</button>
+				    </td>
+				    <!-- Layer hasn't been added to map -->
+				    <ng-template #renderNotStarted>
+				        <!-- Record can not be added -->
                         <button *ngIf="!isAddableRecord(layer) && !olMapService.layerExists(layer.id)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Layer has no appropriate online resources and as such, cannot be added">
                             <i class="fa fa-times"></i>
                         </button>
@@ -93,31 +97,31 @@
                         <button *ngIf="isAddableRecord(layer)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Add layer to map" (click)="addCSWRecord(layer)">
                             <i class="fa fa-plus-circle" style="color:green;"></i>
                         </button>
-				    </th>
-					<th>	
-						<!-- Layer displayed, button will remove from map -->
-                        <button *ngIf="olMapService.layerExists(layer.id)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Remove layer from map" (click)="removeCSWRecord(layer.id)">
-                            <i class="fa fa-trash" style="color:red;"></i>
-                        </button>
-                    </th>
-                    <th>{{ layer.name }}</th>
-                    <th>
+                    </ng-template>
+                    <td>                    
+                        <div>{{ layer.name }}</div>
+                        <div *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="progress progress-xs" style="height: 5px">
+                            <div class="progress-bar bg-gradient-blue-purple" [style.width]="uiLayerModels[layer.id].statusMap.completePercentage" role="progressbar"></div>   
+                        </div>                            
+                        <span class="float-right project-percentage hasEvent light-blue">
+                             <u (click)="openStatusReport(uiLayerModels[layer.id]); $event.stopPropagation();">
+                                {{uiLayerModels[layer.id].statusMap.completePercentage}}
+                            </u>
+                        </span>           
+                        <i *ngIf="uiLayerModels[layer.id].statusMap.containsError" class="fa fa-warning text-warning" title="This service is currently experiencing some problem and may not work as expected"></i>
+                    </td>
+                    <td>
                         <span class="input-group-append">
                             <button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Click to display layer information" (click)="displayRecordInformation(layer)">
                                 <i class="fa fa-info-circle" style="color:blue;"></i>
                             </button>
                         </span>
-                    </th>
-                    <th>
-					    <div *ngIf="uiLayerModels[layer.id].statusMap.renderStarted" class="progress progress-xs" style="height: 5px">
-						    <div class="progress-bar bg-gradient-blue-purple" [style.width]="uiLayerModels[layer.id].statusMap.completePercentage" role="progressbar"></div>
-					    </div>
-				    </th>
-				</tr>
+                    </td>
+                 </tr>	
 			</table>
 		</li>
 		<div class="pagination dark">
-			<a  class="page dark gradient" (click)="currentPage=currentPage-1;search()" style="margin-right:10px;">Last</a>
+			<a  class="page dark gradient" (click)="currentPage=currentPage-1;search()" style="margin-right:10px;">Prev</a>
 			<a  class="page dark gradient" (click)="currentPage=currentPage+1;search()" style="margin-right:10px;">Next</a>
 			<select name="pageNumber" class="page gradient" [(ngModel)]="currentPage" (change)="search()">
 				<option *ngFor="let idx of totalResults">{{idx}}</option>
