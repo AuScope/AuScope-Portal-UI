@@ -114,7 +114,7 @@
 	    <app-advance-filter *ngIf="showAdvanceFilter" [layer]="layer" (advanceparam)="onAdvanceParamChange($event)"></app-advance-filter>
 
 
-	    <p *ngIf="layer.stackdriverFailingHosts" class='small text-danger'><i class="fa fa-warning text-warning"></i> One or more of the services used by this layer are reported to be experiencing issues at the moment. Click on the info panel for more information.</p>
+	    <p *ngIf='layerStatus.isLayerDown(layer.id)' class='small text-danger'><i class="fa fa-warning text-warning"></i> One or more of the services used by this layer are reported to be experiencing issues at the moment. Click on the info panel for more information.</p>
 	    <div>
             <button *ngIf="analyticMap[layer.id]" type="button" class="btn btn-warning btn-sm" (click)="processLayerAnalytic(layer)"><i class="fa fa-bar-chart" aria-hidden="true"></i> Analytic</button>
 	    	<button type="button" class="btn btn-info btn-sm float-right" (click)="addLayer(layer)"><i class="fa fa-plus-circle" aria-hidden="true"></i> Add Layer</button>

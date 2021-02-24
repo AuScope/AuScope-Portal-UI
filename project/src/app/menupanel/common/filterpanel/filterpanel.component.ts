@@ -15,13 +15,14 @@ import { AuMapService } from '../../../services/wcustom/au-map.service';
 import { OlIrisService } from '../../../services/wcustom/iris/ol-iris.service';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { OlWMSService } from 'portal-core-ui';
+import { LayerStatusService } from 'portal-core-ui';
 
 declare var gtag: Function;
 
 @Component({
   selector: 'app-filter-panel',
   templateUrl: './filterpanel.component.html',
-  providers: [AuMapService, OlIrisService],
+  providers: [AuMapService, OlIrisService, LayerStatusService],
   styleUrls: ['./filterpanel.component.scss', '../../menupanel.scss']
 })
 export class FilterPanelComponent implements OnInit {
@@ -43,7 +44,8 @@ export class FilterPanelComponent implements OnInit {
     private modalService: BsModalService,
     private manageStateService: ManageStateService,
     private olClipboardService: OlClipboardService,
-    private olWMSService: OlWMSService
+    private olWMSService: OlWMSService,
+    public layerStatus: LayerStatusService
   ) {
     this.providers = [];
     this.optionalFilters = [];

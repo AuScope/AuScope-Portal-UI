@@ -8,12 +8,14 @@ import { LayerHandlerService } from 'portal-core-ui';
 import { OlMapPreviewComponent } from './openlayermappreview/olmap.preview.component';
 import * as olProj from 'ol/proj';
 import { Constants } from 'portal-core-ui';
+import { LayerStatusService } from 'portal-core-ui';
 
 
 
 @Component({
     selector: 'info-panel',
     templateUrl: './infopanel.component.html',
+    providers: [LayerStatusService],
     styleUrls: ['../../menupanel.scss']
 })
 
@@ -27,7 +29,8 @@ export class InfoPanelComponent implements OnChanges {
     // legends: any = {};
     featureArr: any = [];
 
-    constructor(private layerHandlerService: LayerHandlerService) {
+    constructor(private layerHandlerService: LayerHandlerService,
+        public layerStatus: LayerStatusService) {
     }
 
     /**
@@ -125,26 +128,6 @@ export class InfoPanelComponent implements OnChanges {
     lowlightOnPreviewMap(layerName: string, adminArea: string): void {
         const key = this.makeKey(layerName, adminArea);
         this.previewMap.setBBoxHighlight(false, key);
-    }
-
-    /**
-     * check if the cswRecord has a entry in the list of failing stackdriver record
-     * @param stackdriverFailingHosts array of the list of host that is experiencing problem
-     * @param cswRecord the csw we are matching for problem
-     */
-    isEndpointFailing(stackdriverFailingHosts: string[], cswRecord: CSWRecordModel): boolean {
-      if (stackdriverFailingHosts && stackdriverFailingHosts.length > 0) {
-        for (const stackdriverFailingHost of stackdriverFailingHosts) {
-          for (const onlineResource of this.layerHandlerService.getOnlineResourcesFromCSW(cswRecord)) {
-            if (onlineResource.url.indexOf(stackdriverFailingHost) > -1) {
-              return true;
-            }
-          }
-
-        }
-      }
-
-      return false;
     }
 
 }
