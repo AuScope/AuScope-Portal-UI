@@ -61,7 +61,7 @@
     "tslib": "^1.10.0",
     "x2js": "^3.4.0",
     "zone.js": "~0.10.2",
-    "portal-core-ui": "^1.0.3"
+    "@auscope/portal-core-ui": "^1.0.4"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.901.12",
