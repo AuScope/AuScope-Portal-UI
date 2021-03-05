@@ -33,11 +33,9 @@ import { CsMapClipboardComponent } from './cesium-map/csmap.clipboard.component'
 
 import { AngularCesiumModule } from 'angular-cesium';
 
-
 import { NotificationComponent } from './toppanel/notification/notification.component';
 import { QuerierModalComponent } from './modalwindow/querier/querier.modal.component';
 import { ClipboardModule } from 'ngx-clipboard';
-
 
 import { PortalCoreModule } from 'portal-core-ui';
 import { PortalCorePipesModule } from 'portal-core-ui';
@@ -52,16 +50,14 @@ import { MatTreeModule } from '@angular/material/tree';
 import { CdkTableModule } from '@angular/cdk/table';
 
 import { StorageServiceModule } from 'ngx-webstorage-service';
-import { CsMapBaseLayerSelectorComponent } from './cesium-map/csmap.baselayerselector/csmap.baselayerselector.component';
 import { DisclaimerModalComponent } from './modalwindow/disclaimer/disclaimer.modal.component';
 import { PortalDetailsPanelComponent } from './menupanel/portal-details-panel/portal-details-panel.component';
 
-import {NgxChartsModule} from '@swimlane/ngx-charts';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { MSCLComponent } from './modalwindow/querier/customanalytic/mscl/mscl.component';
 import { MSCLAnalyticComponent } from './modalwindow/layeranalytic/mscl/mscl.analytic.component';
-
 
 import { PlotlyViaCDNModule } from 'angular-plotly.js';
 
@@ -99,7 +95,6 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     DynamicAdvancefilterComponent,
     CapdfAdvanceFilterComponent,
     CapdfAnalyticComponent,
-    CsMapBaseLayerSelectorComponent,
     DisclaimerModalComponent,
     PortalDetailsPanelComponent,
     MSCLComponent,

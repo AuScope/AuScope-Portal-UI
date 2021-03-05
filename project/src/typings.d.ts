@@ -5,4 +5,4 @@ interface NodeModule {
 }
 declare module 'simplify-js';
 
-declare var Cesium; 
+declare var Cesium;

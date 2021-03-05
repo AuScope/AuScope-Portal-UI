@@ -1,37 +1,37 @@
 import { config } from '../../environments/config';
 import { ref } from '../../environments/ref';
-import {QuerierModalComponent} from '../modalwindow/querier/querier.modal.component';
+import { QuerierModalComponent } from '../modalwindow/querier/querier.modal.component';
 import { CSWRecordModel } from 'portal-core-ui';
-import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 //import olZoom from 'ol/control/Zoom';
 //import olScaleLine from 'ol/control/ScaleLine';
-import {BsModalService, BsModalRef} from 'ngx-bootstrap/modal';
+import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 //import olControlMousePosition from 'ol/control/MousePosition';
 //import * as olCoordinate from 'ol/coordinate';
 import { ViewerConfiguration } from 'angular-cesium';
 declare var Cesium: any;
-import {CsMapObject} from 'portal-core-ui';
-import {CsMapService} from 'portal-core-ui';
-import {ManageStateService } from 'portal-core-ui';
-import {CsCSWService } from 'portal-core-ui';
-import {QueryWFSService} from 'portal-core-ui';
-import {QueryWMSService} from 'portal-core-ui';
-import {GMLParserService} from 'portal-core-ui';
-import {SimpleXMLService} from 'portal-core-ui';
-import {UtilitiesService} from 'portal-core-ui';
+import { CsMapObject } from 'portal-core-ui';
+import { CsMapService } from 'portal-core-ui';
+import { ManageStateService } from 'portal-core-ui';
+import { CsCSWService } from 'portal-core-ui';
+import { QueryWFSService } from 'portal-core-ui';
+import { QueryWMSService } from 'portal-core-ui';
+import { GMLParserService } from 'portal-core-ui';
+import { SimpleXMLService } from 'portal-core-ui';
+import { UtilitiesService } from 'portal-core-ui';
 
 @Component({
   selector: 'app-cs-map',
   template: `
-    <div #mapElement id="map" class="h-100 w-100"> 
-    <ac-map>
-    </ac-map>
+    <div #mapElement id="map" class="h-100 w-100">
+      <ac-map></ac-map>
     </div>
     `,
     providers: [ViewerConfiguration], // Don't forget to Provide it 
   // styleUrls: ['./csmap.component.css']
   // The "#" (template reference variable) matters to access the map element with the ViewChild decorator!
 })
+
 
 export class CsMapComponent implements AfterViewInit {
   // This is necessary to access the html element to set the map target (after view init)!
@@ -42,6 +42,7 @@ export class CsMapComponent implements AfterViewInit {
   Cesium = Cesium;
   viewer: any;
   //Viewer viewer;
+
 
   ngOnInit() {
       console.log('load main map')
@@ -56,13 +57,15 @@ export class CsMapComponent implements AfterViewInit {
       this.handleLayerClick(mapClickInfo);
     });
 
-    // viewerOptions will be passed the Cesium.Viewer constuctor 
+    // viewerOptions will be passed the Cesium.Viewer constuctor
     viewerConf.viewerOptions = {
       selectionIndicator: false,
       timeline: false,
       infoBox: false,
       fullscreenButton: false,
-      baseLayerPicker: false,
+      baseLayerPicker: true,
+      imageryProviderViewModels: this.csMapService.createBaseMapLayers(),
+      terrainProviderViewModels: [],
       animation: false,
       shouldAnimate: false,
       homeButton: false,
@@ -71,9 +74,9 @@ export class CsMapComponent implements AfterViewInit {
       navigationInstructionsInitiallyVisible: false,
       mapMode2D: Cesium.MapMode2D.ROTATE,
     };
-    // Will be called on viewer initialistion   
+    // Will be called on viewer initialistion
     viewerConf.viewerModifier = (viewer: any) => {
-      // Remove default double click zoom behaviour  
+      // Remove default double click zoom behaviour
       viewer.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
       /*viewer.imageryLayers.addImageryProvider(
         new Cesium.WebMapServiceImageryProvider({
@@ -146,13 +149,9 @@ export class CsMapComponent implements AfterViewInit {
                     me.setModal(layerStateObj[layerKey].raw, mapLayer, me.bsModalRef, layerStateObj[layerKey].gmlid);
                   }
                 }, 0);
-
               })
-
-
             }
           }
-
       });
       // VT: End permanent link
     }
@@ -201,9 +200,7 @@ export class CsMapComponent implements AfterViewInit {
             '...', feature, this.bsModalRef);
           break;
         }
-
       }
-
     }
 
     // VT: process list of layers clicked
@@ -363,7 +360,6 @@ export class CsMapComponent implements AfterViewInit {
   }
 
 
-
   /**
    * Set the modal dialog with an HTML message
    * @param html HTML response string
@@ -382,6 +378,5 @@ export class CsMapComponent implements AfterViewInit {
       }
      this.bsModalRef.content.downloading = false;
   }
-
 
 }
