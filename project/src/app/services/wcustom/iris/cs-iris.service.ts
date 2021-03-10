@@ -19,8 +19,11 @@ import olStyleCircle from 'ol/style/Circle';
 import olStyleFill from 'ol/style/Fill';
 import olStyleStroke from 'ol/style/Stroke';
 import olStyleText from 'ol/style/Text';
+import { MapsManagerService } from 'angular-cesium';
 import { Constants } from 'portal-core-ui';
 import { RenderStatusService } from 'portal-core-ui';
+
+declare var Cesium: any;
 
 /**
  * Use Cesium to add layer to map. This service class adds wfs layer to the map
@@ -30,9 +33,12 @@ export class CsIrisService {
 
   private map: olMap;
 
-  constructor(private csMapObject: CsMapObject, private layerHandlerService: LayerHandlerService,
-                  private http: HttpClient,
-                  private renderStatusService: RenderStatusService, @Inject('env') private env) {
+  constructor(private csMapObject: CsMapObject,
+              private layerHandlerService: LayerHandlerService,
+              private http: HttpClient,
+              private renderStatusService: RenderStatusService,
+              private mapsManagerService: MapsManagerService,
+              @Inject('env') private env) {
     this.map = this.csMapObject.getMap();
   }
 
@@ -118,22 +124,58 @@ export class CsIrisService {
       this.renderStatusService.addResource(layer, onlineResource);
 
       this.getKMLFeature(layer, onlineResource).subscribe(response => {
+        const parser = new DOMParser();
+        const dom = parser.parseFromString(response, "application/xml");
+
         this.renderStatusService.updateComplete(layer, onlineResource);
-        // Set extractStyles = false to disable default style
-        const features = new olFormatKML({extractStyles: false}).readFeatures(response, {
-          dataProjection: 'EPSG:4326',
-          featureProjection: Constants.MAP_PROJ
-        });
-        // Loop over features and apply new style and LayerVector for each feature
-        features.forEach(feature => {
-          const kmlLayer = new olLayerVector({
-            source: new olSourceVector({features: []}),
-            style: this.irisStyleFunction(feature.get('name'))
-          });
-          feature.layer = layer;
-          kmlLayer.getSource().addFeature(feature);
-          this.csMapObject.addLayerById(kmlLayer, layer.id);
-        });
+
+        const viewer = this.getViewer();
+        const options = {
+          camera: viewer.scene.camera,
+          canvas: viewer.scene.canvas
+        };
+        var source = new Cesium.KmlDataSource(options);
+        source.load(dom).then(function(dataSource) {
+          var entities = dataSource.entities.values;
+          console.log("entities=", entities);
+          for(var i=0; i<entities.length; i++) {
+		        var entity = entities[i];
+            if (entity.label) {
+			        entity.label.showBackground = true;
+			        entity.label.backgroundColor = new Cesium.Color.fromRandom({red : 0.1, maximumGreen : 0.8, minimumBlue : 0.1, alpha : 0.5});
+			        entity.label.fillColor = Cesium.Color.YELLOW;
+			        entity.label.outlineColor = Cesium.Color.RED;
+			        entity.label.distanceDisplayCondition = new Cesium.DistanceDisplayCondition(1.0, 8000000.0);
+			        entity.label.disableDepthTestDistance = Number.POSITIVE_INFINITY;
+		        }
+		        if (entity.billboard) {
+			        entity.billboard.color = new Cesium.Color.fromRandom({red : 0.5, maximumGreen : 0.3, minimumBlue : 0.5, alpha : 1.0});
+			        entity.billboard.disableDepthTestDistance = Number.POSITIVE_INFINITY;
+			        entity.billboard.distanceDisplayCondition = new Cesium.DistanceDisplayCondition(1.0, 8000000.0);
+		        }
+          }
+          viewer.dataSources.add(dataSource);
+        }
+                                                        );
+
+
+
+        // // Set extractStyles = false to disable default style
+        // const features = new olFormatKML({extractStyles: false}).readFeatures(response, {
+        //   dataProjection: 'EPSG:4326',
+        //   featureProjection: Constants.MAP_PROJ
+        // });
+        // // Loop over features and apply new style and LayerVector for each feature
+        // features.forEach(feature => {
+
+          // const kmlLayer = new olLayerVector({
+          //   source: new olSourceVector({features: []}),
+          //   style: this.irisStyleFunction(feature.get('name'))
+          // });
+          // feature.layer = layer;
+          // kmlLayer.getSource().addFeature(feature);
+          // this.csMapObject.addLayerById(kmlLayer, layer.id);
+        // });
       },
         err => {
           this.renderStatusService.updateComplete(layer, onlineResource, true);
@@ -145,5 +187,8 @@ export class CsIrisService {
 
   }
 
+  private getViewer() {
+    return this.mapsManagerService.getMap().getCesiumViewer();
+  }
 
 }

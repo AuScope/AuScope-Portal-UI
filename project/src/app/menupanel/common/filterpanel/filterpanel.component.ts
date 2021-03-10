@@ -141,7 +141,7 @@ export class FilterPanelComponent implements OnInit {
       }
     }
     // VT: End append
-    //try {
+    // try {
       const viewer = this.mapsManagerService.getMap().getCesiumViewer();
       if (this.layerHandlerService.containsWMS(layer)) {
         const wmsOnlineResources = this.layerHandlerService.getWMSResource(layer);
@@ -175,16 +175,18 @@ export class FilterPanelComponent implements OnInit {
           
           // this.olMapService.addLayer(layer, param);
       }
-    //} catch (error) {
-    //  // VT: If portal-core-ui is unable to render the layer, it must be a auscope specific layer. E.g Iris
-    //  try {
-    //    this.auscopeMapService.addLayer(layer, param);
-    //  } catch (error) {
-    //    alert(
-    //      'Unable to render layer as this layer is missing vital information required for rendering'
-    //    );
-    //  }
-    //}
+      else {
+    // } catch (error) {
+        // VT: If portal-core-ui is unable to render the layer, it must be a auscope specific layer. E.g Iris
+        try {
+          this.auscopeMapService.addLayer(layer, param);
+        } catch (error) {
+          alert(
+            'Unable to render layer as this layer is missing vital information required for rendering'
+          );
+        }
+      }
+    // }
 
     // If on a small screen, when a new layer is added, roll up the sidebar to expose the map */
     if ($('#sidebar-toggle-btn').css('display') !== 'none') {
