@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { LayerModel } from 'portal-core-ui';
-import { OnlineResourceModel } from 'portal-core-ui';
-import { QuerierInfoModel } from 'portal-core-ui';
+import { LayerModel } from '@auscope/portal-core-ui';
+import { OnlineResourceModel } from '@auscope/portal-core-ui';
+import { QuerierInfoModel } from '@auscope/portal-core-ui';
 import { MSCLService, Metric } from '../../../layeranalytic/mscl/mscl.service';
 import {BsModalService, BsModalRef} from 'ngx-bootstrap/modal';
 import {MSCLAnalyticComponent} from '../../../layeranalytic/mscl/mscl.analytic.component';

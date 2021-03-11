@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import { OlClipboardService } from 'portal-core-ui';
+import { OlClipboardService } from '@auscope/portal-core-ui';
 
 
 @Component({

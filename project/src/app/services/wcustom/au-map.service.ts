@@ -1,7 +1,7 @@
-import { LayerModel } from 'portal-core-ui';
-import { OlMapObject } from 'portal-core-ui';
-import { OlMapService } from 'portal-core-ui';
-import { OlCSWService } from 'portal-core-ui';
+import { LayerModel } from '@auscope/portal-core-ui';
+import { OlMapObject } from '@auscope/portal-core-ui';
+import { OlMapService } from '@auscope/portal-core-ui';
+import { OlCSWService } from '@auscope/portal-core-ui';
 import { OlIrisService } from './../wcustom/iris/ol-iris.service';
 import { Injectable } from '@angular/core';
 

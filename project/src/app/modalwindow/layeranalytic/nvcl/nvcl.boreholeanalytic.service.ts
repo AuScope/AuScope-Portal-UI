@@ -2,8 +2,8 @@
 import {throwError as observableThrowError,  Observable } from 'rxjs';
 
 import {catchError, map} from 'rxjs/operators';
-import { LayerModel } from 'portal-core-ui';
-import { LayerHandlerService } from 'portal-core-ui';
+import { LayerModel } from '@auscope/portal-core-ui';
+import { LayerHandlerService } from '@auscope/portal-core-ui';
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
