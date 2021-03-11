@@ -1,9 +1,9 @@
-import { Bbox } from 'portal-core-ui';
-import { LayerModel } from 'portal-core-ui';
-import { LayerHandlerService } from 'portal-core-ui';
-import { OlMapService } from 'portal-core-ui';
-import { RenderStatusService } from 'portal-core-ui';
-import { Constants } from 'portal-core-ui';
+import { Bbox } from '@auscope/portal-core-ui';
+import { LayerModel } from '@auscope/portal-core-ui';
+import { LayerHandlerService } from '@auscope/portal-core-ui';
+import { OlMapService } from '@auscope/portal-core-ui';
+import { RenderStatusService } from '@auscope/portal-core-ui';
+import { Constants } from '@auscope/portal-core-ui';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { CataloguesearchService } from './cataloguesearch.service';

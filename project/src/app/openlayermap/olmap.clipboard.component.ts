@@ -1,4 +1,4 @@
-import { OlClipboardService, Polygon } from 'portal-core-ui';
+import { OlClipboardService, Polygon } from '@auscope/portal-core-ui';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
