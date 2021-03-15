@@ -1,27 +1,28 @@
-import { LayerModel } from 'portal-core-ui';
-import { LayerHandlerService } from 'portal-core-ui';
-import { FilterPanelService } from 'portal-core-ui';
-import { OlMapService } from 'portal-core-ui';
-import { OlClipboardService } from 'portal-core-ui';
+import { LayerModel } from '@auscope/portal-core-ui';
+import { LayerHandlerService } from '@auscope/portal-core-ui';
+import { FilterPanelService } from '@auscope/portal-core-ui';
+import { OlMapService } from '@auscope/portal-core-ui';
+import { OlClipboardService } from '@auscope/portal-core-ui';
 import * as $ from 'jquery';
-import { UtilitiesService } from 'portal-core-ui';
+import { UtilitiesService } from '@auscope/portal-core-ui';
 import { Component, Input, OnInit } from '@angular/core';
 import * as _ from 'lodash';
 import { environment } from '../../../../environments/environment';
 import { ref } from '../../../../environments/ref';
 import { LayerAnalyticModalComponent } from '../../../modalwindow/layeranalytic/layer.analytic.modal.component';
-import { ManageStateService } from 'portal-core-ui';
+import { ManageStateService } from '@auscope/portal-core-ui';
 import { AuMapService } from '../../../services/wcustom/au-map.service';
 import { OlIrisService } from '../../../services/wcustom/iris/ol-iris.service';
 import { BsModalService } from 'ngx-bootstrap/modal';
-import { OlWMSService } from 'portal-core-ui';
+import { OlWMSService } from '@auscope/portal-core-ui';
+import { LayerStatusService } from '@auscope/portal-core-ui';
 
 declare var gtag: Function;
 
 @Component({
   selector: 'app-filter-panel',
   templateUrl: './filterpanel.component.html',
-  providers: [AuMapService, OlIrisService],
+  providers: [AuMapService, OlIrisService, LayerStatusService],
   styleUrls: ['./filterpanel.component.scss', '../../menupanel.scss']
 })
 export class FilterPanelComponent implements OnInit {
@@ -43,7 +44,8 @@ export class FilterPanelComponent implements OnInit {
     private modalService: BsModalService,
     private manageStateService: ManageStateService,
     private olClipboardService: OlClipboardService,
-    private olWMSService: OlWMSService
+    private olWMSService: OlWMSService,
+    public layerStatus: LayerStatusService
   ) {
     this.providers = [];
     this.optionalFilters = [];

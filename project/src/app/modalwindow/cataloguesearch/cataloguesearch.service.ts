@@ -4,7 +4,7 @@ import {throwError as observableThrowError,  Observable } from 'rxjs';
 import {map, catchError} from 'rxjs/operators';
 
 import { environment } from '../../../environments/environment';
-import { LayerModel } from 'portal-core-ui';
+import { LayerModel } from '@auscope/portal-core-ui';
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpParams, HttpHeaders, HttpResponse} from '@angular/common/http';
 import { OnlineResourceModel } from 'portal-core-ui';

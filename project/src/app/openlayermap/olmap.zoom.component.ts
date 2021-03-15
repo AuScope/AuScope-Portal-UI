@@ -1,4 +1,4 @@
-import { OlMapService } from 'portal-core-ui';
+import { OlMapService } from '@auscope/portal-core-ui';
 import { Component } from '@angular/core';
 
 
