@@ -1,4 +1,4 @@
-import { CsMapService } from 'portal-core-ui';
+import { CsMapService } from '@auscope/portal-core-ui';
 import { Component } from '@angular/core';
 
 

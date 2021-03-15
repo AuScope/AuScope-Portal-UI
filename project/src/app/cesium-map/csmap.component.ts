@@ -1,7 +1,7 @@
 import { config } from '../../environments/config';
 import { ref } from '../../environments/ref';
 import { QuerierModalComponent } from '../modalwindow/querier/querier.modal.component';
-import { CSWRecordModel } from 'portal-core-ui';
+import { CSWRecordModel } from '@auscope/portal-core-ui';
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 //import olZoom from 'ol/control/Zoom';
 //import olScaleLine from 'ol/control/ScaleLine';
@@ -10,15 +10,15 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 //import * as olCoordinate from 'ol/coordinate';
 import { ViewerConfiguration } from 'angular-cesium';
 declare var Cesium: any;
-import { CsMapObject } from 'portal-core-ui';
-import { CsMapService } from 'portal-core-ui';
-import { ManageStateService } from 'portal-core-ui';
-import { CsCSWService } from 'portal-core-ui';
-import { QueryWFSService } from 'portal-core-ui';
-import { QueryWMSService } from 'portal-core-ui';
-import { GMLParserService } from 'portal-core-ui';
-import { SimpleXMLService } from 'portal-core-ui';
-import { UtilitiesService } from 'portal-core-ui';
+import { CsMapObject } from '@auscope/portal-core-ui';
+import { CsMapService } from '@auscope/portal-core-ui';
+import { ManageStateService } from '@auscope/portal-core-ui';
+import { CsCSWService } from '@auscope/portal-core-ui';
+import { QueryWFSService } from '@auscope/portal-core-ui';
+import { QueryWMSService } from '@auscope/portal-core-ui';
+import { GMLParserService } from '@auscope/portal-core-ui';
+import { SimpleXMLService } from '@auscope/portal-core-ui';
+import { UtilitiesService } from '@auscope/portal-core-ui';
 
 @Component({
   selector: 'app-cs-map',

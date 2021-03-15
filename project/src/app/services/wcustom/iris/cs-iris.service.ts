@@ -3,13 +3,13 @@ import {throwError as observableThrowError,  Observable } from 'rxjs';
 
 import {catchError, map} from 'rxjs/operators';
 
-import { CSWRecordModel } from 'portal-core-ui';
+import { CSWRecordModel } from '@auscope/portal-core-ui';
 import { Injectable, Inject } from '@angular/core';
 import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
-import {LayerModel} from 'portal-core-ui';
-import { OnlineResourceModel } from 'portal-core-ui';
-import { LayerHandlerService } from 'portal-core-ui';
-import { CsMapObject } from 'portal-core-ui';
+import {LayerModel} from '@auscope/portal-core-ui';
+import { OnlineResourceModel } from '@auscope/portal-core-ui';
+import { LayerHandlerService } from '@auscope/portal-core-ui';
+import { CsMapObject } from '@auscope/portal-core-ui';
 import olMap from 'ol/Map';
 import olLayerVector from 'ol/layer/Vector';
 import olSourceVector from 'ol/source/Vector';
@@ -19,8 +19,8 @@ import olStyleCircle from 'ol/style/Circle';
 import olStyleFill from 'ol/style/Fill';
 import olStyleStroke from 'ol/style/Stroke';
 import olStyleText from 'ol/style/Text';
-import { Constants } from 'portal-core-ui';
-import { RenderStatusService } from 'portal-core-ui';
+import { Constants } from '@auscope/portal-core-ui';
+import { RenderStatusService } from '@auscope/portal-core-ui';
 
 /**
  * Use Cesium to add layer to map. This service class adds wfs layer to the map

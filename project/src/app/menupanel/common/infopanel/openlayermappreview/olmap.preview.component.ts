@@ -1,6 +1,6 @@
-import { OlMapObject } from 'portal-core-ui';
-import { OlMapService } from 'portal-core-ui';
-import { Constants } from 'portal-core-ui';
+import { OlMapObject } from '@auscope/portal-core-ui';
+import { OlMapService } from '@auscope/portal-core-ui';
+import { Constants } from '@auscope/portal-core-ui';
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import olStyle from 'ol/style/Style';
 import olView from 'ol/View';

@@ -1,4 +1,4 @@
-import { CsClipboardService, Polygon } from 'portal-core-ui';
+import { CsClipboardService, Polygon } from '@auscope/portal-core-ui';
 import { Component, OnInit } from '@angular/core';
 
 // TODO: Convert to cesium

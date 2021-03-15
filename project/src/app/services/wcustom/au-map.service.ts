@@ -1,7 +1,7 @@
-import { LayerModel } from 'portal-core-ui';
-import { CsMapObject } from 'portal-core-ui';
-import { CsMapService } from 'portal-core-ui';
-import { CsCSWService } from 'portal-core-ui';
+import { LayerModel } from '@auscope/portal-core-ui';
+import { CsMapObject } from '@auscope/portal-core-ui';
+import { CsMapService } from '@auscope/portal-core-ui';
+import { CsCSWService } from '@auscope/portal-core-ui';
 import { CsIrisService } from './../wcustom/iris/cs-iris.service';
 import { Injectable } from '@angular/core';
 

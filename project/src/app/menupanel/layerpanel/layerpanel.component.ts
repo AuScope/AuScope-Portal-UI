@@ -1,17 +1,17 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { LayerHandlerService } from 'portal-core-ui';
+import { LayerHandlerService } from '@auscope/portal-core-ui';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
-import { LayerModel } from 'portal-core-ui';
-import { CsMapService } from 'portal-core-ui';
-import { CsClipboardService } from 'portal-core-ui';
+import { LayerModel } from '@auscope/portal-core-ui';
+import { CsMapService } from '@auscope/portal-core-ui';
+import { CsClipboardService } from '@auscope/portal-core-ui';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
-import { RenderStatusService } from 'portal-core-ui';
-import { ManageStateService } from 'portal-core-ui';
-import { UtilitiesService } from 'portal-core-ui';
+import { RenderStatusService } from '@auscope/portal-core-ui';
+import { ManageStateService } from '@auscope/portal-core-ui';
+import { UtilitiesService } from '@auscope/portal-core-ui';
 import {config} from '../../../environments/config';
 import { MatSliderChange } from '@angular/material/slider';
-import { KeysPipe } from 'portal-core-ui'; // Necessary for 'getKey' pipe in "layerpanel.component.html"
+import { KeysPipe } from '@auscope/portal-core-ui'; // Necessary for 'getKey' pipe in "layerpanel.component.html"
 
 
 @Component({
