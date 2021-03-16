@@ -111,6 +111,31 @@ export class CsIrisService {
       return dotStyle;
     }
 
+  private styleIrisEntity(entity) {
+    if (entity.name) {
+      entity.label = new Cesium.LabelGraphics({
+        text: entity.name,
+        showBackground: false,
+        fillColor: Cesium.Color.BLACK,
+        font: '12px roboto,sans-serif',
+        style: Cesium.LabelStyle.FILL,
+        pixelOffset: new Cesium.Cartesian2(9, -2),
+        horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
+			  distanceDisplayCondition: new Cesium.DistanceDisplayCondition(1.0, 8000000.0),
+			  disableDepthTestDistance: Number.POSITIVE_INFINITY
+      });
+      entity.point = new Cesium.PointGraphics({
+        color: Cesium.Color.PURPLE,
+        outlineColor: Cesium.Color.WHITE,
+        outlineWidth: 2,
+        pixelSize: 8,
+	      disableDepthTestDistance: Number.POSITIVE_INFINITY,
+			  distanceDisplayCondition: new Cesium.DistanceDisplayCondition(1.0, 8000000.0)
+      });
+      entity.billboard = null;
+    }
+  }
+
   /**
    * Add the wfs layer
    * @param layer the layer to add to the map
@@ -134,48 +159,14 @@ export class CsIrisService {
           camera: viewer.scene.camera,
           canvas: viewer.scene.canvas
         };
+        const stylefn = this.styleIrisEntity;
         var source = new Cesium.KmlDataSource(options);
         source.load(dom).then(function(dataSource) {
-          var entities = dataSource.entities.values;
-          console.log("entities=", entities);
-          for(var i=0; i<entities.length; i++) {
-		        var entity = entities[i];
-            if (entity.label) {
-			        entity.label.showBackground = true;
-			        entity.label.backgroundColor = new Cesium.Color.fromRandom({red : 0.1, maximumGreen : 0.8, minimumBlue : 0.1, alpha : 0.5});
-			        entity.label.fillColor = Cesium.Color.YELLOW;
-			        entity.label.outlineColor = Cesium.Color.RED;
-			        entity.label.distanceDisplayCondition = new Cesium.DistanceDisplayCondition(1.0, 8000000.0);
-			        entity.label.disableDepthTestDistance = Number.POSITIVE_INFINITY;
-		        }
-		        if (entity.billboard) {
-			        entity.billboard.color = new Cesium.Color.fromRandom({red : 0.5, maximumGreen : 0.3, minimumBlue : 0.5, alpha : 1.0});
-			        entity.billboard.disableDepthTestDistance = Number.POSITIVE_INFINITY;
-			        entity.billboard.distanceDisplayCondition = new Cesium.DistanceDisplayCondition(1.0, 8000000.0);
-		        }
+          for (const entity of dataSource.entities.values) {
+            stylefn(entity);
           }
           viewer.dataSources.add(dataSource);
-        }
-                                                        );
-
-
-
-        // // Set extractStyles = false to disable default style
-        // const features = new olFormatKML({extractStyles: false}).readFeatures(response, {
-        //   dataProjection: 'EPSG:4326',
-        //   featureProjection: Constants.MAP_PROJ
-        // });
-        // // Loop over features and apply new style and LayerVector for each feature
-        // features.forEach(feature => {
-
-          // const kmlLayer = new olLayerVector({
-          //   source: new olSourceVector({features: []}),
-          //   style: this.irisStyleFunction(feature.get('name'))
-          // });
-          // feature.layer = layer;
-          // kmlLayer.getSource().addFeature(feature);
-          // this.csMapObject.addLayerById(kmlLayer, layer.id);
-        // });
+        });
       },
         err => {
           this.renderStatusService.updateComplete(layer, onlineResource, true);
