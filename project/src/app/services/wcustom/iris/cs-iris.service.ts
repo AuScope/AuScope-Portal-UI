@@ -19,8 +19,11 @@ import olStyleCircle from 'ol/style/Circle';
 import olStyleFill from 'ol/style/Fill';
 import olStyleStroke from 'ol/style/Stroke';
 import olStyleText from 'ol/style/Text';
+import { MapsManagerService } from 'angular-cesium';
 import { Constants } from 'portal-core-ui';
 import { RenderStatusService } from 'portal-core-ui';
+
+declare var Cesium: any;
 
 /**
  * Use Cesium to add layer to map. This service class adds wfs layer to the map
@@ -30,9 +33,12 @@ export class CsIrisService {
 
   private map: olMap;
 
-  constructor(private csMapObject: CsMapObject, private layerHandlerService: LayerHandlerService,
-                  private http: HttpClient,
-                  private renderStatusService: RenderStatusService, @Inject('env') private env) {
+  constructor(private csMapObject: CsMapObject,
+              private layerHandlerService: LayerHandlerService,
+              private http: HttpClient,
+              private renderStatusService: RenderStatusService,
+              private mapsManagerService: MapsManagerService,
+              @Inject('env') private env) {
     this.map = this.csMapObject.getMap();
   }
 
@@ -105,6 +111,31 @@ export class CsIrisService {
       return dotStyle;
     }
 
+  private styleIrisEntity(entity) {
+    if (entity.name) {
+      entity.label = new Cesium.LabelGraphics({
+        text: entity.name,
+        showBackground: false,
+        fillColor: Cesium.Color.BLACK,
+        font: '12px roboto,sans-serif',
+        style: Cesium.LabelStyle.FILL,
+        pixelOffset: new Cesium.Cartesian2(9, -2),
+        horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
+			  distanceDisplayCondition: new Cesium.DistanceDisplayCondition(1.0, 8000000.0),
+			  disableDepthTestDistance: Number.POSITIVE_INFINITY
+      });
+      entity.point = new Cesium.PointGraphics({
+        color: Cesium.Color.PURPLE,
+        outlineColor: Cesium.Color.WHITE,
+        outlineWidth: 2,
+        pixelSize: 8,
+	      disableDepthTestDistance: Number.POSITIVE_INFINITY,
+			  distanceDisplayCondition: new Cesium.DistanceDisplayCondition(1.0, 8000000.0)
+      });
+      entity.billboard = null;
+    }
+  }
+
   /**
    * Add the wfs layer
    * @param layer the layer to add to the map
@@ -118,21 +149,23 @@ export class CsIrisService {
       this.renderStatusService.addResource(layer, onlineResource);
 
       this.getKMLFeature(layer, onlineResource).subscribe(response => {
+        const parser = new DOMParser();
+        const dom = parser.parseFromString(response, "application/xml");
+
         this.renderStatusService.updateComplete(layer, onlineResource);
-        // Set extractStyles = false to disable default style
-        const features = new olFormatKML({extractStyles: false}).readFeatures(response, {
-          dataProjection: 'EPSG:4326',
-          featureProjection: Constants.MAP_PROJ
-        });
-        // Loop over features and apply new style and LayerVector for each feature
-        features.forEach(feature => {
-          const kmlLayer = new olLayerVector({
-            source: new olSourceVector({features: []}),
-            style: this.irisStyleFunction(feature.get('name'))
-          });
-          feature.layer = layer;
-          kmlLayer.getSource().addFeature(feature);
-          this.csMapObject.addLayerById(kmlLayer, layer.id);
+
+        const viewer = this.getViewer();
+        const options = {
+          camera: viewer.scene.camera,
+          canvas: viewer.scene.canvas
+        };
+        const stylefn = this.styleIrisEntity;
+        var source = new Cesium.KmlDataSource(options);
+        source.load(dom).then(function(dataSource) {
+          for (const entity of dataSource.entities.values) {
+            stylefn(entity);
+          }
+          viewer.dataSources.add(dataSource);
         });
       },
         err => {
@@ -145,5 +178,8 @@ export class CsIrisService {
 
   }
 
+  private getViewer() {
+    return this.mapsManagerService.getMap().getCesiumViewer();
+  }
 
 }
