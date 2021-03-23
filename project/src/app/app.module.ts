@@ -31,7 +31,7 @@ import { CsMapZoomComponent } from './cesium-map/csmap.zoom.component';
 import { NgbdModalStatusReportComponent } from './toppanel/renderstatus/renderstatus.component';
 import { CsMapClipboardComponent } from './cesium-map/csmap.clipboard.component';
 
-import { AngularCesiumModule } from 'angular-cesium';
+import { AngularCesiumModule, AngularCesiumWidgetsModule } from 'angular-cesium';
 
 import { NotificationComponent } from './toppanel/notification/notification.component';
 import { QuerierModalComponent } from './modalwindow/querier/querier.modal.component';
@@ -119,7 +119,8 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     BrowserAnimationsModule,
     BsDropdownModule.forRoot(),
     CommonModule, PlotlyViaCDNModule,
-    AngularCesiumModule.forRoot()
+    AngularCesiumModule.forRoot(),
+    AngularCesiumWidgetsModule
   ],
   entryComponents: [
     NgbdModalStatusReportComponent,

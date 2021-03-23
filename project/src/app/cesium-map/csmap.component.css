@@ -11,3 +11,13 @@
 .card .card-body .btn-active {
         background-color: rgba(17,216,66,0.8);
     }
+
+
+.editor-box {
+    position: fixed;
+    top: 100px;
+    right: 10px;
+    width:205px;
+    height:110px;
+    z-index: 100;
+}    
