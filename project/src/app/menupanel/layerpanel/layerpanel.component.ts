@@ -193,6 +193,7 @@ export class LayerPanelComponent implements OnInit {
               me.layerGroups = response;
               for (const key in me.layerGroups) {
                 for (let i = 0; i < me.layerGroups[key].length; i++) {
+                  me.layerGroups[key][i].csImgLayers = [];
                   const uiLayerModel = new UILayerModel(me.layerGroups[key][i].id, me.renderStatusService.getStatusBSubject(me.layerGroups[key][i]));
                   // VT: permanent link
                   if (layerStateObj && layerStateObj[uiLayerModel.id]) {
@@ -246,8 +247,8 @@ export class LayerPanelComponent implements OnInit {
     /**
      * Layer opacity slider change event
      */
-    public layerOpacityChange(event: MatSliderChange, layerId: string) {
-      this.csMapService.setLayerOpacity(layerId, (event.value / 100));
+    public layerOpacityChange(event: MatSliderChange, layer: LayerModel) {
+      this.csMapService.setLayerOpacity(layer, (event.value / 100));
     }
 
 }

@@ -3,14 +3,8 @@ import { ref } from '../../environments/ref';
 import { QuerierModalComponent } from '../modalwindow/querier/querier.modal.component';
 import { CSWRecordModel } from '@auscope/portal-core-ui';
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-//import olZoom from 'ol/control/Zoom';
-//import olScaleLine from 'ol/control/ScaleLine';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
-//import olControlMousePosition from 'ol/control/MousePosition';
-//import * as olCoordinate from 'ol/coordinate';
 import { ViewerConfiguration } from 'angular-cesium';
-declare var Cesium: any;
-import { CsMapObject } from '@auscope/portal-core-ui';
 import { CsMapService } from '@auscope/portal-core-ui';
 import { ManageStateService } from '@auscope/portal-core-ui';
 import { CsCSWService } from '@auscope/portal-core-ui';
@@ -19,6 +13,8 @@ import { QueryWMSService } from '@auscope/portal-core-ui';
 import { GMLParserService } from '@auscope/portal-core-ui';
 import { SimpleXMLService } from '@auscope/portal-core-ui';
 import { UtilitiesService } from '@auscope/portal-core-ui';
+
+import { MapMode2D, ScreenSpaceEventType, Rectangle } from 'cesium';
 
 @Component({
   selector: 'app-cs-map',
@@ -39,23 +35,21 @@ export class CsMapComponent implements AfterViewInit {
 
   name = 'Angular';
   cesiumLoaded = true;
-  Cesium = Cesium;
   viewer: any;
-  //Viewer viewer;
 
 
   ngOnInit() {
-      console.log('load main map')
+      console.log('load main map');
   }
 
   private bsModalRef: BsModalRef;
 
-  constructor(public csMapObject: CsMapObject, private csMapService: CsMapService, private modalService: BsModalService,
+  constructor(private csMapService: CsMapService, private modalService: BsModalService,
     private queryWFSService: QueryWFSService, private queryWMSService: QueryWMSService, private gmlParserService: GMLParserService,
     private manageStateService: ManageStateService, private viewerConf: ViewerConfiguration) {
-    this.csMapService.getClickedLayerListBS().subscribe(mapClickInfo => {
-      this.handleLayerClick(mapClickInfo);
-    });
+    // FIXME this.csMapService.getClickedLayerListBS().subscribe(mapClickInfo => {
+    //  this.handleLayerClick(mapClickInfo);
+    //});
 
     // viewerOptions will be passed the Cesium.Viewer constuctor
     viewerConf.viewerOptions = {
@@ -72,60 +66,39 @@ export class CsMapComponent implements AfterViewInit {
       geocoder: false,
       navigationHelpButton: false,
       navigationInstructionsInitiallyVisible: false,
-      mapMode2D: Cesium.MapMode2D.ROTATE,
+      mapMode2D: MapMode2D.ROTATE,
     };
     // Will be called on viewer initialistion
     viewerConf.viewerModifier = (viewer: any) => {
       // Remove default double click zoom behaviour
-      viewer.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
-      /*viewer.imageryLayers.addImageryProvider(
-        new Cesium.WebMapServiceImageryProvider({
-          url:
-            "https://nationalmap.gov.au/proxy/http://geoserver.nationalmap.nicta.com.au/geotopo_250k/ows",
-          layers: "Hydrography:bores",
-          parameters: {
-            transparent: true,
-            format: "image/png",
-          },
-        })
-      );*/
+      viewer.screenSpaceEventHandler.removeInputAction(ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+
       // Look at Australia
       viewer.camera.setView({
-        destination: Cesium.Rectangle.fromDegrees(
-          114.591,
-          -45.837,
-          148.97,
-          -5.73
-        ),
+        destination: Rectangle.fromDegrees(114.591, -45.837, 148.97, -5.73),
       });
       this.viewer = viewer;
     };
+
   }
 
   getViewer() {
     return this.viewer;
   }
 
-  // After view init the map target can be set!
   ngAfterViewInit() {
 
-    // Add a WMS imagery layer
+    this.csMapService.init();
 
-    //const mousePositionControl = new olControlMousePosition({
-    //  coordinateFormat: olCoordinate.createStringXY(4),
-    //  projection: 'EPSG:4326',
-    //  target: document.getElementById('mouse-position'),
-    //  undefinedHTML: 'Mouse out of range'
-    //});
+    // TODO: Add a cesium widget to display coordinates of mouse 
 
-    //this.olMapObject.addControlToMap(mousePositionControl);
-    //this.olMapObject.addControlToMap(new olZoom());
-    //this.olMapObject.addControlToMap(new olScaleLine('metric'));
-    //this.olMapObject.addGeocoderToMap();
+    // TODO: Add a cesium widget to zoom in/out on map
+  
+    // TODO: Add a cesium widget to display map scale
+    
+    // TODO: Add a cesium geocoder widget
 
-    //this.olMapObject.getMap().setTarget(this.mapElement.nativeElement.id);
-
-    // VT: permanent link(open borehole in external window)
+    // This code is used to display the map state stored in a permanent link
     const state = UtilitiesService.getUrlParameterByName('state');
     if (state) {
       const me = this;

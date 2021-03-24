@@ -5,11 +5,11 @@ import {catchError, map} from 'rxjs/operators';
 
 import { CSWRecordModel } from '@auscope/portal-core-ui';
 import { Injectable, Inject } from '@angular/core';
-import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
+import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import {LayerModel} from '@auscope/portal-core-ui';
 import { OnlineResourceModel } from '@auscope/portal-core-ui';
 import { LayerHandlerService } from '@auscope/portal-core-ui';
-import { CsMapObject } from '@auscope/portal-core-ui';
+// import { CsMapObject } from '@auscope/portal-core-ui';
 import olMap from 'ol/Map';
 import olLayerVector from 'ol/layer/Vector';
 import olSourceVector from 'ol/source/Vector';
@@ -30,10 +30,10 @@ export class CsIrisService {
 
   private map: olMap;
 
-  constructor(private csMapObject: CsMapObject, private layerHandlerService: LayerHandlerService,
+  constructor(private layerHandlerService: LayerHandlerService,
                   private http: HttpClient,
                   private renderStatusService: RenderStatusService, @Inject('env') private env) {
-    this.map = this.csMapObject.getMap();
+    // FIXME this.map = this.csMapObject.getMap();
   }
 
   /**
@@ -132,7 +132,7 @@ export class CsIrisService {
           });
           feature.layer = layer;
           kmlLayer.getSource().addFeature(feature);
-          this.csMapObject.addLayerById(kmlLayer, layer.id);
+          // FIXME this.csMapObject.addLayerById(kmlLayer, layer.id);
         });
       },
         err => {
