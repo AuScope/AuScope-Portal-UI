@@ -63,6 +63,8 @@ import { MSCLAnalyticComponent } from './modalwindow/layeranalytic/mscl/mscl.ana
 
 
 import { PlotlyViaCDNModule } from 'angular-plotly.js';
+import { OlmapactivelayersComponent } from './menupanel/olmapactivelayers/olmapactivelayers.component';
+
 
 // Using CDN module to avoid bug https://github.com/plotly/angular-plotly.js/issues/75
 PlotlyViaCDNModule.plotlyVersion = '1.53.0';
@@ -102,7 +104,8 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     DisclaimerModalComponent,
     PortalDetailsPanelComponent,
     MSCLComponent,
-    MSCLAnalyticComponent
+    MSCLAnalyticComponent,
+    OlmapactivelayersComponent,
   ],
   providers: [],
   imports: [
@@ -122,7 +125,8 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     NgxChartsModule,
     BrowserAnimationsModule,
     BsDropdownModule.forRoot(),
-    CommonModule, PlotlyViaCDNModule
+    CommonModule, 
+    PlotlyViaCDNModule, 
   ],
   entryComponents: [
     NgbdModalStatusReportComponent,
@@ -150,7 +154,8 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     ClipboardComponent,
     OlMapClipboardComponent,
     OlmapBaselayerselectorComponent,
-    PortalDetailsPanelComponent
+    PortalDetailsPanelComponent,
+    OlmapactivelayersComponent
   ]
 })
 export class AppModule { }
