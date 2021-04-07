@@ -1,9 +1,9 @@
-import { Bbox } from 'portal-core-ui';
-import { LayerModel } from 'portal-core-ui';
-import { LayerHandlerService } from 'portal-core-ui';
-import { OlMapService } from 'portal-core-ui';
-import { RenderStatusService } from 'portal-core-ui';
-import { Constants } from 'portal-core-ui';
+import { Bbox } from '@auscope/portal-core-ui';
+import { LayerModel } from '@auscope/portal-core-ui';
+import { LayerHandlerService } from '@auscope/portal-core-ui';
+import { OlMapService } from '@auscope/portal-core-ui';
+import { RenderStatusService } from '@auscope/portal-core-ui';
+import { Constants } from '@auscope/portal-core-ui';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
 import { UILayerModel } from '../../menupanel/common/model/ui/uilayer.model';
 import { CataloguesearchService } from './cataloguesearch.service';
@@ -11,19 +11,21 @@ import { Component, AfterViewInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import * as Proj from 'ol/proj';
 import { RecordModalComponent } from './record.modal.component';
-import { BsModalRef } from 'ngx-bootstrap/modal';
+import { Registry } from '../../shared/modules/registry.model';
+import { routerTransition } from '../../router.animations';
 
 // List of valid online resource types that can be added to the map
 const VALID_ONLINE_RESOURCE_TYPES: string[] = ['WMS', 'WFS', 'CSW', 'WWW'];
 
 @Component({
-    selector: 'app-catalogue-search-modal-window',
-    templateUrl: './cataloguesearch.modal.component.html',
-    styleUrls: ['./cataloguesearch.modal.component.scss', '../../menupanel/menupanel.scss']
+    selector: 'app-catalogue-search-component',
+    templateUrl: './cataloguesearch.component.html',
+    styleUrls: ['./cataloguesearch.component.scss', '../../menupanel/menupanel.scss'],
+    animations: [routerTransition()]
 })
 
 
-export class CatalogueSearchModalComponent implements AfterViewInit {
+export class CatalogueSearchComponent implements AfterViewInit {
 
   drawStarted: boolean;
   bbox: Bbox;
@@ -39,10 +41,10 @@ export class CatalogueSearchModalComponent implements AfterViewInit {
   statusmsg: string;
   totalResults = [];
   currentPage: number;
+  availableServices: any = [];
  
   constructor(private olMapService: OlMapService, private cataloguesearchService: CataloguesearchService,
-    private renderStatusService: RenderStatusService, public modalRef: BsModalRef, private modalService: NgbModal, 
-        private layerHandlerService: LayerHandlerService) {    
+    private renderStatusService: RenderStatusService, private modalService: NgbModal, private layerHandlerService: LayerHandlerService) {    
     this.drawStarted = false;
     this.searchMode = true;
     this.uiLayerModels = {};
@@ -56,9 +58,19 @@ export class CatalogueSearchModalComponent implements AfterViewInit {
     }
 
   }
+  
+  ngOnInit(): void {
+      // Define available services
+      this.availableServices = [
+          { 'id': 'wcs', 'name': 'WCS', 'checked': false },
+          { 'id': 'ncss', 'name': 'NCSS', 'checked': false },
+          { 'id': 'opendap', 'name': 'OPeNDAP', 'checked': false },
+          { 'id': 'wfs', 'name': 'WFS', 'checked': false },
+          { 'id': 'wms', 'name': 'WMS', 'checked': false }];
+  }
 
   ngAfterViewInit(): void {
-    this.cataloguesearchService.getCSWServices().subscribe(response => {
+      this.cataloguesearchService.getCSWServices().subscribe(response => {
       this.cswRegistries = response;
 
       for (const reg of this.cswRegistries) {
@@ -257,6 +269,32 @@ export class CatalogueSearchModalComponent implements AfterViewInit {
                 }
             }
         }
-    }    
+    } 
+    
+    /**
+     * Get service information
+     *
+     * @param id the ID of the service
+     */
+    public getService(id: string): any {
+        return this.availableServices.find(s => s.id === id);
+    }
+    
+    /**
+     *
+     */
+    public getTotalSearchResultCount(): number {
+        let count: number = 0;
+        this.cswRegistries.forEach((registry: Registry) => {
+            count += registry.recordsMatched;
+        });
+        return count;
+    }
+    
+    
+    /* on Dragging of the gutter between map and datasets search input area resize the map */
+    onDrag() {
+          this.olMapService.updateSize();
+    }   
 
 }

@@ -1,0 +1,52 @@
+.card {
+    font-size: small;
+    border-width: 0;
+    .card-body {
+        padding: 6px;
+        .row {
+            margin-bottom: 10px;
+        }
+        li {
+            list-style-type: none;
+        }
+        .submenu-header {
+            padding: 4px;
+            cursor: pointer;
+            background: #eee;
+        }
+        /* Get rid of borders and grey background from checkboxes */
+        .input-group-text {
+            border: none;
+            background: none;
+        }
+    }
+}
+
+.btn {
+    cursor: pointer;
+}
+
+.spinner {
+    margin-top: 32px;
+}
+
+.split-area-search {
+    z-index: 1;
+}
+
+.split-area-map {
+    z-index: 0;
+}
+
+.datasets-split {
+    ::ng-deep {
+        split-gutter {
+            z-index: 1;
+        }
+    }
+}
+
+// Tabs
+.tab-text {
+    font-size: small;
+}

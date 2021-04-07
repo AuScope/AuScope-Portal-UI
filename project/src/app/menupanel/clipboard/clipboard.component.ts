@@ -1,13 +1,14 @@
-import {Component} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import { OlClipboardService } from '@auscope/portal-core-ui';
 
-
 @Component({
-  selector: '[appFilterClipboard]',
+  selector: 'appFilterClipboard',
   templateUrl: './clipboard.component.html'
 })
 
 export class ClipboardComponent {
+  // True if the component label should be shown, false if it should be hidden
+  @Input() public showLabel;
 
   public isClipboardShown;
 

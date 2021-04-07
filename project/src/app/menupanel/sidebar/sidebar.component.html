@@ -1,0 +1,65 @@
+<nav class="sidebar d-flex flex-column" class="sidebar slimscroll sidebar-collapse show" style="overflow: auto;">
+<!--  [ngClass]="{'sidebarPushRight': isActive}" [ngStyle]="setSidebarStyle()"-->
+    <div class="list-group common-items">
+    
+            <h6 class="sidebar-heading">Menu</h6>
+            <h5 class="mb-1">
+                <a [routerLink]="['home']" [routerLinkActive]="['router-link-active']" class="mb-0">
+                    <i class="ti-home"></i><span *ngIf="isSidebarExpanded">{{ 'Home' }}</span>
+                </a>
+            </h5>    
+            <h5><a href="http://www.auscope.org.au/"><i class="ti-info-alt"></i><span *ngIf="isSidebarExpanded">{{ 'About Us' }}</span></a></h5>
+            <h5><a href="https://confluence.csiro.au/display/AusGRID/AuScope+Portal+User+Guide"><i class="ti-book"></i><span *ngIf="isSidebarExpanded">{{ 'User Guide' }}</span></a></h5>
+            <h5><a href="mailto:cg-admin@csiro.au?Subject=Auscope-portal"><i class="ti-email"></i><span *ngIf="isSidebarExpanded">{{ 'Contact Us' }}</span></a></h5>
+            <appPermanentLink class="hasEvent" [showLabel]="isSidebarExpanded"></appPermanentLink>
+            <appFilterClipboard class="hasEvent d-none d-md-block" [showLabel]="isSidebarExpanded"></appFilterClipboard>
+            <!-- 
+            <li class="hasEvent" appPermanentLink></li>
+            <li class="hasEvent d-none d-md-block" appFilterClipboard></li>
+            -->
+            <hr/>
+            <h6 class="sidebar-heading">Layer Selection</h6>
+            <!-- BEGIN All Layers -->
+            <input type="checkbox" class="menuBtn" id="allLayersBtn"/>
+            <h5 class="mb-1">
+                <label id="allLayersLink" for="allLayersBtn" class="mb-0">
+                    <i class="ti-layers"></i>
+                    <span *ngIf="isSidebarExpanded">{{ 'All Layers' }}</span>
+                    <i class="fa fa-arrow-circle-down"></i>
+                </label>
+                <ul class="card-sub"appLayerPanel></ul>
+            </h5>
+            <!-- END All Layers -->
+
+            <!-- BEGIN Custom Layers -->
+            <input type="checkbox" class="menuBtn" id="customLayersBtn"/>
+            <h5 class="mb-1">
+                <label for="customLayersBtn" class="mb-0">
+                    <i class="ti-pencil-alt"></i>
+                    <span *ngIf="isSidebarExpanded">{{ 'Custom Layer' }}</span>
+                    <i class="fa fa-arrow-circle-down"></i>
+                </label>
+                <ul class="card-sub" appCustomPanel></ul>
+            </h5>
+            <!-- END Custom Layers -->
+
+            <!-- BEGIN Catalogue Search -->
+            <h5 class="mb-1">
+                <a [routerLink]="['cataloguesearch']" [routerLinkActive]="['router-link-active']" [routerLinkActiveOptions]=" {exact:true}" class="mb-0">
+                    <i class="ti-search" [attr.title]="isSidebarExpanded ? null : ('Catalogue Search')"></i>
+                    <span *ngIf="isSidebarExpanded">{{ 'Catalogue Search' }}</span>
+                </a>
+            </h5>    
+            <!-- END Catalogue Search -->
+            <hr/>
+            <li appPortalDetailsPanel></li>
+    </div>
+    
+            
+
+    <!-- Sidebar expansion/contraction -->
+    <div class="mt-auto" style="bottom:0px;" *ngIf="!isMediaScreen()">
+        <button class="btn pull-right" *ngIf="isSidebarExpanded" (click)="setExpanded(false)" title="Collapse sidebar" style="background: #222;"><i class="fa fa-lg fa-chevron-circle-left" style="color: #fff;"></i></button>
+        <button class="btn pull-right" *ngIf="!isSidebarExpanded" (click)="setExpanded(true)" title="Expand sidebar" style="background: #222;"><i class="fa fa-lg fa-chevron-circle-right" style="color: #fff;"></i></button>
+    </div>
+</nav>

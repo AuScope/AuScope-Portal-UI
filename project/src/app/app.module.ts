@@ -1,13 +1,17 @@
 import { environment } from '../environments/environment';
 import { config } from '../environments/config';
 import { NgModule } from '@angular/core';
-import { ModalModule } from 'ngx-bootstrap/modal';
+import { FormsModule } from '@angular/forms';
+import { ModalModule, BsModalRef } from 'ngx-bootstrap/modal';
 import { NouisliderModule } from 'ng2-nouislider';
-import { CommonModule } from '@angular/common';   
-import { RouterModule, Routes } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { AngularSplitModule } from 'angular-split';
 
 // Components
-import { OlMapComponent } from './openlayermap/olmap.component';
+import { AppComponent } from './app.component';
+//import { OlMapComponent } from './openlayermap/olmap.component';
 import { OlMapPreviewComponent } from './menupanel/common/infopanel/openlayermappreview/olmap.preview.component';
 import { LayerPanelComponent } from './menupanel/layerpanel/layerpanel.component';
 import { CustomPanelComponent } from './menupanel/custompanel/custompanel.component';
@@ -17,8 +21,7 @@ import { CapdfAdvanceFilterComponent } from './menupanel/common/filterpanel/adva
 import { DynamicAdvancefilterComponent } from './menupanel/common/filterpanel/dynamic.advancefilter.component';
 import { InfoPanelComponent } from './menupanel/common/infopanel/infopanel.component';
 import { InfoPanelSubComponent } from './menupanel/common/infopanel/subpanel/subpanel.component';
-import { PermanentLinkComponent } from './menupanel/permanentlink/permanentlink.component';
-import { ClipboardComponent } from './menupanel/clipboard/clipboard.component';
+//import { PermanentLinkComponent } from './menupanel/permanentlink/permanentlink.component';
 import { CapdfAnalyticComponent } from './modalwindow/layeranalytic/capdf/capdf.analytic.component';
 import { DynamicLayerAnalyticComponent } from './modalwindow/layeranalytic/dynamic.layer.analytic.component';
 import { LayerAnalyticModalComponent } from './modalwindow/layeranalytic/layer.analytic.modal.component';
@@ -27,9 +30,9 @@ import { RemanentAnomaliesComponent } from './modalwindow/querier/customanalytic
 import { DynamicAnalyticComponent } from './modalwindow/querier/dynamic.analytic.component';
 import { NVCLDatasetListComponent, NVCLDatasetListDialogComponent } from './modalwindow/querier/customanalytic/nvcl/nvcl.datasetlist.component';
 import { TIMAComponent } from './modalwindow/querier/customanalytic/tima/tima.component';
-import { OlMapZoomComponent } from './openlayermap/olmap.zoom.component';
+//import { OlMapZoomComponent } from './openlayermap/olmap.zoom.component';
 import { NgbdModalStatusReportComponent } from './toppanel/renderstatus/renderstatus.component';
-import { OlMapClipboardComponent } from './openlayermap/olmap.clipboard.component';
+//import { OlMapClipboardComponent } from './openlayermap/olmap.clipboard.component';
 
 
 
@@ -69,26 +72,30 @@ PlotlyViaCDNModule.plotlyVersion = '1.53.0';
 PlotlyViaCDNModule.plotlyBundle = 'basic';
 
 // catalogue search
-import { CatalogueSearchPanelComponent } from './menupanel/cataloguesearch/cataloguesearch.panel.component';
-import { CatalogueSearchModalComponent } from './modalwindow/cataloguesearch/cataloguesearch.modal.component';
-import { RecordModalComponent } from './modalwindow/cataloguesearch/record.modal.component';
-import { CataloguesearchService } from './modalwindow/cataloguesearch/cataloguesearch.service';
+import { CatalogueSearchModule } from './menupanel/cataloguesearch/cataloguesearch.module';
+import { SidebarComponent } from './menupanel/sidebar/sidebar.component';
+//import { PageHeaderComponent } from './shared/modules/page-header/page-header.component';
+import { OlMapModule } from './openlayermap/olmap.module';
+import { PageHeaderModule } from './shared/modules/page-header/page-header.module';
+import { PermanentLinkModule } from './menupanel/permanentlink/permanentlink.module';
+import { ClipboardComponent } from './menupanel/clipboard/clipboard.component';
+import { AppRoutingModule } from './app-routing.module';
 
 @NgModule({
   declarations: [
-    OlMapComponent,
+    AppComponent,
+    //OlMapComponent,
     OlMapPreviewComponent,
     LayerPanelComponent,
     CustomPanelComponent,
-    CatalogueSearchPanelComponent,
     FilterPanelComponent,
     DownloadPanelComponent,
     NgbdModalStatusReportComponent,
-    OlMapClipboardComponent,
+    //OlMapClipboardComponent,
     InfoPanelComponent,
     NotificationComponent,
     InfoPanelSubComponent,
-    OlMapZoomComponent,
+    //OlMapZoomComponent,
     QuerierModalComponent,
     DynamicAnalyticComponent,
     NVCLDatasetListComponent,
@@ -98,25 +105,29 @@ import { CataloguesearchService } from './modalwindow/cataloguesearch/catalogues
     LayerAnalyticModalComponent,
     DynamicLayerAnalyticComponent,
     NVCLBoreholeAnalyticComponent,
-    PermanentLinkComponent,
-    ClipboardComponent,
+    //PermanentLinkComponent,
     DynamicAdvancefilterComponent,
     CapdfAdvanceFilterComponent,
     CapdfAnalyticComponent,
-    OlmapBaselayerselectorComponent,
+    //OlmapBaselayerselectorComponent,
     DisclaimerModalComponent,
     PortalDetailsPanelComponent,
     MSCLComponent,
     MSCLAnalyticComponent,
-    CatalogueSearchModalComponent,
-    RecordModalComponent
+   // RecordModalComponent,
+    SidebarComponent,
+    ClipboardComponent
+    //PageHeaderComponent
   ],
-  providers: [CataloguesearchService],
+  providers: [BsModalRef, ClipboardComponent],
   imports: [
+    AppRoutingModule,
     PortalCoreModule.forRoot(environment, config),
     PortalCorePipesModule,
     ClipboardModule,
-    RouterModule.forRoot([]),
+    PermanentLinkModule,
+    //ClipboardPortalModule,
+    CatalogueSearchModule,
     ModalModule.forRoot(),
     NouisliderModule,
     NgSelectModule,
@@ -130,7 +141,12 @@ import { CataloguesearchService } from './modalwindow/cataloguesearch/catalogues
     NgxChartsModule,
     BrowserAnimationsModule,
     BsDropdownModule.forRoot(),
-    CommonModule, PlotlyViaCDNModule
+    CommonModule, 
+    PlotlyViaCDNModule,
+    AngularSplitModule,
+    NgbModule,
+    OlMapModule,
+    PageHeaderModule
   ],
   entryComponents: [
     NgbdModalStatusReportComponent,
@@ -148,17 +164,19 @@ import { CataloguesearchService } from './modalwindow/cataloguesearch/catalogues
     MSCLAnalyticComponent
   ],
   bootstrap: [
-    OlMapComponent,
-    LayerPanelComponent,
-    CustomPanelComponent,
-    NotificationComponent,
-    OlMapZoomComponent,
-    PermanentLinkComponent,
-    CatalogueSearchPanelComponent,
-    ClipboardComponent,
-    OlMapClipboardComponent,
-    OlmapBaselayerselectorComponent,
-    PortalDetailsPanelComponent
+    AppComponent,
+    ClipboardComponent
+    //OlMapComponent,
+    //LayerPanelComponent,
+    //CustomPanelComponent,
+    //NotificationComponent,
+    //OlMapZoomComponent,
+    //PermanentLinkComponent,
+    //CatalogueSearchComponent,
+    //OlMapClipboardComponent,
+    //OlmapBaselayerselectorComponent
+    //PortalDetailsPanelComponent,
+    //PageHeaderComponent
   ]
 })
 export class AppModule { }

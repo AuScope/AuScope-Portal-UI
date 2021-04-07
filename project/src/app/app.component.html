@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<!-- BEGIN navbar -->
+<div id="header" class="navbar fixed-top">
+	<!-- BEGIN navbar-header -->
+	<div class="navbar-header">
+		<!-- BEGIN organisation logo -->
+		<span class="navbar-brand"> <img id="org-logo"
+			src="extension/img/auscope_single-colour-1.png"> <span><b>Au</b>Scope
+				Discovery Portal</span>
+		</span>
+		<!-- END organisation logo -->
+
+		<!-- START sidebar toggle -->
+		<button id="sidebar-toggle-btn"
+			class="nav navbar-toggler d-inline d-md-none p-0 mb-0 mt-1"
+			data-toggle="collapse" data-target=".sidebar-collapse">
+			<div class="nav-index-btn">
+				<span class="icon-bar"></span> <span class="icon-bar"></span> <span
+					class="icon-bar"></span> <span class="icon-bar"></span> <span
+					class="icon-bar"></span>
+			</div>
+			<div class="nav-map-btn">
+				<i class="ti-world"></i>
+			</div>
+		</button>
+		<!-- END sidebar toggle -->
+	</div>
+	<!-- END navbar-header -->
+
+	<!-- BEGIN notification dropdown -->
+	<ul class="nav navbar-nav mb-1 mr-3">
+		<li class="dropdown" app-notification></li>
+	</ul>
+	<!-- END notification dropdown -->
+</div>
+<!-- END navbar -->
+
+<!-- BEGIN sidebar -->
+<app-sidebar [isSidebarExpanded]="isSidebarExpanded"
+	(sidebarExpansionEvent)="sidebarExpanded($event)"></app-sidebar>
+<!-- END sidebar -->
+<!--  
+<section class="main-container" [ngStyle]="setMainContainerStyle()">
+	<router-outlet></router-outlet>
+</section> -->
+<router-outlet></router-outlet>
+<!-- Modal window used as a popup when map querying -->
+<app-querier-modal-window></app-querier-modal-window>
+<app-layer-modal-window></app-layer-modal-window>
+<app-disclaimer-modal-window></app-disclaimer-modal-window>
+</html>

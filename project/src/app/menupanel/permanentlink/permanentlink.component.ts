@@ -1,11 +1,11 @@
 import {ManageStateService} from '@auscope/portal-core-ui';
 import { UtilitiesService } from '@auscope/portal-core-ui';
 import { environment } from '../../../environments/environment';
-import {Component} from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 @Component({
-  selector: '[appPermanentLink]',
+  selector: 'appPermanentLink',
   templateUrl: './permanentlink.component.html',
   styleUrls: ['../menupanel.scss']
 })
@@ -16,6 +16,7 @@ export class PermanentLinkComponent {
   public textwww = 'fdsafdas';
   public showPermanentLink = false;
   public shorteningMode = false;
+  @Input() public showLabel;
 
   constructor(private http: HttpClient, private manageStateService: ManageStateService) {
 
