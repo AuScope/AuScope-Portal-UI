@@ -6,7 +6,7 @@ import { Component, OnInit } from '@angular/core';
 @Component({
   selector: 'app-cs-clipboard',
   templateUrl: './csmap.clipboard.component.html',
-  styleUrls: ['./csmap.component.css']
+  styleUrls: ['./csmap.component.css'],
 })
 
 export class CsMapClipboardComponent implements OnInit {

@@ -20,7 +20,9 @@ import { MapMode2D, ScreenSpaceEventType, Rectangle } from 'cesium';
   selector: 'app-cs-map',
   template: `
     <div #mapElement id="map" class="h-100 w-100">
-      <ac-map></ac-map>
+      <ac-map>
+          <app-cs-clipboard class="btn-group float-right mb-3"></app-cs-clipboard>
+      </ac-map>
     </div>
     `,
     providers: [ViewerConfiguration], // Don't forget to Provide it 
@@ -39,7 +41,6 @@ export class CsMapComponent implements AfterViewInit {
 
 
   ngOnInit() {
-      console.log('load main map');
   }
 
   private bsModalRef: BsModalRef;

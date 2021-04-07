@@ -1,7 +1,7 @@
 import { LayerModel } from '@auscope/portal-core-ui';
 import { CsMapService } from '@auscope/portal-core-ui';
 import { CsCSWService } from '@auscope/portal-core-ui';
-import { CsIrisService } from './../wcustom/iris/cs-iris.service';
+import { OlIrisService } from './../wcustom/iris/ol-iris.service';
 import { Injectable } from '@angular/core';
 
 /**
@@ -10,7 +10,7 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export class AuMapService {
 
-   constructor(private csIrisService: CsIrisService, private csMapService: CsMapService, private csCSWService: CsCSWService) {}
+   constructor(private csIrisService: OlIrisService, private csMapService: CsMapService, private csCSWService: CsCSWService) {}
 
 
   /**

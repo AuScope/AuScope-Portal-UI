@@ -5,7 +5,7 @@ import {CsMapService} from '@auscope/portal-core-ui';
 import {DownloadWfsService} from '@auscope/portal-core-ui';
 import {Component, Input, OnInit} from '@angular/core';
 import {UtilitiesService} from '@auscope/portal-core-ui';
-import {Constants} from '@auscope/portal-core-ui';
+import {Constants, ResourceType} from '@auscope/portal-core-ui';
 import {saveAs} from 'file-saver';
 import {config} from '../../../../environments/config';
 import { DownloadWcsService } from '@auscope/portal-core-ui';
@@ -102,7 +102,7 @@ export class DownloadPanelComponent implements OnInit {
   }
 
   public describeCoverage() {
-    if (this.layerHandlerService.containsWCS(this.layer)) {
+    if (this.layerHandlerService.contains(this.layer, ResourceType.WCS)) {
       const wcsResources = this.layerHandlerService.getWCSResource(this.layer);
       this.downloadWcsService.describeCoverage(wcsResources[0].url, wcsResources[0].name).subscribe(response => {
         this.wcsDownloadListOption = {
@@ -131,7 +131,7 @@ export class DownloadPanelComponent implements OnInit {
    */
   public download(): void {
     if (this.downloadStarted) {
-      alert('Download in progres, kindly wait for it to completed');
+      alert('Download in progress, kindly wait for it to completed');
       return
     }
     this.downloadStarted = true;

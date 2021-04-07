@@ -11,8 +11,8 @@ import { environment } from '../../../../environments/environment';
 import { ref } from '../../../../environments/ref';
 import { LayerAnalyticModalComponent } from '../../../modalwindow/layeranalytic/layer.analytic.modal.component';
 import { ManageStateService } from '@auscope/portal-core-ui';
-import { AuMapService } from '../../../services/wcustom/au-map.service';
-import { CsIrisService } from '../../../services/wcustom/iris/cs-iris.service';
+// import { AuMapService } from '../../../services/wcustom/au-map.service';
+import { CsIrisService } from '@auscope/portal-core-ui';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { CsWMSService } from '@auscope/portal-core-ui';
 
@@ -21,7 +21,7 @@ declare var gtag: Function;
 @Component({
   selector: 'app-filter-panel',
   templateUrl: './filterpanel.component.html',
-  providers: [AuMapService, CsIrisService],
+  providers: [CsIrisService],
   styleUrls: ['./filterpanel.component.scss', '../../menupanel.scss']
 })
 export class FilterPanelComponent implements OnInit {
@@ -38,7 +38,7 @@ export class FilterPanelComponent implements OnInit {
   constructor(
     private csMapService: CsMapService,
     private layerHandlerService: LayerHandlerService,
-    private auscopeMapService: AuMapService,
+    // private auscopeMapService: AuMapService,
     private filterPanelService: FilterPanelService,
     private modalService: BsModalService,
     private manageStateService: ManageStateService,

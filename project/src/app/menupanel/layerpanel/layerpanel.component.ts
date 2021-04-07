@@ -12,7 +12,7 @@ import { UtilitiesService } from '@auscope/portal-core-ui';
 import {config} from '../../../environments/config';
 import { MatSliderChange } from '@angular/material/slider';
 import { KeysPipe } from '@auscope/portal-core-ui'; // Necessary for 'getKey' pipe in "layerpanel.component.html"
-
+import { ResourceType } from '@auscope/portal-core-ui';
 
 @Component({
     selector: '[appLayerPanel]',
@@ -116,7 +116,7 @@ export class LayerPanelComponent implements OnInit {
       for (const layerGroupKey in this.layerGroups) {
         this.layerGroups[layerGroupKey].hide = true;
         for (const layer of this.layerGroups[layerGroupKey]) {
-          if (this.layerHandlerService.containsWMS(layer)) {
+          if (this.layerHandlerService.contains(layer, ResourceType.WMS)) {
             layer.hide = false;
             this.layerGroups[layerGroupKey].hide = false;
             this.layerGroups[layerGroupKey].expanded = true;
@@ -140,7 +140,7 @@ export class LayerPanelComponent implements OnInit {
       for (const layerGroupKey in this.layerGroups) {
         this.layerGroups[layerGroupKey].hide = true;
         for (const layer of this.layerGroups[layerGroupKey]) {
-          if (this.layerHandlerService.containsWFS(layer)) {
+          if (this.layerHandlerService.contains(layer, ResourceType.WFS)) {
             layer.hide = false;
             this.layerGroups[layerGroupKey].hide = false;
             this.layerGroups[layerGroupKey].expanded = true;
@@ -193,7 +193,7 @@ export class LayerPanelComponent implements OnInit {
               me.layerGroups = response;
               for (const key in me.layerGroups) {
                 for (let i = 0; i < me.layerGroups[key].length; i++) {
-                  me.layerGroups[key][i].csImgLayers = [];
+                  me.layerGroups[key][i].csLayers = [];
                   const uiLayerModel = new UILayerModel(me.layerGroups[key][i].id, me.renderStatusService.getStatusBSubject(me.layerGroups[key][i]));
                   // VT: permanent link
                   if (layerStateObj && layerStateObj[uiLayerModel.id]) {
