@@ -24,8 +24,9 @@ import { UtilitiesService } from 'portal-core-ui';
   selector: 'app-cs-map',
   template: `
     <div #mapElement id="map" class="h-100 w-100">
-      <ac-map>
-          <app-cs-clipboard class="btn-group float-right mb-3"></app-cs-clipboard>
+      <ac-map>          
+          <app-cs-map-zoom></app-cs-map-zoom>
+          <app-cs-clipboard class="btn-group float-right mb-3"></app-cs-clipboard> 
       </ac-map>
     </div>
     `,
@@ -42,9 +43,10 @@ export class CsMapComponent implements AfterViewInit {
   name = 'Angular';
   cesiumLoaded = true;
   Cesium = Cesium;
-  viewer: any;
+  viewer: any;  
   //Viewer viewer;
-
+  
+  public static AUSTRALIA = Cesium.Rectangle.fromDegrees(114.591, -45.837, 148.97, -5.73);
 
   ngOnInit() {
       console.log('load main map')
@@ -93,12 +95,7 @@ export class CsMapComponent implements AfterViewInit {
       );*/
       // Look at Australia
       viewer.camera.setView({
-        destination: Cesium.Rectangle.fromDegrees(
-          114.591,
-          -45.837,
-          148.97,
-          -5.73
-        ),
+        destination: CsMapComponent.AUSTRALIA
       });
       this.viewer = viewer;
     };
