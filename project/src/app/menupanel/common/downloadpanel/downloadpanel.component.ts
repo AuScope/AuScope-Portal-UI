@@ -12,9 +12,6 @@ import { DownloadWcsService } from 'portal-core-ui';
 import { RectangleEditorObservable } from 'angular-cesium';
 import { ChangeDetectorRef } from '@angular/core';
 
-declare var Cesium;
-
-
 @Component({
   selector: 'app-download-panel',
   templateUrl: './downloadpanel.component.html',
@@ -76,7 +73,8 @@ export class DownloadPanelComponent implements OnInit {
     setTimeout(() => this.drawStarted = true, 0);
     const me = this;
     this.rectangleObservable = this.csMapService.drawBound();
-    this.rectangleObservable.subscribe((vector) => {
+    this.rectangleObservable.subscribe((vector) => {      
+      me.drawStarted = false;             
       if (!vector.points) {
           // drawing hasn't started
           return;
@@ -87,7 +85,6 @@ export class DownloadPanelComponent implements OnInit {
           // drawing hasn't finished
           return;
       }
-      me.drawStarted = false;             
     
       const points = vector.points;
       // calculate area from the 2 rectangle points 
@@ -108,27 +105,7 @@ export class DownloadPanelComponent implements OnInit {
       }
       
       //reproject to EPSG:4326      
-      me.bbox = new Bbox();
-      me.bbox.crs = 'EPSG:4326';
-      var point1 = new Cesium.Cartographic(points[0].getPosition().x, points[0].getPosition().y);
-      var point2 = new Cesium.Cartographic(points[1].getPosition().x, points[1].getPosition().y);
-      var epsg4326 = new Cesium.GeographicProjection(Cesium.Ellipsoid.WGS84);
-      var reprojectedPoint1 = epsg4326.project(point1);
-      var reprojectedPoint2 = epsg4326.project(point2);
-      if (reprojectedPoint1.x > reprojectedPoint2.x) {
-          me.bbox.eastBoundLongitude = reprojectedPoint1.x; 
-          me.bbox.westBoundLongitude = reprojectedPoint2.x;
-      } else {
-          me.bbox.eastBoundLongitude = reprojectedPoint2.x;
-          me.bbox.westBoundLongitude = reprojectedPoint1.x;
-      }
-      if (reprojectedPoint1.y > reprojectedPoint2.y) {
-          me.bbox.northBoundLatitude = reprojectedPoint1.y;
-          me.bbox.southBoundLatitude = reprojectedPoint2.y;
-      } else {
-          me.bbox.northBoundLatitude = reprojectedPoint2.y;
-          me.bbox.southBoundLatitude = reprojectedPoint1.y;
-      }
+      me.bbox = UtilitiesService.reprojectToWGS84(points);
       
       if (me.isWCSDownloadSupported) {
         me.describeCoverage();
