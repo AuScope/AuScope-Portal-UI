@@ -1,40 +1,52 @@
 import { CsMapService } from '@auscope/portal-core-ui';
-import { Component } from '@angular/core';
-
-
-
+import { Component, ViewEncapsulation } from '@angular/core';
+import { CameraService, CesiumService, ZoomToRectangleService } from 'angular-cesium';
+import { CsMapComponent } from './csmap.component';
 
 @Component({
-  // TODO: Replace with cesium 
   selector: 'app-cs-map-zoom',
-  template: `
-    <button type="button" class="btn btn-sm btn-inverse active" id="map-theme-text" (click)='zoomClick()'>
-      <i class="fa fa-search-plus fa-fw" aria-hidden="true"></i> {{buttonText}}</button>
-    `,
-  styleUrls: ['./csmap.component.css']
-  // The "#" (template reference variable) matters to access the map element with the ViewChild decorator!
+  templateUrl: './csmap.zoom.component.html', 
+  styles: ['.map-toolbar { width: 40px !important; height: 40px !important; }'],
+  encapsulation: ViewEncapsulation.None // NB: Styles are not encapsulated.
+                                        // This adds the style to global styles 
 })
-
 export class CsMapZoomComponent {
+  // amount to zoom in/out by. 10x the default camera zoom
+  zoomAmount = 1000000;
 
-  buttonText = 'Magnify';
-
-  constructor(private csMapService: CsMapService) {}
+  constructor(
+    private cameraService: CameraService,
+    private cesiumService: CesiumService,
+    private zoomToRectangleService: ZoomToRectangleService,
+  ) {
+    this.zoomToRectangleService.init(cesiumService, cameraService);
+  }
 
   /**
-   * toggle on zoom to zoom into bbox
+   * Toggle on zoom to zoom into bbox
    */
-  public zoomClick() {
-    this.buttonText = 'Click on Map';
-    this.csMapService.drawBound().subscribe((vector) => {
-      const features = vector.getSource().getFeatures();
-      const me = this;
-      // Go through this array and get coordinates of their geometry.
-      features.forEach(function(feature) {
-        me.buttonText = 'Magnify';
-        me.csMapService.fitView(feature.getGeometry().getExtent());
-      });
-
-    });
+  public zoomToRectangle() {
+    this.zoomToRectangleService.activate();
+  }
+  
+  /**
+   * Tell the camera to go back to original map position.
+   */
+  public goHome() {
+    this.cameraService.cameraFlyTo({destination: CsMapComponent.AUSTRALIA});
+  }
+  
+  /**
+   * Tell the camera to zoom in.
+   */
+  public zoomIn() {
+    this.cameraService.zoomIn(this.zoomAmount);
+  }
+  
+  /**
+   * Tell the cmaera to zoom out.
+   */
+  public zoomOut() {
+    this.cameraService.zoomOut(this.zoomAmount);
   }
 }

@@ -20,8 +20,9 @@ import { MapMode2D, ScreenSpaceEventType, Rectangle } from 'cesium';
   selector: 'app-cs-map',
   template: `
     <div #mapElement id="map" class="h-100 w-100">
-      <ac-map>
-          <app-cs-clipboard class="btn-group float-right mb-3"></app-cs-clipboard>
+      <ac-map>          
+          <app-cs-map-zoom></app-cs-map-zoom>
+          <app-cs-clipboard class="btn-group float-right mb-3"></app-cs-clipboard> 
       </ac-map>
     </div>
     `,
@@ -37,8 +38,10 @@ export class CsMapComponent implements AfterViewInit {
 
   name = 'Angular';
   cesiumLoaded = true;
-  viewer: any;
-
+  viewer: any;  
+  //Viewer viewer;
+  
+  public static AUSTRALIA = Rectangle.fromDegrees(114.591, -45.837, 148.97, -5.73);
 
   ngOnInit() {
   }
@@ -76,7 +79,7 @@ export class CsMapComponent implements AfterViewInit {
 
       // Look at Australia
       viewer.camera.setView({
-        destination: Rectangle.fromDegrees(114.591, -45.837, 148.97, -5.73),
+        destination: CsMapComponent.AUSTRALIA
       });
       this.viewer = viewer;
     };

@@ -6,6 +6,9 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { NouisliderModule } from 'ng2-nouislider';
 import { CommonModule } from '@angular/common';
 
+// Cesium icons
+import { MatTooltipModule } from '@angular/material/tooltip';
+
 // Components
 import { CsMapComponent } from './cesium-map/csmap.component';
 import { OlMapPreviewComponent } from './menupanel/common/infopanel/openlayermappreview/olmap.preview.component';
@@ -120,7 +123,8 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     BsDropdownModule.forRoot(),
     CommonModule, PlotlyViaCDNModule,
     AngularCesiumModule.forRoot(),
-    AngularCesiumWidgetsModule
+    AngularCesiumWidgetsModule,
+    MatTooltipModule
   ],
   entryComponents: [
     NgbdModalStatusReportComponent,
