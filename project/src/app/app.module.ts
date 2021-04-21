@@ -63,6 +63,7 @@ import { MSCLComponent } from './modalwindow/querier/customanalytic/mscl/mscl.co
 import { MSCLAnalyticComponent } from './modalwindow/layeranalytic/mscl/mscl.analytic.component';
 
 import { PlotlyViaCDNModule } from 'angular-plotly.js';
+import { RectanglesEditorService } from 'angular-cesium';
 
 // Using CDN module to avoid bug https://github.com/plotly/angular-plotly.js/issues/75
 PlotlyViaCDNModule.plotlyVersion = '1.53.0';
@@ -103,7 +104,7 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     MSCLComponent,
     MSCLAnalyticComponent
   ],
-  providers: [],
+  providers: [RectanglesEditorService],
   imports: [
     PortalCoreModule.forRoot(environment, config),
     PortalCorePipesModule,

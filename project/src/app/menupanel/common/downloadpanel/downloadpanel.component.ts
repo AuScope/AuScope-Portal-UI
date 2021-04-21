@@ -9,6 +9,11 @@ import {Constants} from 'portal-core-ui';
 import {saveAs} from 'file-saver';
 import {config} from '../../../../environments/config';
 import { DownloadWcsService } from 'portal-core-ui';
+import { RectangleEditorObservable } from 'angular-cesium';
+import { ChangeDetectorRef } from '@angular/core';
+
+declare var Cesium;
+
 
 @Component({
   selector: 'app-download-panel',
@@ -29,10 +34,13 @@ export class DownloadPanelComponent implements OnInit {
   isWCSDownloadSupported: boolean;
   downloadSizeLimit: number;
 
-  wcsDownloadListOption: any
-  wcsDownloadForm: any
-
-  constructor(private layerHandlerService: LayerHandlerService, private csMapService: CsMapService,
+  wcsDownloadListOption: any;
+  wcsDownloadForm: any;
+  
+  // the rectangle drawn on the map
+  private rectangleObservable: RectangleEditorObservable;
+  
+  constructor( private cdRef:ChangeDetectorRef, private layerHandlerService: LayerHandlerService, private csMapService: CsMapService,
     private downloadWfsService: DownloadWfsService, private downloadWcsService: DownloadWcsService) {
     this.bbox = null;
     this.drawStarted = false;
@@ -66,36 +74,65 @@ export class DownloadPanelComponent implements OnInit {
    */
   public drawBound(): void {
     setTimeout(() => this.drawStarted = true, 0);
-
-    this.csMapService.drawBound().subscribe((vector) => {
-      this.drawStarted = false;
-      const features = vector.getSource().getFeatures();
-      const me = this;
-      // Go through this array and get coordinates of their geometry.
-      features.forEach(function(feature) {
-        if (config.wcsSupportedLayer[me.layer.id]) {
+    const me = this;
+    this.rectangleObservable = this.csMapService.drawBound();
+    this.rectangleObservable.subscribe((vector) => {
+      if (!vector.points) {
+          // drawing hasn't started
+          return;
+      }
+      if (vector.points.length < 2
+              || vector.points[0].getPosition().x == vector.points[1].getPosition().x
+              || vector.points[0].getPosition().y == vector.points[1].getPosition().y) {
+          // drawing hasn't finished
+          return;
+      }
+      me.drawStarted = false;             
+    
+      const points = vector.points;
+      // calculate area from the 2 rectangle points 
+      var width = points[0].getPosition().x - points[1].getPosition().x;
+      var length = points[0].getPosition().y - points[1].getPosition().y;
+      const area = Math.abs(width * length);
+      
+      if (config.wcsSupportedLayer[me.layer.id]) {
           // If 'downloadAreaMaxsize' is not set to Number.MAX_SAFE_INTEGER then download limits will apply
           const maxSize = config.wcsSupportedLayer[me.layer.id].downloadAreaMaxSize;
-          if (maxSize != Number.MAX_SAFE_INTEGER && maxSize < feature.getGeometry().getArea()) {
-            alert('The area size you have selected of ' + feature.getGeometry().getArea() + 'm2 exceed the limited size of ' +
+          if (maxSize != Number.MAX_SAFE_INTEGER && maxSize < area) {
+            alert('The area size you have selected of ' + area + 'm2 exceed the limited size of ' +
             config.wcsSupportedLayer[me.layer.id].downloadAreaMaxSize + 'm2. Due to the size of the dataset' +
              ' we have to limit the download area');
             me.bbox = null;
             return;
           }
-        }
-        me.bbox = new Bbox();
-        me.bbox.crs = 'EPSG:4326';
-        const bbox4326 = feature.getGeometry().transform(Constants.MAP_PROJ, 'EPSG:4326');
-        me.bbox.eastBoundLongitude = bbox4326.getExtent()[2];
-        me.bbox.westBoundLongitude = bbox4326.getExtent()[0];
-        me.bbox.northBoundLatitude = bbox4326.getExtent()[3];
-        me.bbox.southBoundLatitude = bbox4326.getExtent()[1];
-
-        if (me.isWCSDownloadSupported) {
-          me.describeCoverage();
-        }
-      });
+      }
+      
+      //reproject to EPSG:4326      
+      me.bbox = new Bbox();
+      me.bbox.crs = 'EPSG:4326';
+      var point1 = new Cesium.Cartographic(points[0].getPosition().x, points[0].getPosition().y);
+      var point2 = new Cesium.Cartographic(points[1].getPosition().x, points[1].getPosition().y);
+      var epsg4326 = new Cesium.GeographicProjection(Cesium.Ellipsoid.WGS84);
+      var reprojectedPoint1 = epsg4326.project(point1);
+      var reprojectedPoint2 = epsg4326.project(point2);
+      if (reprojectedPoint1.x > reprojectedPoint2.x) {
+          me.bbox.eastBoundLongitude = reprojectedPoint1.x; 
+          me.bbox.westBoundLongitude = reprojectedPoint2.x;
+      } else {
+          me.bbox.eastBoundLongitude = reprojectedPoint2.x;
+          me.bbox.westBoundLongitude = reprojectedPoint1.x;
+      }
+      if (reprojectedPoint1.y > reprojectedPoint2.y) {
+          me.bbox.northBoundLatitude = reprojectedPoint1.y;
+          me.bbox.southBoundLatitude = reprojectedPoint2.y;
+      } else {
+          me.bbox.northBoundLatitude = reprojectedPoint2.y;
+          me.bbox.southBoundLatitude = reprojectedPoint1.y;
+      }
+      
+      if (me.isWCSDownloadSupported) {
+        me.describeCoverage();
+      }
 
     });
 
@@ -104,12 +141,15 @@ export class DownloadPanelComponent implements OnInit {
   public describeCoverage() {
     if (this.layerHandlerService.containsWCS(this.layer)) {
       const wcsResources = this.layerHandlerService.getWCSResource(this.layer);
+      const me = this;
       this.downloadWcsService.describeCoverage(wcsResources[0].url, wcsResources[0].name).subscribe(response => {
-        this.wcsDownloadListOption = {
+        me.wcsDownloadListOption = {
           inputCrsList: response.supportedRequestCRSs,
           outputCrsList: response.supportedResponseCRSs,
           downloadFormatList: response.supportedFormats
         }
+        // somehow needs this to refresh the form with above
+        me.cdRef.detectChanges();        
       })
     } else {
       alert('No coverage found. Kindly contact cg-admin@csiro.au');
@@ -125,14 +165,19 @@ export class DownloadPanelComponent implements OnInit {
     this.bbox = null;
     this.wcsDownloadForm = {};
     this.wcsDownloadListOption = null;
+    // clear rectangle on the map
+    if (this.rectangleObservable) {
+        this.rectangleObservable.dispose();
+        this.rectangleObservable = null;
+    }
   }
   /**
    * Download the layer
    */
   public download(): void {
     if (this.downloadStarted) {
-      alert('Download in progres, kindly wait for it to completed');
-      return
+      alert('Download in progress, kindly wait for it to completed');
+      return;
     }
     this.downloadStarted = true;
 
