@@ -1,18 +1,18 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { LayerHandlerService } from 'portal-core-ui';
+import { LayerHandlerService } from '@auscope/portal-core-ui';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
-import { LayerModel } from 'portal-core-ui';
-import { CsMapService } from 'portal-core-ui';
-import { CsClipboardService } from 'portal-core-ui';
+import { LayerModel } from '@auscope/portal-core-ui';
+import { CsMapService } from '@auscope/portal-core-ui';
+import { CsClipboardService } from '@auscope/portal-core-ui';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
-import { RenderStatusService } from 'portal-core-ui';
-import { ManageStateService } from 'portal-core-ui';
-import { UtilitiesService } from 'portal-core-ui';
+import { RenderStatusService } from '@auscope/portal-core-ui';
+import { ManageStateService } from '@auscope/portal-core-ui';
+import { UtilitiesService } from '@auscope/portal-core-ui';
 import {config} from '../../../environments/config';
 import { MatSliderChange } from '@angular/material/slider';
-import { KeysPipe } from 'portal-core-ui'; // Necessary for 'getKey' pipe in "layerpanel.component.html"
-
+import { KeysPipe } from '@auscope/portal-core-ui'; // Necessary for 'getKey' pipe in "layerpanel.component.html"
+import { ResourceType } from '@auscope/portal-core-ui';
 
 @Component({
     selector: '[appLayerPanel]',
@@ -116,7 +116,7 @@ export class LayerPanelComponent implements OnInit {
       for (const layerGroupKey in this.layerGroups) {
         this.layerGroups[layerGroupKey].hide = true;
         for (const layer of this.layerGroups[layerGroupKey]) {
-          if (this.layerHandlerService.containsWMS(layer)) {
+          if (this.layerHandlerService.contains(layer, ResourceType.WMS)) {
             layer.hide = false;
             this.layerGroups[layerGroupKey].hide = false;
             this.layerGroups[layerGroupKey].expanded = true;
@@ -140,7 +140,7 @@ export class LayerPanelComponent implements OnInit {
       for (const layerGroupKey in this.layerGroups) {
         this.layerGroups[layerGroupKey].hide = true;
         for (const layer of this.layerGroups[layerGroupKey]) {
-          if (this.layerHandlerService.containsWFS(layer)) {
+          if (this.layerHandlerService.contains(layer, ResourceType.WFS)) {
             layer.hide = false;
             this.layerGroups[layerGroupKey].hide = false;
             this.layerGroups[layerGroupKey].expanded = true;
@@ -193,6 +193,7 @@ export class LayerPanelComponent implements OnInit {
               me.layerGroups = response;
               for (const key in me.layerGroups) {
                 for (let i = 0; i < me.layerGroups[key].length; i++) {
+                  me.layerGroups[key][i].csLayers = [];
                   const uiLayerModel = new UILayerModel(me.layerGroups[key][i].id, me.renderStatusService.getStatusBSubject(me.layerGroups[key][i]));
                   // VT: permanent link
                   if (layerStateObj && layerStateObj[uiLayerModel.id]) {
@@ -246,8 +247,8 @@ export class LayerPanelComponent implements OnInit {
     /**
      * Layer opacity slider change event
      */
-    public layerOpacityChange(event: MatSliderChange, layerId: string) {
-      this.csMapService.setLayerOpacity(layerId, (event.value / 100));
+    public layerOpacityChange(event: MatSliderChange, layer: LayerModel) {
+      this.csMapService.setLayerOpacity(layer, (event.value / 100));
     }
 
 }

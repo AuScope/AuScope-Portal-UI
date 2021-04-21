@@ -1,8 +1,7 @@
-import { LayerModel } from 'portal-core-ui';
-import { CsMapObject } from 'portal-core-ui';
-import { CsMapService } from 'portal-core-ui';
-import { CsCSWService } from 'portal-core-ui';
-import { CsIrisService } from './../wcustom/iris/cs-iris.service';
+import { LayerModel } from '@auscope/portal-core-ui';
+import { CsMapService } from '@auscope/portal-core-ui';
+import { CsCSWService } from '@auscope/portal-core-ui';
+import { OlIrisService } from './../wcustom/iris/ol-iris.service';
 import { Injectable } from '@angular/core';
 
 /**
@@ -11,7 +10,7 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export class AuMapService {
 
-   constructor(private csMapObject: CsMapObject, private csIrisService: CsIrisService, private csMapService: CsMapService, private csCSWService: CsCSWService) {}
+   constructor(private csIrisService: OlIrisService, private csMapService: CsMapService, private csCSWService: CsCSWService) {}
 
 
   /**
@@ -19,7 +18,7 @@ export class AuMapService {
    * @param layer the layer to add to the map
    */
    public addLayer(layer: LayerModel, param: any): void {
-     this.csMapObject.removeLayerById(layer.id);
+     this.csMapService.removeLayer(layer);
      if (layer.id === 'seismology-in-schools-site') {
        this.csIrisService.addLayer(layer, param);
        this.csMapService.appendToLayerModelList(layer);

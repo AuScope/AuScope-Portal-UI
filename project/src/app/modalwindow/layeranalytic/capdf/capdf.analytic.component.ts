@@ -1,6 +1,6 @@
-import { LayerModel } from 'portal-core-ui';
-import { LayerHandlerService } from 'portal-core-ui';
-import { UtilitiesService } from 'portal-core-ui';
+import { LayerModel } from '@auscope/portal-core-ui';
+import { LayerHandlerService } from '@auscope/portal-core-ui';
+import { UtilitiesService } from '@auscope/portal-core-ui';
 import { LayerAnalyticInterface } from '../layer.analytic.interface';
 import { CapdfAnalyticService } from './capdf.analytic.service';
 import {saveAs} from 'file-saver';

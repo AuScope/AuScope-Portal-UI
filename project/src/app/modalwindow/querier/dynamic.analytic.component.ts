@@ -1,9 +1,9 @@
-import { LayerModel } from 'portal-core-ui';
-import { OnlineResourceModel } from 'portal-core-ui';
+import { LayerModel } from '@auscope/portal-core-ui';
+import { OnlineResourceModel } from '@auscope/portal-core-ui';
 import { NVCLDatasetListComponent } from './customanalytic/nvcl/nvcl.datasetlist.component';
 import { Component, Input, ViewChild, ComponentFactoryResolver, ViewContainerRef, ChangeDetectorRef } from '@angular/core';
 import {ref} from '../../../environments/ref';
-import { QuerierInfoModel } from 'portal-core-ui';
+import { QuerierInfoModel } from '@auscope/portal-core-ui';
 import { RemanentAnomaliesComponent } from './customanalytic/RemanentAnomalies/remanentanomalies.component';
 import { TIMAComponent } from './customanalytic/tima/tima.component';
 import { MSCLComponent } from './customanalytic/mscl/mscl.component';

@@ -1,5 +1,5 @@
-import {ManageStateService} from 'portal-core-ui';
-import { UtilitiesService } from 'portal-core-ui';
+import {ManageStateService} from '@auscope/portal-core-ui';
+import { UtilitiesService } from '@auscope/portal-core-ui';
 import { environment } from '../../../environments/environment';
 import {Component} from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';

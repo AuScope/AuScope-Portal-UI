@@ -1,16 +1,20 @@
 <ac-toolbar [allowDrag]="false">
     <ac-toolbar-button matTooltip="Home" matTooltipPosition="right"
         [iconUrl]="'extension/svg/home-icon.svg'"
+        [buttonClass]="'map-toolbar'"
         (onClick)="goHome()">
     </ac-toolbar-button>
     <ac-toolbar-button matTooltip="Zoom To Rectangle" matTooltipPosition="right"
         [iconUrl]="'extension/svg/select.svg'"
+        [buttonClass]="'map-toolbar'"
         (onClick)="zoomToRectangle()">
     </ac-toolbar-button>
     <ac-toolbar-button matTooltip="Zoom In" matTooltipPosition="right"
+        [buttonClass]="'map-toolbar'"
         (onClick)="zoomIn()"><h3>+</h3>
     </ac-toolbar-button>
     <ac-toolbar-button matTooltip="Zoom Out" matTooltipPosition="right"
+        [buttonClass]="'map-toolbar'"
         (onClick)="zoomOut()"><h3>-</h3>
     </ac-toolbar-button>
 </ac-toolbar>
