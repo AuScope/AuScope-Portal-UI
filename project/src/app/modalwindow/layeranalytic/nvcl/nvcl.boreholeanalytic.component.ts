@@ -1,8 +1,8 @@
 import { environment } from '../../../../environments/environment';
 import { saveAs } from 'file-saver';
-import { LayerModel } from 'portal-core-ui';
-import { ManageStateService } from 'portal-core-ui';
-import { UtilitiesService } from 'portal-core-ui';
+import { LayerModel } from '@auscope/portal-core-ui';
+import { ManageStateService } from '@auscope/portal-core-ui';
+import { UtilitiesService } from '@auscope/portal-core-ui';
 import { NVCLBoreholeAnalyticService } from './nvcl.boreholeanalytic.service';
 import {
   Component,

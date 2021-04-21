@@ -1,30 +1,27 @@
-import { LayerModel } from 'portal-core-ui';
-import { LayerHandlerService } from 'portal-core-ui';
-import { FilterPanelService } from 'portal-core-ui';
-import { CsMapService } from 'portal-core-ui';
-import { CsClipboardService } from 'portal-core-ui';
+import { LayerModel } from '@auscope/portal-core-ui';
+import { LayerHandlerService } from '@auscope/portal-core-ui';
+import { FilterPanelService } from '@auscope/portal-core-ui';
+import { CsMapService } from '@auscope/portal-core-ui';
+import { CsClipboardService } from '@auscope/portal-core-ui';
 import * as $ from 'jquery';
-import { UtilitiesService } from 'portal-core-ui';
+import { UtilitiesService } from '@auscope/portal-core-ui';
 import { Component, Input, OnInit } from '@angular/core';
 import * as _ from 'lodash';
 import { environment } from '../../../../environments/environment';
 import { ref } from '../../../../environments/ref';
 import { LayerAnalyticModalComponent } from '../../../modalwindow/layeranalytic/layer.analytic.modal.component';
-import { ManageStateService } from 'portal-core-ui';
-import { AuMapService } from '../../../services/wcustom/au-map.service';
-import { CsIrisService } from '../../../services/wcustom/iris/cs-iris.service';
+import { ManageStateService } from '@auscope/portal-core-ui';
+// import { AuMapService } from '../../../services/wcustom/au-map.service';
+import { CsIrisService } from '@auscope/portal-core-ui';
 import { BsModalService } from 'ngx-bootstrap/modal';
-import { CsWMSService } from 'portal-core-ui';
-import { MapsManagerService } from 'angular-cesium';
-import { RenderStatusService } from 'portal-core-ui';
+import { CsWMSService } from '@auscope/portal-core-ui';
 
 declare var gtag: Function;
-declare var Cesium: any;
 
 @Component({
   selector: 'app-filter-panel',
   templateUrl: './filterpanel.component.html',
-  providers: [AuMapService, CsIrisService],
+  providers: [CsIrisService],
   styleUrls: ['./filterpanel.component.scss', '../../menupanel.scss']
 })
 export class FilterPanelComponent implements OnInit {
@@ -41,14 +38,12 @@ export class FilterPanelComponent implements OnInit {
   constructor(
     private csMapService: CsMapService,
     private layerHandlerService: LayerHandlerService,
-    private auscopeMapService: AuMapService,
+    // private auscopeMapService: AuMapService,
     private filterPanelService: FilterPanelService,
     private modalService: BsModalService,
     private manageStateService: ManageStateService,
     private CsClipboardService: CsClipboardService,
-    private csWMSService: CsWMSService,
-    private mapsManagerService: MapsManagerService,
-    private renderStatusService: RenderStatusService
+    private csWMSService: CsWMSService
   ) {
     this.providers = [];
     this.optionalFilters = [];
@@ -142,49 +137,8 @@ export class FilterPanelComponent implements OnInit {
     }
     // VT: End append
 
-    const viewer = this.mapsManagerService.getMap().getCesiumViewer();
-    if (this.layerHandlerService.containsWMS(layer)) {
-      const wmsOnlineResources = this.layerHandlerService.getWMSResource(layer);
-      this.renderStatusService.register(layer, wmsOnlineResources[0]);
-      let tileLoadFlag = false;
-      const tileLoading = (l: number) => {
-        console.log("tileLoading: ", l);
-        if (l == 0) {
-          console.log("UpdateComplete(", layer, wmsOnlineResources[0], ")");
-          this.renderStatusService.updateComplete(layer, wmsOnlineResources[0]);
-        } else if (!tileLoadFlag) {
-          console.log("AddResource()");
-          tileLoadFlag = true;
-          this.renderStatusService.addResource(layer, wmsOnlineResources[0]);
-        }
-      }
-      viewer.scene.globe.tileLoadProgressEvent.addEventListener(tileLoading);
-      console.log("layer=", layer);
-
-      console.log("wmsOnlineResources=", wmsOnlineResources);
-      const wmsImagProv = new Cesium.WebMapServiceImageryProvider({
-        url: UtilitiesService.rmParamURL(wmsOnlineResources[0].url),
-        layers: wmsOnlineResources[0].name,
-        parameters: {
-          transparent: true,
-          format: "image/png",
-        },
-      });
-      wmsImagProv.errorEvent.addEventListener(this.errorEvent);
-      viewer.imageryLayers.addImageryProvider(wmsImagProv);
-
-      // this.olMapService.addLayer(layer, param);
-    }
-    else {
-      // VT: If portal-core-ui is unable to render the layer, it must be a auscope specific layer. E.g Iris
-      try {
-        this.auscopeMapService.addLayer(layer, param);
-      } catch (error) {
-        alert(
-          'Unable to render layer as this layer is missing vital information required for rendering'
-        );
-      }
-    }
+    // Add layer      
+    this.csMapService.addLayer(layer, param);
 
     // If on a small screen, when a new layer is added, roll up the sidebar to expose the map */
     if ($('#sidebar-toggle-btn').css('display') !== 'none') {
@@ -192,9 +146,6 @@ export class FilterPanelComponent implements OnInit {
     }
   }
 
-  public errorEvent(evt) {
-    console.log('ERROR! evt = ', evt);
-  }
 
   /**
    * Get Filter for NvclAnalytical

@@ -1,12 +1,14 @@
-import { CsMapService } from 'portal-core-ui';
-import { Component } from '@angular/core';
+import { CsMapService } from '@auscope/portal-core-ui';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { CameraService, CesiumService, ZoomToRectangleService } from 'angular-cesium';
 import { CsMapComponent } from './csmap.component';
 
 @Component({
   selector: 'app-cs-map-zoom',
   templateUrl: './csmap.zoom.component.html', 
-  styleUrls: ['./csmap.component.css']
+  styles: ['.map-toolbar { width: 40px !important; height: 40px !important; }'],
+  encapsulation: ViewEncapsulation.None // NB: Styles are not encapsulated.
+                                        // This adds the style to global styles 
 })
 export class CsMapZoomComponent {
   // amount to zoom in/out by. 10x the default camera zoom

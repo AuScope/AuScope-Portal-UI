@@ -25,5 +25,6 @@ declare var require;
 declare var Cesium: any;
 // This access token is taken from the "angular-cesium" website - you can replace it with your own one
 Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2YTY1NDYzYS01YzgxLTQ2MGUtODBiYy0zODRmY2MwOGY4MDIiLCJpZCI6MjA1LCJpYXQiOjE1MDQ3MjQ1Njh9.rKgXUKAfFiiSAm_b9T8bpsDVdj0YyZeqGxNpzLlhxpk';
-Cesium.buildModuleUrl.setBaseUrl('/assets/cesium/'); // If youre using Cesium version >= 1.42.0 add this line
+Cesium.buildModuleUrl.setBaseUrl('/assets/cesium/'); // If you're using Cesium version >= 1.42.0 add this line
+window['CESIUM_BASE_URL'] = ''; // For some reason this is required to use Cesium's own typescript definitions
 platformBrowserDynamic().bootstrapModule(AppModule);

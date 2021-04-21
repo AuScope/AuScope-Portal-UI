@@ -1,8 +1,8 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { CSWRecordModel } from 'portal-core-ui';
-import { LayerModel } from 'portal-core-ui';
-import { LegendService } from 'portal-core-ui';
-import { UtilitiesService } from 'portal-core-ui';
+import { CSWRecordModel } from '@auscope/portal-core-ui';
+import { LayerModel } from '@auscope/portal-core-ui';
+import { LegendService } from '@auscope/portal-core-ui';
+import { UtilitiesService } from '@auscope/portal-core-ui';
 
 
 
