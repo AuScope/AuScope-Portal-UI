@@ -3,6 +3,7 @@ import { LayerModel } from '@auscope/portal-core-ui';
 import { LayerHandlerService } from '@auscope/portal-core-ui';
 import { CsMapService } from '@auscope/portal-core-ui';
 import { RenderStatusService } from '@auscope/portal-core-ui';
+import { UtilitiesService } from 'portal-core-ui';
 import { Constants } from '@auscope/portal-core-ui';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
