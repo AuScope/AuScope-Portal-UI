@@ -21,13 +21,14 @@ import { MapMode2D, ScreenSpaceEventType, Rectangle } from 'cesium';
   template: `
     <div #mapElement id="map" class="h-100 w-100">
       <ac-map>          
+          <rectangles-editor></rectangles-editor>
           <app-cs-map-zoom></app-cs-map-zoom>
           <app-cs-clipboard class="btn-group float-right mb-3"></app-cs-clipboard> 
       </ac-map>
     </div>
     `,
     providers: [ViewerConfiguration], // Don't forget to Provide it 
-  // styleUrls: ['./csmap.component.css']
+    styleUrls: ['./csmap.component.css']
   // The "#" (template reference variable) matters to access the map element with the ViewChild decorator!
 })
 
