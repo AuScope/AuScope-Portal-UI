@@ -39,8 +39,7 @@ export class CsMapComponent implements AfterViewInit {
 
   name = 'Angular';
   cesiumLoaded = true;
-  viewer: any;  
-  //Viewer viewer;
+  viewer: any;
   
   public static AUSTRALIA = Rectangle.fromDegrees(114.591, -45.837, 148.97, -5.73);
 
@@ -83,6 +82,9 @@ export class CsMapComponent implements AfterViewInit {
         destination: CsMapComponent.AUSTRALIA
       });
       this.viewer = viewer;
+
+      // This reduces the blockiness of the text fonts and other graphics
+      this.viewer.resolutionScale = window.devicePixelRatio;
     };
 
   }
