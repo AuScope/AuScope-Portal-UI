@@ -174,3 +174,13 @@ div.modal-card-size .btn {
 .lightgray-bg {
 	background: #e4e4e4;
 }
+
+::ng-deep .mat-tooltip{
+    border: 1px solid $modal-tab-border-colour !important;
+    border-radius: 3px;
+    background: $modal-background-colour;
+    color: $modal-text-colour !important;
+    padding: 5px;
+    text-align: justify;
+    font-size: 12px;
+}
