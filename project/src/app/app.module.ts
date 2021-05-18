@@ -65,6 +65,7 @@ import { MSCLAnalyticComponent } from './modalwindow/layeranalytic/mscl/mscl.ana
 import { PlotlyViaCDNModule } from 'angular-plotly.js';
 import { OlmapactivelayersComponent } from './menupanel/olmapactivelayers/olmapactivelayers.component';
 
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 // Using CDN module to avoid bug https://github.com/plotly/angular-plotly.js/issues/75
 PlotlyViaCDNModule.plotlyVersion = '1.53.0';
@@ -127,6 +128,7 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     BsDropdownModule.forRoot(),
     CommonModule, 
     PlotlyViaCDNModule, 
+    MatTooltipModule
   ],
   entryComponents: [
     NgbdModalStatusReportComponent,
