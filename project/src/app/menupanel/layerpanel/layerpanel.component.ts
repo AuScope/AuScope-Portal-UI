@@ -13,14 +13,13 @@ import {config} from '../../../environments/config';
 import { MatSliderChange } from '@angular/material/slider';
 import { KeysPipe } from '@auscope/portal-core-ui'; // Necessary for 'getKey' pipe in "layerpanel.component.html"
 import { ResourceType } from '@auscope/portal-core-ui';
+import { ImagerySplitDirection } from 'cesium';
 
 @Component({
     selector: '[appLayerPanel]',
     templateUrl: './layerpanel.component.html',
     styleUrls: ['../menupanel.scss']
 })
-
-
 export class LayerPanelComponent implements OnInit {
 
   layerGroups: {};
@@ -29,7 +28,6 @@ export class LayerPanelComponent implements OnInit {
   @Output() expanded: EventEmitter<any> = new EventEmitter();
   searchText: string
   searchMode: boolean;
-
 
   constructor(private layerHandlerService: LayerHandlerService, private renderStatusService: RenderStatusService,
     private modalService: BsModalService, private csMapService: CsMapService,
@@ -249,6 +247,38 @@ export class LayerPanelComponent implements OnInit {
      */
     public layerOpacityChange(event: MatSliderChange, layer: LayerModel) {
       this.csMapService.setLayerOpacity(layer, (event.value / 100));
+    }
+
+    /**
+     * Split buttons will only be displayed if the split map is shown
+     */
+    public getSplitMapShown(): boolean {
+      return this.csMapService.getSplitMapShown();
+    }
+
+    /**
+     * Set a layer's split direction so that it will appear in either the left, right or both (None) panes.
+     * 
+     * @param event the event trigger
+     * @param layer the layer to set split direction on
+     * @param direction the split direction for the layer to occupy
+     */
+    public setLayerSplitDirection(event: any, layer: LayerModel, direction: string) {
+      event.stopPropagation();
+      let splitDir: ImagerySplitDirection;
+      switch (direction) {
+        case "left":
+          splitDir = ImagerySplitDirection.LEFT;
+          break;
+        case "right":
+          splitDir = ImagerySplitDirection.RIGHT;
+          break;
+        case "none":
+        default:
+          splitDir = ImagerySplitDirection.NONE;
+          break;
+      }
+      this.csMapService.setLayerSplitDirection(layer, splitDir);
     }
 
 }

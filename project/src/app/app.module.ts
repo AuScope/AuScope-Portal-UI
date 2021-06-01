@@ -30,6 +30,7 @@ import { RemanentAnomaliesComponent } from './modalwindow/querier/customanalytic
 import { DynamicAnalyticComponent } from './modalwindow/querier/dynamic.analytic.component';
 import { NVCLDatasetListComponent, NVCLDatasetListDialogComponent } from './modalwindow/querier/customanalytic/nvcl/nvcl.datasetlist.component';
 import { TIMAComponent } from './modalwindow/querier/customanalytic/tima/tima.component';
+import { CsMapSplitComponent } from './cesium-map/csmap.split.component';
 import { CsMapZoomComponent } from './cesium-map/csmap.zoom.component';
 import { NgbdModalStatusReportComponent } from './toppanel/renderstatus/renderstatus.component';
 import { CsMapClipboardComponent } from './cesium-map/csmap.clipboard.component';
@@ -84,6 +85,7 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     InfoPanelComponent,
     NotificationComponent,
     InfoPanelSubComponent,
+    CsMapSplitComponent,
     CsMapZoomComponent,
     QuerierModalComponent,
     DynamicAnalyticComponent,
