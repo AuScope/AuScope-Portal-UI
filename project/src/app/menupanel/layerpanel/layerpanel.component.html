@@ -48,7 +48,13 @@
 							</div>
 							<div *ngIf="uiLayerModels[layer.id].statusMap.renderStarted || uiLayerModels[layer.id].statusMap.renderComplete" class="opacity-slider-panel d-flex" (click)="$event.stopPropagation()">
 								<div class="opacity-label">Opacity {{ uiLayerModels[layer.id].opacity }}%&nbsp;</div>
-								<mat-slider [min]="0" [max]="100" class="opacity-slider flex-grow-1" [(ngModel)]="uiLayerModels[layer.id].opacity" (input)="layerOpacityChange($event, layer.id)"></mat-slider>
+								<mat-slider [min]="0" [max]="100" class="opacity-slider flex-grow-1" [(ngModel)]="uiLayerModels[layer.id].opacity" (input)="layerOpacityChange($event, layer)"></mat-slider>
+							</div>
+							<div class="split-panel" *ngIf="getSplitMapShown() && (uiLayerModels[layer.id].statusMap.renderStarted || uiLayerModels[layer.id].statusMap.renderComplete)" (click)="$event.stopPropagation()">
+								Split Direction&nbsp;
+								<button id="moveLeft" class="btn btn-warning btn-split" (click)="setLayerSplitDirection($event, layer, 'left')">Left</button>
+								<button id="moveBoth" class="btn btn-warning btn-split" (click)="setLayerSplitDirection($event, layer, 'none')">Both</button>
+								<button id="moveRight" class="btn btn-warning btn-split" (click)="setLayerSplitDirection($event, layer, 'right')">Right</button>
 							</div>
 						</div>
 

@@ -19,11 +19,11 @@ import olStyleCircle from 'ol/style/Circle';
 import olStyleFill from 'ol/style/Fill';
 import olStyleStroke from 'ol/style/Stroke';
 import olStyleText from 'ol/style/Text';
-import { Constants } from '@auscope/portal-core-ui';
+import { Constants, ResourceType } from '@auscope/portal-core-ui';
 import { RenderStatusService } from '@auscope/portal-core-ui';
 
 /**
- * Use OlMapService to add layer to map. This service class adds wfs layer to the map
+ * Use open layers to add layer to map. This service class adds vector layer to the map
  */
 @Injectable()
 export class OlIrisService {
@@ -44,7 +44,7 @@ export class OlIrisService {
    */
   public getKMLFeature(layer: LayerModel, onlineResource: OnlineResourceModel): Observable<any> {
 
-    const irisResources = this.layerHandlerService.getOnlineResources(layer, Constants.resourceType.IRIS);
+    const irisResources = this.layerHandlerService.getOnlineResources(layer, ResourceType.IRIS);
     const irisResource = irisResources[0];
     const serviceUrl = irisResource.url;
     const networkCode = irisResource.name;
@@ -111,7 +111,7 @@ export class OlIrisService {
    * @param the wfs layer to be added to the map
    */
   public addLayer(layer: LayerModel, param?: any): void {
-    const irisOnlineResources = this.layerHandlerService.getOnlineResources(layer, Constants.resourceType.IRIS);
+    const irisOnlineResources = this.layerHandlerService.getOnlineResources(layer, ResourceType.IRIS);
 
     for (const onlineResource of irisOnlineResources) {
 

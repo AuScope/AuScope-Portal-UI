@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import { OlClipboardService } from '@auscope/portal-core-ui';
+import { CsClipboardService } from '@auscope/portal-core-ui';
 
 
 @Component({
@@ -11,15 +11,15 @@ export class ClipboardComponent {
 
   public isClipboardShown;
 
-  constructor(private olClipboardService: OlClipboardService) {
+  constructor(private CsClipboardService: CsClipboardService) {
     this.isClipboardShown = false;
-    this.olClipboardService.clipboardBS.subscribe(clipboardStatus => {
+    this.CsClipboardService.clipboardBS.subscribe(clipboardStatus => {
       this.isClipboardShown = clipboardStatus;
     })
 
   }
 
   public toggleClipboard () {
-    this.olClipboardService.toggleClipboard();
+    this.CsClipboardService.toggleClipboard();
   }
 }

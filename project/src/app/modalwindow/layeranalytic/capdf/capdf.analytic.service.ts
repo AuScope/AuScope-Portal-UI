@@ -126,7 +126,7 @@ export class CapdfAnalyticService {
         this.clearPlot(divId);
         const margin = {top: 15, right: 5, bottom: 20, left: 40};
 
-        const targetWidth = $('#' + divId).width();
+        const targetWidth = 100;//$('#' + divId).width();
 
 
         const width = targetWidth - margin.left - margin.right,
@@ -264,7 +264,7 @@ export class CapdfAnalyticService {
      public plotBox(csv, id, targetHeight, xaxis, yaxis) {
          this.clearPlot(id);
          const divId = '#' + id;
-         const targetWidth = $(divId).width();
+         const targetWidth = 100;//$(divId).width();
          const container = d3.select(divId);
          const preserveAspectRatio = true;
          const d3svg = container.append('svg')

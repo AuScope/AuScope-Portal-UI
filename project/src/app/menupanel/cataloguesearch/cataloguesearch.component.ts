@@ -1,14 +1,16 @@
 import { Bbox } from '@auscope/portal-core-ui';
 import { LayerModel } from '@auscope/portal-core-ui';
 import { LayerHandlerService } from '@auscope/portal-core-ui';
-import { OlMapService } from '@auscope/portal-core-ui';
+import { CsMapService } from '@auscope/portal-core-ui';
 import { RenderStatusService } from '@auscope/portal-core-ui';
+import { UtilitiesService } from '@auscope/portal-core-ui';
 import { Constants } from '@auscope/portal-core-ui';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { CataloguesearchService } from './cataloguesearch.service';
 import { Component, AfterViewInit } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
+import { RectangleEditorObservable } from 'angular-cesium';
 
 
 @Component({
@@ -36,8 +38,11 @@ export class CatalogueSearchComponent implements AfterViewInit {
   statusmsg: string;
   totalResults = [];
   currentPage: number;
+     
+  // the rectangle drawn on the map
+  private rectangleObservable: RectangleEditorObservable;
 
-  constructor(private olMapService: OlMapService, private cataloguesearchService: CataloguesearchService,
+  constructor(private csMapService: CsMapService, private cataloguesearchService: CataloguesearchService,
     private renderStatusService: RenderStatusService,  private modalService: BsModalService, private layerHandlerService: LayerHandlerService) {
     this.drawStarted = false;
     this.searchMode = true;
@@ -87,6 +92,11 @@ export class CatalogueSearchComponent implements AfterViewInit {
    */
   public clearBound(): void {
     this.bbox = null;
+    // clear rectangle on the map
+    if (this.rectangleObservable) {
+        this.rectangleObservable.dispose();
+        this.rectangleObservable = null;
+    }
   }
 
   /**
@@ -95,24 +105,26 @@ export class CatalogueSearchComponent implements AfterViewInit {
   public drawBound(): void {
     setTimeout(() => this.drawStarted = true, 0);
 
-    this.olMapService.drawBound().subscribe((vector) => {
-      this.drawStarted = false;
-      const features = vector.getSource().getFeatures();
-      const me = this;
-      // Go through this array and get coordinates of their geometry.
-      features.forEach(function(feature) {
-        me.bbox = new Bbox();
-        me.bbox.crs = 'EPSG:4326';
-        const bbox4326 = feature.getGeometry().transform(Constants.MAP_PROJ, 'EPSG:4326');
-        me.bbox.eastBoundLongitude = bbox4326.getExtent()[2];
-        me.bbox.westBoundLongitude = bbox4326.getExtent()[0];
-        me.bbox.northBoundLatitude = bbox4326.getExtent()[3];
-        me.bbox.southBoundLatitude = bbox4326.getExtent()[1];
-        me.form.north = me.bbox.northBoundLatitude;
-        me.form.south = me.bbox.southBoundLatitude;
-        me.form.east = me.bbox.eastBoundLongitude;
-        me.form.west = me.bbox.westBoundLongitude;
-      });
+    const me = this;
+    this.rectangleObservable = this.csMapService.drawBound();
+    this.rectangleObservable.subscribe((vector) => {
+      me.drawStarted = false;
+      if (!vector.points) {
+          // drawing hasn't started
+          return;
+      }
+      if (vector.points.length < 2
+              || vector.points[0].getPosition().x == vector.points[1].getPosition().x
+              || vector.points[0].getPosition().y == vector.points[1].getPosition().y) {
+          // drawing hasn't finished
+          return;
+      }
+      //EPSG:4326    
+      me.bbox = UtilitiesService.reprojectToWGS84(vector.points);
+      me.form.north = me.bbox.northBoundLatitude;
+      me.form.south = me.bbox.southBoundLatitude;
+      me.form.east = me.bbox.eastBoundLongitude;
+      me.form.west = me.bbox.westBoundLongitude;
     });
   }
 
@@ -128,6 +140,11 @@ export class CatalogueSearchComponent implements AfterViewInit {
    * Search list of wms layer given the wms url
    */
   public search() {
+    // clear rectangle on the map because there is no way to remove it after search is displayed
+    if (this.rectangleObservable) {
+        this.rectangleObservable.dispose();
+        this.rectangleObservable = null;
+    }
     this.layerGroups = [];
     this.loading = true;
     this.searchMode = false;
@@ -165,7 +182,7 @@ export class CatalogueSearchComponent implements AfterViewInit {
    * remove a layer from the map
    */
     public removeLayer(layer: LayerModel) {
-      this.olMapService.removeLayer(layer);
+      this.csMapService.removeLayer(layer);
     }
 
 }
