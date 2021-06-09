@@ -1,5 +1,6 @@
 import { OlMapObject } from '@auscope/portal-core-ui';
 import { OlMapService } from '@auscope/portal-core-ui';
+import { RenderStatusService } from '@auscope/portal-core-ui';
 import { Constants } from '@auscope/portal-core-ui';
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import olStyle from 'ol/style/Style';
@@ -40,7 +41,7 @@ export class OlMapPreviewComponent implements AfterViewInit {
      * This constructor creates the preview map
      */
     constructor(private olMapService: OlMapService) {
-        this.olMapObject = new OlMapObject();
+        this.olMapObject = new OlMapObject(new RenderStatusService(), null);
         this.olMapService = olMapService;
         const map = this.olMapObject.getMap();
         const me = this;
