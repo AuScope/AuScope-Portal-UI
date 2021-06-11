@@ -5,7 +5,7 @@ import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ViewerConfiguration } from 'angular-cesium';
 import { CsCSWService, CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService, QueryWFSService, QueryWMSService, SimpleXMLService, UtilitiesService } from '@auscope/portal-core-ui';
-import { MapMode2D, ScreenSpaceEventHandler, ScreenSpaceEventType, Rectangle, ImagerySplitDirection } from 'cesium';
+import { Cartesian3, MapMode2D, Math, ScreenSpaceEventHandler, SceneMode, ScreenSpaceEventType, Rectangle, ImagerySplitDirection } from 'cesium';
 
 @Component({
   selector: 'app-cs-map',
@@ -81,8 +81,26 @@ export class CsMapComponent implements AfterViewInit {
 
       // This reduces the blockiness of the text fonts and other graphics
       this.viewer.resolutionScale = window.devicePixelRatio;
-    };
 
+      // Zoom to Australia after 2D/3D/Columbus morph
+      this.viewer.scene.morphComplete.addEventListener(() => {
+        const pitch = this.viewer.camera._mode === SceneMode.COLUMBUS_VIEW ? Math.toRadians(-45.0) : Math.toRadians(-90.0);
+        const orient = {
+          heading : Math.toRadians(0.0),
+          pitch : pitch,
+          roll : 0.0
+        }
+        const SOUTH_OF_AUSTRALIA = Cartesian3.fromDegrees(133.7751, -60.0, 3000000.0);
+        const destination = this.viewer.camera._mode === SceneMode.COLUMBUS_VIEW ? SOUTH_OF_AUSTRALIA : CsMapComponent.AUSTRALIA;
+        // Timeout required for bug preventing flyTo immediately after morph
+        setTimeout(() => {
+          this.viewer.camera.flyTo({
+            destination: destination,
+            orientation: orient
+          });
+        }, 100);
+      });
+    };
   }
 
   getViewer() {
