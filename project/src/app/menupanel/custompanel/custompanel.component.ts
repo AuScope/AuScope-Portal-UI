@@ -1,9 +1,9 @@
 import { Component, Output, EventEmitter } from '@angular/core';
-import { LayerHandlerService } from 'portal-core-ui';
+import { LayerHandlerService } from '@auscope/portal-core-ui';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
-import { LayerModel } from 'portal-core-ui';
-import { OlMapService } from 'portal-core-ui';
-import { RenderStatusService } from 'portal-core-ui';
+import { LayerModel } from '@auscope/portal-core-ui';
+import { CsMapService } from '@auscope/portal-core-ui';
+import { RenderStatusService } from '@auscope/portal-core-ui';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
@@ -28,7 +28,7 @@ export class CustomPanelComponent {
     @Output() expanded: EventEmitter<any> = new EventEmitter();
 
     constructor(private layerHandlerService: LayerHandlerService, private renderStatusService: RenderStatusService,
-      private modalService: BsModalService, private olMapService: OlMapService) {
+      private modalService: BsModalService, private csMapService: CsMapService) {
       this.uiLayerModels = {};
       this.loading = false;
       this.statusmsg = 'Enter your WMS service endpoint URL and hit <i class="fa fa-search"></i>';
@@ -72,7 +72,7 @@ export class CustomPanelComponent {
    * remove a layer from the map
    */
     public removeLayer(layer: LayerModel) {
-      this.olMapService.removeLayer(layer);
+      this.csMapService.removeLayer(layer);
     }
 
 }

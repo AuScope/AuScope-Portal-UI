@@ -1,25 +1,25 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { LayerHandlerService } from 'portal-core-ui';
+import { LayerHandlerService } from '@auscope/portal-core-ui';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
-import { LayerModel } from 'portal-core-ui';
-import { OlMapService } from 'portal-core-ui';
-import { OlClipboardService } from 'portal-core-ui';
+import { LayerModel } from '@auscope/portal-core-ui';
+import { CsMapService } from '@auscope/portal-core-ui';
+import { CsClipboardService } from '@auscope/portal-core-ui';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
-import { RenderStatusService } from 'portal-core-ui';
-import { ManageStateService } from 'portal-core-ui';
-import { UtilitiesService } from 'portal-core-ui';
+import { RenderStatusService } from '@auscope/portal-core-ui';
+import { ManageStateService } from '@auscope/portal-core-ui';
+import { UtilitiesService } from '@auscope/portal-core-ui';
 import {config} from '../../../environments/config';
 import { MatSliderChange } from '@angular/material/slider';
-
+import { KeysPipe } from '@auscope/portal-core-ui'; // Necessary for 'getKey' pipe in "layerpanel.component.html"
+import { ResourceType } from '@auscope/portal-core-ui';
+import { ImagerySplitDirection } from 'cesium';
 
 @Component({
     selector: '[appLayerPanel]',
     templateUrl: './layerpanel.component.html',
     styleUrls: ['../menupanel.scss']
 })
-
-
 export class LayerPanelComponent implements OnInit {
 
   layerGroups: {};
@@ -29,10 +29,9 @@ export class LayerPanelComponent implements OnInit {
   searchText: string
   searchMode: boolean;
 
-
   constructor(private layerHandlerService: LayerHandlerService, private renderStatusService: RenderStatusService,
-    private modalService: BsModalService, private olMapService: OlMapService,
-    private manageStateService: ManageStateService, private olClipboardService: OlClipboardService) {
+    private modalService: BsModalService, private csMapService: CsMapService,
+    private manageStateService: ManageStateService, private CsClipboardService: CsClipboardService) {
     this.uiLayerModels = {};
     this.searchMode = false;
    }
@@ -115,7 +114,7 @@ export class LayerPanelComponent implements OnInit {
       for (const layerGroupKey in this.layerGroups) {
         this.layerGroups[layerGroupKey].hide = true;
         for (const layer of this.layerGroups[layerGroupKey]) {
-          if (this.layerHandlerService.containsWMS(layer)) {
+          if (this.layerHandlerService.contains(layer, ResourceType.WMS)) {
             layer.hide = false;
             this.layerGroups[layerGroupKey].hide = false;
             this.layerGroups[layerGroupKey].expanded = true;
@@ -139,7 +138,7 @@ export class LayerPanelComponent implements OnInit {
       for (const layerGroupKey in this.layerGroups) {
         this.layerGroups[layerGroupKey].hide = true;
         for (const layer of this.layerGroups[layerGroupKey]) {
-          if (this.layerHandlerService.containsWFS(layer)) {
+          if (this.layerHandlerService.contains(layer, ResourceType.WFS)) {
             layer.hide = false;
             this.layerGroups[layerGroupKey].hide = false;
             this.layerGroups[layerGroupKey].expanded = true;
@@ -192,6 +191,7 @@ export class LayerPanelComponent implements OnInit {
               me.layerGroups = response;
               for (const key in me.layerGroups) {
                 for (let i = 0; i < me.layerGroups[key].length; i++) {
+                  me.layerGroups[key][i].csLayers = [];
                   const uiLayerModel = new UILayerModel(me.layerGroups[key][i].id, me.renderStatusService.getStatusBSubject(me.layerGroups[key][i]));
                   // VT: permanent link
                   if (layerStateObj && layerStateObj[uiLayerModel.id]) {
@@ -213,7 +213,7 @@ export class LayerPanelComponent implements OnInit {
               }
             });
         });
-        this.olClipboardService.filterLayersBS.subscribe(
+        this.CsClipboardService.filterLayersBS.subscribe(
           (bFilterLayers) => {
             if (bFilterLayers) {
               this.searchFilter();
@@ -239,14 +239,61 @@ export class LayerPanelComponent implements OnInit {
      */
     public removeLayer(layer: LayerModel) {
       this.uiLayerModels[layer.id].opacity = 100;
-      this.olMapService.removeLayer(layer);
+      this.csMapService.removeLayer(layer);
     }
 
     /**
      * Layer opacity slider change event
      */
-    public layerOpacityChange(event: MatSliderChange, layerId: string) {
-      this.olMapService.setLayerOpacity(layerId, (event.value / 100));
+    public layerOpacityChange(event: MatSliderChange, layer: LayerModel) {
+      this.csMapService.setLayerOpacity(layer, (event.value / 100));
     }
+
+    /**
+     * Split buttons will only be displayed if the split map is shown
+     */
+    public getSplitMapShown(): boolean {
+      return this.csMapService.getSplitMapShown();
+    }
+
+    /**
+     * Set a layer's split direction so that it will appear in either the left, right or both (None) panes.
+     * 
+     * @param event the event trigger
+     * @param layer the layer to set split direction on
+     * @param direction the split direction for the layer to occupy
+     */
+    public setLayerSplitDirection(event: any, layer: LayerModel, direction: string) {
+      event.stopPropagation();
+      let splitDir: ImagerySplitDirection;
+      switch (direction) {
+        case "left":
+          splitDir = ImagerySplitDirection.LEFT;
+          break;
+        case "right":
+          splitDir = ImagerySplitDirection.RIGHT;
+          break;
+        case "none":
+        default:
+          splitDir = ImagerySplitDirection.NONE;
+          break;
+      }
+      this.csMapService.setLayerSplitDirection(layer, splitDir);
+    }
+
+    /**
+     * Returns true if any layer in a layer group is active 
+     * "layerGroup" - an instance of this.layerGroups[key].value
+     */
+    public isLayerGroupActive(layerGroupValue): boolean {
+      let activeLayers: string[]= Object.keys(this.csMapService.getLayerModelList());
+      for (const layer of layerGroupValue) {
+        if(activeLayers.indexOf(layer.id)>-1){
+         return true;
+       }
+     };  
+     return false;
+
+  }
 
 }

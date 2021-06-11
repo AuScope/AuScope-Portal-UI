@@ -277,3 +277,17 @@ input + div.input-group-append  > button {
         }
     }
 }
+
+.split-panel {
+    margin-bottom: 4px;
+}
+
+.btn-split {
+    height: 20px;
+    padding: 2px;
+    justify-content: center;
+    align-items: center;
+    display: inline-flex;
+    margin-left: 4px;
+    font-size: small;
+}

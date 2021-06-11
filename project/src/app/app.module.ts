@@ -6,8 +6,11 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { NouisliderModule } from 'ng2-nouislider';
 import { CommonModule } from '@angular/common';
 
+// Cesium icons
+import { MatTooltipModule } from '@angular/material/tooltip';
+
 // Components
-import { OlMapComponent } from './openlayermap/olmap.component';
+import { CsMapComponent } from './cesium-map/csmap.component';
 import { OlMapPreviewComponent } from './menupanel/common/infopanel/openlayermappreview/olmap.preview.component';
 import { LayerPanelComponent } from './menupanel/layerpanel/layerpanel.component';
 import { CustomPanelComponent } from './menupanel/custompanel/custompanel.component';
@@ -27,19 +30,19 @@ import { RemanentAnomaliesComponent } from './modalwindow/querier/customanalytic
 import { DynamicAnalyticComponent } from './modalwindow/querier/dynamic.analytic.component';
 import { NVCLDatasetListComponent, NVCLDatasetListDialogComponent } from './modalwindow/querier/customanalytic/nvcl/nvcl.datasetlist.component';
 import { TIMAComponent } from './modalwindow/querier/customanalytic/tima/tima.component';
-import { OlMapZoomComponent } from './openlayermap/olmap.zoom.component';
+import { CsMapSplitComponent } from './cesium-map/csmap.split.component';
+import { CsMapZoomComponent } from './cesium-map/csmap.zoom.component';
 import { NgbdModalStatusReportComponent } from './toppanel/renderstatus/renderstatus.component';
-import { OlMapClipboardComponent } from './openlayermap/olmap.clipboard.component';
+import { CsMapClipboardComponent } from './cesium-map/csmap.clipboard.component';
 
-
+import { AngularCesiumModule, AngularCesiumWidgetsModule } from 'angular-cesium';
 
 import { NotificationComponent } from './toppanel/notification/notification.component';
 import { QuerierModalComponent } from './modalwindow/querier/querier.modal.component';
 import { ClipboardModule } from 'ngx-clipboard';
 
-
-import { PortalCoreModule } from 'portal-core-ui';
-import { PortalCorePipesModule } from 'portal-core-ui';
+import { PortalCoreModule } from '@auscope/portal-core-ui';
+import { PortalCorePipesModule } from '@auscope/portal-core-ui';
 
 import { NgSelectModule } from '@ng-select/ng-select';
 
@@ -51,18 +54,17 @@ import { MatTreeModule } from '@angular/material/tree';
 import { CdkTableModule } from '@angular/cdk/table';
 
 import { StorageServiceModule } from 'ngx-webstorage-service';
-import { OlmapBaselayerselectorComponent } from './openlayermap/olmap.baselayerselector/olmap.baselayerselector.component';
 import { DisclaimerModalComponent } from './modalwindow/disclaimer/disclaimer.modal.component';
 import { PortalDetailsPanelComponent } from './menupanel/portal-details-panel/portal-details-panel.component';
 
-import {NgxChartsModule} from '@swimlane/ngx-charts';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { MSCLComponent } from './modalwindow/querier/customanalytic/mscl/mscl.component';
 import { MSCLAnalyticComponent } from './modalwindow/layeranalytic/mscl/mscl.analytic.component';
 
-
 import { PlotlyViaCDNModule } from 'angular-plotly.js';
+import { RectanglesEditorService } from 'angular-cesium';
 
 // Using CDN module to avoid bug https://github.com/plotly/angular-plotly.js/issues/75
 PlotlyViaCDNModule.plotlyVersion = '1.53.0';
@@ -71,7 +73,7 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
 
 @NgModule({
   declarations: [
-    OlMapComponent,
+    CsMapComponent,
     OlMapPreviewComponent,
     LayerPanelComponent,
     CustomPanelComponent,
@@ -79,11 +81,12 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     FilterPanelComponent,
     DownloadPanelComponent,
     NgbdModalStatusReportComponent,
-    OlMapClipboardComponent,
+    CsMapClipboardComponent,
     InfoPanelComponent,
     NotificationComponent,
     InfoPanelSubComponent,
-    OlMapZoomComponent,
+    CsMapSplitComponent,
+    CsMapZoomComponent,
     QuerierModalComponent,
     DynamicAnalyticComponent,
     NVCLDatasetListComponent,
@@ -98,13 +101,12 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     DynamicAdvancefilterComponent,
     CapdfAdvanceFilterComponent,
     CapdfAnalyticComponent,
-    OlmapBaselayerselectorComponent,
     DisclaimerModalComponent,
     PortalDetailsPanelComponent,
     MSCLComponent,
     MSCLAnalyticComponent
   ],
-  providers: [],
+  providers: [RectanglesEditorService],
   imports: [
     PortalCoreModule.forRoot(environment, config),
     PortalCorePipesModule,
@@ -122,7 +124,10 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     NgxChartsModule,
     BrowserAnimationsModule,
     BsDropdownModule.forRoot(),
-    CommonModule, PlotlyViaCDNModule
+    CommonModule, PlotlyViaCDNModule,
+    AngularCesiumModule.forRoot(),
+    AngularCesiumWidgetsModule,
+    MatTooltipModule
   ],
   entryComponents: [
     NgbdModalStatusReportComponent,
@@ -140,16 +145,16 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     MSCLAnalyticComponent
   ],
   bootstrap: [
-    OlMapComponent,
+    CsMapComponent,
     LayerPanelComponent,
     CustomPanelComponent,
     NotificationComponent,
-    OlMapZoomComponent,
+    // OlMapZoomComponent,
     PermanentLinkComponent,
     CatalogueSearchComponent,
     ClipboardComponent,
-    OlMapClipboardComponent,
-    OlmapBaselayerselectorComponent,
+    // OlMapClipboardComponent,
+    // OlmapBaselayerselectorComponent,
     PortalDetailsPanelComponent
   ]
 })

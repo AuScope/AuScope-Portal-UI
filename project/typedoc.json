@@ -11,5 +11,5 @@
   "stripInternal": "true",
   "suppressExcessPropertyErrors": "true",
   "suppressImplicitAnyIndexErrors": "true",
-  "module": "portal-core-ui"
+  "module": "@auscope/portal-core-ui"
 }

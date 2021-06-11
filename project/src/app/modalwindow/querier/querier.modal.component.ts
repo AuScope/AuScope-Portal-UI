@@ -1,15 +1,15 @@
 
-import {UtilitiesService} from 'portal-core-ui';
+import {UtilitiesService} from '@auscope/portal-core-ui';
 import {Component} from '@angular/core';
 import {environment} from '../../../environments/environment';
 import {config} from '../../../environments/config';
 import {ref} from '../../../environments/ref';
-import {QuerierInfoModel} from 'portal-core-ui';
+import {QuerierInfoModel} from '@auscope/portal-core-ui';
 import {NVCLService} from './customanalytic/nvcl/nvcl.service';
 import {BsModalRef} from 'ngx-bootstrap/modal';
-import {OlClipboardService, Polygon} from 'portal-core-ui';
-import {ManageStateService} from 'portal-core-ui';
-import {GMLParserService} from 'portal-core-ui';
+import {CsClipboardService, Polygon} from '@auscope/portal-core-ui';
+import {ManageStateService} from '@auscope/portal-core-ui';
+import {GMLParserService} from '@auscope/portal-core-ui';
 import {NestedTreeControl} from '@angular/cdk/tree';
 import {MatTreeNestedDataSource} from '@angular/material/tree';
 import {BehaviorSubject, of as observableOf} from 'rxjs';
@@ -49,7 +49,7 @@ export class QuerierModalComponent {
 
   nestedDataSource: MatTreeNestedDataSource<FileNode>[] = [];
 
-  constructor(public bsModalRef: BsModalRef, public olClipboardService: OlClipboardService,
+  constructor(public bsModalRef: BsModalRef, public CsClipboardService: CsClipboardService,
     private manageStateService: ManageStateService, private gmlParserService: GMLParserService, 
         private http: HttpClient, @Inject('env') private env, private sanitizer: DomSanitizer) {
     this.analyticMap = ref.analytic;
@@ -112,8 +112,8 @@ export class QuerierModalComponent {
       polygon.srs = config.clipboard.ProvinceFullExtent.srsName;
     }
     if (polygon !== null) {
-      this.olClipboardService.addPolygon(polygon);
-      this.olClipboardService.toggleClipboard(true);
+      this.CsClipboardService.addPolygon(polygon);
+      this.CsClipboardService.toggleClipboard(true);
     }
   }
   

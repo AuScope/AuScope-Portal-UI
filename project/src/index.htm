@@ -73,6 +73,19 @@
 			<li class="hasEvent d-none d-md-block" appFilterClipboard></li>
             <hr/>
 			<h6 class="sidebar-heading">Layer Selection</h6>
+
+            <!-- BEGIN Active Layers -->
+            <input type="checkbox" checked disabled class="menuBtn" id="activeLayersBtn"/>
+            <h5 class="mb-1">
+                <label id="activeLayersLink" for="activeLayersBtn" class="mb-0">
+                    <i class="ti-filter"></i>
+                    Active Layers
+                    <i class="fa fa-arrow-circle-down"></i>
+                </label>
+                <ul class="card-sub" app-olmapactivelayers></ul>
+            </h5>
+            <!-- END Active Layers -->
+
             <!-- BEGIN All Layers -->
             <input type="checkbox" class="menuBtn" id="allLayersBtn"/>
 			<h5 class="mb-1">
@@ -116,28 +129,27 @@
 		<!-- BEGIN #map-area -->
 		<div id="map-area" class="map-area">
 			<!-- BEGIN map-area-controlsr -->
-			<div class="map-area-controls">
+			<!-- TODO: Replace with cesium equivalents
+                <div class="map-area-controls">
 
                 <div class="btn-group float-right d-none d-md-block">
-					<app-olmap-baselayerselector class="float-right mb-3"></app-olmap-baselayerselector>
-					<br>
 					<app-ol-map-zoom class="float-right mb-3"></app-ol-map-zoom>
 					<br>
-					<app-ol-clipboard class="btn-inverse float-right mb-3"></app-ol-clipboard>
+                    <app-ol-clipboard class="btn-inverse float-right mb-3"></app-ol-clipboard>
                 </div>
 
                 <div class="btn-group float-left">
                     <button type="button" class="btn btn-sm btn-inverse active d-none d-md-block" id="mouse-position" style="cursor: default;" >Coordinate: Lon/Lat</button>
                 </div>
 
-			</div>
+			</div> -->
 			<!-- BEGIN map-area-controls -->
 
-			<!-- BEGIN map-area-olmap -->
-            <div class="map-area-olmap">
-				 <app-ol-map class="h-100 w-100"></app-ol-map>
+			<!-- BEGIN map-area-csmap -->
+            <div class="map-area-csmap">
+				 <app-cs-map class="h-100 w-100"></app-cs-map>
             </div>
-			<!-- END map-area-olmap -->
+			<!-- END map-area-csmap -->
 		</div>
 		<!-- END #content -->
 

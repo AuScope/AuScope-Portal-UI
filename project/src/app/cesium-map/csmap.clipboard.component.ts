@@ -1,48 +1,50 @@
-import { OlClipboardService, Polygon } from 'portal-core-ui';
+import { CsClipboardService, Polygon } from '@auscope/portal-core-ui';
 import { Component, OnInit } from '@angular/core';
 
+// TODO: Convert to cesium
+
 @Component({
-  selector: 'app-ol-clipboard',
-  templateUrl: './olmap.clipboard.component.html',
-  styleUrls: ['./olmap.component.css']
+  selector: 'app-cs-clipboard',
+  templateUrl: './csmap.clipboard.component.html',
+  styleUrls: ['./csmap.component.css'],
 })
 
-export class OlMapClipboardComponent implements OnInit {
+export class CsMapClipboardComponent implements OnInit {
   buttonText = 'clipboard';
   polygonBBox: Polygon;
   bShowClipboard: Boolean;
   public isFilterLayerShown: Boolean;
   public isDrawingPolygon: boolean;
-  constructor(private olClipboardService: OlClipboardService) {
+  constructor(private CsClipboardService: CsClipboardService) {
     this.polygonBBox = null;
     this.isFilterLayerShown = false;
     this.isDrawingPolygon = false;
-    this.olClipboardService.filterLayersBS.subscribe(filterLayerStatus => {
+    this.CsClipboardService.filterLayersBS.subscribe(filterLayerStatus => {
       this.isFilterLayerShown = filterLayerStatus;
     })
 
-    this.olClipboardService.polygonsBS.subscribe(polygon => {
+    this.CsClipboardService.polygonsBS.subscribe(polygon => {
         this.isDrawingPolygon = false;
     })
   }
 
   ngOnInit(): void {
-      this.olClipboardService.clipboardBS.subscribe(
+      this.CsClipboardService.clipboardBS.subscribe(
         (show) => {
           this.bShowClipboard = show;
       });
 
-      this.olClipboardService.polygonsBS.subscribe(
+      this.CsClipboardService.polygonsBS.subscribe(
         (polygonBBox) => {
           this.polygonBBox = polygonBBox;
       });
     }
   clearClipboard() {
-    this.olClipboardService.clearClipboard();
+    this.CsClipboardService.clearClipboard();
   }
 
   public toggleFilterLayers() {
-    this.olClipboardService.toggleFilterLayers();
+    this.CsClipboardService.toggleFilterLayers();
   }
 
   /**
@@ -51,7 +53,7 @@ export class OlMapClipboardComponent implements OnInit {
    */
   public drawPolygon(): void {
     this.isDrawingPolygon = true;
-    this.olClipboardService.drawPolygon();
+    this.CsClipboardService.drawPolygon();
   }
 
   getPolygonBBoxs(): String {

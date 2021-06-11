@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {NotificationService} from 'portal-core-ui';
+import {NotificationService} from '@auscope/portal-core-ui';
 
 
 @Component({

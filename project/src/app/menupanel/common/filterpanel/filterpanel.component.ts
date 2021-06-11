@@ -1,28 +1,28 @@
-import { LayerModel } from 'portal-core-ui';
-import { LayerHandlerService } from 'portal-core-ui';
-import { FilterPanelService } from 'portal-core-ui';
-import { OlMapService } from 'portal-core-ui';
-import { OlClipboardService } from 'portal-core-ui';
+import { LayerModel } from '@auscope/portal-core-ui';
+import { LayerHandlerService } from '@auscope/portal-core-ui';
+import { FilterPanelService } from '@auscope/portal-core-ui';
+import { CsMapService } from '@auscope/portal-core-ui';
+import { CsClipboardService } from '@auscope/portal-core-ui';
 import * as $ from 'jquery';
-import { UtilitiesService } from 'portal-core-ui';
+import { UtilitiesService } from '@auscope/portal-core-ui';
 import { Component, Input, OnInit } from '@angular/core';
 import * as _ from 'lodash';
 import { environment } from '../../../../environments/environment';
 import { ref } from '../../../../environments/ref';
 import { LayerAnalyticModalComponent } from '../../../modalwindow/layeranalytic/layer.analytic.modal.component';
-import { ManageStateService } from 'portal-core-ui';
-import { AuMapService } from '../../../services/wcustom/au-map.service';
-import { OlIrisService } from '../../../services/wcustom/iris/ol-iris.service';
+import { ManageStateService } from '@auscope/portal-core-ui';
+// import { AuMapService } from '../../../services/wcustom/au-map.service';
+import { CsIrisService } from '@auscope/portal-core-ui';
 import { BsModalService } from 'ngx-bootstrap/modal';
-import { OlWMSService } from 'portal-core-ui';
-import { LayerStatusService } from 'portal-core-ui';
+import { CsWMSService } from '@auscope/portal-core-ui';
+import { LayerStatusService } from '@auscope/portal-core-ui';
 
 declare var gtag: Function;
 
 @Component({
   selector: 'app-filter-panel',
   templateUrl: './filterpanel.component.html',
-  providers: [AuMapService, OlIrisService, LayerStatusService],
+  providers: [CsIrisService, LayerStatusService],
   styleUrls: ['./filterpanel.component.scss', '../../menupanel.scss']
 })
 export class FilterPanelComponent implements OnInit {
@@ -37,14 +37,14 @@ export class FilterPanelComponent implements OnInit {
   public bApplyClipboardBBox = true;
 
   constructor(
-    private olMapService: OlMapService,
+    private csMapService: CsMapService,
     private layerHandlerService: LayerHandlerService,
-    private auscopeMapService: AuMapService,
+    // private auscopeMapService: AuMapService,
     private filterPanelService: FilterPanelService,
     private modalService: BsModalService,
     private manageStateService: ManageStateService,
-    private olClipboardService: OlClipboardService,
-    private olWMSService: OlWMSService,
+    private CsClipboardService: CsClipboardService,
+    private csWMSService: CsWMSService,
     public layerStatus: LayerStatusService
   ) {
     this.providers = [];
@@ -138,24 +138,17 @@ export class FilterPanelComponent implements OnInit {
       }
     }
     // VT: End append
-    try {
-      this.olMapService.addLayer(layer, param);
-    } catch (error) {
-      // VT: If portal-core-ui is unable to render the layer, it must be a auscope specific layer. E.g Iris
-      try {
-        this.auscopeMapService.addLayer(layer, param);
-      } catch (error) {
-        alert(
-          'Unable to render layer as this layer is missing vital information required for rendering'
-        );
-      }
-    }
+
+    // Add layer      
+    this.csMapService.addLayer(layer, param);
 
     // If on a small screen, when a new layer is added, roll up the sidebar to expose the map */
     if ($('#sidebar-toggle-btn').css('display') !== 'none') {
       $('#sidebar-toggle-btn').click();
     }
   }
+
+
   /**
    * Get Filter for NvclAnalytical
    * @param layer the layer to add to map
@@ -180,7 +173,7 @@ export class FilterPanelComponent implements OnInit {
     }
     const me = this;
     try {
-      this.olWMSService.getNvclFilter(layer, param).subscribe(response => {
+      this.csWMSService.getNvclFilter(layer, param).subscribe(response => {
         if (response.indexOf('<ogc:Intersects>') >= 0) {
           const ogcIntersects = UtilitiesService.getPolygonFilter(response);
           // tslint:disable-next-line:max-line-length
@@ -199,7 +192,7 @@ export class FilterPanelComponent implements OnInit {
    */
   public onApplyClipboardBBox(): void {
     if (this.bApplyClipboardBBox) {
-      this.olClipboardService.polygonsBS.subscribe(polygonBBoxs => {
+      this.CsClipboardService.polygonsBS.subscribe(polygonBBoxs => {
         if (!UtilitiesService.isEmpty(polygonBBoxs)) {
           for (const optFilter of this.optionalFilters) {
             if (optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
@@ -267,7 +260,7 @@ export class FilterPanelComponent implements OnInit {
     }
 
     if (filter.type === 'OPTIONAL.POLYGONBBOX') {
-      this.olClipboardService.toggleClipboard(true);
+      this.CsClipboardService.toggleClipboard(true);
     }
     this.optionalFilters.push(filter);
   }

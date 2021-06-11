@@ -8,7 +8,7 @@ import {NVCLBoreholeAnalyticComponent} from '../app/modalwindow/layeranalytic/nv
 import { RemanentAnomaliesComponent } from '../app/modalwindow/querier/customanalytic/RemanentAnomalies/remanentanomalies.component';
 import {NVCLDatasetListComponent} from '../app/modalwindow/querier/customanalytic/nvcl/nvcl.datasetlist.component';
 import {TIMAComponent} from '../app/modalwindow/querier/customanalytic/tima/tima.component';
-import {IrisQuerierHandler} from '../app/openlayermap/custom-querier-handler/iris-querier-handler.service';
+import {IrisQuerierHandler} from '../app/cesium-map/custom-querier-handler/iris-querier-handler.service';
 import {MSCLComponent} from '../app/modalwindow/querier/customanalytic/mscl/mscl.component';
 export const ref = {
   analytic: {

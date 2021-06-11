@@ -1,64 +1,107 @@
 import { config } from '../../environments/config';
 import { ref } from '../../environments/ref';
-import {QuerierModalComponent} from '../modalwindow/querier/querier.modal.component';
-import { CSWRecordModel } from 'portal-core-ui';
-import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
-import olZoom from 'ol/control/Zoom';
-import olScaleLine from 'ol/control/ScaleLine';
-import {BsModalService, BsModalRef} from 'ngx-bootstrap/modal';
-import {OlMapObject} from 'portal-core-ui';
-import {OlMapService} from 'portal-core-ui';
-import {ManageStateService } from 'portal-core-ui';
-import {OlCSWService } from 'portal-core-ui';
-import {QueryWFSService} from 'portal-core-ui';
-import {QueryWMSService} from 'portal-core-ui';
-import {GMLParserService} from 'portal-core-ui';
-import {SimpleXMLService} from 'portal-core-ui';
-import { UtilitiesService } from 'portal-core-ui';
-import olControlMousePosition from 'ol/control/MousePosition';
-import * as olCoordinate from 'ol/coordinate';
+import { QuerierModalComponent } from '../modalwindow/querier/querier.modal.component';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
+import { ViewerConfiguration } from 'angular-cesium';
+import { CsCSWService, CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService, QueryWFSService, QueryWMSService, SimpleXMLService, UtilitiesService } from '@auscope/portal-core-ui';
+import { MapMode2D, ScreenSpaceEventHandler, ScreenSpaceEventType, Rectangle, ImagerySplitDirection } from 'cesium';
 
 @Component({
-  selector: 'app-ol-map',
+  selector: 'app-cs-map',
   template: `
-    <div #mapElement id="map" class="h-100 w-100"> </div>
+    <div #mapElement id="map" class="h-100 w-100">
+      <ac-map>
+          <rectangles-editor></rectangles-editor>
+          <app-cs-map-zoom></app-cs-map-zoom>
+          <app-cs-map-split (toggleEvent)="toggleShowMapSplit()"></app-cs-map-split>
+          <app-cs-clipboard class="btn-group float-right mb-3"></app-cs-clipboard>
+          <div #mapSlider id="mapSlider" *ngIf="getSplitMapShown()">
+            <div class="slider-grabber"></div>
+          </div>
+      </ac-map>
+    </div>
     `,
-  styleUrls: ['./olmap.component.css']
+    providers: [ViewerConfiguration], // Don't forget to Provide it 
+    styleUrls: ['./csmap.component.css']
   // The "#" (template reference variable) matters to access the map element with the ViewChild decorator!
 })
 
-export class OlMapComponent implements AfterViewInit {
+
+export class CsMapComponent implements AfterViewInit {
   // This is necessary to access the html element to set the map target (after view init)!
   @ViewChild('mapElement', { static: true }) mapElement: ElementRef;
 
+  @ViewChild('mapSlider', { static: false }) mapSlider: ElementRef;
+
+  name = 'Angular';
+  cesiumLoaded = true;
+  viewer: any;
+
+  sliderMoveActive: boolean = false;
+
+  public static AUSTRALIA = Rectangle.fromDegrees(114.591, -45.837, 148.97, -5.73);
+
   private bsModalRef: BsModalRef;
 
-  constructor(public olMapObject: OlMapObject, private olMapService: OlMapService, private modalService: BsModalService,
+  constructor(private csMapService: CsMapService, private modalService: BsModalService,
     private queryWFSService: QueryWFSService, private queryWMSService: QueryWMSService, private gmlParserService: GMLParserService,
-    private manageStateService: ManageStateService) {
-    this.olMapService.getClickedLayerListBS().subscribe(mapClickInfo => {
-      this.handleLayerClick(mapClickInfo);
-    })
+    private manageStateService: ManageStateService, private viewerConf: ViewerConfiguration) {
+    // FIXME this.csMapService.getClickedLayerListBS().subscribe(mapClickInfo => {
+    //  this.handleLayerClick(mapClickInfo);
+    //});
+
+    // viewerOptions will be passed the Cesium.Viewer constuctor
+    viewerConf.viewerOptions = {
+      selectionIndicator: false,
+      timeline: false,
+      infoBox: false,
+      fullscreenButton: false,
+      baseLayerPicker: true,
+      imageryProviderViewModels: this.csMapService.createBaseMapLayers(),
+      terrainProviderViewModels: [],
+      animation: false,
+      shouldAnimate: false,
+      homeButton: false,
+      geocoder: false,
+      navigationHelpButton: false,
+      navigationInstructionsInitiallyVisible: false,
+      mapMode2D: MapMode2D.ROTATE,
+    };
+    // Will be called on viewer initialistion
+    viewerConf.viewerModifier = (viewer: any) => {
+      // Remove default double click zoom behaviour
+      viewer.screenSpaceEventHandler.removeInputAction(ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+
+      // Look at Australia
+      viewer.camera.setView({
+        destination: CsMapComponent.AUSTRALIA
+      });
+      this.viewer = viewer;
+
+      // This reduces the blockiness of the text fonts and other graphics
+      this.viewer.resolutionScale = window.devicePixelRatio;
+    };
+
   }
 
+  getViewer() {
+    return this.viewer;
+  }
 
-  // After view init the map target can be set!
   ngAfterViewInit() {
-    const mousePositionControl = new olControlMousePosition({
-      coordinateFormat: olCoordinate.createStringXY(4),
-      projection: 'EPSG:4326',
-      target: document.getElementById('mouse-position'),
-      undefinedHTML: 'Mouse out of range'
-    });
 
-    this.olMapObject.addControlToMap(mousePositionControl);
-    this.olMapObject.addControlToMap(new olZoom());
-    this.olMapObject.addControlToMap(new olScaleLine('metric'));
-    this.olMapObject.addGeocoderToMap();
+    this.csMapService.init();
 
-    this.olMapObject.getMap().setTarget(this.mapElement.nativeElement.id);
+    // TODO: Add a cesium widget to display coordinates of mouse 
 
-    // VT: permanent link(open borehole in external window)
+    // TODO: Add a cesium widget to zoom in/out on map
+  
+    // TODO: Add a cesium widget to display map scale
+    
+    // TODO: Add a cesium geocoder widget
+
+    // This code is used to display the map state stored in a permanent link
     const state = UtilitiesService.getUrlParameterByName('state');
     if (state) {
       const me = this;
@@ -71,7 +114,7 @@ export class OlMapComponent implements AfterViewInit {
               continue;
             }
             if (layerStateObj[layerKey].raw) {
-              me.olMapService.getAddLayerSubject().subscribe(layer => {
+              me.csMapService.getAddLayerSubject().subscribe((layer: LayerModel) => {
                 setTimeout(() => {
                   if (layer.id === layerKey) {
                     const mapLayer = {
@@ -82,13 +125,9 @@ export class OlMapComponent implements AfterViewInit {
                     me.setModal(layerStateObj[layerKey].raw, mapLayer, me.bsModalRef, layerStateObj[layerKey].gmlid);
                   }
                 }, 0);
-
               })
-
-
             }
           }
-
       });
       // VT: End permanent link
     }
@@ -114,7 +153,7 @@ export class OlMapComponent implements AfterViewInit {
       this.displayModal(modalDisplayed, mapClickInfo.clickCoord);
 
       // VT: if it is a csw renderer layer, handling of the click is slightly different
-      if (config.cswrenderer.includes(feature.layer.id) || OlCSWService.cswDiscoveryRendered.includes(feature.layer.id)) {
+      if (config.cswrenderer.includes(feature.layer.id) || CsCSWService.cswDiscoveryRendered.includes(feature.layer.id)) {
         this.setModalHTML(this.parseCSWtoHTML(feature.cswRecord), feature.cswRecord.name, feature, this.bsModalRef);
       } else if (ref.customQuerierHandler[feature.layer.id]) {
           const handler = new ref.customQuerierHandler[feature.layer.id](feature);
@@ -137,9 +176,7 @@ export class OlMapComponent implements AfterViewInit {
             '...', feature, this.bsModalRef);
           break;
         }
-
       }
-
     }
 
     // VT: process list of layers clicked
@@ -198,9 +235,9 @@ export class OlMapComponent implements AfterViewInit {
       modalDisplayed.value = true;
       this.bsModalRef.content.downloading = true;
       if (clickCoord) {
-        const vector = this.olMapService.drawDot(clickCoord);
+        const vector = this.csMapService.drawDot(clickCoord);
         this.modalService.onHide.subscribe(reason => {
-          this.olMapService.removeVector(vector);
+          this.csMapService.removeVector(vector);
         })
       }
     }
@@ -299,7 +336,6 @@ export class OlMapComponent implements AfterViewInit {
   }
 
 
-
   /**
    * Set the modal dialog with an HTML message
    * @param html HTML response string
@@ -319,5 +355,66 @@ export class OlMapComponent implements AfterViewInit {
      this.bsModalRef.content.downloading = false;
   }
 
+  /**
+   * Updates the imagerySplitPosition when the slider is moved
+   * @param movement mouse event
+   */
+  private moveSlider = (movement) => {
+    if (!this.sliderMoveActive) {
+      return;
+    }
+    // New position is slider position + the relative mouse offset    
+    let newSliderPosition = this.mapSlider.nativeElement.offsetLeft + movement.endPosition.x;
+    // Make sure we haven't gone too far left (slider < 0) or right (slider > map width - slider width)
+    if (newSliderPosition < 0) {
+      newSliderPosition = 0;
+    } else if (newSliderPosition > (this.mapElement.nativeElement.offsetWidth - this.mapSlider.nativeElement.offsetWidth)) {
+      newSliderPosition = this.mapElement.nativeElement.offsetWidth - this.mapSlider.nativeElement.offsetWidth;
+    }
+    const splitPosition = newSliderPosition / this.mapElement.nativeElement.offsetWidth;
+    this.mapSlider.nativeElement.style.left = 100.0 * splitPosition + "%";
+    this.viewer.scene.imagerySplitPosition = splitPosition;
+  }
+
+  /**
+   * Split map toggled on/off
+   * If on, sets imagerySplitPosition and adds handlers
+   * If off, resets all active layer split directions to NONE
+   */
+  public toggleShowMapSplit() {
+    this.csMapService.setSplitMapShown(!this.csMapService.getSplitMapShown());
+    if (this.csMapService.getSplitMapShown()) {
+        setTimeout(() => {
+          this.viewer.scene.imagerySplitPosition = this.mapSlider.nativeElement.offsetLeft / this.mapElement.nativeElement.offsetWidth;
+          let handler = new ScreenSpaceEventHandler(this.mapSlider.nativeElement);
+          handler.setInputAction(() => {
+            this.sliderMoveActive = true;
+          }, ScreenSpaceEventType.LEFT_DOWN);
+          handler.setInputAction(() => {
+            this.sliderMoveActive = true;
+          }, ScreenSpaceEventType.PINCH_START);
+          handler.setInputAction(this.moveSlider, ScreenSpaceEventType.MOUSE_MOVE);
+          handler.setInputAction(this.moveSlider, ScreenSpaceEventType.PINCH_MOVE);
+          handler.setInputAction(() => {
+            this.sliderMoveActive = false;
+          }, ScreenSpaceEventType.LEFT_UP);
+          handler.setInputAction(() => {
+            this.sliderMoveActive = false;
+          }, ScreenSpaceEventType.PINCH_END);
+        }, 10);
+
+    } else {
+      for (let l = 0; l < this.viewer.imageryLayers.length; l++) {
+        this.viewer.imageryLayers.get(l).splitDirection = ImagerySplitDirection.NONE;
+      }
+    }
+  }
+  
+  /**
+   * Get whether the map split is shown
+   */
+  public getSplitMapShown(): boolean {
+    return this.csMapService.getSplitMapShown();
+  }
 
 }
