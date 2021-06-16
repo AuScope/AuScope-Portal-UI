@@ -33,6 +33,11 @@ h6 {
 	font-size: 0.9rem;
 }
 
+/* Override the text cursor that was appearing in layer selection */
+a {
+    cursor: pointer;
+}
+
 .infopanel-legend {
 	max-width: 220px;
 }
