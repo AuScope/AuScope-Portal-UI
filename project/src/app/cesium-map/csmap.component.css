@@ -12,7 +12,6 @@
     background-color: rgba(17,216,66,0.8);
 }
 
-
 .editor-box {
     position: fixed;
     top: 100px;
@@ -26,10 +25,10 @@
     position: absolute;
     left: 50%;
     top: 0px;
-    background-color: #222;
+    background-color: #282572;
     width: 5px;
     height: 100%;
-    z-index: 9999;
+    z-index: 1;
 }
 #mapSlider:hover {
     cursor: ew-resize;
@@ -38,9 +37,24 @@
     left: -10px;
     width: 25px;
     height: 25px;
-    background: #222;
+    background: #282572;
     border-radius: 100px;
     position: relative;
     top: 50%;
     transform: translateY(-50%);
+}
+
+.slider-grabber-inner {
+    left: 5px;
+    width: 15px;
+    height: 15px;
+    background: #59c2aa;
+    border-radius: 90px;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+::ng-deep .cesium-viewer-toolbar {
+    z-index: 10;
 }

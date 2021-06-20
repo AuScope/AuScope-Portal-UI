@@ -17,7 +17,9 @@ import { Cartesian3, MapMode2D, Math, ScreenSpaceEventHandler, SceneMode, Screen
           <app-cs-map-split (toggleEvent)="toggleShowMapSplit()"></app-cs-map-split>
           <app-cs-clipboard class="btn-group float-right mb-3"></app-cs-clipboard>
           <div #mapSlider id="mapSlider" *ngIf="getSplitMapShown()">
-            <div class="slider-grabber"></div>
+            <div class="slider-grabber">
+              <div class="slider-grabber-inner"></div>
+            </div>
           </div>
       </ac-map>
     </div>
