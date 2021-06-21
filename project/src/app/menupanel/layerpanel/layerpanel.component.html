@@ -48,7 +48,7 @@
 							</div>
 							<div *ngIf="uiLayerModels[layer.id].statusMap.renderStarted || uiLayerModels[layer.id].statusMap.renderComplete" class="opacity-slider-panel d-flex" (click)="$event.stopPropagation()">
 								<div class="opacity-label">Opacity {{ uiLayerModels[layer.id].opacity }}%&nbsp;</div>
-								<mat-slider [min]="0" [max]="100" class="opacity-slider flex-grow-1" [(ngModel)]="uiLayerModels[layer.id].opacity" (input)="layerOpacityChange($event, layer)"></mat-slider>
+								<mat-slider [min]="0" [max]="100" class="flex-grow-1" [(ngModel)]="uiLayerModels[layer.id].opacity" (input)="layerOpacityChange($event, layer)"></mat-slider>
 							</div>
 							<div class="split-panel" *ngIf="getSplitMapShown() && (uiLayerModels[layer.id].statusMap.renderStarted || uiLayerModels[layer.id].statusMap.renderComplete)" (click)="$event.stopPropagation()">
 								Split Direction&nbsp;
