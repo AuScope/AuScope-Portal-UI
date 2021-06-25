@@ -5,6 +5,7 @@ import { LayerModel } from '@auscope/portal-core-ui';
 import { CsMapService } from '@auscope/portal-core-ui';
 import { CsClipboardService } from '@auscope/portal-core-ui';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
+import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { RenderStatusService } from '@auscope/portal-core-ui';
 import { ManageStateService } from '@auscope/portal-core-ui';
@@ -15,6 +16,7 @@ import { KeysPipe } from '@auscope/portal-core-ui'; // Necessary for 'getKey' pi
 import { ResourceType } from '@auscope/portal-core-ui';
 import { ImagerySplitDirection } from 'cesium';
 
+
 @Component({
     selector: '[appLayerPanel]',
     templateUrl: './layerpanel.component.html',
@@ -23,7 +25,6 @@ import { ImagerySplitDirection } from 'cesium';
 export class LayerPanelComponent implements OnInit {
 
   layerGroups: {};
-  uiLayerModels: {};
   bsModalRef: BsModalRef;
   @Output() expanded: EventEmitter<any> = new EventEmitter();
   searchText: string
@@ -31,14 +32,15 @@ export class LayerPanelComponent implements OnInit {
 
   constructor(private layerHandlerService: LayerHandlerService, private renderStatusService: RenderStatusService,
     private modalService: BsModalService, private csMapService: CsMapService,
-    private manageStateService: ManageStateService, private CsClipboardService: CsClipboardService) {
-    this.uiLayerModels = {};
+    private manageStateService: ManageStateService, private CsClipboardService: CsClipboardService,
+    private uiLayerModelService: UILayerModelService) {
     this.searchMode = false;
    }
 
     public selectTabPanel(layerId: string, panelType: string) {
-      (<UILayerModel>this.uiLayerModels[layerId]).tabpanel.setPanelOpen(panelType);
+      this.getUILayerModel(layerId).tabpanel.setPanelOpen(panelType);
     }
+    
     /**
      * search through the layers and filter out based on keyword
      */
@@ -81,7 +83,7 @@ export class LayerPanelComponent implements OnInit {
       }
     }
 
-   /**
+    /**
      * search through the layers and filter out based on keyword
      */
     public searchActive() {
@@ -91,7 +93,7 @@ export class LayerPanelComponent implements OnInit {
       for (const layerGroupKey in this.layerGroups) {
         this.layerGroups[layerGroupKey].hide = true;
         for (const layer of this.layerGroups[layerGroupKey]) {
-          if (this.uiLayerModels[layer.id].statusMap.renderStarted) {
+          if (this.getUILayerModel(layer.id).statusMap.getRenderStarted()) {
             layer.hide = false;
             this.layerGroups[layerGroupKey].hide = false;
             this.layerGroups[layerGroupKey].expanded = true;
@@ -105,8 +107,8 @@ export class LayerPanelComponent implements OnInit {
     }
 
     /**
-       * search through the layers and filter out based on keyword
-       */
+     * search through the layers and filter out based on keyword
+     */
     public searchImage() {
       this.searchText = 'Image Layer';
       this.searchMode = true;
@@ -129,8 +131,8 @@ export class LayerPanelComponent implements OnInit {
 
 
     /**
-       * search through the layers and filter out based on keyword
-       */
+     * search through the layers and filter out based on keyword
+     */
     public searchData() {
       this.searchText = 'Data Layer';
       this.searchMode = true;
@@ -166,9 +168,9 @@ export class LayerPanelComponent implements OnInit {
         return false;
     }
 
-  /**
-   * Clear the search result
-   */
+    /**
+     * Clear the search result
+     */
     public clearSearch() {
       setTimeout(() => {
         this.searchMode = false;
@@ -202,13 +204,12 @@ export class LayerPanelComponent implements OnInit {
                     me.layerGroups[key][i].filterCollection.mandatoryFilters = layerStateObj[uiLayerModel.id].filterCollection.mandatoryFilters
                   }
                   // LJ: nvclAnalyticalJob link
-                  if ( nvclanid && uiLayerModel.id === 'nvcl-v2-borehole') {
+                  if (nvclanid && uiLayerModel.id === 'nvcl-v2-borehole') {
                     me.layerGroups[key].expanded = true;
                     me.layerGroups[key].loaded = me.layerGroups[key];
                     me.layerGroups[key][i].expanded = true;
                   }
-                  me.uiLayerModels[me.layerGroups[key][i].id] = uiLayerModel;
-
+                  me.uiLayerModelService.setUILayerModel(me.layerGroups[key][i].id, uiLayerModel);
                 }
               }
             });
@@ -220,7 +221,6 @@ export class LayerPanelComponent implements OnInit {
             } else {
               this.clearSearch();
             }
-
         });
     }
 
@@ -238,7 +238,7 @@ export class LayerPanelComponent implements OnInit {
      * remove the layer from the map
      */
     public removeLayer(layer: LayerModel) {
-      this.uiLayerModels[layer.id].opacity = 100;
+      this.getUILayerModel(layer.id).opacity = 100;
       this.csMapService.removeLayer(layer);
     }
 
@@ -278,7 +278,23 @@ export class LayerPanelComponent implements OnInit {
           splitDir = ImagerySplitDirection.NONE;
           break;
       }
+      layer.splitDirection = splitDir;
       this.csMapService.setLayerSplitDirection(layer, splitDir);
+    }
+
+    public getLayerSplitDirection(layerId: string): string {
+      let splitDir = "none";
+      if (this.csMapService.getLayerModel(layerId) !== null) {
+        switch(this.csMapService.getLayerModel(layerId).splitDirection) {
+          case ImagerySplitDirection.LEFT:
+            splitDir = "left";
+            break;
+          case ImagerySplitDirection.RIGHT:
+            splitDir = "right";
+            break;
+        }
+      }
+      return splitDir;
     }
 
     /**
@@ -286,14 +302,17 @@ export class LayerPanelComponent implements OnInit {
      * "layerGroup" - an instance of this.layerGroups[key].value
      */
     public isLayerGroupActive(layerGroupValue): boolean {
-      let activeLayers: string[]= Object.keys(this.csMapService.getLayerModelList());
+      let activeLayers: string[] = Object.keys(this.csMapService.getLayerModelList());
       for (const layer of layerGroupValue) {
         if(activeLayers.indexOf(layer.id)>-1){
-         return true;
-       }
-     };  
+          return true;
+        }
+      }
      return false;
+  }
 
+  public getUILayerModel(layerId: string): UILayerModel {
+    return this.uiLayerModelService.getUILayerModel(layerId);
   }
 
 }

@@ -1,9 +1,9 @@
 import { StatusMapModel } from '@auscope/portal-core-ui';
 import { UITabPanel } from './uitabpanel.model';
-import {BehaviorSubject} from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 /**
- * a representation of the state of the panel component  in the expanded panel.
+ * a representation of the state of the panel component in the expanded panel.
  */
 export class UILayerModel {
     expanded: boolean;
@@ -18,7 +18,6 @@ export class UILayerModel {
     loadingSubject.subscribe((value) => {
       this.statusMap = value;
     });
-
    }
 
 }

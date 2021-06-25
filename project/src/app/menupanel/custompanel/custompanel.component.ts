@@ -7,6 +7,7 @@ import { RenderStatusService } from '@auscope/portal-core-ui';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
+import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 
 
 @Component({
@@ -23,20 +24,19 @@ export class CustomPanelComponent {
    statusmsg: string;
 
    layerGroups: {};
-    uiLayerModels: {};
     bsModalRef: BsModalRef;
     @Output() expanded: EventEmitter<any> = new EventEmitter();
 
     constructor(private layerHandlerService: LayerHandlerService, private renderStatusService: RenderStatusService,
-      private modalService: BsModalService, private csMapService: CsMapService) {
-      this.uiLayerModels = {};
+      private modalService: BsModalService, private csMapService: CsMapService, private uiLayerModelService: UILayerModelService) {
       this.loading = false;
       this.statusmsg = 'Enter your WMS service endpoint URL and hit <i class="fa fa-search"></i>';
     }
 
     public selectTabPanel(layerId: string, panelType: string) {
-      (<UILayerModel>this.uiLayerModels[layerId]).tabpanel.setPanelOpen(panelType);
+      this.uiLayerModelService.getUILayerModel(layerId).tabpanel.setPanelOpen(panelType);
     }
+    
     /**
      * Search list of wms layer given the wms url
      */
@@ -50,7 +50,7 @@ export class CustomPanelComponent {
             for (const key in this.layerGroups) {
               for (let i = 0; i < this.layerGroups[key].length; i++) {
                 const uiLayerModel = new UILayerModel(this.layerGroups[key][i].id, this.renderStatusService.getStatusBSubject(this.layerGroups[key][i]));
-                this.uiLayerModels[this.layerGroups[key][i].id] = uiLayerModel;
+                this.uiLayerModelService.setUILayerModel(this.layerGroups[key][i].id, uiLayerModel);
               }
             }
           } else {
@@ -58,6 +58,7 @@ export class CustomPanelComponent {
           }
         });
     }
+
     /**
      * open the modal that display the status of the render
      */
@@ -68,11 +69,19 @@ export class CustomPanelComponent {
       });
     }
 
-  /**
-   * remove a layer from the map
-   */
+    /**
+      * remove a layer from the map
+      */
     public removeLayer(layer: LayerModel) {
       this.csMapService.removeLayer(layer);
+    }
+
+    /**
+     * Retrieve UILayerModel from the UILayerModelService
+     * @param layerId ID of layer
+     */
+    public getUILayerModel(layerId: string): UILayerModel {
+      return this.uiLayerModelService.getUILayerModel(layerId);
     }
 
 }
