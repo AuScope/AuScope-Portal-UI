@@ -19,9 +19,13 @@
 				                </div>
 			                </div>
                             <!-- END form-inline -->
-							<div *ngIf="downloading"><h2 class="wip">Downloading <i class="fa fa-circle small"></i><i class="fa fa-circle small"></i><i class="fa fa-circle small"></i></h2></div>
+							<div *ngIf="downloading"><h2 class="wip">Downloading:<i class="fa fa-circle small"></i><i class="fa fa-circle small"></i><i class="fa fa-circle small"></i></h2></div>
                             <!-- BEGIN querier accordion -->
                             <div id="querier-accordion">
+								<div><p id="lj2021">my-test-var:{{test}} </p>
+								<button type="button" class="btn btn-light" (click)="onDataChange()">change</button></div>
+																												
+
 								<!-- BEGIN card -->
 								<div *ngFor="let doc of docs | querierFeatureSearchPipe:selectLayerNameFilter; let i = index;" class="card card-default card-bordered">
 									<!-- BEGIN card-header -->
