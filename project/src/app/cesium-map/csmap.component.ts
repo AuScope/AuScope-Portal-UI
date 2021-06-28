@@ -1,34 +1,24 @@
 import { config } from '../../environments/config';
 import { ref } from '../../environments/ref';
 import { QuerierModalComponent } from '../modalwindow/querier/querier.modal.component';
-import { CsMapObject, CSWRecordModel } from '@auscope/portal-core-ui';
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
-import { EventResult, ViewerConfiguration } from 'angular-cesium';
-import { CsMapService } from '@auscope/portal-core-ui';
-import { ManageStateService } from '@auscope/portal-core-ui';
-import { CsCSWService } from '@auscope/portal-core-ui';
-import { QueryWFSService } from '@auscope/portal-core-ui';
-import { QueryWMSService } from '@auscope/portal-core-ui';
-import { GMLParserService } from '@auscope/portal-core-ui';
-import { SimpleXMLService } from '@auscope/portal-core-ui';
-import { UtilitiesService } from '@auscope/portal-core-ui';
-
-import olPoint from 'ol/geom/Point';
-import olFeature from 'ol/Feature';
-
-
-import { MapMode2D, ScreenSpaceEventType, Rectangle } from 'cesium';
+import { ViewerConfiguration } from 'angular-cesium';
+import { CsMapObject, CsCSWService, CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService, QueryWFSService, QueryWMSService, SimpleXMLService, UtilitiesService } from '@auscope/portal-core-ui';
+import { MapMode2D, ScreenSpaceEventHandler, ScreenSpaceEventType, Rectangle, ImagerySplitDirection } from 'cesium';
 declare var Cesium: any;
-
 @Component({
   selector: 'app-cs-map',
   template: `
     <div #mapElement id="map" class="h-100 w-100">
-      <ac-map>          
+      <ac-map>
           <rectangles-editor></rectangles-editor>
           <app-cs-map-zoom></app-cs-map-zoom>
-          <app-cs-clipboard class="btn-group float-right mb-3"></app-cs-clipboard> 
+          <app-cs-map-split (toggleEvent)="toggleShowMapSplit()"></app-cs-map-split>
+          <app-cs-clipboard class="btn-group float-right mb-3"></app-cs-clipboard>
+          <div #mapSlider id="mapSlider" *ngIf="getSplitMapShown()">
+            <div class="slider-grabber"></div>
+          </div>
       </ac-map>
     </div>
     `,
@@ -42,15 +32,15 @@ export class CsMapComponent implements AfterViewInit {
   // This is necessary to access the html element to set the map target (after view init)!
   @ViewChild('mapElement', { static: true }) mapElement: ElementRef;
 
+  @ViewChild('mapSlider', { static: false }) mapSlider: ElementRef;
+
   name = 'Angular';
   cesiumLoaded = true;
   viewer: any;
-  
-  public static AUSTRALIA = Rectangle.fromDegrees(110, -44, 156, -9);
-  //public static AUSTRALIA = Rectangle.fromDegrees(114.591, -45.837, 148.97, -5.73);
 
-  ngOnInit() {
-  }
+  sliderMoveActive: boolean = false;
+
+  public static AUSTRALIA = Rectangle.fromDegrees(114.591, -45.837, 148.97, -5.73);
 
   private bsModalRef: BsModalRef;
 
@@ -133,7 +123,7 @@ export class CsMapComponent implements AfterViewInit {
               continue;
             }
             if (layerStateObj[layerKey].raw) {
-              me.csMapService.getAddLayerSubject().subscribe(layer => {
+              me.csMapService.getAddLayerSubject().subscribe((layer: LayerModel) => {
                 setTimeout(() => {
                   if (layer.id === layerKey) {
                     const mapLayer = {
@@ -380,6 +370,68 @@ export class CsMapComponent implements AfterViewInit {
      this.bsModalRef.content.downloading = false;
      this.bsModalRef.content.onDataChange();
 
+  }
+
+  /**
+   * Updates the imagerySplitPosition when the slider is moved
+   * @param movement mouse event
+   */
+  private moveSlider = (movement) => {
+    if (!this.sliderMoveActive) {
+      return;
+    }
+    // New position is slider position + the relative mouse offset    
+    let newSliderPosition = this.mapSlider.nativeElement.offsetLeft + movement.endPosition.x;
+    // Make sure we haven't gone too far left (slider < 0) or right (slider > map width - slider width)
+    if (newSliderPosition < 0) {
+      newSliderPosition = 0;
+    } else if (newSliderPosition > (this.mapElement.nativeElement.offsetWidth - this.mapSlider.nativeElement.offsetWidth)) {
+      newSliderPosition = this.mapElement.nativeElement.offsetWidth - this.mapSlider.nativeElement.offsetWidth;
+    }
+    const splitPosition = newSliderPosition / this.mapElement.nativeElement.offsetWidth;
+    this.mapSlider.nativeElement.style.left = 100.0 * splitPosition + "%";
+    this.viewer.scene.imagerySplitPosition = splitPosition;
+  }
+
+  /**
+   * Split map toggled on/off
+   * If on, sets imagerySplitPosition and adds handlers
+   * If off, resets all active layer split directions to NONE
+   */
+  public toggleShowMapSplit() {
+    this.csMapService.setSplitMapShown(!this.csMapService.getSplitMapShown());
+    if (this.csMapService.getSplitMapShown()) {
+        setTimeout(() => {
+          this.viewer.scene.imagerySplitPosition = this.mapSlider.nativeElement.offsetLeft / this.mapElement.nativeElement.offsetWidth;
+          let handler = new ScreenSpaceEventHandler(this.mapSlider.nativeElement);
+          handler.setInputAction(() => {
+            this.sliderMoveActive = true;
+          }, ScreenSpaceEventType.LEFT_DOWN);
+          handler.setInputAction(() => {
+            this.sliderMoveActive = true;
+          }, ScreenSpaceEventType.PINCH_START);
+          handler.setInputAction(this.moveSlider, ScreenSpaceEventType.MOUSE_MOVE);
+          handler.setInputAction(this.moveSlider, ScreenSpaceEventType.PINCH_MOVE);
+          handler.setInputAction(() => {
+            this.sliderMoveActive = false;
+          }, ScreenSpaceEventType.LEFT_UP);
+          handler.setInputAction(() => {
+            this.sliderMoveActive = false;
+          }, ScreenSpaceEventType.PINCH_END);
+        }, 10);
+
+    } else {
+      for (let l = 0; l < this.viewer.imageryLayers.length; l++) {
+        this.viewer.imageryLayers.get(l).splitDirection = ImagerySplitDirection.NONE;
+      }
+    }
+  }
+  
+  /**
+   * Get whether the map split is shown
+   */
+  public getSplitMapShown(): boolean {
+    return this.csMapService.getSplitMapShown();
   }
 
 }
