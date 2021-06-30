@@ -199,7 +199,9 @@ export class CsMapComponent implements AfterViewInit {
         } else {
           if (onlineResource) {
             me.bsModalRef.content.downloading = true;
-              this.queryWMSService.wfsGetFeature(1, onlineResource, maplayer.sldBody, maplayer.clickPixel, maplayer.clickCoord).subscribe(result => {
+              const serviceUrl = UtilitiesService.rmParamURL(onlineResource.url);
+              const typeName = onlineResource.name;
+              this.queryWMSService.wfsGetFeature(serviceUrl, typeName, maplayer.clickCoord[0], maplayer.clickCoord[1]).subscribe(result => {
               const feature = {onlineResource: onlineResource, layer: maplayer};
               this.setModal(result, feature, this.bsModalRef);
             },
