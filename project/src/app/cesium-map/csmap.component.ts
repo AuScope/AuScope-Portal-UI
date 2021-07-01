@@ -199,9 +199,11 @@ export class CsMapComponent implements AfterViewInit {
         } else {
           if (onlineResource) {
             me.bsModalRef.content.downloading = true;
-              const serviceUrl = UtilitiesService.rmParamURL(onlineResource.url);
-              const typeName = onlineResource.name;
-              this.queryWMSService.wfsGetFeature(serviceUrl, typeName, maplayer.clickCoord[0], maplayer.clickCoord[1]).subscribe(result => {
+              let extraFilter = '';
+              if (maplayer.id === 'nvcl-v2-borehole') {
+                extraFilter = '<ogc:PropertyIsEqualTo><ogc:PropertyName>gsmlp:nvclCollection</ogc:PropertyName><ogc:Literal>true</ogc:Literal></ogc:PropertyIsEqualTo>';
+              }
+              this.queryWMSService.wfsGetFeature(onlineResource, maplayer.clickCoord[0], maplayer.clickCoord[1], extraFilter).subscribe(result => {
               const feature = {onlineResource: onlineResource, layer: maplayer};
               this.setModal(result, feature, this.bsModalRef);
             },

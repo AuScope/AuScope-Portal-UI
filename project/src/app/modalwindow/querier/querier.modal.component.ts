@@ -121,8 +121,8 @@ export class QuerierModalComponent {
   }
   public onDataChange(): void {
     this.test += 1;
-    // this.changeDetectorRef.detectChanges();
-    this.appRef.tick();
+     this.changeDetectorRef.detectChanges();
+    //this.appRef.tick();
     // this.changeDetectorRef.markForCheck(); 
     console.log('test:' + this.test);
   }
