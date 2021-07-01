@@ -18,10 +18,45 @@
 				<div class="tab-content" id="card-tab-content">
 					<!-- BEGIN tab-pane -->
 					<div class="tab-pane fade show active" id="nvcl-card-tab-image-{{nvclDataset.datasetId}}" role="tabpanel">
-						<div class="modal-card-size loading-iframe">
-							<button class="float-right" mat-stroked-button (click)="openLegend(nvclDataset.datasetId)">Show Legend</button>
-							<ng-select *ngIf="nvclDataset.datasetId" [items] = "datasetScalars[nvclDataset.datasetId]" [multiple]="false" bindLabel="logName" bindValue="logId" placeholder="Select Scalar" (change)="changeScalarSelection(nvclDataset.datasetId)" [(ngModel)]="selectedScalar"></ng-select>
-							<iframe *ngIf="datasetImages[nvclDataset.datasetId]" frameborder="0" [src]="datasetImages[nvclDataset.datasetId] | trustResourceUrl"></iframe>
+						<div class="modal-card-size loading-iframe">						
+							<!-- Add definition -->
+							<button class="float-right" mat-stroked-button (click)="openLegend(nvclDataset.datasetId)" >Show Legend</button>                 
+                              <ng-select *ngIf="nvclDataset.datasetId" [items] = "datasetScalars[nvclDataset.datasetId]" [multiple]="false" bindLabel="logName" bindValue="logId" placeholder="Select Scalar" (change)="changeScalarSelection(nvclDataset.datasetId)" [(ngModel)]="selectedScalar">                                
+                                <ng-template ng-label-tmp let-item="item">
+                                    <div class="row" >
+                                        <div class="col-8">
+                                            <div  [matTooltip]="datasetScalarDefinition[item.logName]? datasetScalarDefinition[item.logName].definition : null">{{item.logName}}</div>
+                                        </div>
+                                        <div  class="col-4" *ngIf="item.logName">
+                                            <span *ngIf="datasetScalarDefinition[item.logName]!=null">
+                                                <div class="fake-link" [matTooltip]="datasetScalarDefinition[item.logName].definition"> ? </div>
+                                            </span>
+                                            <span *ngIf="datasetScalarDefinition[item.logName] == null"> 
+                                                <div class="fake-link" (mouseover)="getDefinition(item.logName)" > ? </div>
+                                            </span>
+                                        </div>        
+                                    </div>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item" >
+                                    <div class="row" >
+                                        <div class="col-8">
+                                            <div>{{item.logName}}</div>
+                                        </div>
+                                        <div  class="col-4">
+                                            <span *ngIf="datasetScalarDefinition[item.logName]!=null">
+                                                <div class="fake-link" [matTooltip]="datasetScalarDefinition[item.logName].definition">?</div>
+                                            </span>
+                                            <span *ngIf="datasetScalarDefinition[item.logName] == null"> 
+                                                <div class="fake-link" (mouseover)="getDefinition(item.logName)" >?</div>
+                                            </span>
+                                        </div>        
+                                    </div>
+                                </ng-template>
+                            </ng-select>
+					<!-- END Add definition -->
+
+					<iframe *ngIf="datasetImages[nvclDataset.datasetId]" frameborder="0" [src]="datasetImages[nvclDataset.datasetId] | trustResourceUrl"></iframe>
 						</div>
 					</div>
 					<!-- END tab-pane -->

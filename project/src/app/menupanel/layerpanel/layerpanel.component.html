@@ -26,7 +26,8 @@
 	<li *ngFor="let layerGroup of layerGroups | getKey" >
 
 	   		<a [hidden]="layerGroup.value.hide" (click) = "layerGroup.value.loaded=layerGroup.value;layerGroup.value.expanded = !layerGroup.value.expanded;"
-			    [ngClass]="{'highlight': isLayerGroupVisible(layerGroup.value)}">
+			    [ngClass]="{'highlight': isLayerGroupVisible(layerGroup.value) , 'text-primary': isLayerGroupActive(layerGroup.value),
+				 'font-weight-bold': isLayerGroupActive(layerGroup.value) ,'font-italic':isLayerGroupActive(layerGroup.value)}" >
                 {{layerGroup.key}}
 				<i class="fa fa-arrow-circle-down" [ngClass]="{'submenu-open-inline':isLayerGroupVisible(layerGroup.value), 'hidden':!isLayerGroupVisible(layerGroup.value) }" ></i>
 	        </a>
@@ -47,7 +48,7 @@
 							</div>
 							<div *ngIf="uiLayerModels[layer.id].statusMap.renderStarted || uiLayerModels[layer.id].statusMap.renderComplete" class="opacity-slider-panel d-flex" (click)="$event.stopPropagation()">
 								<div class="opacity-label">Opacity {{ uiLayerModels[layer.id].opacity }}%&nbsp;</div>
-								<mat-slider [min]="0" [max]="100" class="opacity-slider flex-grow-1" [(ngModel)]="uiLayerModels[layer.id].opacity" (input)="layerOpacityChange($event, layer)"></mat-slider>
+								<mat-slider [min]="0" [max]="100" class="flex-grow-1" [(ngModel)]="uiLayerModels[layer.id].opacity" (input)="layerOpacityChange($event, layer)"></mat-slider>
 							</div>
 							<div class="split-panel" *ngIf="getSplitMapShown() && (uiLayerModels[layer.id].statusMap.renderStarted || uiLayerModels[layer.id].statusMap.renderComplete)" (click)="$event.stopPropagation()">
 								Split Direction&nbsp;

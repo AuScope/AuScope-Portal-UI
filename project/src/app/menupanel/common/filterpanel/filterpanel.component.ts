@@ -15,13 +15,14 @@ import { ManageStateService } from '@auscope/portal-core-ui';
 import { CsIrisService } from '@auscope/portal-core-ui';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { CsWMSService } from '@auscope/portal-core-ui';
+import { LayerStatusService } from '@auscope/portal-core-ui';
 
 declare var gtag: Function;
 
 @Component({
   selector: 'app-filter-panel',
   templateUrl: './filterpanel.component.html',
-  providers: [CsIrisService],
+  providers: [CsIrisService, LayerStatusService],
   styleUrls: ['./filterpanel.component.scss', '../../menupanel.scss']
 })
 export class FilterPanelComponent implements OnInit {
@@ -43,7 +44,8 @@ export class FilterPanelComponent implements OnInit {
     private modalService: BsModalService,
     private manageStateService: ManageStateService,
     private CsClipboardService: CsClipboardService,
-    private csWMSService: CsWMSService
+    private csWMSService: CsWMSService,
+    public layerStatus: LayerStatusService
   ) {
     this.providers = [];
     this.optionalFilters = [];

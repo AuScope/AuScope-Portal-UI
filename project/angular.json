@@ -50,7 +50,7 @@
               "src/extension/js/no-ie-support.js",
               "./node_modules/cesium/Build/Cesium/Cesium.js"
             ],
-	    "customWebpackConfig": {
+	          "customWebpackConfig": {
               "path": "./extra-webpack.config.js"
             }
           },
