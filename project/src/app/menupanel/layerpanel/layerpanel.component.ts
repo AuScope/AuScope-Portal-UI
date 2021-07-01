@@ -281,4 +281,19 @@ export class LayerPanelComponent implements OnInit {
       this.csMapService.setLayerSplitDirection(layer, splitDir);
     }
 
+    /**
+     * Returns true if any layer in a layer group is active 
+     * "layerGroup" - an instance of this.layerGroups[key].value
+     */
+    public isLayerGroupActive(layerGroupValue): boolean {
+      let activeLayers: string[]= Object.keys(this.csMapService.getLayerModelList());
+      for (const layer of layerGroupValue) {
+        if(activeLayers.indexOf(layer.id)>-1){
+         return true;
+       }
+     };  
+     return false;
+
+  }
+
 }

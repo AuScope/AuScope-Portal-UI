@@ -16,11 +16,19 @@ export const environment = {
   portalBaseUrl: 'https://au-portal-2.it.csiro.au/api/',
   hostUrl: 'https://au-portal-2.it.csiro.au/portal/index.htm',
   nVCLAnalyticalUrl: 'https://aus-analytical.it.csiro.au/NVCLAnalyticalServices/',
-  googleAnalyticsKey: 'UA-33658784-2',
+  googleAnalyticsKey: null,
+  bingMapsKey: '',
   baseMapLayers: [
-    { value: 'OSM', viewValue: 'OpenStreetMap', layerType: 'OSM' },
-    { value: 'Road', viewValue: 'Bing Roads', layerType: 'Bing' },
-    { value: 'Aerial', viewValue: 'Bing Aerial', layerType: 'Bing' },
-    { value: 'AerialWithLabels', viewValue: 'Bing Aerial With Labels', layerType: 'Bing' },
+    { value: 'World_Imagery', viewValue: 'ESRI World Imagery', tooltip: 'ESRI World Imagery', layerType: 'ESRI' },
+    { value: 'NatGeo_World_Map', viewValue: 'ESRI National Geographic Map', tooltip: 'ESRI National Geographic Map', layerType: 'ESRI' },
+    { value: 'World_Street_Map', viewValue: 'ESRI Street Map', tooltip: 'ESRI Street Map', layerType: 'ESRI' },
+    { value: 'OSM', viewValue: 'OpenStreetMap',
+      tooltip: 'OpenStreetMap (OSM) is a collaborative project to create a free editable\n' +
+               'map of the world.\nhttp://www.openstreetmap.org', layerType: 'OSM' },
+    { value: 'Road', viewValue: 'Bing Roads', tooltip: 'Bing Maps Road', layerType: 'Bing' },
+    { value: 'Aerial', viewValue: 'Bing Aerial', tooltip: 'Bing Maps Aerial', layerType: 'Bing' },
+    { value: 'AerialWithLabels', viewValue: 'Bing Aerial With Labels', tooltip: 'Bing Maps Aerial with Labels', layerType: 'Bing' },
+    { value: 'Natural_Earth_II', viewValue: 'Natural Earth II',
+      tooltip: 'Natural Earth II, darkened for contrast.\nhttp://www.naturalearthdata.com/', layerType: 'NEII' },
   ]
 };

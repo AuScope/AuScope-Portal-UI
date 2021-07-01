@@ -33,6 +33,11 @@ h6 {
 	font-size: 0.9rem;
 }
 
+/* Override the text cursor that was appearing in layer selection */
+a {
+    cursor: pointer;
+}
+
 .infopanel-legend {
 	max-width: 220px;
 }
@@ -266,14 +271,18 @@ input + div.input-group-append  > button {
     .opacity-label {
         width: 80px;
     }
-    .opacity-slider {
-        ::ng-deep {
-            .mat-slider-thumb {
-                background-color: white;
-            }
-            .mat-slider-track-background {
-                background-color: white;
-            }
+    ::ng-deep {
+        .mat-slider {
+            height: 30px;
+        }
+        .mat-slider-horizontal .mat-slider-wrapper {
+            top: 15px;
+        }
+        .mat-slider-thumb {
+            background-color: white;
+        }
+        .mat-slider-track-background {
+            background-color: white;
         }
     }
 }
