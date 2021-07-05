@@ -34,7 +34,6 @@ export class FileNode {
 })
 
 export class QuerierModalComponent {
-  public test = 88;
   public downloading: boolean;
   public docs: QuerierInfoModel[] = [];
   public htmls: QuerierInfoModel[] = [];
@@ -120,11 +119,7 @@ export class QuerierModalComponent {
     }
   }
   public onDataChange(): void {
-    this.test += 1;
      this.changeDetectorRef.detectChanges();
-    //this.appRef.tick();
-    // this.changeDetectorRef.markForCheck(); 
-    console.log('test:' + this.test);
   }
   public transformToHtml(document): void {    
     if (document.transformed) {
@@ -158,7 +153,8 @@ export class QuerierModalComponent {
                     return this.parseTree(document);
                 }
                 document.home = true;
-                document.loadSubComponent = true
+                document.loadSubComponent = true;
+                this.changeDetectorRef.detectChanges();
             }, 
             // try default XML tree display
             error => { this.parseTree(document) }
