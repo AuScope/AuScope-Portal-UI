@@ -156,11 +156,12 @@ label {
 
     /* position the twitter feed dropdown */
     .navbar-nav > li > .dropdown-menu {
+        padding: 10px;
+        background: #282572;
         position: absolute;
         right: 20px;
         left: auto;
         top: $navbar-height + 8px;
-        min-width: 310px;
     }
 
     /* Organisation logo */
@@ -698,13 +699,6 @@ fieldset.show-fieldset-borders-whitebg legend{
 
     .navbar {
         height: $navbar-more-height;
-    }
-
-    /* Notifications dropdown */
-    .navbar-nav > li >.dropdown-menu {
-        max-width: 90vw;
-        left: 20px;
-        right: auto;
     }
 
     /* In the sidebar, under info tab, openlayers map */
