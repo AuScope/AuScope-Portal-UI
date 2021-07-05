@@ -48,6 +48,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatTreeModule } from '@angular/material/tree';
@@ -65,6 +66,7 @@ import { MSCLAnalyticComponent } from './modalwindow/layeranalytic/mscl/mscl.ana
 
 import { PlotlyViaCDNModule } from 'angular-plotly.js';
 import { RectanglesEditorService } from 'angular-cesium';
+import { HelpMenuComponent } from './toppanel/help-menu/help-menu.component';
 
 // Using CDN module to avoid bug https://github.com/plotly/angular-plotly.js/issues/75
 PlotlyViaCDNModule.plotlyVersion = '1.53.0';
@@ -104,7 +106,8 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     DisclaimerModalComponent,
     PortalDetailsPanelComponent,
     MSCLComponent,
-    MSCLAnalyticComponent
+    MSCLAnalyticComponent,
+    HelpMenuComponent
   ],
   providers: [RectanglesEditorService],
   imports: [
@@ -119,6 +122,7 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     MatIconModule,
     MatButtonModule,
     MatDialogModule,
+    MatMenuModule,
     MatSliderModule,
     StorageServiceModule,
     NgxChartsModule,
@@ -155,7 +159,8 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     ClipboardComponent,
     // OlMapClipboardComponent,
     // OlmapBaselayerselectorComponent,
-    PortalDetailsPanelComponent
+    PortalDetailsPanelComponent,
+    HelpMenuComponent
   ]
 })
 export class AppModule { }
