@@ -4,8 +4,9 @@ import { QuerierModalComponent } from '../modalwindow/querier/querier.modal.comp
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ViewerConfiguration } from 'angular-cesium';
-import { CsCSWService, CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService, QueryWFSService, QueryWMSService, SimpleXMLService, UtilitiesService } from '@auscope/portal-core-ui';
+import { CsCSWService, CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService, QueryWFSService, QueryWMSService, SimpleXMLService, UtilitiesService,CsMapObject } from '@auscope/portal-core-ui';
 import { Cartesian3, MapMode2D, Math, ScreenSpaceEventHandler, SceneMode, ScreenSpaceEventType, Rectangle, ImagerySplitDirection } from 'cesium';
+declare var Cesium: any;
 
 @Component({
   selector: 'app-cs-map',
@@ -46,13 +47,14 @@ export class CsMapComponent implements AfterViewInit {
 
   private bsModalRef: BsModalRef;
 
-  constructor(private csMapService: CsMapService, private modalService: BsModalService,
+  constructor(  private csMapObject: CsMapObject,    private csMapService: CsMapService, private modalService: BsModalService,
     private queryWFSService: QueryWFSService, private queryWMSService: QueryWMSService, private gmlParserService: GMLParserService,
     private manageStateService: ManageStateService, private viewerConf: ViewerConfiguration) {
-    // FIXME this.csMapService.getClickedLayerListBS().subscribe(mapClickInfo => {
-    //  this.handleLayerClick(mapClickInfo);
-    //});
-
+    //this.csMapService.getClickedLayerListBS().subscribe(this.handleLayerClick.bind(this));
+    const me = this;
+    this.csMapService.getClickedLayerListBS().subscribe((mapClickInfo) => {
+      me.handleLayerClick(mapClickInfo);
+      });
     // viewerOptions will be passed the Cesium.Viewer constuctor
     viewerConf.viewerOptions = {
       selectionIndicator: false,
@@ -74,7 +76,15 @@ export class CsMapComponent implements AfterViewInit {
     viewerConf.viewerModifier = (viewer: any) => {
       // Remove default double click zoom behaviour
       viewer.screenSpaceEventHandler.removeInputAction(ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
-
+      const scene = viewer.scene;
+      if (!scene.pickPositionSupported) {
+          window.alert('This browser does not support pickPosition.');
+      }
+      const handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+       handler.setInputAction((movement) => {
+       // const cartesian = viewer.scene.pickPosition(movement.position);
+       this.csMapObject.processClick(movement);
+      }, Cesium.ScreenSpaceEventType.LEFT_UP);
       // Look at Australia
       viewer.camera.setView({
         destination: CsMapComponent.AUSTRALIA
@@ -162,6 +172,7 @@ export class CsMapComponent implements AfterViewInit {
     if (UtilitiesService.isEmpty(mapClickInfo)) {
       return;
     }
+
     // Process lists of features
     const modalDisplayed = {value: false}
     let featureCount = 0;
@@ -198,22 +209,30 @@ export class CsMapComponent implements AfterViewInit {
         }
       }
     }
-
+    const me = this;
     // VT: process list of layers clicked
     for (const maplayer of mapClickInfo.clickedLayerList) {
-      this.displayModal(modalDisplayed, mapClickInfo.clickCoord);
-
-      if (config.cswrenderer.includes(maplayer.layer.id)) {
-        this.setModalHTML(this.parseCSWtoHTML(maplayer.cswRecord), maplayer.cswRecord.name, maplayer, this.bsModalRef);
-      } else {
-        if (maplayer.onlineResource) {
-          this.bsModalRef.content.downloading = true;
-          this.queryWMSService.getFeatureInfo(maplayer.onlineResource, maplayer.sldBody, mapClickInfo.pixel, mapClickInfo.clickCoord).subscribe(result => {
-            this.setModal(result, maplayer, this.bsModalRef);
-          },
-            err => {
-              this.bsModalRef.content.downloading = false;
-            });
+      me.displayModal(modalDisplayed, mapClickInfo.clickCoord);
+      for (const i of maplayer.clickCSWRecordsIndex ) {
+        const onlineResource = maplayer.cswRecords[i].onlineResources[0];
+        if (config.cswrenderer.includes(maplayer.id)) {
+          this.setModalHTML(this.parseCSWtoHTML(maplayer.cswRecord), maplayer.cswRecord.name, maplayer, this.bsModalRef);
+        } else {
+          if (onlineResource) {
+            me.bsModalRef.content.downloading = true;
+              let extraFilter = '';
+              if (maplayer.id === 'nvcl-v2-borehole') {
+                extraFilter = '<ogc:PropertyIsEqualTo><ogc:PropertyName>gsmlp:nvclCollection</ogc:PropertyName><ogc:Literal>true</ogc:Literal></ogc:PropertyIsEqualTo>';
+              }
+              this.queryWMSService.wfsGetFeature(onlineResource, maplayer.clickCoord[0], maplayer.clickCoord[1], extraFilter).subscribe(result => {
+              const feature = {onlineResource: onlineResource, layer: maplayer};
+              this.setModal(result, feature, this.bsModalRef);
+            },
+              err => {
+                this.bsModalRef.content.downloading = false;
+                this.bsModalRef.content.onDataChange();
+              });
+          }
         }
       }
 
@@ -257,7 +276,8 @@ export class CsMapComponent implements AfterViewInit {
       if (clickCoord) {
         const vector = this.csMapService.drawDot(clickCoord);
         this.modalService.onHide.subscribe(reason => {
-          this.csMapService.removeVector(vector);
+          if (vector)  {
+            this.csMapService.removeVector(vector);          }
         })
       }
     }
@@ -326,7 +346,6 @@ export class CsMapComponent implements AfterViewInit {
    */
   private setModal(result: string, feature: any, bsModalRef: BsModalRef, gmlid?: string) {
     let treeCollections = [];
-
     // GSKY only returns JSON, even if you ask for XML & GML
     if (UtilitiesService.isGSKY(feature.onlineResource)) {
       treeCollections = this.parseJSONResponse(result, feature);
@@ -348,11 +367,12 @@ export class CsMapComponent implements AfterViewInit {
       treeCollection.raw = result;
       bsModalRef.content.docs.push(treeCollection);
       if (bsModalRef.content.uniqueLayerNames.indexOf(feature.layer.name) === -1) {
-        bsModalRef.content.uniqueLayerNames.push(feature.layer.name)
+        bsModalRef.content.uniqueLayerNames.push(feature.layer.name);
       }
     }
 
-    this.bsModalRef.content.downloading = false
+    this.bsModalRef.content.downloading = false;
+    this.bsModalRef.content.onDataChange();
   }
 
 
@@ -373,6 +393,8 @@ export class CsMapComponent implements AfterViewInit {
         bsModalRef.content.uniqueLayerNames.push(feature.layer.name)
       }
      this.bsModalRef.content.downloading = false;
+     this.bsModalRef.content.onDataChange();
+
   }
 
   /**
