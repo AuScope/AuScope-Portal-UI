@@ -179,7 +179,6 @@ export class FilterPanelComponent implements OnInit {
           // tslint:disable-next-line:max-line-length
           response = '<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:gml=\"http://www.opengis.net/gml\">' + ogcIntersects + '</ogc:Filter>';
         }
-        console.log(response);
         layer.ogcFilter = response;
       });
     } catch (error) {
