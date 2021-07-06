@@ -38,7 +38,6 @@ import { CsMapClipboardComponent } from './cesium-map/csmap.clipboard.component'
 
 import { AngularCesiumModule, AngularCesiumWidgetsModule } from 'angular-cesium';
 
-import { NotificationComponent } from './toppanel/notification/notification.component';
 import { QuerierModalComponent } from './modalwindow/querier/querier.modal.component';
 import { ClipboardModule } from 'ngx-clipboard';
 
@@ -85,7 +84,6 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     NgbdModalStatusReportComponent,
     CsMapClipboardComponent,
     InfoPanelComponent,
-    NotificationComponent,
     InfoPanelSubComponent,
     CsMapSplitComponent,
     CsMapZoomComponent,
@@ -151,7 +149,6 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     LayerPanelComponent,
     CustomPanelComponent,
     ActiveLayersPanelComponent,
-    NotificationComponent,
     // OlMapZoomComponent,
     PermanentLinkComponent,
     CatalogueSearchComponent,

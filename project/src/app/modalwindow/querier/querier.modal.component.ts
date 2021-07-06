@@ -18,7 +18,7 @@ import {Inject} from '@angular/core';
 import * as _ from 'lodash';
 import * as X2JS from 'x2js';
 import { DomSanitizer } from '@angular/platform-browser';
-
+import {ChangeDetectorRef, ApplicationRef} from '@angular/core'
 
 export class FileNode {
   children: FileNode[];
@@ -51,8 +51,10 @@ export class QuerierModalComponent {
 
   constructor(public bsModalRef: BsModalRef, public CsClipboardService: CsClipboardService,
     private manageStateService: ManageStateService, private gmlParserService: GMLParserService, 
-        private http: HttpClient, @Inject('env') private env, private sanitizer: DomSanitizer) {
+        private http: HttpClient, @Inject('env') private env, private sanitizer: DomSanitizer, 
+        private changeDetectorRef: ChangeDetectorRef, private appRef: ApplicationRef) {
     this.analyticMap = ref.analytic;
+
   }
   public getData() {return this.data}
 
@@ -116,7 +118,9 @@ export class QuerierModalComponent {
       this.CsClipboardService.toggleClipboard(true);
     }
   }
-  
+  public onDataChange(): void {
+     this.changeDetectorRef.detectChanges();
+  }
   public transformToHtml(document): void {    
     if (document.transformed) {
        // this is when you're clicking to close an expanded feature
@@ -149,7 +153,8 @@ export class QuerierModalComponent {
                     return this.parseTree(document);
                 }
                 document.home = true;
-                document.loadSubComponent = true
+                document.loadSubComponent = true;
+                this.changeDetectorRef.detectChanges();
             }, 
             // try default XML tree display
             error => { this.parseTree(document) }
@@ -205,6 +210,7 @@ export class QuerierModalComponent {
     }
     const data = this.buildFileTree(JSON.parse(`{"${name}":${JSON.stringify(result)}}`), 0);
     this.dataChange[name].next(data);
+    this.onDataChange();
   }
 
 
