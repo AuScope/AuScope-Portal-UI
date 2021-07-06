@@ -346,6 +346,8 @@ label {
     position: relative;
     height: calc(100% - #{$navbar-height});
     top: $navbar-height;
+    border-top: 1px solid #999;
+    border-left: 1px solid #999;
 
     .map-area-csmap {
         position: absolute;

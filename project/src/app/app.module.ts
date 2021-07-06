@@ -14,6 +14,7 @@ import { CsMapComponent } from './cesium-map/csmap.component';
 import { OlMapPreviewComponent } from './menupanel/common/infopanel/openlayermappreview/olmap.preview.component';
 import { LayerPanelComponent } from './menupanel/layerpanel/layerpanel.component';
 import { CustomPanelComponent } from './menupanel/custompanel/custompanel.component';
+import { ActiveLayersPanelComponent } from './menupanel/activelayers/activelayerspanel.component';
 import { FilterPanelComponent } from './menupanel/common/filterpanel/filterpanel.component';
 import { DownloadPanelComponent } from './menupanel/common/downloadpanel/downloadpanel.component';
 import { CapdfAdvanceFilterComponent } from './menupanel/common/filterpanel/advance/capdf/capdf.advancefilter.component';
@@ -76,6 +77,7 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     OlMapPreviewComponent,
     LayerPanelComponent,
     CustomPanelComponent,
+    ActiveLayersPanelComponent,
     CatalogueSearchComponent,
     FilterPanelComponent,
     DownloadPanelComponent,
@@ -146,6 +148,7 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     CsMapComponent,
     LayerPanelComponent,
     CustomPanelComponent,
+    ActiveLayersPanelComponent,
     // OlMapZoomComponent,
     PermanentLinkComponent,
     CatalogueSearchComponent,

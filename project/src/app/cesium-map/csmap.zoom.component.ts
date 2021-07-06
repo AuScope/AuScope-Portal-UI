@@ -1,4 +1,3 @@
-import { CsMapService } from '@auscope/portal-core-ui';
 import { Component, ViewEncapsulation } from '@angular/core';
 import { CameraService, CesiumService, ZoomToRectangleService } from 'angular-cesium';
 import { CsMapComponent } from './csmap.component';

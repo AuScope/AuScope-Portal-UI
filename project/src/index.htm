@@ -60,8 +60,8 @@
 		<!-- BEGIN sidebar -->
 		<nav id="sidebar" class="sidebar slimscroll sidebar-collapse show" style="overflow: auto;" >
 			<h6 class="sidebar-heading">Menu</h6>
-			<h5><a href="http://www.auscope.org.au/"><i class="ti-home"></i><span>About</span></a></h5>
-			<h5><a href="https://confluence.csiro.au/display/AusGRID/AuScope+Portal+User+Guide"><i class="ti-info-alt"></i><span>User Guide</span></a></h5>
+			<h5><a href="http://www.auscope.org.au/" target="href:blank"><i class="ti-home"></i><span>About</span></a></h5>
+			<h5><a href="https://confluence.csiro.au/display/AusGRID/AuScope+Portal+User+Guide" target="href:blank"><i class="ti-info-alt"></i><span>User Guide</span></a></h5>
 			<h5><a href="mailto:cg-admin@csiro.au?Subject=Auscope-portal"><i class="ti-email"></i><span>Contact us</span></a></h5>
 			<li class="hasEvent" appPermanentLink></li>
 			<li class="hasEvent d-none d-md-block" appFilterClipboard></li>
@@ -69,14 +69,14 @@
 			<h6 class="sidebar-heading">Layer Selection</h6>
 
             <!-- BEGIN Active Layers -->
-            <input type="checkbox" checked disabled class="menuBtn" id="activeLayersBtn"/>
+            <input type="checkbox" checked class="menuBtn" id="activeLayersBtn"/>
             <h5 class="mb-1">
                 <label id="activeLayersLink" for="activeLayersBtn" class="mb-0">
                     <i class="ti-filter"></i>
                     Active Layers
                     <i class="fa fa-arrow-circle-down"></i>
                 </label>
-                <ul class="card-sub" app-olmapactivelayers></ul>
+                <ul class="card-sub" appActiveLayers></ul>
             </h5>
             <!-- END Active Layers -->
 

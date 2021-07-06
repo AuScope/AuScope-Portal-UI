@@ -254,6 +254,11 @@ input + div.input-group-append  > button {
 
 .layerLoadCtrl {
     margin-right: 5px;
+    cursor: default;
+}
+
+.layerLoadClickable {
+    cursor: pointer;
 }
 
 /* Info Panel has an openlayers map */
@@ -299,4 +304,8 @@ input + div.input-group-append  > button {
     display: inline-flex;
     margin-left: 4px;
     font-size: small;
+}
+
+.help-block {
+    color:#d8d9d7;
 }
