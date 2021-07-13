@@ -21,8 +21,8 @@ import { CapdfAdvanceFilterComponent } from './menupanel/common/filterpanel/adva
 import { DynamicAdvancefilterComponent } from './menupanel/common/filterpanel/dynamic.advancefilter.component';
 import { InfoPanelComponent } from './menupanel/common/infopanel/infopanel.component';
 import { InfoPanelSubComponent } from './menupanel/common/infopanel/subpanel/subpanel.component';
-import { PermanentLinkComponent } from './menupanel/permanentlink/permanentlink.component';
-import { ClipboardComponent } from './menupanel/clipboard/clipboard.component';
+//import { PermanentLinkComponent } from './menupanel/permanentlink/permanentlink.component';
+//import { ClipboardComponent } from './menupanel/clipboard/clipboard.component';
 import { CapdfAnalyticComponent } from './modalwindow/layeranalytic/capdf/capdf.analytic.component';
 import { DynamicLayerAnalyticComponent } from './modalwindow/layeranalytic/dynamic.layer.analytic.component';
 import { LayerAnalyticModalComponent } from './modalwindow/layeranalytic/layer.analytic.modal.component';
@@ -98,8 +98,8 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     LayerAnalyticModalComponent,
     DynamicLayerAnalyticComponent,
     NVCLBoreholeAnalyticComponent,
-    PermanentLinkComponent,
-    ClipboardComponent,
+    //PermanentLinkComponent,
+    //ClipboardComponent,
     DynamicAdvancefilterComponent,
     CapdfAdvanceFilterComponent,
     CapdfAnalyticComponent,
@@ -154,9 +154,9 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     CustomPanelComponent,
     ActiveLayersPanelComponent,
     // OlMapZoomComponent,
-    PermanentLinkComponent,
+    //PermanentLinkComponent,
     CatalogueSearchComponent,
-    ClipboardComponent,
+    //ClipboardComponent,
     // OlMapClipboardComponent,
     // OlmapBaselayerselectorComponent,
     PortalDetailsPanelComponent,

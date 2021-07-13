@@ -269,6 +269,10 @@ input + div.input-group-append  > button {
 	margin-left: 5px;
 }
 
+.search-layers {
+    margin-top: 5px;
+}
+
 /* Layer opacity (Material slider) */
 .opacity-slider-panel {
     height: 30px;
@@ -306,6 +310,12 @@ input + div.input-group-append  > button {
     font-size: small;
 }
 
+.select-layers-message {
+    font-size: 0.9rem;
+    color: $auscope-grey;
+    margin-top: 5px;
+}
+
 .help-block {
-    color:#d8d9d7;
+    color: $auscope-grey;
 }
