@@ -157,7 +157,7 @@ label {
     /* position the twitter feed dropdown */
     .navbar-nav > li > .dropdown-menu {
         padding: 10px;
-        background: #282572;
+        background: $auscope-royal-blue;
         position: absolute;
         right: 20px;
         left: auto;
@@ -222,7 +222,7 @@ label {
     }
 
     .sidebar-heading {
-        color: #59c2aa!important;
+        color: $auscope-teal !important;
         font-weight: 700;
         margin-left: 1.5rem;
         margin-top: 0.5rem;
