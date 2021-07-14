@@ -124,7 +124,8 @@ export const config = {
   forceAddLayerViaProxy: [
     'erml-miningactivity',
     'erml-mine',
-    'erml-mineraloccurrence'
+    'erml-mineraloccurrence',
+    'mineral-tenements'
   ],
   cswrenderer: [
     'portal-reports',
