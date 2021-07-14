@@ -1,19 +1,20 @@
 <polygons-editor></polygons-editor>
 
-<div *ngIf="bShowClipboard" class="container-fluid rounded editor-box" role="group"  style="padding:0px; background-color:#7aa5c5 ; color: #ffffff;">
+<div *ngIf="bShowClipboard" class="container-fluid rounded editor-box" role="group">
 		<small style="margin-left:10px">  Polygon Filter Clipboard:</small>
-		<table class="table table-inverse">
+		<table class="table">
 			<tbody>
-				<tr *ngIf="polygonBBox">
-					<td class="content-break-word">{{polygonBBox.name}}</td>
+				<tr>
+					<td *ngIf="polygonBBox" class="content-break-word">{{polygonBBox.name}}</td>
+					<td *ngIf="!polygonBBox">&nbsp;</td> <!-- Ensures buttons don't move up when user hits 'Clear' -->
 				</tr>
 			</tbody>
 		</table>
 	<div class="btn-toolbar " role="toolbar">
 	<div class="btn-group mr-2" role="group">			
-		<button (click)='clearClipboard()' type="button" class="btn btn-sm btn-inverse active"><i class="fa fa-times-circle" aria-hidden="true"></i>Clear</button>
-		<button (click)='drawPolygon()' type="button" [ngClass]="{'btn-inverse': !isDrawingPolygon, 'btn-active': isDrawingPolygon}" class="btn btn-sm btn-inverse active"><i class="fa fa-edit" aria-hidden="true"></i>Draw</button>
-		<button (click)='toggleFilterLayers()' type="button" [ngClass]="{'btn-inverse': !isFilterLayerShown, 'btn-active': isFilterLayerShown}" class="btn btn-sm btn-inverse active"><i class="fa fa-mouse-pointer" aria-hidden="true"></i>Select</button>
+		<button (click)='clearClipboard()' type="button" class="btn btn-sm btn-inverse active"><i class="fa fa-lg fa-times-circle" aria-hidden="true"></i>Clear</button>
+		<button (click)='drawPolygon()' type="button" [ngClass]="{'btn-inverse': !isDrawingPolygon, 'btn-active': isDrawingPolygon}" class="btn btn-sm btn-inverse active"><i class="fa fa-lg fa-edit" aria-hidden="true"></i>Draw</button>
+		<button (click)='toggleFilterLayers()' type="button" [ngClass]="{'btn-inverse': !isFilterLayerShown, 'btn-active': isFilterLayerShown}" class="btn btn-sm btn-inverse active"><i class="fa fa-lg fa-mouse-pointer" aria-hidden="true"></i>Select</button>
 		</div>
 	</div>
 </div>
