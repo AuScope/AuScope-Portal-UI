@@ -1,12 +1,10 @@
 import { CsClipboardService, Polygon } from '@auscope/portal-core-ui';
 import { Component, OnInit } from '@angular/core';
 
-// TODO: Convert to cesium
-
 @Component({
   selector: 'app-cs-clipboard',
   templateUrl: './csmap.clipboard.component.html',
-  styleUrls: ['./csmap.component.css'],
+  styleUrls: ['./csmap.clipboard.component.css'],
 })
 
 export class CsMapClipboardComponent implements OnInit {
