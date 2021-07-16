@@ -27,16 +27,17 @@ export class CsMapClipboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
-      this.CsClipboardService.clipboardBS.subscribe(
-        (show) => {
-          this.bShowClipboard = show;
-      });
+    this.CsClipboardService.clipboardBS.subscribe(
+      (show) => {
+        this.bShowClipboard = show;
+    });
 
-      this.CsClipboardService.polygonsBS.subscribe(
-        (polygonBBox) => {
-          this.polygonBBox = polygonBBox;
-      });
-    }
+    this.CsClipboardService.polygonsBS.subscribe(
+      (polygonBBox) => {
+        this.polygonBBox = polygonBBox;
+    });
+  }
+
   clearClipboard() {
     this.CsClipboardService.clearClipboard();
   }
