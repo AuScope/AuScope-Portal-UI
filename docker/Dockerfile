@@ -2,7 +2,7 @@
 # A static Angular website served by apache2
 #
 # First image, build angular app
-FROM node:12.18-alpine as node
+FROM node:12.19-alpine as node
 
 ENV appdir /usr/src/app
 
@@ -16,11 +16,19 @@ RUN apk update && \
     apk upgrade && \
     apk add git
 
+RUN git clone https://github.com/AuScope/portal-core-ui-app.git && \
+    cd portal-core-ui-app && \
+    npm install && \
+    npm run build portal-core-ui && \
+    cd dist/portal-core-ui && \
+    npm link
+
 # Copy in npm package file
 COPY project/package.json ./
 
 # Install required npm packages
-RUN npm install
+RUN npm install && \
+    npm link @auscope/portal-core-ui
 
 # Copy all the other files
 COPY project ./
