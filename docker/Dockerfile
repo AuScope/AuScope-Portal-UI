@@ -27,8 +27,7 @@ RUN git clone https://github.com/AuScope/portal-core-ui-app.git && \
 COPY project/package.json ./
 
 # Install required npm packages
-RUN npm install && \
-    npm link @auscope/portal-core-ui
+RUN npm install
 
 # Copy all the other files
 COPY project ./
@@ -38,7 +37,7 @@ COPY docker/make_timestamp.sh make_timestamp.sh
 RUN ./make_timestamp.sh $BUILDTYPE > ./src/app/menupanel/portal-details-panel/portal-details-panel.component.html
 
 # Build Angular's static website files
-RUN npm run $BUILDTYPE
+RUN npm link @auscope/portal-core-ui && npm run $BUILDTYPE
 
 # Second image, install website
 FROM debian:10

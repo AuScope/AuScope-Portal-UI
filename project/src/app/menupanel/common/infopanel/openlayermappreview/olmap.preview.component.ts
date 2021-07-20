@@ -34,7 +34,7 @@ export class OlMapPreviewComponent implements AfterViewInit {
     BBOX_HIGH_STROKE_COLOUR = '#ff33cc';
     BBOX_LOW_FILL_COLOUR = 'rgba(128,128,128,0.25)';
     BBOX_HIGH_FILL_COLOUR = 'rgba(255,179,236,0.4)';
-    layerVectorArr: { [key: string]: olLayerVector } = {};
+    layerVectorArr: { [key: string]: olLayerVector<any> } = {};
 
     /**
      * This constructor creates the preview map
@@ -53,7 +53,7 @@ export class OlMapPreviewComponent implements AfterViewInit {
                             feat.geometry.coordinates[0][1], feat.geometry.coordinates[0][2],
                             feat.geometry.coordinates[0][3], feat.geometry.coordinates[0][4]]]);
                     if (poly.intersectsCoordinate(event.coordinate)) {
-                        me.olMapService.fitView(poly.getExtent());
+                        me.olMapService.fitView(<[number, number, number, number]>poly.getExtent());
                     }
                 }
             }
@@ -155,7 +155,7 @@ export class OlMapPreviewComponent implements AfterViewInit {
                        color: fillColour
                    })
                });
-               layer.setStyle(rectStyle);
+               (<olLayerVector<any>>layer).setStyle(rectStyle);
                map.addLayer(layer)
                break;
            }

@@ -104,7 +104,8 @@ export class InfoPanelComponent implements OnChanges {
                 }
                 if (reCentrePt !== {}) {
                     // Ask preview map component to draw bounding boxes and recentre the map
-                    this.previewMap.setupBBoxes(olProj.fromLonLat([reCentrePt.longitude, reCentrePt.latitude]), bboxPolygonArr);
+                    const coords = olProj.fromLonLat([reCentrePt.longitude, reCentrePt.latitude]) as [number, number];
+                    this.previewMap.setupBBoxes(coords, bboxPolygonArr);
                 }
             }
         }
