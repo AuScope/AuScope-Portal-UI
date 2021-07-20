@@ -1,0 +1,32 @@
+.editor-box {
+    position: fixed;
+    top: 100px;
+    right: 10px;
+    width:205px;
+    height:115px;
+    z-index: 100;
+    padding:0px;
+    background-color:#59c2aa;
+    opacity: 0.9;
+}
+
+/* Remove gap between buttons and selected polygon bbox name */
+.table {
+    margin-bottom: 0rem;
+}
+
+/* Remove default white underline */
+.table td {
+    border-top: none;
+}
+
+button:hover, button:focus  {
+    background-color: white;
+    opacity:  0.7;
+}
+
+/* Remove default blue shadow around buttons in 'focus' state */
+.btn:focus {
+    box-shadow: none;
+}
+
