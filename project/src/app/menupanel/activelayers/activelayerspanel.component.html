@@ -1,5 +1,5 @@
-<div *ngIf="getActiveLayers().length==0" style="font-size:0.9rem;color:#d8d9d7;margin-top:5px;">
-    Add layers to map
+<div class="select-layers-message" *ngIf="getActiveLayers().length==0">
+    Select layers below to add to map
 </div>
 <li *ngFor="let layer of getActiveLayers()">
     <div class="layerLoadCtrl">

@@ -1,0 +1,19 @@
+@import '../../globals';
+
+.help-menu {
+    color: $text-colour;
+}
+
+.help-menu:hover {
+    color: $text-highlight-colour;
+}
+
+::ng-deep {
+    .mat-menu-panel {
+        margin-top: 10px;
+    }
+
+    .mat-menu-content {
+        background-color: $background-colour;
+    }
+}

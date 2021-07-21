@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CsMapService, LayerModel } from '@auscope/portal-core-ui';
+import { CsClipboardService, CsMapService, LayerModel } from '@auscope/portal-core-ui';
 import { MatSliderChange } from '@angular/material/slider';
 import { ImagerySplitDirection } from 'cesium';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
@@ -14,7 +14,7 @@ import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 
 export class ActiveLayersPanelComponent {
 
-  constructor(private csMapService: CsMapService, private uiLayerModelService: UILayerModelService) { }
+  constructor(private csClipboardService: CsClipboardService, private csMapService: CsMapService, private uiLayerModelService: UILayerModelService) { }
 
   /**
    * Get active layers
@@ -43,10 +43,17 @@ export class ActiveLayersPanelComponent {
    * @layerId layerId ID of LayerModel
    */
   removeLayer(layerId: string): void {
-    let layerModelList = this.csMapService.getLayerModelList()
+    let layerModelList = this.csMapService.getLayerModelList();
     if (layerModelList.hasOwnProperty(layerId)) {
       this.csMapService.removeLayer(layerModelList[layerId]);
     }
+    // Remove polygon filter if was opened and no layers present
+    /*
+    if (Object.keys(layerModelList).length === 0) {
+      this.csClipboardService.clearClipboard();
+      this.csClipboardService.toggleClipboard(false);
+    }
+    */
   }
 
   /**

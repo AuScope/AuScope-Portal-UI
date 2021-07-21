@@ -1,7 +1,7 @@
 import { config } from '../../environments/config';
 import { ref } from '../../environments/ref';
 import { QuerierModalComponent } from '../modalwindow/querier/querier.modal.component';
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, NgZone, ViewChild } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ViewerConfiguration } from 'angular-cesium';
 import { CsCSWService, CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService, QueryWFSService,
@@ -13,7 +13,7 @@ declare var Cesium: any;
 @Component({
   selector: 'app-cs-map',
   template: `
-    <div #mapElement id="map" class="h-100 w-100">
+    <div #mapElement id="map" class="h-100 w-100" (mouseout)="mouseLongitude=undefined;mouseLatitude=undefined;">
       <ac-map>
           <rectangles-editor></rectangles-editor>
           <app-cs-map-zoom></app-cs-map-zoom>
@@ -24,11 +24,14 @@ declare var Cesium: any;
               <div class="slider-grabber-inner"></div>
             </div>
           </div>
+          <div class="mouse-coordinates" *ngIf="mouseLongitude !== undefined && mouseLatitude !== undefined">
+              Longitude:&nbsp;{{ mouseLongitude }},&nbsp;Latitude:&nbsp;{{ mouseLatitude }}
+          </div>
       </ac-map>
     </div>
     `,
     providers: [ViewerConfiguration], // Don't forget to Provide it 
-    styleUrls: ['./csmap.component.css']
+    styleUrls: ['./csmap.component.scss']
   // The "#" (template reference variable) matters to access the map element with the ViewChild decorator!
 })
 
@@ -42,15 +45,18 @@ export class CsMapComponent implements AfterViewInit {
   cesiumLoaded = true;
   viewer: any;
 
+  mouseLatitude: string;
+  mouseLongitude: string;
+
   sliderMoveActive: boolean = false;
 
   public static AUSTRALIA = Rectangle.fromDegrees(114.591, -45.837, 148.97, -5.73);
 
   private bsModalRef: BsModalRef;
 
-  constructor(  private csMapObject: CsMapObject,    private csMapService: CsMapService, private modalService: BsModalService,
+  constructor(private csMapObject: CsMapObject,    private csMapService: CsMapService, private modalService: BsModalService,
     private queryWFSService: QueryWFSService, private queryWMSService: QueryWMSService, private gmlParserService: GMLParserService,
-    private manageStateService: ManageStateService, private viewerConf: ViewerConfiguration) {
+    private manageStateService: ManageStateService, private viewerConf: ViewerConfiguration, private ngZone: NgZone) {
     //this.csMapService.getClickedLayerListBS().subscribe(this.handleLayerClick.bind(this));
     const me = this;
     this.csMapService.getClickedLayerListBS().subscribe((mapClickInfo) => {
@@ -71,7 +77,7 @@ export class CsMapComponent implements AfterViewInit {
       geocoder: false,
       navigationHelpButton: false,
       navigationInstructionsInitiallyVisible: false,
-      mapMode2D: MapMode2D.ROTATE,
+      mapMode2D: MapMode2D.INFINITE_SCROLL,
     };
     // Will be called on viewer initialistion
     viewerConf.viewerModifier = (viewer: any) => {
@@ -82,10 +88,28 @@ export class CsMapComponent implements AfterViewInit {
           window.alert('This browser does not support pickPosition.');
       }
       const handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
-       handler.setInputAction((movement) => {
-       // const cartesian = viewer.scene.pickPosition(movement.position);
-       this.csMapObject.processClick(movement);
+      handler.setInputAction((movement) => {
+        // const cartesian = viewer.scene.pickPosition(movement.position);
+        this.csMapObject.processClick(movement);
       }, Cesium.ScreenSpaceEventType.LEFT_UP);
+
+      // Keep track of lat/lon at mouse
+      handler.setInputAction((movement) => {
+        const ellipsoid = this.viewer.scene.globe.ellipsoid;
+        const cartesian = this.viewer.camera.pickEllipsoid(movement.endPosition, ellipsoid);
+        this.ngZone.run(() => {
+          if (cartesian) {
+            const cartographic = ellipsoid.cartesianToCartographic(cartesian);
+            me.mouseLongitude = Cesium.Math.toDegrees(cartographic.longitude).toFixed(5);
+            me.mouseLatitude = Cesium.Math.toDegrees(cartographic.latitude).toFixed(5);
+            //const elev = viewer.scene.globe.getHeight(cartographic); // In case we need 3D
+          } else {
+            me.mouseLongitude = undefined;
+            me.mouseLatitude = undefined;
+          }
+        });
+      }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+
       // Look at Australia
       viewer.camera.setView({
         destination: CsMapComponent.AUSTRALIA

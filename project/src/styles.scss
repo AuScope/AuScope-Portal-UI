@@ -156,11 +156,12 @@ label {
 
     /* position the twitter feed dropdown */
     .navbar-nav > li > .dropdown-menu {
+        padding: 10px;
+        background: $auscope-royal-blue;
         position: absolute;
         right: 20px;
         left: auto;
         top: $navbar-height + 8px;
-        min-width: 310px;
     }
 
     /* Organisation logo */
@@ -221,7 +222,7 @@ label {
     }
 
     .sidebar-heading {
-        color: #59c2aa!important;
+        color: $auscope-teal !important;
         font-weight: 700;
         margin-left: 1.5rem;
         margin-top: 0.5rem;
@@ -332,6 +333,10 @@ label {
         i, i:hover, a, a:hover {
             color: black;
         }
+    }
+
+    #activeLayersLink {
+        margin-top: 10px;
     }
 }
 /* END sidebar rules */
@@ -701,13 +706,6 @@ fieldset.show-fieldset-borders-whitebg legend{
 
     .navbar {
         height: $navbar-more-height;
-    }
-
-    /* Notifications dropdown */
-    .navbar-nav > li >.dropdown-menu {
-        max-width: 90vw;
-        left: 20px;
-        right: auto;
     }
 
     /* In the sidebar, under info tab, openlayers map */

@@ -21,7 +21,7 @@ import { CapdfAdvanceFilterComponent } from './menupanel/common/filterpanel/adva
 import { DynamicAdvancefilterComponent } from './menupanel/common/filterpanel/dynamic.advancefilter.component';
 import { InfoPanelComponent } from './menupanel/common/infopanel/infopanel.component';
 import { InfoPanelSubComponent } from './menupanel/common/infopanel/subpanel/subpanel.component';
-import { PermanentLinkComponent } from './menupanel/permanentlink/permanentlink.component';
+//import { PermanentLinkComponent } from './menupanel/permanentlink/permanentlink.component';
 import { ClipboardComponent } from './menupanel/clipboard/clipboard.component';
 import { CapdfAnalyticComponent } from './modalwindow/layeranalytic/capdf/capdf.analytic.component';
 import { DynamicLayerAnalyticComponent } from './modalwindow/layeranalytic/dynamic.layer.analytic.component';
@@ -48,6 +48,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatTreeModule } from '@angular/material/tree';
@@ -65,6 +66,7 @@ import { MSCLAnalyticComponent } from './modalwindow/layeranalytic/mscl/mscl.ana
 
 import { PlotlyViaCDNModule } from 'angular-plotly.js';
 import { RectanglesEditorService } from 'angular-cesium';
+import { HelpMenuComponent } from './toppanel/help-menu/help-menu.component';
 
 // Using CDN module to avoid bug https://github.com/plotly/angular-plotly.js/issues/75
 PlotlyViaCDNModule.plotlyVersion = '1.53.0';
@@ -96,7 +98,7 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     LayerAnalyticModalComponent,
     DynamicLayerAnalyticComponent,
     NVCLBoreholeAnalyticComponent,
-    PermanentLinkComponent,
+    //PermanentLinkComponent,
     ClipboardComponent,
     DynamicAdvancefilterComponent,
     CapdfAdvanceFilterComponent,
@@ -104,7 +106,8 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     DisclaimerModalComponent,
     PortalDetailsPanelComponent,
     MSCLComponent,
-    MSCLAnalyticComponent
+    MSCLAnalyticComponent,
+    HelpMenuComponent
   ],
   providers: [RectanglesEditorService],
   imports: [
@@ -119,6 +122,7 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     MatIconModule,
     MatButtonModule,
     MatDialogModule,
+    MatMenuModule,
     MatSliderModule,
     StorageServiceModule,
     NgxChartsModule,
@@ -149,13 +153,11 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     LayerPanelComponent,
     CustomPanelComponent,
     ActiveLayersPanelComponent,
-    // OlMapZoomComponent,
-    PermanentLinkComponent,
+    //PermanentLinkComponent,
     CatalogueSearchComponent,
     ClipboardComponent,
-    // OlMapClipboardComponent,
-    // OlmapBaselayerselectorComponent,
-    PortalDetailsPanelComponent
+    PortalDetailsPanelComponent,
+    HelpMenuComponent
   ]
 })
 export class AppModule { }
