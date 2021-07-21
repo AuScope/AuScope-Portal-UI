@@ -4,8 +4,10 @@ import { QuerierModalComponent } from '../modalwindow/querier/querier.modal.comp
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ViewerConfiguration } from 'angular-cesium';
-import { CsCSWService, CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService, QueryWFSService, QueryWMSService, SimpleXMLService, UtilitiesService,CsMapObject } from '@auscope/portal-core-ui';
-import { Cartesian3, MapMode2D, Math, ScreenSpaceEventHandler, SceneMode, ScreenSpaceEventType, Rectangle, ImagerySplitDirection } from 'cesium';
+import { CsCSWService, CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService, QueryWFSService,
+  QueryWMSService, SimpleXMLService, UtilitiesService, CsMapObject } from '@auscope/portal-core-ui';
+import { Cartesian3, MapMode2D, Math, ScreenSpaceEventHandler, SceneMode, ScreenSpaceEventType, Rectangle, ImagerySplitDirection,
+   Cartesian2, WebMapServiceImageryProvider, WebMercatorProjection, Cartographic, GeographicProjection } from 'cesium';
 declare var Cesium: any;
 
 @Component({
@@ -29,7 +31,6 @@ declare var Cesium: any;
     styleUrls: ['./csmap.component.css']
   // The "#" (template reference variable) matters to access the map element with the ViewChild decorator!
 })
-
 
 export class CsMapComponent implements AfterViewInit {
   // This is necessary to access the html element to set the map target (after view init)!
@@ -163,6 +164,84 @@ export class CsMapComponent implements AfterViewInit {
     }
   }
 
+  public getParams(x: number, y: number): any {
+
+    const mousePosition = new Cartesian2(x, y);
+    const clickCartesian = this.viewer.camera.pickEllipsoid(mousePosition, this.viewer.scene.globe.ellipsoid);
+    if (!clickCartesian) {
+      return undefined;
+    }
+
+    const scene = this.viewer.scene;
+
+    const clickCartographic = scene.globe.ellipsoid.cartesianToCartographic(clickCartesian);
+    // Find the terrain tile containing the picked location.
+    const tilesToRender = scene.globe._surface._tilesToRender;
+    let pickedTile;
+
+    for (let textureIndex = 0; !pickedTile && textureIndex < tilesToRender.length; ++textureIndex) {
+      const tile = tilesToRender[textureIndex];
+      if (Rectangle.contains(tile.rectangle, clickCartographic)) {
+        pickedTile = tile;
+      }
+    }
+
+    if (!(pickedTile)) {
+      return undefined;
+    }
+
+    // Pick against all attached imagery tiles containing the pickedLocation.
+    const imageryTiles = pickedTile.data.imagery;
+
+    for (let i = imageryTiles.length - 1; i >= 0; --i) {
+      const terrainImagery = imageryTiles[i];
+      const imagery = terrainImagery.readyImagery;
+      if (!imagery) {
+        continue;
+      }
+      const provider = imagery.imageryLayer.imageryProvider;
+      if (!(provider instanceof WebMapServiceImageryProvider)) {
+        continue;
+      }
+      if (!Rectangle.contains(imagery.rectangle, clickCartographic)) {
+        continue;
+      }
+
+      const wmp = new WebMercatorProjection();
+      const clickedLonlat = wmp.project(clickCartographic);
+
+
+      console.log(pickedTile.rectangle);
+      const p0 = new Cartographic(pickedTile.rectangle.west, pickedTile.rectangle.south, 0);
+      const p1 = new Cartographic(pickedTile.rectangle.east, pickedTile.rectangle.north, 0);
+
+      const p00 = wmp.project(p0);
+      const p11 = wmp.project(p1);
+
+      const longitudeLatitudeProjectedScratch = new Cartesian3();
+      const rectangleScratch = new Rectangle();
+      const ijScratch = new Cartesian2();
+      const cartographicScratch = new Cartographic();
+
+      if (provider.tilingScheme.projection instanceof GeographicProjection) {
+        longitudeLatitudeProjectedScratch.x = Cesium.Math.toDegrees(clickCartographic.longitude);
+        longitudeLatitudeProjectedScratch.y = Cesium.Math.toDegrees(clickCartographic.latitude);
+      } else {
+        alert('error:csmap:project');
+      }
+      const projected = longitudeLatitudeProjectedScratch;
+      const rectangle = provider.tilingScheme.tileXYToNativeRectangle(imagery.x, imagery.y, imagery.level, rectangleScratch);
+      ijScratch.x = ((provider.tileWidth * (projected.x - rectangle.west)) / rectangle.width) | 0;
+      ijScratch.y = ((provider.tileHeight * (rectangle.north - projected.y)) / rectangle.height) | 0;
+
+      x = ijScratch.x;
+      y = ijScratch.y;
+      const bbox = [p00.x.toFixed(0), p00.y.toFixed(0), p11.x.toFixed(0), p11.y.toFixed(0)];
+      const width = imagery.imageryLayer.imageryProvider.tileWidth;
+      const height = imagery.imageryLayer.imageryProvider.tileWidth;
+      return { x: x, y: y, width: width, height: height, bbox: bbox };
+    }
+  }
 
   /**
    * Handles the map click event
@@ -220,18 +299,16 @@ export class CsMapComponent implements AfterViewInit {
         } else {
           if (onlineResource) {
             me.bsModalRef.content.downloading = true;
-              let extraFilter = '';
-              if (maplayer.id === 'nvcl-v2-borehole') {
-                extraFilter = '<ogc:PropertyIsEqualTo><ogc:PropertyName>gsmlp:nvclCollection</ogc:PropertyName><ogc:Literal>true</ogc:Literal></ogc:PropertyIsEqualTo>';
-              }
-              this.queryWMSService.wfsGetFeature(onlineResource, maplayer.clickCoord[0], maplayer.clickCoord[1], extraFilter).subscribe(result => {
+            const params = this.getParams(maplayer.clickPixel[0], maplayer.clickPixel[1]);
+            this.queryWMSService.getFeatureInfo(onlineResource, maplayer.sldbody, maplayer.clickCoord[0], maplayer.clickCoord[1],
+              params.x, params.y, params.width, params.height, params.bbox).subscribe( result => {
               const feature = {onlineResource: onlineResource, layer: maplayer};
               this.setModal(result, feature, this.bsModalRef);
             },
-              err => {
+            err => {
                 this.bsModalRef.content.downloading = false;
                 this.bsModalRef.content.onDataChange();
-              });
+            });
           }
         }
       }
