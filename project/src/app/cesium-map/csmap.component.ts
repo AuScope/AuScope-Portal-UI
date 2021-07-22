@@ -317,11 +317,13 @@ export class CsMapComponent implements AfterViewInit {
     for (const maplayer of mapClickInfo.clickedLayerList) {
       me.displayModal(modalDisplayed, mapClickInfo.clickCoord);
       for (const i of maplayer.clickCSWRecordsIndex ) {
-        const onlineResource = maplayer.cswRecords[i].onlineResources[0];
-        if (config.cswrenderer.includes(maplayer.id)) {
-          this.setModalHTML(this.parseCSWtoHTML(maplayer.cswRecord), maplayer.cswRecord.name, maplayer, this.bsModalRef);
-        } else {
-          if (onlineResource) {
+        const cswRecord = maplayer.cswRecords[i];
+        const onlineResource = cswRecord.onlineResources[0];
+        if (onlineResource) {
+          if (config.cswrenderer.includes(maplayer.id)) {
+            const feature = {onlineResource: onlineResource, layer: maplayer};            
+            this.setModalHTML(this.parseCSWtoHTML(cswRecord), cswRecord.name, feature, this.bsModalRef);
+          } else {
             me.bsModalRef.content.downloading = true;
             const params = this.getParams(maplayer.clickPixel[0], maplayer.clickPixel[1]);
             this.queryWMSService.getFeatureInfo(onlineResource, maplayer.sldbody, maplayer.clickCoord[0], maplayer.clickCoord[1],
@@ -336,7 +338,6 @@ export class CsMapComponent implements AfterViewInit {
           }
         }
       }
-
     }
   }
 
