@@ -46,7 +46,6 @@
               "node_modules/lzma/src/lzma_worker.js",
               "src/extension/js/box.js",
               "src/extension/js/d3.legend.js",
-              "node_modules/pace-js/pace.min.js",
               "src/extension/js/no-ie-support.js",
               "./node_modules/cesium/Build/Cesium/Cesium.js"
             ],
@@ -155,8 +154,7 @@
               "src/extension/js/Rickshaw.Graph.SmootherPlus.min.js",
               "node_modules/lzma/src/lzma_worker-min.js",
               "src/extension/js/box.js",
-              "src/extension/js/d3.legend.js",
-              "node_modules/pace-js/pace.min.js"
+              "src/extension/js/d3.legend.js"
             ],
             "styles": [
               "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
