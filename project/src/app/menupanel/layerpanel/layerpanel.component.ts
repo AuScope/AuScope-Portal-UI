@@ -301,6 +301,18 @@ export class LayerPanelComponent implements OnInit {
     }
 
     /**
+     * For the given LayerModel, only show the split map buttons if the split map is shown,
+     * the layer has started (or completed) rendering, and the layer has a WMS resource
+     * 
+     * @param layer current LayerModel
+     */
+    public getShowLayerSplitButtons(layer: LayerModel): boolean {
+      return this.getSplitMapShown() &&
+             (this.getUILayerModel(layer.id).statusMap.getRenderStarted() || this.getUILayerModel(layer.id).statusMap.getRenderComplete()) &&
+             this.layerHandlerService.contains(layer, ResourceType.WMS);
+    }
+
+    /**
      * Returns true if any layer in a layer group is active 
      * "layerGroup" - an instance of this.layerGroups[key].value
      */

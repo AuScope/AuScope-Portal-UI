@@ -548,8 +548,9 @@ export class CsMapComponent implements AfterViewInit {
         }, 10);
 
     } else {
-      for (let l = 0; l < this.viewer.imageryLayers.length; l++) {
-        this.viewer.imageryLayers.get(l).splitDirection = ImagerySplitDirection.NONE;
+      let activeLayerKeys: string[] = Object.keys(this.csMapService.getLayerModelList());
+      for(const layer of activeLayerKeys) {
+        this.csMapService.setLayerSplitDirection(this.csMapService.getLayerModelList()[layer], ImagerySplitDirection.NONE);
       }
     }
   }
