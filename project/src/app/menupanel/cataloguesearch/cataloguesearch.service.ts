@@ -12,10 +12,9 @@ import {HttpClient, HttpParams, HttpHeaders, HttpResponse} from '@angular/common
 @Injectable()
 export class CataloguesearchService {
 
+  static RESULTS_PER_PAGE: number = 35;
 
-  constructor(private http: HttpClient) {
-
-  }
+  constructor(private http: HttpClient) { }
 
 
   public getFilteredCSWKeywords(cswServiceId: string): Observable<any> {
@@ -67,8 +66,6 @@ export class CataloguesearchService {
       httpParams = httpParams.append('key', 'keywords');
     }
 
-
-
     httpParams = httpParams.append('value', param.cswService.id);
     httpParams = httpParams.append('value', 'Any');
     if (param.anyText) {
@@ -96,12 +93,10 @@ export class CataloguesearchService {
       httpParams = httpParams.append('value', param.keywords);
     }
 
-    const limit = 35;
-    const start = ((page - 1) * limit);
+    const start = ((page - 1) * CataloguesearchService.RESULTS_PER_PAGE);
     httpParams = httpParams.append('page', page.toString());
     httpParams = httpParams.append('start', start.toString());
-    httpParams = httpParams.append('limit', limit.toString());
-
+    httpParams = httpParams.append('limit', CataloguesearchService.RESULTS_PER_PAGE.toString());
 
     return this.http.post(environment.portalBaseUrl + 'getFilteredCSWRecords.do', httpParams.toString(), {
       headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
@@ -122,24 +117,20 @@ export class CataloguesearchService {
           itemLayer.name = item.name;
           itemLayers[param.cswService.title].push(itemLayer);
         });
-        const results = {
-            itemLayers: itemLayers,
-            totalResults: parseInt(response['totalResults'], 10) / limit
+        return {
+          itemLayers: itemLayers,
+          totalResults: parseInt(response['totalResults'], 10)
         }
-        return results;
       } else {
         return observableThrowError(response['msg']);
       }
-    }), catchError(
-      (error: HttpResponse<any>) => {
-        return observableThrowError(error);
-      }
-      ), );
+    }), catchError((error: HttpResponse<any>) => {
+      return observableThrowError(error);
+    }), );
   }
 
 
   public getCSWServices(): Observable<any> {
-
     return this.http.post(environment.portalBaseUrl + 'getCSWServices.do', {
       headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
       responseType: 'json'

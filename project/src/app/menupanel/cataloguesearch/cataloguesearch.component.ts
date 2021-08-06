@@ -34,7 +34,7 @@ export class CatalogueSearchComponent implements AfterViewInit {
   layerGroups = [];
   bsModalRef: BsModalRef;
   statusmsg: string;
-  totalResults = [];
+  pageList = [];
   currentPage: number;
      
   // the rectangle drawn on the map
@@ -149,8 +149,9 @@ export class CatalogueSearchComponent implements AfterViewInit {
         this.loading = false;
         if (response != null) {
           me.layerGroups = response.itemLayers;
-          for (let i = 1; i <= response.totalResults; i++) {
-            me.totalResults.push(i);
+          me.pageList = [];
+          for (let i = 1; i <= Math.ceil(response.totalResults / CataloguesearchService.RESULTS_PER_PAGE); i++) {
+            me.pageList.push(i);
           }
           for (const key in this.layerGroups) {
             for (let i = 0; i < this.layerGroups[key].length; i++) {

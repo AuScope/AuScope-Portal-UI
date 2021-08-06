@@ -91,7 +91,7 @@
 						</div>
 					</a>
 					<div [hidden]="!layer.expanded" class="sidebar-card-menu-show">
-						 <div class="card card-info card-with-tabs layer-card animated  slideInRight">
+						 <div class="card card-info card-with-tabs layer-card animated slideInRight">
 							<div class="card-header">
 								<ul id="card-tab" class="nav nav-tabs float-right">
 									<li (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': getUILayerModel(layer.id).tabpanel.filterpanel.expanded}"><a data-toggle="tab"><i class="fa fa-filter"></i> <span class="d-none d-sm-inline">Filter</span></a></li>
@@ -103,7 +103,7 @@
 									<app-filter-panel *ngIf="getUILayerModel(layer.id).tabpanel.filterpanel.expanded "[layer]=layer></app-filter-panel>
 								</div>
 								<div class="tab-pane fade" [ngClass]="{'show active': getUILayerModel(layer.id).tabpanel.infopanel.expanded}">
-									<info-panel *ngIf="getUILayerModel(layer.id).tabpanel.infopanel.expanded" [expanded]="getUILayerModel(layer.id).tabpanel.infopanel.expanded" [cswRecords]=layer.cswRecords [layer]=layer ></info-panel>
+									<info-panel *ngIf="getUILayerModel(layer.id).tabpanel.infopanel.expanded" [expanded]="getUILayerModel(layer.id).tabpanel.infopanel.expanded" [cswRecords]=layer.cswRecords [layer]=layer></info-panel>
 								</div>
 							</div>
 						</div>
@@ -111,16 +111,13 @@
 				</li>
 			</ul>
 		</li>
-		<div class="pagination dark">
-			<a  class="page dark gradient" (click)="currentPage=currentPage-1;search()">Last</a>
-			<a  class="page dark gradient" (click)="currentPage=currentPage+1;search()">Next</a>
+		<div class="pagination dark float-right">
+			<a *ngIf="currentPage>1" class="page dark gradient" (click)="currentPage=currentPage-1;search()">Previous</a>
+			<a *ngIf="currentPage<pageList.length" class="page dark gradient" (click)="currentPage=currentPage+1;search()">Next</a>
 			<select class="page dark gradient" [(ngModel)]="currentPage" (change)="search()">
-				<option *ngFor="let idx of totalResults">{{idx}}</option>
+				<option *ngFor="let idx of pageList">{{idx}}</option>
 			</select>
 		</div>
 	</div>
-
-
-
 
 </div>
