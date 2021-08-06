@@ -240,9 +240,6 @@ export class LayerPanelComponent implements OnInit {
     public removeLayer(layer: LayerModel) {
       this.getUILayerModel(layer.id).opacity = 100;
       this.csMapService.removeLayer(layer);
-      setTimeout(() => {
-        this.renderStatusService.resetLayer(layer.id);
-      }, 100);
     }
 
     /**
