@@ -67,14 +67,16 @@
 
 	</div>
 
-	<div *ngIf="loading && !searchMode"><p class="wip text-danger">Please wait while we search through the catalogue <i class="fa fa-circle small"></i><i class="fa fa-circle small"></i><i class="fa fa-circle small"></i></p></div>
+	<div *ngIf="loading && !searchMode"><p class="wip text-danger center-text">Please wait while we search through the catalogue</p>
+		<div class ="center-text"><em class="fa fa-spinner fa-spin fa-fw text-danger"></em></div>
+	</div>
 
 	<div *ngIf="!searchMode" style="position: relative; font-size:11px;">
 		<div class="float-right" (click)="closeResult()"><i class="fa fa-window-close white"></i></div>
 		<li class="active" *ngFor="let layerGroup of layerGroups | getKey">
-		  		<div class="white">
-		             {{layerGroup.key}}
-		       </div>
+		  	<div class="white">
+		        {{layerGroup.key}}
+		    </div>
 			<ul>
 				<li *ngFor="let layer of layerGroup.value" [ngClass]="{'active': layer.expanded}">
 					<a (click)="layer.expanded = !layer.expanded">
@@ -111,7 +113,7 @@
 				</li>
 			</ul>
 		</li>
-		<div class="pagination dark float-right">
+		<div *ngIf="!loading" class="pagination dark float-right">
 			<a *ngIf="currentPage>1" class="page dark gradient" (click)="currentPage=currentPage-1;search()">Previous</a>
 			<a *ngIf="currentPage<pageList.length" class="page dark gradient" (click)="currentPage=currentPage+1;search()">Next</a>
 			<select class="page dark gradient" [(ngModel)]="currentPage" (change)="search()">

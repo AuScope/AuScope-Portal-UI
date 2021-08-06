@@ -81,11 +81,15 @@ export class CatalogueSearchComponent implements AfterViewInit {
     });
   }
 
-    /**
+  /**
    * clear the bounding box
    */
   public clearBound(): void {
     this.bbox = null;
+    this.form.north = null;
+    this.form.south = null;
+    this.form.east = null;
+    this.form.west = null;
     // clear rectangle on the map
     if (this.rectangleObservable) {
         this.rectangleObservable.dispose();
@@ -137,8 +141,8 @@ export class CatalogueSearchComponent implements AfterViewInit {
   public search() {
     // clear rectangle on the map because there is no way to remove it after search is displayed
     if (this.rectangleObservable) {
-        this.rectangleObservable.dispose();
-        this.rectangleObservable = null;
+      this.rectangleObservable.dispose();
+      this.rectangleObservable = null;
     }
     this.layerGroups = [];
     this.loading = true;
@@ -162,6 +166,8 @@ export class CatalogueSearchComponent implements AfterViewInit {
         } else {
           this.statusmsg = '<div class="text-danger">No records Found</div>';
         }
+      }, error => {
+        this.loading = false;
       });
   }
 
