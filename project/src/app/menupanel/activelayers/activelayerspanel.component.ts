@@ -65,10 +65,11 @@ export class ActiveLayersPanelComponent {
   }
 
   /**
-   * Split buttons will only be displayed if the split map is shown
+   * Split buttons will only be displayed if the split map is shown and the layer has started (or completed) rendering.
    */
-  public getSplitMapShown(): boolean {
-    return this.csMapService.getSplitMapShown();
+  public getShowSplitMapButtons(layer: LayerModel): boolean {
+    return this.csMapService.getSplitMapShown() &&
+           (this.getUILayerModel(layer.id).statusMap.getRenderStarted() || this.getUILayerModel(layer.id).statusMap.getRenderComplete());
   }
 
   /**
@@ -117,15 +118,12 @@ export class ActiveLayersPanelComponent {
   }
 
   /**
-     * For the given LayerModel, only show the split map buttons if the split map is shown,
-     * the layer has started (or completed) rendering, and the layer has a WMS resource
-     * 
-     * @param layer current LayerModel
-     */
-    public getShowLayerSplitButtons(layer: LayerModel): boolean {
-      return this.getSplitMapShown() &&
-             (this.getUILayerModel(layer.id).statusMap.getRenderStarted() || this.getUILayerModel(layer.id).statusMap.getRenderComplete()) &&
-             this.layerHandlerService.contains(layer, ResourceType.WMS);
-    }
+   * Only show the split map buttons if the layer has a WMS resource.
+   * 
+   * @param layer current LayerModel
+   */
+  public getApplicableSplitLayer(layer: LayerModel): boolean {
+    return this.layerHandlerService.contains(layer, ResourceType.WMS);
+  }
 
 }

@@ -11,11 +11,16 @@
             <div class="opacity-label">Opacity {{ getUILayerModel(layer.id).opacity }}%&nbsp;</div>
             <mat-slider [min]="0" [max]="100" class="opacity-slider flex-grow-1" [(ngModel)]="getUILayerModel(layer.id).opacity" (input)="layerOpacityChange($event, layer)"></mat-slider>
         </div>
-        <div class="split-panel" *ngIf="getShowLayerSplitButtons(layer)" (click)="$event.stopPropagation()">
+        <div class="split-panel" *ngIf="getShowSplitMapButtons(layer)" (click)="$event.stopPropagation()">
             Split Direction&nbsp;
-            <button [className]="getLayerSplitDirection(layer.id) == 'left' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'left')">Left</button>
-            <button [className]="getLayerSplitDirection(layer.id) == 'none' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'none')">Both</button>
-            <button [className]="getLayerSplitDirection(layer.id) == 'right' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'right')">Right</button>
+            <div *ngIf="getApplicableSplitLayer(layer)" class="split-button-panel">
+                <button [className]="getLayerSplitDirection(layer.id) == 'left' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'left')">Left</button>
+                <button [className]="getLayerSplitDirection(layer.id) == 'none' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'none')">Both</button>
+                <button [className]="getLayerSplitDirection(layer.id) == 'right' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'right')">Right</button>
+            </div>
+            <div *ngIf="!getApplicableSplitLayer(layer)" class="split-button-panel">
+                <button class="btn btn-split btn-primary" [disabled]="true">Layer not supported</button>
+            </div>
         </div>
     </div>
 </li>
