@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CsClipboardService, CsMapService, LayerModel } from '@auscope/portal-core-ui';
+import { CsClipboardService, CsMapService, LayerHandlerService, LayerModel, ResourceType } from '@auscope/portal-core-ui';
 import { MatSliderChange } from '@angular/material/slider';
 import { ImagerySplitDirection } from 'cesium';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
@@ -14,7 +14,8 @@ import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 
 export class ActiveLayersPanelComponent {
 
-  constructor(private csClipboardService: CsClipboardService, private csMapService: CsMapService, private uiLayerModelService: UILayerModelService) { }
+  constructor(private csClipboardService: CsClipboardService, private csMapService: CsMapService,
+    private uiLayerModelService: UILayerModelService, private layerHandlerService: LayerHandlerService) { }
 
   /**
    * Get active layers
@@ -64,10 +65,11 @@ export class ActiveLayersPanelComponent {
   }
 
   /**
-   * Split buttons will only be displayed if the split map is shown
+   * Split buttons will only be displayed if the split map is shown and the layer has started (or completed) rendering.
    */
-  public getSplitMapShown(): boolean {
-    return this.csMapService.getSplitMapShown();
+  public getShowSplitMapButtons(layer: LayerModel): boolean {
+    return this.csMapService.getSplitMapShown() &&
+           (this.getUILayerModel(layer.id).statusMap.getRenderStarted() || this.getUILayerModel(layer.id).statusMap.getRenderComplete());
   }
 
   /**
@@ -113,6 +115,15 @@ export class ActiveLayersPanelComponent {
       }
     }
     return splitDir;
+  }
+
+  /**
+   * Only show the split map buttons if the layer has a WMS resource.
+   * 
+   * @param layer current LayerModel
+   */
+  public getApplicableSplitLayer(layer: LayerModel): boolean {
+    return this.layerHandlerService.contains(layer, ResourceType.WMS);
   }
 
 }

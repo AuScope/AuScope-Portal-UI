@@ -298,6 +298,9 @@ input + div.input-group-append  > button {
 
 .split-panel {
     margin-bottom: 4px;
+    .split-button-panel {
+        display: contents;
+    }
 }
 
 .btn-split {
