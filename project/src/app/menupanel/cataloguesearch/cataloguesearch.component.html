@@ -113,7 +113,7 @@
 				</li>
 			</ul>
 		</li>
-		<div *ngIf="!loading" class="pagination dark float-right">
+		<div *ngIf="!loading && pageList.length>1" class="pagination dark float-right">
 			<a *ngIf="currentPage>1" class="page dark gradient" (click)="currentPage=currentPage-1;search()">Previous</a>
 			<a *ngIf="currentPage<pageList.length" class="page dark gradient" (click)="currentPage=currentPage+1;search()">Next</a>
 			<select class="page dark gradient" [(ngModel)]="currentPage" (change)="search()">
