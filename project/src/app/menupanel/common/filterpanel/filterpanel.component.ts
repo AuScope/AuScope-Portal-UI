@@ -98,6 +98,27 @@ export class FilterPanelComponent implements OnInit {
   }
 
   /**
+   * Test if a filter contains a value. This means non-null for all filters, with the added
+   * requirement for OPTIONAL.PROVIDER filters that at least one value in the list be true
+   * @param filter the filter to test
+   * @returns true if the filter contains a valid value
+   */
+  filterHasValue(filter: Object): boolean {
+    let hasValue = false;
+    if (filter['type'] === "OPTIONAL.PROVIDER") {
+      for (const provider in filter['value']) {
+        if (filter['value'][provider] === true) {
+          hasValue = true;
+          break;
+        }
+      }
+    } else if (filter['value'] !== null) {
+      hasValue = true;
+    }
+    return hasValue;
+  }
+
+  /**
    * Add layer to map
    * @param layer the layer to add to map
    */
@@ -112,6 +133,9 @@ export class FilterPanelComponent implements OnInit {
     const param = {
       optionalFilters: _.cloneDeep(this.optionalFilters)
     };
+
+    // Remove filters without values
+    param.optionalFilters = param.optionalFilters.filter(f => this.filterHasValue(f));
 
     for (const optFilter of param.optionalFilters) {
       if (optFilter['options']) {
