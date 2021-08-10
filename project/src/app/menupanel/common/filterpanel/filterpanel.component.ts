@@ -103,7 +103,7 @@ export class FilterPanelComponent implements OnInit {
    * @param filter the filter to test
    * @returns true if the filter contains a valid value
    */
-  filterHasValue(filter: Object): boolean {
+  private filterHasValue(filter: Object): boolean {
     let hasValue = false;
     if (filter['type'] === "OPTIONAL.PROVIDER") {
       for (const provider in filter['value']) {
@@ -116,6 +116,25 @@ export class FilterPanelComponent implements OnInit {
       hasValue = true;
     }
     return hasValue;
+  }
+  
+  /**
+   * Check to see if a layer is supported to be added to the map
+   * @param layer layer to check
+   * @returns true if supported layer, false otherwise
+   */
+  public isMapSupportedLayer(layer: LayerModel): boolean {
+    return this.csMapService.isMapSupportedLayer(layer);
+  }
+
+  /**
+   * String to display when a layer cannot be added to the map due to not
+   * containing a supported OnlineResource type.
+   */
+  public getUnsupportedLayerMessage(): string {
+    return "This layer is not supported. Only layers containing the " +
+           "following online resource types can be added to the map: " +
+           this.csMapService.getSupportedOnlineResourceTypes();
   }
 
   /**
