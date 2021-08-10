@@ -1,20 +1,26 @@
 <polygons-editor></polygons-editor>
 
-<div *ngIf="bShowClipboard" class="container-fluid rounded editor-box" role="group">
-		<small style="margin-left:10px">Polygon Filter Clipboard:</small>
+<button class="cesium-button cesium-toolbar-button editor-toggle-button" (click)="toggleEditor()">
+    <em class="fa fa-edit" title="Draw or select polygon filter"></em>
+</button>
+
+<div *ngIf="bShowClipboard" @fadeSlideInOut class="container-fluid editor-box" role="group">
+	<div class="editor-title">
+		Polygon Filter
+	</div>
+	<div class="editor-container">
 		<table class="table">
 			<tbody>
 				<tr>
 					<td *ngIf="polygonBBox" class="content-break-word">{{polygonBBox.name}}</td>
-					<td *ngIf="!polygonBBox">&nbsp;</td> <!-- Ensures buttons don't move up when user hits 'Clear' -->
+					<td *ngIf="!polygonBBox">&nbsp;No polygon</td>
 				</tr>
 			</tbody>
 		</table>
-	<div class="btn-toolbar " role="toolbar">
-	<div class="btn-group mr-2" role="group">			
-		<button (click)='clearClipboard()' type="button" class="btn btn-sm btn-inverse active"><i class="fa fa-lg fa-times-circle" aria-hidden="true"></i>Clear</button>
-		<button (click)='drawPolygon()' type="button" [ngClass]="{'btn-inverse': !isDrawingPolygon, 'btn-active': isDrawingPolygon}" class="btn btn-sm btn-inverse active"><i class="fa fa-lg fa-edit" aria-hidden="true"></i>Draw</button>
-		<button (click)='toggleFilterLayers()' type="button" [ngClass]="{'btn-inverse': !isFilterLayerShown, 'btn-active': isFilterLayerShown}" class="btn btn-sm btn-inverse active"><i class="fa fa-lg fa-mouse-pointer" aria-hidden="true"></i>Select</button>
+		<div class="btn-group mr-2 editor-button-group" role="group">
+			<button (click)='clearClipboard()' type="button" class="cesium-button cesium-toolbar-button editor-button"><em class="fa fa-lg fa-times-circle" aria-hidden="true"></em>Clear</button>
+			<button (click)='drawPolygon()' type="button" [ngClass]="{'btn-inverse': !isDrawingPolygon, 'btn-active': isDrawingPolygon}" class="cesium-button cesium-toolbar-button editor-button"><i class="fa fa-lg fa-edit" aria-hidden="true"></i>Draw</button>
+			<button (click)='toggleFilterLayers()' type="button" [ngClass]="{'btn-inverse': !isFilterLayerShown, 'btn-active': isFilterLayerShown}" class="cesium-button cesium-toolbar-button editor-button"><i class="fa fa-lg fa-mouse-pointer" aria-hidden="true"></i>Select</button>
 		</div>
 	</div>
 </div>

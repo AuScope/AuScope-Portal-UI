@@ -1,8 +1,20 @@
+import { animate, style, transition, trigger } from '@angular/animations';
 import { CsClipboardService, Polygon } from '@auscope/portal-core-ui';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-cs-clipboard',
+  animations: [
+    trigger('fadeSlideInOut', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(-50px)' }),
+        animate('150ms', style({ opacity: 1, transform: 'translateY(2px)' })),
+      ]),
+      transition(':leave', [
+        animate('150ms', style({ opacity: 0, transform: 'translateY(-50px)' })),
+      ]),
+    ]),
+  ],
   templateUrl: './csmap.clipboard.component.html',
   styleUrls: ['./csmap.clipboard.component.css'],
 })
@@ -13,6 +25,7 @@ export class CsMapClipboardComponent implements OnInit {
   bShowClipboard: Boolean;
   public isFilterLayerShown: Boolean;
   public isDrawingPolygon: boolean;
+  
   constructor(private CsClipboardService: CsClipboardService) {
     this.polygonBBox = null;
     this.isFilterLayerShown = false;
@@ -58,4 +71,9 @@ export class CsMapClipboardComponent implements OnInit {
   getPolygonBBoxs(): String {
     return this.polygonBBox.coordinates;
   }
+
+  toggleEditor() {
+    this.CsClipboardService.toggleClipboard();
+  }
+
 }
