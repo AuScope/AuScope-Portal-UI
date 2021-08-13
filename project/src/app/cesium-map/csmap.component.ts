@@ -8,6 +8,7 @@ import { CsCSWService, CsMapService, CSWRecordModel, GMLParserService, LayerMode
   QueryWMSService, SimpleXMLService, UtilitiesService, CsMapObject, ResourceType } from '@auscope/portal-core-ui';
 import { Cartesian3, MapMode2D, Math, ScreenSpaceEventHandler, SceneMode, ScreenSpaceEventType, Rectangle, ImagerySplitDirection,
    Cartesian2, WebMapServiceImageryProvider, WebMercatorProjection, Cartographic, GeographicProjection, Entity } from 'cesium';
+import { IrisQuerierHandler } from './custom-querier-handler/iris-querier-handler.service';
 declare var Cesium: any;
 
 @Component({
@@ -283,10 +284,10 @@ export class CsMapComponent implements AfterViewInit {
       if (layer !== null) {
         // NB: This is just testing that the popup window does display
         this.displayModal(modalDisplayed, mapClickInfo.clickCoord);
-        // Custom renderers
-        if (ref.customQuerierHandler[layer.id]) {
-          const handler = new ref.customQuerierHandler[layer.id](layer, entity);
-            this.setModalHTML(handler.getHTML(entity), layer.name, entity, this.bsModalRef);
+        // IRIS layers
+        if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.IRIS))) {
+          const handler = new IrisQuerierHandler(layer, entity);
+          this.setModalHTML(handler.getHTML(), layer.name, entity, this.bsModalRef);
         }
       }
       // TODO: Remove commented code, kept for yet to be re-implemented entity types
