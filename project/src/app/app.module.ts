@@ -155,7 +155,6 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     ActiveLayersPanelComponent,
     //PermanentLinkComponent,
     CatalogueSearchComponent,
-    ClipboardComponent,
     PortalDetailsPanelComponent,
     HelpMenuComponent
   ]

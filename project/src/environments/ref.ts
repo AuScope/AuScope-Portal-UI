@@ -10,6 +10,7 @@ import {NVCLDatasetListComponent} from '../app/modalwindow/querier/customanalyti
 import {TIMAComponent} from '../app/modalwindow/querier/customanalytic/tima/tima.component';
 import {IrisQuerierHandler} from '../app/cesium-map/custom-querier-handler/iris-querier-handler.service';
 import {MSCLComponent} from '../app/modalwindow/querier/customanalytic/mscl/mscl.component';
+
 export const ref = {
   analytic: {
     'nvcl-borehole': NVCLDatasetListComponent,

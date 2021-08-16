@@ -5,9 +5,10 @@ import { AfterViewInit, Component, ElementRef, NgZone, ViewChild } from '@angula
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ViewerConfiguration } from 'angular-cesium';
 import { CsCSWService, CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService, QueryWFSService,
-  QueryWMSService, SimpleXMLService, UtilitiesService, CsMapObject } from '@auscope/portal-core-ui';
+  QueryWMSService, SimpleXMLService, UtilitiesService, CsMapObject, ResourceType } from '@auscope/portal-core-ui';
 import { Cartesian3, MapMode2D, Math, ScreenSpaceEventHandler, SceneMode, ScreenSpaceEventType, Rectangle, ImagerySplitDirection,
-   Cartesian2, WebMapServiceImageryProvider, WebMercatorProjection, Cartographic, GeographicProjection } from 'cesium';
+   Cartesian2, WebMapServiceImageryProvider, WebMercatorProjection, Cartographic, GeographicProjection, Entity } from 'cesium';
+import { IrisQuerierHandler } from './custom-querier-handler/iris-querier-handler.service';
 declare var Cesium: any;
 
 @Component({
@@ -18,7 +19,7 @@ declare var Cesium: any;
           <rectangles-editor></rectangles-editor>
           <app-cs-map-zoom></app-cs-map-zoom>
           <app-cs-map-split (toggleEvent)="toggleShowMapSplit()"></app-cs-map-split>
-          <app-cs-clipboard class="btn-group float-right mb-3"></app-cs-clipboard>
+          <app-cs-clipboard></app-cs-clipboard>
           <div #mapSlider id="mapSlider" *ngIf="getSplitMapShown()">
             <div class="slider-grabber">
               <div class="slider-grabber-inner"></div>
@@ -234,7 +235,6 @@ export class CsMapComponent implements AfterViewInit {
       const wmp = new WebMercatorProjection();
       const clickedLonlat = wmp.project(clickCartographic);
 
-
       console.log(pickedTile.rectangle);
       const p0 = new Cartographic(pickedTile.rectangle.west, pickedTile.rectangle.south, 0);
       const p1 = new Cartographic(pickedTile.rectangle.east, pickedTile.rectangle.north, 0);
@@ -276,44 +276,58 @@ export class CsMapComponent implements AfterViewInit {
       return;
     }
 
-    // Process lists of features
+    // Process lists of entities
     const modalDisplayed = {value: false}
-    let featureCount = 0;
-    for (const feature of mapClickInfo.clickedFeatureList) {
-      if (feature.id_ && feature.id_.indexOf('geocoder') === 0) {
+    for (const entity of mapClickInfo.clickedEntityList) {
+      // TODO: Ignore polygon filter entities here or in portal-core-ui
+      const layer: LayerModel = this.csMapService.getLayerForEntity(entity);
+      if (layer !== null) {
+        // NB: This is just testing that the popup window does display
+        this.displayModal(modalDisplayed, mapClickInfo.clickCoord);
+        // IRIS layers
+        if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.IRIS))) {
+          const handler = new IrisQuerierHandler(layer, entity);
+          this.setModalHTML(handler.getHTML(), layer.name, entity, this.bsModalRef);
+        }
+      }
+      // TODO: Remove commented code, kept for yet to be re-implemented entity types
+      /*
+      if (entity.id_ && entity.id_.indexOf('geocoder') === 0) {
         continue;
       }
       // NB: This is just testing that the popup window does display
       this.displayModal(modalDisplayed, mapClickInfo.clickCoord);
 
       // VT: if it is a csw renderer layer, handling of the click is slightly different
-      if (config.cswrenderer.includes(feature.layer.id) || CsCSWService.cswDiscoveryRendered.includes(feature.layer.id)) {
-        this.setModalHTML(this.parseCSWtoHTML(feature.cswRecord), feature.cswRecord.name, feature, this.bsModalRef);
-      } else if (ref.customQuerierHandler[feature.layer.id]) {
-          const handler = new ref.customQuerierHandler[feature.layer.id](feature);
-          this.setModalHTML(handler.getHTML(feature), handler.getKey(feature), feature, this.bsModalRef);
+      if (config.cswrenderer.includes(entity.layer.id) || CsCSWService.cswDiscoveryRendered.includes(entity.layer.id)) {
+        this.setModalHTML(this.parseCSWtoHTML(entity.cswRecord), entity.cswRecord.name, entity, this.bsModalRef);
+      } else if (ref.customQuerierHandler[entity.layer.id]) {
+          const handler = new ref.customQuerierHandler[entity.layer.id](entity);
+          this.setModalHTML(handler.getHTML(entity), handler.getKey(entity), entity, this.bsModalRef);
       } else {       // VT: in a normal feature, yes we want to getfeatureinfo
         featureCount++;
         if (featureCount < 10) {// VT: if more than 10 feature, ignore the rest
          try {
-            this.queryWFSService.getFeatureInfo(feature.onlineResource, feature.id_).subscribe(result => {
-              this.setModal(result, feature, this.bsModalRef);
+            this.queryWFSService.getFeatureInfo(entity.onlineResource, entity.id_).subscribe(result => {
+              this.setModal(result, entity, this.bsModalRef);
             }, err => {
               this.bsModalRef.content.downloading = false;
               });
           } catch (error) {
            this.setModalHTML('<p> ' + error + '</p>',
-            'Error Retrieving Data', feature, this.bsModalRef);
+            'Error Retrieving Data', entity, this.bsModalRef);
           }
         } else {
           this.setModalHTML('<p>Too many features to list, zoom in the map to get a more precise location</p>',
-            '...', feature, this.bsModalRef);
+            '...', entity, this.bsModalRef);
           break;
         }
       }
+      */
     }
+
     const me = this;
-    // VT: process list of layers clicked
+    // Process list of layers clicked
     for (const maplayer of mapClickInfo.clickedLayerList) {
       me.displayModal(modalDisplayed, mapClickInfo.clickCoord);
       for (const i of maplayer.clickCSWRecordsIndex ) {
@@ -321,8 +335,8 @@ export class CsMapComponent implements AfterViewInit {
         const onlineResource = cswRecord.onlineResources[0];
         if (onlineResource) {
           if (config.cswrenderer.includes(maplayer.id)) {
-            const feature = {onlineResource: onlineResource, layer: maplayer};            
-            this.setModalHTML(this.parseCSWtoHTML(cswRecord), cswRecord.name, feature, this.bsModalRef);
+            const feature = {onlineResource: onlineResource, layer: maplayer};
+            this.setModalHTML(this.parseCSWtoHTML(cswRecord), cswRecord.name, maplayer, this.bsModalRef);
           } else {
             me.bsModalRef.content.downloading = true;
             const params = this.getParams(maplayer.clickPixel[0], maplayer.clickPixel[1]);
@@ -375,6 +389,7 @@ export class CsMapComponent implements AfterViewInit {
       this.bsModalRef = this.modalService.show(QuerierModalComponent, {class: 'modal-lg'});
       modalDisplayed.value = true;
       this.bsModalRef.content.downloading = true;
+      /*
       if (clickCoord) {
         const vector = this.csMapService.drawDot(clickCoord);
         this.modalService.onHide.subscribe(reason => {
@@ -382,6 +397,7 @@ export class CsMapComponent implements AfterViewInit {
             this.csMapService.removeVector(vector);          }
         })
       }
+      */
     }
   }
 
@@ -485,18 +501,17 @@ export class CsMapComponent implements AfterViewInit {
    * @param feature map feature object
    * @param bsModalRef modal dialog reference
    */
-  private setModalHTML(html: string, key: any, feature: any, bsModalRef: BsModalRef) {
+  private setModalHTML(html: string, key: any, layer: LayerModel, bsModalRef: BsModalRef) {
       bsModalRef.content.htmls.push({
         key: key,
-        layer: feature.layer,
+        layer: layer,
         value: html
       });
-      if (bsModalRef.content.uniqueLayerNames.indexOf(feature.layer.name) === -1) {
-        bsModalRef.content.uniqueLayerNames.push(feature.layer.name)
+      if (bsModalRef.content.uniqueLayerNames.indexOf(layer.name) === -1) {
+        bsModalRef.content.uniqueLayerNames.push(layer.name)
       }
      this.bsModalRef.content.downloading = false;
      this.bsModalRef.content.onDataChange();
-
   }
 
   /**

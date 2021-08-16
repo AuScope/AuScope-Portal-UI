@@ -1,13 +1,25 @@
+/* Editor toggle map buton */
+.editor-toggle-button {
+    display: block;
+    position: absolute;
+    right: 5px;
+    top: 50px;
+    z-index: 5;
+    font-size: 21px;
+}
+
+/* Main editor panel */
 .editor-box {
     position: fixed;
-    top: 100px;
-    right: 10px;
-    width:205px;
-    height:115px;
+    top: 144px;
+    right: 5px;
+    width: 205px;
     z-index: 100;
-    padding:0px;
-    background-color:#59c2aa;
+    padding: 6px;
+    background-color:rgba(38,38,38,0.75);
     opacity: 0.9;
+    border: 1px solid #444444;
+    border-radius: .8rem!important;
 }
 
 /* Remove gap between buttons and selected polygon bbox name */
@@ -17,16 +29,29 @@
 
 /* Remove default white underline */
 .table td {
+    color: #edffff;
     border-top: none;
 }
 
-button:hover, button:focus  {
-    background-color: white;
-    opacity:  0.7;
+.editor-title {
+    font-size: 16pt;
+    text-align: left;
+    color: #edffff;
+    margin-bottom: 4px;
 }
 
-/* Remove default blue shadow around buttons in 'focus' state */
-.btn:focus {
-    box-shadow: none;
+.editor-container {
+    border: 1px solid #888;
+    border-radius: 5px;
 }
 
+.editor-button-group {
+    margin: 5px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.editor-button {
+    width: 50px;
+    height: 50px;
+}
