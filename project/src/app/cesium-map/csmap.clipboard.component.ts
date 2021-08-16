@@ -16,47 +16,45 @@ import { Component, OnInit } from '@angular/core';
     ]),
   ],
   templateUrl: './csmap.clipboard.component.html',
-  styleUrls: ['./csmap.clipboard.component.css'],
+  styleUrls: ['./csmap.clipboard.component.scss'],
 })
 
 export class CsMapClipboardComponent implements OnInit {
   buttonText = 'clipboard';
   polygonBBox: Polygon;
-  bShowClipboard: Boolean;
-  public isFilterLayerShown: Boolean;
+  bShowClipboard: boolean;
+  public isFilterLayerShown: boolean;
   public isDrawingPolygon: boolean;
   
-  constructor(private CsClipboardService: CsClipboardService) {
+  constructor(private csClipboardService: CsClipboardService) {
     this.polygonBBox = null;
     this.isFilterLayerShown = false;
-    this.isDrawingPolygon = false;
-    this.CsClipboardService.filterLayersBS.subscribe(filterLayerStatus => {
+    this.csClipboardService.filterLayersBS.subscribe(filterLayerStatus => {
       this.isFilterLayerShown = filterLayerStatus;
-    })
-
-    this.CsClipboardService.polygonsBS.subscribe(polygon => {
-        this.isDrawingPolygon = false;
-    })
+    });
+    this.csClipboardService.isDrawingPolygonBS.subscribe(drawingPolygon => {
+      this.isDrawingPolygon = drawingPolygon;
+    });
   }
 
   ngOnInit(): void {
-    this.CsClipboardService.clipboardBS.subscribe(
+    this.csClipboardService.clipboardBS.subscribe(
       (show) => {
         this.bShowClipboard = show;
     });
 
-    this.CsClipboardService.polygonsBS.subscribe(
+    this.csClipboardService.polygonsBS.subscribe(
       (polygonBBox) => {
         this.polygonBBox = polygonBBox;
     });
   }
 
   clearClipboard() {
-    this.CsClipboardService.clearClipboard();
+    this.csClipboardService.clearClipboard();
   }
 
   public toggleFilterLayers() {
-    this.CsClipboardService.toggleFilterLayers();
+    this.csClipboardService.toggleFilterLayers();
   }
 
   /**
@@ -64,8 +62,7 @@ export class CsMapClipboardComponent implements OnInit {
    *
    */
   public drawPolygon(): void {
-    this.isDrawingPolygon = true;
-    this.CsClipboardService.drawPolygon();
+    this.csClipboardService.drawPolygon();
   }
 
   getPolygonBBoxs(): String {
@@ -73,7 +70,7 @@ export class CsMapClipboardComponent implements OnInit {
   }
 
   toggleEditor() {
-    this.CsClipboardService.toggleClipboard();
+    this.csClipboardService.toggleClipboard();
   }
 
 }

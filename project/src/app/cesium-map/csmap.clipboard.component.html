@@ -12,15 +12,17 @@
 		<table class="table">
 			<tbody>
 				<tr>
-					<td *ngIf="polygonBBox" class="content-break-word">{{polygonBBox.name}}</td>
-					<td *ngIf="!polygonBBox">&nbsp;No polygon</td>
+					<td *ngIf="!polygonBBox && !isDrawingPolygon">&nbsp;No polygon, click Draw to create one</td>
+					<td *ngIf="isDrawingPolygon">&nbsp;Click map to draw polygon, double-click to end</td>
+					<td *ngIf="!isDrawingPolygon && polygonBBox && !isFilterLayerShown" class="content-break-word">Polygon created, click Select to filter results</td>
+					<td *ngIf="!isDrawingPolygon && polygonBBox && isFilterLayerShown" class="content-break-word">Layers filtered, click Select to display all layers</td>
 				</tr>
 			</tbody>
 		</table>
 		<div class="btn-group mr-2 editor-button-group" role="group">
 			<button (click)='clearClipboard()' type="button" class="cesium-button cesium-toolbar-button editor-button"><em class="fa fa-lg fa-times-circle" aria-hidden="true"></em>Clear</button>
-			<button (click)='drawPolygon()' type="button" [ngClass]="{'btn-inverse': !isDrawingPolygon, 'btn-active': isDrawingPolygon}" class="cesium-button cesium-toolbar-button editor-button"><i class="fa fa-lg fa-edit" aria-hidden="true"></i>Draw</button>
-			<button (click)='toggleFilterLayers()' type="button" [ngClass]="{'btn-inverse': !isFilterLayerShown, 'btn-active': isFilterLayerShown}" class="cesium-button cesium-toolbar-button editor-button"><i class="fa fa-lg fa-mouse-pointer" aria-hidden="true"></i>Select</button>
+			<button (click)='drawPolygon()' type="button" [ngStyle]="{'background-color': isDrawingPolygon ? '#282572' : '#303336'}" class="cesium-button cesium-toolbar-button editor-button"><i class="fa fa-lg fa-edit" aria-hidden="true"></i>Draw</button>
+			<button (click)='toggleFilterLayers()' type="button" [ngStyle]="{'background-color': isFilterLayerShown ? '#282572' : '#303336'}" class="cesium-button cesium-toolbar-button editor-button"><i class="fa fa-lg fa-mouse-pointer" aria-hidden="true"></i>Select</button>
 		</div>
 	</div>
 </div>
