@@ -145,7 +145,6 @@ export const config = {
   ],
   clipboard: {
     'supportedLayersRegKeyword': '(ProvinceFullExtent)',
-    'supportedLayersRegName': '(Geological Provinces)',
     'mineraltenement': {
       'srsName': 'EPSG:4326',
       'nameKeyword': 'name',

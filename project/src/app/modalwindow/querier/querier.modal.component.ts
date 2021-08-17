@@ -1,4 +1,3 @@
-
 import {UtilitiesService} from '@auscope/portal-core-ui';
 import {Component} from '@angular/core';
 import {environment} from '../../../environments/environment';

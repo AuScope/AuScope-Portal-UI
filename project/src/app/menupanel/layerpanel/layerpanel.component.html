@@ -1,4 +1,3 @@
-
 	<div class="form-group" class="search-layers">
 		<div class="input-group">
             <input type="text" class="form-control" placeholder="Enter search term here..." [(ngModel)]="searchText" [disabled]="searchMode">
@@ -22,6 +21,12 @@
                 </ul>
             </div>
         </div>
+	</div>
+	<div *ngIf="areLayersFiltered" class="filtered-layers">
+		<div>Showing layers compatible with Polygon Filter</div>
+		<button class="btn btn-info btn-sm" type="button" title="Show all layers" (click)="removeFilterLayers()">
+			Show All
+		</button>
 	</div>
 	<li *ngFor="let layerGroup of layerGroups | getKey" >
 		<a [hidden]="layerGroup.value.hide" (click)="layerGroup.value.loaded=layerGroup.value;layerGroup.value.expanded = !layerGroup.value.expanded;"

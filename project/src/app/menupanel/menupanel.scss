@@ -322,3 +322,16 @@ input + div.input-group-append  > button {
 .help-block {
     color: $auscope-grey;
 }
+
+/* All Layers -> Filtered Layers box */
+.filtered-layers {
+    display: flex;
+    color: $auscope-grey;
+    align-items: baseline;
+    text-align: center;
+    font-size: small;
+    border: solid 1px $auscope-grey;
+    border-radius: 5px;
+    padding: 5px 5px 0 0;
+    margin: 5px 8px 5px 0;
+}

@@ -65,7 +65,7 @@ export class CsMapClipboardComponent implements OnInit {
     this.csClipboardService.drawPolygon();
   }
 
-  getPolygonBBoxs(): String {
+  getPolygonBBoxs(): string {
     return this.polygonBBox.coordinates;
   }
 
