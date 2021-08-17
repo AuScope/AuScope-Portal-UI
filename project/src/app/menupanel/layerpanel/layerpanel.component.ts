@@ -35,25 +35,32 @@ export class LayerPanelComponent implements OnInit {
   public selectTabPanel(layerId: string, panelType: string) {
     this.getUILayerModel(layerId).tabpanel.setPanelOpen(panelType);
   }
+
+  /**
+   * Check if a LayerModel contains a filter collection that has an optional filter of type "OPTIONAL.POLYGONBBOX"
+   * @param layer the LayerModel
+   * @returns true if a polygon filter is found, false otherwise
+   */
+  private layerHasPolygonFilter(layer: LayerModel): boolean {
+    return layer.filterCollection !== undefined && (layer.filterCollection.optionalFilters !== null &&
+      layer.filterCollection.optionalFilters.filter(f => f.type === 'OPTIONAL.POLYGONBBOX').length > 0);
+  }
   
   /**
-   * Filter layers based on polygon filter compatibility
+   * Filter layers based on polygon filter
    */
   public searchFilter() {
     for (const layerGroupKey in this.layerGroups) {
       this.layerGroups[layerGroupKey].hide = true;
       for (const layer of this.layerGroups[layerGroupKey]) {
-        // Look for layers with a filterCollection containing an optional filter of type 'OPTIONAL.POLYGONBBOX'
-        if (layer.filterCollection !== undefined && (layer.filterCollection.optionalFilters !== null &&
-            layer.filterCollection.optionalFilters.filter(f => f.type === 'OPTIONAL.POLYGONBBOX').length > 0)) {
+        layer.hide = true;
+        this.layerGroups[layerGroupKey].loaded = undefined;
+        // Only layers with a polygon filter
+        if (this.layerHasPolygonFilter(layer)) {
           layer.hide = false;
           this.layerGroups[layerGroupKey].hide = false;
-
           this.layerGroups[layerGroupKey].expanded = true;
           this.layerGroups[layerGroupKey].loaded = this.layerGroups[layerGroupKey];
-
-        } else {
-          layer.hide = true;
         }
       }
     }
@@ -68,17 +75,20 @@ export class LayerPanelComponent implements OnInit {
     } else {
       this.searchMode = true;
     }
-
     for (const layerGroupKey in this.layerGroups) {
       this.layerGroups[layerGroupKey].hide = true;
       for (const layer of this.layerGroups[layerGroupKey]) {
+        layer.hide = true;
+        this.layerGroups[layerGroupKey].loaded = undefined;
+        if (this.areLayersFiltered && !this.layerHasPolygonFilter(layer)) {
+          continue;
+        }
         if (layerGroupKey.toLowerCase().indexOf(this.searchText.toLowerCase()) >= 0
             || layer.description.toLowerCase().indexOf(this.searchText.toLowerCase()) >= 0
             || layer.name.toLowerCase().indexOf(this.searchText.toLowerCase()) >= 0) {
           layer.hide = false;
           this.layerGroups[layerGroupKey].hide = false;
-        } else {
-          layer.hide = true;
+          this.layerGroups[layerGroupKey].loaded = this.layerGroups[layerGroupKey];
         }
       }
     }
@@ -94,13 +104,17 @@ export class LayerPanelComponent implements OnInit {
     for (const layerGroupKey in this.layerGroups) {
       this.layerGroups[layerGroupKey].hide = true;
       for (const layer of this.layerGroups[layerGroupKey]) {
+        layer.hide = true;
+        layer.expanded = false;
+        this.layerGroups[layerGroupKey].loaded = undefined;
+        if (this.areLayersFiltered && !this.layerHasPolygonFilter(layer)) {
+          continue;
+        }
         if (this.getUILayerModel(layer.id).statusMap.getRenderStarted()) {
           layer.hide = false;
           this.layerGroups[layerGroupKey].hide = false;
           this.layerGroups[layerGroupKey].expanded = true;
-          layer.expanded = false;
-        } else {
-          layer.hide = true;
+          this.layerGroups[layerGroupKey].loaded = this.layerGroups[layerGroupKey];
           layer.expanded = false;
         }
       }
@@ -117,13 +131,17 @@ export class LayerPanelComponent implements OnInit {
     for (const layerGroupKey in this.layerGroups) {
       this.layerGroups[layerGroupKey].hide = true;
       for (const layer of this.layerGroups[layerGroupKey]) {
+        layer.hide = true;
+        layer.expanded = false;
+        this.layerGroups[layerGroupKey].loaded = undefined;
+        if (this.areLayersFiltered && !this.layerHasPolygonFilter(layer)) {
+          continue;
+        }
         if (this.layerHandlerService.contains(layer, ResourceType.WMS)) {
           layer.hide = false;
           this.layerGroups[layerGroupKey].hide = false;
           this.layerGroups[layerGroupKey].expanded = true;
-          layer.expanded = false;
-        } else {
-          layer.hide = true;
+          this.layerGroups[layerGroupKey].loaded = this.layerGroups[layerGroupKey];
           layer.expanded = false;
         }
       }
@@ -140,13 +158,17 @@ export class LayerPanelComponent implements OnInit {
     for (const layerGroupKey in this.layerGroups) {
       this.layerGroups[layerGroupKey].hide = true;
       for (const layer of this.layerGroups[layerGroupKey]) {
+        layer.hide = true;
+        layer.expanded = false;
+        this.layerGroups[layerGroupKey].loaded = undefined;
+        if (this.areLayersFiltered && !this.layerHasPolygonFilter(layer)) {
+          continue;
+        }
         if (this.layerHandlerService.contains(layer, ResourceType.WFS)) {
           layer.hide = false;
           this.layerGroups[layerGroupKey].hide = false;
           this.layerGroups[layerGroupKey].expanded = true;
-          layer.expanded = false;
-        } else {
-          layer.hide = true;
+          this.layerGroups[layerGroupKey].loaded = this.layerGroups[layerGroupKey];
           layer.expanded = false;
         }
       }
