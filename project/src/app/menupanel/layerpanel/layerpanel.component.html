@@ -28,12 +28,12 @@
 			Show All
 		</button>
 	</div>
-	<li *ngFor="let layerGroup of layerGroups | getKey" >
+	<li *ngFor="let layerGroup of layerGroups | keyvalue" >
 		<a [hidden]="layerGroup.value.hide" (click)="layerGroup.value.loaded=layerGroup.value;layerGroup.value.expanded = !layerGroup.value.expanded;"
 			[ngClass]="{'highlight': isLayerGroupVisible(layerGroup.value) , 'text-primary': isLayerGroupActive(layerGroup.value),
 				'font-weight-bold': isLayerGroupActive(layerGroup.value) ,'font-italic':isLayerGroupActive(layerGroup.value)}" >
 			{{layerGroup.key}}
-			<i class="fa fa-arrow-circle-down" [ngClass]="{'submenu-open-inline':isLayerGroupVisible(layerGroup.value), 'hidden':!isLayerGroupVisible(layerGroup.value) }" ></i>
+			<i class="fa fa-arrow-circle-down" [ngClass]="{'submenu-open-inline':isLayerGroupVisible(layerGroup.value), 'hidden':!isLayerGroupVisible(layerGroup.value) }"></i>
 		</a>
 		<ul *ngIf="layerGroup.value.loaded" [ngClass]="{'submenu-open-block':layerGroup.value.expanded, 'hidden':!layerGroup.value.expanded}">
 			<li *ngFor="let layer of layerGroup.value.loaded" [ngClass]="{'active': layer.expanded}">

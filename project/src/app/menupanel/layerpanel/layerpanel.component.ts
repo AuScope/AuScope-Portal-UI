@@ -1,10 +1,9 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
-import { CsClipboardService, CsMapService, KeysPipe, LayerHandlerService, LayerModel, ManageStateService, RenderStatusService, ResourceType, UtilitiesService } from '@auscope/portal-core-ui';
+import { CsClipboardService, CsMapService, LayerHandlerService, LayerModel, ManageStateService, RenderStatusService, ResourceType, UtilitiesService } from '@auscope/portal-core-ui';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
-import { config } from '../../../environments/config';
 import { MatSliderChange } from '@angular/material/slider';
 import { ImagerySplitDirection } from 'cesium';
 
@@ -49,6 +48,10 @@ export class LayerPanelComponent implements OnInit {
             layer.filterCollection.optionalFilters.filter(f => f.type === 'OPTIONAL.POLYGONBBOX').length > 0)) {
           layer.hide = false;
           this.layerGroups[layerGroupKey].hide = false;
+
+          this.layerGroups[layerGroupKey].expanded = true;
+          this.layerGroups[layerGroupKey].loaded = this.layerGroups[layerGroupKey];
+
         } else {
           layer.hide = true;
         }
@@ -70,8 +73,8 @@ export class LayerPanelComponent implements OnInit {
       this.layerGroups[layerGroupKey].hide = true;
       for (const layer of this.layerGroups[layerGroupKey]) {
         if (layerGroupKey.toLowerCase().indexOf(this.searchText.toLowerCase()) >= 0
-          || layer.description.toLowerCase().indexOf(this.searchText.toLowerCase()) >= 0
-          || layer.name.toLowerCase().indexOf(this.searchText.toLowerCase()) >= 0) {
+            || layer.description.toLowerCase().indexOf(this.searchText.toLowerCase()) >= 0
+            || layer.name.toLowerCase().indexOf(this.searchText.toLowerCase()) >= 0) {
           layer.hide = false;
           this.layerGroups[layerGroupKey].hide = false;
         } else {
@@ -126,7 +129,6 @@ export class LayerPanelComponent implements OnInit {
       }
     }
   }
-
 
   /**
    * search through the layers and filter out based on keyword

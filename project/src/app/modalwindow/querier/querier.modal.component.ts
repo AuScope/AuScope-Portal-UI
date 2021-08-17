@@ -115,6 +115,7 @@ export class QuerierModalComponent {
     if (polygon !== null) {
       this.CsClipboardService.addPolygon(polygon);
       this.CsClipboardService.toggleClipboard(true);
+      this.appRef.tick();
     }
   }
   public onDataChange(): void {

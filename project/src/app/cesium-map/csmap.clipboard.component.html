@@ -14,7 +14,7 @@
 				<tr>
 					<td *ngIf="!polygonBBox && !isDrawingPolygon">&nbsp;Click Draw to create polygon</td>
 					<td *ngIf="isDrawingPolygon">&nbsp;Click map to draw polygon, double-click to end</td>
-					<td *ngIf="!isDrawingPolygon && polygonBBox">Polygon created</td>
+					<td *ngIf="!isDrawingPolygon && polygonBBox">{{ polygonBBox.name }}</td>
 				</tr>
 			</tbody>
 		</table>
