@@ -71,19 +71,29 @@
 		<div *ngIf="wcsDownloadListOption" class="form-group  form-group-sm">
 			<label>Reference System:</label>
 			<select class="form-control form-control-sm" [(ngModel)]="wcsDownloadForm.inputCrs">
+				<option [ngValue]="" disabled>{{SELECT_DEFAULT_REF_SYSTEM}}</option>
 				<option *ngFor="let inputCrs of wcsDownloadListOption.inputCrsList">{{inputCrs}}</option>
 			</select>
 		</div>
 		<div *ngIf="wcsDownloadListOption" class="form-group  form-group-sm">
 			<label>Format:</label>
 			<select class="form-control form-control-sm" [(ngModel)]="wcsDownloadForm.downloadFormat">
+				<option [ngValue]="" disabled>{{SELECT_DEFAULT_DOWNLOAD_FMT}}</option>
 				<option *ngFor="let downloadFormat of wcsDownloadListOption.downloadFormatList">{{downloadFormat}}</option>
 			</select>
 		</div>
 		<div *ngIf="wcsDownloadListOption" class="form-group  form-group-sm">
 			<label>Output CRS:</label>
 			<select class="form-control form-control-sm" [(ngModel)]="wcsDownloadForm.outputCrs">
+				<option [ngValue]="" disabled>{{SELECT_DEFAULT_OUTPUT_CRS}}</option>
 				<option *ngFor="let outputCrs of wcsDownloadListOption.outputCrsList">{{outputCrs}}</option>
+			</select>
+		</div>
+		<div *ngIf="wcsDownloadListOption && wcsDownloadListOption.timePositionList.length > 0" class="form-group  form-group-sm">
+			<label>Time Position:</label>
+			<select class="form-control form-control-sm" [(ngModel)]="wcsDownloadForm.timePosition">
+				<option [ngValue]="" disabled>{{SELECT_DEFAULT_TIME_POS}}</option>
+				<option *ngFor="let timePos of wcsDownloadListOption.timePositionList">{{timePos}}</option>
 			</select>
 		</div>
 
