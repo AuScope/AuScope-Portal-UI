@@ -301,7 +301,9 @@ export class CsMapComponent implements AfterViewInit {
       // VT: if it is a csw renderer layer, handling of the click is slightly different
       if (config.cswrenderer.includes(entity.layer.id) || CsCSWService.cswDiscoveryRendered.includes(entity.layer.id)) {
         this.setModalHTML(this.parseCSWtoHTML(entity.cswRecord), entity.cswRecord.name, entity, this.bsModalRef);
-      } else if (ref.customQuerierHandler[entity.layer.id]) {
+      }
+      // Note: customQuerierHandler property currently removed from ref.ts
+      else if (ref.customQuerierHandler[entity.layer.id]) {
           const handler = new ref.customQuerierHandler[entity.layer.id](entity);
           this.setModalHTML(handler.getHTML(entity), handler.getKey(entity), entity, this.bsModalRef);
       } else {       // VT: in a normal feature, yes we want to getfeatureinfo

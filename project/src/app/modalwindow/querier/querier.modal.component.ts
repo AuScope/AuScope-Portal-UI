@@ -1,4 +1,3 @@
-
 import {UtilitiesService} from '@auscope/portal-core-ui';
 import {Component} from '@angular/core';
 import {environment} from '../../../environments/environment';
@@ -116,6 +115,7 @@ export class QuerierModalComponent {
     if (polygon !== null) {
       this.CsClipboardService.addPolygon(polygon);
       this.CsClipboardService.toggleClipboard(true);
+      this.appRef.tick();
     }
   }
   public onDataChange(): void {
