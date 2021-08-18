@@ -125,7 +125,9 @@ export const config = {
     'erml-miningactivity',
     'erml-mine',
     'erml-mineraloccurrence',
-    'mineral-tenements'
+    'mineral-tenements',
+    'tima-geosample',
+    'tima-shrimp-geosample'
   ],
   cswrenderer: [
     'portal-reports',
