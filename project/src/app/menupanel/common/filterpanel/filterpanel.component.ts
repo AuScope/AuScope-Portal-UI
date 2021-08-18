@@ -43,7 +43,7 @@ export class FilterPanelComponent implements OnInit {
     private filterPanelService: FilterPanelService,
     private modalService: BsModalService,
     private manageStateService: ManageStateService,
-    private CsClipboardService: CsClipboardService,
+    private csClipboardService: CsClipboardService,
     private csWMSService: CsWMSService,
     public layerStatus: LayerStatusService
   ) {
@@ -191,7 +191,6 @@ export class FilterPanelComponent implements OnInit {
     }
   }
 
-
   /**
    * Get Filter for NvclAnalytical
    * @param layer the layer to add to map
@@ -228,29 +227,31 @@ export class FilterPanelComponent implements OnInit {
       alert('Unable to getNvclFilter');
     }
   }
+
   /**
    * Draw a polygon layer to map
    *
    */
   public onApplyClipboardBBox(): void {
-    if (this.bApplyClipboardBBox) {
-      this.CsClipboardService.polygonsBS.subscribe(polygonBBoxs => {
-        if (!UtilitiesService.isEmpty(polygonBBoxs)) {
+    this.csClipboardService.polygonsBS.subscribe(polygon => {
+      if (polygon !== null && this.bApplyClipboardBBox) {
+        if (!UtilitiesService.isEmpty(polygon)) {
           for (const optFilter of this.optionalFilters) {
             if (optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
-              optFilter['value'] = polygonBBoxs.coordinates;
+              optFilter['value'] = polygon.coordinates;
             }
           }
         }
-      });
-    } else {
-      for (const optFilter of this.optionalFilters) {
-        if (optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
-          optFilter['value'] = null;
+      } else {
+        for (const optFilter of this.optionalFilters) {
+          if (optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
+            optFilter['value'] = null;
+          }
         }
       }
-    }
+    });
   }
+
   public getKey(options: Object): string {
     return UtilitiesService.getKey(options);
   }
@@ -302,7 +303,7 @@ export class FilterPanelComponent implements OnInit {
     }
 
     if (filter.type === 'OPTIONAL.POLYGONBBOX') {
-      this.CsClipboardService.toggleClipboard(true);
+      this.csClipboardService.toggleClipboard(true);
     }
     this.optionalFilters.push(filter);
   }

@@ -125,7 +125,9 @@ export const config = {
     'erml-miningactivity',
     'erml-mine',
     'erml-mineraloccurrence',
-    'mineral-tenements'
+    'mineral-tenements',
+    'tima-geosample',
+    'tima-shrimp-geosample'
   ],
   cswrenderer: [
     'portal-reports',
@@ -145,7 +147,6 @@ export const config = {
   ],
   clipboard: {
     'supportedLayersRegKeyword': '(ProvinceFullExtent)',
-    'supportedLayersRegName': '(Geological Provinces)',
     'mineraltenement': {
       'srsName': 'EPSG:4326',
       'nameKeyword': 'name',
