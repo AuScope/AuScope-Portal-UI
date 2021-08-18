@@ -235,15 +235,13 @@ export class FilterPanelComponent implements OnInit {
   public onApplyClipboardBBox(): void {
     this.csClipboardService.polygonsBS.subscribe(polygon => {
       if (polygon !== null && this.bApplyClipboardBBox) {
-        this.csClipboardService.polygonsBS.subscribe(polygonBBoxs => {
-          if (!UtilitiesService.isEmpty(polygonBBoxs)) {
-            for (const optFilter of this.optionalFilters) {
-              if (optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
-                optFilter['value'] = polygonBBoxs.coordinates;
-              }
+        if (!UtilitiesService.isEmpty(polygon)) {
+          for (const optFilter of this.optionalFilters) {
+            if (optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
+              optFilter['value'] = polygon.coordinates;
             }
           }
-        });
+        }
       } else {
         for (const optFilter of this.optionalFilters) {
           if (optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
