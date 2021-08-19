@@ -40,8 +40,8 @@ export class OlMapPreviewComponent implements AfterViewInit {
     /**
      * This constructor creates the preview map
      */
-    constructor(private olMapService: OlMapService) {
-        this.olMapObject = new OlMapObject(new RenderStatusService(), null);
+    constructor(private olMapService: OlMapService, private renderStatusService: RenderStatusService) {
+        this.olMapObject = new OlMapObject(renderStatusService, null);
         this.olMapService = olMapService;
         const map = this.olMapObject.getMap();
         const me = this;
