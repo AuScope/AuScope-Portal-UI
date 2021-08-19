@@ -113,6 +113,7 @@ export class QuerierModalComponent {
       polygon.srs = config.clipboard.ProvinceFullExtent.srsName;
     }
     if (polygon !== null) {
+      this.CsClipboardService.clearClipboard();
       this.CsClipboardService.addPolygon(polygon);
       this.CsClipboardService.toggleClipboard(true);
       this.appRef.tick();
