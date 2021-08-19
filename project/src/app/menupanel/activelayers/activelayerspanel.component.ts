@@ -4,6 +4,8 @@ import { MatSliderChange } from '@angular/material/slider';
 import { ImagerySplitDirection } from 'cesium';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
+import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
+import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
 
 @Component({
   selector: '[appActiveLayers]',
@@ -13,9 +15,11 @@ import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 
 
 export class ActiveLayersPanelComponent {
+  bsModalRef: BsModalRef;
 
   constructor(private csClipboardService: CsClipboardService, private csMapService: CsMapService,
-    private uiLayerModelService: UILayerModelService, private layerHandlerService: LayerHandlerService) { }
+    private uiLayerModelService: UILayerModelService, private layerHandlerService: LayerHandlerService,
+    private modalService: BsModalService) { }
 
   /**
    * Get active layers
@@ -124,6 +128,16 @@ export class ActiveLayersPanelComponent {
    */
   public getApplicableSplitLayer(layer: LayerModel): boolean {
     return this.layerHandlerService.contains(layer, ResourceType.WMS);
+  }
+
+  /**
+   * open the modal that display the status of the render
+   */
+   public openStatusReport(uiLayerModel: UILayerModel) {
+    this.bsModalRef = this.modalService.show(NgbdModalStatusReportComponent, {class: 'modal-lg'});
+    uiLayerModel.statusMap.getStatusBSubject().subscribe((value) => {
+      this.bsModalRef.content.resourceMap = value.resourceMap;
+    });
   }
 
 }

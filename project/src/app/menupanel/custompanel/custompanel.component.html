@@ -27,7 +27,7 @@
 				<div>
 					<span *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="float-right project-percentage hasEvent light-blue">
 						<u (click)="openStatusReport(getUILayerModel(layer.id)); $event.stopPropagation();">{{getUILayerModel(layer.id).statusMap.getCompletePercentage()}}
-							<i *ngIf="!getUILayerModel(layer.id).statusMap.getContainsError()" class="fa fa-warning text-warning"></i>
+							<i *ngIf="getUILayerModel(layer.id).statusMap.getContainsError()" class="fa fa-warning text-warning"></i>
 						</u>
 					</span>
 					<div>

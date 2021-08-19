@@ -40,7 +40,10 @@
 				<a [hidden]="layer.hide" (click)="layer.expanded = !layer.expanded;" [ngClass]="{'highlight': layer.expanded}">
 					<div class="layerLoadCtrl">
 						<span *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="float-right project-percentage hasEvent light-blue">
-							<u (click)="openStatusReport(getUILayerModel(layer.id)); $event.stopPropagation();">{{getUILayerModel(layer.id).statusMap.getCompletePercentage()}}</u>
+							<u (click)="openStatusReport(getUILayerModel(layer.id)); $event.stopPropagation();">{{getUILayerModel(layer.id).statusMap.getCompletePercentage()}}
+								<i *ngIf="getUILayerModel(layer.id).statusMap.getContainsError()" class="fa fa-warning text-warning">
+								</i>
+							</u>
 						</span>
 						<div class="layerLoadClickable">
 							<i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-times red" (click)="removeLayer(layer);$event.stopPropagation()"></i>
