@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { OlmapactivelayersComponent } from './olmapactivelayers.component';
+import { HelpMenuComponent } from './help-menu.component';
 
-describe('OlmapactivelayersComponent', () => {
-  let component: OlmapactivelayersComponent;
-  let fixture: ComponentFixture<OlmapactivelayersComponent>;
+describe('HelpMenuComponent', () => {
+  let component: HelpMenuComponent;
+  let fixture: ComponentFixture<HelpMenuComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ OlmapactivelayersComponent ]
+      declarations: [ HelpMenuComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(OlmapactivelayersComponent);
+    fixture = TestBed.createComponent(HelpMenuComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

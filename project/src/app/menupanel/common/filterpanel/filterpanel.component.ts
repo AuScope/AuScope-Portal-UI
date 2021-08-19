@@ -43,7 +43,7 @@ export class FilterPanelComponent implements OnInit {
     private filterPanelService: FilterPanelService,
     private modalService: BsModalService,
     private manageStateService: ManageStateService,
-    private CsClipboardService: CsClipboardService,
+    private csClipboardService: CsClipboardService,
     private csWMSService: CsWMSService,
     public layerStatus: LayerStatusService
   ) {
@@ -98,6 +98,46 @@ export class FilterPanelComponent implements OnInit {
   }
 
   /**
+   * Test if a filter contains a value. This means non-null for all filters, with the added
+   * requirement for OPTIONAL.PROVIDER filters that at least one value in the list be true
+   * @param filter the filter to test
+   * @returns true if the filter contains a valid value
+   */
+  private filterHasValue(filter: Object): boolean {
+    let hasValue = false;
+    if (filter['type'] === "OPTIONAL.PROVIDER") {
+      for (const provider in filter['value']) {
+        if (filter['value'][provider] === true) {
+          hasValue = true;
+          break;
+        }
+      }
+    } else if (filter['value'] !== null) {
+      hasValue = true;
+    }
+    return hasValue;
+  }
+  
+  /**
+   * Check to see if a layer is supported to be added to the map
+   * @param layer layer to check
+   * @returns true if supported layer, false otherwise
+   */
+  public isMapSupportedLayer(layer: LayerModel): boolean {
+    return this.csMapService.isMapSupportedLayer(layer);
+  }
+
+  /**
+   * String to display when a layer cannot be added to the map due to not
+   * containing a supported OnlineResource type.
+   */
+  public getUnsupportedLayerMessage(): string {
+    return "This layer is not supported. Only layers containing the " +
+           "following online resource types can be added to the map: " +
+           this.csMapService.getSupportedOnlineResourceTypes();
+  }
+
+  /**
    * Add layer to map
    * @param layer the layer to add to map
    */
@@ -112,6 +152,9 @@ export class FilterPanelComponent implements OnInit {
     const param = {
       optionalFilters: _.cloneDeep(this.optionalFilters)
     };
+
+    // Remove filters without values
+    param.optionalFilters = param.optionalFilters.filter(f => this.filterHasValue(f));
 
     for (const optFilter of param.optionalFilters) {
       if (optFilter['options']) {
@@ -148,7 +191,6 @@ export class FilterPanelComponent implements OnInit {
     }
   }
 
-
   /**
    * Get Filter for NvclAnalytical
    * @param layer the layer to add to map
@@ -179,36 +221,37 @@ export class FilterPanelComponent implements OnInit {
           // tslint:disable-next-line:max-line-length
           response = '<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:gml=\"http://www.opengis.net/gml\">' + ogcIntersects + '</ogc:Filter>';
         }
-        console.log(response);
         layer.ogcFilter = response;
       });
     } catch (error) {
       alert('Unable to getNvclFilter');
     }
   }
+
   /**
    * Draw a polygon layer to map
    *
    */
   public onApplyClipboardBBox(): void {
-    if (this.bApplyClipboardBBox) {
-      this.CsClipboardService.polygonsBS.subscribe(polygonBBoxs => {
-        if (!UtilitiesService.isEmpty(polygonBBoxs)) {
+    this.csClipboardService.polygonsBS.subscribe(polygon => {
+      if (polygon !== null && this.bApplyClipboardBBox) {
+        if (!UtilitiesService.isEmpty(polygon)) {
           for (const optFilter of this.optionalFilters) {
             if (optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
-              optFilter['value'] = polygonBBoxs.coordinates;
+              optFilter['value'] = polygon.coordinates;
             }
           }
         }
-      });
-    } else {
-      for (const optFilter of this.optionalFilters) {
-        if (optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
-          optFilter['value'] = null;
+      } else {
+        for (const optFilter of this.optionalFilters) {
+          if (optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
+            optFilter['value'] = null;
+          }
         }
       }
-    }
+    });
   }
+
   public getKey(options: Object): string {
     return UtilitiesService.getKey(options);
   }
@@ -260,7 +303,7 @@ export class FilterPanelComponent implements OnInit {
     }
 
     if (filter.type === 'OPTIONAL.POLYGONBBOX') {
-      this.CsClipboardService.toggleClipboard(true);
+      this.csClipboardService.toggleClipboard(true);
     }
     this.optionalFilters.push(filter);
   }

@@ -1,19 +1,31 @@
 <polygons-editor></polygons-editor>
 
-<div *ngIf="bShowClipboard" class="container-fluid rounded editor-box" role="group"  style="padding:0px; background-color:#7aa5c5 ; color: #ffffff;">
-		<small style="margin-left:10px">  Polygon Filter Clipboard:</small>
-		<table class="table table-inverse">
+<button class="cesium-button cesium-toolbar-button editor-toggle-button" (click)="toggleEditor()">
+    <em class="fa fa-edit" title="Draw or select polygon filter"></em>
+</button>
+
+<div *ngIf="bShowClipboard" @fadeSlideInOut class="container-fluid editor-box" role="group">
+	<div class="editor-title">
+		Polygon Filter
+	</div>
+	<div class="editor-container">
+		<table class="table">
 			<tbody>
-				<tr *ngIf="polygonBBox">
-					<td class="content-break-word">{{polygonBBox.name}}</td>
+				<tr>
+					<td *ngIf="!polygonBBox && !isDrawingPolygon">&nbsp;Click Draw to create polygon</td>
+					<td *ngIf="isDrawingPolygon">&nbsp;Click map to draw polygon, double-click to end</td>
+					<td *ngIf="!isDrawingPolygon && polygonBBox">{{ polygonBBox.name }}</td>
 				</tr>
 			</tbody>
 		</table>
-	<div class="btn-toolbar " role="toolbar">
-	<div class="btn-group mr-2" role="group">			
-		<button (click)='clearClipboard()' type="button" class="btn btn-sm btn-inverse active"><i class="fa fa-times-circle" aria-hidden="true"></i>Clear</button>
-		<button (click)='drawPolygon()' type="button" [ngClass]="{'btn-inverse': !isDrawingPolygon, 'btn-active': isDrawingPolygon}" class="btn btn-sm btn-inverse active"><i class="fa fa-edit" aria-hidden="true"></i>Draw</button>
-		<button (click)='toggleFilterLayers()' type="button" [ngClass]="{'btn-inverse': !isFilterLayerShown, 'btn-active': isFilterLayerShown}" class="btn btn-sm btn-inverse active"><i class="fa fa-mouse-pointer" aria-hidden="true"></i>Select</button>
+		<div class="btn-group mr-2 editor-button-group" role="group">
+			<button (click)='clearClipboard()' type="button" title="Clear polygon" [disabled]="!polygonBBox || isDrawingPolygon" class="cesium-button cesium-toolbar-button editor-button"><em class="fa fa-lg fa-times-circle" aria-hidden="true"></em>Clear</button>
+			<button (click)='drawPolygon()' type="button" title="Draw polygon" [ngStyle]="{'background-color': isDrawingPolygon ? '#282572' : '#303336'}" class="cesium-button cesium-toolbar-button editor-button"><i class="fa fa-lg fa-edit" aria-hidden="true"></i>Draw</button>
+			<button (click)='toggleFilterLayers()' type="button" title="Toggle applicable layers" class="cesium-button cesium-toolbar-button editor-button">
+				<i *ngIf="!isFilterLayerShown" class="fa fa-lg fa-toggle-off" aria-hidden="true"></i>
+				<i *ngIf="isFilterLayerShown" class="fa fa-lg fa-toggle-on" aria-hidden="true"></i>
+				Toggle
+			</button>
 		</div>
 	</div>
 </div>

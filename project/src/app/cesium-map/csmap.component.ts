@@ -1,32 +1,40 @@
 import { config } from '../../environments/config';
 import { ref } from '../../environments/ref';
 import { QuerierModalComponent } from '../modalwindow/querier/querier.modal.component';
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, NgZone, ViewChild } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ViewerConfiguration } from 'angular-cesium';
-import { CsCSWService, CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService, QueryWFSService, QueryWMSService, SimpleXMLService, UtilitiesService } from '@auscope/portal-core-ui';
-import { MapMode2D, ScreenSpaceEventHandler, ScreenSpaceEventType, Rectangle, ImagerySplitDirection } from 'cesium';
+import { CsCSWService, CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService, QueryWFSService,
+  QueryWMSService, SimpleXMLService, UtilitiesService, CsMapObject, ResourceType } from '@auscope/portal-core-ui';
+import { Cartesian3, MapMode2D, Math, ScreenSpaceEventHandler, SceneMode, ScreenSpaceEventType, Rectangle, ImagerySplitDirection,
+   Cartesian2, WebMapServiceImageryProvider, WebMercatorProjection, Cartographic, GeographicProjection, Entity } from 'cesium';
+import { IrisQuerierHandler } from './custom-querier-handler/iris-querier-handler.service';
+declare var Cesium: any;
 
 @Component({
   selector: 'app-cs-map',
   template: `
-    <div #mapElement id="map" class="h-100 w-100">
+    <div #mapElement id="map" class="h-100 w-100" (mouseout)="mouseLongitude=undefined;mouseLatitude=undefined;">
       <ac-map>
           <rectangles-editor></rectangles-editor>
           <app-cs-map-zoom></app-cs-map-zoom>
           <app-cs-map-split (toggleEvent)="toggleShowMapSplit()"></app-cs-map-split>
-          <app-cs-clipboard class="btn-group float-right mb-3"></app-cs-clipboard>
+          <app-cs-clipboard></app-cs-clipboard>
           <div #mapSlider id="mapSlider" *ngIf="getSplitMapShown()">
-            <div class="slider-grabber"></div>
+            <div class="slider-grabber">
+              <div class="slider-grabber-inner"></div>
+            </div>
+          </div>
+          <div class="mouse-coordinates" *ngIf="mouseLongitude !== undefined && mouseLatitude !== undefined">
+              Longitude:&nbsp;{{ mouseLongitude }},&nbsp;Latitude:&nbsp;{{ mouseLatitude }}
           </div>
       </ac-map>
     </div>
     `,
     providers: [ViewerConfiguration], // Don't forget to Provide it 
-    styleUrls: ['./csmap.component.css']
+    styleUrls: ['./csmap.component.scss']
   // The "#" (template reference variable) matters to access the map element with the ViewChild decorator!
 })
-
 
 export class CsMapComponent implements AfterViewInit {
   // This is necessary to access the html element to set the map target (after view init)!
@@ -38,19 +46,23 @@ export class CsMapComponent implements AfterViewInit {
   cesiumLoaded = true;
   viewer: any;
 
+  mouseLatitude: string;
+  mouseLongitude: string;
+
   sliderMoveActive: boolean = false;
 
   public static AUSTRALIA = Rectangle.fromDegrees(114.591, -45.837, 148.97, -5.73);
 
   private bsModalRef: BsModalRef;
 
-  constructor(private csMapService: CsMapService, private modalService: BsModalService,
+  constructor(private csMapObject: CsMapObject,    private csMapService: CsMapService, private modalService: BsModalService,
     private queryWFSService: QueryWFSService, private queryWMSService: QueryWMSService, private gmlParserService: GMLParserService,
-    private manageStateService: ManageStateService, private viewerConf: ViewerConfiguration) {
-    // FIXME this.csMapService.getClickedLayerListBS().subscribe(mapClickInfo => {
-    //  this.handleLayerClick(mapClickInfo);
-    //});
-
+    private manageStateService: ManageStateService, private viewerConf: ViewerConfiguration, private ngZone: NgZone) {
+    //this.csMapService.getClickedLayerListBS().subscribe(this.handleLayerClick.bind(this));
+    const me = this;
+    this.csMapService.getClickedLayerListBS().subscribe((mapClickInfo) => {
+      me.handleLayerClick(mapClickInfo);
+      });
     // viewerOptions will be passed the Cesium.Viewer constuctor
     viewerConf.viewerOptions = {
       selectionIndicator: false,
@@ -66,12 +78,38 @@ export class CsMapComponent implements AfterViewInit {
       geocoder: false,
       navigationHelpButton: false,
       navigationInstructionsInitiallyVisible: false,
-      mapMode2D: MapMode2D.ROTATE,
+      mapMode2D: MapMode2D.INFINITE_SCROLL,
     };
     // Will be called on viewer initialistion
     viewerConf.viewerModifier = (viewer: any) => {
       // Remove default double click zoom behaviour
       viewer.screenSpaceEventHandler.removeInputAction(ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+      const scene = viewer.scene;
+      if (!scene.pickPositionSupported) {
+          window.alert('This browser does not support pickPosition.');
+      }
+      const handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+      handler.setInputAction((movement) => {
+        // const cartesian = viewer.scene.pickPosition(movement.position);
+        this.csMapObject.processClick(movement);
+      }, Cesium.ScreenSpaceEventType.LEFT_UP);
+
+      // Keep track of lat/lon at mouse
+      handler.setInputAction((movement) => {
+        const ellipsoid = this.viewer.scene.globe.ellipsoid;
+        const cartesian = this.viewer.camera.pickEllipsoid(movement.endPosition, ellipsoid);
+        this.ngZone.run(() => {
+          if (cartesian) {
+            const cartographic = ellipsoid.cartesianToCartographic(cartesian);
+            me.mouseLongitude = Cesium.Math.toDegrees(cartographic.longitude).toFixed(5);
+            me.mouseLatitude = Cesium.Math.toDegrees(cartographic.latitude).toFixed(5);
+            //const elev = viewer.scene.globe.getHeight(cartographic); // In case we need 3D
+          } else {
+            me.mouseLongitude = undefined;
+            me.mouseLatitude = undefined;
+          }
+        });
+      }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
       // Look at Australia
       viewer.camera.setView({
@@ -81,8 +119,26 @@ export class CsMapComponent implements AfterViewInit {
 
       // This reduces the blockiness of the text fonts and other graphics
       this.viewer.resolutionScale = window.devicePixelRatio;
-    };
 
+      // Zoom to Australia after 2D/3D/Columbus morph
+      this.viewer.scene.morphComplete.addEventListener(() => {
+        const pitch = this.viewer.camera._mode === SceneMode.COLUMBUS_VIEW ? Math.toRadians(-45.0) : Math.toRadians(-90.0);
+        const orient = {
+          heading : Math.toRadians(0.0),
+          pitch : pitch,
+          roll : 0.0
+        }
+        const SOUTH_OF_AUSTRALIA = Cartesian3.fromDegrees(133.7751, -60.0, 3000000.0);
+        const destination = this.viewer.camera._mode === SceneMode.COLUMBUS_VIEW ? SOUTH_OF_AUSTRALIA : CsMapComponent.AUSTRALIA;
+        // Timeout required for bug preventing flyTo immediately after morph
+        setTimeout(() => {
+          this.viewer.camera.flyTo({
+            destination: destination,
+            orientation: orient
+          });
+        }, 100);
+      });
+    };
   }
 
   getViewer() {
@@ -133,6 +189,83 @@ export class CsMapComponent implements AfterViewInit {
     }
   }
 
+  public getParams(x: number, y: number): any {
+
+    const mousePosition = new Cartesian2(x, y);
+    const clickCartesian = this.viewer.camera.pickEllipsoid(mousePosition, this.viewer.scene.globe.ellipsoid);
+    if (!clickCartesian) {
+      return undefined;
+    }
+
+    const scene = this.viewer.scene;
+
+    const clickCartographic = scene.globe.ellipsoid.cartesianToCartographic(clickCartesian);
+    // Find the terrain tile containing the picked location.
+    const tilesToRender = scene.globe._surface._tilesToRender;
+    let pickedTile;
+
+    for (let textureIndex = 0; !pickedTile && textureIndex < tilesToRender.length; ++textureIndex) {
+      const tile = tilesToRender[textureIndex];
+      if (Rectangle.contains(tile.rectangle, clickCartographic)) {
+        pickedTile = tile;
+      }
+    }
+
+    if (!(pickedTile)) {
+      return undefined;
+    }
+
+    // Pick against all attached imagery tiles containing the pickedLocation.
+    const imageryTiles = pickedTile.data.imagery;
+
+    for (let i = imageryTiles.length - 1; i >= 0; --i) {
+      const terrainImagery = imageryTiles[i];
+      const imagery = terrainImagery.readyImagery;
+      if (!imagery) {
+        continue;
+      }
+      const provider = imagery.imageryLayer.imageryProvider;
+      if (!(provider instanceof WebMapServiceImageryProvider)) {
+        continue;
+      }
+      if (!Rectangle.contains(imagery.rectangle, clickCartographic)) {
+        continue;
+      }
+
+      const wmp = new WebMercatorProjection();
+      const clickedLonlat = wmp.project(clickCartographic);
+
+      console.log(pickedTile.rectangle);
+      const p0 = new Cartographic(pickedTile.rectangle.west, pickedTile.rectangle.south, 0);
+      const p1 = new Cartographic(pickedTile.rectangle.east, pickedTile.rectangle.north, 0);
+
+      const p00 = wmp.project(p0);
+      const p11 = wmp.project(p1);
+
+      const longitudeLatitudeProjectedScratch = new Cartesian3();
+      const rectangleScratch = new Rectangle();
+      const ijScratch = new Cartesian2();
+      const cartographicScratch = new Cartographic();
+
+      if (provider.tilingScheme.projection instanceof GeographicProjection) {
+        longitudeLatitudeProjectedScratch.x = Cesium.Math.toDegrees(clickCartographic.longitude);
+        longitudeLatitudeProjectedScratch.y = Cesium.Math.toDegrees(clickCartographic.latitude);
+      } else {
+        alert('error:csmap:project');
+      }
+      const projected = longitudeLatitudeProjectedScratch;
+      const rectangle = provider.tilingScheme.tileXYToNativeRectangle(imagery.x, imagery.y, imagery.level, rectangleScratch);
+      ijScratch.x = ((provider.tileWidth * (projected.x - rectangle.west)) / rectangle.width) | 0;
+      ijScratch.y = ((provider.tileHeight * (rectangle.north - projected.y)) / rectangle.height) | 0;
+
+      x = ijScratch.x;
+      y = ijScratch.y;
+      const bbox = [p00.x.toFixed(0), p00.y.toFixed(0), p11.x.toFixed(0), p11.y.toFixed(0)];
+      const width = imagery.imageryLayer.imageryProvider.tileWidth;
+      const height = imagery.imageryLayer.imageryProvider.tileWidth;
+      return { x: x, y: y, width: width, height: height, bbox: bbox };
+    }
+  }
 
   /**
    * Handles the map click event
@@ -142,61 +275,85 @@ export class CsMapComponent implements AfterViewInit {
     if (UtilitiesService.isEmpty(mapClickInfo)) {
       return;
     }
-    // Process lists of features
+
+    // Process lists of entities
     const modalDisplayed = {value: false}
-    let featureCount = 0;
-    for (const feature of mapClickInfo.clickedFeatureList) {
-      if (feature.id_ && feature.id_.indexOf('geocoder') === 0) {
+    for (const entity of mapClickInfo.clickedEntityList) {
+      // TODO: Ignore polygon filter entities here or in portal-core-ui
+      const layer: LayerModel = this.csMapService.getLayerForEntity(entity);
+      if (layer !== null) {
+        // NB: This is just testing that the popup window does display
+        this.displayModal(modalDisplayed, mapClickInfo.clickCoord);
+        // IRIS layers
+        if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.IRIS))) {
+          const handler = new IrisQuerierHandler(layer, entity);
+          this.setModalHTML(handler.getHTML(), layer.name, entity, this.bsModalRef);
+        }
+      }
+      // TODO: Remove commented code, kept for yet to be re-implemented entity types
+      /*
+      if (entity.id_ && entity.id_.indexOf('geocoder') === 0) {
         continue;
       }
       // NB: This is just testing that the popup window does display
       this.displayModal(modalDisplayed, mapClickInfo.clickCoord);
 
       // VT: if it is a csw renderer layer, handling of the click is slightly different
-      if (config.cswrenderer.includes(feature.layer.id) || CsCSWService.cswDiscoveryRendered.includes(feature.layer.id)) {
-        this.setModalHTML(this.parseCSWtoHTML(feature.cswRecord), feature.cswRecord.name, feature, this.bsModalRef);
-      } else if (ref.customQuerierHandler[feature.layer.id]) {
-          const handler = new ref.customQuerierHandler[feature.layer.id](feature);
-          this.setModalHTML(handler.getHTML(feature), handler.getKey(feature), feature, this.bsModalRef);
+      if (config.cswrenderer.includes(entity.layer.id) || CsCSWService.cswDiscoveryRendered.includes(entity.layer.id)) {
+        this.setModalHTML(this.parseCSWtoHTML(entity.cswRecord), entity.cswRecord.name, entity, this.bsModalRef);
+      }
+      // Note: customQuerierHandler property currently removed from ref.ts
+      else if (ref.customQuerierHandler[entity.layer.id]) {
+          const handler = new ref.customQuerierHandler[entity.layer.id](entity);
+          this.setModalHTML(handler.getHTML(entity), handler.getKey(entity), entity, this.bsModalRef);
       } else {       // VT: in a normal feature, yes we want to getfeatureinfo
         featureCount++;
         if (featureCount < 10) {// VT: if more than 10 feature, ignore the rest
          try {
-            this.queryWFSService.getFeatureInfo(feature.onlineResource, feature.id_).subscribe(result => {
-              this.setModal(result, feature, this.bsModalRef);
+            this.queryWFSService.getFeatureInfo(entity.onlineResource, entity.id_).subscribe(result => {
+              this.setModal(result, entity, this.bsModalRef);
             }, err => {
               this.bsModalRef.content.downloading = false;
               });
           } catch (error) {
            this.setModalHTML('<p> ' + error + '</p>',
-            'Error Retrieving Data', feature, this.bsModalRef);
+            'Error Retrieving Data', entity, this.bsModalRef);
           }
         } else {
           this.setModalHTML('<p>Too many features to list, zoom in the map to get a more precise location</p>',
-            '...', feature, this.bsModalRef);
+            '...', entity, this.bsModalRef);
           break;
         }
       }
+      */
     }
 
-    // VT: process list of layers clicked
+    const me = this;
+    // Process list of layers clicked
     for (const maplayer of mapClickInfo.clickedLayerList) {
-      this.displayModal(modalDisplayed, mapClickInfo.clickCoord);
-
-      if (config.cswrenderer.includes(maplayer.layer.id)) {
-        this.setModalHTML(this.parseCSWtoHTML(maplayer.cswRecord), maplayer.cswRecord.name, maplayer, this.bsModalRef);
-      } else {
-        if (maplayer.onlineResource) {
-          this.bsModalRef.content.downloading = true;
-          this.queryWMSService.getFeatureInfo(maplayer.onlineResource, maplayer.sldBody, mapClickInfo.pixel, mapClickInfo.clickCoord).subscribe(result => {
-            this.setModal(result, maplayer, this.bsModalRef);
-          },
+      me.displayModal(modalDisplayed, mapClickInfo.clickCoord);
+      for (const i of maplayer.clickCSWRecordsIndex ) {
+        const cswRecord = maplayer.cswRecords[i];
+        const onlineResource = cswRecord.onlineResources[0];
+        if (onlineResource) {
+          if (config.cswrenderer.includes(maplayer.id)) {
+            const feature = {onlineResource: onlineResource, layer: maplayer};
+            this.setModalHTML(this.parseCSWtoHTML(cswRecord), cswRecord.name, maplayer, this.bsModalRef);
+          } else {
+            me.bsModalRef.content.downloading = true;
+            const params = this.getParams(maplayer.clickPixel[0], maplayer.clickPixel[1]);
+            this.queryWMSService.getFeatureInfo(onlineResource, maplayer.sldBody, maplayer.clickCoord[0], maplayer.clickCoord[1],
+              params.x, params.y, params.width, params.height, params.bbox).subscribe( result => {
+              const feature = {onlineResource: onlineResource, layer: maplayer};
+              this.setModal(result, feature, this.bsModalRef);
+            },
             err => {
-              this.bsModalRef.content.downloading = false;
+                this.bsModalRef.content.downloading = false;
+                this.bsModalRef.content.onDataChange();
             });
+          }
         }
       }
-
     }
   }
 
@@ -234,12 +391,15 @@ export class CsMapComponent implements AfterViewInit {
       this.bsModalRef = this.modalService.show(QuerierModalComponent, {class: 'modal-lg'});
       modalDisplayed.value = true;
       this.bsModalRef.content.downloading = true;
+      /*
       if (clickCoord) {
         const vector = this.csMapService.drawDot(clickCoord);
         this.modalService.onHide.subscribe(reason => {
-          this.csMapService.removeVector(vector);
+          if (vector)  {
+            this.csMapService.removeVector(vector);          }
         })
       }
+      */
     }
   }
 
@@ -306,7 +466,6 @@ export class CsMapComponent implements AfterViewInit {
    */
   private setModal(result: string, feature: any, bsModalRef: BsModalRef, gmlid?: string) {
     let treeCollections = [];
-
     // GSKY only returns JSON, even if you ask for XML & GML
     if (UtilitiesService.isGSKY(feature.onlineResource)) {
       treeCollections = this.parseJSONResponse(result, feature);
@@ -328,11 +487,12 @@ export class CsMapComponent implements AfterViewInit {
       treeCollection.raw = result;
       bsModalRef.content.docs.push(treeCollection);
       if (bsModalRef.content.uniqueLayerNames.indexOf(feature.layer.name) === -1) {
-        bsModalRef.content.uniqueLayerNames.push(feature.layer.name)
+        bsModalRef.content.uniqueLayerNames.push(feature.layer.name);
       }
     }
 
-    this.bsModalRef.content.downloading = false
+    this.bsModalRef.content.downloading = false;
+    this.bsModalRef.content.onDataChange();
   }
 
 
@@ -343,16 +503,17 @@ export class CsMapComponent implements AfterViewInit {
    * @param feature map feature object
    * @param bsModalRef modal dialog reference
    */
-  private setModalHTML(html: string, key: any, feature: any, bsModalRef: BsModalRef) {
+  private setModalHTML(html: string, key: any, layer: LayerModel, bsModalRef: BsModalRef) {
       bsModalRef.content.htmls.push({
         key: key,
-        layer: feature.layer,
+        layer: layer,
         value: html
       });
-      if (bsModalRef.content.uniqueLayerNames.indexOf(feature.layer.name) === -1) {
-        bsModalRef.content.uniqueLayerNames.push(feature.layer.name)
+      if (bsModalRef.content.uniqueLayerNames.indexOf(layer.name) === -1) {
+        bsModalRef.content.uniqueLayerNames.push(layer.name)
       }
      this.bsModalRef.content.downloading = false;
+     this.bsModalRef.content.onDataChange();
   }
 
   /**
@@ -404,8 +565,9 @@ export class CsMapComponent implements AfterViewInit {
         }, 10);
 
     } else {
-      for (let l = 0; l < this.viewer.imageryLayers.length; l++) {
-        this.viewer.imageryLayers.get(l).splitDirection = ImagerySplitDirection.NONE;
+      let activeLayerKeys: string[] = Object.keys(this.csMapService.getLayerModelList());
+      for(const layer of activeLayerKeys) {
+        this.csMapService.setLayerSplitDirection(this.csMapService.getLayerModelList()[layer], ImagerySplitDirection.NONE);
       }
     }
   }

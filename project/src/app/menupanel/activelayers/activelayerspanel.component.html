@@ -1,0 +1,29 @@
+<div class="select-layers-message" *ngIf="getActiveLayers().length==0">
+    Select layers below to add to map
+</div>
+<li *ngFor="let layer of getActiveLayers()">
+    <div class="layerLoadCtrl">
+        <div>
+            <i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-times red layerLoadClickable" (click)="removeLayer(layer.id);$event.stopPropagation()"></i>
+            <u (click)="openStatusReport(getUILayerModel(layer.id)); $event.stopPropagation();">{{ layer.name }}
+                <i *ngIf="getUILayerModel(layer.id).statusMap.getContainsError()" class="fa fa-warning text-warning">
+                </i>
+            </u>
+        </div>
+        <div *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted() || getUILayerModel(layer.id).statusMap.getRenderComplete()" class="opacity-slider-panel d-flex" (click)="$event.stopPropagation()">
+            <div class="opacity-label">Opacity {{ getUILayerModel(layer.id).opacity }}%&nbsp;</div>
+            <mat-slider [min]="0" [max]="100" class="opacity-slider flex-grow-1" [(ngModel)]="getUILayerModel(layer.id).opacity" (input)="layerOpacityChange($event, layer)"></mat-slider>
+        </div>
+        <div class="split-panel" *ngIf="getShowSplitMapButtons(layer)" (click)="$event.stopPropagation()">
+            Split Direction&nbsp;
+            <div *ngIf="getApplicableSplitLayer(layer)" class="split-button-panel">
+                <button [className]="getLayerSplitDirection(layer.id) == 'left' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'left')">Left</button>
+                <button [className]="getLayerSplitDirection(layer.id) == 'none' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'none')">Both</button>
+                <button [className]="getLayerSplitDirection(layer.id) == 'right' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'right')">Right</button>
+            </div>
+            <div *ngIf="!getApplicableSplitLayer(layer)" class="split-button-panel">
+                <button class="btn btn-split btn-primary" [disabled]="true">Layer not supported</button>
+            </div>
+        </div>
+    </div>
+</li>

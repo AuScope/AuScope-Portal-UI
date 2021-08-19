@@ -2,7 +2,7 @@
 # A static Angular website served by apache2
 #
 # First image, build angular app
-FROM node:12.18-alpine as node
+FROM node:12.19-alpine as node
 
 ENV appdir /usr/src/app
 
@@ -15,6 +15,13 @@ ARG BUILDTYPE=build-dev
 RUN apk update && \
     apk upgrade && \
     apk add git
+
+RUN git clone https://github.com/AuScope/portal-core-ui-app.git && \
+    cd portal-core-ui-app && \
+    npm install && \
+    npm run build portal-core-ui && \
+    cd dist/portal-core-ui && \
+    npm link
 
 # Copy in npm package file
 COPY project/package.json ./
@@ -30,7 +37,7 @@ COPY docker/make_timestamp.sh make_timestamp.sh
 RUN ./make_timestamp.sh $BUILDTYPE > ./src/app/menupanel/portal-details-panel/portal-details-panel.component.html
 
 # Build Angular's static website files
-RUN npm run $BUILDTYPE
+RUN npm link @auscope/portal-core-ui && npm run $BUILDTYPE
 
 # Second image, install website
 FROM debian:10

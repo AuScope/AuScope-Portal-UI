@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Auscope Discovery Portal</title>
+    <title>AuScope Discovery Portal</title>
     <base href="./">
 
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
@@ -55,34 +55,32 @@
             </div>
             <!-- END navbar-header -->
 
-            <!-- BEGIN notification dropdown -->
+            <!-- help dropdown menu -->
             <ul class="nav navbar-nav mb-1 mr-3">
-                <li class="dropdown" app-notification></li>
+                <li class="dropdown" app-help-menu></li>
             </ul>
-            <!-- END notification dropdown -->
 		</div>
 		<!-- END navbar -->
 
 		<!-- BEGIN sidebar -->
 		<nav id="sidebar" class="sidebar slimscroll sidebar-collapse show" style="overflow: auto;" >
+            <!--
 			<h6 class="sidebar-heading">Menu</h6>
-			<h5><a href="http://www.auscope.org.au/"><i class="ti-home"></i><span>About</span></a></h5>
-			<h5><a href="https://confluence.csiro.au/display/AusGRID/AuScope+Portal+User+Guide"><i class="ti-info-alt"></i><span>User Guide</span></a></h5>
-			<h5><a href="mailto:cg-admin@csiro.au?Subject=Auscope-portal"><i class="ti-email"></i><span>Contact us</span></a></h5>
 			<li class="hasEvent" appPermanentLink></li>
 			<li class="hasEvent d-none d-md-block" appFilterClipboard></li>
             <hr/>
 			<h6 class="sidebar-heading">Layer Selection</h6>
+            -->
 
             <!-- BEGIN Active Layers -->
-            <input type="checkbox" checked disabled class="menuBtn" id="activeLayersBtn"/>
+            <input type="checkbox" checked class="menuBtn" id="activeLayersBtn"/>
             <h5 class="mb-1">
                 <label id="activeLayersLink" for="activeLayersBtn" class="mb-0">
                     <i class="ti-filter"></i>
                     Active Layers
                     <i class="fa fa-arrow-circle-down"></i>
                 </label>
-                <ul class="card-sub" app-olmapactivelayers></ul>
+                <ul class="card-sub" appActiveLayers></ul>
             </h5>
             <!-- END Active Layers -->
 
@@ -163,11 +161,9 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-migrate/3.0.1/jquery-migrate.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-slimScroll/1.3.8/jquery.slimscroll.min.js"></script>
     <script> $(document).ready(function(){$('#allLayersLink').click();});</script>
 	<!-- ================== END BASE JS ================== -->
-
-	<script async src="https://platform.twitter.com/widgets.js"></script>
   </body>
 </html>

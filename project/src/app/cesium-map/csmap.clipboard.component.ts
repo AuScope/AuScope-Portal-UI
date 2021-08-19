@@ -1,50 +1,60 @@
+import { animate, style, transition, trigger } from '@angular/animations';
 import { CsClipboardService, Polygon } from '@auscope/portal-core-ui';
 import { Component, OnInit } from '@angular/core';
 
-// TODO: Convert to cesium
-
 @Component({
   selector: 'app-cs-clipboard',
+  animations: [
+    trigger('fadeSlideInOut', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(-50px)' }),
+        animate('150ms', style({ opacity: 1, transform: 'translateY(2px)' })),
+      ]),
+      transition(':leave', [
+        animate('150ms', style({ opacity: 0, transform: 'translateY(-50px)' })),
+      ]),
+    ]),
+  ],
   templateUrl: './csmap.clipboard.component.html',
-  styleUrls: ['./csmap.component.css'],
+  styleUrls: ['./csmap.clipboard.component.scss'],
 })
 
 export class CsMapClipboardComponent implements OnInit {
   buttonText = 'clipboard';
   polygonBBox: Polygon;
-  bShowClipboard: Boolean;
-  public isFilterLayerShown: Boolean;
+  bShowClipboard: boolean;
+  public isFilterLayerShown: boolean;
   public isDrawingPolygon: boolean;
-  constructor(private CsClipboardService: CsClipboardService) {
+  
+  constructor(private csClipboardService: CsClipboardService) {
     this.polygonBBox = null;
     this.isFilterLayerShown = false;
-    this.isDrawingPolygon = false;
-    this.CsClipboardService.filterLayersBS.subscribe(filterLayerStatus => {
+    this.csClipboardService.filterLayersBS.subscribe(filterLayerStatus => {
       this.isFilterLayerShown = filterLayerStatus;
-    })
-
-    this.CsClipboardService.polygonsBS.subscribe(polygon => {
-        this.isDrawingPolygon = false;
-    })
+    });
+    this.csClipboardService.isDrawingPolygonBS.subscribe(drawingPolygon => {
+      this.isDrawingPolygon = drawingPolygon;
+    });
   }
 
   ngOnInit(): void {
-      this.CsClipboardService.clipboardBS.subscribe(
-        (show) => {
-          this.bShowClipboard = show;
-      });
+    this.csClipboardService.clipboardBS.subscribe(
+      (show) => {
+        this.bShowClipboard = show;
+    });
 
-      this.CsClipboardService.polygonsBS.subscribe(
-        (polygonBBox) => {
-          this.polygonBBox = polygonBBox;
-      });
-    }
+    this.csClipboardService.polygonsBS.subscribe(
+      (polygonBBox) => {
+        this.polygonBBox = polygonBBox;
+    });
+  }
+
   clearClipboard() {
-    this.CsClipboardService.clearClipboard();
+    this.csClipboardService.clearClipboard();
   }
 
   public toggleFilterLayers() {
-    this.CsClipboardService.toggleFilterLayers();
+    this.csClipboardService.toggleFilterLayers();
   }
 
   /**
@@ -52,11 +62,15 @@ export class CsMapClipboardComponent implements OnInit {
    *
    */
   public drawPolygon(): void {
-    this.isDrawingPolygon = true;
-    this.CsClipboardService.drawPolygon();
+    this.csClipboardService.drawPolygon();
   }
 
-  getPolygonBBoxs(): String {
+  getPolygonBBoxs(): string {
     return this.polygonBBox.coordinates;
   }
+
+  toggleEditor() {
+    this.csClipboardService.toggleClipboard();
+  }
+
 }

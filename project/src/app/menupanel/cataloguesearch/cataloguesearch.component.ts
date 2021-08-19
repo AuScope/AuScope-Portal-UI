@@ -1,16 +1,15 @@
 import { Bbox } from '@auscope/portal-core-ui';
 import { LayerModel } from '@auscope/portal-core-ui';
-import { LayerHandlerService } from '@auscope/portal-core-ui';
 import { CsMapService } from '@auscope/portal-core-ui';
 import { RenderStatusService } from '@auscope/portal-core-ui';
 import { UtilitiesService } from '@auscope/portal-core-ui';
-import { Constants } from '@auscope/portal-core-ui';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { CataloguesearchService } from './cataloguesearch.service';
 import { Component, AfterViewInit } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { RectangleEditorObservable } from 'angular-cesium';
+import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 
 
 @Component({
@@ -33,20 +32,19 @@ export class CatalogueSearchComponent implements AfterViewInit {
   loading: boolean;
   searchMode: boolean;
   layerGroups = [];
-  uiLayerModels: {};
   bsModalRef: BsModalRef;
   statusmsg: string;
-  totalResults = [];
+  pageList = [];
   currentPage: number;
      
   // the rectangle drawn on the map
   private rectangleObservable: RectangleEditorObservable;
 
   constructor(private csMapService: CsMapService, private cataloguesearchService: CataloguesearchService,
-    private renderStatusService: RenderStatusService,  private modalService: BsModalService, private layerHandlerService: LayerHandlerService) {
+              private renderStatusService: RenderStatusService,  private modalService: BsModalService,
+              private uiLayerModelService: UILayerModelService) {
     this.drawStarted = false;
     this.searchMode = true;
-    this.uiLayerModels = {};
     this.loading = false;
     this.form = {};
     this.currentPage = 1;
@@ -61,18 +59,14 @@ export class CatalogueSearchComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.cataloguesearchService.getCSWServices().subscribe(response => {
       this.cswRegistries = response;
-
       for (const reg of this.cswRegistries) {
         if (reg['selectedByDefault'] === true) {
           this.form.cswService = reg;
           this.setkeywords(reg);
         }
-
       }
-    })
-
+    });
   }
-
 
   private setkeywords(registry) {
     this.cataloguesearchService.getFilteredCSWKeywords(registry.id).subscribe(keywords => {
@@ -84,14 +78,18 @@ export class CatalogueSearchComponent implements AfterViewInit {
         });
       }
       this.form.keywords = [];
-    })
+    });
   }
 
-    /**
+  /**
    * clear the bounding box
    */
   public clearBound(): void {
     this.bbox = null;
+    this.form.north = null;
+    this.form.south = null;
+    this.form.east = null;
+    this.form.west = null;
     // clear rectangle on the map
     if (this.rectangleObservable) {
         this.rectangleObservable.dispose();
@@ -129,21 +127,22 @@ export class CatalogueSearchComponent implements AfterViewInit {
   }
 
   public selectTabPanel(layerId, panelType) {
-    (<UILayerModel>this.uiLayerModels[layerId]).tabpanel.setPanelOpen(panelType);
+    this.uiLayerModelService.getUILayerModel(layerId).tabpanel.setPanelOpen(panelType);
   }
 
   public closeResult() {
     this.searchMode = true;
     this.currentPage = 1;
   }
+
   /**
    * Search list of wms layer given the wms url
    */
   public search() {
     // clear rectangle on the map because there is no way to remove it after search is displayed
     if (this.rectangleObservable) {
-        this.rectangleObservable.dispose();
-        this.rectangleObservable = null;
+      this.rectangleObservable.dispose();
+      this.rectangleObservable = null;
     }
     this.layerGroups = [];
     this.loading = true;
@@ -154,35 +153,47 @@ export class CatalogueSearchComponent implements AfterViewInit {
         this.loading = false;
         if (response != null) {
           me.layerGroups = response.itemLayers;
-          for (let i = 1; i <= response.totalResults; i++) {
-            me.totalResults.push(i);
+          me.pageList = [];
+          for (let i = 1; i <= Math.ceil(response.totalResults / CataloguesearchService.RESULTS_PER_PAGE); i++) {
+            me.pageList.push(i);
           }
           for (const key in this.layerGroups) {
             for (let i = 0; i < this.layerGroups[key].length; i++) {
               const uiLayerModel = new UILayerModel(this.layerGroups[key][i].id, this.renderStatusService.getStatusBSubject(this.layerGroups[key][i]));
-              me.uiLayerModels[me.layerGroups[key][i].id] = uiLayerModel;
+              this.uiLayerModelService.setUILayerModel(me.layerGroups[key][i].id, uiLayerModel);
             }
           }
         } else {
           this.statusmsg = '<div class="text-danger">No records Found</div>';
         }
+      }, error => {
+        this.loading = false;
       });
   }
-    /**
-     * open the modal that display the status of the render
-     */
-    public openStatusReport(uiLayerModel: UILayerModel) {
-      this.bsModalRef = this.modalService.show(NgbdModalStatusReportComponent, {class: 'modal-lg'});
-      uiLayerModel.statusMap.getStatusBSubject().subscribe((value) => {
-        this.bsModalRef.content.resourceMap = value.resourceMap;
-      });
-    }
+
+  /**
+   * open the modal that display the status of the render
+   */
+  public openStatusReport(uiLayerModel: UILayerModel) {
+    this.bsModalRef = this.modalService.show(NgbdModalStatusReportComponent, {class: 'modal-lg'});
+    uiLayerModel.statusMap.getStatusBSubject().subscribe((value) => {
+      this.bsModalRef.content.resourceMap = value.resourceMap;
+    });
+  }
 
   /**
    * remove a layer from the map
    */
-    public removeLayer(layer: LayerModel) {
-      this.csMapService.removeLayer(layer);
-    }
+  public removeLayer(layer: LayerModel) {
+    this.csMapService.removeLayer(layer);
+  }
+
+  /**
+   * Retrieve UILayerModel from the UILayerModelService
+   * @param layerId ID of layer
+   */
+  public getUILayerModel(layerId: string): UILayerModel {
+    return this.uiLayerModelService.getUILayerModel(layerId);
+  }
 
 }
