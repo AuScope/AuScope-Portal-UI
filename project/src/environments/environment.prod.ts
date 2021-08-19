@@ -11,8 +11,8 @@
 
 export const environment = {
   production: true,
-  getCSWRecordUrl: 'getKnownLayers.do',
-  getCustomLayers: 'getCustomLayers.do',
+  getCSWRecordEndP: 'getKnownLayers.do',
+  getCustLayersEndP: 'getCustomLayers.do',
   portalBaseUrl: 'http://portal.auscope.org.au/api/',
   hostUrl: 'http://portal.auscope.org.au/index.htm',
   nVCLAnalyticalUrl: 'https://aus-analytical.it.csiro.au/NVCLAnalyticalServices/',
