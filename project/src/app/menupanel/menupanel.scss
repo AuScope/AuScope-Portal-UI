@@ -226,7 +226,7 @@ input[type=checkbox] + label {
 	right: 8px;
 }
 
-/* "All Layers" and "Custom Layers" search filter boxes */
+/* "Featured Layers" and "Custom Layers" search filter boxes */
 input + div.input-group-append  > button {
 	margin-right: 0px;
 }
@@ -323,7 +323,7 @@ input + div.input-group-append  > button {
     color: $auscope-grey;
 }
 
-/* All Layers -> Filtered Layers box */
+/* Featured Layers -> Filtered Layers box */
 .filtered-layers {
     display: flex;
     color: $auscope-grey;
