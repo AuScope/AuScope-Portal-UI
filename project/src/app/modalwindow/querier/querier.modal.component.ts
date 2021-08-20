@@ -1,23 +1,19 @@
-import {UtilitiesService} from '@auscope/portal-core-ui';
-import {Component} from '@angular/core';
-import {environment} from '../../../environments/environment';
-import {config} from '../../../environments/config';
-import {ref} from '../../../environments/ref';
-import {QuerierInfoModel} from '@auscope/portal-core-ui';
-import {NVCLService} from './customanalytic/nvcl/nvcl.service';
-import {BsModalRef} from 'ngx-bootstrap/modal';
-import {CsClipboardService, Polygon} from '@auscope/portal-core-ui';
-import {ManageStateService} from '@auscope/portal-core-ui';
-import {GMLParserService} from '@auscope/portal-core-ui';
-import {NestedTreeControl} from '@angular/cdk/tree';
-import {MatTreeNestedDataSource} from '@angular/material/tree';
-import {BehaviorSubject, of as observableOf} from 'rxjs';
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
-import {Inject} from '@angular/core';
+import { Component } from '@angular/core';
+import { environment } from '../../../environments/environment';
+import { config } from '../../../environments/config';
+import { ref } from '../../../environments/ref';
+import { CsClipboardService, GMLParserService, ManageStateService, Polygon, QuerierInfoModel, UtilitiesService } from '@auscope/portal-core-ui';
+import { NVCLService } from './customanalytic/nvcl/nvcl.service';
+import { BsModalRef } from 'ngx-bootstrap/modal';
+import { NestedTreeControl}  from '@angular/cdk/tree';
+import { MatTreeNestedDataSource } from '@angular/material/tree';
+import { BehaviorSubject, of as observableOf } from 'rxjs';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Inject } from '@angular/core';
 import * as _ from 'lodash';
 import * as X2JS from 'x2js';
 import { DomSanitizer } from '@angular/platform-browser';
-import {ChangeDetectorRef, ApplicationRef} from '@angular/core'
+import { ChangeDetectorRef, ApplicationRef } from '@angular/core'
 
 export class FileNode {
   children: FileNode[];
@@ -34,6 +30,7 @@ export class FileNode {
 
 export class QuerierModalComponent {
   public downloading: boolean;
+  public transformingToHtml: Map<string, boolean> = new Map<string, boolean>();
   public docs: QuerierInfoModel[] = [];
   public htmls: QuerierInfoModel[] = [];
   public uniqueLayerNames: string[] = [];
@@ -48,13 +45,13 @@ export class QuerierModalComponent {
 
   nestedDataSource: MatTreeNestedDataSource<FileNode>[] = [];
 
-  constructor(public bsModalRef: BsModalRef, public CsClipboardService: CsClipboardService,
-    private manageStateService: ManageStateService, private gmlParserService: GMLParserService, 
+  constructor(public bsModalRef: BsModalRef, public csClipboardService: CsClipboardService,
+        private manageStateService: ManageStateService, private gmlParserService: GMLParserService, 
         private http: HttpClient, @Inject('env') private env, private sanitizer: DomSanitizer, 
         private changeDetectorRef: ChangeDetectorRef, private appRef: ApplicationRef) {
     this.analyticMap = ref.analytic;
-
   }
+
   public getData() {return this.data}
 
   private _getChildren = (node: FileNode) => observableOf(node.children);
@@ -66,7 +63,6 @@ export class QuerierModalComponent {
   }
 
   public newWindow(doc: QuerierInfoModel) {
-
     const state = _.cloneDeep(this.manageStateService.getState());
     const layerid = doc.layer.id;
     for (const key in state) {
@@ -113,9 +109,9 @@ export class QuerierModalComponent {
       polygon.srs = config.clipboard.ProvinceFullExtent.srsName;
     }
     if (polygon !== null) {
-      this.CsClipboardService.clearClipboard();
-      this.CsClipboardService.addPolygon(polygon);
-      this.CsClipboardService.toggleClipboard(true);
+      this.csClipboardService.clearClipboard();
+      this.csClipboardService.addPolygon(polygon);
+      this.csClipboardService.toggleClipboard(true);
       this.appRef.tick();
     }
   }
@@ -131,35 +127,40 @@ export class QuerierModalComponent {
        // We don't care about formatting non gml
        return this.parseTree(document);
     }
+
+    this.transformingToHtml[document.key] = true;
+    this.changeDetectorRef.detectChanges();
+
     let formdata = new HttpParams();
     formdata = formdata.append('gml', document.value.outerHTML);
     
-    this.http
-        .post(this.env.portalBaseUrl + 'transformToHtmlPopup.do', formdata.toString(),
-            {headers: 
-                new HttpHeaders().set('Content-Type','application/x-www-form-urlencoded'),
-                responseType: 'text'
-            })
-        .subscribe(
-            response => { 
-                var bodyHtml = /<body.*?>([\s\S]*)<\/body>/.exec(response)[1];
-                if (bodyHtml.length < 1) {
-                    // if no transformation, fallback to XML tree
-                    return this.parseTree(document);
-                }
-                //sanitizer will make sure the HTML styling is applied
-                document.transformed = this.sanitizer.bypassSecurityTrustHtml(response);
-                if (!document.transformed) {
-                    // fallback to XML tree
-                    return this.parseTree(document);
-                }
-                document.home = true;
-                document.loadSubComponent = true;
-                this.changeDetectorRef.detectChanges();
-            }, 
-            // try default XML tree display
-            error => { this.parseTree(document) }
-        );
+    this.http.post(this.env.portalBaseUrl + 'transformToHtmlPopup.do', formdata.toString(), {
+        headers: new HttpHeaders().set('Content-Type','application/x-www-form-urlencoded'),
+        responseType: 'text'}).subscribe(response => {
+      var bodyHtml = /<body.*?>([\s\S]*)<\/body>/.exec(response)[1];
+      if (bodyHtml.length < 1) {
+        this.transformingToHtml[document.key] = false;
+        // if no transformation, fallback to XML tree
+        return this.parseTree(document);
+      }
+      //sanitizer will make sure the HTML styling is applied
+      document.transformed = this.sanitizer.bypassSecurityTrustHtml(response);
+      if (!document.transformed) {
+        this.transformingToHtml[document.key] = false;
+        // fallback to XML tree
+        return this.parseTree(document);
+      }
+      document.home = true;
+      document.loadSubComponent = true;
+      this.transformingToHtml[document.key] = false;
+      this.changeDetectorRef.detectChanges();
+    }, 
+    // try default XML tree display
+    error => {
+      this.parseTree(document);
+      this.transformingToHtml[document.key] = false;
+      this.changeDetectorRef.detectChanges();
+    });
   }
 
 
@@ -335,5 +336,3 @@ export class QuerierModalComponent {
   }
 
 }
-
-

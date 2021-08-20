@@ -69,7 +69,7 @@
 									<div class="container-fluid">
 										<div class="row justify-content-between d-none d-md-flex">
 											<div class="col-3">
-												<div *ngIf="jobList[featureId].length > 0" data-toggle="tooltip" title="Job View" (click)="jobView=true;" class="btn btn-light btn-sm"
+												<div *ngIf="jobList[featureId] && jobList[featureId].length > 0" data-toggle="tooltip" title="Job View" (click)="jobView=true;" class="btn btn-light btn-sm"
 												 [ngClass]="{'lightgray-bg':jobView}">
 													<span><i class="ti-flag-alt"></i>Job</span>
 												</div>

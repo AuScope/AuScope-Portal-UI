@@ -348,8 +348,8 @@ export class CsMapComponent implements AfterViewInit {
               this.setModal(result, feature, this.bsModalRef);
             },
             err => {
-                this.bsModalRef.content.downloading = false;
                 this.bsModalRef.content.onDataChange();
+                this.bsModalRef.content.downloading = false;
             });
           }
         }

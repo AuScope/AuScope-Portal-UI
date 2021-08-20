@@ -1,137 +1,140 @@
 
-	<!-- Modal for querier-->
-                <div class="modal-header">
-                	<h1 class="page-header">Response: <small>Feature Info result</small></h1>
-                </div>
-				<div class="modal-body">
+<!-- Modal for querier-->
+<div class="modal-header">
+	<h1 class="page-header">Response: <small>Feature Info result</small></h1>
+</div>
+<div class="modal-body">
 
-					<div class="card card-default">
-						<!-- BEGIN card-body -->
-						<div class="card-body">
-							<!-- BEGIN form-inline -->
-							<div class="form-inline">
-								<div class="form-group  form-group-sm">
-				                    <label><i class="fa fa-filter" aria-hidden="true"></i> Filter: </label>
-									<select class="form-control form-control-sm" [(ngModel)]="selectLayerNameFilter">
-										<option value="ALL" selected="selected">ALL</option>
-										<option *ngFor="let uniqueLayerName of uniqueLayerNames">{{uniqueLayerName}}</option>
-									</select>
-				                </div>
-			                </div>
-                            <!-- END form-inline -->
-							<div *ngIf="downloading"><h2 class="wip">Downloading:<i class="fa fa-circle small"></i><i class="fa fa-circle small"></i><i class="fa fa-circle small"></i></h2></div>
-                            <!-- BEGIN querier accordion -->
-                            <div id="querier-accordion">
-								<!-- BEGIN card -->
-								<div *ngFor="let doc of docs | querierFeatureSearchPipe:selectLayerNameFilter; let i = index;" class="card card-default card-bordered">
-									<!-- BEGIN card-header -->
-									<div class="card-header">
-										<h4 class="card-title">
-											<a (click)="transformToHtml(doc)" class="accordion-link" data-toggle="collapse" href="#doc-collapse{{i}}">
-												{{doc.key}}
-											</a>
-										</h4>
-									</div>
-									<!-- END card-header -->
-									<!-- BEGIN card-collapse -->
-									<div id="doc-collapse{{i}}" class="card-body card-collapse collapse">
-										<div class="card card-default card-with-tabs">
-											<!-- BEGIN card-header -->
-											<div class="card-header">
-												<ul id="querier-card-tab" class="nav nav-tabs float-right">
-													<li (click)="doc.home=true;doc.analytic=false;onDataChange()" [ngClass]="{'active':doc.home}"><a href="#{{doc.key}}-card-tab-home" data-toggle="tab"><i class="fa fa-list"></i><span class="d-none d-md-inline"> WFS</span></a></li>
-													<li (click)="doc.home=false;doc.analytic=true;onDataChange()" [ngClass]="{'active':doc.analytic}" *ngIf="analyticMap[doc.layer.id]" ><a href="#{{doc.key}}-card-tab-profile" data-toggle="tab"><i class="fa fa-line-chart"></i><span class="d-none d-md-inline"> Analytic</span></a></li>
-												</ul>
-												<h4 *ngIf="doc.home" class="card-title">Feature Detail</h4>
-                                                <h4 *ngIf="doc.analytic" class="card-title">Analytic</h4>
+	<div class="card card-default">
+		<!-- BEGIN card-body -->
+		<div class="card-body">
+			<!-- BEGIN form-inline -->
+			<div class="form-inline">
+				<div class="form-group form-group-sm" style="align-items:baseline;">
+					<label style="font-size:large;"><i class="fa fa-filter" aria-hidden="true"></i>Filter&nbsp;</label>
+					<select class="form-control form-control-sm" [(ngModel)]="selectLayerNameFilter" [disabled]="docs.length===0">
+						<option value="ALL" selected="selected">ALL</option>
+						<option *ngFor="let uniqueLayerName of uniqueLayerNames">{{uniqueLayerName}}</option>
+					</select>
+				</div>
+			</div>
+			<!-- END form-inline -->
+			<div *ngIf="downloading"><h2 class="wip" style="margin-top:10px;">Downloading&nbsp;<i class="fa fa-spinner fa-spin"></i></h2></div>
+			<!-- BEGIN querier accordion -->
+			<div id="querier-accordion">
+				<!-- BEGIN card -->
+				<div *ngIf="docs.length === 0 && !downloading">
+					<h2 style="margin-top:10px;">No results found, try zooming to improve accuracy</h2>
+				</div>
+				<div *ngFor="let doc of docs | querierFeatureSearchPipe:selectLayerNameFilter; let i = index;" class="card card-default card-bordered">
+					<!-- BEGIN card-header -->
+					<div class="card-header">
+						<h4 class="card-title">
+							<a (click)="transformToHtml(doc)" class="accordion-link" data-toggle="collapse" href="#doc-collapse{{i}}">
+								{{doc.key}}&nbsp;<i *ngIf="transformingToHtml[doc.key]" class="fa fa-spinner fa-spin"></i>
+							</a>
+						</h4>
+					</div>
+					<!-- END card-header -->
+					<!-- BEGIN card-collapse -->
+					<div id="doc-collapse{{i}}" class="card-body card-collapse collapse">
+						<div class="card card-default card-with-tabs">
+							<!-- BEGIN card-header -->
+							<div class="card-header">
+								<ul id="querier-card-tab" class="nav nav-tabs float-right">
+									<li (click)="doc.home=true;doc.analytic=false;onDataChange()" [ngClass]="{'active':doc.home}"><a href="#{{doc.key}}-card-tab-home" data-toggle="tab"><i class="fa fa-list"></i><span class="d-none d-md-inline"> WFS</span></a></li>
+									<li (click)="doc.home=false;doc.analytic=true;onDataChange()" [ngClass]="{'active':doc.analytic}" *ngIf="analyticMap[doc.layer.id]" ><a href="#{{doc.key}}-card-tab-profile" data-toggle="tab"><i class="fa fa-line-chart"></i><span class="d-none d-md-inline"> Analytic</span></a></li>
+								</ul>
+								<h4 *ngIf="doc.home" class="card-title">Feature Detail</h4>
+								<h4 *ngIf="doc.analytic" class="card-title">Analytic</h4>
+							</div>
+							<!-- END card-header -->
+
+							<!-- BEGIN tab-content -->
+							<div id="card-tab-content" class="tab-content" style="max-height:calc(75vh)">
+								<!-- BEGIN tab-pane -->
+								<div *ngIf="doc.key !== 'Server Error'" class="tab-pane fade" [ngClass]="{'active show':doc.home}" id="{{doc.key}}-card-tab-home">
+									<div *ngIf="bToClipboard || supportOpenInNewWindow(doc)" style="position: inherit;padding-top: unset;margin-bottom: 20px;">
+										<div class="float-left d-none d-md-inline mt-0 w-100">
+											<div *ngIf="bToClipboard" data-toggle="tooltip" title="Copy to Clipboard" (click)="CopyToClipboard(doc)" class="btn btn-light btn-sm">
+												<span><i class="ti-clip"></i>Add to Clipboard</span>
 											</div>
-											<!-- END card-header -->
-
-											<!-- BEGIN tab-content -->
-											<div id="card-tab-content" class="tab-content" style="max-height:calc(75vh)">
-												<!-- BEGIN tab-pane -->
-												<div *ngIf="doc.key !== 'Server Error'" class="tab-pane fade" [ngClass]="{'active show':doc.home}" id="{{doc.key}}-card-tab-home">
-													<div *ngIf="bToClipboard || supportOpenInNewWindow(doc)" style="position: inherit;padding-top: unset;margin-bottom: 20px;">
-														<div class="float-left d-none d-md-inline mt-0 w-100">
-															<div *ngIf="bToClipboard" data-toggle="tooltip" title="Copy to Clipboard" (click)="CopyToClipboard(doc)" class="btn btn-light btn-sm">
-																<span><i class="ti-clip"></i>Add to Clipboard</span>
-															</div>
-														</div>
-													</div>
-													<!-- Show HTML if XML is transformed -->
-													<div *ngIf="doc.transformed" [innerHtml]="doc.transformed"></div>
-													<!-- Show default XML Tree if there is no HTML transformation -->
-													<mat-tree *ngIf="nestedDataSource[doc.key]" [dataSource]="nestedDataSource[doc.key]" [treeControl]="nestedTreeControl[doc.key]"
-													 class="example-tree">
-														<dl>
-															<mat-tree-node *matTreeNodeDef="let node" style="font-size: 12px !important;padding: 3px; min-height: 0px">
-																<dt style="flex: auto;">{{node.filename}}</dt>
-																<dd>{{node.type}}
-																	<a *ngIf="node.type.toString().startsWith('http')" target="_blank" href="{{node.type}}">
-																		<i class="fa fa-external-link-square" aria-hidden="true"></i>
-																	</a>
-																</dd>
-															</mat-tree-node>
-															<mat-nested-tree-node *matTreeNodeDef="let node; when: hasNestedChild">
-																<dt style="flex: auto;">
-																	<button mat-icon-button matTreeNodeToggle [attr.aria-label]="'toggle ' + node.filename">
-																		<mat-icon class="mat-icon-rtl-mirror">
-																			{{nestedTreeControl[doc.key].isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-																		</mat-icon>
-																	</button>{{node.filename}}</dt>
-																<dd>
-																	<dl [class.feature-tree-invisible]="!nestedTreeControl[doc.key].isExpanded(node)" style="margin-left:10px">
-																		<ng-container matTreeNodeOutlet></ng-container>
-																	</dl>
-																</dd>
-															</mat-nested-tree-node>
-														</dl>
-													</mat-tree>
-
-													<!-- END NEW Tree -->
-												</div>
-												<div *ngIf="doc.key === 'Server Error'" class="tab-pane fade" [ngClass]="{'active show':doc.home}" id="{{doc.key}}-card-tab-home">
-													<p>Sorry - {{doc.onlineResource.url}} server has returned an error message. See browser console for more information</p>
-												</div>
-
-												<!-- END tab-pane -->
-												<!-- BEGIN tab-pane -->
-												<div *ngIf="analyticMap[doc.layer.id]" class="tab-pane fade" [ngClass]="{'active show':doc.analytic}" id="{{doc.key}}-card-tab-profile">
-													<app-custom-analytic [layer]="doc.layer" [load]="doc.loadSubComponent" [onlineResource] = "doc.onlineResource" [featureId]="doc.key" [doc] = "doc"></app-custom-analytic>
-												</div>
-												<!-- END tab-pane -->
-											</div>
-											<!-- END tab-content -->
 										</div>
 									</div>
-									<!-- END card-collapse -->
-								</div>
-								<!-- END card -->
+									<!-- Show HTML if XML is transformed -->
+									<div *ngIf="doc.transformed" [innerHtml]="doc.transformed"></div>
+									<!-- Show default XML Tree if there is no HTML transformation -->
+									<mat-tree *ngIf="nestedDataSource[doc.key]" [dataSource]="nestedDataSource[doc.key]" [treeControl]="nestedTreeControl[doc.key]"
+										class="example-tree">
+										<dl>
+											<mat-tree-node *matTreeNodeDef="let node" style="font-size: 12px !important;padding: 3px; min-height: 0px">
+												<dt style="flex: auto;">{{node.filename}}</dt>
+												<dd>{{node.type}}
+													<a *ngIf="node.type && node.type.toString().startsWith('http')" target="_blank" href="{{node.type}}">
+														<i class="fa fa-external-link-square" aria-hidden="true"></i>
+													</a>
+												</dd>
+											</mat-tree-node>
+											<mat-nested-tree-node *matTreeNodeDef="let node; when: hasNestedChild">
+												<dt style="flex: auto;">
+													<button mat-icon-button matTreeNodeToggle [attr.aria-label]="'toggle ' + node.filename">
+														<mat-icon class="mat-icon-rtl-mirror">
+															{{nestedTreeControl[doc.key].isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+														</mat-icon>
+													</button>{{node.filename}}</dt>
+												<dd>
+													<dl [class.feature-tree-invisible]="!nestedTreeControl[doc.key].isExpanded(node)" style="margin-left:10px">
+														<ng-container matTreeNodeOutlet></ng-container>
+													</dl>
+												</dd>
+											</mat-nested-tree-node>
+										</dl>
+									</mat-tree>
 
-								<!-- BEGIN card -->
-								<div *ngFor="let html of htmls | querierFeatureSearchPipe:selectLayerNameFilter; let i = index" class="card card-default card-bordered">
-									<!-- BEGIN card-header -->
-									<div class="card-header">
-										<h4 class="card-title">
-											<a class="accordion-link"  data-toggle="collapse" href="#html-collapse{{i}}">
-												{{html.key}}
-											</a>
-										</h4>
-									</div>
-									<!-- END card-header -->
-									<!-- BEGIN card-collapse -->
-									<div id="html-collapse{{i}}" class="card-body card-collapse collapse">
-										<div [innerHTML] = "html.value | trustResourceHtml"></div>
-									</div>
-									<!-- END card-collapse -->
+									<!-- END NEW Tree -->
 								</div>
-                                <!-- END card -->
+								<div *ngIf="doc.key === 'Server Error'" class="tab-pane fade" [ngClass]="{'active show':doc.home}" id="{{doc.key}}-card-tab-home">
+									<p>Sorry - {{doc.onlineResource.url}} server has returned an error message. See browser console for more information</p>
+								</div>
+
+								<!-- END tab-pane -->
+								<!-- BEGIN tab-pane -->
+								<div *ngIf="analyticMap[doc.layer.id]" class="tab-pane fade" [ngClass]="{'active show':doc.analytic}" id="{{doc.key}}-card-tab-profile">
+									<app-custom-analytic [layer]="doc.layer" [load]="doc.loadSubComponent" [onlineResource] = "doc.onlineResource" [featureId]="doc.key" [doc] = "doc"></app-custom-analytic>
+								</div>
+								<!-- END tab-pane -->
 							</div>
-                            <!-- END querier accordion -->
+							<!-- END tab-content -->
 						</div>
-						<!-- END card-body -->
 					</div>
+					<!-- END card-collapse -->
 				</div>
-				<div class="modal-footer">
-                    <button type="button" class="btn btn-light" (click)="bsModalRef.hide()">Close</button>
+				<!-- END card -->
+
+				<!-- BEGIN card -->
+				<div *ngFor="let html of htmls | querierFeatureSearchPipe:selectLayerNameFilter; let i = index" class="card card-default card-bordered">
+					<!-- BEGIN card-header -->
+					<div class="card-header">
+						<h4 class="card-title">
+							<a class="accordion-link"  data-toggle="collapse" href="#html-collapse{{i}}">
+								{{html.key}}
+							</a>
+						</h4>
+					</div>
+					<!-- END card-header -->
+					<!-- BEGIN card-collapse -->
+					<div id="html-collapse{{i}}" class="card-body card-collapse collapse">
+						<div [innerHTML] = "html.value | trustResourceHtml"></div>
+					</div>
+					<!-- END card-collapse -->
 				</div>
+				<!-- END card -->
+			</div>
+			<!-- END querier accordion -->
+		</div>
+		<!-- END card-body -->
+	</div>
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn btn-light" (click)="bsModalRef.hide()">Close</button>
+</div>
