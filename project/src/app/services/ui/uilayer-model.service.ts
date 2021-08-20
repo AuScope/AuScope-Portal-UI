@@ -6,7 +6,7 @@ import { UILayerModel } from 'app/menupanel/common/model/ui/uilayer.model';
 })
 export class UILayerModelService {
   /**
-   *  Keep track of the UILayerModels in use (Active Layers, All Layers, Custom Search and Catalogue Search)
+   *  Keep track of the UILayerModels in use (Active Layers, Featured Layers, Custom Search and Catalogue Search)
    */
   private uiLayerModels = new Map<string, UILayerModel>();
 
