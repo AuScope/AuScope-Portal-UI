@@ -139,12 +139,14 @@ export class QuerierModalComponent {
         responseType: 'text'}).subscribe(response => {
       var bodyHtml = /<body.*?>([\s\S]*)<\/body>/.exec(response)[1];
       if (bodyHtml.length < 1) {
+        this.transformingToHtml[document.key] = false;
         // if no transformation, fallback to XML tree
         return this.parseTree(document);
       }
       //sanitizer will make sure the HTML styling is applied
       document.transformed = this.sanitizer.bypassSecurityTrustHtml(response);
       if (!document.transformed) {
+        this.transformingToHtml[document.key] = false;
         // fallback to XML tree
         return this.parseTree(document);
       }
