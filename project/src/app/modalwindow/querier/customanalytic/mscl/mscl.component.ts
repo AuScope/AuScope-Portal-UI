@@ -1,10 +1,8 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { LayerModel } from '@auscope/portal-core-ui';
-import { OnlineResourceModel } from '@auscope/portal-core-ui';
-import { QuerierInfoModel } from '@auscope/portal-core-ui';
+import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
+import { LayerModel, OnlineResourceModel, QuerierInfoModel } from '@auscope/portal-core-ui';
 import { MSCLService, Metric } from '../../../layeranalytic/mscl/mscl.service';
-import {BsModalService, BsModalRef} from 'ngx-bootstrap/modal';
-import {MSCLAnalyticComponent} from '../../../layeranalytic/mscl/mscl.analytic.component';
+import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
+import { MSCLAnalyticComponent } from '../../../layeranalytic/mscl/mscl.analytic.component';
 
 @Component({
   selector: 'app-mscl',
@@ -24,10 +22,11 @@ export class MSCLComponent implements OnInit {
     public allMetricList: Metric[];  // List of all possible metrics
     public modalDisplayed = false; // Is modal dialogue displayed?
     public allTicked = false; // Are all tickboxes ticked?
+    public showSelectMetricError: boolean; // Show error if no metrics chosen when Draw Graph is pressed
 
     private bsModalRef: BsModalRef;
 
-    constructor(public msclService: MSCLService, private modalService: BsModalService) {
+    constructor(public msclService: MSCLService, private modalService: BsModalService, private changeDetectorRef: ChangeDetectorRef) {
         this.msclform = {};
         this.allMetricList = this.msclService.getMetricList();
     }
@@ -37,6 +36,7 @@ export class MSCLComponent implements OnInit {
         this.msclform.startDepth = 0;
         this.msclform.endDepth = 2000;
         this.msclform.bMetric = {};
+        this.showSelectMetricError = false;
         for (const metric of this.allMetricList) {
             this.msclform.bMetric[metric] = false;
         }
@@ -52,7 +52,7 @@ export class MSCLComponent implements OnInit {
     }
 
     /**
-      Creates a modal dialogue which contains plots of MSCL data
+     * Creates a modal dialogue which contains plots of MSCL data
      */
     public createGraphModal() {
         this.metricList = [];
@@ -61,20 +61,30 @@ export class MSCLComponent implements OnInit {
                 this.metricList.push(metric);
             }
         }
-        if (this.modalDisplayed === false) {
+        if (this.metricList.length === 0) {
+            this.showSelectMetricError = true;
+        } else if (this.modalDisplayed === false) {
+            this.showSelectMetricError = false;
             // Create the dialogue with relevant input parameters
-            this.bsModalRef = this.modalService.show(MSCLAnalyticComponent, {class: 'modal-xl', initialState: { 'startDepth': this.msclform.startDepth,
-                                                                                                                 'endDepth': this.msclform.endDepth,
-                                                                                                                 'metricList': this.metricList,
-                                                                                                                 'featureId': this.featureId,
-                                                                                                                 'closeGraphModal': this.closeGraphModal.bind(this),
-                                                                                                                 'serviceUrl': this.onlineResource.url }});
+            this.bsModalRef = this.modalService.show(MSCLAnalyticComponent, {
+                class: 'modal-xl',
+                ignoreBackdropClick: true,
+                keyboard: false,
+                initialState: {
+                    'startDepth': this.msclform.startDepth,
+                    'endDepth': this.msclform.endDepth,
+                    'metricList': this.metricList,
+                    'featureId': this.featureId,
+                    'closeGraphModal': this.closeGraphModal.bind(this),
+                    'serviceUrl': this.onlineResource.url
+                }
+            });
             this.modalDisplayed = true;
         }
+        this.changeDetectorRef.detectChanges();
     }
 
     /**
-     Close modal dialogue with MSCL plots
      */
     public closeGraphModal() {
         if (this.modalDisplayed) {

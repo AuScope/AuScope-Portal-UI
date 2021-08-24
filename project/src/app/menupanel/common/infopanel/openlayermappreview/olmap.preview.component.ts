@@ -1,7 +1,4 @@
-import { OlMapObject } from '@auscope/portal-core-ui';
-import { OlMapService } from '@auscope/portal-core-ui';
-import { RenderStatusService } from '@auscope/portal-core-ui';
-import { Constants } from '@auscope/portal-core-ui';
+import { Constants, CsMapService, OlMapObject, RenderStatusService } from '@auscope/portal-core-ui';
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import olStyle from 'ol/style/Style';
 import olView from 'ol/View';
@@ -40,9 +37,8 @@ export class OlMapPreviewComponent implements AfterViewInit {
     /**
      * This constructor creates the preview map
      */
-    constructor(private olMapService: OlMapService, private renderStatusService: RenderStatusService) {
+    constructor(private csMapService: CsMapService, private renderStatusService: RenderStatusService) {
         this.olMapObject = new OlMapObject(renderStatusService, null);
-        this.olMapService = olMapService;
         const map = this.olMapObject.getMap();
         const me = this;
 
@@ -54,33 +50,33 @@ export class OlMapPreviewComponent implements AfterViewInit {
                             feat.geometry.coordinates[0][1], feat.geometry.coordinates[0][2],
                             feat.geometry.coordinates[0][3], feat.geometry.coordinates[0][4]]]);
                     if (poly.intersectsCoordinate(event.coordinate)) {
-                        me.olMapService.fitView(<[number, number, number, number]>poly.getExtent());
+                        me.csMapService.fitView(<[number, number, number, number]>poly.getExtent());
                     }
                 }
             }
-        } );
+        });
     }
 
     /**
      * Set the map target, refresh the map, disable map controls
      */
-     ngAfterViewInit() {
-         // After view init the map target can be set!
-         const map = this.olMapObject.getMap();
-         map.setTarget(this.mapElement.nativeElement);
+    ngAfterViewInit() {
+        // After view init the map target can be set!
+        const map = this.olMapObject.getMap();
+        map.setTarget(this.mapElement.nativeElement);
 
-         // Remove controls
-         const contrColl = map.getControls();
-         for (let i = 0; i < contrColl.getLength(); i++) {
-             map.removeControl(contrColl.item(i));
-         }
-         // Disable pan and zoom via keyboard & mouse
-         const actionColl = map.getInteractions();
-         for (let i = 0; i < actionColl.getLength(); i++) {
-             const action = actionColl.item(i);
-             action.setActive(false);
-         }
-     }
+        // Remove controls
+        const contrColl = map.getControls();
+        for (let i = 0; i < contrColl.getLength(); i++) {
+            map.removeControl(contrColl.item(i));
+        }
+        // Disable pan and zoom via keyboard & mouse
+        const actionColl = map.getInteractions();
+        for (let i = 0; i < actionColl.getLength(); i++) {
+            const action = actionColl.item(i);
+            action.setActive(false);
+        }
+    }
 
     /**
     * Adds bounding boxes to the preview map, recentres the map to the middle of the bounding boxes
@@ -88,7 +84,6 @@ export class OlMapPreviewComponent implements AfterViewInit {
     * @param bboxGeojsonObj  Bounding boxes in GeoJSON format
     */
     setupBBoxes(reCentrePt: [number, number], bboxGeojsonObj: { [key: string]: GeoJSON.FeatureCollection<any> }) {
-
         for (const key in bboxGeojsonObj) {
             // Store the BBOXes for making the main map's view fit to the BBOX when BBOX is clicked on in preview map
             this.bboxGeojsonObjectArr.push(bboxGeojsonObj[key]);
@@ -162,4 +157,5 @@ export class OlMapPreviewComponent implements AfterViewInit {
            }
        }
    }
+
 }
