@@ -62,7 +62,7 @@ export class CsMapComponent implements AfterViewInit {
     const me = this;
     this.csMapService.getClickedLayerListBS().subscribe((mapClickInfo) => {
       me.handleLayerClick(mapClickInfo);
-      });
+    });
     // viewerOptions will be passed the Cesium.Viewer constuctor
     viewerConf.viewerOptions = {
       selectionIndicator: false,

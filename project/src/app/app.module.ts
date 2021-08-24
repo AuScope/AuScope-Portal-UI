@@ -64,13 +64,13 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { MSCLComponent } from './modalwindow/querier/customanalytic/mscl/mscl.component';
 import { MSCLAnalyticComponent } from './modalwindow/layeranalytic/mscl/mscl.analytic.component';
 
-import { PlotlyViaCDNModule } from 'angular-plotly.js';
 import { RectanglesEditorService } from 'angular-cesium';
 import { HelpMenuComponent } from './toppanel/help-menu/help-menu.component';
 
-// Using CDN module to avoid bug https://github.com/plotly/angular-plotly.js/issues/75
-PlotlyViaCDNModule.plotlyVersion = '1.53.0';
-PlotlyViaCDNModule.plotlyBundle = 'basic';
+import * as PlotlyJS from 'plotly.js-dist-min';
+import { PlotlyModule } from 'angular-plotly.js';
+
+PlotlyModule.plotlyjs = PlotlyJS;
 
 
 @NgModule({
@@ -128,7 +128,8 @@ PlotlyViaCDNModule.plotlyBundle = 'basic';
     NgxChartsModule,
     BrowserAnimationsModule,
     BsDropdownModule.forRoot(),
-    CommonModule, PlotlyViaCDNModule,
+    CommonModule,
+    PlotlyModule,
     AngularCesiumModule.forRoot(),
     AngularCesiumWidgetsModule,
     MatTooltipModule

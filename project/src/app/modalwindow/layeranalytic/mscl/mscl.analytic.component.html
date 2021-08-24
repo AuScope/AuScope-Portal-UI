@@ -6,11 +6,17 @@
 <div class="modal-body">
 	<div class="card card-default">
 		<div class="card-header">
-			<h4 class="card-title">MSCL Analytics: Borehole {{featureId}}</h4>
+			<h4 class="card-title pull-left">
+				MSCL Analytics: Borehole {{featureId}}<br>
+				<h5><span *ngIf="processingData" style="position:relative;top:7px;color:red;">Processing data (this may take a while)&nbsp;&nbsp;<i class="fa fa-spin fa-spinner"></i></span></h5>
+			</h4>
+			<button type="button" class="close pull-right" aria-label="Close" (click)="closeGraphModal()">
+				<span aria-hidden="true">×</span>
+			</button>
 		</div>
 		<div class="card-body">
 			<div #graphing_area>
-			    <plotly-plot [data]="graphInput.data" [layout]="graphInput.layout" [config]="graphInput.options"></plotly-plot>
+			    <plotly-plot [data]="graphInput.data" [layout]="graphInput.layout" [config]="graphInput.options" [updateOnLayoutChange]="true" [updateOnDataChange]="true" [divId]="graphing_area"></plotly-plot>
 			</div>
 		</div>
 	</div>

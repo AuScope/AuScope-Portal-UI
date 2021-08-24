@@ -43,9 +43,13 @@
                 </div>
             </fieldset>
             <fieldset>
+                <div *ngIf="showSelectMetricError" class="alert alert-danger">
+                    Plese select at least one metric
+                </div>
+            </fieldset>
+            <fieldset>
                 <div class="float-left"><button (click)="createGraphModal()" class="btn btn-primary">Draw Graph</button></div>
             </fieldset>
-
         </div>
     </div>
   </div>

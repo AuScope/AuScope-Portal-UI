@@ -1,10 +1,10 @@
 
-import {throwError as observableThrowError, Observable } from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
+import { throwError as observableThrowError, Observable } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpParams, HttpHeaders, HttpResponse} from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
-import { Layout, Data } from 'plotly.js-basic-dist';
+import { Layout, Data } from 'plotly.js-dist-min';
 
 // This is the complete list of metrics for MSCL data
 // If you change this, then must also modify 'toMetric()' and 'fromMetric()'
@@ -32,7 +32,7 @@ export class MSCLService {
     }
 
     /**
-     @returns a complete list of metrics for MSCL data service
+     * @returns a complete list of metrics for MSCL data service
      */
     public getMetricList(): Metric[] {
         return [ Metric.diameter, Metric.pWaveAmp, Metric.pWaveVel, Metric.density,
@@ -40,9 +40,9 @@ export class MSCLService {
     }
 
     /**
-      Converts from string to Metric
-      @param apiString string representation of a metric, e.g. 'p_wave_amplitude'
-      @returns Metric representation of apiString
+     * Converts from string to Metric
+     * @param apiString string representation of a metric, e.g. 'p_wave_amplitude'
+     * @returns Metric representation of apiString
      */
     public toMetric(apiString: string): Metric {
         switch (apiString) {
@@ -68,9 +68,9 @@ export class MSCLService {
 
 
     /**
-      Converts from Metric to string
-      @param metric Metric to be converted
-      @returns string representation of metric
+     * Converts from Metric to string
+     * @param metric Metric to be converted
+     * @returns string representation of metric
      */
     public fromMetric(metric: Metric): string {
         switch (metric) {
@@ -96,10 +96,10 @@ export class MSCLService {
 
 
     /**
-     Smooths an array of numbers to a particular window size
-     @param arr array of numbers
-     @param windowSize integer representing smoothing window size
-     @returns array of smoothed numbers
+     * Smooths an array of numbers to a particular window size
+     * @param arr array of numbers
+     * @param windowSize integer representing smoothing window size
+     * @returns array of smoothed numbers
      */
     private smooth(arr: number[], windowSize: number) {
         const result = [];
@@ -123,10 +123,10 @@ export class MSCLService {
 
 
     /**
-     Smooth out x-values
-     @param metricList list of metrics
-     @param xLists lists of x-values in associative array, key is metric string
-     @return smoothed x-values in same format as 'xLists'
+     * Smooth out x-values
+     * @param metricList list of metrics
+     * @param xLists lists of x-values in associative array, key is metric string
+     * @return smoothed x-values in same format as 'xLists'
      */
     private smoothOut(metricList: Metric[], xLists: {}, windowSize: number) {
         const xLists_out = {};
@@ -141,9 +141,9 @@ export class MSCLService {
 
 
     /**
-     Creates layout for several plots in one area
-     @param metricList list of Metrics to plot
-     @returns plot layout
+     * Creates layout for several plots in one area
+     * @param metricList list of Metrics to plot
+     * @returns plot layout
      */
     public getGraphLayout(metricList: Metric[], xLists: {}): Partial<Layout> {
         const layout: Partial<Layout> = {
@@ -251,11 +251,11 @@ export class MSCLService {
 
 
     /**
-     Create plot data for plotly graphs
-     @param metricList list of metrics to create plot data
-     @param xLists list of x-axis data
-     @param yList y-axis data
-     @return plotly 'Data' object containing plot data
+     * Create plot data for plotly graphs
+     * @param metricList list of metrics to create plot data
+     * @param xLists list of x-axis data
+     * @param yList y-axis data
+     * @return plotly 'Data' object containing plot data
      */
     public getGraphTraceList(metricList: Metric[], xLists: {}, yList: number[]): Data[] {
         const traceList: Data[] = [];
@@ -300,13 +300,13 @@ export class MSCLService {
 
 
     /**
-     Contacts the MSCL data service and retrieves plot data
-     @param serviceUrl the URL for the MSCL service
-     @param boreholeHeaderId borehole identifier
-     @param startDepth retrieve plot data starting at this depth
-     @param endDepth retrieve plot data ending at this depth
-     @param metricList list of metrics for which plotting data is required
-     @return Observable for waiting on
+     * Contacts the MSCL data service and retrieves plot data
+     * @param serviceUrl the URL for the MSCL service
+     * @param boreholeHeaderId borehole identifier
+     * @param startDepth retrieve plot data starting at this depth
+     * @param endDepth retrieve plot data ending at this depth
+     * @param metricList list of metrics for which plotting data is required
+     * @return Observable for waiting on
      */
     public getMSCLDownload(serviceUrl: string, boreholeHeaderId: string, startDepth: number, endDepth: number, metricList: Metric[]): Observable<any> {
         let httpParams = new HttpParams();
@@ -332,4 +332,5 @@ export class MSCLService {
             }
         ), );
     }
+
 }
