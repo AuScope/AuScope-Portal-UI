@@ -4,10 +4,10 @@ import { QuerierModalComponent } from '../modalwindow/querier/querier.modal.comp
 import { AfterViewInit, Component, ElementRef, NgZone, ViewChild } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ViewerConfiguration } from 'angular-cesium';
-import { CsCSWService, CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService, QueryWFSService,
+import { CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService,
   QueryWMSService, SimpleXMLService, UtilitiesService, CsMapObject, ResourceType } from '@auscope/portal-core-ui';
 import { Cartesian3, MapMode2D, Math, ScreenSpaceEventHandler, SceneMode, ScreenSpaceEventType, Rectangle, ImagerySplitDirection,
-   Cartesian2, WebMapServiceImageryProvider, WebMercatorProjection, Cartographic, GeographicProjection, Entity } from 'cesium';
+   Cartesian2, WebMapServiceImageryProvider, WebMercatorProjection, Cartographic, GeographicProjection } from 'cesium';
 import { IrisQuerierHandler } from './custom-querier-handler/iris-querier-handler.service';
 declare var Cesium: any;
 
@@ -55,10 +55,9 @@ export class CsMapComponent implements AfterViewInit {
 
   private bsModalRef: BsModalRef;
 
-  constructor(private csMapObject: CsMapObject,    private csMapService: CsMapService, private modalService: BsModalService,
-    private queryWFSService: QueryWFSService, private queryWMSService: QueryWMSService, private gmlParserService: GMLParserService,
+  constructor(private csMapObject: CsMapObject, private csMapService: CsMapService, private modalService: BsModalService,
+    private queryWMSService: QueryWMSService, private gmlParserService: GMLParserService,
     private manageStateService: ManageStateService, private viewerConf: ViewerConfiguration, private ngZone: NgZone) {
-    //this.csMapService.getClickedLayerListBS().subscribe(this.handleLayerClick.bind(this));
     const me = this;
     this.csMapService.getClickedLayerListBS().subscribe((mapClickInfo) => {
       me.handleLayerClick(mapClickInfo);

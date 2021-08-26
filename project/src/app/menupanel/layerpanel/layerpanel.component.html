@@ -39,10 +39,18 @@
 			<li *ngFor="let layer of layerGroup.value.loaded" [ngClass]="{'active': layer.expanded}">
 				<a [hidden]="layer.hide" (click)="layer.expanded = !layer.expanded;" [ngClass]="{'highlight': layer.expanded}">
 					<div class="layerLoadCtrl">
+						<!--
 						<span *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="float-right project-percentage hasEvent light-blue">
 							<u (click)="openStatusReport(getUILayerModel(layer.id)); $event.stopPropagation();">{{getUILayerModel(layer.id).statusMap.getCompletePercentage()}}
 								<i *ngIf="getUILayerModel(layer.id).statusMap.getContainsError()" class="fa fa-warning text-warning">
 								</i>
+							</u>
+						</span>
+						-->
+						<span *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted() && !getUILayerModel(layer.id).statusMap.getRenderComplete()" class="float-right project-percentage hasEvent light-blue">
+							<u (click)="openStatusReport(getUILayerModel(layer.id)); $event.stopPropagation();">
+								<i class="fa fa-spin fa-spinner"></i>
+								<i *ngIf="getUILayerModel(layer.id).statusMap.getContainsError()" class="fa fa-warning text-warning"></i>
 							</u>
 						</span>
 						<div class="layerLoadClickable">
@@ -50,9 +58,11 @@
 							{{layer.name}}
 							<i *ngIf="layer.expanded && !getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-arrow-circle-down"></i>
 						</div>
+						<!--
 						<div *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="progress progress-xs" style="height: 5px">
 							<div class="progress-bar bg-gradient-blue-purple" [style.width]="getUILayerModel(layer.id).statusMap.getCompletePercentage()" role="progressbar"></div>
 						</div>
+						-->
 						<div *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted() || getUILayerModel(layer.id).statusMap.getRenderComplete()" class="opacity-slider-panel d-flex" (click)="$event.stopPropagation()">
 							<div class="opacity-label">Opacity {{ getUILayerModel(layer.id).opacity }}%&nbsp;</div>
 							<mat-slider [min]="0" [max]="100" class="opacity-slider flex-grow-1" [(ngModel)]="getUILayerModel(layer.id).opacity" (input)="layerOpacityChange($event, layer)"></mat-slider>
