@@ -6,11 +6,13 @@
         <div>
             <i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-times red layerLoadClickable" (click)="removeLayer(layer.id);$event.stopPropagation()"></i>
             <u (click)="openStatusReport(getUILayerModel(layer.id)); $event.stopPropagation();">{{ layer.name }}
-                <i *ngIf="getUILayerModel(layer.id).statusMap.getContainsError()" class="fa fa-warning text-warning">
-                </i>
+                <span *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="float-right project-percentage hasEvent light-blue">
+                    <i *ngIf="!getUILayerModel(layer.id).statusMap.getRenderComplete()" class="fa fa-spin fa-spinner"></i>
+                    <i *ngIf="getUILayerModel(layer.id).statusMap.getContainsError()" class="fa fa-warning text-warning"></i>
+                </span>
             </u>
         </div>
-        <div *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted() || getUILayerModel(layer.id).statusMap.getRenderComplete()" class="opacity-slider-panel d-flex" (click)="$event.stopPropagation()">
+        <div *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="opacity-slider-panel d-flex" (click)="$event.stopPropagation()">
             <div class="opacity-label">Opacity {{ getUILayerModel(layer.id).opacity }}%&nbsp;</div>
             <mat-slider [min]="0" [max]="100" class="opacity-slider flex-grow-1" [(ngModel)]="getUILayerModel(layer.id).opacity" (input)="layerOpacityChange($event, layer)"></mat-slider>
         </div>
