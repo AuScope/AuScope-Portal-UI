@@ -235,7 +235,6 @@ export class CsMapComponent implements AfterViewInit {
       const wmp = new WebMercatorProjection();
       const clickedLonlat = wmp.project(clickCartographic);
 
-      console.log(pickedTile.rectangle);
       const p0 = new Cartographic(pickedTile.rectangle.west, pickedTile.rectangle.south, 0);
       const p1 = new Cartographic(pickedTile.rectangle.east, pickedTile.rectangle.north, 0);
 
