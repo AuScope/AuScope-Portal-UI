@@ -42,21 +42,24 @@ export class CustomPanelComponent {
      */
     public search() {
       this.loading = true;
-      this.layerHandlerService.getCustomLayerRecord(this.searchUrl).subscribe(
-        response => {
-          this.loading = false;
-          if (response != null) {
-            this.layerGroups = response;
+      this.layerHandlerService.getCustomLayerRecord(this.searchUrl).subscribe(response => {
+        this.loading = false;
+        if (response != null) {
+          this.layerGroups = response;
+          if (Object.keys(this.layerGroups).length === 0) {
+            this.statusmsg = '<div class="text-danger">No valid layers could be found for this endpoint.</div>';
+          } else {
             for (const key in this.layerGroups) {
               for (let i = 0; i < this.layerGroups[key].length; i++) {
                 const uiLayerModel = new UILayerModel(this.layerGroups[key][i].id, this.renderStatusService.getStatusBSubject(this.layerGroups[key][i]));
                 this.uiLayerModelService.setUILayerModel(this.layerGroups[key][i].id, uiLayerModel);
               }
             }
-          } else {
-            this.statusmsg = '<div class="text-danger">No viable WMS found on the service endpoint. Kindly check your URL again.</div>';
           }
-        });
+        } else {
+          this.statusmsg = '<div class="text-danger">No viable WMS found on the service endpoint. Kindly check your URL again.</div>';
+        }
+      });
     }
 
     /**

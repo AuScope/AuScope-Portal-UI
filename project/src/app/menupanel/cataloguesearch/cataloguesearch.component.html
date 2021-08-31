@@ -71,7 +71,7 @@
 		<div class ="center-text"><em class="fa fa-spinner fa-spin fa-fw text-danger"></em></div>
 	</div>
 
-	<div *ngIf="!searchMode" style="position: relative; font-size:11px;">
+	<div *ngIf="!searchMode" style="position:relative;font-size:11px;margin-right:5px;">
 		<div class="float-right" (click)="closeResult()"><i class="fa fa-window-close white"></i></div>
 		<li class="active" *ngFor="let layerGroup of layerGroups | getKey">
 		  	<div class="white">
@@ -81,20 +81,26 @@
 				<li *ngFor="let layer of layerGroup.value" [ngClass]="{'active': layer.expanded}">
 					<a (click)="layer.expanded = !layer.expanded">
 						<div>
+							<!--
 							<span *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="float-right project-percentage hasEvent light-blue">
 								<u (click)="openStatusReport(getUILayerModel(layer.id)); $event.stopPropagation();">{{getUILayerModel(layer.id).statusMap.getCompletePercentage()}}
 									<i *ngIf="getUILayerModel(layer.id).statusMap.getContainsError()" class="fa fa-warning text-warning">
 									</i>
 								</u>
 							</span>
+							-->
 							<div>
 								<i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-times red" (click) = "removeLayer(layer);$event.stopPropagation();"></i>
-									<i class="fa fa-arrow-right light-blue"></i> {{layer.name}}
-									<i *ngIf="layer.expanded && !getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-arrow-circle-down"></i>
+								<i class="fa fa-arrow-right light-blue"></i> {{layer.name}}
+								<i *ngIf="layer.expanded && !getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-arrow-circle-down"></i>
+								<i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted() && !getUILayerModel(layer.id).statusMap.getRenderComplete()" class="float-right fa fa-spin fa-spinner light-blue"></i>
+								<i *ngIf="getUILayerModel(layer.id).statusMap.getContainsError()" class="float-right fa fa-warning text-warning"></i>
 							</div>
+							<!--
 							<div *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="progress progress-xs" style="height: 5px">
 								<div class="progress-bar bg-gradient-blue-purple" [style.width]="getUILayerModel(layer.id).statusMap.getCompletePercentage()" role="progressbar"></div>
 							</div>
+							-->
 						</div>
 					</a>
 					<div [hidden]="!layer.expanded" class="sidebar-card-menu-show">
