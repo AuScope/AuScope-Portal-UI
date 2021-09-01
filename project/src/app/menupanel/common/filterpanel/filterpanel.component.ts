@@ -67,7 +67,9 @@ export class FilterPanelComponent implements OnInit {
             me.getProvider();
           }
           me.optionalFilters = layerStateObj[me.layer.id].optionalFilters;
-          me.addLayer(me.layer);
+          setTimeout(() => {
+            me.addLayer(me.layer);
+          }, 100)
         }
       });
     }
@@ -81,7 +83,9 @@ export class FilterPanelComponent implements OnInit {
           me.getProvider();
         }
         me.layer.filterCollection['mandatoryFilters'][0].value = nvclanid;
-        me.addLayer(me.layer);
+        setTimeout(() => {
+          me.addLayer(me.layer);
+        });
       }
     }
   }
