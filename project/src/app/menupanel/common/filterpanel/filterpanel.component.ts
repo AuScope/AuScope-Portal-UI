@@ -83,7 +83,9 @@ export class FilterPanelComponent implements OnInit {
           me.getProvider();
         }
         me.layer.filterCollection['mandatoryFilters'][0].value = nvclanid;
-        me.addLayer(me.layer);
+        setTimeout(() => {
+          me.addLayer(me.layer);
+        });
       }
     }
   }
