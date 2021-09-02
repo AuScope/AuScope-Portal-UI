@@ -28,7 +28,7 @@ jobs:
           ref: ${{ github.event.inputs.ui-buildtag }}
 
       - name: Run tests
-        run: docker build . --file docker/Dockerfile --build-arg BUILDTYPE=build-prod --build-arg PCUI-BUILDTAG=${{ github.event.inputs.pcui-buildtag }}
+        run: docker build . --file docker/Dockerfile --build-arg BUILDTYPE=build-prod --build-arg PCUIBUILDTAG=${{ github.event.inputs.pcui-buildtag }}
 
   ## Push image to GitHub Packages.
   ## See also https://docs.docker.com/docker-hub/builds/
@@ -45,7 +45,7 @@ jobs:
   #        ref: ${{ github.event.inputs.ui-buildtag }}
 
   #    - name: Build image
-  #      run: docker build . --file docker/Dockerfile --tag $IMAGE_NAME --build-arg BUILDTYPE=build-prod --build-arg PCUI-BUILDTAG=${{ github.event.inputs.pcui-buildtag }}
+  #      run: docker build . --file docker/Dockerfile --tag $IMAGE_NAME --build-arg BUILDTYPE=build-prod --build-arg PCUIBUILDTAG=${{ github.event.inputs.pcui-buildtag }}
 
   #    - name: Log into registry
   #      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
