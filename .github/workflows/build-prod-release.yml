@@ -2,11 +2,14 @@
 name: Build production release
 
 on:
-  # Manually triggered, user must supply tag
+  # Manually triggered, user must supply build tags
   workflow_dispatch:
     inputs:
-      buildtag:
-        description: 'Tag to build at'
+      ui-buildtag:
+        description: 'AuScope-Portal-UI build tag:'
+        required: true
+      pcui-buildtag:
+        description: 'portal-core-ui-app build tag:'
         required: true
 
 env:
@@ -22,40 +25,40 @@ jobs:
       - name: Checkout code at build tag
         uses: actions/checkout@v2
         with:
-          ref: ${{ github.event.inputs.buildtag }}
+          ref: ${{ github.event.inputs.ui-buildtag }}
 
       - name: Run tests
-        run: docker build . --file docker/Dockerfile --build-arg BUILDTYPE=build-prod
+        run: docker build . --file docker/Dockerfile --build-arg BUILDTYPE=build-prod --build-arg PCUI-BUILDTAG=${{ github.event.inputs.pcui-buildtag }}
 
-  # Push image to GitHub Packages.
-  # See also https://docs.docker.com/docker-hub/builds/
-  push:
-    # Ensure test job passes before pushing image.
-    needs: test
+  ## Push image to GitHub Packages.
+  ## See also https://docs.docker.com/docker-hub/builds/
+  #push:
+  #  # Ensure test job passes before pushing image.
+  #  needs: test
 
-    runs-on: ubuntu-latest
+  #  runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code at build tag
-        uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.inputs.buildtag }}
+  #  steps:
+  #    - name: Checkout code at build tag
+  #      uses: actions/checkout@v2
+  #      with:
+  #        ref: ${{ github.event.inputs.ui-buildtag }}
 
-      - name: Build image
-        run: docker build . --file docker/Dockerfile --tag $IMAGE_NAME --build-arg BUILDTYPE=build-prod
+  #    - name: Build image
+  #      run: docker build . --file docker/Dockerfile --tag $IMAGE_NAME --build-arg BUILDTYPE=build-prod --build-arg PCUI-BUILDTAG=${{ github.event.inputs.pcui-buildtag }}
 
-      - name: Log into registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+  #    - name: Log into registry
+  #      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
 
-      - name: Push image
-        run: |
-          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
-          # Change all uppercase to lowercase
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-          VERSION=latest
-          echo "Build Tag: ${{ github.event.inputs.buildtag }}"
-          echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$VERSION
+  #    - name: Push image
+  #      run: |
+  #        IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
+  #        # Change all uppercase to lowercase
+  #        IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+  #        VERSION=latest
+  #        echo "Build Tag: ${{ github.event.inputs.ui-buildtag }}"
+  #        echo IMAGE_ID=$IMAGE_ID
+  #        echo VERSION=$VERSION
+  #        docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+  #        docker push $IMAGE_ID:$VERSION
 
