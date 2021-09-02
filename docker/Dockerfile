@@ -10,6 +10,8 @@ WORKDIR ${appdir}
 
 # Build type. Can be one of: build-dev, build-prod, build-test
 ARG BUILDTYPE=build-dev
+# Build tag for the portal-core-ui-app repository
+ARG PCUI-BUILDTAG=master
 
 # Install git to download portal-core-ui
 RUN apk update && \
@@ -18,6 +20,7 @@ RUN apk update && \
 
 RUN git clone https://github.com/AuScope/portal-core-ui-app.git && \
     cd portal-core-ui-app && \
+    git checkout $PCUI-BUILDTAG && \
     npm install && \
     npm run build portal-core-ui && \
     cd dist/portal-core-ui && \
