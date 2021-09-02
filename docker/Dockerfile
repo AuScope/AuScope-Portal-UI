@@ -18,6 +18,8 @@ RUN apk update && \
     apk upgrade && \
     apk add git
 
+RUN npm --version && node --version
+
 RUN git clone https://github.com/AuScope/portal-core-ui-app.git && \
     cd portal-core-ui-app && \
     echo "Checking out: $PCUIBUILDTAG" && \
