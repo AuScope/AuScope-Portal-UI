@@ -19,7 +19,7 @@ jobs:
   # Run tests.
   # See also https://docs.docker.com/docker-hub/builds/automated-testing/
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     steps:
       - name: Checkout code at build tag
@@ -36,7 +36,7 @@ jobs:
   #  # Ensure test job passes before pushing image.
   #  needs: test
 
-  #  runs-on: ubuntu-latest
+  #  runs-on: ubuntu-18.04
 
   #  steps:
   #    - name: Checkout code at build tag
