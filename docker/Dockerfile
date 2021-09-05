@@ -29,14 +29,11 @@ RUN git clone https://github.com/AuScope/portal-core-ui-app.git && \
     cd dist/portal-core-ui && \
     npm link
 
-# Copy in npm package file
-COPY project/package.json ./
+# Copy in auscope-portal-ui repository
+COPY project ./
 
 # Install required npm packages
 RUN npm install
-
-# Copy all the other files
-COPY project ./
 
 # Alter panel to show build date & time
 COPY docker/make_timestamp.sh make_timestamp.sh
