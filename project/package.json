@@ -30,7 +30,7 @@
     "@angular/platform-server": "^10.2.5",
     "@angular/router": "^10.2.5",
     "@auscope/portal-core-ui": "^1.0.5",
-    "@ng-select/ng-select": "^4.0.0",
+    "@ng-select/ng-select": "^6.1.0",
     "@swimlane/ngx-charts": "^17.0.1",
     "@thi.ng/hiccup": "^3.5.8",
     "@turf/bbox-polygon": "^6.0.1",
