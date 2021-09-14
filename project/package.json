@@ -31,7 +31,7 @@
     "@angular/router": "^10.2.5",
     "@auscope/portal-core-ui": "^1.0.5",
     "@ng-select/ng-select": "^4.0.0",
-    "@swimlane/ngx-charts": "^13.0.2",
+    "@swimlane/ngx-charts": "^19.0.1",
     "@thi.ng/hiccup": "^3.5.8",
     "@turf/bbox-polygon": "^6.0.1",
     "@turf/boolean-point-in-polygon": "^6.0.1",
