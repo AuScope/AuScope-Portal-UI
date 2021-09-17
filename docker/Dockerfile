@@ -2,7 +2,7 @@
 # A static Angular website served by apache2
 #
 # First image, build angular app
-FROM node:14.17 as node
+FROM node:14.17.6-alpine as node
 
 ENV appdir /usr/src/app
 
@@ -13,10 +13,10 @@ ARG BUILDTYPE=build-dev
 # Build tag for the portal-core-ui-app repository
 ARG PCUIBUILDTAG=master
 
-# Install build-essential
-RUN apt-get update && \
-    apt-get upgrade && \
-    apt-get install -y g++ build-essential 
+# Install git to download portal-core-ui
+RUN apk update && \
+    apk upgrade && \
+    apk add git python2 g++ make
 
 RUN npm install -g npm@7
 
