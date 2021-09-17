@@ -16,7 +16,7 @@ ARG PCUIBUILDTAG=master
 # Install build-essential
 RUN apt-get update && \
     apt-get upgrade && \
-    apt-get install g++ build-essential 
+    apt-get install -y g++ build-essential 
 
 RUN npm --version && node --version
 
