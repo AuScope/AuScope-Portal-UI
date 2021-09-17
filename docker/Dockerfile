@@ -2,7 +2,7 @@
 # A static Angular website served by apache2
 #
 # First image, build angular app
-FROM node:16.9.1 as node
+FROM node:14.17 as node
 
 ENV appdir /usr/src/app
 
@@ -17,6 +17,8 @@ ARG PCUIBUILDTAG=master
 RUN apt-get update && \
     apt-get upgrade && \
     apt-get install -y g++ build-essential 
+
+RUN npm install -g npm@7
 
 RUN npm --version && node --version
 
