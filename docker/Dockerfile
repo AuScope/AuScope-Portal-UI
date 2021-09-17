@@ -2,7 +2,7 @@
 # A static Angular website served by apache2
 #
 # First image, build angular app
-FROM node:16.9.1-alpine as node
+FROM node:16.9.1 as node
 
 ENV appdir /usr/src/app
 
@@ -12,11 +12,6 @@ WORKDIR ${appdir}
 ARG BUILDTYPE=build-dev
 # Build tag for the portal-core-ui-app repository
 ARG PCUIBUILDTAG=master
-
-# Install git to download portal-core-ui
-RUN apk update && \
-    apk upgrade && \
-    apk add git python2 g++ make
 
 RUN npm --version && node --version
 
