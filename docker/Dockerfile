@@ -2,7 +2,7 @@
 # A static Angular website served by apache2
 #
 # First image, build angular app
-FROM node:12.19-alpine as node
+FROM node:16.9.1-alpine as node
 
 ENV appdir /usr/src/app
 
