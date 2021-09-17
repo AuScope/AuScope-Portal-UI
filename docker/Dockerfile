@@ -13,6 +13,11 @@ ARG BUILDTYPE=build-dev
 # Build tag for the portal-core-ui-app repository
 ARG PCUIBUILDTAG=master
 
+# Install build-essential
+RUN apt-get update && \
+    apt-get upgrade && \
+    apt-get install g++ build-essential 
+
 RUN npm --version && node --version
 
 RUN git clone https://github.com/AuScope/portal-core-ui-app.git && \
