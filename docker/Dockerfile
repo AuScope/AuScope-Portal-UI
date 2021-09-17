@@ -16,7 +16,7 @@ ARG PCUIBUILDTAG=master
 # Install git to download portal-core-ui
 RUN apk update && \
     apk upgrade && \
-    apk add git python3 
+    apk add git python2 
 
 RUN npm --version && node --version
 
