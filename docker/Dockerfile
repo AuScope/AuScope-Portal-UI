@@ -32,7 +32,7 @@ RUN git clone https://github.com/AuScope/portal-core-ui-app.git && \
     npm link
 
 # Copy in auscope-portal-ui repository
-COPY project ./
+COPY . ./
 
 # Install required npm packages
 RUN npm install
