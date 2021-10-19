@@ -47,7 +47,7 @@ jobs:
       - name: Inject Google analytics key
         run: |
           ls -lR
-          sed "s~googleAnalyticsKey. null~googleAnalyticsKey. 'UA-XXXXXXXX-Y'~" src/environments/environment.prod.ts
+          sed "s~googleAnalyticsKey. null~googleAnalyticsKey. 'UA-XXXXXXXX-Y'~" project/src/environments/environment.prod.ts
 
       #- name: Build image
       #  run: docker build . --file docker/Dockerfile --tag $IMAGE_NAME --build-arg BUILDTYPE=build-prod --build-arg PCUIBUILDTAG=${{ github.event.inputs.pcui-buildtag }}
