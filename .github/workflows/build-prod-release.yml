@@ -29,10 +29,12 @@ jobs:
           
       - name: Inject Google analytics key
         run: >
-          sed "s~googleAnalyticsKey: null~googleAnalyticsKey: '${{ secrets.PROD_GOOGLE_ANALYTICS_KEY }}'~" project/src/environments/environment.prod.ts > project/src/environments/environment.prod.ts
+          sed "s~googleAnalyticsKey: null~googleAnalyticsKey: '${{ secrets.PROD_GOOGLE_ANALYTICS_KEY }}'~" project/src/environments/environment.prod.ts > 
           
       - name: Test
-        run: cat project/src/environments/environment.prod.ts
+        run: |
+          ls -lR
+          cat project/src/environments/environment.prod.ts
           
 #      - name: Run tests
 #        run: docker build . --file docker/Dockerfile --build-arg BUILDTYPE=build-prod --build-arg PCUIBUILDTAG=${{ github.event.inputs.pcui-buildtag }}
