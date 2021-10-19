@@ -27,55 +27,48 @@ jobs:
         with:
           ref: ${{ github.event.inputs.ui-buildtag }}
           
-      - name: Inject Google analytics key
+      - name: Inject Google Analytics key into environment
         run: >
           sed "s~googleAnalyticsKey: null~googleAnalyticsKey: '${{ secrets.PROD_GOOGLE_ANALYTICS_KEY }}'~" project/src/environments/environment.prod.ts > project/src/environments/environment.prod.ts.temp
           
-      - name: Copy
+      - name: Install new environment
         run: cp project/src/environments/environment.prod.ts.temp project/src/environments/environment.prod.ts
-        
-      - name: Test
-        run: ls -lR
-
-      - name: Show
-        run: cat project/src/environments/environment.prod.ts
           
-#      - name: Run tests
-#        run: docker build . --file docker/Dockerfile --build-arg BUILDTYPE=build-prod --build-arg PCUIBUILDTAG=${{ github.event.inputs.pcui-buildtag }}
+      - name: Run tests
+        run: docker build . --file docker/Dockerfile --build-arg BUILDTYPE=build-prod --build-arg PCUIBUILDTAG=${{ github.event.inputs.pcui-buildtag }}
 
-#  # Push image to GitHub Packages.
-#  # See also https://docs.docker.com/docker-hub/builds/
-#  push:
-#    # Ensure test job passes before pushing image.
-#    needs: test
+  # Push image to GitHub Packages.
+  # See also https://docs.docker.com/docker-hub/builds/
+  push:
+    # Ensure test job passes before pushing image.
+    needs: test
 
-#    runs-on: ubuntu-18.04
+    runs-on: ubuntu-18.04
 
-#    steps:
-#      - name: Checkout code at build tag
-#        uses: actions/checkout@v2
-#        with:
-#          ref: ${{ github.event.inputs.ui-buildtag }}
-#          
-#      - name: Inject Google analytics key
-#        run: >
-#          sed "s~googleAnalyticsKey: null~googleAnalyticsKey: '${{ secrets.PROD_GOOGLE_ANALYTICS_KEY }}'~" project/src/environments/environment.prod.ts > project/src/environments/environment.prod.ts
-#
-#      - name: Build image
-#        run: docker build . --file docker/Dockerfile --tag $IMAGE_NAME --build-arg BUILDTYPE=build-prod --build-arg PCUIBUILDTAG=${{ github.event.inputs.pcui-buildtag }}
-#      
-#      - name: Log into registry
-#        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
-#
-#      - name: Push image
-#        run: |
-#          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
-#          # Change all uppercase to lowercase
-#          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-#          VERSION=latest
-#          echo "Build Tag: ${{ github.event.inputs.ui-buildtag }}"
-#          echo IMAGE_ID=$IMAGE_ID
-#          echo VERSION=$VERSION
-#          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-#          docker push $IMAGE_ID:$VERSION
+    steps:
+      - name: Checkout code at build tag
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.ui-buildtag }}
+          
+      - name: Inject Google analytics key
+        run: >
+          sed "s~googleAnalyticsKey: null~googleAnalyticsKey: '${{ secrets.PROD_GOOGLE_ANALYTICS_KEY }}'~" project/src/environments/environment.prod.ts > project/src/environments/environment.prod.ts#
+      - name: Build image
+        run: docker build . --file docker/Dockerfile --tag $IMAGE_NAME --build-arg BUILDTYPE=build-prod --build-arg PCUIBUILDTAG=${{ github.event.inputs.pcui-buildtag }}
+      
+      - name: Log into registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+
+      - name: Push image
+        run: |
+          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          VERSION=latest
+          echo "Build Tag: ${{ github.event.inputs.ui-buildtag }}"
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
 
