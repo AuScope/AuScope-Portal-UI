@@ -91,7 +91,6 @@ export class CsMapComponent implements AfterViewInit {
       }
       const handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
       handler.setInputAction((movement) => {
-        // const cartesian = viewer.scene.pickPosition(movement.position);
         this.csMapObject.processClick(movement);
       }, Cesium.ScreenSpaceEventType.LEFT_UP);
 
@@ -170,7 +169,7 @@ export class CsMapComponent implements AfterViewInit {
                       onlineResource: layerStateObj[layerKey].onlineResource,
                       layer: layer
                     }
-                    me.setModal(layerStateObj[layerKey].raw, mapLayer, me.bsModalRef, {}, layerStateObj[layerKey].gmlid);
+                    me.setModal(layerStateObj[layerKey].raw, mapLayer, {}, layerStateObj[layerKey].gmlid);
                   }
                 }, 0);
               })
@@ -187,7 +186,7 @@ export class CsMapComponent implements AfterViewInit {
    * @param mouseY y position in screen
    * @returns {x: y: width: height: bbox:} or undefined if could not calculate
    */
-  public getParams(mouseX: number, mouseY: number): {x: number, y: number, width: number, height: number, bbox: number[]} {
+  public getParams(mouseX: number, mouseY: number): {x: number, y: number, width: number, height: number, bbox: number[], level: number} {
 
     // Convert mouse coords to X,Y,Z cartesian
     const mousePosition = new Cartesian2(mouseX, mouseY);
@@ -266,7 +265,7 @@ export class CsMapComponent implements AfterViewInit {
       // Assemble params
       const width = imagery.imageryLayer.imageryProvider.tileWidth;
       const height = imagery.imageryLayer.imageryProvider.tileHeight;
-      return { x: ijScratch.x, y: ijScratch.y, width: width, height: height, bbox: bbox };
+      return { x: ijScratch.x, y: ijScratch.y, width: width, height: height, bbox: bbox, level: imagery.level};
     }
   }
 
@@ -275,6 +274,9 @@ export class CsMapComponent implements AfterViewInit {
    * @param mapClickInfo object with map click information
    */
   private handleLayerClick(mapClickInfo) {
+
+    const me = this;
+
     if (UtilitiesService.isEmpty(mapClickInfo)) {
       return;
     }
@@ -310,10 +312,10 @@ export class CsMapComponent implements AfterViewInit {
           this.setModalHTML(handler.getHTML(entity), handler.getKey(entity), entity, this.bsModalRef);
       } else {       // VT: in a normal feature, yes we want to getfeatureinfo
         featureCount++;
-        if (featureCount < 10) {// VT: if more than 10 feature, ignore the rest
-         try {
+        if (featureCount < 10) { // VT: if more than 10 feature, ignore the rest
+          try {
             this.queryWFSService.getFeatureInfo(entity.onlineResource, entity.id_).subscribe(result => {
-              this.setModal(result, entity, this.bsModalRef);
+              this.setModal(result, entity);
             }, err => {
               this.bsModalRef.content.downloading = false;
               });
@@ -330,27 +332,41 @@ export class CsMapComponent implements AfterViewInit {
       */
     }
 
-    const me = this;
     // Process list of layers clicked
     for (const maplayer of mapClickInfo.clickedLayerList) {
       for (const i of maplayer.clickCSWRecordsIndex ) {
         const cswRecord = maplayer.cswRecords[i];
         const onlineResource = cswRecord.onlineResources[0];
         if (onlineResource) {
+
+          // Display CSW record info
           if (config.cswrenderer.includes(maplayer.id)) {
+            me.displayModal(mapClickInfo.clickCoord);
             const feature = {onlineResource: onlineResource, layer: maplayer};
             this.setModalHTML(this.parseCSWtoHTML(cswRecord), cswRecord.name, maplayer, this.bsModalRef);
+
+          // Display WMS layer info
           } else {
             const params = this.getParams(maplayer.clickPixel[0], maplayer.clickPixel[1]);
             this.queryWMSService.getFeatureInfo(onlineResource, maplayer.sldBody, maplayer.clickCoord[0], maplayer.clickCoord[1],
-              params.x, params.y, params.width, params.height, params.bbox).subscribe( result => {
-              const feature = {onlineResource: onlineResource, layer: maplayer};
-              this.setModal(result, feature, this.bsModalRef, mapClickInfo.clickCoord);
-            },
-            err => {
-                this.bsModalRef.content.onDataChange();
-                this.bsModalRef.content.downloading = false;
-            });
+              params.x, params.y, params.width, params.height, params.bbox).subscribe(
+                result => {
+                  const feature = {onlineResource: onlineResource, layer: maplayer};
+                  // Display the modal, but only if there are features 
+                  const num_feats = me.setModal(result, feature, mapClickInfo.clickCoord);
+
+                  // If zoom level is too low and nothing is found then show zoom message
+                  if (num_feats == 0 && params.level <= 3) {
+                    me.displayModal(mapClickInfo.clickCoord);
+                    me.bsModalRef.content.downloading = false;
+                    me.bsModalRef.content.showZoomMsg = true;
+                  }
+                },
+                err => {
+                  me.bsModalRef.content.onDataChange();
+                  me.bsModalRef.content.downloading = false;
+                }
+              );
           }
         }
       }
@@ -460,10 +476,9 @@ export class CsMapComponent implements AfterViewInit {
    * Set the modal dialog with the layers that have been clicked on
    * @param result response string
    * @param feature map feature object
-   * @param bsModalRef modal dialog reference
    * @param gmlid: a optional filter to only display the gmlId specified
    */
-  private setModal(result: string, feature: any, bsModalRef: BsModalRef, clickCoord: any, gmlid?: string, ) {
+  private setModal(result: string, feature: any, clickCoord: any, gmlid?: string, ) {
     let treeCollections = [];
     // GSKY only returns JSON, even if you ask for XML & GML
     if (UtilitiesService.isGSKY(feature.onlineResource)) {
@@ -474,7 +489,6 @@ export class CsMapComponent implements AfterViewInit {
     let featureCount = 0;
     for (const treeCollection of treeCollections) {
       this.displayModal(clickCoord);
-      this.bsModalRef.content.downloading = true;
       if (gmlid && gmlid !== treeCollection.key) {
         continue;
       }
