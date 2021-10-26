@@ -45,6 +45,9 @@ export class QuerierModalComponent {
 
   nestedDataSource: MatTreeNestedDataSource<FileNode>[] = [];
 
+  // Show a message to zoom in
+  public showZoomMsg: boolean = false;
+
   constructor(public bsModalRef: BsModalRef, public csClipboardService: CsClipboardService,
         private manageStateService: ManageStateService, private gmlParserService: GMLParserService, 
         private http: HttpClient, @Inject('env') private env, private sanitizer: DomSanitizer, 
