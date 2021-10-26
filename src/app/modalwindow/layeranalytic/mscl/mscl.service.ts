@@ -131,10 +131,7 @@ export class MSCLService {
     private smoothOut(metricList: Metric[], xLists: {}, windowSize: number) {
         const xLists_out = {};
         for (const metric of metricList) {
-            xLists_out[metric] = [];
-            for (let i = 0; i < xLists[metric].length; i++) {
-                xLists_out[metric] = this.smooth(xLists[metric], windowSize);
-            }
+            xLists_out[metric] = this.smooth(xLists[metric], windowSize);
         }
         return xLists_out;
     }
@@ -259,7 +256,6 @@ export class MSCLService {
      */
     public getGraphTraceList(metricList: Metric[], xLists: {}, yList: number[]): Data[] {
         const traceList: Data[] = [];
-
         const xLists_sm = {};
         xLists_sm[SM_WINDOW_LIST[0]] = xLists;
         for (let i = 1; i < SM_WINDOW_LIST.length; i++) {
