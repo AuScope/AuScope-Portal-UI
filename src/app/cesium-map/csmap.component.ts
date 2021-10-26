@@ -169,7 +169,7 @@ export class CsMapComponent implements AfterViewInit {
                       onlineResource: layerStateObj[layerKey].onlineResource,
                       layer: layer
                     }
-                    me.setModal(layerStateObj[layerKey].raw, mapLayer, {}, layerStateObj[layerKey].gmlid);
+                    me.setModal(layerStateObj[layerKey].raw, mapLayer, null, layerStateObj[layerKey].gmlid);
                   }
                 }, 0);
               })
@@ -401,7 +401,7 @@ export class CsMapComponent implements AfterViewInit {
    * Display the querier modal on map click
    * @param clickCoord map click coordinates
    */
-  private displayModal(clickCoord: {x: number, y: number, z: number}) {
+  private displayModal(clickCoord: {x: number, y: number, z: number}|null) {
     if (this.modalDisplayed.value === false) {
       this.bsModalRef = this.modalService.show(QuerierModalComponent, {class: 'modal-lg'});
       this.modalDisplayed.value = true;
@@ -476,9 +476,10 @@ export class CsMapComponent implements AfterViewInit {
    * Set the modal dialog with the layers that have been clicked on
    * @param result response string
    * @param feature map feature object
+   * @param clickCoord map click coordinates
    * @param gmlid: a optional filter to only display the gmlId specified
    */
-  private setModal(result: string, feature: any, clickCoord: any, gmlid?: string, ) {
+  private setModal(result: string, feature: any, clickCoord: {x: number, y: number, z: number}|null, gmlid?: string) {
     let treeCollections = [];
     // GSKY only returns JSON, even if you ask for XML & GML
     if (UtilitiesService.isGSKY(feature.onlineResource)) {
