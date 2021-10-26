@@ -1,13 +1,12 @@
 import { config } from '../../environments/config';
-import { ref } from '../../environments/ref';
 import { QuerierModalComponent } from '../modalwindow/querier/querier.modal.component';
 import { AfterViewInit, Component, ElementRef, NgZone, ViewChild } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ViewerConfiguration } from 'angular-cesium';
-import { CsCSWService, CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService, QueryWFSService,
+import { CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService, QueryWFSService,
   QueryWMSService, SimpleXMLService, UtilitiesService, CsMapObject, ResourceType } from '@auscope/portal-core-ui';
 import { Cartesian3, MapMode2D, Math, ScreenSpaceEventHandler, SceneMode, ScreenSpaceEventType, Rectangle, ImagerySplitDirection,
-   Cartesian2, WebMapServiceImageryProvider, WebMercatorProjection, Cartographic, GeographicProjection, Entity } from 'cesium';
+   Cartesian2, WebMapServiceImageryProvider, WebMercatorProjection, Cartographic, GeographicProjection } from 'cesium';
 import { IrisQuerierHandler } from './custom-querier-handler/iris-querier-handler.service';
 declare var Cesium: any;
 
@@ -54,12 +53,12 @@ export class CsMapComponent implements AfterViewInit {
   public static AUSTRALIA = Rectangle.fromDegrees(114.591, -45.837, 148.97, -5.73);
 
   private bsModalRef: BsModalRef;
-  private modalDisplayed = {value: false};
+  private modalDisplayed = false;
 
-  constructor(private csMapObject: CsMapObject,    private csMapService: CsMapService, private modalService: BsModalService,
+  constructor(private csMapObject: CsMapObject, private csMapService: CsMapService, private modalService: BsModalService,
     private queryWFSService: QueryWFSService, private queryWMSService: QueryWMSService, private gmlParserService: GMLParserService,
     private manageStateService: ManageStateService, private viewerConf: ViewerConfiguration, private ngZone: NgZone) {
-    //this.csMapService.getClickedLayerListBS().subscribe(this.handleLayerClick.bind(this));
+
     const me = this;
     this.csMapService.getClickedLayerListBS().subscribe((mapClickInfo) => {
       me.handleLayerClick(mapClickInfo);
@@ -155,7 +154,7 @@ export class CsMapComponent implements AfterViewInit {
       const me = this;
       this.manageStateService.getUnCompressedString(state, function(result) {
         const layerStateObj = JSON.parse(result);
-        me.modalDisplayed = {value: false}
+        me.modalDisplayed = false;
 
           for (const layerKey in layerStateObj) {
             if (layerKey === 'map') {
@@ -282,7 +281,7 @@ export class CsMapComponent implements AfterViewInit {
     }
 
     // Process lists of entities
-    this.modalDisplayed = {value: false};
+    this.modalDisplayed = false;
     for (const entity of mapClickInfo.clickedEntityList) {
       // TODO: Ignore polygon filter entities here or in portal-core-ui
       const layer: LayerModel = this.csMapService.getLayerForEntity(entity);
@@ -402,9 +401,9 @@ export class CsMapComponent implements AfterViewInit {
    * @param clickCoord map click coordinates
    */
   private displayModal(clickCoord: {x: number, y: number, z: number}|null) {
-    if (this.modalDisplayed.value === false) {
+    if (!this.modalDisplayed) {
       this.bsModalRef = this.modalService.show(QuerierModalComponent, {class: 'modal-lg'});
-      this.modalDisplayed.value = true;
+      this.modalDisplayed = true;
       this.bsModalRef.content.downloading = true;
       /*
       if (clickCoord) {
