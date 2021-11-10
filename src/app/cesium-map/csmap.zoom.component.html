@@ -1,0 +1,14 @@
+<ac-toolbar [allowDrag]="false">
+    <button class="cesium-button cesium-toolbar-button zoom-button" title="Home" (click)="goHome()">
+        <em class="fa fa-home"></em>
+    </button>
+    <button class="cesium-button cesium-toolbar-button zoom-button" title="Zoom To Rectangle" (click)="zoomToRectangle()">
+        <img src="extension/svg/select.svg" class="zoom-svg" style="color:#edffff;">
+    </button>
+    <button class="cesium-button cesium-toolbar-button zoom-button" title="Zoom In" (click)="zoomIn()">
+        <em class="fa fa-search-plus"></em>
+    </button>
+    <button class="cesium-button cesium-toolbar-button zoom-button" title="Zoom Out" (click)="zoomOut()">
+        <em class="fa fa-search-minus"></em>
+    </button>
+</ac-toolbar>

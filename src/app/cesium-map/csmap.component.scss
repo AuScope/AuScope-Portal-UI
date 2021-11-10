@@ -1,0 +1,61 @@
+@import '../globals';
+
+#map-theme-text {
+    z-index: 2;
+}
+
+/* Remove Cesium Ion logo */
+::ng-deep .cesium-widget-credits {
+    display:none !important;
+}
+
+#mapSlider {
+    position: absolute;
+    left: 50%;
+    top: 0px;
+    background-color: $auscope-royal-blue;
+    width: 5px;
+    height: 100%;
+    z-index: 1;
+}
+#mapSlider:hover {
+    cursor: ew-resize;
+}
+.slider-grabber {
+    left: -10px;
+    width: 25px;
+    height: 25px;
+    background: $auscope-royal-blue;
+    border-radius: 100px;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.slider-grabber-inner {
+    left: 5px;
+    width: 15px;
+    height: 15px;
+    background: $auscope-teal;
+    border-radius: 90px;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+::ng-deep .cesium-viewer-toolbar {
+    z-index: 10;
+}
+
+.mouse-coordinates {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    z-index: 2;
+    background-color: rgba(40, 37, 114, 0.5);
+    padding: 6px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    text-align: center;
+    color: white;
+}

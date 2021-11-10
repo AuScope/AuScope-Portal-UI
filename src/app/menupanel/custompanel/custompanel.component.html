@@ -1,0 +1,70 @@
+<!-- Custom Layer Input -->
+<div class="form-group">
+	<label class="control-label" for="inputSuccess1"><small class="white">WMS Service URL</small></label>
+	<div class="input-group">
+		<input type="text" class="form-control" [(ngModel)] = "searchUrl" >
+		<div class="input-group-append" (click)="search()">
+			<button class="btn btn-light" type="button">
+				<i *ngIf="!loading" class="fa fa-search"></i>
+				<i *ngIf="loading" class="fa fa-spinner fa-spin fa-fw"></i>
+			</button>
+		</div>
+	</div>
+	 <span class="help-block small" [innerHTML]="statusmsg">
+	</span>
+</div>
+
+
+<!-- Custom Layer Controls -->
+<li class="active" *ngFor="let layerGroup of layerGroups | getKey">
+  		<a href="javascript:;">
+           <i class="ti-angle-down float-right"></i>
+             {{layerGroup.key}}
+        </a>
+	<ul>
+		<li *ngFor="let layer of layerGroup.value" [ngClass]="{'active': layer.expanded}">
+			<a (click)="layer.expanded = !layer.expanded">
+				<div>
+					<!--
+					<span *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="float-right project-percentage hasEvent light-blue">
+						<u (click)="openStatusReport(getUILayerModel(layer.id)); $event.stopPropagation();">{{getUILayerModel(layer.id).statusMap.getCompletePercentage()}}
+							<i *ngIf="getUILayerModel(layer.id).statusMap.getContainsError()" class="fa fa-warning text-warning"></i>
+						</u>
+					</span>
+					-->
+					<div>
+						<i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-times red" (click) = "removeLayer(layer);$event.stopPropagation();"></i>
+						{{layer.name}}
+						<i *ngIf="layer.expanded && !getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-arrow-circle-down"></i>
+						<i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted() && !getUILayerModel(layer.id).statusMap.getRenderComplete()" class="float-right light-blue fa fa-spin fa-spinner"></i>
+						<i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted() && getUILayerModel(layer.id).statusMap.getContainsError()" class="fa fa-warning text-warning"></i>
+					</div>
+					<!--
+					<div *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="progress progress-xs" style="height: 5px">
+						<div class="progress-bar bg-gradient-blue-purple" [style.width]="getUILayerModel(layer.id).statusMap.getCompletePercentage()" role="progressbar"></div>
+					</div>
+					-->
+				</div>
+			</a>
+			<div [hidden]="!layer.expanded" class="sidebar-card-menu-show">
+				 <div class="card card-info card-with-tabs layer-card animated slideInRight">
+					<div class="card-header">
+						<ul id="card-tab" class="nav nav-tabs float-right">
+							<li (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': getUILayerModel(layer.id).tabpanel.filterpanel.expanded}"><a data-toggle="tab"><i class="fa fa-filter"></i> <span class="d-none d-sm-inline">Filter</span></a></li>
+							<li (click)="selectTabPanel(layer.id,'infopanel')" [ngClass]="{'active': getUILayerModel(layer.id).tabpanel.infopanel.expanded}"><a data-toggle="tab"><i class="fa fa-info-circle"></i> <span class="d-none d-sm-inline">Info</span></a></li>
+						</ul>
+					</div>
+					<div id="card-tab-content" class="tab-content">
+						<div class="tab-pane fade" [ngClass]="{'show active': getUILayerModel(layer.id).tabpanel.filterpanel.expanded}">
+							<app-filter-panel *ngIf="getUILayerModel(layer.id).tabpanel.filterpanel.expanded" [layer]=layer></app-filter-panel>
+						</div>
+						<div class="tab-pane fade" [ngClass]="{'show active': getUILayerModel(layer.id).tabpanel.infopanel.expanded}">
+							<info-panel *ngIf="getUILayerModel(layer.id).tabpanel.infopanel.expanded" [expanded]="getUILayerModel(layer.id).tabpanel.infopanel.expanded" [cswRecords]=layer.cswRecords [layer]=layer ></info-panel>
+						</div>
+					</div>
+				</div>
+			</div>
+		</li>
+	</ul>
+</li>
+<hr [hidden]="!layerGroups">
