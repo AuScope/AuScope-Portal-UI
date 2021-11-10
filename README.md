@@ -1,7 +1,6 @@
 # AuScope-Portal-UI
 
 [![Build status](https://github.com/AuScope/AuScope-Portal-UI/actions/workflows/build-prod-release.yml/badge.svg)](https://github.com/AuScope/AuScope-Portal-UI/actions/workflows/build-prod-release.yml)
-# AuScope-Portal-UI
 
 This project was generated with the [Angular CLI](https://github.com/angular/angular-cli).  It is now on version 11 of angular.  For best results compile with angular 11, node 14 and npm 7.
 
