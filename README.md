@@ -1,13 +1,15 @@
 [![Build status](https://github.com/AuScope/AuScope-Portal-UI/actions/workflows/build-prod-release.yml/badge.svg)](https://github.com/AuScope/AuScope-Portal-UI/actions/workflows/build-prod-release.yml)
 # AuScope-Portal-UI
 
-This project was generated with the [Angular CLI](https://github.com/angular/angular-cli).  It is now on version 11 of angular.  For best results compile with angular 11, node 14 and npm 7.
+User Interface component for the [AuScope Discovery Portal](http://portal.auscope.org.au/) 
+
+This project was generated with the [Angular CLI](https://github.com/angular/angular-cli).  It is now on version 11 of Angular.  For best results compile with Angular 11, node 14 and npm 7.
 
 ## Prerequisites
 
 Install node v14 https://nodejs.org/en/download/ 
 Install npm v7 `npm install -g npm@7` 
-install the angular CLI v11 `npm install -g @angular/cli@11`
+install the Angular CLI v11 `npm install -g @angular/cli@11`
 
 ## Development server
 
