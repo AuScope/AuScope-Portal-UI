@@ -38,7 +38,11 @@
 
 		<button *ngIf="!bbox" type="button" class="btn btn-info btn-xs" (click)="drawBound()"><i class="fa fa-object-ungroup"></i> Select Bounds</button>
 		<button *ngIf="bbox" type="button" class="btn btn-danger btn-xs" (click)="clearBound()"><i class="fa fa-refresh"></i> Clear Bounds</button>
-		<button type="button" class="btn btn-info btn-xs float-right" (click)="download()"><i *ngIf="downloadStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!downloadStarted" class="fa fa-cloud-download"></i> Download</button>
+		<button type="button" class="btn btn-info btn-xs " (click)="download()"><i *ngIf="downloadStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!downloadStarted" class="fa fa-cloud-download"></i> Download</button>
+		
+		<p *ngIf="!polygonFilter" class="small text-danger">If you want to download from Polygon Filter, please draw or pick a polygon first from the PolygonFilter Panel.</p>
+		<button *ngIf="polygonFilter" type="button" class="btn btn-info btn-xs float-left" (click)="download4Polygon()"><i *ngIf="download4pStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!download4pStarted" class="fa fa-cloud-download"></i> Download4Polygon</button>
+
 	</div>
 
 	<div [hidden]='!isWCSDownloadSupported' class="form-group">

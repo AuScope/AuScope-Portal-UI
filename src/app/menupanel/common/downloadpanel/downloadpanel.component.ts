@@ -10,7 +10,7 @@ import {saveAs} from 'file-saver';
 import {config} from '../../../../environments/config';
 import { RectangleEditorObservable } from 'angular-cesium';
 import { ChangeDetectorRef } from '@angular/core';
-import { DownloadWcsService } from '@auscope/portal-core-ui';
+import { DownloadWcsService ,CsClipboardService } from '@auscope/portal-core-ui';
 
 @Component({
   selector: 'app-download-panel',
@@ -24,8 +24,10 @@ export class DownloadPanelComponent implements OnInit {
 
   @Input() layer: LayerModel;
   bbox: Bbox;
+  polygonFilter: any;
   drawStarted: boolean;
   downloadStarted: boolean;
+  download4pStarted: boolean;
   isCsvSupportedLayer: boolean;
 
   isWCSDownloadSupported: boolean;
@@ -44,7 +46,8 @@ export class DownloadPanelComponent implements OnInit {
   private rectangleObservable: RectangleEditorObservable;
   
   constructor( private cdRef:ChangeDetectorRef, private layerHandlerService: LayerHandlerService, private csMapService: CsMapService,
-    private downloadWfsService: DownloadWfsService, private downloadWcsService: DownloadWcsService) {
+    private downloadWfsService: DownloadWfsService, private downloadWcsService: DownloadWcsService, private csClipboardService: CsClipboardService ){
+
     this.bbox = null;
     this.drawStarted = false;
     this.downloadStarted = false;
@@ -66,6 +69,15 @@ export class DownloadPanelComponent implements OnInit {
       } else {
         this.isWCSDownloadSupported = false;
       }
+      this.csClipboardService.polygonsBS.subscribe(
+        (polygonBBox) => {
+          if (polygonBBox && polygonBBox.coordinates) {
+            this.polygonFilter = '<ogc:Filter  xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:gml=\"http://www.opengis.net/gml\"><ogc:Intersects><ogc:PropertyName>gsmlp:shape</ogc:PropertyName>' + polygonBBox.coordinates + '</ogc:Intersects></ogc:Filter>';
+            console.log(this.polygonFilter);
+          } else {
+            this.polygonFilter = null;
+          }
+      });
     } else {
       this.isCsvSupportedLayer = false;
       this.isWCSDownloadSupported = false;
@@ -212,6 +224,7 @@ export class DownloadPanelComponent implements OnInit {
       return;
     }
     let observableResponse = null;
+    // fetch polygon filter
 
     // WCS download
     if (this.isWCSDownloadSupported) {
@@ -247,7 +260,7 @@ export class DownloadPanelComponent implements OnInit {
     // WFS download
     } else {
       this.downloadStarted = true;
-      observableResponse = this.downloadWfsService.download(this.layer, this.bbox)
+      observableResponse = this.downloadWfsService.download(this.layer, this.bbox, null);
     }
 
     observableResponse.subscribe(value => {
@@ -256,6 +269,36 @@ export class DownloadPanelComponent implements OnInit {
       saveAs(blob, 'download.zip');
     }, err => {
       this.downloadStarted = false;
+      if (UtilitiesService.isEmpty(err.message)) {
+        alert('An error has occured whilst attempting to download. Kindly contact cg-admin@csiro.au');
+      } else {
+        alert('An error has occured whilst attempting to download. (' + err.message + ') Kindly contact cg-admin@csiro.au');
+      }
+    });
+  }
+
+   /**
+   * Download the layer
+   */
+  public download4Polygon(): void {
+
+    if (this.download4pStarted) {
+      alert('Download in progress, kindly wait for it to completed');
+      return;
+    }
+    let observableResponse = null;
+
+    // WFS download
+
+      this.download4pStarted = true;
+      observableResponse = this.downloadWfsService.download(this.layer, null, this.polygonFilter);
+
+    observableResponse.subscribe(value => {
+      this.download4pStarted = false;
+      const blob = new Blob([value], {type: 'application/zip'});
+      saveAs(blob, 'download.zip');
+    }, err => {
+      this.download4pStarted = false;
       if (UtilitiesService.isEmpty(err.message)) {
         alert('An error has occured whilst attempting to download. Kindly contact cg-admin@csiro.au');
       } else {
