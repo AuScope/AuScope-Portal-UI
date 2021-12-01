@@ -73,7 +73,7 @@ export class DownloadPanelComponent implements OnInit {
         (polygonBBox) => {
           if (polygonBBox && polygonBBox.coordinates) {
             this.polygonFilter = '<ogc:Filter  xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:gml=\"http://www.opengis.net/gml\"><ogc:Intersects><ogc:PropertyName>gsmlp:shape</ogc:PropertyName>' + polygonBBox.coordinates + '</ogc:Intersects></ogc:Filter>';
-            console.log(this.polygonFilter);
+            //console.log(this.polygonFilter);
           } else {
             this.polygonFilter = null;
           }
