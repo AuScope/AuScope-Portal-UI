@@ -28,6 +28,7 @@ export class DownloadPanelComponent implements OnInit {
   drawStarted: boolean;
   downloadStarted: boolean;
   download4pStarted: boolean;
+  isPolygonSupportedLayer: boolean;
   isCsvSupportedLayer: boolean;
 
   isWCSDownloadSupported: boolean;
@@ -57,6 +58,7 @@ export class DownloadPanelComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.layer) {
+      this.isPolygonSupportedLayer = config.polygonSupportedLayer.indexOf(this.layer.id) >= 0;
       this.isCsvSupportedLayer = config.csvSupportedLayer.indexOf(this.layer.id) >= 0;
       if (config.wcsSupportedLayer[this.layer.id]) {
         this.isWCSDownloadSupported = true;
@@ -72,6 +74,7 @@ export class DownloadPanelComponent implements OnInit {
       this.csClipboardService.polygonsBS.subscribe(
         (polygonBBox) => {
           if (polygonBBox && polygonBBox.coordinates) {
+            this.clearBound();
             this.polygonFilter = '<ogc:Filter  xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:gml=\"http://www.opengis.net/gml\"><ogc:Intersects><ogc:PropertyName>gsmlp:shape</ogc:PropertyName>' + polygonBBox.coordinates + '</ogc:Intersects></ogc:Filter>';
             //console.log(this.polygonFilter);
           } else {
@@ -81,6 +84,7 @@ export class DownloadPanelComponent implements OnInit {
     } else {
       this.isCsvSupportedLayer = false;
       this.isWCSDownloadSupported = false;
+      this.isPolygonSupportedLayer = false;
     }
   }
 
@@ -88,6 +92,7 @@ export class DownloadPanelComponent implements OnInit {
    * Draw bound to get the bbox for download
    */
   public drawBound(): void {
+    this.clearBound();
     setTimeout(() => this.drawStarted = true, 0);
     const me = this;
     this.rectangleObservable = this.csMapService.drawBound();
