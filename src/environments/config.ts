@@ -15,6 +15,16 @@ export const config = {
     'erl-mineraloccurrenceview',
     'erl-commodityresourceview'
   ],
+
+  polygonSupportedLayer: [
+    'mineral-tenements',
+    'tima-geosample',
+    'nvcl-v2-borehole',
+    'tima-shrimp-geosample',
+    'erl-mineview',
+    'erl-mineraloccurrenceview',
+    'erl-commodityresourceview'
+  ],
   // Set 'downloadAreaMaxSize' to Number.MAX_SAFE_INTEGER
   // to disable area download limits
   wcsSupportedLayer: {
