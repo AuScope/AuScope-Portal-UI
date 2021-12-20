@@ -25,7 +25,9 @@ export class CsMapClipboardComponent implements OnInit {
   bShowClipboard: boolean;
   public isFilterLayerShown: boolean;
   public isDrawingPolygon: boolean;
-  
+  kmlFileName = '';
+
+
   constructor(private csClipboardService: CsClipboardService) {
     this.polygonBBox = null;
     this.isFilterLayerShown = false;
@@ -48,6 +50,15 @@ export class CsMapClipboardComponent implements OnInit {
         this.polygonBBox = polygonBBox;
     });
   }
+
+  onFileSelected(event) {
+
+    const file:File = event.target.files[0];
+
+    if (file) {
+      this.csClipboardService.loadPolygonFromKML(file);
+    }
+}
 
   clearClipboard() {
     this.csClipboardService.clearClipboard();
