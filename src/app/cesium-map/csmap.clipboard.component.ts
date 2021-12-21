@@ -51,7 +51,7 @@ export class CsMapClipboardComponent implements OnInit {
     });
   }
 
-  onFileSelected(event) {
+  onKmlFileSelected(event) {
 
     const file:File = event.target.files[0];
 
