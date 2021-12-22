@@ -21,6 +21,8 @@
 		<div class="btn-group mr-2 editor-button-group" role="group">
 			<button (click)='clearClipboard()' type="button" title="Clear polygon" [disabled]="!polygonBBox || isDrawingPolygon" class="cesium-button cesium-toolbar-button editor-button"><em class="fa fa-lg fa-times-circle" aria-hidden="true"></em>Clear</button>
 			<button (click)='drawPolygon()' type="button" title="Draw polygon" [ngStyle]="{'background-color': isDrawingPolygon ? '#282572' : '#303336'}" class="cesium-button cesium-toolbar-button editor-button"><i class="fa fa-lg fa-edit" aria-hidden="true"></i>Draw</button>
+			<input type="file" accept=".kml" class="file-input" (change)="onKmlFileSelected($event)" #KmlFileLoader>
+			<button (click)="KmlFileLoader.click()" type="button" title="Load polygon from KML file" [ngStyle]="{'background-color': isDrawingPolygon ? '#282572' : '#303336'}" class="cesium-button cesium-toolbar-button editor-button"><i class="fa fa-lg fa-file" aria-hidden="true"></i>Load</button>
 			<button (click)='toggleFilterLayers()' type="button" title="Toggle applicable layers" class="cesium-button cesium-toolbar-button editor-button">
 				<i *ngIf="!isFilterLayerShown" class="fa fa-lg fa-toggle-off" aria-hidden="true"></i>
 				<i *ngIf="isFilterLayerShown" class="fa fa-lg fa-toggle-on" aria-hidden="true"></i>
