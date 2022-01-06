@@ -72,7 +72,8 @@ import { PlotlyModule } from 'angular-plotly.js';
 // import { CatalogueSearchComponent } from './menupanel/cataloguesearch/cataloguesearch.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DataExplorerComponent } from './menupanel/data-explorer/data-explorer.component';
-
+import { DataExplorerdRecordModule } from './menupanel/data-explorer-record/data-explorer-record.modules';
+import { RecordModalComponent } from './menupanel/record-modal/record-modal.component';
 PlotlyModule.plotlyjs = PlotlyJS;
 
 
@@ -112,6 +113,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
     MSCLAnalyticComponent,
     HelpMenuComponent,
     DataExplorerComponent,
+    RecordModalComponent,
   ],
   providers: [RectanglesEditorService],
   imports: [
@@ -134,6 +136,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
     BsDropdownModule.forRoot(),
     CommonModule,
     PlotlyModule,
+    DataExplorerdRecordModule,
     AngularCesiumModule.forRoot(),
     AngularCesiumWidgetsModule,
     MatTooltipModule,
@@ -153,6 +156,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
     DisclaimerModalComponent,
     MSCLComponent,
     MSCLAnalyticComponent,
+    RecordModalComponent,   
   ],
   bootstrap: [
     CsMapComponent,
