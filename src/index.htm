@@ -108,8 +108,20 @@
 			</h5>
             <!-- END Custom Layers -->
 
+            <!-- BEGIN Data Explorer -->
+            <input type="checkbox" class="menuBtn" id="dataBtn"/>
+            <h5 class="mb-1">
+                <label for="dataBtn" class="mb-0">
+                    <i class="ti-book"></i>
+                    Data Search
+                    <i class="fa fa-arrow-circle-down"></i>
+                </label>
+                <ul class="card-sub" appDataExplorer></ul>
+            </h5>
+            <!-- END Data Explorer -->
+
             <!-- BEGIN Catalogue Search -->
-            <input type="checkbox" class="menuBtn" id="catalogueBtn"/>
+            <!-- <input type="checkbox" class="menuBtn" id="catalogueBtn"/>
 			<h5 class="mb-1">
 				<label for="catalogueBtn" class="mb-0">
                     <i class="ti-book"></i>
@@ -117,8 +129,8 @@
                     <i class="fa fa-arrow-circle-down"></i>
 				</label>
 				<ul class="card-sub" appCatalogueSearchPanel></ul>
-			</h5>
-            <!-- END Catalogue Search -->
+			</h5> -->
+            <!-- END Catalogue Search -->           
             <hr/>
 			<li appPortalDetailsPanel></li>
 		</nav>

@@ -1,6 +1,5 @@
 import { environment } from '../environments/environment';
 import { config } from '../environments/config';
-import { CatalogueSearchComponent } from './menupanel/cataloguesearch/cataloguesearch.component';
 import { NgModule } from '@angular/core';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { NouisliderModule } from 'ng2-nouislider';
@@ -70,6 +69,10 @@ import { HelpMenuComponent } from './toppanel/help-menu/help-menu.component';
 import * as PlotlyJS from 'plotly.js-dist-min';
 import { PlotlyModule } from 'angular-plotly.js';
 
+// import { CatalogueSearchComponent } from './menupanel/cataloguesearch/cataloguesearch.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { DataExplorerComponent } from './menupanel/data-explorer/data-explorer.component';
+
 PlotlyModule.plotlyjs = PlotlyJS;
 
 
@@ -80,7 +83,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
     LayerPanelComponent,
     CustomPanelComponent,
     ActiveLayersPanelComponent,
-    CatalogueSearchComponent,
+    // CatalogueSearchComponent,
     FilterPanelComponent,
     DownloadPanelComponent,
     NgbdModalStatusReportComponent,
@@ -107,7 +110,8 @@ PlotlyModule.plotlyjs = PlotlyJS;
     PortalDetailsPanelComponent,
     MSCLComponent,
     MSCLAnalyticComponent,
-    HelpMenuComponent
+    HelpMenuComponent,
+    DataExplorerComponent,
   ],
   providers: [RectanglesEditorService],
   imports: [
@@ -132,7 +136,8 @@ PlotlyModule.plotlyjs = PlotlyJS;
     PlotlyModule,
     AngularCesiumModule.forRoot(),
     AngularCesiumWidgetsModule,
-    MatTooltipModule
+    MatTooltipModule,
+    NgbModule,
   ],
   entryComponents: [
     NgbdModalStatusReportComponent,
@@ -147,7 +152,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
     CapdfAnalyticComponent,
     DisclaimerModalComponent,
     MSCLComponent,
-    MSCLAnalyticComponent
+    MSCLAnalyticComponent,
   ],
   bootstrap: [
     CsMapComponent,
@@ -155,7 +160,8 @@ PlotlyModule.plotlyjs = PlotlyJS;
     CustomPanelComponent,
     ActiveLayersPanelComponent,
     //PermanentLinkComponent,
-    CatalogueSearchComponent,
+    // CatalogueSearchComponent,
+    DataExplorerComponent,
     PortalDetailsPanelComponent,
     HelpMenuComponent
   ]
