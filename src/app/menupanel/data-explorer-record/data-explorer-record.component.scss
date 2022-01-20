@@ -1,0 +1,38 @@
+:host {
+    .btn {
+      cursor: pointer;
+      border: none;
+      height: 24px;
+      width: 24px;
+      line-height: 14px;
+      padding: 0px;
+      margin-left: 2px;
+      margin-right: 2px;    }
+  
+    label {
+      width: 100%;
+      margin-left: 4px;
+      margin-right: 4px;
+      height: 24px;
+      line-height: 24px;
+      font-size: 12px;
+    }
+  
+    .text-truncate {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  
+    ::ng-deep {
+      .input-group {
+        height: 24px;
+        line-height: 14px;
+        /* Newer Bootstrap added flex-wrap which completely broke layout */
+        flex-wrap: nowrap;
+      }
+    }
+  
+
+  }
+  

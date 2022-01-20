@@ -1,0 +1,80 @@
+@import '../../globals';
+
+    .card {
+        font-size: small;
+        border-width: 0;
+        margin-left: 0px;
+        padding-left: 0px;
+        
+        .card-body {
+            // padding: 6px;
+            position: relative;
+            left: -20px;
+            .row {
+                margin-bottom: 10px;
+                margin-left: 0px;
+                padding-left: 0px;
+            }
+            li {
+                list-style-type: none;
+            }
+            .submenu-header {
+                padding: 4px;
+                cursor: pointer;
+                // background: #eee;
+                
+            }
+            /* Get rid of borders and grey background from checkboxes */
+            .input-group-text {
+                border: none;
+                background: none;
+            }
+
+            label,input{
+                display: inline-block;
+                vertical-align: middle;
+            }
+
+            /* Position checkboxes and labels e.g. providers, hylogged boreholes */
+            input[type=checkbox] {
+                position: relative;
+                top: 0px;
+            }
+
+            input[type=checkbox] , label {
+                margin-left: 10px;
+            }
+
+            fieldset {
+                border: 1px solid $auscope-grey;
+                margin-right:4px; 
+                margin-top: 6px; 
+                margin-bottom: 4px;
+                padding-bottom: 4px;
+
+                .control-label{
+                    width:auto;
+                    margin-left:4px;
+                }
+                .input-group{
+                    margin-left:4px;
+                    margin-right:4px;
+                }
+                #searchResults{
+                    position:relative;
+                    border-style:solid;
+                    border-color:$auscope-grey;
+                    margin: 0px;
+                    padding: 0px;
+                }
+            }
+            #no-result-container{
+                padding:2px;
+                border:solid 1px $auscope-grey;
+                border-radius:2px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+        }
+    }
+
