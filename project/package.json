@@ -53,6 +53,7 @@
     "ngx-bootstrap": "^5.6.1",
     "ngx-clipboard": "^13.0.0",
     "ngx-webstorage-service": "^4.1.0",
+    "ngx-device-detector": "~2.0.5",
     "nouislider": "^14.2.0",
     "ol": "^6.4.3",
     "ol-geocoder": "^4.0.0",
