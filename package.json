@@ -43,7 +43,7 @@
     "@types/jquery": "^3.3.34",
     "@types/openlayers": "^4.6.17",
     "ajv": "^6.12.3",
-    "angular-cesium": "0.0.66",
+    "angular-cesium": "0.0.73",
     "angular-plotly.js": "^4.0.4",
     "cesium": "^1.75.0",
     "file-saver": "^2.0.2",
@@ -53,7 +53,7 @@
     "simplify-ts": "^1.0.2",
     "ng2-nouislider": "^1.8.2",
     "ngx-bootstrap": "^5.6.1",
-    "ngx-clipboard": "^13.0.0",
+    "ngx-clipboard": "~14.0.2",
     "ngx-webstorage-service": "^4.1.0",
     "ngx-device-detector": "~2.0.5",
     "nouislider": "^14.2.0",
@@ -93,6 +93,6 @@
     "ts-node": "^8.8.2",
     "tslint": "~6.1.0",
     "typedoc": "^0.22.11",
-    "typescript": "~4.0.8"
+    "typescript": "^4.1.5"
   }
 }
