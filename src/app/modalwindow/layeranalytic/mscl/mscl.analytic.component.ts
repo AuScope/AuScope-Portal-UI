@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, Renderer2, ChangeDetectorRef } from '@angular/core';
-import { MSCLService, Metric } from './mscl.service';
+import { MSCLService } from './mscl.service';
 
 @Component({
   selector: 'app-mscl.analytic',
@@ -13,14 +13,14 @@ export class MSCLAnalyticComponent implements OnInit {
     startDepth: number; // Start depth for plotting
     endDepth: number;  // End depth for plotting
     featureId: string;  // Identifier of the borehole
-    metricList: Metric[];  // List of metrics to plot
+    metricList: string[];  // List of metrics to plot
     closeGraphModal: () => null;  // Function to call when the modal dialogue must be closed
     serviceUrl: string; // URL of MSCL service
     processingData = false;
 
-    @ViewChild('graphing_area', { static: true }) public graphing_area: ElementRef;  // Area used to display plots
+    @ViewChild('error_display', { static: true }) public error_display: ElementRef;  // Area used to display error messages
 
-    public allMetricList: Metric[];  // List of all possible metrics
+    public allMetricList: string[];  // List of all possible metrics
 
     public graphInput = {
         data: {},
@@ -42,19 +42,27 @@ export class MSCLAnalyticComponent implements OnInit {
      * Draws the plots
      */
     ngOnInit() {
-        const element = this.graphing_area.nativeElement;
+        const error_display = this.error_display.nativeElement;
         // Fetch data from MSCL service
         this.processingData = true;
         this.msclService.getMSCLDownload(this.serviceUrl, this.featureId, this.startDepth, this.endDepth, this.metricList).subscribe(valuesList => {
+            // Check response
+            if (valuesList == null || !(Symbol.iterator in Object(valuesList))) {
+                this.processingData = false;
+                console.error('Error retrieving MSCL data - bad response from service');
+                this.createModalMessage(error_display, 'Error retrieving MSCL data - bad response from service');
+                return;
+            }
+            
             // Compile lists of X and Y values; plots are vertical, Y is common to all plots
-            const xLists: { Metric: number[] } | {} = {};
+            const xLists: { string: number[] } | {} = {};
             const yList: number[] = [];
             for (const metricEnum of this.metricList) {
                 xLists[metricEnum] = [];
             }
             for (const values of valuesList) {
                 for (const metricEnum of this.metricList) {
-                    const valMetric = this.msclService.fromMetric(metricEnum);
+                    const valMetric = this.msclService.getMetricAttr(metricEnum, 'name');
                     xLists[metricEnum].push(values[valMetric]);
                 }
                 yList.push(values.depth);
@@ -72,18 +80,22 @@ export class MSCLAnalyticComponent implements OnInit {
         }, error => {
             this.processingData = false;
             console.error('Error retrieving MSCL data:', error);
-            this.createModalMessage(element, 'Error retrieving MSCL data');
+            this.createModalMessage(error_display, 'Error retrieving MSCL data');
         });
     }
 
     /**
      * Insert a message into modal dialogue in place of a graph. Used for error conditions.
+     * 
+     * @param element: reference to <div> where message will appear
+     * @param message: message string 
      */
     private createModalMessage(element: ElementRef, message: string) {
         const d2 = this.renderer.createElement('div');
         const text = this.renderer.createText(message);
+        this.renderer.setStyle(element, 'color', 'red');
+        this.renderer.setStyle(element, 'font-size', 'large');
         this.renderer.appendChild(d2, text);
         this.renderer.appendChild(element, d2);
     }
-
 }

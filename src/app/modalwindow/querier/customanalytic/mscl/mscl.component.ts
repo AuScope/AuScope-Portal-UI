@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
 import { LayerModel, OnlineResourceModel, QuerierInfoModel } from '@auscope/portal-core-ui';
-import { MSCLService, Metric } from '../../../layeranalytic/mscl/mscl.service';
+import { MSCLService } from '../../../layeranalytic/mscl/mscl.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { MSCLAnalyticComponent } from '../../../layeranalytic/mscl/mscl.analytic.component';
 
@@ -18,8 +18,8 @@ export class MSCLComponent implements OnInit {
     @Input() doc: QuerierInfoModel;
 
     public msclform: any; // Used to store form data
-    public metricList: Metric[]; // List of metrics selected by user
-    public allMetricList: Metric[];  // List of all possible metrics
+    public metricList: string[]; // List of metrics selected by user
+    public allMetricList: string[];  // List of all possible metrics
     public modalDisplayed = false; // Is modal dialogue displayed?
     public allTicked = false; // Are all tickboxes ticked?
     public showSelectMetricError: boolean; // Show error if no metrics chosen when Draw Graph is pressed
