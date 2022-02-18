@@ -13,14 +13,12 @@ export class MSCLAnalyticComponent implements OnInit {
     startDepth: number; // Start depth for plotting
     endDepth: number;  // End depth for plotting
     featureId: string;  // Identifier of the borehole
-    metricList: string[];  // List of metrics to plot
+    metricList: string[];  // List of metric enums to plot
     closeGraphModal: () => null;  // Function to call when the modal dialogue must be closed
     serviceUrl: string; // URL of MSCL service
     processingData = false;
 
     @ViewChild('error_display', { static: true }) public error_display: ElementRef;  // Area used to display error messages
-
-    public allMetricList: string[];  // List of all possible metrics
 
     public graphInput = {
         data: {},
@@ -35,7 +33,6 @@ export class MSCLAnalyticComponent implements OnInit {
      * @param msclService service used to retrieve MCSL data
      */
     constructor(public msclService: MSCLService, private renderer: Renderer2, private changeDetectorRef: ChangeDetectorRef) {
-        this.allMetricList = this.msclService.getMetricList();
     }
 
     /**
@@ -62,8 +59,8 @@ export class MSCLAnalyticComponent implements OnInit {
             }
             for (const values of valuesList) {
                 for (const metricEnum of this.metricList) {
-                    const valMetric = this.msclService.getMetricAttr(metricEnum, 'name');
-                    xLists[metricEnum].push(values[valMetric]);
+                    const featName = this.msclService.getMetricInfoAttr(metricEnum, 'feat_elem');
+                    xLists[metricEnum].push(values[featName]);
                 }
                 yList.push(values.depth);
             }

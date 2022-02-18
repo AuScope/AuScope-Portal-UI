@@ -15,7 +15,7 @@ const ReflectWavelength = [ '400', '410',	'420',	'430',	'440',	'450',	'460',	'47
                         	'490',	'500',	'510',	'520',	'530',	'540',	'550',	'560',	'570',	'580',	
                             '590', '600',	'610',	'620',	'630',	'640',	'650',	'660',	'670',	'680',	'690',	'700'];
 
-// This is a list of many of the dislayable metrics for MSCL data, others are added programmatically
+// This is a list of string enums. These are many of the dislayable metrics for MSCL data, others are added programmatically
 export enum Metric { diameter = "diameter",
             pWaveAmp = "pWaveAmp",
             pWaveVel = "pWaveVel",
@@ -48,7 +48,7 @@ export enum Metric { diameter = "diameter",
 
 // Interface used to store information about each metric
 interface Info {
-    name: string, // Printable name
+    pname: string, // Printable name
     group: string, // Name of group, if any
     desc: string, // Description
     units: string, // Units of measurement
@@ -57,32 +57,32 @@ interface Info {
 
 // A map from a string enum to the 'Info' object
 let metricMap: Map<string, Info> = new Map( [
-    [ Metric.diameter, { name: 'Diameter', group: '', desc: 'Diameter', units: '', feat_elem: 'diameter'}],
-    [ Metric.pWaveVel, { name: 'P-Wave Vel.', group: 'P-Wave', desc: 'P-Wave Velocity', units: 'm/s', feat_elem: 'p_wave_velocity'}],
-    [ Metric.pWaveAmp, { name: 'P-Wave Amp.', group: 'P-Wave', desc: 'P-Wave Amplitude', units: '', feat_elem: 'p_wave_amplitude'}],
-    [ Metric.density,  { name: 'Density', group: '', desc: 'Density', units: '', feat_elem: 'density'} ],
-    [ Metric.magSuscPoint, { name: 'Mag. Susc. Point', group: 'Mag. Susc.', desc: 'Magnetic Susceptibility Point', units: 'SI x 10^-5', feat_elem: 'magnetic_susceptibility'}  ],
-    [ Metric.magSuscLoopVC, { name: 'Mag. Susc. LoopVC', group: 'Mag. Susc.', desc: 'Magnetic Susceptibility Loop Volume Corrected', units: 'SI x 10^-5', feat_elem: 'magnetic_susc_loop_vc'}  ],
-    [ Metric.magSuscLoopDC, { name: 'Mag. Susc. LoopDC', group: 'Mag. Susc.', desc: 'Magnetic Susceptibility Loop Density Corrected', units: 'SI x 10^-5', feat_elem: 'magnetic_susc_loop_dc'}  ],
-    [ Metric.impedance,  { name: 'Impedance', group: '', desc: 'Impedance', units: '', feat_elem: 'impedance'} ],
-    [ Metric.naturalGamma,  { name: 'Natural Gamma Cnt', group: 'Natural Gamma', desc: 'Natural Gamma Total Count', units: 'cps', feat_elem: 'natural_gamma' } ],
-    [ Metric.naturalGammaK,  { name: 'Natural Gamma K', group: 'Natural Gamma', desc: 'Natural Gamma Potassium', units: '%', feat_elem: 'natural_gamma_k' } ],
-    [ Metric.naturalGammaU,  { name: 'Natural Gamma U', group: 'Natural Gamma', desc: 'Natural Gamma Uranium', units: 'ppm', feat_elem: 'natural_gamma_u' } ],
-    [ Metric.naturalGammaTh,  { name: 'Natural Gamma Th', group: 'Natural Gamma', desc: 'Natural Gamma Thorium', units: 'ppm', feat_elem: 'natural_gamma_th' } ],
-    [ Metric.resistivity,   { name: 'Resistivity', group: '', desc: 'Resistivity', units: 'Ohm.m', feat_elem: 'resistivity' } ],
-    [ Metric.fracPorosity, { name: 'Frac. Porosity', group: '', desc: 'Fractional Porosity', units:'', feat_elem: 'frac_porosity'}],
-    [ Metric.temperature, { name: 'Temperature', group: '', desc: 'Temperature', units: '°C', feat_elem: 'temperature'}],
-    [ Metric.munsell, { name: 'Munsell Val.', group: 'Spectrophot', desc: 'Spectrophotometer Munsell Value', units: '', feat_elem: 'sp_munsell'}],
-    [ Metric.cieColourL, { name: 'CIE Colour L*', group: 'Spectrophot', desc: 'Spectrophotometer Colour L*', units: '', feat_elem: 'sp_cie_colour_l'}],
-    [ Metric.cieColourA, { name: 'CIE Colour a*', group: 'Spectrophot', desc: 'Spectrophotometer Colour a*', units: '', feat_elem: 'sp_cie_colour_a'}],
-    [ Metric.cieColourB, { name: 'CIE Colour b*', group: 'Spectrophot', desc: 'Spectrophotometer Colour b*', units: '', feat_elem: 'sp_cie_colour_b'}],
-    [ Metric.cieColourX, { name: 'CIE Colour X', group: 'Spectrophot', desc: 'Spectrophotometer Colour X', units: '', feat_elem: 'sp_cie_colour_x'}],
-    [ Metric.cieColourY, { name: 'CIE Colour Y', group: 'Spectrophot', desc: 'Spectrophotometer Colour Y', units: '', feat_elem: 'sp_cie_colour_y'}],
-    [ Metric.cieColourZ, { name: 'CIE Colour Z', group: 'Spectrophot', desc: 'Spectrophotometer Colour Z', units: '', feat_elem: 'sp_cie_colour_z'}],
-    [ Metric.reflectRed, { name: 'Reflect. Red', group: 'Spectrophot', desc: 'Spectrophotometer Reflectance Red (595 - 700)', units: '', feat_elem: 'sp_refl_red'}],
-    [ Metric.reflectRed, { name: 'Reflect. Green', group: 'Spectrophot', desc: 'Spectrophotometer Reflectance Green (515 - 595)', units: '', feat_elem: 'sp_refl_green'}],
-    [ Metric.reflectRed, { name: 'Reflect. Blue', group: 'Spectrophot', desc: 'Spectrophotometer Reflectance Blue (400 - 515)', units: '', feat_elem: 'sp_refl_blue'}],
-    [ Metric.unknown, { name: 'Unknown', group: '', desc: 'Unrecognised metric', units: '', feat_elem: ''}]
+    [ Metric.diameter, { pname: 'Diameter', group: '', desc: 'Diameter', units: '', feat_elem: 'diameter'}],
+    [ Metric.pWaveVel, { pname: 'P-Wave Vel.', group: '', desc: 'P-Wave Velocity', units: 'm/s', feat_elem: 'p_wave_velocity'}],
+    [ Metric.pWaveAmp, { pname: 'P-Wave Amp.', group: '', desc: 'P-Wave Amplitude', units: '', feat_elem: 'p_wave_amplitude'}],
+    [ Metric.density,  { pname: 'Density', group: '', desc: 'Density', units: '', feat_elem: 'density'} ],
+    [ Metric.magSuscPoint, { pname: 'Mag. Susc. Point', group: '', desc: 'Magnetic Susceptibility Point', units: 'SI x 10^-5', feat_elem: 'magnetic_susc_point'}  ],
+    [ Metric.magSuscLoopVC, { pname: 'Mag. Susc. LoopVC', group: '', desc: 'Magnetic Susceptibility Loop Volume Corrected', units: 'SI x 10^-5', feat_elem: 'magnetic_susceptibility'}  ],
+    [ Metric.magSuscLoopDC, { pname: 'Mag. Susc. LoopDC', group: '', desc: 'Magnetic Susceptibility Loop Density Corrected', units: 'SI x 10^-5', feat_elem: 'magnetic_susc_loop_dc'}  ],
+    [ Metric.impedance,  { pname: 'Impedance', group: '', desc: 'Impedance', units: '', feat_elem: 'impedance'} ],
+    [ Metric.naturalGamma,  { pname: 'Natural Gamma', group: '', desc: 'Natural Gamma Total Count', units: 'cps', feat_elem: 'natural_gamma' } ],
+    [ Metric.naturalGammaK,  { pname: 'Natural Gamma K', group: '', desc: 'Natural Gamma Potassium', units: '%', feat_elem: 'natural_gamma_k' } ],
+    [ Metric.naturalGammaU,  { pname: 'Natural Gamma U', group: '', desc: 'Natural Gamma Uranium', units: 'ppm', feat_elem: 'natural_gamma_u' } ],
+    [ Metric.naturalGammaTh,  { pname: 'Natural Gamma Th', group: '', desc: 'Natural Gamma Thorium', units: 'ppm', feat_elem: 'natural_gamma_th' } ],
+    [ Metric.resistivity,   { pname: 'Resistivity', group: '', desc: 'Resistivity', units: 'Ohm.m', feat_elem: 'resistivity' } ],
+    [ Metric.fracPorosity, { pname: 'Frac. Porosity', group: '', desc: 'Fractional Porosity', units:'', feat_elem: 'frac_porosity'}],
+    [ Metric.temperature, { pname: 'Temperature', group: '', desc: 'Temperature', units: '°C', feat_elem: 'temperature'}],
+    [ Metric.munsell, { pname: 'Munsell Val.', group: 'Spectrophot', desc: 'Spectrophotometer Munsell Value', units: '', feat_elem: 'sp_munsell'}],
+    [ Metric.cieColourL, { pname: 'CIE Colour L*', group: 'Spectrophot', desc: 'Spectrophotometer Colour L*', units: '', feat_elem: 'sp_cie_colour_l'}],
+    [ Metric.cieColourA, { pname: 'CIE Colour a*', group: 'Spectrophot', desc: 'Spectrophotometer Colour a*', units: '', feat_elem: 'sp_cie_colour_a'}],
+    [ Metric.cieColourB, { pname: 'CIE Colour b*', group: 'Spectrophot', desc: 'Spectrophotometer Colour b*', units: '', feat_elem: 'sp_cie_colour_b'}],
+    [ Metric.cieColourX, { pname: 'CIE Colour X', group: 'Spectrophot', desc: 'Spectrophotometer Colour X', units: '', feat_elem: 'sp_cie_colour_x'}],
+    [ Metric.cieColourY, { pname: 'CIE Colour Y', group: 'Spectrophot', desc: 'Spectrophotometer Colour Y', units: '', feat_elem: 'sp_cie_colour_y'}],
+    [ Metric.cieColourZ, { pname: 'CIE Colour Z', group: 'Spectrophot', desc: 'Spectrophotometer Colour Z', units: '', feat_elem: 'sp_cie_colour_z'}],
+    [ Metric.reflectRed, { pname: 'Reflect. Red', group: 'Spectrophot', desc: 'Spectrophotometer Reflectance Red (595 - 700)', units: '', feat_elem: 'sp_refl_red'}],
+    [ Metric.reflectRed, { pname: 'Reflect. Green', group: 'Spectrophot', desc: 'Spectrophotometer Reflectance Green (515 - 595)', units: '', feat_elem: 'sp_refl_green'}],
+    [ Metric.reflectRed, { pname: 'Reflect. Blue', group: 'Spectrophot', desc: 'Spectrophotometer Reflectance Blue (400 - 515)', units: '', feat_elem: 'sp_refl_blue'}],
+    [ Metric.unknown, { pname: 'Unknown', group: '', desc: 'Unrecognised metric', units: '', feat_elem: ''}]
 ])
 
 // Smoothing window list - list of smoothing windows applied to smooth out graph lines
@@ -98,12 +98,12 @@ export class MSCLService {
 
         // Setup the map with the numerous XRF elements
         for (let elem of XRFElem) {
-            metricMap.set("XRF_" + elem, { name: 'XRF ' + elem,
+            metricMap.set("XRF_" + elem, { pname: 'XRF ' + elem,
                                         group: 'XRF',
                                         desc: 'XRF measurement of ' + elem,
                                         units: '',
                                         feat_elem: 'xrf_' + elem});
-            metricMap.set("XRF_" + elem + "_Error", { name: 'XRF ' + elem + ' Error',
+            metricMap.set("XRF_" + elem + "_Error", { pname: 'XRF ' + elem + ' Error',
                                         group: 'XRF',
                                         desc: 'XRF measurement of ' + elem + ' Error',
                                         units: '',
@@ -112,7 +112,7 @@ export class MSCLService {
 
         // Setup the map with the spectrophotometer reflectance wavelengths
         for (let w of ReflectWavelength) {
-            metricMap.set("Reflect_" + w, { name: 'Reflect. '+ w,
+            metricMap.set("Reflect_" + w, { pname: 'Reflect. '+ w,
                                             group: 'Spectrophot',
                                             desc: 'Spectrophotometer Reflectance at wavelength ' + w + 'nm',
                                             units: 'nm',
@@ -122,15 +122,34 @@ export class MSCLService {
 
 
     /**
-     * @returns a complete list of metric names for MSCL data service
+     * Returns a complete list of printable metrics if no parameter supplied or converts a list of feature element names to printable names
+     * 
+     * @featList optional list of features to convert to printable names
+     * @returns a list of printable metric names for MSCL data service
      */
-    public getMetricList(): string[] {
+    public getMetricPNameList(featList?: string[]): string[] {
         let retList = [];
-        for (let mm of metricMap.values()) {
-            if (mm.group === '') {
-                retList.push(mm.name);
-            } else if (!retList.includes(mm.group)) {
-                retList.push(mm.group);
+        if (featList) {
+            // Convert feature name list to a list of names and group names
+            for (let featElem of featList) {
+                for (let mm of metricMap.values()) {
+                    if (mm.feat_elem === featElem) {
+                        if (mm.group !== '' && !retList.includes(mm.group)) {
+                            retList.push(mm.group);
+                        } else if (!retList.includes(mm.pname)) {
+                            retList.push(mm.pname);
+                        }
+                    }
+                }
+            }
+        } else {
+            // Return full list of names and group names
+            for (let mm of metricMap.values()) {
+                if (mm.group === '') {
+                    retList.push(mm.pname);
+                } else if (!retList.includes(mm.group)) {
+                    retList.push(mm.group);
+                }
             }
         }
         return retList;
@@ -176,7 +195,7 @@ export class MSCLService {
      * @param featAttr  WFS feature representation of a metric, e.g. 'p_wave_amplitude'
      * @returns Metric representation of apiString
      */
-    public toMetric(featAttr: string): string {
+    public toMetricEnum(featAttr: string): string {
         for (let m of metricMap.keys()) {
             if (metricMap.get(m).feat_elem === featAttr) {
                 return m;
@@ -187,16 +206,16 @@ export class MSCLService {
 
 
     /**
-     * Converts from Metric to WFS feature attribute string
+     * Converts from printable metric name to Info member string
      * 
-     * @param metricName Name of metric to be converted
+     * @param metricPName Printable name of metric to be converted
      * @param attr 'Info' attribute to be retrieved
      * @returns string representation of metric
      */
-    public getMetricAttr(metricName: string, attr: string): string {
-        for (let m of metricMap.keys()) {
-            if (metricMap.get(m).name === metricName) {
-                return metricMap.get(m)[attr];
+    public getMetricInfoAttr(metricPName: string, attr: string): string {
+        for (let info of metricMap.values()) {
+            if (info.pname === metricPName) {
+                return info[attr];
             }
         }
         return "";
@@ -425,7 +444,7 @@ export class MSCLService {
         httpParams = httpParams.append('startDepth', startDepth.toString());
         httpParams = httpParams.append('endDepth', endDepth.toString());
         for (const metric of metricList) {
-            const feat_elem = this.getMetricAttr(metric, 'feat_elem');
+            const feat_elem = this.getMetricInfoAttr(metric, 'feat_elem');
             if (feat_elem != '') {
                 httpParams = httpParams.append('observationsToReturn', feat_elem);
             } else if (this.isMetricGroup(metric)) {

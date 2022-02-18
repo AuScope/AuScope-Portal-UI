@@ -13,7 +13,7 @@
                     <label for="mscl-metrics-all">&nbsp;ALL</label>
                 </div>
                     <div class="form-row">
-                        <div *ngFor="let metric of allMetricList">
+                        <div *ngFor="let metric of metricPNameList">
                                 <div class="checkbox col">
                                     <input id="mscl-metrics" type="checkbox" [(ngModel)]="msclform.bMetric[metric]" />
                                     <label for="mscl-metrics">&nbsp;{{metric}}</label>
