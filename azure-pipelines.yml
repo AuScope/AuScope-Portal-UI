@@ -26,5 +26,6 @@ stages:
       inputs:
         command: 'build'
         Dockerfile: '**/Dockerfile'
+        buildContext: '.'
         tags: '$(tag)'
         arguments: '--build-arg BUILDTYPE=build-dev'
