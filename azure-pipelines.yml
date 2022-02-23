@@ -27,4 +27,4 @@ stages:
         command: 'build'
         Dockerfile: '**/Dockerfile'
         tags: '$(tag)'
-        arguments: 'BUILDTYPE=build-dev'
+        arguments: '--build-arg BUILDTYPE=build-dev'
