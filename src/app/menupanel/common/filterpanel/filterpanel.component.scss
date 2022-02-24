@@ -11,3 +11,15 @@ div.red {
 .warning-icon {
     color: orange;
 }
+
+.unsupported-layer-message {
+    margin-top: 8px;
+}
+
+.unclickable-btn {
+    pointer-events: none;
+}
+
+.date-btn {
+    position: absolute;
+}
