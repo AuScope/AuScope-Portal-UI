@@ -1,4 +1,4 @@
-import { CsClipboardService, CsMapService, CsWMSService, FilterPanelService, LayerHandlerService,
+import { CsClipboardService, CsMapService, CsWMSService, FilterPanelService, GetCapsService, LayerHandlerService,
          LayerModel, LayerStatusService, ManageStateService, UtilitiesService } from '@auscope/portal-core-ui';
 import * as $ from 'jquery';
 import { Component, Input, OnInit } from '@angular/core';
@@ -7,7 +7,6 @@ import { environment } from '../../../../environments/environment';
 import { ref } from '../../../../environments/ref';
 import { LayerAnalyticModalComponent } from '../../../modalwindow/layeranalytic/layer.analytic.modal.component';
 import { BsModalService } from 'ngx-bootstrap/modal';
-import { AuscopeApiService } from 'app/services/api/auscope-api.service';
 
 declare var gtag: Function;
 
@@ -40,7 +39,7 @@ export class FilterPanelComponent implements OnInit {
               private csClipboardService: CsClipboardService,
               private csWMSService: CsWMSService,
               public layerStatus: LayerStatusService,
-              private auscopeApiService: AuscopeApiService) {
+              private getCapsService: GetCapsService) {
     this.providers = [];
     this.optionalFilters = [];
     this.analyticMap = ref.layeranalytic;
@@ -373,7 +372,6 @@ export class FilterPanelComponent implements OnInit {
     this.timeExtent = [];
     let wmsEndpointUrl = null;
     let layerName = null;
-    let version = "1.1.1";
     // Check if WMS capability record present and time extent set
     const layerCapRec = this.layer.capabilityRecords.find(c => c.serviceType.toLowerCase() === 'wms');
     if (layerCapRec && layerCapRec.layers.length > 0) {
@@ -389,17 +387,17 @@ export class FilterPanelComponent implements OnInit {
       if (resource) {
         wmsEndpointUrl = resource.url;
         layerName = resource.name;
-        if (resource['version'] !== "") {
-          version = resource['version'];
-        }
       }
     }
     // Query WMS GetCapabilities for timeExtent
     if (wmsEndpointUrl !== null && layerName !== null) {
       this.loadingTimeExtent = true;
-      this.auscopeApiService.getWmsCapabilities(wmsEndpointUrl, version).subscribe(response => {
-        if (response.layers) {
-          const responseLayers = response.layers.filter(l => l.name === layerName);
+      if (wmsEndpointUrl.indexOf('?') !== -1) {
+        wmsEndpointUrl = wmsEndpointUrl.substring(0, wmsEndpointUrl.indexOf('?'));
+      }
+      this.getCapsService.getCaps(wmsEndpointUrl).subscribe(response => {
+        if (response.data.capabilityRecords.length === 1 && response.data.capabilityRecords[0].layers.length > 0) {
+          const responseLayers = response.data.capabilityRecords[0].layers.filter(l => l.name === layerName);
           if (responseLayers && responseLayers.length > 0 && responseLayers[0].timeExtent) {
             // Sort by date (newest first)
             this.timeExtent = responseLayers[0].timeExtent.sort((a, b) => {
@@ -407,8 +405,8 @@ export class FilterPanelComponent implements OnInit {
             });
             this.currentTime = this.timeExtent[0];
           }
-          this.loadingTimeExtent = false;
         }
+        this.loadingTimeExtent = false;
       }, () => {
         this.loadingTimeExtent = false;
       });
