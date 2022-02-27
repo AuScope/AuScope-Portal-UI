@@ -373,20 +373,26 @@ export class FilterPanelComponent implements OnInit {
     let wmsEndpointUrl = null;
     let layerName = null;
     // Check if WMS capability record present and time extent set
-    const layerCapRec = this.layer.capabilityRecords.find(c => c.serviceType.toLowerCase() === 'wms');
-    if (layerCapRec && layerCapRec.layers.length > 0) {
-      if (layerCapRec.layers[0].timeExtent) {
-        this.timeExtent = layerCapRec.layers[0].timeExtent;
-        this.currentTime = this.timeExtent[0];
+    if (this.layer.capabilityRecords && this.layer.capabilityRecords.length > 0) {
+      const layerCapRec = this.layer.capabilityRecords.find(c => c.serviceType.toLowerCase() === 'wms');
+      if (layerCapRec && layerCapRec.layers.length > 0) {
+        if (layerCapRec.layers[0].timeExtent) {
+          this.timeExtent = layerCapRec.layers[0].timeExtent;
+          this.currentTime = this.timeExtent[0];
+        }
       }
     }
     // Look for WMS endpoint in CSW records if not already found
-    if (!this.currentTime && this.layer.cswRecords.length > 0) {
-      const resource = this.layer.cswRecords.find(rec => rec.onlineResources.find(
-        o => o.type.toLowerCase() === "wms")).onlineResources.find(o => o.type.toLowerCase() === "wms");
-      if (resource) {
-        wmsEndpointUrl = resource.url;
-        layerName = resource.name;
+    if (!this.currentTime && this.layer.cswRecords && this.layer.cswRecords.length > 0) {
+      for (const cswRecord of this.layer.cswRecords) {
+        if (cswRecord.onlineResources) {
+          const resource = cswRecord.onlineResources.find(o => o.type.toLowerCase() === 'wms');
+          if (resource) {
+            wmsEndpointUrl = resource.url;
+            layerName = resource.name;
+            continue;
+          }
+        }
       }
     }
     // Query WMS GetCapabilities for timeExtent

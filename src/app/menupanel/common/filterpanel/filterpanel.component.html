@@ -118,7 +118,7 @@
 		<div ngbDropdown *ngIf="currentTime">
 			<button *ngIf="!loadingTimeExtent && timeExtent.length === 1" type="button" class="btn btn-info btn-sm date-btn unclickable-btn" style="cursor:default;"><i class="fa fa-calendar"></i>&nbsp;&nbsp;{{ currentTime | date }}</button>
 			<button *ngIf="!loadingTimeExtent && timeExtent.length > 1" type="button" class="btn btn-info btn-sm date-btn" ngbDropdownToggle><i class="fa fa-calendar"></i>&nbsp;&nbsp;{{ currentTime | date }}</button>
-			<div *ngIf="!loadingTimeExtent && timeExtent && timeExtent.length > 1" ngbDropdownMenu>
+			<div class="dropdown-menu" *ngIf="!loadingTimeExtent && timeExtent && timeExtent.length > 1" ngbDropdownMenu>
 				<div *ngFor="let d of timeExtent">
 					<button ngbDropdownItem (click)="changeCurrentTime(d)">{{ d | date }}</button>
 				</div>

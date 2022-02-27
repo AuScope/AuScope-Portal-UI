@@ -20,6 +20,15 @@ div.red {
     pointer-events: none;
 }
 
+:host {
+    ::ng-deep {
+        .dropdown-menu {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    }
+}
+
 .date-btn {
     position: absolute;
 }
