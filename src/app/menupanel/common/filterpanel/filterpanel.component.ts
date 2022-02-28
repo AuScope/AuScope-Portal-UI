@@ -1,4 +1,4 @@
-import { CsClipboardService, CsMapService, CsWMSService, FilterPanelService, LayerHandlerService,
+import { CsClipboardService, CsMapService, CsWMSService, FilterPanelService, GetCapsService, LayerHandlerService,
          LayerModel, LayerStatusService, ManageStateService, UtilitiesService } from '@auscope/portal-core-ui';
 import * as $ from 'jquery';
 import { Component, Input, OnInit } from '@angular/core';
@@ -16,6 +16,7 @@ declare var gtag: Function;
   styleUrls: ['./filterpanel.component.scss', '../../menupanel.scss']
 })
 export class FilterPanelComponent implements OnInit {
+
   @Input() layer: LayerModel;
   private providers: Array<Object>;
   public optionalFilters: Array<Object>;
@@ -25,17 +26,20 @@ export class FilterPanelComponent implements OnInit {
   public advanceFilterMap;
   public showAdvanceFilter = false;
   public bApplyClipboardBBox = true;
+  public timeExtent: Date[] = [];             // WMS time extent (optional)
+  public currentTime: Date;                   // Current selected WMS time (from timeExtent)
+  public loadingTimeExtent: boolean = false;  // Flag for WMS times loading
 
-  constructor(
-    private csMapService: CsMapService,
-    private layerHandlerService: LayerHandlerService,
-    private filterPanelService: FilterPanelService,
-    private modalService: BsModalService,
-    private manageStateService: ManageStateService,
-    private csClipboardService: CsClipboardService,
-    private csWMSService: CsWMSService,
-    public layerStatus: LayerStatusService
-  ) {
+
+  constructor(private csMapService: CsMapService,
+              private layerHandlerService: LayerHandlerService,
+              private filterPanelService: FilterPanelService,
+              private modalService: BsModalService,
+              private manageStateService: ManageStateService,
+              private csClipboardService: CsClipboardService,
+              private csWMSService: CsWMSService,
+              public layerStatus: LayerStatusService,
+              private getCapsService: GetCapsService) {
     this.providers = [];
     this.optionalFilters = [];
     this.analyticMap = ref.layeranalytic;
@@ -88,6 +92,9 @@ export class FilterPanelComponent implements OnInit {
         });
       }
     }
+
+    // Set time extent if WMS and present
+    this.setLayerTimeExtent();
   }
 
   /**
@@ -174,6 +181,11 @@ export class FilterPanelComponent implements OnInit {
       }
     }
     // VT: End append
+
+    // WMS layers may have a time set
+    if (this.currentTime) {
+      param['time'] = this.currentTime;
+    }
 
     // Add layer      
     this.csMapService.addLayer(layer, param);
@@ -351,4 +363,75 @@ export class FilterPanelComponent implements OnInit {
     });
     bsModalRef.content.layer = layer;
   }
+
+  /**
+   * Set time extent for a layer, first looking at the layer's capability records
+   * and then the CSW records.
+   */
+  private setLayerTimeExtent() {
+    this.timeExtent = [];
+    let wmsEndpointUrl = null;
+    let layerName = null;
+    // Check if WMS capability record present and time extent set
+    if (this.layer.capabilityRecords && this.layer.capabilityRecords.length > 0) {
+      const layerCapRec = this.layer.capabilityRecords.find(c => c.serviceType.toLowerCase() === 'wms');
+      if (layerCapRec && layerCapRec.layers.length > 0) {
+        if (layerCapRec.layers[0].timeExtent) {
+          this.timeExtent = layerCapRec.layers[0].timeExtent;
+          this.currentTime = this.timeExtent[0];
+        }
+      }
+    }
+    // Look for WMS endpoint in CSW records if not already found
+    if (!this.currentTime && this.layer.cswRecords && this.layer.cswRecords.length > 0) {
+      for (const cswRecord of this.layer.cswRecords) {
+        if (cswRecord.onlineResources) {
+          const resource = cswRecord.onlineResources.find(o => o.type.toLowerCase() === 'wms');
+          if (resource) {
+            wmsEndpointUrl = resource.url;
+            layerName = resource.name;
+            continue;
+          }
+        }
+      }
+    }
+    // Query WMS GetCapabilities for timeExtent
+    if (wmsEndpointUrl !== null && layerName !== null) {
+      this.loadingTimeExtent = true;
+      if (wmsEndpointUrl.indexOf('?') !== -1) {
+        wmsEndpointUrl = wmsEndpointUrl.substring(0, wmsEndpointUrl.indexOf('?'));
+      }
+      this.getCapsService.getCaps(wmsEndpointUrl).subscribe(response => {
+        if (response.data.capabilityRecords.length === 1 && response.data.capabilityRecords[0].layers.length > 0) {
+          const responseLayers = response.data.capabilityRecords[0].layers.filter(l => l.name === layerName);
+          if (responseLayers && responseLayers.length > 0 && responseLayers[0].timeExtent) {
+            // Sort by date (newest first)
+            this.timeExtent = responseLayers[0].timeExtent.sort((a, b) => {
+              return <any>new Date(b) - <any>new Date(a);
+            });
+            this.currentTime = this.timeExtent[0];
+          }
+        }
+        this.loadingTimeExtent = false;
+      }, () => {
+        this.loadingTimeExtent = false;
+      });
+    }
+  }
+
+  /**
+   * WMS date dropdown change event, set the current time
+   * 
+   * @param newDate new date chosen from time extent
+   */
+  public changeCurrentTime(newDate: Date) {
+    this.currentTime = newDate;
+    // Re-add layer to map
+    let layerModelList = this.csMapService.getLayerModelList();
+    if (layerModelList.hasOwnProperty(this.layer.id)) {
+      this.csMapService.removeLayer(layerModelList[this.layer.id]);
+    }
+    this.addLayer(this.layer);
+  }
+
 }

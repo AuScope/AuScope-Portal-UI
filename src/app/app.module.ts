@@ -63,8 +63,11 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { MSCLComponent } from './modalwindow/querier/customanalytic/mscl/mscl.component';
 import { MSCLAnalyticComponent } from './modalwindow/layeranalytic/mscl/mscl.analytic.component';
 
-import { RectanglesEditorService } from 'angular-cesium';
 import { HelpMenuComponent } from './toppanel/help-menu/help-menu.component';
+
+// Services
+import { AuscopeApiService } from './services/api/auscope-api.service';
+import { RectanglesEditorService } from 'angular-cesium';
 
 import * as PlotlyJS from 'plotly.js-dist-min';
 import { PlotlyModule } from 'angular-plotly.js';
@@ -74,6 +77,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DataExplorerComponent } from './menupanel/data-explorer/data-explorer.component';
 import { DataExplorerdRecordModule } from './menupanel/data-explorer-record/data-explorer-record.modules';
 import { RecordModalComponent } from './menupanel/record-modal/record-modal.component';
+
+
 PlotlyModule.plotlyjs = PlotlyJS;
 
 
@@ -113,9 +118,9 @@ PlotlyModule.plotlyjs = PlotlyJS;
     MSCLAnalyticComponent,
     HelpMenuComponent,
     DataExplorerComponent,
-    RecordModalComponent,
+    RecordModalComponent
   ],
-  providers: [RectanglesEditorService],
+  providers: [ AuscopeApiService, RectanglesEditorService ],
   imports: [
     PortalCoreModule.forRoot(environment, config),
     PortalCorePipesModule,
