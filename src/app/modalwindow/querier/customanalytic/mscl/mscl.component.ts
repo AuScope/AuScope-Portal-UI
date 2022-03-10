@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
 import { LayerModel, OnlineResourceModel, QuerierInfoModel } from '@auscope/portal-core-ui';
-import { MSCLService, Metric } from '../../../layeranalytic/mscl/mscl.service';
+import { MSCLService } from '../../../layeranalytic/mscl/mscl.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { MSCLAnalyticComponent } from '../../../layeranalytic/mscl/mscl.analytic.component';
 
@@ -17,9 +17,14 @@ export class MSCLComponent implements OnInit {
     @Input() featureId: string;
     @Input() doc: QuerierInfoModel;
 
-    public msclform: any; // Used to store form data
-    public metricList: Metric[]; // List of metrics selected by user
-    public allMetricList: Metric[];  // List of all possible metrics
+    public msclform: { startDepth: number, endDepth: number, bMetric: {}, bGroup: {} }; // Used to store form data
+                       // startDepth = start depth
+                       // endDepth = end depth
+                       // bMetric = metric tickbox, dict: key is printable name, val is boolean
+                       // bGroup = group metric tickbox, dict: key is printable name, val is boolean
+
+    public metricPNameList: string[];  // Printable list of all selectable metrics
+    public metricGroupList: string[]; // List of selectable group names
     public modalDisplayed = false; // Is modal dialogue displayed?
     public allTicked = false; // Are all tickboxes ticked?
     public showSelectMetricError: boolean; // Show error if no metrics chosen when Draw Graph is pressed
@@ -27,8 +32,9 @@ export class MSCLComponent implements OnInit {
     private bsModalRef: BsModalRef;
 
     constructor(public msclService: MSCLService, private modalService: BsModalService, private changeDetectorRef: ChangeDetectorRef) {
-        this.msclform = {};
-        this.allMetricList = this.msclService.getMetricList();
+        this.msclform = { startDepth: 0.0, endDepth: 2000.0, bMetric: {}, bGroup: {} };
+        this.metricPNameList = [];
+        this.metricGroupList = [];
     }
 
     ngOnInit() {
@@ -36,9 +42,26 @@ export class MSCLComponent implements OnInit {
         this.msclform.startDepth = 0;
         this.msclform.endDepth = 2000;
         this.msclform.bMetric = {};
+        this.msclform.bGroup = {};
         this.showSelectMetricError = false;
-        for (const metric of this.allMetricList) {
-            this.msclform.bMetric[metric] = false;
+        // Extract the available metrics from the "datasetProperties" XML element in the WFS response
+        // "datasetProperties" is a list of the metrics available in this borehole's dataset
+        // The members of the list take the form of XML element names  e.g. p_wave_velocity
+        const metrics = /<gsmlp:datasetProperties>[a-z_,]*<\/gsmlp:datasetProperties>/.exec(this.doc.raw).toString();
+        // Remove tags at ends and convert to a list
+        const metricList = metrics.substring(25, metrics.length - 26).split(",");
+        this.metricPNameList = this.msclService.getMetricPNameList(metricList)
+
+        // Given list of metrics, set up the data structures that support tickboxes
+        for (const pName of this.metricPNameList) {
+            this.msclform.bMetric[pName] = false;
+            const group = this.msclService.pNameToGroup(pName);
+            if (group !== '') {
+                this.msclform.bGroup[group] = false;
+                if (!this.metricGroupList.includes(group)) {
+                    this.metricGroupList.push(group);
+                }
+            }
         }
     }
 
@@ -46,22 +69,38 @@ export class MSCLComponent implements OnInit {
      * Sets all tickboxes to be same as 'ALL' tickbox
      */
     public toggle_all_chkbox() {
-        for (const metric of this.allMetricList) {
-            this.msclform.bMetric[metric] = this.allTicked;
+        for (const pName of this.metricPNameList) {
+            this.msclform.bMetric[pName] = this.allTicked;
         }
+        for (const group of this.metricGroupList) {
+            this.msclform.bGroup[group] = this.allTicked;
+        }
+        this.changeDetectorRef.detectChanges();
+    }
+
+    /**
+     * Set all metric tickboxes within a group
+     * 
+     * @param group group name
+     */
+    public toggle_grp_chkbox(group: string) {
+        for (const pName of this.msclService.getInfoAttrsForGrp(group, 'pname')) {
+            this.msclform.bMetric[pName] = this.msclform.bGroup[group];
+        }
+        this.changeDetectorRef.detectChanges();
     }
 
     /**
      * Creates a modal dialogue which contains plots of MSCL data
      */
     public createGraphModal() {
-        this.metricList = [];
-        for (const metric of this.allMetricList) {
-            if (this.msclform.bMetric[metric]) {
-                this.metricList.push(metric);
+        const selecMetricList: string[] = []; // List of metrics selected by user
+        for (const pName of this.metricPNameList) {
+            if (this.msclform.bMetric[pName]) {
+                selecMetricList.push(pName);
             }
         }
-        if (this.metricList.length === 0) {
+        if (selecMetricList.length === 0) {
             this.showSelectMetricError = true;
         } else if (this.modalDisplayed === false) {
             this.showSelectMetricError = false;
@@ -73,7 +112,7 @@ export class MSCLComponent implements OnInit {
                 initialState: {
                     'startDepth': this.msclform.startDepth,
                     'endDepth': this.msclform.endDepth,
-                    'metricList': this.metricList,
+                    'metricList': selecMetricList,
                     'featureId': this.featureId,
                     'closeGraphModal': this.closeGraphModal.bind(this),
                     'serviceUrl': this.onlineResource.url
@@ -85,6 +124,7 @@ export class MSCLComponent implements OnInit {
     }
 
     /**
+     * Closes the MSCL plot's modal dialogue
      */
     public closeGraphModal() {
         if (this.modalDisplayed) {

@@ -7,20 +7,33 @@
   	<div class="card card-default">
   		<div class="card-body">
             <fieldset class="show-fieldset-borders-whitebg mb-3">
-                <legend><h6>Select Metrics</h6></legend>
+                <legend><h6>Select Sensor or Metrics</h6></legend>
                 <div class="checkbox col">
                     <input id="mscl-metrics-all" type="checkbox" [(ngModel)]="allTicked" (change)="toggle_all_chkbox()" />
-                    <label for="mscl-metrics-all">ALL</label>
+                    <label for="mscl-metrics-all">&nbsp;ALL</label>
                 </div>
+                <fieldset class="show-fieldset-borders-whitebg mb-3">
+                    <legend><h6>Sensor</h6></legend>
                     <div class="form-row">
-                        <div *ngFor="let metric of allMetricList">
+                        <div *ngFor="let group of metricGroupList">
+                            <div class="checkbox col">
+                                <input id="mscl-metrics-grp" type="checkbox" [(ngModel)]="msclform.bGroup[group]" (change)="toggle_grp_chkbox(group)"/>
+                                <label for="mscl-metrics-grp">&nbsp;{{group}}</label>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="show-fieldset-borders-whitebg mb-3">
+                <legend><h6>Metrics</h6></legend>
+                    <div class="form-row">
+                        <div *ngFor="let pname of metricPNameList">
                                 <div class="checkbox col">
-                                    <input id="mscl-metrics" type="checkbox" [(ngModel)]="msclform.bMetric[metric]" />
-                                    <label for="mscl-metrics">{{metric}}</label>
+                                    <input id="mscl-metrics" type="checkbox" [(ngModel)]="msclform.bMetric[pname]" />
+                                    <label for="mscl-metrics">&nbsp;{{pname}}</label>
                                 </div>
                         </div>
-
                     </div>
+                </fieldset>
             </fieldset>
             <fieldset class="show-fieldset-borders-whitebg mb-3">
                 <legend><h6>Select Depth Range</h6></legend>
@@ -44,7 +57,7 @@
             </fieldset>
             <fieldset>
                 <div *ngIf="showSelectMetricError" class="alert alert-danger">
-                    Plese select at least one metric
+                    Please select at least one metric or sensor
                 </div>
             </fieldset>
             <fieldset>
