@@ -58,8 +58,8 @@ interface Info {
 // A map from a string enum to the 'Info' object
 let metricMap: Map<string, Info> = new Map( [
     [ Metric.diameter, { pname: 'Diameter', group: '', desc: 'Diameter', units: '', feat_elem: 'diameter'}],
-    [ Metric.pWaveVel, { pname: 'P-Wave Vel.', group: '', desc: 'P-Wave Velocity', units: 'm/s', feat_elem: 'p_wave_velocity'}],
-    [ Metric.pWaveAmp, { pname: 'P-Wave Amp.', group: '', desc: 'P-Wave Amplitude', units: '', feat_elem: 'p_wave_amplitude'}],
+    [ Metric.pWaveVel, { pname: 'P-Wave Vel.', group: 'P-Wave', desc: 'P-Wave Velocity', units: 'm/s', feat_elem: 'p_wave_velocity'}],
+    [ Metric.pWaveAmp, { pname: 'P-Wave Amp.', group: 'P-Wave', desc: 'P-Wave Amplitude', units: '', feat_elem: 'p_wave_amplitude'}],
     [ Metric.density,  { pname: 'Density', group: '', desc: 'Density', units: '', feat_elem: 'density'} ],
     [ Metric.magSuscPoint, { pname: 'Mag. Susc. Point', group: '', desc: 'Magnetic Susceptibility Point', units: 'SI x 10^-5', feat_elem: 'magnetic_susc_point'}  ],
     [ Metric.magSuscLoopVC, { pname: 'Mag. Susc. LoopVC', group: '', desc: 'Magnetic Susceptibility Loop Volume Corrected', units: 'SI x 10^-5', feat_elem: 'magnetic_susceptibility'}  ],
@@ -122,7 +122,8 @@ export class MSCLService {
 
 
     /**
-     * Returns a complete list of printable metrics if no parameter supplied or converts a list of feature element names to printable names
+     * Returns a complete list of printable metric name if no parameter supplied 
+     * or converts a list of feature element names to printable names
      * 
      * @featList optional list of features to convert to printable names
      * @returns a list of printable metric names for MSCL data service
@@ -134,9 +135,7 @@ export class MSCLService {
             for (let featElem of featList) {
                 for (let mm of metricMap.values()) {
                     if (mm.feat_elem === featElem) {
-                        if (mm.group !== '' && !retList.includes(mm.group)) {
-                            retList.push(mm.group);
-                        } else if (!retList.includes(mm.pname)) {
+                        if (!retList.includes(mm.pname)) {
                             retList.push(mm.pname);
                         }
                     }
@@ -173,16 +172,17 @@ export class MSCLService {
 
 
     /**
-     * Gets the feature element names for a group
+     * Gets a list of 'Info' attributes for a group
      * 
      * @param groupName group name string
+     * @param attr requested 'Info' attribute
      * @returns list of WFS feature element names
      */
-    public getFeatsForGrp(groupName: string): string[] {
+    public getInfoAttrsForGrp(groupName: string, attr: string): string[] {
         let retList = [];
         for (let mm of metricMap.values()) {
             if (mm.group === groupName) {
-                retList.push(mm.feat_elem);
+                retList.push(mm[attr]);
             }
         }
         return retList;
@@ -202,6 +202,21 @@ export class MSCLService {
             }
         }
         return Metric.unknown;
+    }
+
+    /**
+     * Given a printable metric name returns its group name, returns '' if not found
+     * 
+     * @param pName printable metric name
+     * @returns group name
+     */
+    public pNameToGroup(pName: string): string {
+        for (let mm of metricMap.values()) {
+            if (mm.pname == pName) {
+                return mm.group;
+            }
+        }
+        return "";
     }
 
 
@@ -443,17 +458,20 @@ export class MSCLService {
         httpParams = httpParams.append('boreholeHeaderId', boreholeHeaderId);
         httpParams = httpParams.append('startDepth', startDepth.toString());
         httpParams = httpParams.append('endDepth', endDepth.toString());
+        // Assemble list of observations to send in the request
         for (const metric of metricList) {
             const feat_elem = this.getMetricInfoAttr(metric, 'feat_elem');
             if (feat_elem != '') {
                 httpParams = httpParams.append('observationsToReturn', feat_elem);
+            // If user requested a group name, append all members of group
             } else if (this.isMetricGroup(metric)) {
-                const gMetricList = this.getFeatsForGrp(metric);
+                const gMetricList = this.getInfoAttrsForGrp(metric, 'feat_elem');
                 for (let gMet of gMetricList) {
                     httpParams = httpParams.append('observationsToReturn', gMet);
                 }
             }
         }
+        // Send HTTP request for observations for a borehole
         return this.http.post(environment.portalBaseUrl + 'getMsclObservationsForGraph.do', httpParams.toString(), {
             headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
             responseType: 'json'
