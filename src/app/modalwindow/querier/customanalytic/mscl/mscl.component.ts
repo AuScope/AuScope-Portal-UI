@@ -75,6 +75,7 @@ export class MSCLComponent implements OnInit {
         for (const group of this.metricGroupList) {
             this.msclform.bGroup[group] = this.allTicked;
         }
+        this.changeDetectorRef.detectChanges();
     }
 
     /**
@@ -86,6 +87,7 @@ export class MSCLComponent implements OnInit {
         for (const pName of this.msclService.getInfoAttrsForGrp(group, 'pname')) {
             this.msclform.bMetric[pName] = this.msclform.bGroup[group];
         }
+        this.changeDetectorRef.detectChanges();
     }
 
     /**
