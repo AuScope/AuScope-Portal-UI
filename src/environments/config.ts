@@ -161,9 +161,24 @@ export const config = {
     'UOW-OSLTL-Outlets'
   ],
   cswrenderer: [
-    'portal-reports',
-    'portal-pmd-crc-reports',
-    'fina-repo-3d-geol-mode-of-the-east-yilg-crat-proj-pmd-y2-sept-2001-dece-2004',
+    'pmd-crc-project-a1-presentations',
+    'pmd-crc-project-c1-final-report',
+    'pmd-crc-project-c2-final-report',
+    'pmd-crc-project-c6-final-report',
+    'pmd-crc-project-c7-final-report',
+    'pmd-crc-project-i1-appendix1',
+    'pmd-crc-project-i1-appendix5',
+    'pmd-crc-project-i2-presentations',
+    'pmd-crc-project-i5-final-report',
+    'pmd-crc-project-i6-final-report',
+    'pmd-crc-project-i9-final-report',
+    'pmd-crc-project-t1-final-report',
+    'pmd-crc-project-t3-final-report',
+    'pmd-crc-project-t67-final-report',
+    'pmd-crc-project-t11-final-report',
+    'pmd-crc-project-y2-appendix',
+    'pmd-crc-project-y4-final-report',
+    'leme-crc-maps',
     'portal-geo-models'
   ],
   supportOpenInNewWindow: [
