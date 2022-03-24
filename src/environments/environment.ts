@@ -10,11 +10,10 @@
 
 export const environment = {
   production: false,
-  //getCSWRecordEndP: 'getKnownLayers.do',
-  getCSWRecordEndP: 'getTestKnownLayers.do',
+  production: false,
+  getCSWRecordEndP: 'getKnownLayers.do',
   //portalBaseUrl: 'http://localhost:8080/AuScope-Portal/',
-  //portalBaseUrl: 'https://au-portal-dev.it.csiro.au/api/',
-  portalBaseUrl: 'http://localhost:8080/api/',
+  portalBaseUrl: 'https://au-portal-dev.it.csiro.au/api/',
   hostUrl: 'http://localhost:4200/index.htm',
   nVCLAnalyticalUrl: 'https://aus-analytical.it.csiro.au/NVCLAnalyticalServices/',
   googleAnalyticsKey: null,
