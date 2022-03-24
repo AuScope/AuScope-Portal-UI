@@ -8,7 +8,7 @@ import {UtilitiesService} from '@auscope/portal-core-ui';
 import {ResourceType} from '@auscope/portal-core-ui';
 import {saveAs} from 'file-saver';
 import {config} from '../../../../environments/config';
-import { RectangleEditorObservable } from 'angular-cesium';
+import { RectangleEditorObservable } from '@auscope/angular-cesium';
 import { ChangeDetectorRef } from '@angular/core';
 import { DownloadWcsService ,CsClipboardService } from '@auscope/portal-core-ui';
 

@@ -35,7 +35,7 @@ import { CsMapZoomComponent } from './cesium-map/csmap.zoom.component';
 import { NgbdModalStatusReportComponent } from './toppanel/renderstatus/renderstatus.component';
 import { CsMapClipboardComponent } from './cesium-map/csmap.clipboard.component';
 
-import { AngularCesiumModule, AngularCesiumWidgetsModule } from 'angular-cesium';
+import { AngularCesiumModule, AngularCesiumWidgetsModule } from '@auscope/angular-cesium';
 
 import { QuerierModalComponent } from './modalwindow/querier/querier.modal.component';
 import { ClipboardModule } from 'ngx-clipboard';
@@ -67,7 +67,7 @@ import { HelpMenuComponent } from './toppanel/help-menu/help-menu.component';
 
 // Services
 import { AuscopeApiService } from './services/api/auscope-api.service';
-import { RectanglesEditorService } from 'angular-cesium';
+import { RectanglesEditorService } from '@auscope/angular-cesium';
 
 import * as PlotlyJS from 'plotly.js-dist-min';
 import { PlotlyModule } from 'angular-plotly.js';
