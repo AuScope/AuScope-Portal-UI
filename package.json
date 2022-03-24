@@ -54,6 +54,7 @@
     "ng2-nouislider": "^1.8.2",
     "ngx-bootstrap": "^5.6.1",
     "ngx-clipboard": "~14.0.2",
+    "ngx-colors": "^3.0.4",
     "ngx-webstorage-service": "^4.1.0",
     "ngx-device-detector": "~2.0.5",
     "nouislider": "^14.2.0",

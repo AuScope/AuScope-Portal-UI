@@ -1,0 +1,32 @@
+:host {
+    .grace-toolbar {
+        margin-left: 33px;
+        margin-right: 33px;
+    }
+
+    .style-form {
+        padding: 8px;
+        border: 1px solid cadetblue;
+        margin-bottom: 10px;
+        margin-top: 5px;
+        background: linear-gradient(45deg, black, transparent);
+    }
+
+    .text-and-units {
+        display: inline-block;
+        transform: translateY(-8px);
+    }
+    
+    .style-text-input {
+        width: 70px;
+    }
+
+    input.ng-touched.ng-invalid {
+        background: lightcoral;
+    }
+
+    .style-reminder {
+        padding: 4px;
+    }
+
+}

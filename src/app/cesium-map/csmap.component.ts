@@ -1,6 +1,6 @@
 import { config } from '../../environments/config';
 import { QuerierModalComponent } from '../modalwindow/querier/querier.modal.component';
-import { AfterViewInit, Component, ElementRef, NgZone, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, NgZone, ViewChild, ViewContainerRef } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ViewerConfiguration } from 'angular-cesium';
 import { CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService, QueryWFSService,
@@ -8,6 +8,8 @@ import { CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageState
 import { Cartesian3, MapMode2D, Math, ScreenSpaceEventHandler, SceneMode, ScreenSpaceEventType, Rectangle, ImagerySplitDirection,
    Cartesian2, WebMapServiceImageryProvider, WebMercatorProjection, Cartographic, GeographicProjection } from 'cesium';
 import { IrisQuerierHandler } from './custom-querier-handler/iris-querier-handler.service';
+import { ToolbarComponentsService } from 'app/services/ui/toolbar-components.service';
+
 declare var Cesium: any;
 
 @Component({
@@ -27,10 +29,13 @@ declare var Cesium: any;
           <div class="mouse-coordinates" *ngIf="mouseLongitude !== undefined && mouseLatitude !== undefined">
               Longitude:&nbsp;{{ mouseLongitude }},&nbsp;Latitude:&nbsp;{{ mouseLatitude }}
           </div>
+          <div class="toolbar" style="position:absolute;z-index:1;">
+              <ng-template #toolbars></ng-template>
+          </div>
       </ac-map>
     </div>
     `,
-    providers: [ViewerConfiguration], // Don't forget to Provide it 
+    providers: [ViewerConfiguration], // Don't forget to Provide it
     styleUrls: ['./csmap.component.scss']
   // The "#" (template reference variable) matters to access the map element with the ViewChild decorator!
 })
@@ -41,6 +46,9 @@ export class CsMapComponent implements AfterViewInit {
 
   @ViewChild('mapSlider', { static: false }) mapSlider: ElementRef;
 
+  // Map toolbars
+  @ViewChild('toolbars', { static: true, read: ViewContainerRef }) mapToolbars: ViewContainerRef;
+
   name = 'Angular';
   cesiumLoaded = true;
   viewer: any;
@@ -48,7 +56,7 @@ export class CsMapComponent implements AfterViewInit {
   mouseLatitude: string;
   mouseLongitude: string;
 
-  sliderMoveActive: boolean = false;
+  sliderMoveActive = false;
 
   public static AUSTRALIA = Rectangle.fromDegrees(114.591, -45.837, 148.97, -5.73);
 
@@ -57,7 +65,8 @@ export class CsMapComponent implements AfterViewInit {
 
   constructor(private csMapObject: CsMapObject, private csMapService: CsMapService, private modalService: BsModalService,
     private queryWFSService: QueryWFSService, private queryWMSService: QueryWMSService, private gmlParserService: GMLParserService,
-    private manageStateService: ManageStateService, private viewerConf: ViewerConfiguration, private ngZone: NgZone) {
+    private manageStateService: ManageStateService, private toolbarComponentsService: ToolbarComponentsService,
+    private viewerConf: ViewerConfiguration, private ngZone: NgZone) {
 
     const me = this;
     this.csMapService.getClickedLayerListBS().subscribe((mapClickInfo) => {
@@ -177,6 +186,9 @@ export class CsMapComponent implements AfterViewInit {
       });
       // VT: End permanent link
     }
+
+    // Set the map's ViewContainerRef for adding toolbars
+    this.toolbarComponentsService.setMapWidgetViewContainerRef(this.mapToolbars);
   }
 
   /**
@@ -273,9 +285,11 @@ export class CsMapComponent implements AfterViewInit {
    * @param mapClickInfo object with map click information
    */
   private handleLayerClick(mapClickInfo) {
-
     const me = this;
 
+    if (this.csMapObject.getIgnoreMapClick()) {
+      return;
+    }
     if (UtilitiesService.isEmpty(mapClickInfo)) {
       return;
     }

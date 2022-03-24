@@ -1,0 +1,20 @@
+:host {
+    .citations {
+        border: 1px solid gray;
+        margin: 0 5px 5px 5px;
+        padding: 10px;
+        font-size: small;    
+
+        a, a:link, a:visited {
+            color: royalblue;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    }
+    .error {
+        color: red;
+        font-size: initial;
+        text-align:center;
+    }
+}

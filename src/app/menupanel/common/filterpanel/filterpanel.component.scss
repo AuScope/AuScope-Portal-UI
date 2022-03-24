@@ -22,9 +22,11 @@ div.red {
 
 :host {
     ::ng-deep {
-        .dropdown-menu {
-            max-height: 200px;
-            overflow-y: auto;
+        .time-dropdown {
+            .dropdown-menu {
+                max-height: 200px;
+                overflow-y: auto;
+            }
         }
     }
 }

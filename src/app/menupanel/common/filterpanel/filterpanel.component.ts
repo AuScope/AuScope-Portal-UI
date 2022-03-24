@@ -1,12 +1,14 @@
 import { CsClipboardService, CsMapService, CsWMSService, FilterPanelService, GetCapsService, LayerHandlerService,
          LayerModel, LayerStatusService, ManageStateService, UtilitiesService } from '@auscope/portal-core-ui';
 import * as $ from 'jquery';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import * as _ from 'lodash';
 import { environment } from '../../../../environments/environment';
 import { ref } from '../../../../environments/ref';
 import { LayerAnalyticModalComponent } from '../../../modalwindow/layeranalytic/layer.analytic.modal.component';
 import { BsModalService } from 'ngx-bootstrap/modal';
+import { ToolbarComponentsService } from 'app/services/ui/toolbar-components.service';
+import { GraceStyleService } from 'app/services/wcustom/grace/grace-style.service';
 
 declare var gtag: Function;
 
@@ -28,7 +30,10 @@ export class FilterPanelComponent implements OnInit {
   public bApplyClipboardBBox = true;
   public timeExtent: Date[] = [];             // WMS time extent (optional)
   public currentTime: Date;                   // Current selected WMS time (from timeExtent)
-  public loadingTimeExtent: boolean = false;  // Flag for WMS times loading
+  public loadingTimeExtent = false;  // Flag for WMS times loading
+
+  // Layer toolbar
+  @ViewChild('toolbars', { static: true, read: ViewContainerRef }) filterToolbars: ViewContainerRef;
 
 
   constructor(private csMapService: CsMapService,
@@ -39,7 +44,9 @@ export class FilterPanelComponent implements OnInit {
               private csClipboardService: CsClipboardService,
               private csWMSService: CsWMSService,
               public layerStatus: LayerStatusService,
-              private getCapsService: GetCapsService) {
+              private getCapsService: GetCapsService,
+              private toolbarService: ToolbarComponentsService,
+              private graceStyleService: GraceStyleService) {
     this.providers = [];
     this.optionalFilters = [];
     this.analyticMap = ref.layeranalytic;
@@ -93,6 +100,9 @@ export class FilterPanelComponent implements OnInit {
       }
     }
 
+    // Add any layer specific toolbars
+    this.toolbarService.addFilterPanelToolbarComponents(this.layer, this.filterToolbars);
+
     // Set time extent if WMS and present
     this.setLayerTimeExtent();
   }
@@ -117,7 +127,7 @@ export class FilterPanelComponent implements OnInit {
     }
     return hasValue;
   }
-  
+
   /**
    * Check to see if a layer is supported to be added to the map
    * @param layer layer to check
@@ -187,13 +197,20 @@ export class FilterPanelComponent implements OnInit {
       param['time'] = this.currentTime;
     }
 
-    // Add layer      
+    if (layer.id === 'grace_mascons') {
+      param['sld_body'] = this.graceStyleService.getGraceSld();
+    }
+
+    // Add layer
     this.csMapService.addLayer(layer, param);
 
     // If on a small screen, when a new layer is added, roll up the sidebar to expose the map */
     if ($('#sidebar-toggle-btn').css('display') !== 'none') {
       $('#sidebar-toggle-btn').click();
     }
+
+    // Add any toolbar components to map defined in refs.ts
+    this.toolbarService.addMapToolbarComponents(this.layer);
   }
 
   /**
@@ -396,7 +413,7 @@ export class FilterPanelComponent implements OnInit {
       }
     }
     // Query WMS GetCapabilities for timeExtent
-    if (wmsEndpointUrl !== null && layerName !== null) {
+    if (this.timeExtent.length === 0 && wmsEndpointUrl !== null && layerName !== null) {
       this.loadingTimeExtent = true;
       if (wmsEndpointUrl.indexOf('?') !== -1) {
         wmsEndpointUrl = wmsEndpointUrl.substring(0, wmsEndpointUrl.indexOf('?'));
@@ -427,7 +444,7 @@ export class FilterPanelComponent implements OnInit {
   public changeCurrentTime(newDate: Date) {
     this.currentTime = newDate;
     // Re-add layer to map
-    let layerModelList = this.csMapService.getLayerModelList();
+    const layerModelList = this.csMapService.getLayerModelList();
     if (layerModelList.hasOwnProperty(this.layer.id)) {
       this.csMapService.removeLayer(layerModelList[this.layer.id]);
     }

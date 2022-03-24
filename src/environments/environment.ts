@@ -10,9 +10,11 @@
 
 export const environment = {
   production: false,
-  getCSWRecordEndP: 'getKnownLayers.do',
+  //getCSWRecordEndP: 'getKnownLayers.do',
+  getCSWRecordEndP: 'getTestKnownLayers.do',
   //portalBaseUrl: 'http://localhost:8080/AuScope-Portal/',
-  portalBaseUrl: 'https://au-portal-dev.it.csiro.au/api/',
+  //portalBaseUrl: 'https://au-portal-dev.it.csiro.au/api/',
+  portalBaseUrl: 'http://localhost:8080/api/',
   hostUrl: 'http://localhost:4200/index.htm',
   nVCLAnalyticalUrl: 'https://aus-analytical.it.csiro.au/NVCLAnalyticalServices/',
   googleAnalyticsKey: null,
@@ -29,5 +31,9 @@ export const environment = {
     { value: 'AerialWithLabels', viewValue: 'Bing Aerial With Labels', tooltip: 'Bing Maps Aerial with Labels', layerType: 'Bing' },
     { value: 'Natural_Earth_II', viewValue: 'Natural Earth II',
       tooltip: 'Natural Earth II, darkened for contrast.\nhttp://www.naturalearthdata.com/', layerType: 'NEII' },
-  ]
+  ],
+  grace: {
+    //hostUrl: 'https://insargrace.geoanalytics.csiro.au:/grace/grace'
+    hostUrl: 'http://gis-dev-ie.it.csiro.au:8001/grace'
+  }
 };
