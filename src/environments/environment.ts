@@ -10,7 +10,6 @@
 
 export const environment = {
   production: false,
-  production: false,
   getCSWRecordEndP: 'getKnownLayers.do',
   //portalBaseUrl: 'http://localhost:8080/AuScope-Portal/',
   portalBaseUrl: 'https://au-portal-dev.it.csiro.au/api/',
@@ -32,7 +31,6 @@ export const environment = {
       tooltip: 'Natural Earth II, darkened for contrast.\nhttp://www.naturalearthdata.com/', layerType: 'NEII' },
   ],
   grace: {
-    //hostUrl: 'https://insargrace.geoanalytics.csiro.au:/grace/grace'
-    hostUrl: 'http://gis-dev-ie.it.csiro.au:8001/grace'
+    hostUrl: 'https://insargrace.geoanalytics.csiro.au:/grace/grace'
   }
 };
