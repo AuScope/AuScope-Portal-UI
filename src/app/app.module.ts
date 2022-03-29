@@ -69,7 +69,7 @@ import { HelpMenuComponent } from './toppanel/help-menu/help-menu.component';
 import { AuscopeApiService } from './services/api/auscope-api.service';
 import { RectanglesEditorService } from '@auscope/angular-cesium';
 
-import * as PlotlyJS from 'plotly.js-dist-min';
+import * as PlotlyJS from 'plotly.js-dist-min/plotly.min.js';
 import { PlotlyModule } from 'angular-plotly.js';
 
 // import { CatalogueSearchComponent } from './menupanel/cataloguesearch/cataloguesearch.component';
@@ -77,6 +77,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DataExplorerComponent } from './menupanel/data-explorer/data-explorer.component';
 import { DataExplorerdRecordModule } from './menupanel/data-explorer-record/data-explorer-record.modules';
 import { RecordModalComponent } from './menupanel/record-modal/record-modal.component';
+import { ToolbarModule } from './toolbar/toolbar.module';
 
 
 PlotlyModule.plotlyjs = PlotlyJS;
@@ -146,6 +147,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
         AngularCesiumWidgetsModule,
         MatTooltipModule,
         NgbModule,
+        ToolbarModule
     ],
     bootstrap: [
         CsMapComponent,

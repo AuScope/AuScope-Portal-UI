@@ -1,0 +1,48 @@
+<div class="grace-toolbar">
+    <div class="row">
+        <!-- Time series graphs -->
+        <div ngbDropdown>
+            <button class="btn btn-sm btn-primary" type="button" [disabled]="!layerAdded()" ngbDropdownToggle><em class="fa fa-chart-line"></em>&nbsp;Time Series</button>
+            <div ngbDropdownMenu>
+                <button ngbDropdownItem (click)="selectGraceDataPoint()">
+                    <em class="fa fa-map-marker"></em>&nbsp;Select Mascon Point
+                </button>
+                <button ngbDropdownItem (click)="selectGraceDataPolygon()">
+                    <em class="fa fa-edit"></em>&nbsp;Select Mascon Region
+                </button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="style-form">
+                <form [formGroup]="styleGroup" (ngSubmit)="setStyle()">
+                    <table>
+                        <tr>
+                            <td>Max</td>
+                            <td>
+                                <div class="text-and-units"><input class="style-text-input" id="maxValue" type="text" formControlName="maxValue" (change)="setStyle()"/>&nbsp;(m)</div>
+                                <ngx-colors ngx-colors-trigger [hideColorPicker]="true" style="display: inline-block; margin:5px;" formControlName="maxColor" (change)="setStyle()"></ngx-colors>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Neutral&nbsp;&nbsp;</td>
+                            <td class="text-input">
+                                <div class="text-and-units"><input class="style-text-input" id="neutralValue" type="text" formControlName="neutralValue" (change)="setStyle()"/>&nbsp;(m)</div>
+                                <ngx-colors ngx-colors-trigger [hideColorPicker]="true" style="display: inline-block; margin:5px;" formControlName="neutralColor" (change)="setStyle()"></ngx-colors>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Min</td>
+                            <td class="text-input">
+                                <div class="text-and-units"><input class="style-text-input" id="minValue" type="text" formControlName="minValue" (change)="setStyle()"/>&nbsp;(m)</div>
+                                <ngx-colors ngx-colors-trigger [hideColorPicker]="true" style="display: inline-block; margin:5px;" formControlName="minColor" (change)="setStyle()"></ngx-colors>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="style-reminder">
+                        Click Add Layer below to apply changes.
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

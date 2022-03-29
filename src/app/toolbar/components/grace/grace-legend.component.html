@@ -1,0 +1,16 @@
+<div class="style-legend">
+    <div class="legend-header">
+        EWH (m)
+    </div>
+    <div class="legend-panel">
+        <div class="legend-gradient">
+        <div class="max-legend" [ngStyle]="{ 'background-image': 'linear-gradient(' + graceStyleSettings.maxColor + ',' + graceStyleSettings.neutralColor + ')' }"></div>
+        <div class="min-legend" [ngStyle]="{'background-image': 'linear-gradient(' + graceStyleSettings.neutralColor + ',' + graceStyleSettings.minColor + ')'}"></div>
+        </div>
+        <div class="legend-text">
+            <div class="max-text">{{ graceStyleSettings.maxValue }}</div>
+            <div class="neutral-text">{{ graceStyleSettings.neutralValue }}</div>
+            <div>{{ graceStyleSettings.minValue }}</div>
+        </div>
+    </div>
+</div>
