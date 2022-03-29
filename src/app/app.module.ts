@@ -35,7 +35,7 @@ import { CsMapZoomComponent } from './cesium-map/csmap.zoom.component';
 import { NgbdModalStatusReportComponent } from './toppanel/renderstatus/renderstatus.component';
 import { CsMapClipboardComponent } from './cesium-map/csmap.clipboard.component';
 
-import { AngularCesiumModule, AngularCesiumWidgetsModule } from 'angular-cesium';
+import { AngularCesiumModule, AngularCesiumWidgetsModule } from '@auscope/angular-cesium';
 
 import { QuerierModalComponent } from './modalwindow/querier/querier.modal.component';
 import { ClipboardModule } from 'ngx-clipboard';
@@ -67,7 +67,7 @@ import { HelpMenuComponent } from './toppanel/help-menu/help-menu.component';
 
 // Services
 import { AuscopeApiService } from './services/api/auscope-api.service';
-import { RectanglesEditorService } from 'angular-cesium';
+import { RectanglesEditorService } from '@auscope/angular-cesium';
 
 import * as PlotlyJS from 'plotly.js-dist-min/plotly.min.js';
 import { PlotlyModule } from 'angular-plotly.js';
@@ -84,97 +84,81 @@ PlotlyModule.plotlyjs = PlotlyJS;
 
 
 @NgModule({
-  declarations: [
-    CsMapComponent,
-    OlMapPreviewComponent,
-    LayerPanelComponent,
-    CustomPanelComponent,
-    ActiveLayersPanelComponent,
-    // CatalogueSearchComponent,
-    FilterPanelComponent,
-    DownloadPanelComponent,
-    NgbdModalStatusReportComponent,
-    CsMapClipboardComponent,
-    InfoPanelComponent,
-    InfoPanelSubComponent,
-    CsMapSplitComponent,
-    CsMapZoomComponent,
-    QuerierModalComponent,
-    DynamicAnalyticComponent,
-    NVCLDatasetListComponent,
-    NVCLDatasetListDialogComponent,
-    TIMAComponent,
-    RemanentAnomaliesComponent,
-    LayerAnalyticModalComponent,
-    DynamicLayerAnalyticComponent,
-    NVCLBoreholeAnalyticComponent,
-    //PermanentLinkComponent,
-    ClipboardComponent,
-    DynamicAdvancefilterComponent,
-    CapdfAdvanceFilterComponent,
-    CapdfAnalyticComponent,
-    DisclaimerModalComponent,
-    PortalDetailsPanelComponent,
-    MSCLComponent,
-    MSCLAnalyticComponent,
-    HelpMenuComponent,
-    DataExplorerComponent,
-    RecordModalComponent
-  ],
-  providers: [ AuscopeApiService, RectanglesEditorService ],
-  imports: [
-    PortalCoreModule.forRoot(environment, config),
-    PortalCorePipesModule,
-    ClipboardModule,
-    ModalModule.forRoot(),
-    NouisliderModule,
-    NgSelectModule,
-    CdkTableModule,
-    MatTreeModule,
-    MatIconModule,
-    MatButtonModule,
-    MatDialogModule,
-    MatMenuModule,
-    MatSliderModule,
-    StorageServiceModule,
-    NgxChartsModule,
-    BrowserAnimationsModule,
-    BsDropdownModule.forRoot(),
-    CommonModule,
-    PlotlyModule,
-    DataExplorerdRecordModule,
-    AngularCesiumModule.forRoot(),
-    AngularCesiumWidgetsModule,
-    MatTooltipModule,
-    NgbModule,
-    ToolbarModule
-  ],
-  entryComponents: [
-    NgbdModalStatusReportComponent,
-    QuerierModalComponent,
-    NVCLDatasetListComponent,
-    NVCLDatasetListDialogComponent,
-    TIMAComponent,
-    RemanentAnomaliesComponent,
-    LayerAnalyticModalComponent,
-    NVCLBoreholeAnalyticComponent,
-    CapdfAdvanceFilterComponent,
-    CapdfAnalyticComponent,
-    DisclaimerModalComponent,
-    MSCLComponent,
-    MSCLAnalyticComponent,
-    RecordModalComponent,   
-  ],
-  bootstrap: [
-    CsMapComponent,
-    LayerPanelComponent,
-    CustomPanelComponent,
-    ActiveLayersPanelComponent,
-    //PermanentLinkComponent,
-    // CatalogueSearchComponent,
-    DataExplorerComponent,
-    PortalDetailsPanelComponent,
-    HelpMenuComponent
-  ]
+    declarations: [
+        CsMapComponent,
+        OlMapPreviewComponent,
+        LayerPanelComponent,
+        CustomPanelComponent,
+        ActiveLayersPanelComponent,
+        // CatalogueSearchComponent,
+        FilterPanelComponent,
+        DownloadPanelComponent,
+        NgbdModalStatusReportComponent,
+        CsMapClipboardComponent,
+        InfoPanelComponent,
+        InfoPanelSubComponent,
+        CsMapSplitComponent,
+        CsMapZoomComponent,
+        QuerierModalComponent,
+        DynamicAnalyticComponent,
+        NVCLDatasetListComponent,
+        NVCLDatasetListDialogComponent,
+        TIMAComponent,
+        RemanentAnomaliesComponent,
+        LayerAnalyticModalComponent,
+        DynamicLayerAnalyticComponent,
+        NVCLBoreholeAnalyticComponent,
+        //PermanentLinkComponent,
+        ClipboardComponent,
+        DynamicAdvancefilterComponent,
+        CapdfAdvanceFilterComponent,
+        CapdfAnalyticComponent,
+        DisclaimerModalComponent,
+        PortalDetailsPanelComponent,
+        MSCLComponent,
+        MSCLAnalyticComponent,
+        HelpMenuComponent,
+        DataExplorerComponent,
+        RecordModalComponent
+    ],
+    providers: [AuscopeApiService, RectanglesEditorService],
+    imports: [
+        PortalCoreModule.forRoot(environment, config),
+        PortalCorePipesModule,
+        ClipboardModule,
+        ModalModule.forRoot(),
+        NouisliderModule,
+        NgSelectModule,
+        CdkTableModule,
+        MatTreeModule,
+        MatIconModule,
+        MatButtonModule,
+        MatDialogModule,
+        MatMenuModule,
+        MatSliderModule,
+        StorageServiceModule,
+        NgxChartsModule,
+        BrowserAnimationsModule,
+        BsDropdownModule.forRoot(),
+        CommonModule,
+        PlotlyModule,
+        DataExplorerdRecordModule,
+        AngularCesiumModule.forRoot(),
+        AngularCesiumWidgetsModule,
+        MatTooltipModule,
+        NgbModule,
+        ToolbarModule
+    ],
+    bootstrap: [
+        CsMapComponent,
+        LayerPanelComponent,
+        CustomPanelComponent,
+        ActiveLayersPanelComponent,
+        //PermanentLinkComponent,
+        // CatalogueSearchComponent,
+        DataExplorerComponent,
+        PortalDetailsPanelComponent,
+        HelpMenuComponent
+    ]
 })
 export class AppModule { }

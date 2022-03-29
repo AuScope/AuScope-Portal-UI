@@ -30,7 +30,7 @@ export const ref = {
     'capdf-hydrogeochem': CapdfAdvanceFilterComponent
   },
   toolbar: {
-    'grace_mascons': [
+    'grace-mascons': [
       {
         'component': GraceToolbarComponent,
         'type': ToolbarType.FilterPanel

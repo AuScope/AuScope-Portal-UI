@@ -197,7 +197,7 @@ export class FilterPanelComponent implements OnInit {
       param['time'] = this.currentTime;
     }
 
-    if (layer.id === 'grace_mascons') {
+    if (layer.id === 'grace-mascons') {
       param['sld_body'] = this.graceStyleService.getGraceSld();
     }
 

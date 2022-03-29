@@ -1,10 +1,12 @@
 module.exports = {
-  node: {
-    fs: "empty",
-    Buffer: false,
-    http: "empty",
-    https: "empty",
-    zlib: "empty"
+  resolve: {
+      fallback: {
+      fs: false,
+      Buffer: false,
+      http: false,
+      https: false,
+      zlib: false
+    },
   },
   module: {
     unknownContextCritical: false

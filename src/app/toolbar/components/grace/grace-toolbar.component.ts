@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CsMapObject, CsMapService } from '@auscope/portal-core-ui';
-import { MapsManagerService } from 'angular-cesium';
+import { MapsManagerService } from '@auscope/angular-cesium';
 import { GraceService } from 'app/services/wcustom/grace/grace.service';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { ToolbarComponent } from '../../toolbar.component';

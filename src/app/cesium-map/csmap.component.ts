@@ -2,7 +2,7 @@ import { config } from '../../environments/config';
 import { QuerierModalComponent } from '../modalwindow/querier/querier.modal.component';
 import { AfterViewInit, Component, ElementRef, NgZone, ViewChild, ViewContainerRef } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
-import { ViewerConfiguration } from 'angular-cesium';
+import { ViewerConfiguration } from '@auscope/angular-cesium';
 import { CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService, QueryWFSService,
   QueryWMSService, SimpleXMLService, UtilitiesService, CsMapObject, ResourceType } from '@auscope/portal-core-ui';
 import { Cartesian3, MapMode2D, Math, ScreenSpaceEventHandler, SceneMode, ScreenSpaceEventType, Rectangle, ImagerySplitDirection,

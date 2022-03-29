@@ -46,7 +46,7 @@ export class LayerPanelComponent implements OnInit {
     return layer.filterCollection !== undefined && (layer.filterCollection.optionalFilters !== null &&
       layer.filterCollection.optionalFilters.filter(f => f.type === 'OPTIONAL.POLYGONBBOX').length > 0);
   }
-  
+
   /**
    * Filter layers based on polygon filter
    */
@@ -213,6 +213,9 @@ export class LayerPanelComponent implements OnInit {
         }
         me.layerHandlerService.getLayerRecord().subscribe(
           response => {
+
+            console.log(JSON.stringify(response));
+
             me.layerGroups = response;
             for (const key in me.layerGroups) {
               for (let i = 0; i < me.layerGroups[key].length; i++) {

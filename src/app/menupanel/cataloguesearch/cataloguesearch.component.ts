@@ -8,7 +8,7 @@ import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { CataloguesearchService } from './cataloguesearch.service';
 import { Component, AfterViewInit } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
-import { RectangleEditorObservable } from 'angular-cesium';
+import { RectangleEditorObservable } from '@auscope/angular-cesium';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 
 
