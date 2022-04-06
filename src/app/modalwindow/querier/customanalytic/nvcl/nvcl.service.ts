@@ -1,8 +1,8 @@
 
-import {throwError as observableThrowError, Observable } from 'rxjs';
+import {throwError as observableThrowError, Observable, BehaviorSubject, of, ReplaySubject, timer } from 'rxjs';
 
 import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
-import {catchError, map} from 'rxjs/operators';
+import {catchError, delay, map} from 'rxjs/operators';
 import { UtilitiesService } from '@auscope/portal-core-ui';
 import { Injectable, Inject} from '@angular/core';
 import {HttpClient, HttpParams, HttpHeaders, HttpResponse} from '@angular/common/http';
@@ -11,9 +11,26 @@ declare var gtag: Function;
 @Injectable()
 export class NVCLService {
 
+  public isAnalytic: BehaviorSubject<boolean>; // observable used in querier to control Analytic TAB
+
+  /**
+   * returns the observable of "isAnalytic" variable 
+   */
+  getAnalytic(): Observable<boolean> {
+    //console.log("[nvclservice]getAnalytic().this.isAnalytic="+this.isAnalytic.asObservable()._isScalar);
+    return this.isAnalytic.asObservable(); //.pipe(delay(0));
+  }
+
+  /**
+   * sets the state of "isAnalytic" variable
+   */
+  setAnalytic(state:boolean): void {
+    //console.log("[nvclservice]setAnalytic("+state+")");
+    this.isAnalytic.next(state);
+  }
 
   constructor(private http: HttpClient , @Inject(LOCAL_STORAGE) private storage: StorageService) {
-
+    this.isAnalytic = new BehaviorSubject<boolean>(false);
   }
 
   public getNVCLDatasets(serviceUrl: string, holeIdentifier: string): Observable<any> {

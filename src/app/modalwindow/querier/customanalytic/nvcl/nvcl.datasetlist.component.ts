@@ -2,7 +2,7 @@ import { RickshawService } from '@auscope/portal-core-ui';
 import { LayerModel } from '@auscope/portal-core-ui';
 import { OnlineResourceModel } from '@auscope/portal-core-ui';
 import { NVCLService } from './nvcl.service';
-import { Component, Inject, Input, AfterViewInit, OnInit } from '@angular/core';
+import { Component, Inject, Input, OnInit } from '@angular/core';
 import { HttpParams } from '@angular/common/http';
 import { DomSanitizer } from '@angular/platform-browser';
 import {saveAs} from 'file-saver';
@@ -10,22 +10,23 @@ import { NVCLBoreholeAnalyticService } from '../../../layeranalytic/nvcl/nvcl.bo
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { UtilitiesService } from '@auscope/portal-core-ui';
 
-
 export interface DialogData {
   scalarClasses: any[];
   name: string;
 }
 
-
 @Component({
   selector: 'app-nvcl-datasetlist-component-dialog',
   templateUrl: 'nvcl.datasetlist.dialog.component.html',
 })
-export class NVCLDatasetListDialogComponent {
+export class NVCLDatasetListDialogComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<NVCLDatasetListDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData) {}
+  ngOnInit(): void {
+    throw new Error('Method not implemented.');
+  }
 
   onNoClick(): void {
     this.dialogRef.close();
@@ -36,7 +37,7 @@ export class NVCLDatasetListDialogComponent {
 @Component({
   selector: 'app-nvcl-datasetlist-component',
   templateUrl: './nvcl.datasetlist.component.html',
-  providers: [NVCLService, RickshawService, NVCLBoreholeAnalyticService],
+  providers: [RickshawService, NVCLBoreholeAnalyticService],
   styleUrls: ['../../../../../../node_modules/@auscope/portal-core-ui/src/lib/widget/chart/rickshaw/rickshaw.service.scss', '../../../modalwindow.scss']
 })
 export class NVCLDatasetListComponent implements OnInit {
@@ -99,12 +100,13 @@ export class NVCLDatasetListComponent implements OnInit {
   public currentStatus = [];
   public checkingTSG = false;
 
+  
   constructor(public nvclService: NVCLService,
     public domSanitizer: DomSanitizer,
     private rickshawService: RickshawService,
     public nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService,
-    public dialog: MatDialog) {}
-
+    public dialog: MatDialog) {
+    }
 
     ngOnInit(): void {
 
@@ -120,13 +122,20 @@ export class NVCLDatasetListComponent implements OnInit {
         this._getNVCLScalar(this.onlineResource.url, nvclDataset.datasetId);
         this.nvclDatasets.push(nvclDataset);
       }
-
+      //console.log("nvcldataset]getNVCLDatasets.result.length = "+result.length);
+      if (result.length == 0) {
+        this.nvclService.setAnalytic(false);
+      } else {
+        this.nvclService.setAnalytic(true);
+      }
     })
 
     this.nvclService.getNVCL2_0_TsgJobsByBoreholeId(this.featureId).subscribe(result => {
       this.jobList[this.featureId] = result;
     })
   }
+
+
 
   public drawGraph(logIds: Array<string>, logNames: Array<string>) {
     const me = this;
