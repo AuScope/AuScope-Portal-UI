@@ -3,19 +3,25 @@
 
 export const config = {
   nvclUrl: 'https://nvclwebservices.csiro.au/NVCLDataServices',
+  // Layers that support downloading WFS feature data as zipped CSV files
   csvSupportedLayer: [
     'mineral-tenements',
     'tima-geosample',
     'nvcl-v2-borehole',
     'tima-shrimp-geosample',
-    'mscl-borehole',
     'pressuredb-borehole',
     'sf0-borehole-nvcl',
     'erl-mineview',
     'erl-mineraloccurrenceview',
     'erl-commodityresourceview'
   ],
-
+  // Layers that download zipped datasets using 'datasetURL' feature name in the WFS response
+  datasetUrlSupportedLayer: {
+    'mscl-borehole': {
+        datasetURL: 'datasetURL'
+    }
+  },
+  // Layers that support downloads of an area bounded by a polygon
   polygonSupportedLayer: [
     'mineral-tenements',
     'tima-geosample',
@@ -25,8 +31,8 @@ export const config = {
     'erl-mineraloccurrenceview',
     'erl-commodityresourceview'
   ],
-  // Set 'downloadAreaMaxSize' to Number.MAX_SAFE_INTEGER
-  // to disable area download limits
+  // Layers that support downloading datasets via WCS
+  // (Set 'downloadAreaMaxSize' to Number.MAX_SAFE_INTEGER to disable area download limits)
   wcsSupportedLayer: {
     'aster-aloh': {
       downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
@@ -131,6 +137,7 @@ export const config = {
       downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
     }
   },
+  // Layers that require the proxy service to add layers
   forceAddLayerViaProxy: [
     'erml-miningactivity',
     'erml-mine',
@@ -166,6 +173,7 @@ export const config = {
     'Octopus-Sahul-Sed-Archives-Lacustrine-Osl',
     'Octopus-Sahul-Sed-Archives-Lacustrine-Tl'
   ],
+  // Layers that use CSW records to display a simple rectangle on map
   cswrenderer: [
     'pmd-crc-project-a1-presentations',
     'pmd-crc-project-c1-final-report',
