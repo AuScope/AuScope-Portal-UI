@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { config } from '../../../environments/config';
 import { ref } from '../../../environments/ref';
@@ -24,11 +24,11 @@ export class FileNode {
 @Component({
   selector: 'app-querier-modal-window',
   templateUrl: './querier.modal.component.html',
-  providers: [NVCLService],
+  providers: [],
   styleUrls: ['../modalwindow.scss']
 })
 
-export class QuerierModalComponent {
+export class QuerierModalComponent  implements OnInit {
   public downloading: boolean;
   public transformingToHtml: Map<string, boolean> = new Map<string, boolean>();
   public docs: QuerierInfoModel[] = [];
@@ -48,11 +48,42 @@ export class QuerierModalComponent {
   // Show a message to zoom in
   public showZoomMsg: boolean = false;
 
-  constructor(public bsModalRef: BsModalRef, public csClipboardService: CsClipboardService,
+  /**
+   * 
+   * reflects the value of nvclService.getAnalytic(); updates the html Analytic TAB
+   * 
+   * When a "borehole name" is clicked on, onDataChange() is fired and a detectChanges() event causes
+   * nvclService.getNVCLDatasets() to be called from nvcl.datasetlist.component.ts
+   * This will set the "isAnalytic" variable in the service nvcl.service.ts to be set (boolean).
+   * 
+   * Note: to support this, nvcl.service was removed as a provide from this component and datasetlist
+   * The reason for this is to prevent the service from being instantiated for each component.
+   * The app.module.ts code was updated to add this service in the providers list - making it a global instance
+   * 
+   * If this was not done the two components would not see the same state of the service variable "isAnalytic"
+  */
+  public flagAnalytic: boolean; 
+
+  constructor(public nvclService: NVCLService,public bsModalRef: BsModalRef, public csClipboardService: CsClipboardService,
         private manageStateService: ManageStateService, private gmlParserService: GMLParserService, 
         private http: HttpClient, @Inject('env') private env, private sanitizer: DomSanitizer, 
         private changeDetectorRef: ChangeDetectorRef, private appRef: ApplicationRef) {
     this.analyticMap = ref.analytic;
+  }
+  
+  ngOnInit() {
+    
+  /**
+   * checks the state of "isAnalytic" variable in the nvclService - observable
+   * and updates the local varibale "flagAnalytic" - which updates the Analytic TAB in the html
+   */
+    this.nvclService.getAnalytic().subscribe((result) => {
+      // console.log("[querier]ngOnInit().getAnalytic() = "+result);
+      this.flagAnalytic = result;
+
+      this.onDataChange();
+    });
+
   }
 
   public getData() {return this.data}
@@ -118,9 +149,11 @@ export class QuerierModalComponent {
       this.appRef.tick();
     }
   }
+
   public onDataChange(): void {
-     this.changeDetectorRef.detectChanges();
+      this.changeDetectorRef.detectChanges();
   }
+
   public transformToHtml(document): void {    
     if (document.transformed) {
        // this is when you're clicking to close an expanded feature
