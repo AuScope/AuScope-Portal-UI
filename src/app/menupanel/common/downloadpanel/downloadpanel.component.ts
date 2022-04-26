@@ -8,7 +8,7 @@ import {UtilitiesService} from '@auscope/portal-core-ui';
 import {ResourceType} from '@auscope/portal-core-ui';
 import {saveAs} from 'file-saver';
 import {config} from '../../../../environments/config';
-import { RectangleEditorObservable } from 'angular-cesium';
+import { RectangleEditorObservable } from '@auscope/angular-cesium';
 import { ChangeDetectorRef } from '@angular/core';
 import { DownloadWcsService ,CsClipboardService } from '@auscope/portal-core-ui';
 
@@ -29,10 +29,10 @@ export class DownloadPanelComponent implements OnInit {
   downloadStarted: boolean;
   download4pStarted: boolean;
   isPolygonSupportedLayer: boolean;
-  isCsvSupportedLayer: boolean;
-
-  isWCSDownloadSupported: boolean;
-  downloadSizeLimit: number;
+  isCsvSupportedLayer: boolean;  // Supports CSV downloads of WFS Features
+  isDatasetURLSupportedLayer: boolean; // Supports dataset downloads using a URL in the WFS GetFeature response
+  isWCSDownloadSupported: boolean; // Supports WCS dataset downloads
+  downloadSizeLimit: number; // Limits the WCS download size
 
   wcsDownloadListOption: any;
   wcsDownloadForm: any;
@@ -60,6 +60,7 @@ export class DownloadPanelComponent implements OnInit {
     if (this.layer) {
       this.isPolygonSupportedLayer = config.polygonSupportedLayer.indexOf(this.layer.id) >= 0;
       this.isCsvSupportedLayer = config.csvSupportedLayer.indexOf(this.layer.id) >= 0;
+      this.isDatasetURLSupportedLayer = config.datasetUrlSupportedLayer[this.layer.id] !== undefined;
       if (config.wcsSupportedLayer[this.layer.id]) {
         this.isWCSDownloadSupported = true;
         // If 'downloadAreaMaxsize' is not set to Number.MAX_SAFE_INTEGER then download limits will apply
@@ -85,6 +86,7 @@ export class DownloadPanelComponent implements OnInit {
       this.isCsvSupportedLayer = false;
       this.isWCSDownloadSupported = false;
       this.isPolygonSupportedLayer = false;
+      this.isDatasetURLSupportedLayer = false;
     }
   }
 
@@ -139,6 +141,9 @@ export class DownloadPanelComponent implements OnInit {
 
   }
 
+  /**
+   * Runs the WCS 'DescribeCoverage' request to gather more information about the WCS resource
+   */
   public describeCoverage() {
     if (this.layerHandlerService.contains(this.layer, ResourceType.WCS)) {
       const wcsResources = this.layerHandlerService.getWCSResource(this.layer);
@@ -206,9 +211,8 @@ export class DownloadPanelComponent implements OnInit {
   }
 
 
-
   /**
-   * clear the bounding box
+   * Clear the bounding box
    */
   public clearBound(): void {
     this.bbox = null;
@@ -220,6 +224,8 @@ export class DownloadPanelComponent implements OnInit {
         this.rectangleObservable = null;
     }
   }
+
+
   /**
    * Download the layer
    */
@@ -262,12 +268,18 @@ export class DownloadPanelComponent implements OnInit {
       observableResponse = this.downloadWcsService.download(this.layer, this.bbox, this.wcsDownloadForm.inputCrs, 
         this.wcsDownloadForm.downloadFormat, this.wcsDownloadForm.outputCrs, timePositions);
 
-    // WFS download
+    // Download datasets using a URL in the WFS GetFeature response
+    } else if (this.isDatasetURLSupportedLayer) {
+      this.downloadStarted = true;
+      observableResponse = this.downloadWfsService.downloadDatasetURL(this.layer, this.bbox, null);
+
+    // Download WFS features as CSV files 
     } else {
       this.downloadStarted = true;
-      observableResponse = this.downloadWfsService.download(this.layer, this.bbox, null);
+      observableResponse = this.downloadWfsService.downloadCSV(this.layer, this.bbox, null);
     }
 
+    // Kick off the download process and save zip file in browser
     observableResponse.subscribe(value => {
       this.downloadStarted = false;
       const blob = new Blob([value], {type: 'application/zip'});
@@ -275,15 +287,15 @@ export class DownloadPanelComponent implements OnInit {
     }, err => {
       this.downloadStarted = false;
       if (UtilitiesService.isEmpty(err.message)) {
-        alert('An error has occured whilst attempting to download. Kindly contact cg-admin@csiro.au');
+        alert('An error has occurred whilst attempting to download. Kindly contact cg-admin@csiro.au');
       } else {
-        alert('An error has occured whilst attempting to download. (' + err.message + ') Kindly contact cg-admin@csiro.au');
+        alert('An error has occurred whilst attempting to download. (' + err.message + ') Kindly contact cg-admin@csiro.au');
       }
     });
   }
 
    /**
-   * Download the layer
+   * Download the layer using a polyon to specify desired area
    */
   public download4Polygon(): void {
 
@@ -292,12 +304,18 @@ export class DownloadPanelComponent implements OnInit {
       return;
     }
     let observableResponse = null;
+    this.download4pStarted = true;
 
-    // WFS download
+    // Download datasets using a URL in the WFS GetFeature response
+    if (this.isDatasetURLSupportedLayer) {
+      observableResponse = this.downloadWfsService.downloadDatasetURL(this.layer, null, this.polygonFilter);
+    
+    // Download WFS features as CSV files 
+    } else {
+      observableResponse = this.downloadWfsService.downloadCSV(this.layer, null, this.polygonFilter);
+    }
 
-      this.download4pStarted = true;
-      observableResponse = this.downloadWfsService.download(this.layer, null, this.polygonFilter);
-
+    // Kick off the download process and save zip file in browser
     observableResponse.subscribe(value => {
       this.download4pStarted = false;
       const blob = new Blob([value], {type: 'application/zip'});
@@ -305,9 +323,9 @@ export class DownloadPanelComponent implements OnInit {
     }, err => {
       this.download4pStarted = false;
       if (UtilitiesService.isEmpty(err.message)) {
-        alert('An error has occured whilst attempting to download. Kindly contact cg-admin@csiro.au');
+        alert('An error has occurred whilst attempting to download. Kindly contact cg-admin@csiro.au');
       } else {
-        alert('An error has occured whilst attempting to download. (' + err.message + ') Kindly contact cg-admin@csiro.au');
+        alert('An error has occurred whilst attempting to download. (' + err.message + ') Kindly contact cg-admin@csiro.au');
       }
     });
   }

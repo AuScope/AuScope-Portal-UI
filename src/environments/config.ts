@@ -3,19 +3,25 @@
 
 export const config = {
   nvclUrl: 'https://nvclwebservices.csiro.au/NVCLDataServices',
+  // Layers that support downloading WFS feature data as zipped CSV files
   csvSupportedLayer: [
     'mineral-tenements',
     'tima-geosample',
     'nvcl-v2-borehole',
     'tima-shrimp-geosample',
-    'mscl-borehole',
     'pressuredb-borehole',
     'sf0-borehole-nvcl',
     'erl-mineview',
     'erl-mineraloccurrenceview',
     'erl-commodityresourceview'
   ],
-
+  // Layers that download zipped datasets using 'datasetURL' feature name in the WFS response
+  datasetUrlSupportedLayer: {
+    'mscl-borehole': {
+        datasetURL: 'datasetURL'
+    }
+  },
+  // Layers that support downloads of an area bounded by a polygon
   polygonSupportedLayer: [
     'mineral-tenements',
     'tima-geosample',
@@ -25,8 +31,8 @@ export const config = {
     'erl-mineraloccurrenceview',
     'erl-commodityresourceview'
   ],
-  // Set 'downloadAreaMaxSize' to Number.MAX_SAFE_INTEGER
-  // to disable area download limits
+  // Layers that support downloading datasets via WCS
+  // (Set 'downloadAreaMaxSize' to Number.MAX_SAFE_INTEGER to disable area download limits)
   wcsSupportedLayer: {
     'aster-aloh': {
       downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
@@ -131,6 +137,7 @@ export const config = {
       downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
     }
   },
+  // Layers that require the proxy service to add layers
   forceAddLayerViaProxy: [
     'erml-miningactivity',
     'erml-mine',
@@ -149,21 +156,43 @@ export const config = {
     'gsv-geological-unit-50k-',
     'gsv-shear-displacement-structure-50k-',
     'gsv-geological-unit-50k-age',
-    'UOW-Crn-Aus-Basins',
-    'UOW-Crn-Aus-Outlets',
-    'UOW-Crn-Inprep-Basins',
-    'UOW-Crn-Inprep-Outlets',
-    'UOW-Crn-Int-Basins',
-    'UOW-Crn-Int-Outlets',
-    'UOW-Crn-XXL-Basins',
-    'UOW-Crn-XXL-Outlets',
-    'UOW-OSLTL-Basins',
-    'UOW-OSLTL-Outlets'
+    'Octopus-Crn-Aus-Basins',
+    'Octopus-Crn-Aus-Outlets',
+    'Octopus-Crn-Int-Basins',
+    'Octopus-Crn-Int-Outlets',
+    'Octopus-Crn-XXL-Basins',
+    'Octopus-Crn-XXL-Outlets',
+    'Octopus-Crn-Basin-BBoxes',
+    'Octopus-Sahul-Arch-Radicarbon',
+    'Octopus-Sahul-Arch-OSL',
+    'Octopus-Sahul-Arch-TL',
+    'Octopus-Sahul-Sed-Archives-Aeolian-Osl',
+    'Octopus-Sahul-Sed-Archives-Aeolian-Tl',
+    'Octopus-Sahul-Sed-Archives-Fluvial-Osl',
+    'Octopus-Sahul-Sed-Archives-Fluvial-Tl',
+    'Octopus-Sahul-Sed-Archives-Lacustrine-Osl',
+    'Octopus-Sahul-Sed-Archives-Lacustrine-Tl'
   ],
+  // Layers that use CSW records to display a simple rectangle on map
   cswrenderer: [
-    'portal-reports',
-    'portal-pmd-crc-reports',
-    'fina-repo-3d-geol-mode-of-the-east-yilg-crat-proj-pmd-y2-sept-2001-dece-2004',
+    'pmd-crc-project-a1-presentations',
+    'pmd-crc-project-c1-final-report',
+    'pmd-crc-project-c2-final-report',
+    'pmd-crc-project-c6-final-report',
+    'pmd-crc-project-c7-final-report',
+    'pmd-crc-project-i1-appendix1',
+    'pmd-crc-project-i1-appendix5',
+    'pmd-crc-project-i2-presentations',
+    'pmd-crc-project-i5-final-report',
+    'pmd-crc-project-i6-final-report',
+    'pmd-crc-project-i9-final-report',
+    'pmd-crc-project-t1-final-report',
+    'pmd-crc-project-t3-final-report',
+    'pmd-crc-project-t67-final-report',
+    'pmd-crc-project-t11-final-report',
+    'pmd-crc-project-y2-appendix',
+    'pmd-crc-project-y4-final-report',
+    'leme-crc-maps',
     'portal-geo-models'
   ],
   supportOpenInNewWindow: [

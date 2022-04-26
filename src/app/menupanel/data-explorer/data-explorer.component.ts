@@ -7,7 +7,7 @@ import { NgbTypeahead } from "@ng-bootstrap/ng-bootstrap";
 import { UILayerModelService } from "app/services/ui/uilayer-model.service";
 import { RenderStatusService } from "@auscope/portal-core-ui";
 import { Registry } from "./data-model";
-import { RectangleEditorObservable } from "angular-cesium";
+import { RectangleEditorObservable } from "@auscope/angular-cesium";
 import { UILayerModel } from "../common/model/ui/uilayer.model";
 
 @Component({

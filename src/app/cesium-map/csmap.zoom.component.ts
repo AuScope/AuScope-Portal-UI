@@ -1,5 +1,5 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import { CameraService, CesiumService, ZoomToRectangleService } from 'angular-cesium';
+import { CameraService, CesiumService, ZoomToRectangleService } from '@auscope/angular-cesium';
 import { CsMapComponent } from './csmap.component';
 
 @Component({

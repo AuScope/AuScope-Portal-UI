@@ -1,0 +1,45 @@
+:host {
+    position: absolute;
+    margin-left: 22px;
+    margin-top: 175px;
+
+    .style-legend {
+        border: solid 1px black;
+        background-color: rgba(255,255,255,0.6);
+        padding: 5px;
+        height: 140px;
+        text-align: center;
+      }
+      
+    .legend-panel {
+        display: flex;
+    }
+
+    .max-legend {
+        height: 50px;
+        width: 50px;
+    }
+
+    .min-legend {
+        height: 50px;
+        width: 50px;
+    }
+
+    .legend-gradient {
+        float: left;
+    }
+
+    .legend-text {
+        float: left;
+        margin-left: 4px;
+    }
+    
+    .max-text {
+        height: 42px;
+    }
+
+    .neutral-text {
+        height: 40px;
+    }
+
+}

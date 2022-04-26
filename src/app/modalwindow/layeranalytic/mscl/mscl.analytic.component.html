@@ -14,6 +14,7 @@
 				<span aria-hidden="true">×</span>
 			</button>
 		</div>
+		<div #error_display></div>
 		<div class="card-body">
 			<div #graphing_area>
 			    <plotly-plot [data]="graphInput.data" [layout]="graphInput.layout" [config]="graphInput.options" [updateOnLayoutChange]="true" [updateOnDataChange]="true" [divId]="graphing_area"></plotly-plot>

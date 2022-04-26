@@ -261,6 +261,16 @@ input + div.input-group-append  > button {
     cursor: pointer;
 }
 
+
+
+/* Info Panel has an openlayers map */
+#previewMapElementContainer {
+    display: block;
+    height: calc(#{$card-width} - 40px);
+    width: calc(#{$card-width} - 40px);
+    margin-left: 5px;
+}
+
 #previewMapElement {
     display: block;
     width: 100%;
