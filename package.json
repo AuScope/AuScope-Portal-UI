@@ -4,8 +4,8 @@
   "license": "MIT",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
+    "start": "node --max_old_space_size=8000 ./node_modules/@angular/cli/bin/ng serve",
+    "build": "node --max_old_space_size=8000 ./node_modules/@angular/cli/bin/ng build",
     "build-prod": "node --max_old_space_size=8000 ./node_modules/@angular/cli/bin/ng build --configuration production --configuration=production",
     "build-test": "node --max_old_space_size=8000 ./node_modules/@angular/cli/bin/ng build --configuration production --configuration=au2",
     "build-dev": "node --max_old_space_size=8000 ./node_modules/@angular/cli/bin/ng build --configuration production --configuration=audev",
