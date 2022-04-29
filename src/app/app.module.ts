@@ -78,6 +78,7 @@ import { DataExplorerComponent } from './menupanel/data-explorer/data-explorer.c
 import { DataExplorerdRecordModule } from './menupanel/data-explorer-record/data-explorer-record.modules';
 import { RecordModalComponent } from './menupanel/record-modal/record-modal.component';
 import { ToolbarModule } from './toolbar/toolbar.module';
+import { NVCLService } from './modalwindow/querier/customanalytic/nvcl/nvcl.service';
 
 
 PlotlyModule.plotlyjs = PlotlyJS;
@@ -121,7 +122,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
         DataExplorerComponent,
         RecordModalComponent
     ],
-    providers: [AuscopeApiService, RectanglesEditorService],
+    providers: [AuscopeApiService, RectanglesEditorService,,NVCLService],
     imports: [
         PortalCoreModule.forRoot(environment, config),
         PortalCorePipesModule,

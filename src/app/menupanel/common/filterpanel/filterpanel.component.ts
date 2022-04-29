@@ -438,7 +438,7 @@ export class FilterPanelComponent implements OnInit {
 
   /**
    * WMS date dropdown change event, set the current time
-   * 
+   *
    * @param newDate new date chosen from time extent
    */
   public changeCurrentTime(newDate: Date) {

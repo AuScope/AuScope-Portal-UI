@@ -118,7 +118,7 @@
 
 		<!-- WMS time periods (if time extents present in LayerModel.capabilityRecords or GetCapabilities) -->
 		<button *ngIf="loadingTimeExtent" type="button" class="btn btn-info btn-sm date-btn unclickable-btn"><i class="fa fa-spinner fa-spin" style="cursor:default;"></i>&nbsp;&nbsp;Querying time</button>
-		<div ngbDropdown class="time-dropdown" *ngIf="currentTime">
+		<div ngbDropdown *ngIf="currentTime" dropdownClass="time-dropdown" container="body">
 			<button *ngIf="!loadingTimeExtent && timeExtent.length === 1" type="button" class="btn btn-info btn-sm date-btn unclickable-btn" style="cursor:default;"><i class="fa fa-calendar"></i>&nbsp;&nbsp;{{ currentTime | date }}</button>
 			<button *ngIf="!loadingTimeExtent && timeExtent.length > 1" type="button" class="btn btn-info btn-sm date-btn" ngbDropdownToggle><i class="fa fa-calendar"></i>&nbsp;&nbsp;{{ currentTime | date }}</button>
 			<div class="dropdown-menu" *ngIf="!loadingTimeExtent && timeExtent && timeExtent.length > 1" ngbDropdownMenu>
