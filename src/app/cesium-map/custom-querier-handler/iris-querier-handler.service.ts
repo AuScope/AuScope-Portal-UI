@@ -20,7 +20,7 @@ export class IrisQuerierHandler {
       html += '<div class="row"><div class="col-md-3">Resource Description</div><div class="col-md-9">' + cswRecord.description + '</div></div><hr>';
       html += '<div class="row"><div class="col-md-3">Provider</div><div class="col-md-9">' + cswRecord.resourceProvider + '</div></div><hr>';
       html += '<div class="row"><div class="col-md-3">Date</div><div class="col-md-9">' + cswRecord.date + '</div></div><hr>';
-      html += '<div class="row"><div class="col-md-3">Source</div><div class="col-md-9"><a href="' + cswRecord.recordInfoUrl + '">Full Metadata and download</a></div></div><hr>';
+      html += '<div class="row"><div class="col-md-3">Source</div><div class="col-md-9"><a style="color: #000000" href="' + cswRecord.recordInfoUrl + '">Full Metadata and download</a></div></div><hr>';
     }
     html += '</div></div>';
     return html;
