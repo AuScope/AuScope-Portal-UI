@@ -77,7 +77,7 @@ export class FilterPanelComponent implements OnInit {
             me.getProvider();
           }
           if (layerStateObj.hasOwnProperty(me.layer.id)) {
-            me.optionalFilters = layerStateObj[me.layer.id].optionalFilters;
+            me.optionalFilters = me.optionalFilters.concat(layerStateObj[me.layer.id].optionalFilters);
             setTimeout(() => {
               me.addLayer(me.layer);
             }, 100);
@@ -302,11 +302,10 @@ export class FilterPanelComponent implements OnInit {
         return;
       }
     }
-    if (
-      UtilitiesService.isEmpty(this.providers) &&
-      filter.type === 'OPTIONAL.PROVIDER'
-    ) {
-      this.getProvider();
+    if (filter.type === 'OPTIONAL.PROVIDER') {
+      if (UtilitiesService.isEmpty(this.providers)) {
+        this.getProvider();
+      }
       filter.value = {};
       for (const provider of this.providers) {
         filter.value[provider['value']] = false;
