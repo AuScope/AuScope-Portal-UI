@@ -110,14 +110,13 @@ export class QuerierModalComponent  implements OnInit {
       }
     }
 
+    // Store state object in DB & open up window
     const uncompStateStr = JSON.stringify(state);
-    this.manageStateService.getCompressedString(uncompStateStr, function(result) {
-      // Encode state in base64 so it can be used in a URL
-      const stateStr = UtilitiesService.encode_base64(String.fromCharCode.apply(String, result));
-      const permanentlink = environment.hostUrl + '?state=' + stateStr
-      window.open(permanentlink);
+    this.manageStateService.saveStateToDB(uncompStateStr).subscribe((response: any) => {
+      if (response.success === true) {
+        window.open(environment.hostUrl + '?state=' + response.id);
+      }
     });
-
   }
 
 

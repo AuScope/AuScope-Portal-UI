@@ -1,8 +1,6 @@
 import {ManageStateService} from '@auscope/portal-core-ui';
-import { UtilitiesService } from '@auscope/portal-core-ui';
+import { Component } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import {Component} from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 @Component({
   selector: '[appPermanentLink]',
@@ -11,44 +9,27 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 })
 
 export class PermanentLinkComponent {
-
-  public permanentlink = '';
-  public textwww = 'fdsafdas';
+  public permanentlink = "";
   public showPermanentLink = false;
   public shorteningMode = false;
 
-  constructor(private http: HttpClient, private manageStateService: ManageStateService) {
+  constructor(private manageStateService: ManageStateService) {
 
   }
 
   /**
-   * generate the permanent link
+   * Generate the permanent link
    */
   public generatePermanentLink() {
     if (this.showPermanentLink) {
       const uncompStateStr = JSON.stringify(this.manageStateService.getState());
       const me = this;
-      this.manageStateService.getCompressedString(uncompStateStr, function(result) {
-
-        // Encode state in base64 so it can be used in a URL
-        const stateStr = encodeURIComponent(UtilitiesService.encode_base64(String.fromCharCode.apply(String, result)));
-        me.permanentlink = environment.hostUrl + '?state=' + stateStr;
-        me.shorteningMode = true;
-        // Shorten url by bitly
-        let httpParams = new HttpParams();
-        httpParams = httpParams.append('format', 'json');
-        httpParams = httpParams.append('apiKey', 'R_c8a26bd1b5294388873f7d5adb79192b');
-        httpParams = httpParams.append('login', 'lingbojiang');
-        httpParams = httpParams.append('longUrl', me.permanentlink);
-        const me_ = me;
-        me.http.post('http://api.bitly.com/v3/shorten?', httpParams.toString(), {
-          headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'), responseType: 'json'
-        }).subscribe((response: any) => {
-          if (response.status_txt === 'OK') {
-            me_.permanentlink = response.data.url;
-          }
-          me_.shorteningMode = false;
-        });
+      me.shorteningMode = true;
+      this.manageStateService.saveStateToDB(uncompStateStr).subscribe((response: any) => {
+        if (response.success === true) {
+          me.permanentlink = environment.hostUrl + "?state=" + response.id;
+        }
+        me.shorteningMode = false;
       });
     }
   }

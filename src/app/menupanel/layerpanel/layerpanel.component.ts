@@ -8,6 +8,12 @@ import { MatSliderChange } from '@angular/material/slider';
 import { ImagerySplitDirection } from 'cesium';
 import { ToolbarComponentsService } from 'app/services/ui/toolbar-components.service';
 
+// Filter modes available in the dropdown layer filter selector
+enum FilterMode {
+  Active = "Active Layer",
+  Image = "Image Layer",
+  Data = "Data Layer"
+};
 
 @Component({
     selector: '[appLayerPanel]',
@@ -16,12 +22,17 @@ import { ToolbarComponentsService } from 'app/services/ui/toolbar-components.ser
 })
 export class LayerPanelComponent implements OnInit {
 
+  // Create a FilterMode that can be used in the HTML template 
+  eFilterMode = FilterMode;
+
   layerGroups: {};
   bsModalRef: BsModalRef;
   @Output() expanded: EventEmitter<any> = new EventEmitter();
   searchText: string
   searchMode: boolean;
   areLayersFiltered: boolean;
+
+
 
   constructor(private layerHandlerService: LayerHandlerService, private renderStatusService: RenderStatusService,
       private modalService: BsModalService, private csMapService: CsMapService,
@@ -51,24 +62,24 @@ export class LayerPanelComponent implements OnInit {
    * Filter layers based on polygon filter
    */
   public searchFilter() {
-    for (const layerGroupKey in this.layerGroups) {
-      this.layerGroups[layerGroupKey].hide = true;
-      for (const layer of this.layerGroups[layerGroupKey]) {
+    for (const group in this.layerGroups) {
+      this.layerGroups[group].hide = true;
+      for (const layer of this.layerGroups[group]) {
         layer.hide = true;
-        this.layerGroups[layerGroupKey].loaded = undefined;
+        this.layerGroups[group].loaded = undefined;
         // Only layers with a polygon filter
         if (this.layerHasPolygonFilter(layer)) {
           layer.hide = false;
-          this.layerGroups[layerGroupKey].hide = false;
-          this.layerGroups[layerGroupKey].expanded = true;
-          this.layerGroups[layerGroupKey].loaded = this.layerGroups[layerGroupKey];
+          this.layerGroups[group].hide = false;
+          this.layerGroups[group].expanded = true;
+          this.layerGroups[group].loaded = this.layerGroups[group];
         }
       }
     }
   }
 
   /**
-   * search through the layers and filter out based on keyword
+   * Search through the layers and filter out based on keyword
    */
   public search() {
     if (this.searchText.trim() === '') {
@@ -76,105 +87,66 @@ export class LayerPanelComponent implements OnInit {
     } else {
       this.searchMode = true;
     }
-    for (const layerGroupKey in this.layerGroups) {
-      this.layerGroups[layerGroupKey].hide = true;
-      for (const layer of this.layerGroups[layerGroupKey]) {
+    for (const group in this.layerGroups) {
+      this.layerGroups[group].hide = true;
+      for (const layer of this.layerGroups[group]) {
         layer.hide = true;
-        this.layerGroups[layerGroupKey].loaded = undefined;
+        this.layerGroups[group].loaded = undefined;
         if (this.areLayersFiltered && !this.layerHasPolygonFilter(layer)) {
           continue;
         }
-        if (layerGroupKey.toLowerCase().indexOf(this.searchText.toLowerCase()) >= 0
+        if (group.toLowerCase().indexOf(this.searchText.toLowerCase()) >= 0
             || layer.description.toLowerCase().indexOf(this.searchText.toLowerCase()) >= 0
             || layer.name.toLowerCase().indexOf(this.searchText.toLowerCase()) >= 0) {
           layer.hide = false;
-          this.layerGroups[layerGroupKey].hide = false;
-          this.layerGroups[layerGroupKey].loaded = this.layerGroups[layerGroupKey];
+          this.layerGroups[group].hide = false;
+          this.layerGroups[group].loaded = this.layerGroups[group];
         }
       }
     }
   }
 
   /**
-   * search through the layers and filter out based on keyword
+   * Search through the layers and filter layers by FilterMode
+   * 
+   * @param mode FilterMode
    */
-  public searchActive() {
-    this.searchText = 'Active Layer';
+  public searchByFilterMode(mode: FilterMode) {
+    this.searchText = mode;
     this.searchMode = true;
 
-    for (const layerGroupKey in this.layerGroups) {
-      this.layerGroups[layerGroupKey].hide = true;
-      for (const layer of this.layerGroups[layerGroupKey]) {
+    for (const group in this.layerGroups) {
+      this.layerGroups[group].hide = true;
+      for (const layer of this.layerGroups[group]) {
         layer.hide = true;
         layer.expanded = false;
-        this.layerGroups[layerGroupKey].loaded = undefined;
+        this.layerGroups[group].loaded = undefined;
         if (this.areLayersFiltered && !this.layerHasPolygonFilter(layer)) {
           continue;
         }
-        if (this.getUILayerModel(layer.id).statusMap.getRenderStarted()) {
+        let cond = false;
+        switch(mode) {
+          case FilterMode.Active:
+            cond = this.getUILayerModel(layer.id).statusMap.getRenderStarted();
+            break;
+          case FilterMode.Image:
+            cond = this.layerHandlerService.contains(layer, ResourceType.WMS);
+            break;
+          case FilterMode.Data:
+            cond = this.layerHandlerService.contains(layer, ResourceType.WFS);
+            break;
+        }
+        if (cond) {
           layer.hide = false;
-          this.layerGroups[layerGroupKey].hide = false;
-          this.layerGroups[layerGroupKey].expanded = true;
-          this.layerGroups[layerGroupKey].loaded = this.layerGroups[layerGroupKey];
+          this.layerGroups[group].hide = false;
+          this.layerGroups[group].expanded = true;
+          this.layerGroups[group].loaded = this.layerGroups[group];
           layer.expanded = false;
         }
       }
     }
   }
 
-  /**
-   * search through the layers and filter out based on keyword
-   */
-  public searchImage() {
-    this.searchText = 'Image Layer';
-    this.searchMode = true;
-
-    for (const layerGroupKey in this.layerGroups) {
-      this.layerGroups[layerGroupKey].hide = true;
-      for (const layer of this.layerGroups[layerGroupKey]) {
-        layer.hide = true;
-        layer.expanded = false;
-        this.layerGroups[layerGroupKey].loaded = undefined;
-        if (this.areLayersFiltered && !this.layerHasPolygonFilter(layer)) {
-          continue;
-        }
-        if (this.layerHandlerService.contains(layer, ResourceType.WMS)) {
-          layer.hide = false;
-          this.layerGroups[layerGroupKey].hide = false;
-          this.layerGroups[layerGroupKey].expanded = true;
-          this.layerGroups[layerGroupKey].loaded = this.layerGroups[layerGroupKey];
-          layer.expanded = false;
-        }
-      }
-    }
-  }
-
-  /**
-   * search through the layers and filter out based on keyword
-   */
-  public searchData() {
-    this.searchText = 'Data Layer';
-    this.searchMode = true;
-
-    for (const layerGroupKey in this.layerGroups) {
-      this.layerGroups[layerGroupKey].hide = true;
-      for (const layer of this.layerGroups[layerGroupKey]) {
-        layer.hide = true;
-        layer.expanded = false;
-        this.layerGroups[layerGroupKey].loaded = undefined;
-        if (this.areLayersFiltered && !this.layerHasPolygonFilter(layer)) {
-          continue;
-        }
-        if (this.layerHandlerService.contains(layer, ResourceType.WFS)) {
-          layer.hide = false;
-          this.layerGroups[layerGroupKey].hide = false;
-          this.layerGroups[layerGroupKey].expanded = true;
-          this.layerGroups[layerGroupKey].loaded = this.layerGroups[layerGroupKey];
-          layer.expanded = false;
-        }
-      }
-    }
-  }
 
   /**
    * Returns true if any layer in a layer group is visible in the sidebar
@@ -206,37 +178,54 @@ export class LayerPanelComponent implements OnInit {
       const nvclanid = UtilitiesService.getUrlParameterByName('nvclanid');
       const state = UtilitiesService.getUrlParameterByName('state');
       const me = this;
-      this.manageStateService.getUnCompressedString(state, function(result) {
-        const layerStateObj = JSON.parse(result);
+
+      // Attempt to fetch state from permanent link database
+      this.manageStateService.fetchStateFromDB(state).subscribe((layerStateObj: any) => {
+
+        // If permanent link state is defined, then re-orient the camera
         if (!UtilitiesService.isEmpty(layerStateObj)) {
           me.manageStateService.resumeMapState(layerStateObj.map);
         }
+
+        // Initialise layers and groups in sidebar
         me.layerHandlerService.getLayerRecord().subscribe(
           response => {
             me.layerGroups = response;
-            for (const key in me.layerGroups) {
-              for (let i = 0; i < me.layerGroups[key].length; i++) {
-                me.layerGroups[key][i].csLayers = [];
-                const uiLayerModel = new UILayerModel(me.layerGroups[key][i].id, me.renderStatusService.getStatusBSubject(me.layerGroups[key][i]));
-                // VT: permanent link
+            // Loop over each group of layers
+            for (const group in me.layerGroups) {
+              // Loop over each layer in a group
+              for (let layer_idx = 0; layer_idx < me.layerGroups[group].length; layer_idx++) {
+
+                // Initialise a list of cesium layers
+                me.layerGroups[group][layer_idx].csLayers = [];
+                // Initialise UILayerModel
+                const uiLayerModel = new UILayerModel(me.layerGroups[group][layer_idx].id, me.renderStatusService.getStatusBSubject(me.layerGroups[group][layer_idx]));
+                me.uiLayerModelService.setUILayerModel(me.layerGroups[group][layer_idx].id, uiLayerModel);
+
+                // Configure according to permanent link state
                 if (layerStateObj && layerStateObj[uiLayerModel.id]) {
-                  me.layerGroups[key].expanded = true;
-                  me.layerGroups[key].loaded = me.layerGroups[key];
-                  me.layerGroups[key][i].expanded = true;
-                  me.layerGroups[key][i].filterCollection.hiddenParams = layerStateObj[uiLayerModel.id].filterCollection.hiddenParams
-                  me.layerGroups[key][i].filterCollection.mandatoryFilters = layerStateObj[uiLayerModel.id].filterCollection.mandatoryFilters
+                  me.layerGroups[group].expanded = true;
+                  me.layerGroups[group].loaded = me.layerGroups[group];
+                  me.layerGroups[group][layer_idx].expanded = true;
+                  if (layerStateObj[uiLayerModel.id].filterCollection.hasOwnProperty('hiddenParams')) {
+                    me.layerGroups[group][layer_idx].filterCollection.hiddenParams = layerStateObj[uiLayerModel.id].filterCollection.hiddenParams;
+                  }
+                  if (layerStateObj[uiLayerModel.id].filterCollection.hasOwnProperty('mandatoryFilter')) {
+                    me.layerGroups[group][layer_idx].filterCollection.mandatoryFilters = layerStateObj[uiLayerModel.id].filterCollection.mandatoryFilters;
+                  }
                 }
+
                 // LJ: nvclAnalyticalJob link
                 if (nvclanid && uiLayerModel.id === 'nvcl-v2-borehole') {
-                  me.layerGroups[key].expanded = true;
-                  me.layerGroups[key].loaded = me.layerGroups[key];
-                  me.layerGroups[key][i].expanded = true;
+                  me.layerGroups[group].expanded = true;
+                  me.layerGroups[group].loaded = me.layerGroups[group];
+                  me.layerGroups[group][layer_idx].expanded = true;
                 }
-                me.uiLayerModelService.setUILayerModel(me.layerGroups[key][i].id, uiLayerModel);
               }
             }
           });
       });
+
       this.CsClipboardService.filterLayersBS.subscribe(
         (bFilterLayers) => {
           if (bFilterLayers) {
@@ -248,7 +237,7 @@ export class LayerPanelComponent implements OnInit {
   }
 
   /**
-   * open the modal that display the status of the render
+   * Open the modal that display the status of the render
    */
   public openStatusReport(uiLayerModel: UILayerModel) {
     this.bsModalRef = this.modalService.show(NgbdModalStatusReportComponent, {class: 'modal-lg'});
@@ -258,7 +247,7 @@ export class LayerPanelComponent implements OnInit {
   }
 
   /**
-   * remove the layer from the map
+   * Remove the layer from the map
    */
   public removeLayer(layer: LayerModel) {
     this.getUILayerModel(layer.id).opacity = 100;
@@ -308,6 +297,12 @@ export class LayerPanelComponent implements OnInit {
     this.csMapService.setLayerSplitDirection(layer, splitDir);
   }
 
+  /**
+   * Gets the layer's split direction
+   * 
+   * @param layerId layer id string
+   * @returns a string "none" or "left" or "right"
+   */
   public getLayerSplitDirection(layerId: string): string {
     let splitDir = "none";
     if (this.csMapService.getLayerModel(layerId) !== null) {
@@ -346,6 +341,12 @@ export class LayerPanelComponent implements OnInit {
    return false;
   }
 
+  /**
+   * Gets a layers "UILayerModel"
+   * 
+   * @param layerId layer id string
+   * @returns UILayerModel object 
+   */
   public getUILayerModel(layerId: string): UILayerModel {
     return this.uiLayerModelService.getUILayerModel(layerId);
   }

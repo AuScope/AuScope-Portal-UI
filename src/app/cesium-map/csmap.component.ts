@@ -161,15 +161,14 @@ export class CsMapComponent implements AfterViewInit {
     const state = UtilitiesService.getUrlParameterByName('state');
     if (state) {
       const me = this;
-      this.manageStateService.getUnCompressedString(state, function(result) {
-        const layerStateObj = JSON.parse(result);
-        me.modalDisplayed = false;
-
+      this.manageStateService.fetchStateFromDB(state).subscribe((layerStateObj: any) => {
+        if (layerStateObj) {
+          me.modalDisplayed = false;
           for (const layerKey in layerStateObj) {
             if (layerKey === 'map') {
               continue;
             }
-            if (layerStateObj[layerKey].raw) {
+            if (layerStateObj[layerKey] && layerStateObj[layerKey].hasOwnProperty('raw') && layerStateObj[layerKey].raw) {
               me.csMapService.getAddLayerSubject().subscribe((layer: LayerModel) => {
                 setTimeout(() => {
                   if (layer.id === layerKey) {
@@ -183,8 +182,8 @@ export class CsMapComponent implements AfterViewInit {
               })
             }
           }
+        }
       });
-      // VT: End permanent link
     }
 
     // Set the map's ViewContainerRef for adding toolbars
