@@ -94,34 +94,7 @@ export class LayerPanelComponent implements OnInit {
       }
     }
   }
-
-  /**
-   * search through the layers and filter out based on keyword
-   */
-  public searchActive() {
-    this.searchText = 'Active Layer';
-    this.searchMode = true;
-
-    for (const layerGroupKey in this.layerGroups) {
-      this.layerGroups[layerGroupKey].hide = true;
-      for (const layer of this.layerGroups[layerGroupKey]) {
-        layer.hide = true;
-        layer.expanded = false;
-        this.layerGroups[layerGroupKey].loaded = undefined;
-        if (this.areLayersFiltered && !this.layerHasPolygonFilter(layer)) {
-          continue;
-        }
-        if (this.getUILayerModel(layer.id).statusMap.getRenderStarted()) {
-          layer.hide = false;
-          this.layerGroups[layerGroupKey].hide = false;
-          this.layerGroups[layerGroupKey].expanded = true;
-          this.layerGroups[layerGroupKey].loaded = this.layerGroups[layerGroupKey];
-          layer.expanded = false;
-        }
-      }
-    }
-  }
-
+  
   /**
    * search through the layers and filter out based on keyword
    */
