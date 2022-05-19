@@ -73,7 +73,7 @@ export class CsMapComponent implements AfterViewInit {
       me.handleLayerClick(mapClickInfo);
     });
     // viewerOptions will be passed the Cesium.Viewer constuctor
-    viewerConf.viewerOptions = {
+    this.viewerConf.viewerOptions = {
       selectionIndicator: false,
       timeline: false,
       infoBox: false,
@@ -90,7 +90,8 @@ export class CsMapComponent implements AfterViewInit {
       mapMode2D: MapMode2D.INFINITE_SCROLL,
     };
     // Will be called on viewer initialistion
-    viewerConf.viewerModifier = (viewer: any) => {
+    this.viewerConf.viewerModifier = (viewer: any) => {
+      this.viewer = viewer;
       // Remove default double click zoom behaviour
       viewer.screenSpaceEventHandler.removeInputAction(ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
       const scene = viewer.scene;
@@ -123,13 +124,18 @@ export class CsMapComponent implements AfterViewInit {
       viewer.camera.setView({
         destination: CsMapComponent.AUSTRALIA
       });
-      this.viewer = viewer;
 
       // This reduces the blockiness of the text fonts and other graphics
       this.viewer.resolutionScale = window.devicePixelRatio;
 
       // Zoom to Australia after 2D/3D/Columbus morph
       this.viewer.scene.morphComplete.addEventListener(() => {
+        // IF this is a permanent link then suppress the flyto operation
+        if (this.manageStateService.isPermLinkMode()) {
+          // Only do this once, so user can set the SceneMode after applying perm link
+          this.manageStateService.setPermLinkMode(false);
+          return;
+        }
         const pitch = this.viewer.camera._mode === SceneMode.COLUMBUS_VIEW ? Math.toRadians(-45.0) : Math.toRadians(-90.0);
         const orient = {
           heading : Math.toRadians(0.0),
@@ -154,7 +160,6 @@ export class CsMapComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-
     this.csMapService.init();
 
     // This code is used to display the map state stored in a permanent link
