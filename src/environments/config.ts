@@ -13,13 +13,33 @@ export const config = {
     'sf0-borehole-nvcl',
     'erl-mineview',
     'erl-mineraloccurrenceview',
-    'erl-commodityresourceview'
+    'erl-commodityresourceview',
+    'ga-geophysicalsurveys-all',
+    'ga-geophysicalsurveys-grav',
+    'ga-geophysicalsurveys-radio',
+    'ga-geophysicalsurveys-mag',
+    'gga-geophysicalsurveys-elev'
   ],
+
   // Layers that download zipped datasets using 'datasetURL' feature name in the WFS response
   datasetUrlSupportedLayer: {
     'mscl-borehole': {
-        datasetURL: 'datasetURL'
-    }
+      datasetURL: 'datasetURL'
+    },
+  },
+
+  // Layers that download 
+  datasetUrlAussPassLayer: {
+    'passive seismic': {
+      'serviceType': {
+        'Station': {
+          isGeometryOptional: true,
+        },
+        'Dataselect': {
+          isGeometryOptional: false,
+        }
+      }
+    },
   },
   // Layers that support downloads of an area bounded by a polygon
   polygonSupportedLayer: [

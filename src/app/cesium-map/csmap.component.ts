@@ -397,7 +397,7 @@ export class CsMapComponent implements AfterViewInit {
    * @returns HTML string
    */
   private parseCSWtoHTML(cswRecord: CSWRecordModel): string {
-    let html =  '<div class="row"><div class="col-md-3">Source</div><div class="col-md-9"><a href="' + cswRecord.recordInfoUrl + '">Full Metadata and download</a></div></div><hr>';
+    let html =  '<div class="row"><div class="col-md-3">Source</div><div class="col-md-9"><a style="color: #000000" href="' + cswRecord.recordInfoUrl + '">Full Metadata and download</a></div></div><hr>';
     html +=  '<div class="row"><div class="col-md-3">Title</div><div class="col-md-9">' + cswRecord.name + '</div></div><hr>';
     html +=  '<div class="row"><div class="col-md-3">Abstract</div><div class="col-md-8"><div class="row" style="height: 100px;overflow-y: scroll;margin-left:0">' +
        cswRecord.description + '</div></div></div><hr>';
@@ -406,7 +406,7 @@ export class CsMapComponent implements AfterViewInit {
 
     html +=  '<div class="row"><div class="col-md-3">Resource link</div><div class="col-md-9">';
     for (const onlineResource of cswRecord.onlineResources) {
-      html += '<p><a href="' + onlineResource.url + '">' + (onlineResource.name ? onlineResource.name : 'Web resource link') + '</a></p>';
+      html += '<p><a style="color: #000000" href="' + onlineResource.url + '">' + (onlineResource.name ? onlineResource.name : 'Web resource link') + '</a></p>';
     }
     html += '</div></div>';
 
