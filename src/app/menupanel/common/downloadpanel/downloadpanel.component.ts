@@ -362,6 +362,7 @@ export class DownloadPanelComponent implements OnInit {
 
     // Kick off the download process and save zip file in browser
     observableResponse.subscribe(value => {
+      console.log(value)
       this.downloadStarted = false;
       const blob = new Blob([value], { type: 'application/zip' });
       saveAs(blob, 'download.zip');
@@ -370,7 +371,12 @@ export class DownloadPanelComponent implements OnInit {
       if (UtilitiesService.isEmpty(err.message)) {
         alert('An error has occurred whilst attempting to download. Kindly contact cg-admin@csiro.au');
       } else {
-        alert('An error has occurred whilst attempting to download. (' + err.message + ') Kindly contact cg-admin@csiro.au');
+        if (err.status == 413 && this.irisDownloadListOption) {
+          alert('An error has occurred whilst attempting to download. (Request entity is too large, please reduce the size by limiting the stations, channels, or time period.) Kindly contact cg-admin@csiro.au');
+
+        } else {
+          alert('An error has occurred whilst attempting to download. (' + err.message + ') Kindly contact cg-admin@csiro.au');
+        }
       }
     });
   }
