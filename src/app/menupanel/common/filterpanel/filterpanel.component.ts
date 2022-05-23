@@ -22,7 +22,7 @@ export class FilterPanelComponent implements OnInit {
   @Input() layer: LayerModel;
   private providers: Array<Object>;
   public optionalFilters: Array<Object>;
-  private selectedFilter;
+  public selectedFilter;
   public advanceparam = [];
   public analyticMap;
   public advanceFilterMap;
@@ -67,20 +67,21 @@ export class FilterPanelComponent implements OnInit {
       }
     }
 
-    // VT: permanent link
+    // This sets the filter parameters using the state data in the permanent link
     const state = UtilitiesService.getUrlParameterByName('state');
     if (state) {
       const me = this;
-      this.manageStateService.getUnCompressedString(state, function(result) {
-        const layerStateObj = JSON.parse(result);
-        if (layerStateObj[me.layer.id]) {
+      this.manageStateService.fetchStateFromDB(state).subscribe((layerStateObj: any) => {
+        if (layerStateObj) {
           if (UtilitiesService.isEmpty(me.providers)) {
             me.getProvider();
           }
-          me.optionalFilters = layerStateObj[me.layer.id].optionalFilters;
-          setTimeout(() => {
-            me.addLayer(me.layer);
-          }, 100)
+          if (layerStateObj.hasOwnProperty(me.layer.id)) {
+            me.optionalFilters = me.optionalFilters.concat(layerStateObj[me.layer.id].optionalFilters);
+            setTimeout(() => {
+              me.addLayer(me.layer);
+            }, 100);
+          }
         }
       });
     }
@@ -301,11 +302,10 @@ export class FilterPanelComponent implements OnInit {
         return;
       }
     }
-    if (
-      UtilitiesService.isEmpty(this.providers) &&
-      filter.type === 'OPTIONAL.PROVIDER'
-    ) {
-      this.getProvider();
+    if (filter.type === 'OPTIONAL.PROVIDER') {
+      if (UtilitiesService.isEmpty(this.providers)) {
+        this.getProvider();
+      }
       filter.value = {};
       for (const provider of this.providers) {
         filter.value[provider['value']] = false;
