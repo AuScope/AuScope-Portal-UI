@@ -60,6 +60,7 @@ export class DataExplorerRecordComponent implements OnInit {
     if (cswRecord) {
       const modelRef = this.modalService.open(RecordModalComponent, {
         size: "lg",
+        backdrop:false
       });
       modelRef.componentInstance.cswRecords = this.layer.cswRecords;
       modelRef.componentInstance.layer = this.layer;
