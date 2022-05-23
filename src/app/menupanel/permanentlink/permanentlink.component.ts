@@ -1,6 +1,7 @@
 import {ManageStateService} from '@auscope/portal-core-ui';
 import { Component } from '@angular/core';
 import { environment } from '../../../environments/environment';
+import { MapState } from '@auscope/portal-core-ui';
 
 @Component({
   selector: '[appPermanentLink]',
@@ -22,7 +23,8 @@ export class PermanentLinkComponent {
    */
   public generatePermanentLink() {
     if (this.showPermanentLink) {
-      const uncompStateStr = JSON.stringify(this.manageStateService.getState());
+      const mapState: MapState = this.manageStateService.getState();
+      const uncompStateStr = JSON.stringify(mapState);
       const me = this;
       me.shorteningMode = true;
       this.manageStateService.saveStateToDB(uncompStateStr).subscribe((response: any) => {
