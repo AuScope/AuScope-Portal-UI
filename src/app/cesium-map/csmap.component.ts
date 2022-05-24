@@ -41,6 +41,9 @@ declare var Cesium: any;
 })
 
 export class CsMapComponent implements AfterViewInit {
+
+  public static AUSTRALIA = Rectangle.fromDegrees(114.591, -45.837, 148.97, -5.73);
+
   // This is necessary to access the html element to set the map target (after view init)!
   @ViewChild('mapElement', { static: true }) mapElement: ElementRef;
 
@@ -57,8 +60,6 @@ export class CsMapComponent implements AfterViewInit {
   mouseLongitude: string;
 
   sliderMoveActive = false;
-
-  public static AUSTRALIA = Rectangle.fromDegrees(114.591, -45.837, 148.97, -5.73);
 
   private bsModalRef: BsModalRef;
   private modalDisplayed = false;
@@ -181,7 +182,7 @@ export class CsMapComponent implements AfterViewInit {
                       onlineResource: layerStateObj[layerKey].onlineResource,
                       layer: layer
                     }
-                    me.setModal(layerStateObj[layerKey].raw, mapLayer, null, layerStateObj[layerKey].gmlid);
+                    me.setModal(layerKey, layerStateObj[layerKey].raw, mapLayer, null, layerStateObj[layerKey].gmlid);
                   }
                 }, 0);
               })
@@ -359,21 +360,55 @@ export class CsMapComponent implements AfterViewInit {
           // Display CSW record info
           if (config.cswrenderer.includes(maplayer.id)) {
             me.displayModal(mapClickInfo.clickCoord);
-            const feature = {onlineResource: onlineResource, layer: maplayer};
             this.setModalHTML(this.parseCSWtoHTML(cswRecord), cswRecord.name, maplayer, this.bsModalRef);
 
           // Display WMS layer info
           } else {
             const params = this.getParams(maplayer.clickPixel[0], maplayer.clickPixel[1]);
-            this.queryWMSService.getFeatureInfo(onlineResource, maplayer.sldBody, maplayer.clickCoord[0], maplayer.clickCoord[1],
-              params.x, params.y, params.width, params.height, params.bbox).subscribe(
+            let sldBody = maplayer.sldBody;
+            let postMethod = false;
+            let infoFormat: string;
+            if (sldBody) {
+              postMethod = true;
+            } else {
+              sldBody = '';
+            }
+
+            // Layer specific SLD_BODY, INFO_FORMAT and postMethod
+            if (onlineResource.name.indexOf('ProvinceFullExtent') >= 0) {
+              infoFormat = 'application/vnd.ogc.gml';
+            } else {
+              infoFormat = 'application/vnd.ogc.gml/3.1.1';
+            }
+
+            if (UtilitiesService.isArcGIS(onlineResource)) {
+              infoFormat = 'text/xml';
+              sldBody = '';
+              postMethod = false;
+            }
+
+            // GSKY and some Loop3D layers require JSON response
+            if (config.wmsGetFeatureJSON.indexOf(maplayer.id) !== -1) {
+              infoFormat = 'application/json';
+            }
+
+            if (onlineResource.description.indexOf('EMAG2 - Total Magnetic Intensity') >= 0) {
+              infoFormat = 'text/xml';
+            }
+
+            if (onlineResource.description.indexOf('Onshore Seismic Surveys') >= 0) {
+              infoFormat = 'text/xml';
+            }
+
+            this.queryWMSService.getFeatureInfo(onlineResource, sldBody, infoFormat, postMethod,
+              maplayer.clickCoord[0], maplayer.clickCoord[1], params.x, params.y, params.width, params.height, params.bbox).subscribe(
                 result => {
                   const feature = {onlineResource: onlineResource, layer: maplayer};
-                  // Display the modal, but only if there are features 
-                  const num_feats = me.setModal(result, feature, mapClickInfo.clickCoord);
+                  // Display the modal, but only if there are features
+                  const num_feats = me.setModal(maplayer.id, result, feature, mapClickInfo.clickCoord);
 
                   // If zoom level is too low and nothing is found then show zoom message
-                  if (num_feats == 0 && params.level <= 3) {
+                  if (num_feats === 0 && params.level <= 3) {
                     me.displayModal(mapClickInfo.clickCoord);
                     me.bsModalRef.content.downloading = false;
                     me.bsModalRef.content.showZoomMsg = true;
@@ -445,13 +480,12 @@ export class CsMapComponent implements AfterViewInit {
     }
   }
 
-
   /**
    * Parse JSON response. This is used for responses from GSKY servers
    * but could be adapted for other servers at a later date
    * @param result response string to be processed
    * @param feature map feature object
-   * @returns list of objects; for each object keys are: 'key' 
+   * @returns list of objects; for each object keys are: 'key'
    */
   private parseJSONResponse(result: string, feature: any): any[] {
     const treeCollections = [];
@@ -463,22 +497,31 @@ export class CsMapComponent implements AfterViewInit {
       if (type === '[object Object]' || type === '[object Array]') {
         if (jsonObj.type && jsonObj.type === 'FeatureCollection' && jsonObj.features) {
           for (const jsonFeature of jsonObj.features) {
-            if (jsonFeature.properties) {
+            if (jsonFeature.properties && jsonFeature.properties.error) {
               // Remove GSKY error about 'Requested width/height is too large, max width:512, height:512'
               // NB: This can be removed once NCI improve the GSKY server so that there is a bigger limit on
               // WIDTH/HEIGHT parameter for the OGC WMS GetFeatureInfo request
               if (jsonFeature.properties.error) {
                 delete jsonFeature.properties.error;
               }
-              // Create a JSON-based feature
-              treeCollections.push({
-                key: feature.layer.name,
-                layer: feature.layer,
-                onlineResource: feature.onlineResource,
-                value: jsonFeature.properties,
-                format: 'JSON'
-              });
             }
+            // Type is always Feature, not useful
+            if (jsonFeature.type) {
+              delete jsonFeature.type;
+            }
+            // Convert coordinates to string (multiple levels of arrays made Loop3D coords unreadable)
+            if (jsonFeature.geometry && jsonFeature.geometry.coordinates) {
+              jsonFeature.geometry.coordinates = JSON.stringify(jsonFeature.geometry.coordinates);
+            }
+            // Create a JSON-based feature
+            treeCollections.push({
+              // Loop3D layers uniquely identified by id field not present in GSKY
+              key: jsonFeature.id ? jsonFeature.id : feature.layer.name,
+              layer: feature.layer,
+              onlineResource: feature.onlineResource,
+              value: jsonFeature,
+              format: 'JSON'
+            });
           }
         }
       }
@@ -491,15 +534,16 @@ export class CsMapComponent implements AfterViewInit {
 
   /**
    * Set the modal dialog with the layers that have been clicked on
+   * @param layerId the ID of the layer
    * @param result response string
    * @param feature map feature object
    * @param clickCoord map click coordinates
-   * @param gmlid: a optional filter to only display the gmlId specified
+   * @param gmlid a optional filter to only display the gmlId specified
    */
-  private setModal(result: string, feature: any, clickCoord: {x: number, y: number, z: number}|null, gmlid?: string) {
+  private setModal(layerId: string, result: string, feature: any, clickCoord: {x: number, y: number, z: number}|null, gmlid?: string) {
     let treeCollections = [];
-    // GSKY only returns JSON, even if you ask for XML & GML
-    if (UtilitiesService.isGSKY(feature.onlineResource)) {
+    // Some layers return JSON
+    if (config.wmsGetFeatureJSON.indexOf(layerId) !== -1) {
       treeCollections = this.parseJSONResponse(result, feature);
     } else {
       treeCollections = SimpleXMLService.parseTreeCollection(this.gmlParserService.getRootNode(result), feature);
@@ -560,7 +604,7 @@ export class CsMapComponent implements AfterViewInit {
     if (!this.sliderMoveActive) {
       return;
     }
-    // New position is slider position + the relative mouse offset    
+    // New position is slider position + the relative mouse offset
     let newSliderPosition = this.mapSlider.nativeElement.offsetLeft + movement.endPosition.x;
     // Make sure we haven't gone too far left (slider < 0) or right (slider > map width - slider width)
     if (newSliderPosition < 0) {
@@ -569,7 +613,7 @@ export class CsMapComponent implements AfterViewInit {
       newSliderPosition = this.mapElement.nativeElement.offsetWidth - this.mapSlider.nativeElement.offsetWidth;
     }
     const splitPosition = newSliderPosition / this.mapElement.nativeElement.offsetWidth;
-    this.mapSlider.nativeElement.style.left = 100.0 * splitPosition + "%";
+    this.mapSlider.nativeElement.style.left = 100.0 * splitPosition + '%';
     this.viewer.scene.imagerySplitPosition = splitPosition;
   }
 
@@ -583,7 +627,7 @@ export class CsMapComponent implements AfterViewInit {
     if (this.csMapService.getSplitMapShown()) {
         setTimeout(() => {
           this.viewer.scene.imagerySplitPosition = this.mapSlider.nativeElement.offsetLeft / this.mapElement.nativeElement.offsetWidth;
-          let handler = new ScreenSpaceEventHandler(this.mapSlider.nativeElement);
+          const handler = new ScreenSpaceEventHandler(this.mapSlider.nativeElement);
           handler.setInputAction(() => {
             this.sliderMoveActive = true;
           }, ScreenSpaceEventType.LEFT_DOWN);
@@ -601,13 +645,13 @@ export class CsMapComponent implements AfterViewInit {
         }, 10);
 
     } else {
-      let activeLayerKeys: string[] = Object.keys(this.csMapService.getLayerModelList());
+      const activeLayerKeys: string[] = Object.keys(this.csMapService.getLayerModelList());
       for(const layer of activeLayerKeys) {
         this.csMapService.setLayerSplitDirection(this.csMapService.getLayerModelList()[layer], ImagerySplitDirection.NONE);
       }
     }
   }
-  
+
   /**
    * Get whether the map split is shown
    */

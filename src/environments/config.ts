@@ -215,6 +215,18 @@ export const config = {
     'leme-crc-maps',
     'portal-geo-models'
   ],
+  // Layers that require a JSON response for WMS GetFeature requests
+  wmsGetFeatureJSON: [
+    // GSKY only returns JSON
+    'aster-aloh', 'aster-ferrous', 'aster-opaque', 'aster-ferric-oxide-content',
+    'aster-feoh', 'aster-ferric-oxide-comp', 'aster-group-index',
+    'aster-quartz-index', 'aster-mgoh-content', 'aster-green-veg',
+    'aster-ferr-carb', 'aster-mgoh-group-comp', 'aster-aloh-group-content',
+    'aster-silica-content',
+    // Loop3D has XML formatting issues on some layers issues due to incorrectly defined namespaces
+    '2m_linear_structures', '2_5m_interpgeop15', '500k_geol_4326',
+    '500k_geol_28350', '500k_faults_4326',
+  ],
   supportOpenInNewWindow: [
     'nvcl-v2-borehole',
     'nvcl-borehole',
