@@ -3,19 +3,45 @@
 
 export const config = {
   nvclUrl: 'https://nvclwebservices.csiro.au/NVCLDataServices',
+  // Layers that support downloading WFS feature data as zipped CSV files
   csvSupportedLayer: [
     'mineral-tenements',
     'tima-geosample',
     'nvcl-v2-borehole',
     'tima-shrimp-geosample',
-    'mscl-borehole',
     'pressuredb-borehole',
     'sf0-borehole-nvcl',
     'erl-mineview',
     'erl-mineraloccurrenceview',
-    'erl-commodityresourceview'
+    'erl-commodityresourceview',
+    'ga-geophysicalsurveys-all',
+    'ga-geophysicalsurveys-grav',
+    'ga-geophysicalsurveys-radio',
+    'ga-geophysicalsurveys-mag',
+    'gga-geophysicalsurveys-elev'
   ],
 
+  // Layers that download zipped datasets using 'datasetURL' feature name in the WFS response
+  datasetUrlSupportedLayer: {
+    'mscl-borehole': {
+      datasetURL: 'datasetURL'
+    },
+  },
+
+  // Layers that download 
+  datasetUrlAussPassLayer: {
+    'passive seismic': {
+      'serviceType': {
+        'Station': {
+          isGeometryOptional: true,
+        },
+        'Dataselect': {
+          isGeometryOptional: false,
+        }
+      }
+    },
+  },
+  // Layers that support downloads of an area bounded by a polygon
   polygonSupportedLayer: [
     'mineral-tenements',
     'tima-geosample',
@@ -25,8 +51,8 @@ export const config = {
     'erl-mineraloccurrenceview',
     'erl-commodityresourceview'
   ],
-  // Set 'downloadAreaMaxSize' to Number.MAX_SAFE_INTEGER
-  // to disable area download limits
+  // Layers that support downloading datasets via WCS
+  // (Set 'downloadAreaMaxSize' to Number.MAX_SAFE_INTEGER to disable area download limits)
   wcsSupportedLayer: {
     'aster-aloh': {
       downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
@@ -131,6 +157,7 @@ export const config = {
       downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
     }
   },
+  // Layers that require the proxy service to add layers
   forceAddLayerViaProxy: [
     'erml-miningactivity',
     'erml-mine',
@@ -166,6 +193,7 @@ export const config = {
     'Octopus-Sahul-Sed-Archives-Lacustrine-Osl',
     'Octopus-Sahul-Sed-Archives-Lacustrine-Tl'
   ],
+  // Layers that use CSW records to display a simple rectangle on map
   cswrenderer: [
     'pmd-crc-project-a1-presentations',
     'pmd-crc-project-c1-final-report',
@@ -186,6 +214,18 @@ export const config = {
     'pmd-crc-project-y4-final-report',
     'leme-crc-maps',
     'portal-geo-models'
+  ],
+  // Layers that require a JSON response for WMS GetFeature requests
+  wmsGetFeatureJSON: [
+    // GSKY only returns JSON
+    'aster-aloh', 'aster-ferrous', 'aster-opaque', 'aster-ferric-oxide-content',
+    'aster-feoh', 'aster-ferric-oxide-comp', 'aster-group-index',
+    'aster-quartz-index', 'aster-mgoh-content', 'aster-green-veg',
+    'aster-ferr-carb', 'aster-mgoh-group-comp', 'aster-aloh-group-content',
+    'aster-silica-content',
+    // Loop3D has XML formatting issues on some layers issues due to incorrectly defined namespaces
+    '2m_linear_structures', '2_5m_interpgeop15', '500k_geol_4326',
+    '500k_geol_28350', '500k_faults_4326',
   ],
   supportOpenInNewWindow: [
     'nvcl-v2-borehole',

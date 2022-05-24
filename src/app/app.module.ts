@@ -20,7 +20,7 @@ import { CapdfAdvanceFilterComponent } from './menupanel/common/filterpanel/adva
 import { DynamicAdvancefilterComponent } from './menupanel/common/filterpanel/dynamic.advancefilter.component';
 import { InfoPanelComponent } from './menupanel/common/infopanel/infopanel.component';
 import { InfoPanelSubComponent } from './menupanel/common/infopanel/subpanel/subpanel.component';
-//import { PermanentLinkComponent } from './menupanel/permanentlink/permanentlink.component';
+import { PermanentLinkComponent } from './menupanel/permanentlink/permanentlink.component';
 import { ClipboardComponent } from './menupanel/clipboard/clipboard.component';
 import { CapdfAnalyticComponent } from './modalwindow/layeranalytic/capdf/capdf.analytic.component';
 import { DynamicLayerAnalyticComponent } from './modalwindow/layeranalytic/dynamic.layer.analytic.component';
@@ -53,7 +53,6 @@ import { MatSliderModule } from '@angular/material/slider';
 import { MatTreeModule } from '@angular/material/tree';
 import { CdkTableModule } from '@angular/cdk/table';
 
-import { StorageServiceModule } from 'ngx-webstorage-service';
 import { DisclaimerModalComponent } from './modalwindow/disclaimer/disclaimer.modal.component';
 import { PortalDetailsPanelComponent } from './menupanel/portal-details-panel/portal-details-panel.component';
 
@@ -78,6 +77,7 @@ import { DataExplorerComponent } from './menupanel/data-explorer/data-explorer.c
 import { DataExplorerdRecordModule } from './menupanel/data-explorer-record/data-explorer-record.modules';
 import { RecordModalComponent } from './menupanel/record-modal/record-modal.component';
 import { ToolbarModule } from './toolbar/toolbar.module';
+import { NVCLService } from './modalwindow/querier/customanalytic/nvcl/nvcl.service';
 
 
 PlotlyModule.plotlyjs = PlotlyJS;
@@ -108,7 +108,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
         LayerAnalyticModalComponent,
         DynamicLayerAnalyticComponent,
         NVCLBoreholeAnalyticComponent,
-        //PermanentLinkComponent,
+        PermanentLinkComponent,
         ClipboardComponent,
         DynamicAdvancefilterComponent,
         CapdfAdvanceFilterComponent,
@@ -121,7 +121,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
         DataExplorerComponent,
         RecordModalComponent
     ],
-    providers: [AuscopeApiService, RectanglesEditorService],
+    providers: [AuscopeApiService, RectanglesEditorService,,NVCLService],
     imports: [
         PortalCoreModule.forRoot(environment, config),
         PortalCorePipesModule,
@@ -136,7 +136,6 @@ PlotlyModule.plotlyjs = PlotlyJS;
         MatDialogModule,
         MatMenuModule,
         MatSliderModule,
-        StorageServiceModule,
         NgxChartsModule,
         BrowserAnimationsModule,
         BsDropdownModule.forRoot(),
@@ -154,7 +153,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
         LayerPanelComponent,
         CustomPanelComponent,
         ActiveLayersPanelComponent,
-        //PermanentLinkComponent,
+        PermanentLinkComponent,
         // CatalogueSearchComponent,
         DataExplorerComponent,
         PortalDetailsPanelComponent,

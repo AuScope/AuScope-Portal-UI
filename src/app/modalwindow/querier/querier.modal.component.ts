@@ -1,19 +1,17 @@
-import { Component } from '@angular/core';
+import { ApplicationRef, ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { config } from '../../../environments/config';
 import { ref } from '../../../environments/ref';
 import { CsClipboardService, GMLParserService, ManageStateService, Polygon, QuerierInfoModel, UtilitiesService } from '@auscope/portal-core-ui';
 import { NVCLService } from './customanalytic/nvcl/nvcl.service';
 import { BsModalRef } from 'ngx-bootstrap/modal';
-import { NestedTreeControl}  from '@angular/cdk/tree';
+import { NestedTreeControl} from '@angular/cdk/tree';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
 import { BehaviorSubject, of as observableOf } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Inject } from '@angular/core';
 import * as _ from 'lodash';
 import * as X2JS from 'x2js';
 import { DomSanitizer } from '@angular/platform-browser';
-import { ChangeDetectorRef, ApplicationRef } from '@angular/core'
 
 export class FileNode {
   children: FileNode[];
@@ -24,11 +22,11 @@ export class FileNode {
 @Component({
   selector: 'app-querier-modal-window',
   templateUrl: './querier.modal.component.html',
-  providers: [NVCLService],
+  providers: [],
   styleUrls: ['../modalwindow.scss']
 })
 
-export class QuerierModalComponent {
+export class QuerierModalComponent  implements OnInit {
   public downloading: boolean;
   public transformingToHtml: Map<string, boolean> = new Map<string, boolean>();
   public docs: QuerierInfoModel[] = [];
@@ -40,7 +38,7 @@ export class QuerierModalComponent {
   public bToClipboard = false;
   public data: FileNode[][] = [];
   dataChange: BehaviorSubject<FileNode[]>[] = [];
-  
+
   nestedTreeControl: NestedTreeControl<FileNode>[] = [];
 
   nestedDataSource: MatTreeNestedDataSource<FileNode>[] = [];
@@ -48,11 +46,42 @@ export class QuerierModalComponent {
   // Show a message to zoom in
   public showZoomMsg: boolean = false;
 
-  constructor(public bsModalRef: BsModalRef, public csClipboardService: CsClipboardService,
-        private manageStateService: ManageStateService, private gmlParserService: GMLParserService, 
-        private http: HttpClient, @Inject('env') private env, private sanitizer: DomSanitizer, 
+  /**
+   * 
+   * reflects the value of nvclService.getAnalytic(); updates the html Analytic TAB
+   * 
+   * When a "borehole name" is clicked on, onDataChange() is fired and a detectChanges() event causes
+   * nvclService.getNVCLDatasets() to be called from nvcl.datasetlist.component.ts
+   * This will set the "isAnalytic" variable in the service nvcl.service.ts to be set (boolean).
+   * 
+   * Note: to support this, nvcl.service was removed as a provide from this component and datasetlist
+   * The reason for this is to prevent the service from being instantiated for each component.
+   * The app.module.ts code was updated to add this service in the providers list - making it a global instance
+   * 
+   * If this was not done the two components would not see the same state of the service variable "isAnalytic"
+  */
+  public flagAnalytic: boolean;
+
+  constructor(public nvclService: NVCLService, public bsModalRef: BsModalRef, public csClipboardService: CsClipboardService,
+        private manageStateService: ManageStateService, private gmlParserService: GMLParserService,
+        private http: HttpClient, @Inject('env') private env, private sanitizer: DomSanitizer,
         private changeDetectorRef: ChangeDetectorRef, private appRef: ApplicationRef) {
     this.analyticMap = ref.analytic;
+  }
+
+  ngOnInit() {
+
+  /**
+   * checks the state of "isAnalytic" variable in the nvclService - observable
+   * and updates the local varibale "flagAnalytic" - which updates the Analytic TAB in the html
+   */
+    this.nvclService.getAnalytic().subscribe((result) => {
+      // console.log("[querier]ngOnInit().getAnalytic() = "+result);
+      this.flagAnalytic = result;
+
+      this.onDataChange();
+    });
+
   }
 
   public getData() {return this.data}
@@ -79,14 +108,13 @@ export class QuerierModalComponent {
       }
     }
 
+    // Store state object in DB & open up window
     const uncompStateStr = JSON.stringify(state);
-    this.manageStateService.getCompressedString(uncompStateStr, function(result) {
-      // Encode state in base64 so it can be used in a URL
-      const stateStr = UtilitiesService.encode_base64(String.fromCharCode.apply(String, result));
-      const permanentlink = environment.hostUrl + '?state=' + stateStr
-      window.open(permanentlink);
+    this.manageStateService.saveStateToDB(uncompStateStr).subscribe((response: any) => {
+      if (response.success === true) {
+        window.open(environment.hostUrl + '?state=' + response.id);
+      }
     });
-
   }
 
 
@@ -118,15 +146,17 @@ export class QuerierModalComponent {
       this.appRef.tick();
     }
   }
+
   public onDataChange(): void {
-     this.changeDetectorRef.detectChanges();
+      this.changeDetectorRef.detectChanges();
   }
-  public transformToHtml(document): void {    
+
+  public transformToHtml(document): void {
     if (document.transformed) {
        // this is when you're clicking to close an expanded feature
        return;
     }
-    if (!document.raw.includes("gml")) {
+    if (!document.raw.includes('gml')) {
        // We don't care about formatting non gml
        return this.parseTree(document);
     }
@@ -136,11 +166,11 @@ export class QuerierModalComponent {
 
     let formdata = new HttpParams();
     formdata = formdata.append('gml', document.value.outerHTML);
-    
+
     this.http.post(this.env.portalBaseUrl + 'transformToHtmlPopup.do', formdata.toString(), {
-        headers: new HttpHeaders().set('Content-Type','application/x-www-form-urlencoded'),
+        headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
         responseType: 'text'}).subscribe(response => {
-      var bodyHtml = /<body.*?>([\s\S]*)<\/body>/.exec(response)[1];
+      const bodyHtml = /<body.*?>([\s\S]*)<\/body>/.exec(response)[1];
       if (bodyHtml.length < 1) {
         this.transformingToHtml[document.key] = false;
         // if no transformation, fallback to XML tree
@@ -157,7 +187,7 @@ export class QuerierModalComponent {
       document.loadSubComponent = true;
       this.transformingToHtml[document.key] = false;
       this.changeDetectorRef.detectChanges();
-    }, 
+    },
     // try default XML tree display
     error => {
       this.parseTree(document);
@@ -248,19 +278,19 @@ export class QuerierModalComponent {
       // RA: Remove namespace declarations
       if (k.startsWith('_xmlns')) {
         continue;
-      }      
-      
+      }
+
       const v = value[k];
       const node = new FileNode();
 
-      // RA AUS-3342: make popup labels more friendly 
+      // RA AUS-3342: make popup labels more friendly
       if (level > 0) {
           node.filename = this.formatLabels(`${k}`);
       } else {
           // gml:id to stay as is
           node.filename = `${k}`;
-      }      
-      
+      }
+
       if (v === null || v === undefined) {
         // no action
       } else if (typeof v === 'object') {
@@ -292,50 +322,55 @@ export class QuerierModalComponent {
    */
   private formatLabels(label: string): string {
     // remove prefix
-    var filename = label.substring(label.indexOf(':') + 1, label.length);
+    let filename = label.substring(label.indexOf(':') + 1, label.length);
     // Remove leading underscores from name (LHS column in popup)
     while (filename.startsWith('_')) {
         filename = filename.substring(1);
     }
+    while (filename.endsWith('_')) {
+      filename = filename.substring(0, filename.length - 1)
+    }
     // separate camel case e.g. observationMethod
     filename = filename.replace(/([a-z])([A-Z])/g, '$1 $2');
     // separate "_"
-    filename = filename.split(/[_]/).join(" ");
-    var terms = filename.split(" ");
-    for(var j = 0; j < terms.length; j++) {
+    filename = filename.split(/[_]/).join(' ');
+    const terms = filename.split(' ');
+    for (let j = 0; j < terms.length; j++) {
         const term = terms[j];
-        switch(term) {
+        switch (term) {
             // capitalise abbreviations
             // i.e. UOM, SRS, URI, HREF
             case 'uom':
             case 'uri':
             case 'srs':
             case 'nvcl':
-            case 'href': {
+            case 'href':
+            case 'id': {
                 terms[j] = term.toUpperCase();
                 break;
             }
             // put uom in brackets
-            case 'm': {  
-                terms[j] = "(" + term + ")";
+            case 'm':
+            case 'km': {
+                terms[j] = '(' + term + ')';
                 break;
             }
             // handle geom pos and posList
-            case 'pos': { 
+            case 'pos': {
                 terms[j] = 'Position';
                 break;
             }
             case 'posList': {
                 terms[j] = 'Position List';
                 break;
-            }                          
+            }
             default: {
                 // make sure each first letter is capitalised
                 terms[j] = term[0].toUpperCase() + term.slice(1);
             }
         }
     }
-    return terms.join(" ");  
+    return terms.join(' ');
   }
 
 }

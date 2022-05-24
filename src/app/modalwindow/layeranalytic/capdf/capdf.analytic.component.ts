@@ -77,7 +77,7 @@ export class CapdfAnalyticComponent implements OnInit, LayerAnalyticInterface {
       saveAs(blob, this.param['featureType'] + '.csv');
     }, err => {
       if (UtilitiesService.isEmpty(err.message)) {
-        alert('An error has occured whilst attempting to download. Kindly contact cg-admin@csiro.au');
+        alert('An error has occurred whilst attempting to download. Kindly contact cg-admin@csiro.au');
       } else {
         alert(err.message + '. Kindly contact cg-admin@csiro.au');
       }
