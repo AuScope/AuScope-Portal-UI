@@ -72,9 +72,6 @@ export class FilterPanelComponent implements OnInit {
     const state = UtilitiesService.getUrlParameterByName('state');
     if (state) {
       const me = this;
-      this.manageStateService.getUnCompressedString(state, function (result) {
-        const layerStateObj = JSON.parse(result);
-        if (layerStateObj[me.layer.id]) {
       this.manageStateService.fetchStateFromDB(state).subscribe((layerStateObj: any) => {
         if (layerStateObj) {
           if (UtilitiesService.isEmpty(me.providers)) {
