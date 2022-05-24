@@ -29,7 +29,22 @@ export class InfoPanelSubComponent implements OnChanges {
      * @param constraints string array of contraints
      * @return string constraints in string format
      */
+    public selectConstraints(capabilityRecords, cswConstraints: string[]) {
+        if (capabilityRecords && capabilityRecords.length > 0 && capabilityRecords[0].accessConstraints && capabilityRecords[0].accessConstraints.length > 0) {
+            return this.cleanConstraints(capabilityRecords[0].accessConstraints);
+        } else {
+            return this.cleanConstraints(cswConstraints);
+        }
+    }
+
+
+    /**
+     * Remove unwanted strings from metadata constraints fields
+     * @param constraints string array of contraints
+     * @return string constraints in string format
+     */
     public cleanConstraints(constraints: string[]) {
+
         let outStr = "";
         for (const conStr of constraints) {
             if (conStr.indexOf("#MD_RestrictionCode") < 0) {
@@ -37,7 +52,7 @@ export class InfoPanelSubComponent implements OnChanges {
             }
         }
         // Remove trailing comma
-        return outStr.replace(/, $/,"");
+        return outStr.replace(/, $/, "");
     }
 
     /**
@@ -58,7 +73,7 @@ export class InfoPanelSubComponent implements OnChanges {
                             for (let j = 0; j < onlineResources.length; j++) {
                                 if (onlineResources[j].type === 'WMS') {
                                     let params = 'SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png&HEIGHT=25&BGCOLOR=0xFFFFFF'
-                                    + '&LAYER=' + onlineResources[j].name + '&LAYERS=' + onlineResources[j].name + '&SCALE=1000000';
+                                        + '&LAYER=' + onlineResources[j].name + '&LAYERS=' + onlineResources[j].name + '&SCALE=1000000';
                                     // If there is a style, then use it
                                     if (sldBody.length > 0) {
                                         params += '&SLD_BODY=' + sldBody + '&LEGEND_OPTIONS=forceLabels:on;minSymbolSize:16';
@@ -68,31 +83,31 @@ export class InfoPanelSubComponent implements OnChanges {
                             }
                         }
                     });
-                } else {
-                    const onlineResources = this.cswRecord.onlineResources;
-                    for (let j = 0; j < onlineResources.length; j++) {
-                        if (onlineResources[j].type === 'WMS') {
-                            const params = 'SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png&HEIGHT=25&BGCOLOR=0xFFFFFF'
-                            + '&LAYER=' + onlineResources[j].name + '&LAYERS=' + onlineResources[j].name + '&WIDTH=188&SCALE=1000000';
-                            this.legendUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(onlineResources[j].url), params);
-                        }
-                    }
-                }
-
-                // Gather up BBOX coordinates to calculate the centre and envelope
-                const bbox = this.cswRecord.geographicElements[0];
-
-                // Gather up lists of information URLs
+            } else {
                 const onlineResources = this.cswRecord.onlineResources;
                 for (let j = 0; j < onlineResources.length; j++) {
                     if (onlineResources[j].type === 'WMS') {
-                        const params = 'SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&STYLES=&FORMAT=image/png&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&LAYERS='
+                        const params = 'SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png&HEIGHT=25&BGCOLOR=0xFFFFFF'
+                            + '&LAYER=' + onlineResources[j].name + '&LAYERS=' + onlineResources[j].name + '&WIDTH=188&SCALE=1000000';
+                        this.legendUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(onlineResources[j].url), params);
+                    }
+                }
+            }
+
+            // Gather up BBOX coordinates to calculate the centre and envelope
+            const bbox = this.cswRecord.geographicElements[0];
+
+            // Gather up lists of information URLs
+            const onlineResources = this.cswRecord.onlineResources;
+            for (let j = 0; j < onlineResources.length; j++) {
+                if (onlineResources[j].type === 'WMS') {
+                    const params = 'SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&STYLES=&FORMAT=image/png&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&LAYERS='
                         + encodeURIComponent(onlineResources[j].name) + '&SRS=EPSG:4326&BBOX=' + bbox.westBoundLongitude + ',' + bbox.southBoundLatitude
                         + ',' + bbox.eastBoundLongitude + ',' + bbox.northBoundLatitude
                         + '&WIDTH=400&HEIGHT=400';
-                        this.wmsUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(onlineResources[j].url), params);
-                    }
+                    this.wmsUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(onlineResources[j].url), params);
                 }
+            }
         }
     }
 
