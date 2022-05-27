@@ -5,7 +5,7 @@ import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { MatSliderChange } from '@angular/material/slider';
-import { ImagerySplitDirection } from 'cesium';
+import { SplitDirection } from 'cesium';
 import { ToolbarComponentsService } from 'app/services/ui/toolbar-components.service';
 
 // Filter modes available in the dropdown layer filter selector
@@ -280,17 +280,17 @@ export class LayerPanelComponent implements OnInit {
    */
   public setLayerSplitDirection(event: any, layer: LayerModel, direction: string) {
     event.stopPropagation();
-    let splitDir: ImagerySplitDirection;
+    let splitDir: SplitDirection;
     switch (direction) {
       case "left":
-        splitDir = ImagerySplitDirection.LEFT;
+        splitDir = SplitDirection.LEFT;
         break;
       case "right":
-        splitDir = ImagerySplitDirection.RIGHT;
+        splitDir = SplitDirection.RIGHT;
         break;
       case "none":
       default:
-        splitDir = ImagerySplitDirection.NONE;
+        splitDir = SplitDirection.NONE;
         break;
     }
     layer.splitDirection = splitDir;
@@ -307,10 +307,10 @@ export class LayerPanelComponent implements OnInit {
     let splitDir = "none";
     if (this.csMapService.getLayerModel(layerId) !== null) {
       switch(this.csMapService.getLayerModel(layerId).splitDirection) {
-        case ImagerySplitDirection.LEFT:
+        case SplitDirection.LEFT:
           splitDir = "left";
           break;
-        case ImagerySplitDirection.RIGHT:
+        case SplitDirection.RIGHT:
           splitDir = "right";
           break;
       }

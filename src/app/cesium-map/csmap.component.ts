@@ -5,7 +5,7 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ViewerConfiguration } from '@auscope/angular-cesium';
 import { CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService, QueryWFSService,
   QueryWMSService, SimpleXMLService, UtilitiesService, CsMapObject, ResourceType } from '@auscope/portal-core-ui';
-import { Cartesian3, MapMode2D, Math, ScreenSpaceEventHandler, SceneMode, ScreenSpaceEventType, Rectangle, ImagerySplitDirection,
+import { Cartesian3, MapMode2D, Math, ScreenSpaceEventHandler, SceneMode, ScreenSpaceEventType, Rectangle, SplitDirection,
    Cartesian2, WebMapServiceImageryProvider, WebMercatorProjection, Cartographic, GeographicProjection } from 'cesium';
 import { IrisQuerierHandler } from './custom-querier-handler/iris-querier-handler.service';
 import { ToolbarComponentsService } from 'app/services/ui/toolbar-components.service';
@@ -647,7 +647,7 @@ export class CsMapComponent implements AfterViewInit {
     } else {
       const activeLayerKeys: string[] = Object.keys(this.csMapService.getLayerModelList());
       for(const layer of activeLayerKeys) {
-        this.csMapService.setLayerSplitDirection(this.csMapService.getLayerModelList()[layer], ImagerySplitDirection.NONE);
+        this.csMapService.setLayerSplitDirection(this.csMapService.getLayerModelList()[layer], SplitDirection.NONE);
       }
     }
   }
