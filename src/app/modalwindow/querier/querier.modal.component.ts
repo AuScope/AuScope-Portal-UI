@@ -148,10 +148,18 @@ export class QuerierModalComponent  implements OnInit {
   }
 
   public onDataChange(): void {
+    setTimeout(() => {
       this.changeDetectorRef.detectChanges();
+    }, 50);
   }
 
   public transformToHtml(document): void {
+    if (!document.expanded) {
+      document.expanded = true;
+    } else {
+      document.expanded = !document.expanded;
+    }
+
     if (document.transformed) {
        // this is when you're clicking to close an expanded feature
        return;
