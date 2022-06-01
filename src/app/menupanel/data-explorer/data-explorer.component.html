@@ -6,7 +6,7 @@
             <div class="row">
                 <div class="col">
                     <div class="submenu-header" (click)="anyTextIsCollapsed = !anyTextIsCollapsed">
-                        <span>Any Text</span>
+                        <span title="Search records using any text">Any Text</span>
                         <i *ngIf="anyTextIsCollapsed" style="line-height:inherit;" class="fa fa-arrow-circle-down fa-pull-right"></i>
                         <i *ngIf="!anyTextIsCollapsed" style="line-height:inherit;" class="fa fa-arrow-circle-up fa-pull-right"></i>
                     </div>
@@ -27,13 +27,13 @@
             <div class="row">
                 <div class="col">
                     <div class="submenu-header" (click)="spatialBoundsIsCollapsed = !spatialBoundsIsCollapsed">
-                        <span>Spatial Bounds</span>
+                        <span title="Search records by spatial bounds">Spatial Bounds</span>
                         <i *ngIf="spatialBoundsIsCollapsed" style="line-height:inherit;" class="fa fa-arrow-circle-down pull-right"></i>
                         <i *ngIf="!spatialBoundsIsCollapsed" style="line-height:inherit;" class="fa fa-arrow-circle-up pull-right"></i>
                     </div>
                     <div [ngbCollapse]="spatialBoundsIsCollapsed">
                         <div class="input-group input-group-sm">
-                            <input type="text" class="form-control" placeholder="Use buttons to enter bounds" [value]="spatialBoundsText" readonly>
+                            <input type="text" class="form-control" placeholder="Click button to draw bounds on map" [value]="spatialBoundsText" readonly>
                             <div class="input-group-append">
                                 <button *ngIf="!bbox" class="btn btn-light" type="button" data-toggle="tooltip" title="Draw bounds" (click)="drawBound()">
                                     <i class="fa fa-edit"></i>
@@ -51,7 +51,7 @@
             <div class="row">
                 <div class="col">
                     <div class="submenu-header" (click)="keywordsIsCollapsed = !keywordsIsCollapsed">
-                        <span>Keywords</span>
+                        <span title="Search records by keywords">Keywords</span>
                         <i *ngIf="keywordsIsCollapsed" style="line-height:inherit;" class="fa fa-arrow-circle-down pull-right"></i>
                         <i *ngIf="!keywordsIsCollapsed" style="line-height:inherit;" class="fa fa-arrow-circle-up pull-right"></i>
                     </div>
@@ -70,7 +70,7 @@
             <div class="row">
                 <div class="col">
                     <div class="submenu-header" (click)="pubDateIsCollapsed = !pubDateIsCollapsed">
-                        <span>Publication Date</span>
+                        <span title="Search records by publication date">Publication Date</span>
                         <i *ngIf="pubDateIsCollapsed" style="line-height:inherit;" class="fa fa-arrow-circle-down pull-right"></i>
                         <i *ngIf="!pubDateIsCollapsed" style="line-height:inherit;" class="fa fa-arrow-circle-up pull-right"></i>
                     </div>
@@ -91,7 +91,7 @@
             <div class="row">
                 <div class="col">
                     <div class="submenu-header" (click)="servicesIsCollapsed = !servicesIsCollapsed">
-                        <span>Available Services</span>
+                        <span title="Search records by available OGC services">Available Services</span>
                         <i *ngIf="servicesIsCollapsed" style="line-height:inherit;" class="fa fa-arrow-circle-down pull-right"></i>
                         <i *ngIf="!servicesIsCollapsed" style="line-height:inherit;" class="fa fa-arrow-circle-up pull-right"></i>
                     </div>
@@ -155,7 +155,7 @@
             <div class="row">
                 <div class="col">
                     <div class="submenu-header" (click)="registriesIsCollapsed = !registriesIsCollapsed">
-                        <span>Available Registries</span>
+                        <span title="Search records by CSW registry">Available Registries</span>
                         <i *ngIf="registriesIsCollapsed" style="line-height:inherit;" class="fa fa-arrow-circle-down pull-right"></i>
                         <i *ngIf="!registriesIsCollapsed" style="line-height:inherit;" class="fa fa-arrow-circle-up pull-right"></i>
                     </div>

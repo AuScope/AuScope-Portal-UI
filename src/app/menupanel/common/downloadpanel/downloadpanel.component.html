@@ -73,14 +73,20 @@
 		</div>
     	<!--End AusPass Data Download -->
 
-		<button *ngIf="!bbox && (!irisDownloadListOption || (irisDownloadListOption && irisDownloadListOption.displayBbox)) " type="button" class="btn btn-info btn-xs" (click)="drawBound()"><i class="fa fa-object-ungroup"></i> Select Bounds</button>
-		<button *ngIf="bbox && (!irisDownloadListOption || (irisDownloadListOption && irisDownloadListOption.displayBbox))" type="button" class="btn btn-danger btn-xs" (click)="clearBound()"><i class="fa fa-refresh"></i> Clear Bounds</button>
+		<button *ngIf="!bbox && (!irisDownloadListOption || (irisDownloadListOption && irisDownloadListOption.displayBbox)) " type="button" title="Draw bounds"
+		        class="btn btn-info btn-xs" (click)="drawBound()"><i class="fa fa-object-ungroup"></i>&nbsp;Select Bounds</button>
+		<button *ngIf="bbox && (!irisDownloadListOption || (irisDownloadListOption && irisDownloadListOption.displayBbox))" type="button" title="Remove bounds"
+		        class="btn btn-danger btn-xs" (click)="clearBound()"><i class="fa fa-refresh"></i>&nbsp;Clear Bounds</button>
 
-		<button type="button" class="btn btn-info btn-xs " (click)="download()"><i *ngIf="downloadStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!downloadStarted" class="fa fa-cloud-download"></i> Download</button>
+		<button type="button" class="btn btn-info btn-xs" title="Download data" (click)="download()">
+			<i *ngIf="downloadStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!downloadStarted" class="fa fa-cloud-download"></i>&nbsp;Download
+		</button>
 		
 		<div [hidden]='!isPolygonSupportedLayer' class="form-group">
 			<p *ngIf="!polygonFilter" class="small text-danger">If you want to download from Polygon Filter, please draw or pick a polygon first from the PolygonFilter Panel. (Hint: look for <i class="fa fa-edit"></i> on map)</p>
-			<button *ngIf="polygonFilter" type="button" class="btn btn-info btn-xs float-left" (click)="download4Polygon()"><i *ngIf="download4pStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!download4pStarted" class="fa fa-cloud-download"></i> Download4Polygon</button>
+			<button *ngIf="polygonFilter" type="button" class="btn btn-info btn-xs float-left" title="Download data" (click)="download4Polygon()">
+				<i *ngIf="download4pStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!download4pStarted" class="fa fa-cloud-download"></i>&nbsp;Download4Polygon
+			</button>
 		</div>
 	</div>
 
@@ -139,9 +145,11 @@
 				<option *ngFor="let timePos of wcsDownloadListOption.timePositionList">{{timePos}}</option>
 			</select>
 		</div>
-		<button *ngIf="!bbox" type="button" class="btn btn-info btn-xs" (click)="drawBound()"><i class="fa fa-object-ungroup"></i> Select Bounds</button>
-		<button *ngIf="bbox" type="button" class="btn btn-danger btn-xs" (click)="clearBound()"><i class="fa fa-refresh"></i> Clear</button>
-		<button type="button" class="btn btn-info btn-xs float-right" (click)="download()"><i *ngIf="downloadStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!downloadStarted" class="fa fa-cloud-download"></i> Download</button>
+		<button *ngIf="!bbox" type="button" class="btn btn-info btn-xs" title="Draw bounds" (click)="drawBound()"><i class="fa fa-object-ungroup"></i>&nbsp;Select Bounds</button>
+		<button *ngIf="bbox" type="button" class="btn btn-danger btn-xs" title="Remove bounds" (click)="clearBound()"><i class="fa fa-refresh"></i>&nbsp;Clear</button>
+		<button type="button" class="btn btn-info btn-xs float-right" title="Download data" (click)="download()">
+			<i *ngIf="downloadStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!downloadStarted" class="fa fa-cloud-download"></i>&nbsp;Download
+		</button>
 	</div>
 
 </div>
