@@ -31,7 +31,7 @@
 					<div class="card-header">
 						<h4 class="card-title">
 							<a (click)="transformToHtml(doc)" class="accordion-link" data-toggle="collapse" href="#doc-collapse{{i}}">
-								{{doc.key}}&nbsp;<i *ngIf="transformingToHtml[doc.key]" class="fa fa-spinner fa-spin"></i>
+								{{doc.key}}&nbsp;<i *ngIf="transformingToHtml[doc.key] && doc.expanded" class="fa fa-spinner fa-spin"></i>
 							</a>
 						</h4>
 					</div>
