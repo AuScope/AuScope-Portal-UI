@@ -32,7 +32,7 @@
 
         </div>
 
-        <div *ngIf="!layer.filterCollection">
+        <div *ngIf="!layer.filterCollection && !layerHasFilterPanelToolbarComponent(layer.id)">
 	        <div class="alert alert-warning fade show">
 
                 <i class="ti-bell float-left"></i>

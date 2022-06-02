@@ -11,6 +11,7 @@ import { LayerAnalyticModalComponent } from '../../../modalwindow/layeranalytic/
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { ToolbarComponentsService } from 'app/services/ui/toolbar-components.service';
 import { GraceStyleService } from 'app/services/wcustom/grace/grace-style.service';
+import { ToolbarType } from 'app/toolbar/toolbar.component';
 
 declare var gtag: Function;
 
@@ -422,8 +423,6 @@ export class FilterPanelComponent implements OnInit {
     }
   }
 
-
-
   /**
    * Set time extent for a layer, first looking at the layer's capability records
    * and then the CSW records.
@@ -498,6 +497,16 @@ export class FilterPanelComponent implements OnInit {
       this.csMapService.removeLayer(layerModelList[this.layer.id]);
     }
     this.addLayer(this.layer);
+  }
+
+  /**
+   * Check for a layer having a FilterPanel ToolbarComponent so we can disable the No Filter message.
+   *
+   * @param layerId ID of layer to check for toolbar components
+   * @returns true if the layer has a FilterPanel ToolbarComponent, false otherwise
+   */
+  layerHasFilterPanelToolbarComponent(layerId: string): boolean {
+    return ref.toolbar[layerId] && ref.toolbar[layerId].find(t => t.type === ToolbarType.FilterPanel);
   }
 
 }
