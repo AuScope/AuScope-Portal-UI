@@ -9,7 +9,7 @@ import { OlMapPreviewComponent } from './openlayermappreview/olmap.preview.compo
 import * as olProj from 'ol/proj';
 import { Constants } from '@auscope/portal-core-ui';
 import { LayerStatusService } from '@auscope/portal-core-ui';
-
+import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
 
 
 @Component({
@@ -30,6 +30,7 @@ export class InfoPanelComponent implements OnChanges {
     featureArr: any = [];
 
     constructor(private layerHandlerService: LayerHandlerService,
+        public activeModal: NgbActiveModal,
         public layerStatus: LayerStatusService) {
     }
 

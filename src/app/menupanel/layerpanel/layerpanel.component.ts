@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
 import { CsClipboardService, CsMapService, LayerHandlerService, LayerModel, ManageStateService, RenderStatusService, ResourceType, UtilitiesService } from '@auscope/portal-core-ui';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
@@ -7,6 +7,10 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { MatSliderChange } from '@angular/material/slider';
 import { ImagerySplitDirection } from 'cesium';
 import { ToolbarComponentsService } from 'app/services/ui/toolbar-components.service';
+import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
+import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { CSWRecordModel } from '@auscope/portal-core-ui';
+
 
 // Filter modes available in the dropdown layer filter selector
 enum FilterMode {
@@ -35,6 +39,8 @@ export class LayerPanelComponent implements OnInit {
 
 
   constructor(private layerHandlerService: LayerHandlerService, private renderStatusService: RenderStatusService,
+      private activeModalService: NgbModal,
+
       private modalService: BsModalService, private csMapService: CsMapService,
       private manageStateService: ManageStateService, private CsClipboardService: CsClipboardService,
       private uiLayerModelService: UILayerModelService, private toolbarService: ToolbarComponentsService) {
@@ -357,5 +363,22 @@ export class LayerPanelComponent implements OnInit {
   public removeFilterLayers() {
     this.CsClipboardService.toggleFilterLayers(false);
   }
+
+ /**
+   * Display the record information dialog
+   *
+   * @param cswRecord CSW record for information
+   */
+  public displayRecordInformation(layer: any) {
+    if (layer) {
+      const modelRef = this.activeModalService.open(InfoPanelComponent, {
+        size: "lg",
+        backdrop:false
+      });
+      modelRef.componentInstance.cswRecords = layer.cswRecords;
+      modelRef.componentInstance.layer = layer;
+    }
+  }
+
 
 }
