@@ -2,9 +2,12 @@
 		<div class="input-group">
             <input type="text" class="form-control" placeholder="Enter search term here..." [(ngModel)]="searchText" [disabled]="searchMode">
             <div class="input-group-append">
-                <button *ngIf="!searchMode" tabindex="-1" class="btn btn-light" type="button" (click)="search()"><i class="fa fa-search"></i></button>
-                <button *ngIf="searchMode" tabindex="-1" class="btn btn-light" type="button" (click)="clearSearch()"><i class="fa fa-ban"></i></button>
-                <button tabindex="-1" data-toggle="dropdown" class="btn btn-light dropdown-toggle" type="button">
+                <button *ngIf="!searchMode" [disabled]="!searchText || searchText.trim() === ''" tabindex="-1" class="btn btn-light" type="button"
+						title="Search layers" (click)="search()">
+					<i class="fa fa-search"></i>
+				</button>
+                <button *ngIf="searchMode" tabindex="-1" class="btn btn-light" type="button" title="Clear search" (click)="clearSearch()"><i class="fa fa-ban"></i></button>
+                <button tabindex="-1" data-toggle="dropdown" class="btn btn-light dropdown-toggle" type="button" title="Select image/data layers">
                     <i class="fa fa-ellipsis-h"></i>
                 </button>
                 <ul id="menu-option-dropdown" class="dropdown-menu">
@@ -47,7 +50,7 @@
 							-->
 						</span>
 						<div class="layerLoadClickable">
-							<i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-times red" (click)="removeLayer(layer);$event.stopPropagation()"></i>
+							<i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-times red" title="Remove layer from map" (click)="removeLayer(layer);$event.stopPropagation()"></i>
 							{{layer.name}}
 							<i *ngIf="layer.expanded && !getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-arrow-circle-down"></i>
 						</div>

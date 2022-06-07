@@ -16,9 +16,11 @@ export const config = {
     'erl-commodityresourceview',
     'ga-geophysicalsurveys-all',
     'ga-geophysicalsurveys-grav',
+    'auslamp',
     'ga-geophysicalsurveys-radio',
     'ga-geophysicalsurveys-mag',
-    'gga-geophysicalsurveys-elev'
+    'gga-geophysicalsurveys-elev',
+    'grace-mascons'
   ],
 
   // Layers that download zipped datasets using 'datasetURL' feature name in the WFS response

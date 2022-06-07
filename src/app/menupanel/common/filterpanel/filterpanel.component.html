@@ -25,26 +25,25 @@
 	            <div *ngIf="mandatoryFilter.type == 'MANDATORY.TEXTBOX'">
 	                <div class="form-group  form-group-sm">
 	                    <label>{{mandatoryFilter.label}}</label>
-						<input type="text" class="form-control form-control-sm"  [(ngModel)]="mandatoryFilter.value">
+						<input type="text" class="form-control form-control-sm" [(ngModel)]="mandatoryFilter.value">
 	                </div>
 	            </div>
 	        </div>
 
         </div>
 
-        <div *ngIf="!layer.filterCollection">
+        <div *ngIf="!layer.filterCollection && !layerHasFilterPanelToolbarComponent(layer.id)">
 	        <div class="alert alert-warning fade show">
 
                 <i class="ti-bell float-left"></i>
                 <p>There are no filters associated with this layer</p>
             </div>
-
     	</div>
 
     	<fieldset *ngIf="layer.filterCollection && layer.filterCollection.optionalFilters" class="show-fieldset-borders">
         	<legend><h5>Optional Filters</h5></legend>
         	<div class="form-group  form-group-sm">
-	            <label><i class="fa fa-times hasEvent red" (click)="refreshFilter()"></i> Select Filter:</label>
+	            <label *ngIf="optionalFilters.length > 0" title="Remove filter"><i class="fa fa-times hasEvent red" (click)="refreshFilter()"></i> Select Filter:</label>
                 <select class="form-control form-control-sm" [ngModel]="selectedFilter" (ngModelChange)="addFilter($event)">
 					<option [ngValue]="filt" *ngFor="let filt of layer.filterCollection.optionalFilters">{{filt.label}}</option>
 				</select>
@@ -54,7 +53,7 @@
 	            <div *ngIf="optionalFilter.type=='OPTIONAL.TEXT'">
 	                <div class="form-group  form-group-sm">
 					    <label>{{optionalFilter.label}}:</label>
-					    <input type="text" class="form-control form-control-sm"  [(ngModel)]="optionalFilter.value">
+					    <input type="text" class="form-control form-control-sm" [(ngModel)]="optionalFilter.value">
 					</div>
 	            </div>
 	            <div *ngIf="optionalFilter.type=='OPTIONAL.DATE'">
@@ -121,7 +120,7 @@
 		<div ngbDropdown *ngIf="currentTime" dropdownClass="time-dropdown" container="body">
 			<button *ngIf="!loadingTimeExtent && timeExtent.length === 1" type="button" class="btn btn-info btn-sm date-btn unclickable-btn" style="cursor:default;"><i class="fa fa-calendar"></i>&nbsp;&nbsp;{{ currentTime | date }}</button>
 			<button *ngIf="!loadingTimeExtent && timeExtent.length > 1" type="button" class="btn btn-info btn-sm date-btn" ngbDropdownToggle><i class="fa fa-calendar"></i>&nbsp;&nbsp;{{ currentTime | date }}</button>
-			<div class="dropdown-menu" *ngIf="!loadingTimeExtent && timeExtent && timeExtent.length > 1" ngbDropdownMenu>
+			<div class="dropdown-menu" title="Select time to display" *ngIf="!loadingTimeExtent && timeExtent && timeExtent.length > 1" ngbDropdownMenu>
 				<div *ngFor="let d of timeExtent">
 					<button ngbDropdownItem (click)="changeCurrentTime(d)">{{ d | date }}</button>
 				</div>
@@ -130,7 +129,7 @@
 
 	    <p *ngIf='layerStatus.isLayerDown(layer.id)' class='small text-danger'><i class="fa fa-warning text-warning"></i> One or more of the services used by this layer are reported to be experiencing issues at the moment. Click on the info panel for more information.</p>
 	    <div>
-            <button *ngIf="analyticMap[layer.id]" type="button" class="btn btn-warning btn-sm" (click)="processLayerAnalytic(layer)"><i class="fa fa-bar-chart" aria-hidden="true"></i>&nbsp;Analytic</button>
+            <button *ngIf="analyticMap[layer.id]" type="button" class="btn btn-warning btn-sm" title="Display analytics" (click)="processLayerAnalytic(layer)"><i class="fa fa-bar-chart" aria-hidden="true"></i>&nbsp;Analytic</button>
 	    	<button type="button" *ngIf="isMapSupportedLayer(layer)" class="btn btn-info btn-sm float-right" (click)="addLayer(layer)"><i class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp;Add Layer</button>
 			<div class="unsupported-layer-message" *ngIf="!isMapSupportedLayer(layer)">
 				<em class="fa fa-exclamation-triangle warning-icon"></em>

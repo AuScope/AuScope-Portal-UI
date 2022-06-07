@@ -307,19 +307,19 @@ export class DownloadPanelComponent implements OnInit {
         return;
       }
       // Check that input values were selected
-      if (this.wcsDownloadForm.inputCrs == this.SELECT_DEFAULT_REF_SYSTEM) {
+      if (this.wcsDownloadForm.inputCrs === this.SELECT_DEFAULT_REF_SYSTEM) {
         alert('Cannot download. A reference system value has not been selected');
         return;
       }
-      if (this.wcsDownloadForm.downloadFormat == this.SELECT_DEFAULT_DOWNLOAD_FMT) {
+      if (this.wcsDownloadForm.downloadFormat === this.SELECT_DEFAULT_DOWNLOAD_FMT) {
         alert('Cannot download. An download format has not been selected');
         return;
       }
-      if (this.wcsDownloadForm.outputCrs == this.SELECT_DEFAULT_OUTPUT_CRS) {
+      if (this.wcsDownloadForm.outputCrs === this.SELECT_DEFAULT_OUTPUT_CRS) {
         alert('Cannot download. An output CRS has not been selected');
         return;
       }
-      if (this.wcsDownloadListOption.timePositionList.length > 0 && this.wcsDownloadForm.timePosition == this.SELECT_DEFAULT_TIME_POS) {
+      if (this.wcsDownloadListOption.timePositionList.length > 0 && this.wcsDownloadForm.timePosition === this.SELECT_DEFAULT_TIME_POS) {
         alert('Cannot download. A time position value has not been selected');
         return;
       }
@@ -350,7 +350,7 @@ export class DownloadPanelComponent implements OnInit {
       let channel = this.SELECT_ALL_CODE;
       channel = !this.irisDownloadListOption.selectedChannels.includes(this.SELECT_ALL_CHANNEL) ? this.irisDownloadListOption.selectedChannels.join(",") : this.SELECT_ALL_CODE;
 
-      if (this.irisDownloadListOption.selectedserviceType == 'Station') {
+      if (this.irisDownloadListOption.selectedserviceType === 'Station') {
         observableResponse = this.downloadIrisService.downloadIRISStation(this.layer, this.bbox, station, channel, start, end);
       } else {
         observableResponse = this.downloadIrisService.downloadIRISDataselect(this.layer, station, channel, start, end);
@@ -371,7 +371,7 @@ export class DownloadPanelComponent implements OnInit {
       if (UtilitiesService.isEmpty(err.message)) {
         alert('An error has occurred whilst attempting to download. Kindly contact cg-admin@csiro.au');
       } else {
-        if (err.status == 413 && this.irisDownloadListOption) {
+        if (err.status === 413 && this.irisDownloadListOption) {
           alert('An error has occurred whilst attempting to download. (Request entity is too large, please reduce the size by limiting the stations, channels, or time period.) Kindly contact cg-admin@csiro.au');
 
         } else {

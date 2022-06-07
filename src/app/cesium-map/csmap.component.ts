@@ -365,6 +365,9 @@ export class CsMapComponent implements AfterViewInit {
           // Display WMS layer info
           } else {
             const params = this.getParams(maplayer.clickPixel[0], maplayer.clickPixel[1]);
+            if (!params) {
+              continue;
+            }
             let sldBody = maplayer.sldBody;
             let postMethod = false;
             let infoFormat: string;

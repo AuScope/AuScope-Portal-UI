@@ -1,5 +1,7 @@
-import { CsClipboardService, CsMapService, CsWMSService, FilterPanelService, GetCapsService, LayerHandlerService,
-         LayerModel, LayerStatusService, ManageStateService, UtilitiesService } from '@auscope/portal-core-ui';
+import {
+  CsClipboardService, CsMapService, CsWMSService, FilterPanelService, GetCapsService, LayerHandlerService,
+  LayerModel, LayerStatusService, ManageStateService, UtilitiesService
+} from '@auscope/portal-core-ui';
 import * as $ from 'jquery';
 import { Component, Input, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import * as _ from 'lodash';
@@ -9,6 +11,7 @@ import { LayerAnalyticModalComponent } from '../../../modalwindow/layeranalytic/
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { ToolbarComponentsService } from 'app/services/ui/toolbar-components.service';
 import { GraceStyleService } from 'app/services/wcustom/grace/grace-style.service';
+import { ToolbarType } from 'app/toolbar/toolbar.component';
 
 declare var gtag: Function;
 
@@ -18,7 +21,6 @@ declare var gtag: Function;
   styleUrls: ['./filterpanel.component.scss', '../../menupanel.scss']
 })
 export class FilterPanelComponent implements OnInit {
-
   @Input() layer: LayerModel;
   private providers: Array<Object>;
   public optionalFilters: Array<Object>;
@@ -37,16 +39,16 @@ export class FilterPanelComponent implements OnInit {
 
 
   constructor(private csMapService: CsMapService,
-              private layerHandlerService: LayerHandlerService,
-              private filterPanelService: FilterPanelService,
-              private modalService: BsModalService,
-              private manageStateService: ManageStateService,
-              private csClipboardService: CsClipboardService,
-              private csWMSService: CsWMSService,
-              public layerStatus: LayerStatusService,
-              private getCapsService: GetCapsService,
-              private toolbarService: ToolbarComponentsService,
-              private graceStyleService: GraceStyleService) {
+    private layerHandlerService: LayerHandlerService,
+    private filterPanelService: FilterPanelService,
+    private modalService: BsModalService,
+    private manageStateService: ManageStateService,
+    private csClipboardService: CsClipboardService,
+    private csWMSService: CsWMSService,
+    public layerStatus: LayerStatusService,
+    private getCapsService: GetCapsService,
+    private toolbarService: ToolbarComponentsService,
+    private graceStyleService: GraceStyleService) {
     this.providers = [];
     this.optionalFilters = [];
     this.analyticMap = ref.layeranalytic;
@@ -104,6 +106,9 @@ export class FilterPanelComponent implements OnInit {
     // Add any layer specific toolbars
     this.toolbarService.addFilterPanelToolbarComponents(this.layer, this.filterToolbars);
 
+    // Get capability records
+    this.getcapabilityRecord();
+
     // Set time extent if WMS and present
     this.setLayerTimeExtent();
   }
@@ -144,8 +149,8 @@ export class FilterPanelComponent implements OnInit {
    */
   public getUnsupportedLayerMessage(): string {
     return "This layer is not supported. Only layers containing the " +
-           "following online resource types can be added to the map: " +
-           this.csMapService.getSupportedOnlineResourceTypes();
+      "following online resource types can be added to the map: " +
+      this.csMapService.getSupportedOnlineResourceTypes();
   }
 
   /**
@@ -382,6 +387,43 @@ export class FilterPanelComponent implements OnInit {
   }
 
   /**
+   * Send a request to get the capability record and set layer's capability records
+   */
+  private getcapabilityRecord() {
+    let wmsEndpointUrl = null;
+    let layerName = null;
+    // Check if WMS capability record present 
+    if (this.layer.capabilityRecords && this.layer.capabilityRecords.length > 0) {
+      return;
+    }
+    // Look for WMS endpoint in CSW records if not already found
+    if (this.layer.cswRecords && this.layer.cswRecords.length > 0) {
+      for (const cswRecord of this.layer.cswRecords) {
+        if (cswRecord.onlineResources) {
+          const resource = cswRecord.onlineResources.find(o => o.type.toLowerCase() === 'wms');
+          if (resource) {
+            wmsEndpointUrl = resource.url;
+            layerName = resource.name;
+            continue;
+          }
+        }
+      }
+    }
+
+    // Query WMS GetCapabilities for timeExtent
+    if (wmsEndpointUrl !== null && layerName !== null) {
+      if (wmsEndpointUrl.indexOf('?') !== -1) {
+        wmsEndpointUrl = wmsEndpointUrl.substring(0, wmsEndpointUrl.indexOf('?'));
+      }
+      this.getCapsService.getCaps(wmsEndpointUrl).subscribe(response => {
+        if (response.data.capabilityRecords.length === 1) {
+          this.layer.capabilityRecords = response.data.capabilityRecords;
+        }
+      });
+    }
+  }
+
+  /**
    * Set time extent for a layer, first looking at the layer's capability records
    * and then the CSW records.
    */
@@ -389,6 +431,12 @@ export class FilterPanelComponent implements OnInit {
     this.timeExtent = [];
     let wmsEndpointUrl = null;
     let layerName = null;
+
+    // Check if WMS capability record present 
+    if (!(this.layer.capabilityRecords && this.layer.capabilityRecords.length > 0)) {
+      this.getcapabilityRecord();
+    }
+
     // Check if WMS capability record present and time extent set
     if (this.layer.capabilityRecords && this.layer.capabilityRecords.length > 0) {
       const layerCapRec = this.layer.capabilityRecords.find(c => c.serviceType.toLowerCase() === 'wms');
@@ -449,6 +497,16 @@ export class FilterPanelComponent implements OnInit {
       this.csMapService.removeLayer(layerModelList[this.layer.id]);
     }
     this.addLayer(this.layer);
+  }
+
+  /**
+   * Check for a layer having a FilterPanel ToolbarComponent so we can disable the No Filter message.
+   *
+   * @param layerId ID of layer to check for toolbar components
+   * @returns true if the layer has a FilterPanel ToolbarComponent, false otherwise
+   */
+  layerHasFilterPanelToolbarComponent(layerId: string): boolean {
+    return ref.toolbar[layerId] && ref.toolbar[layerId].find(t => t.type === ToolbarType.FilterPanel);
   }
 
 }
