@@ -117,19 +117,19 @@ export class InfoPanelComponent implements OnChanges {
      * @param layerName name of layerName
      * @param adminArea name of administrative area
      */
-    highlightOnPreviewMap(layerName: string, adminArea: string): void {
-        const key = this.makeKey(layerName, adminArea);
-        this.previewMap.setBBoxHighlight(true, key);
-    }
+    // highlightOnPreviewMap(layerName: string, adminArea: string): void {
+    //     const key = this.makeKey(layerName, adminArea);
+    //     this.previewMap.setBBoxHighlight(true, key);
+    // }
 
     /**
      * Unhighlights a bounding box on the preview map
      * @param layerName name of layerName
      * @param adminArea name of administrative area
      */
-    lowlightOnPreviewMap(layerName: string, adminArea: string): void {
-        const key = this.makeKey(layerName, adminArea);
-        this.previewMap.setBBoxHighlight(false, key);
-    }
+    // lowlightOnPreviewMap(layerName: string, adminArea: string): void {
+    //     const key = this.makeKey(layerName, adminArea);
+    //     this.previewMap.setBBoxHighlight(false, key);
+    // }
 
 }

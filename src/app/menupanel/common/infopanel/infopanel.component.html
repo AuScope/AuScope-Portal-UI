@@ -28,7 +28,7 @@
                     <div *ngFor="let cswRecord of cswRecords.slice(0,10); let i = index;" class="card card-bordered">
                         <div class="card-header">
                                 <h4 class="card-title">
-                                    <a class="accordion-link" data-toggle="collapse" href="#info-link{{i}}" (click)="cswRecord.expanded = !cswRecord.expanded" (mouseenter)="highlightOnPreviewMap(layer.name, cswRecord.adminArea)" (mouseleave)="lowlightOnPreviewMap(layer.name, cswRecord.adminArea)">
+                                    <a class="accordion-link" data-toggle="collapse" href="#info-link{{i}}" (click)="cswRecord.expanded = !cswRecord.expanded" >
                                     <i *ngIf='layerStatus.showInfoWarning(layer.id, cswRecord)' class="fa fa-warning text-warning"> </i>{{cswRecord.adminArea !='' && cswRecord.adminArea!=null ? cswRecord.adminArea : 'More Information'}}
                                 </a>
                                 </h4>
