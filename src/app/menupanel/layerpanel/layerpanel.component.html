@@ -51,7 +51,7 @@
 						</span>
 						<div class="layerLoadClickable">
 							{{layer.name}}
-							<i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-trash red" title="Remove layer from map" (click)="removeLayer(layer);$event.stopPropagation()"></i>
+							<i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-trash float-right red" title="Remove layer from map" (click)="removeLayer(layer);$event.stopPropagation()"></i>
 							<i *ngIf="layer.expanded && !getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-arrow-circle-down"></i>
 						</div>
 						<!--

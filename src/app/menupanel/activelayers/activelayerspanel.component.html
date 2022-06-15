@@ -10,7 +10,7 @@
                     <i *ngIf="getUILayerModel(layer.id).statusMap.getContainsError()" class="fa fa-warning text-warning"></i>
                 </span>
             </u>
-            <i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-trash red layerLoadClickable" (click)="removeLayer(layer.id);$event.stopPropagation()"></i>
+            <i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-trash float-right red layerLoadClickable" (click)="removeLayer(layer.id);$event.stopPropagation()"></i>
         </div>
         <div *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="opacity-slider-panel d-flex" (click)="$event.stopPropagation()">
             <div class="opacity-label">Opacity {{ getUILayerModel(layer.id).opacity }}%&nbsp;</div>
