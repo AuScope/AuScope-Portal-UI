@@ -419,10 +419,10 @@ export class DataExplorerComponent implements OnInit{
    *
    */
   public getFacetedKeywords(): void {
-    let registrySelected: boolean = false;
-    let serviceIds = [];
+    let registrySelected = false;
+    const serviceIds = [];
     this.availableRegistries.forEach(
-      (registry: Registry, serviceId: String) => {
+      (registry: Registry) => {
         if (registry.checked) {
           registrySelected = true;
           serviceIds.push(registry.id);
@@ -435,11 +435,11 @@ export class DataExplorerComponent implements OnInit{
     }
     this.dataExplorerService.getFacetedKeywords(serviceIds).subscribe(
       (data) => {
-        this.availableKeywords = data;
+        this.availableKeywords = data.sort((a, b) => a.trim().toLowerCase().localeCompare(b.trim().toLowerCase()));
       },
       (error) => {
         // TODO: Proper error reporting
-        console.log("Faceted keyword error: " + error.message);
+        console.log('Faceted keyword error: ' + error.message);
       }
     );
   }

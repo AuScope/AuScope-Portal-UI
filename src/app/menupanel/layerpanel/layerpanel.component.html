@@ -50,8 +50,8 @@
 							-->
 						</span>
 						<div class="layerLoadClickable">
-							<i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-times red" title="Remove layer from map" (click)="removeLayer(layer);$event.stopPropagation()"></i>
 							{{layer.name}}
+							<i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-trash float-right red" title="Remove layer from map" (click)="removeLayer(layer);$event.stopPropagation()"></i>
 							<i *ngIf="layer.expanded && !getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-arrow-circle-down"></i>
 						</div>
 						<!--
@@ -81,7 +81,8 @@
 						<div class="card-header">
 							<ul id="card-tab" class="nav nav-tabs">
 								<li (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': getUILayerModel(layer.id).tabpanel.filterpanel.expanded}"><a data-toggle="tab"><i class="fa fa-filter"></i> <span class="d-none d-sm-inline">Filter</span></a></li>
-								<li (click)="selectTabPanel(layer.id,'infopanel')" [ngClass]="{'active': getUILayerModel(layer.id).tabpanel.infopanel.expanded}"><a data-toggle="tab"><i class="fa fa-info-circle"></i> <span class="d-none d-sm-inline">Info</span></a></li>
+								<!-- <li (click)="selectTabPanel(layer.id,'infopanel')" [ngClass]="{'active': getUILayerModel(layer.id).tabpanel.infopanel.expanded}"><a data-toggle="tab"><i class="fa fa-info-circle"></i> <span class="d-none d-sm-inline">Info</span></a></li> -->
+								<li (click)="displayRecordInformation(layer)" [ngClass]="{'active': getUILayerModel(layer.id).tabpanel.infopanel.expanded}"><a data-toggle="tab"><i class="fa fa-info-circle"></i> <span class="d-none d-sm-inline">Info</span></a></li>
 								<li (click)="selectTabPanel(layer.id,'downloadpanel')" [ngClass]="{'active': getUILayerModel(layer.id).tabpanel.downloadpanel.expanded}" class="d-none d-md-block"><a data-toggle="tab"><i class="fa fa-download"></i> <span>Download</span></a></li>
 							</ul>
 						</div>
