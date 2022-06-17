@@ -67,6 +67,10 @@
 	                    <label>{{optionalFilter.label}}</label>
 						<div *ngIf="optionalFilter.multiSelect; else singleSelect">
 							<!-- Can select multiple options -->
+							<mat-radio-group title="Select union or intersection of properties" aria-label="Select union or intersection of properties" [(ngModel)]="optionalFilter.boolOp">
+								<mat-radio-button value="OR">Union</mat-radio-button>
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<mat-radio-button value="AND">Intersect</mat-radio-button>
+							</mat-radio-group>
 							<ng-select [(ngModel)]="optionalFilter.value" [multiple]="true" placeholder="Select...">
                                 <ng-option *ngFor="let option of optionalFilter.options"  ng-if="option!=''" [value]="getValue(option)" >{{getKey(option)}}</ng-option>
                             </ng-select>

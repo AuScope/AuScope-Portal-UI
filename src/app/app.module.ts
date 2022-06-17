@@ -50,6 +50,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSliderModule } from '@angular/material/slider';
+import { MatRadioModule } from '@angular/material/radio'
 import { MatTreeModule } from '@angular/material/tree';
 import { CdkTableModule } from '@angular/cdk/table';
 
@@ -135,6 +136,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
         MatButtonModule,
         MatDialogModule,
         MatMenuModule,
+        MatRadioModule,
         MatSliderModule,
         NgxChartsModule,
         BrowserAnimationsModule,
