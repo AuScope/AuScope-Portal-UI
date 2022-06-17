@@ -9,7 +9,7 @@ import { OlMapPreviewComponent } from './openlayermappreview/olmap.preview.compo
 import * as olProj from 'ol/proj';
 import { Constants } from '@auscope/portal-core-ui';
 import { LayerStatusService } from '@auscope/portal-core-ui';
-
+import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
 
 
 @Component({
@@ -30,6 +30,7 @@ export class InfoPanelComponent implements OnChanges {
     featureArr: any = [];
 
     constructor(private layerHandlerService: LayerHandlerService,
+        public activeModal: NgbActiveModal,
         public layerStatus: LayerStatusService) {
     }
 
@@ -116,19 +117,19 @@ export class InfoPanelComponent implements OnChanges {
      * @param layerName name of layerName
      * @param adminArea name of administrative area
      */
-    highlightOnPreviewMap(layerName: string, adminArea: string): void {
-        const key = this.makeKey(layerName, adminArea);
-        this.previewMap.setBBoxHighlight(true, key);
-    }
+    // highlightOnPreviewMap(layerName: string, adminArea: string): void {
+    //     const key = this.makeKey(layerName, adminArea);
+    //     this.previewMap.setBBoxHighlight(true, key);
+    // }
 
     /**
      * Unhighlights a bounding box on the preview map
      * @param layerName name of layerName
      * @param adminArea name of administrative area
      */
-    lowlightOnPreviewMap(layerName: string, adminArea: string): void {
-        const key = this.makeKey(layerName, adminArea);
-        this.previewMap.setBBoxHighlight(false, key);
-    }
+    // lowlightOnPreviewMap(layerName: string, adminArea: string): void {
+    //     const key = this.makeKey(layerName, adminArea);
+    //     this.previewMap.setBBoxHighlight(false, key);
+    // }
 
 }

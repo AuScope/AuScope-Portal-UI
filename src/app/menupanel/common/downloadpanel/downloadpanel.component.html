@@ -1,5 +1,5 @@
 <div class="filter-form">
-	<div [hidden]="isCsvSupportedLayer || isWCSDownloadSupported || isDatasetURLSupportedLayer">
+	<div [hidden]="isCsvSupportedLayer || isWCSDownloadSupported || isDatasetURLSupportedLayer || isIRISDownloadSupported">
 		<div class="alert alert-danger fade show">
 			<i class="ti-bell float-left" aria-hidden="true"></i>
 			<p>Downloads are not supported by the portal for WMS and complex WFS layers. You may wish to download directly from the server by referring to the documentation on Geoserver
@@ -7,7 +7,7 @@
 			The service endpoint can be found on the infopanel beside the download tab.</p>
 		</div>
 	</div>
-	<div [hidden]='!(isCsvSupportedLayer || isDatasetURLSupportedLayer)' class="form-group">
+	<div [hidden]='!(isCsvSupportedLayer || isDatasetURLSupportedLayer || isIRISDownloadSupported)' class="form-group">
 		<div *ngIf="!bbox&&drawStarted==false">
 			 <div class="alert alert-warning fade show">
                 <i class="ti-bell float-left"></i>
@@ -36,14 +36,59 @@
 
 		<p *ngIf="!bbox" class="small text-danger">Downloads without specifying boundaries may time out after 5 minutes due to the size of the data.</p>
 
-		<button *ngIf="!bbox" type="button" class="btn btn-info btn-xs" (click)="drawBound()"><i class="fa fa-object-ungroup"></i> Select Bounds</button>
-		<button *ngIf="bbox" type="button" class="btn btn-danger btn-xs" (click)="clearBound()"><i class="fa fa-refresh"></i> Clear Bounds</button>
-		<button type="button" class="btn btn-info btn-xs " (click)="download()"><i *ngIf="downloadStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!downloadStarted" class="fa fa-cloud-download"></i> Download</button>
+    <!-- AusPass Data Download -->
+		<div *ngIf="irisDownloadListOption" class="form-group  form-group-sm">
+			<label>Service:</label>
+			<select class="form-control form-control-sm" [(ngModel)]="irisDownloadListOption.selectedserviceType" (ngModelChange)="onServiceTypeChange()" >
+				<option [ngValue]="" disabled>{{SELECT_DEFAULT_DATA_TYPE}}</option>
+				<option *ngFor="let serviceType of irisDownloadListOption.serviceTypeList">{{serviceType}}</option>
+			</select>
+		</div>
+
+		<div *ngIf="irisDownloadListOption" class="form-group  form-group-sm">
+			<label>Station:</label>
+			<ng-select  [(ngModel)]="irisDownloadListOption.selectedStations" [multiple]="true" bindLabel="label" bindValue="value" placeholder="{{SELECT_DEFAULT_STATION}}" (ngModelChange)="onStationChange()">
+				<ng-option *ngFor="let station of irisDownloadListOption.stationLst"  ng-if="station.code!=''" [value]="station.code" >{{station.name}} : {{station.code}}</ng-option>
+			 </ng-select>			
+		</div>
+
+		<div *ngIf="irisDownloadListOption" class="form-group  form-group-sm">
+			<label>Channel:</label>
+
+			 <ng-select [items]="irisDownloadListOption.channelLst" bindLabel="code" bindValue="code" [(ngModel)]="irisDownloadListOption.selectedChannels" [multiple]="true"  placeholder="{{SELECT_DEFAULT_CHANNEL}}" >
+				<ng-template ng-option-tmp let-item="item">
+					<div title="Azimuth:{{item.azimuth}} , Dip:{{item.dip}} , SampleRate:{{item.sampleRate}}">{{item.code}}</div>
+				</ng-template>
+			</ng-select>
+		</div>
+
+		<div *ngIf="irisDownloadListOption" class="form-group  form-group-sm">
+			<label>Start date: [from {{irisDownloadListOption.minDate}}]</label>
+			<input type="date" class="form-control form-control-sm" [(ngModel)]="irisDownloadListOption.dateFrom" placeholder="yyyy-mm-dd" dateFormat="yy-mm-dd"  showIcon="true"/>
+		</div>
+
+		<div *ngIf="irisDownloadListOption " class="form-group  form-group-sm">
+			<label>End date:[to {{irisDownloadListOption.maxDate}}]</label>
+			<input type="date" class="form-control form-control-sm" [(ngModel)]="irisDownloadListOption.dateTo"   placeholder="yyyy-mm-dd" dateFormat="yy-mm-dd"  showIcon="true"/>
+		</div>
+    	<!--End AusPass Data Download -->
+
+		<button *ngIf="!bbox && (!irisDownloadListOption || (irisDownloadListOption && irisDownloadListOption.displayBbox)) " type="button" title="Draw bounds"
+		        class="btn btn-info btn-xs" (click)="drawBound()"><i class="fa fa-object-ungroup"></i>&nbsp;Select Bounds</button>
+		<button *ngIf="bbox && (!irisDownloadListOption || (irisDownloadListOption && irisDownloadListOption.displayBbox))" type="button" title="Remove bounds"
+		        class="btn btn-danger btn-xs" (click)="clearBound()"><i class="fa fa-refresh"></i>&nbsp;Clear Bounds</button>
+
+		<button type="button" class="btn btn-info btn-xs" title="Download data" (click)="download()">
+			<i *ngIf="downloadStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!downloadStarted" class="fa fa-cloud-download"></i>&nbsp;Download
+		</button>
+    <!-- NVCL TSG Download -->
 		<button *ngIf="isNvclLayer" type="button" class="btn btn-info btn-xs float-left" (click)="PopupTSGDownload()"><i *ngIf="download4tStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!download4tStarted" class="fa fa-cloud-download"></i> Download4TsgFiles</button>
 
 		<div [hidden]='!isPolygonSupportedLayer' class="form-group">
 			<p *ngIf="!polygonFilter" class="small text-danger">If you want to download from Polygon Filter, please draw or pick a polygon first from the PolygonFilter Panel. (Hint: look for <i class="fa fa-edit"></i> on map)</p>
-			<button *ngIf="polygonFilter" type="button" class="btn btn-info btn-xs float-left" (click)="download4Polygon()"><i *ngIf="download4pStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!download4pStarted" class="fa fa-cloud-download"></i> Download4Polygon</button>
+			<button *ngIf="polygonFilter" type="button" class="btn btn-info btn-xs float-left" title="Download data" (click)="download4Polygon()">
+				<i *ngIf="download4pStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!download4pStarted" class="fa fa-cloud-download"></i>&nbsp;Download4Polygon
+			</button>
 		</div>
 	</div>
 
@@ -60,7 +105,7 @@
                 <p>Click on the map to select bounding box</p>
             </div>
 		</div>
-		<div *ngIf="bbox" class="container">
+		<div *ngIf="bbox && (!irisDownloadListOption || (irisDownloadListOption && irisDownloadListOption.displayBbox))" class="container">
 			<div class="standard-title row">
 				<h4><span>Bounding Box</span></h4>
 			</div>
@@ -102,10 +147,11 @@
 				<option *ngFor="let timePos of wcsDownloadListOption.timePositionList">{{timePos}}</option>
 			</select>
 		</div>
-
-		<button *ngIf="!bbox" type="button" class="btn btn-info btn-xs" (click)="drawBound()"><i class="fa fa-object-ungroup"></i> Select Bounds</button>
-		<button *ngIf="bbox" type="button" class="btn btn-danger btn-xs" (click)="clearBound()"><i class="fa fa-refresh"></i> Clear</button>
-		<button type="button" class="btn btn-info btn-xs float-right" (click)="download()"><i *ngIf="downloadStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!downloadStarted" class="fa fa-cloud-download"></i> Download</button>
+		<button *ngIf="!bbox" type="button" class="btn btn-info btn-xs" title="Draw bounds" (click)="drawBound()"><i class="fa fa-object-ungroup"></i>&nbsp;Select Bounds</button>
+		<button *ngIf="bbox" type="button" class="btn btn-danger btn-xs" title="Remove bounds" (click)="clearBound()"><i class="fa fa-refresh"></i>&nbsp;Clear</button>
+		<button type="button" class="btn btn-info btn-xs float-right" title="Download data" (click)="download()">
+			<i *ngIf="downloadStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!downloadStarted" class="fa fa-cloud-download"></i>&nbsp;Download
+		</button>
 	</div>
 
 </div>

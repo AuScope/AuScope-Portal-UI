@@ -65,17 +65,14 @@
 		<!-- BEGIN sidebar -->
 		<nav id="sidebar" class="sidebar slimscroll sidebar-collapse show" style="overflow: auto;" >
             <!--
-			<h6 class="sidebar-heading">Menu</h6>
-			<li class="hasEvent" appPermanentLink></li>
 			<li class="hasEvent d-none d-md-block" appFilterClipboard></li>
-            <hr/>
-			<h6 class="sidebar-heading">Layer Selection</h6>
             -->
+            <li class="hasEvent" appPermanentLink></li>
 
             <!-- BEGIN Active Layers -->
             <input type="checkbox" checked class="menuBtn" id="activeLayersBtn"/>
             <h5 class="mb-1">
-                <label id="activeLayersLink" for="activeLayersBtn" class="mb-0">
+                <label id="activeLayersLink" for="activeLayersBtn" class="mb-0" title="Layers added to map">
                     <i class="ti-filter"></i>
                     Active Layers
                     <i class="fa fa-arrow-circle-down"></i>
@@ -87,7 +84,7 @@
             <!-- BEGIN Featured Layers -->
             <input type="checkbox" class="menuBtn" id="featuredLayersBtn"/>
 			<h5 class="mb-1">
-				<label id="featuredLayersLink" for="featuredLayersBtn" class="mb-0">
+				<label id="featuredLayersLink" for="featuredLayersBtn" class="mb-0" title="Select predefined layers">
 				    <i class="ti-layers"></i>
 				    Featured Layers
                     <i class="fa fa-arrow-circle-down"></i>
@@ -99,7 +96,7 @@
             <!-- BEGIN Custom Layers -->
             <input type="checkbox" class="menuBtn" id="customLayersBtn"/>
 			<h5 class="mb-1">
-				<label for="customLayersBtn" class="mb-0">
+				<label for="customLayersBtn" class="mb-0" title="Enter a custom WMS endpoint">
 				    <i class="ti-pencil-alt"></i>
 				    Custom Layer
                     <i class="fa fa-arrow-circle-down"></i>
@@ -111,7 +108,7 @@
             <!-- BEGIN Data Explorer -->
             <input type="checkbox" class="menuBtn" id="dataBtn"/>
             <h5 class="mb-1">
-                <label for="dataBtn" class="mb-0">
+                <label for="dataBtn" class="mb-0" title="Search CSW services for records">
                     <i class="ti-book"></i>
                     Data Search
                     <i class="fa fa-arrow-circle-down"></i>

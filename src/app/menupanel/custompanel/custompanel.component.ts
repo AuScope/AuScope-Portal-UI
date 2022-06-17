@@ -49,10 +49,10 @@ export class CustomPanelComponent {
           if (Object.keys(this.layerGroups).length === 0) {
             this.statusmsg = '<div class="text-danger">No valid layers could be found for this endpoint.</div>';
           } else {
-            for (const key in this.layerGroups) {
-              for (let i = 0; i < this.layerGroups[key].length; i++) {
-                const uiLayerModel = new UILayerModel(this.layerGroups[key][i].id, this.renderStatusService.getStatusBSubject(this.layerGroups[key][i]));
-                this.uiLayerModelService.setUILayerModel(this.layerGroups[key][i].id, uiLayerModel);
+            for (const group in this.layerGroups) {
+              for (let layer_idx = 0; layer_idx < this.layerGroups[group].length; layer_idx++) {
+                const uiLayerModel = new UILayerModel(this.layerGroups[group][layer_idx].id, this.renderStatusService.getStatusBSubject(this.layerGroups[group][layer_idx]));
+                this.uiLayerModelService.setUILayerModel(this.layerGroups[group][layer_idx].id, uiLayerModel);
               }
             }
           }

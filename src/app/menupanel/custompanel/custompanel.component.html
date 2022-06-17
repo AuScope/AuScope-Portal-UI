@@ -3,8 +3,8 @@
 	<label class="control-label" for="inputSuccess1"><small class="white">WMS Service URL</small></label>
 	<div class="input-group">
 		<input type="text" class="form-control" [(ngModel)] = "searchUrl" >
-		<div class="input-group-append" (click)="search()">
-			<button class="btn btn-light" type="button">
+		<div class="input-group-append" title="Add WMS service URL layer to map" (click)="search()">
+			<button class="btn btn-light" type="button" [disabled]="!searchUrl || searchUrl.trim() === ''">
 				<i *ngIf="!loading" class="fa fa-search"></i>
 				<i *ngIf="loading" class="fa fa-spinner fa-spin fa-fw"></i>
 			</button>

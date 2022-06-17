@@ -2,21 +2,21 @@
 		<div class="input-group">
             <input type="text" class="form-control" placeholder="Enter search term here..." [(ngModel)]="searchText" [disabled]="searchMode">
             <div class="input-group-append">
-                <button *ngIf="!searchMode" tabindex="-1" class="btn btn-light" type="button" (click)="search()"><i class="fa fa-search"></i></button>
-                <button *ngIf="searchMode" tabindex="-1" class="btn btn-light" type="button" (click)="clearSearch()"><i class="fa fa-ban"></i></button>
-                <button tabindex="-1" data-toggle="dropdown" class="btn btn-light dropdown-toggle" type="button">
+                <button *ngIf="!searchMode" [disabled]="!searchText || searchText.trim() === ''" tabindex="-1" class="btn btn-light" type="button"
+						title="Search layers" (click)="search()">
+					<i class="fa fa-search"></i>
+				</button>
+                <button *ngIf="searchMode" tabindex="-1" class="btn btn-light" type="button" title="Clear search" (click)="clearSearch()"><i class="fa fa-ban"></i></button>
+                <button tabindex="-1" data-toggle="dropdown" class="btn btn-light dropdown-toggle" type="button" title="Select image/data layers">
                     <i class="fa fa-ellipsis-h"></i>
                 </button>
                 <ul id="menu-option-dropdown" class="dropdown-menu">
-                    <li>
-                        <a (click)="searchActive()"><i class="fa fa-eye"></i> View Active</a>
-                    </li>
                     <li class="divider"></li>
                     <li>
-                        <a (click)="searchImage()"><i class="fa fa-image"></i> Image Layer</a>
+                        <a (click)="searchByFilterMode(eFilterMode.Image)"><i class="fa fa-image"></i> Image Layer</a>
                     </li>
                     <li>
-                        <a (click)="searchData()"><i class="fa fa-sliders"></i> Data Layer</a>
+                        <a (click)="searchByFilterMode(eFilterMode.Data)"><i class="fa fa-sliders"></i> Data Layer</a>
                     </li>
                 </ul>
             </div>
@@ -50,8 +50,8 @@
 							-->
 						</span>
 						<div class="layerLoadClickable">
-							<i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-times red" (click)="removeLayer(layer);$event.stopPropagation()"></i>
 							{{layer.name}}
+							<i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-trash float-right red" title="Remove layer from map" (click)="removeLayer(layer);$event.stopPropagation()"></i>
 							<i *ngIf="layer.expanded && !getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-arrow-circle-down"></i>
 						</div>
 						<!--
@@ -81,7 +81,8 @@
 						<div class="card-header">
 							<ul id="card-tab" class="nav nav-tabs">
 								<li (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': getUILayerModel(layer.id).tabpanel.filterpanel.expanded}"><a data-toggle="tab"><i class="fa fa-filter"></i> <span class="d-none d-sm-inline">Filter</span></a></li>
-								<li (click)="selectTabPanel(layer.id,'infopanel')" [ngClass]="{'active': getUILayerModel(layer.id).tabpanel.infopanel.expanded}"><a data-toggle="tab"><i class="fa fa-info-circle"></i> <span class="d-none d-sm-inline">Info</span></a></li>
+								<!-- <li (click)="selectTabPanel(layer.id,'infopanel')" [ngClass]="{'active': getUILayerModel(layer.id).tabpanel.infopanel.expanded}"><a data-toggle="tab"><i class="fa fa-info-circle"></i> <span class="d-none d-sm-inline">Info</span></a></li> -->
+								<li (click)="displayRecordInformation(layer)" [ngClass]="{'active': getUILayerModel(layer.id).tabpanel.infopanel.expanded}"><a data-toggle="tab"><i class="fa fa-info-circle"></i> <span class="d-none d-sm-inline">Info</span></a></li>
 								<li (click)="selectTabPanel(layer.id,'downloadpanel')" [ngClass]="{'active': getUILayerModel(layer.id).tabpanel.downloadpanel.expanded}" class="d-none d-md-block"><a data-toggle="tab"><i class="fa fa-download"></i> <span>Download</span></a></li>
 							</ul>
 						</div>
