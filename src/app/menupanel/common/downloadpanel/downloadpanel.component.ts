@@ -1,4 +1,3 @@
-import { map } from 'rxjs/operators';
 import { Bbox } from '@auscope/portal-core-ui';
 import { LayerModel } from '@auscope/portal-core-ui';
 import { LayerHandlerService } from '@auscope/portal-core-ui';
