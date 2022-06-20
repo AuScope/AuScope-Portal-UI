@@ -36,9 +36,7 @@
 
 		<p *ngIf="!bbox" class="small text-danger">Downloads without specifying boundaries may time out after 5 minutes due to the size of the data.</p>
 
-		<button *ngIf="!bbox" type="button" class="btn btn-info btn-xs" (click)="drawBound()"><i class="fa fa-object-ungroup"></i> Select Bounds</button>
-		<button *ngIf="bbox" type="button" class="btn btn-danger btn-xs" (click)="clearBound()"><i class="fa fa-refresh"></i> Clear Bounds</button>
-		<button type="button" class="btn btn-info btn-xs " (click)="download()"><i *ngIf="downloadStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!downloadStarted" class="fa fa-cloud-download"></i> Download</button>
+
     <!-- AusPass Data Download -->
 		<div *ngIf="irisDownloadListOption" class="form-group  form-group-sm">
 			<label>Service:</label>
