@@ -1,5 +1,8 @@
-<a class="popup" (click)="showPermanentLink=!showPermanentLink;generatePermanentLink()"><i class="ti-link"></i><span>Permanent Link</span>
+<a class="popup" (click)="showPermanentLink=!showPermanentLink;generatePermanentLink()"><i class="ti-link"></i><span title="Create a link preserving current map layers">Permanent Link</span>
 	<div class="popuptext container-fluid" [ngClass]="{'show':showPermanentLink}"  style="z-index: 10;">
+		<div class="d-flex flex-row-reverse">
+			<i class="fa fa-times"></i>
+		</div>
 		<div class="row ml-3 mb-3">
 			<div class="input-group ">
 				<div class="input-group-prepend">

@@ -20,7 +20,7 @@ import { CapdfAdvanceFilterComponent } from './menupanel/common/filterpanel/adva
 import { DynamicAdvancefilterComponent } from './menupanel/common/filterpanel/dynamic.advancefilter.component';
 import { InfoPanelComponent } from './menupanel/common/infopanel/infopanel.component';
 import { InfoPanelSubComponent } from './menupanel/common/infopanel/subpanel/subpanel.component';
-//import { PermanentLinkComponent } from './menupanel/permanentlink/permanentlink.component';
+import { PermanentLinkComponent } from './menupanel/permanentlink/permanentlink.component';
 import { ClipboardComponent } from './menupanel/clipboard/clipboard.component';
 import { CapdfAnalyticComponent } from './modalwindow/layeranalytic/capdf/capdf.analytic.component';
 import { DynamicLayerAnalyticComponent } from './modalwindow/layeranalytic/dynamic.layer.analytic.component';
@@ -53,7 +53,6 @@ import { MatSliderModule } from '@angular/material/slider';
 import { MatTreeModule } from '@angular/material/tree';
 import { CdkTableModule } from '@angular/cdk/table';
 
-import { StorageServiceModule } from 'ngx-webstorage-service';
 import { DisclaimerModalComponent } from './modalwindow/disclaimer/disclaimer.modal.component';
 import { PortalDetailsPanelComponent } from './menupanel/portal-details-panel/portal-details-panel.component';
 
@@ -111,7 +110,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
         DynamicLayerAnalyticComponent,
         NVCLBoreholeAnalyticComponent,
         NVCLTSGDownloadComponent,
-        //PermanentLinkComponent,
+        PermanentLinkComponent,
         ClipboardComponent,
         DynamicAdvancefilterComponent,
         CapdfAdvanceFilterComponent,
@@ -139,7 +138,6 @@ PlotlyModule.plotlyjs = PlotlyJS;
         MatDialogModule,
         MatMenuModule,
         MatSliderModule,
-        StorageServiceModule,
         NgxChartsModule,
         BrowserAnimationsModule,
         BsDropdownModule.forRoot(),
@@ -157,7 +155,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
         LayerPanelComponent,
         CustomPanelComponent,
         ActiveLayersPanelComponent,
-        //PermanentLinkComponent,
+        PermanentLinkComponent,
         // CatalogueSearchComponent,
         DataExplorerComponent,
         PortalDetailsPanelComponent,

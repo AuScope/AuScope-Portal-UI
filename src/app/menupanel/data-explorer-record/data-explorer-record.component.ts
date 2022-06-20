@@ -39,13 +39,14 @@ export class DataExplorerRecordComponent implements OnInit {
     const state = UtilitiesService.getUrlParameterByName("state");
     if (state) {
       const me = this;
-      this.manageStateService.getUnCompressedString(state, function (result) {
-        const layerStateObj = JSON.parse(result);
-        if (layerStateObj[me.layer.id]) {
-          me.optionalFilters = layerStateObj[me.layer.id].optionalFilters;
-          setTimeout(() => {
-            me.addLayer(me.layer);
-          }, 100);
+      this.manageStateService.fetchStateFromDB(state).subscribe((layerStateObj: any) => {
+        if (layerStateObj) {
+          if (layerStateObj[me.layer.id]) {
+            me.optionalFilters = layerStateObj[me.layer.id].optionalFilters;
+            setTimeout(() => {
+              me.addLayer(me.layer);
+            }, 100);
+          }
         }
       });
     }
@@ -60,6 +61,7 @@ export class DataExplorerRecordComponent implements OnInit {
     if (cswRecord) {
       const modelRef = this.modalService.open(RecordModalComponent, {
         size: "lg",
+        backdrop:false
       });
       modelRef.componentInstance.cswRecords = this.layer.cswRecords;
       modelRef.componentInstance.layer = this.layer;

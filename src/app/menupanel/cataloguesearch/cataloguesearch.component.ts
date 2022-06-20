@@ -157,10 +157,10 @@ export class CatalogueSearchComponent implements AfterViewInit {
           for (let i = 1; i <= Math.ceil(response.totalResults / CataloguesearchService.RESULTS_PER_PAGE); i++) {
             me.pageList.push(i);
           }
-          for (const key in this.layerGroups) {
-            for (let i = 0; i < this.layerGroups[key].length; i++) {
-              const uiLayerModel = new UILayerModel(this.layerGroups[key][i].id, this.renderStatusService.getStatusBSubject(this.layerGroups[key][i]));
-              this.uiLayerModelService.setUILayerModel(me.layerGroups[key][i].id, uiLayerModel);
+          for (const group in this.layerGroups) {
+            for (let layer_idx = 0; layer_idx < this.layerGroups[group].length; layer_idx++) {
+              const uiLayerModel = new UILayerModel(this.layerGroups[group][layer_idx].id, this.renderStatusService.getStatusBSubject(this.layerGroups[group][layer_idx]));
+              this.uiLayerModelService.setUILayerModel(me.layerGroups[group][layer_idx].id, uiLayerModel);
             }
           }
         } else {
