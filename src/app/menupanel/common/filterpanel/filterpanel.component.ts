@@ -148,8 +148,8 @@ export class FilterPanelComponent implements OnInit {
    * containing a supported OnlineResource type.
    */
   public getUnsupportedLayerMessage(): string {
-    return "This layer is not supported. Only layers containing the " +
-      "following online resource types can be added to the map: " +
+    return "This layer cannot be displayed. For Featured Layers, please wait for the layer cache to rebuild itself. " + 
+      "For Custom Layers please note that only the following online resource types can be added to the map: " +
       this.csMapService.getSupportedOnlineResourceTypes();
   }
 
@@ -178,6 +178,7 @@ export class FilterPanelComponent implements OnInit {
       }
     }
 
+    // Add a new layer in the layer state service
     this.manageStateService.addLayer(
       layer.id,
       layer.filterCollection,
@@ -207,7 +208,7 @@ export class FilterPanelComponent implements OnInit {
       param['sld_body'] = this.graceStyleService.getGraceSld();
     }
 
-    // Add layer
+    // Add layer to map in Cesium
     this.csMapService.addLayer(layer, param);
 
     // If on a small screen, when a new layer is added, roll up the sidebar to expose the map */
@@ -302,11 +303,13 @@ export class FilterPanelComponent implements OnInit {
     if (filter == null) {
       return;
     }
+    // If filter is already in panel
     for (const filterobject of this.optionalFilters) {
       if (filterobject['label'] === filter['label']) {
         return;
       }
     }
+    // Initialise provider filter 
     if (filter.type === 'OPTIONAL.PROVIDER') {
       if (UtilitiesService.isEmpty(this.providers)) {
         this.getProvider();
@@ -316,6 +319,7 @@ export class FilterPanelComponent implements OnInit {
         filter.value[provider['value']] = false;
       }
     }
+    // Fill up dropdown remote filter with values fetched from external service
     if (
       UtilitiesService.isEmpty(filter.options) &&
       filter.type === 'OPTIONAL.DROPDOWNREMOTE'
@@ -328,10 +332,16 @@ export class FilterPanelComponent implements OnInit {
         });
       return;
     }
-
+    // For polygon filter make clipboard visible on map
     if (filter.type === 'OPTIONAL.POLYGONBBOX') {
       this.csClipboardService.toggleClipboard(true);
     }
+    // Initialise multiselect boolean filter's radio button
+    if (filter.type === 'OPTIONAL.DROPDOWNSELECTLIST' && filter.multiSelect) {
+      filter.boolOp = "OR";
+    }
+
+    // Add filter to panel
     this.optionalFilters.push(filter);
   }
 
@@ -368,9 +378,21 @@ export class FilterPanelComponent implements OnInit {
   }
 
   /**
-   * refresh and clear the filters;
+   * Refresh and clear the filters
    */
   public refreshFilter(): void {
+    // Clear out filter values
+    for (const filter of this.optionalFilters) {
+      if (filter['type'] === 'OPTIONAL.DROPDOWNSELECTLIST' ||
+          filter['type'] === 'OPTIONAL.DATE' ||
+          filter['type'] === 'OPTIONAL.TEXT' ||
+          filter['type'] === 'OPTIONAL.DROPDOWNREMOTE') {
+        filter['value'] = null;
+        if (filter['multiSelect']) {
+          filter['boolOp'] = "OR";
+        }
+      }
+    }
     this.optionalFilters = [];
     this.selectedFilter = {};
   }
