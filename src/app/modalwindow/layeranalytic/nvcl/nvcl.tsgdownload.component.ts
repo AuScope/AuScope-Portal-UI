@@ -68,7 +68,7 @@ export class NVCLTSGDownloadComponent implements AfterViewInit, OnInit, LayerAna
   }
 
   public onDownload() {
-    this.downloadWfsService.tsgDownloadStartBS.next("start");
+    this.downloadWfsService.tsgDownloadStartBS.next({start:true,email:this.tsgform.email});
   }
 
 

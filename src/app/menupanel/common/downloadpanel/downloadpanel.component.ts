@@ -36,6 +36,8 @@ export class DownloadPanelComponent implements OnInit {
   isDatasetURLSupportedLayer: boolean; // Supports dataset downloads using a URL in the WFS GetFeature response
   isWCSDownloadSupported: boolean; // Supports WCS dataset downloads
   isNvclLayer: boolean;
+  isTsgDownloadAvailable: boolean;
+  tsgDownloadEmail: string;
   downloadSizeLimit: number; // Limits the WCS download size
 
   wcsDownloadListOption: any;
@@ -54,6 +56,7 @@ export class DownloadPanelComponent implements OnInit {
     private downloadWfsService: DownloadWfsService, private downloadWcsService: DownloadWcsService, private csClipboardService: CsClipboardService,
     private modalService: BsModalService){
     this.isNvclLayer = false;
+    this.isTsgDownloadAvailable = false;
     this.bbox = null;
     this.drawStarted = false;
     this.downloadStarted = false;
@@ -66,6 +69,15 @@ export class DownloadPanelComponent implements OnInit {
     if (this.layer) {
       if ( this.layer.id === 'nvcl-v2-borehole') {
         this.isNvclLayer = true;
+        //Setup TsgDownload Button if API is ready.
+        const observableResponse = this.downloadWfsService.checkTsgDownloadAvailable();
+        observableResponse.subscribe(response => {
+          if (response === true) {
+            this.isTsgDownloadAvailable = true;
+          }
+        }, err => {
+          this.isTsgDownloadAvailable = false;
+        });
       }
       this.isPolygonSupportedLayer = config.polygonSupportedLayer.indexOf(this.layer.id) >= 0;
       this.isCsvSupportedLayer = config.csvSupportedLayer.indexOf(this.layer.id) >= 0;
@@ -93,7 +105,8 @@ export class DownloadPanelComponent implements OnInit {
 
       this.downloadWfsService.tsgDownloadStartBS.subscribe(
         (message) => {
-          if (message.includes('start')) {
+          if (message.start == true) {      
+            this.tsgDownloadEmail =  message.email;    
             this.Download4TsgFiles();
           }
         }); 
@@ -332,14 +345,12 @@ export class DownloadPanelComponent implements OnInit {
     }
     let observableResponse = null;
     this.download4tStarted = true;
-    this.downloadWfsService.tsgDownloadBS.next('5,100');
     // Download WFS features as CSV files 
     if (this.polygonFilter) {
-      observableResponse = this.downloadWfsService.downloadTsgFileUrls(this.layer, null, this.polygonFilter);
+      observableResponse = this.downloadWfsService.downloadTsgFileUrls(this.layer, null, this.tsgDownloadEmail, this.polygonFilter);
     } else {
-      observableResponse = this.downloadWfsService.downloadTsgFileUrls(this.layer, this.bbox, null);
+      observableResponse = this.downloadWfsService.downloadTsgFileUrls(this.layer, this.bbox, this.tsgDownloadEmail, null);
     }
-    this.downloadWfsService.tsgDownloadBS.next('20,100');
 
     // Kick off the download process and save zip file in browser
     observableResponse.subscribe(value => {
@@ -362,9 +373,13 @@ export class DownloadPanelComponent implements OnInit {
    * @param urls 
    */
   private async _DownloadTsgFiles ( urls: String) {
-    let urlArray = urls.split(/\r?\n/g);
+    let urlArray = urls.split(/\r?\n/g).filter(function(url) {
+      return url.match(/^http/g);
+    });
+    
+    console.log(urlArray);
     //const noMactched = (urls.match(/NoMatchedDatasetName/g) || []).length;
-    const total = (urls.match(/https:\/\/nvclanalyticscache.z8.web.core.windows.net/g) || []).length;
+    const total = urlArray.length;
     let completed = 1;
     
     for (var i = 0; i < urlArray.length; i++) {
@@ -374,11 +389,8 @@ export class DownloadPanelComponent implements OnInit {
       }
       let filename = url.substring(url.lastIndexOf('/')+1);
       let oResponse = null; 
-      
-      //fake to this url due to cors issue with https://nvclanalyticscache.z8.web.core.windows.net , Will swap to bottom line once peter sort out cors issue.
-      oResponse = await this.downloadWfsService.downloadTsgFile('https://nvcldb.blob.core.windows.net/nvcldb/GBD011_chips.zip').toPromise();
-
-      //oResponse = await this.downloadWfsService.downloadTsgFile(url).toPromise();
+      oResponse = await this.downloadWfsService.downloadTsgFile(url).toPromise();
+      //oResponse = await this.downloadWfsService.downloadTsgFile('https://nvcldb.blob.core.windows.net/nvcldb/GBD011_chips.zip').toPromise();
       if (oResponse) {
         const blob = new Blob([oResponse], {type: 'application/zip'});
         saveAs(blob, filename);
