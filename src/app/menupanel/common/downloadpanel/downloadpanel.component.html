@@ -82,11 +82,7 @@
 		<button type="button" class="btn btn-info btn-xs" title="Download data" (click)="download()">
 			<i *ngIf="downloadStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!downloadStarted" class="fa fa-cloud-download"></i>&nbsp;Download
 		</button>
-		<!-- NVCL TSG Download -->
 
-		<button *ngIf="isTsgDownloadAvailable" type="button" class="btn btn-info btn-xs float-left" (click)="PopupTSGDownload()">
-			<i *ngIf="download4tStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!download4tStarted" class="fa fa-cloud-download"></i> Download4TsgFiles
-		</button>
 
 		<div [hidden]='!isPolygonSupportedLayer' class="form-group">
 			<p *ngIf="!polygonFilter" class="small text-danger">If you want to download from Polygon Filter, please draw or pick a polygon first from the PolygonFilter Panel. (Hint: look for <i class="fa fa-edit"></i> on map)</p>
@@ -94,6 +90,11 @@
 				<i *ngIf="download4pStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!download4pStarted" class="fa fa-cloud-download"></i>&nbsp;Download4Polygon
 			</button>
 		</div>
+		<!-- NVCL TSG Download -->
+
+		<button *ngIf="isTsgDownloadAvailable" type="button" class="btn btn-info btn-xs float-left" (click)="PopupTSGDownload()">
+			<i *ngIf="download4tStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!download4tStarted" class="fa fa-cloud-download"></i> Download4TsgFiles
+		</button>
 	</div>
 
 	<div [hidden]='!isWCSDownloadSupported' class="form-group">

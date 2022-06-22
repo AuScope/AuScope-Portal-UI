@@ -39,6 +39,7 @@ export class DownloadPanelComponent implements OnInit {
   isWCSDownloadSupported: boolean; // Supports WCS dataset downloads
   isNvclLayer: boolean;
   isTsgDownloadAvailable: boolean;
+  tsgDownloadServiceMsg: string;
   tsgDownloadEmail: string;
   downloadSizeLimit: number; // Limits the WCS download size
 
@@ -63,6 +64,7 @@ export class DownloadPanelComponent implements OnInit {
   // the rectangle drawn on the map
   private rectangleObservable: RectangleEditorObservable;
 
+
   constructor(private http: HttpClient, private cdRef: ChangeDetectorRef, private layerHandlerService: LayerHandlerService, private csMapService: CsMapService,
     private downloadWfsService: DownloadWfsService, private downloadWcsService: DownloadWcsService, private downloadIrisService: DownloadIrisService,
     private csClipboardService: CsClipboardService, private csIrisService: CsIrisService, private modalService: BsModalService) {
@@ -82,8 +84,11 @@ export class DownloadPanelComponent implements OnInit {
         //Setup TsgDownload Button if API is ready.
         const observableResponse = this.downloadWfsService.checkTsgDownloadAvailable();
         observableResponse.subscribe(response => {
-          if (response === true) {
+          if (response['success'] === true){
             this.isTsgDownloadAvailable = true;
+            this.tsgDownloadServiceMsg = response['msg'];
+          } else {
+            this.isTsgDownloadAvailable = false;
           }
         }, err => {
           this.isTsgDownloadAvailable = false;
@@ -420,6 +425,7 @@ export class DownloadPanelComponent implements OnInit {
         class: 'modal-lg'
       });
       bsModalRef.content.layer = this.layer;
+      bsModalRef.content.tsgDownloadServiceMsg = this.tsgDownloadServiceMsg;
   }
    /**
    * Download the TSG files filtering with a bbox or polyon filter

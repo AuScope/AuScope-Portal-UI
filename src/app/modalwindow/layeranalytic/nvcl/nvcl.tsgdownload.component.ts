@@ -31,6 +31,7 @@ export class NVCLTSGDownloadComponent implements AfterViewInit, OnInit, LayerAna
   public total: number;
   public completed: number;
   public completePercentage: string;
+  public tsgDownloadServiceMsg: string;
 
   constructor( public bsModalRef: BsModalRef, private manageStateService: ManageStateService, private downloadWfsService: DownloadWfsService ) {
     this.tsgform = {};
