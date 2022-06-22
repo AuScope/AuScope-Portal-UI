@@ -550,11 +550,9 @@ export class CsMapComponent implements AfterViewInit {
    */
   private setModal(layerId: string, result: string, feature: any, clickCoord: {x: number, y: number, z: number}|null, gmlid?: string) {
     let treeCollections = [];
-    let isXml = true;
     // Some layers return JSON
     if (config.wmsGetFeatureJSON.indexOf(layerId) !== -1) {
       treeCollections = this.parseJSONResponse(result, feature);
-      isXml = false;
     } else {
       treeCollections = SimpleXMLService.parseTreeCollection(this.gmlParserService.getRootNode(result), feature);
     }
@@ -564,15 +562,6 @@ export class CsMapComponent implements AfterViewInit {
       if (gmlid && gmlid !== treeCollection.key) {
         continue;
       }
-
-      /*
-      if (isXml) {
-
-      } else {
-        console.log('Feature coords: ' + );
-      }
-      */
-
       featureCount++;
       if (featureCount >= 10) {
         this.setModalHTML('<p>Too many features to list, zoom in the map to get a more precise location</p>',
