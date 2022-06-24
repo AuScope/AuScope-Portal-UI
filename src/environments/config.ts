@@ -226,7 +226,7 @@ export const config = {
   ],
   // Layers that require a JSON response for WMS GetFeature requests
   wmsGetFeatureJSON: [
-    // GSKY only returns JSON
+    // ASTER is served by GSKY which only returns JSON
     'aster-aloh', 'aster-ferrous', 'aster-opaque', 'aster-ferric-oxide-content',
     'aster-feoh', 'aster-ferric-oxide-comp', 'aster-group-index',
     'aster-quartz-index', 'aster-mgoh-content', 'aster-green-veg',
@@ -235,6 +235,11 @@ export const config = {
     // Loop3D has XML formatting issues on some layers issues due to incorrectly defined namespaces
     '2m_linear_structures', '2_5m_interpgeop15', '500k_geol_4326',
     '500k_geol_28350', '500k_faults_4326',
+    // GA/NCI National Geophysical Compilations is GSKY which only returns JSON
+    'ga-geophys-1', 'ga-geophys-2', 'ga-geophys-3', 'ga-geophys-4', 'ga-geophys-5',
+    'ga-geophys-6', 'ga-geophys-7', 'ga-geophys-8', 'ga-geophys-9', 'ga-geophys-10',
+    'ga-geophys-11', 'ga-geophys-12', 'ga-geophys-13', 'ga-geophys-14', 'ga-geophys-15',
+    'ga-geophys-16', 'ga-geophys-17', 'ga-geophys-18', 'ga-geophys-19'
   ],
   supportOpenInNewWindow: [
     'nvcl-v2-borehole',
