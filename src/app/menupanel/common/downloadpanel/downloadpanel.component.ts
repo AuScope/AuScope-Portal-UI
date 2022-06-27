@@ -73,10 +73,13 @@ export class DownloadPanelComponent implements OnInit {
       this.isPolygonSupportedLayer = config.polygonSupportedLayer.indexOf(this.layer.id) >= 0;
       this.isCsvSupportedLayer = config.csvSupportedLayer.indexOf(this.layer.id) >= 0;
       this.isDatasetURLSupportedLayer = config.datasetUrlSupportedLayer[this.layer.id] !== undefined;
-      if (config.datasetUrlAussPassLayer[this.layer.group.toLowerCase()] !== undefined) {
+      // If it is an IRIS layer get the station information
+      if (config.datasetUrlAussPassLayer[this.layer.group.toLowerCase()] !== undefined &&
+          this.layerHandlerService.contains(this.layer, ResourceType.IRIS)) {
         this.isIRISDownloadSupported = true;
         this.getIRISStationInfo();
       }
+      // If layer supports WCS set download size limit
       if (config.wcsSupportedLayer[this.layer.id]) {
         this.isWCSDownloadSupported = true;
         // If 'downloadAreaMaxsize' is not set to Number.MAX_SAFE_INTEGER then download limits will apply
@@ -225,35 +228,31 @@ export class DownloadPanelComponent implements OnInit {
 
 
   /**
- * Runs the getIrisStationFeature request to gather information about the IRIS stations and channels
- */
-  public getIRISStationInfo() {
-    if (this.layerHandlerService.contains(this.layer, ResourceType.IRIS)) {
-      let serviceTypeList = Object.keys(config.datasetUrlAussPassLayer[this.layer.group.toLowerCase()]['serviceType']);
-      this.csIrisService.getIrisStationFeature(this.layer).subscribe(response => {
+   * Runs the getIrisStationFeature request to gather information about the IRIS stations and channels
+   */
+  private getIRISStationInfo() {
+    let serviceTypeList = Object.keys(config.datasetUrlAussPassLayer[this.layer.group.toLowerCase()]['serviceType']);
+    this.csIrisService.getIrisStationFeature(this.layer).subscribe(response => {
 
-        let channelLst = this.getAvilChannel(response['data'][0].stationLst);
+      let channelLst = this.getAvilChannel(response['data'][0].stationLst);
 
-        let stationLst = response['data'][0].stationLst;
-        stationLst = [{ 'code': this.SELECT_ALL_CODE, 'name': this.SELECT_ALL_STATION }].concat(stationLst);
+      let stationLst = response['data'][0].stationLst;
+      stationLst = [{ 'code': this.SELECT_ALL_CODE, 'name': this.SELECT_ALL_STATION }].concat(stationLst);
 
-        this.irisDownloadListOption = {
-          serviceTypeList: serviceTypeList,
-          stationLst: stationLst,
-          channelLst: channelLst,
-          selectedserviceType: (serviceTypeList.length > 0) ? serviceTypeList[0] : this.SELECT_DEFAULT_DATA_TYPE,
-          selectedChannels: [],
-          selectedStations: [],
-          displayBbox: true,
-          minDate: response['data'][0].mintDate,
-          maxDate: response['data'][0].maxDate,
-          dateFrom: response['data'][0].mintDate,
-          dateTo: response['data'][0].maxDate,
-        }
-      })
-    } else {
-      alert('No KML found. Kindly contact cg-admin@csiro.au');
-    }
+      this.irisDownloadListOption = {
+        serviceTypeList: serviceTypeList,
+        stationLst: stationLst,
+        channelLst: channelLst,
+        selectedserviceType: (serviceTypeList.length > 0) ? serviceTypeList[0] : this.SELECT_DEFAULT_DATA_TYPE,
+        selectedChannels: [],
+        selectedStations: [],
+        displayBbox: true,
+        minDate: response['data'][0].mintDate,
+        maxDate: response['data'][0].maxDate,
+        dateFrom: response['data'][0].mintDate,
+        dateTo: response['data'][0].maxDate,
+      }
+    })
   }
 
   /**
