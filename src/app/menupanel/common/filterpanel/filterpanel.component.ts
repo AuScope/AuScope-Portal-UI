@@ -438,7 +438,7 @@ export class FilterPanelComponent implements OnInit {
         wmsEndpointUrl = wmsEndpointUrl.substring(0, wmsEndpointUrl.indexOf('?'));
       }
       this.getCapsService.getCaps(wmsEndpointUrl).subscribe(response => {
-        if (response.data.capabilityRecords.length === 1) {
+        if (response.data && response.data.capabilityRecords.length === 1) {
           this.layer.capabilityRecords = response.data.capabilityRecords;
         }
       });
@@ -489,7 +489,7 @@ export class FilterPanelComponent implements OnInit {
         wmsEndpointUrl = wmsEndpointUrl.substring(0, wmsEndpointUrl.indexOf('?'));
       }
       this.getCapsService.getCaps(wmsEndpointUrl).subscribe(response => {
-        if (response.data.capabilityRecords.length === 1 && response.data.capabilityRecords[0].layers.length > 0) {
+        if (response.data && response.data.capabilityRecords.length === 1 && response.data.capabilityRecords[0].layers.length > 0) {
           const responseLayers = response.data.capabilityRecords[0].layers.filter(l => l.name === layerName);
           if (responseLayers && responseLayers.length > 0 && responseLayers[0].timeExtent) {
             // Sort by date (newest first)
