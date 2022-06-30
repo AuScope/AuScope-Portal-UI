@@ -79,6 +79,7 @@ import { DataExplorerdRecordModule } from './menupanel/data-explorer-record/data
 import { RecordModalComponent } from './menupanel/record-modal/record-modal.component';
 import { ToolbarModule } from './toolbar/toolbar.module';
 import { NVCLService } from './modalwindow/querier/customanalytic/nvcl/nvcl.service';
+import { NVCLTSGDownloadComponent } from './modalwindow/layeranalytic/nvcl/nvcl.tsgdownload.component';
 
 
 PlotlyModule.plotlyjs = PlotlyJS;
@@ -109,6 +110,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
         LayerAnalyticModalComponent,
         DynamicLayerAnalyticComponent,
         NVCLBoreholeAnalyticComponent,
+        NVCLTSGDownloadComponent,
         PermanentLinkComponent,
         ClipboardComponent,
         DynamicAdvancefilterComponent,

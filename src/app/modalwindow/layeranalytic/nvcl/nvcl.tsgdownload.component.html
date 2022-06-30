@@ -1,0 +1,47 @@
+<!-- Modal for querier-->
+<div class="modal-header">
+	<h1 class="page-header">TSG Files Download</h1>
+</div>
+<div class="modal-body">
+	<div class="card card-default">
+		<!-- BEGIN card-body -->
+		<div class="card-body">
+		<form #f="ngForm">
+			<div class="alert alert-danger alert-dismissible">{{tsgDownloadServiceMsg}}</div>
+
+			<div class="alert alert-danger alert-dismissible">
+                TSG Files download are run remotely and may take some time to complete. Please do not click ,close or refresh the browser while downloading. Otherwise you might lost your data.
+            </div>
+            <div class="alert alert-info alert-dismissible">
+                By entering an email you can come back to this form later to collect your results. 
+            </div>
+            <div class="">
+	            <div class="form-group form-group-md row justify-content-start">
+				    <label class="col-md-2">Email:</label>
+				    <div class="col-md-6">
+						<input type="text" class="form-control form-control-sm"  [(ngModel)]="tsgform.email" name="email" ngModel #email="ngModel" required 
+						pattern="([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$">
+						<span class="validity" *ngIf="!email.valid && email.touched"></span>
+					</div>
+				</div>
+				<div class="form-group form-group-md row justify-content-start">
+				    <label class="col-md-2">Progress: {{completed}}:{{total}}</label>
+				    <div class="col-md-6">
+                        <div class="progress progress-xs" style="height: 25px">
+                            <div class="progress-bar bg-gradient-blue-purple" [style.width]= "getCompletePercentage()" role="progressbar"></div>
+                        </div>
+				    </div>
+				</div>
+
+			</div>
+            <div class="float-left">
+                <button  (click)= "onDownload()" class="btn btn-primary"  [disabled]="!tsgform.email">Download</button>
+            </div>
+		</form>
+		</div>
+	</div>
+	<!-- END card-body -->
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn btn-light" (click)="bsModalRef.hide()">Close</button>
+</div>

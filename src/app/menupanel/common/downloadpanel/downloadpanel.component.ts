@@ -1,10 +1,9 @@
-import { map } from 'rxjs/operators';
 import { Bbox } from '@auscope/portal-core-ui';
 import { LayerModel } from '@auscope/portal-core-ui';
 import { LayerHandlerService } from '@auscope/portal-core-ui';
 import { CsMapService } from '@auscope/portal-core-ui';
 import { DownloadWfsService } from '@auscope/portal-core-ui';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { UtilitiesService } from '@auscope/portal-core-ui';
 import { ResourceType } from '@auscope/portal-core-ui';
 import { saveAs } from 'file-saver';
@@ -12,6 +11,11 @@ import { config } from '../../../../environments/config';
 import { RectangleEditorObservable } from '@auscope/angular-cesium';
 import { ChangeDetectorRef } from '@angular/core';
 import { DownloadWcsService, CsClipboardService, DownloadIrisService, CsIrisService } from '@auscope/portal-core-ui';
+import { HttpClient, HttpParams, HttpHeaders, HttpResponse } from '@angular/common/http';
+import {throwError as observableThrowError,  Observable } from 'rxjs';
+import { timeoutWith, map, catchError } from 'rxjs/operators';
+import { BsModalService } from 'ngx-bootstrap/modal';
+import { NVCLTSGDownloadComponent } from 'app/modalwindow/layeranalytic/nvcl/nvcl.tsgdownload.component';
 import { data } from 'jquery';
 
 @Component({
@@ -22,18 +26,21 @@ import { data } from 'jquery';
 
 
 export class DownloadPanelComponent implements OnInit {
-
-
   @Input() layer: LayerModel;
   bbox: Bbox;
   polygonFilter: any;
   drawStarted: boolean;
   downloadStarted: boolean;
   download4pStarted: boolean;
+  download4tStarted: boolean;
   isPolygonSupportedLayer: boolean;
   isCsvSupportedLayer: boolean;  // Supports CSV downloads of WFS Features
   isDatasetURLSupportedLayer: boolean; // Supports dataset downloads using a URL in the WFS GetFeature response
   isWCSDownloadSupported: boolean; // Supports WCS dataset downloads
+  isNvclLayer: boolean;
+  isTsgDownloadAvailable: boolean;
+  tsgDownloadServiceMsg: string;
+  tsgDownloadEmail: string;
   downloadSizeLimit: number; // Limits the WCS download size
 
   wcsDownloadListOption: any;
@@ -57,19 +64,36 @@ export class DownloadPanelComponent implements OnInit {
   // the rectangle drawn on the map
   private rectangleObservable: RectangleEditorObservable;
 
-  constructor(private cdRef: ChangeDetectorRef, private layerHandlerService: LayerHandlerService, private csMapService: CsMapService,
-    private downloadWfsService: DownloadWfsService, private downloadWcsService: DownloadWcsService, private downloadIrisService: DownloadIrisService,
-    private csClipboardService: CsClipboardService, private csIrisService: CsIrisService) {
 
+  constructor(private http: HttpClient, private cdRef: ChangeDetectorRef, private layerHandlerService: LayerHandlerService, private csMapService: CsMapService,
+    private downloadWfsService: DownloadWfsService, private downloadWcsService: DownloadWcsService, private downloadIrisService: DownloadIrisService,
+    private csClipboardService: CsClipboardService, private csIrisService: CsIrisService, private modalService: BsModalService) {
+    this.isNvclLayer = false;
+    this.isTsgDownloadAvailable = false;
     this.bbox = null;
     this.drawStarted = false;
     this.downloadStarted = false;
+    this.download4tStarted = false;    
     this.wcsDownloadForm = {};
-
   }
 
   ngOnInit(): void {
     if (this.layer) {
+      if ( this.layer.id === 'nvcl-v2-borehole') {
+        this.isNvclLayer = true;
+        //Setup TsgDownload Button if API is ready.
+        const observableResponse = this.downloadWfsService.checkTsgDownloadAvailable();
+        observableResponse.subscribe(response => {
+          if (response['success'] === true){
+            this.isTsgDownloadAvailable = true;
+            this.tsgDownloadServiceMsg = response['msg'];
+          } else {
+            this.isTsgDownloadAvailable = false;
+          }
+        }, err => {
+          this.isTsgDownloadAvailable = false;
+        });
+      }
       this.isPolygonSupportedLayer = config.polygonSupportedLayer.indexOf(this.layer.id) >= 0;
       this.isCsvSupportedLayer = config.csvSupportedLayer.indexOf(this.layer.id) >= 0;
       this.isDatasetURLSupportedLayer = config.datasetUrlSupportedLayer[this.layer.id] !== undefined;
@@ -96,11 +120,19 @@ export class DownloadPanelComponent implements OnInit {
           if (polygonBBox && polygonBBox.coordinates) {
             this.clearBound();
             this.polygonFilter = '<ogc:Filter  xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:gml=\"http://www.opengis.net/gml\"><ogc:Intersects><ogc:PropertyName>gsmlp:shape</ogc:PropertyName>' + polygonBBox.coordinates + '</ogc:Intersects></ogc:Filter>';
-            //console.log(this.polygonFilter);
           } else {
             this.polygonFilter = null;
           }
-        });
+      });
+
+      this.downloadWfsService.tsgDownloadStartBS.subscribe(
+        (message) => {
+          if (message.start == true) {      
+            this.tsgDownloadEmail =  message.email;    
+            this.Download4TsgFiles();
+          }
+        }); 
+
     } else {
       this.isCsvSupportedLayer = false;
       this.isWCSDownloadSupported = false;
@@ -381,8 +413,88 @@ export class DownloadPanelComponent implements OnInit {
   }
 
   /**
-  * Download the layer using a polyon to specify desired area
-  */
+   * Popup the TSGDownload Model window.
+   */
+  public PopupTSGDownload() {
+    if (this.polygonFilter === null && this.bbox ===null) {
+      alert('Please draw a boundary or polygon first, otherwise the TSG datasets will be too big to download.');
+      return;
+    }
+      const bsModalRef = this.modalService.show(NVCLTSGDownloadComponent, {
+        class: 'modal-lg'
+      });
+      bsModalRef.content.layer = this.layer;
+      bsModalRef.content.tsgDownloadServiceMsg = this.tsgDownloadServiceMsg;
+  }
+   /**
+   * Download the TSG files filtering with a bbox or polyon filter
+   */
+  public Download4TsgFiles() {
+    if (this.download4tStarted) {
+      alert('Download in progress, kindly wait for it to completed');
+      return;
+    }
+    let observableResponse = null;
+    this.download4tStarted = true;
+    // Download WFS features as CSV files 
+    if (this.polygonFilter) {
+      observableResponse = this.downloadWfsService.downloadTsgFileUrls(this.layer, null, this.tsgDownloadEmail, this.polygonFilter);
+    } else {
+      observableResponse = this.downloadWfsService.downloadTsgFileUrls(this.layer, this.bbox, this.tsgDownloadEmail, null);
+    }
+
+    // Kick off the download process and save zip file in browser
+    observableResponse.subscribe(value => {
+      this._DownloadTsgFiles(value);
+      this.download4tStarted = false;
+    }, err => {
+      this.download4tStarted = false;
+      if (UtilitiesService.isEmpty(err.message)) {
+        alert('An error has occurred whilst attempting to download. Kindly contact cg-admin@csiro.au');
+      } else {
+        alert('An error has occurred whilst attempting to download. (' + err.message + ') Kindly contact cg-admin@csiro.au');
+      }
+    });
+
+    return;
+  }
+
+  /**
+   * Download the TSG files filtering with a bbox or polyon filter
+   * @param urls 
+   */
+  private async _DownloadTsgFiles ( urls: String) {
+    let urlArray = urls.split(/\r?\n/g).filter(function(url) {
+      return url.match(/^http/g);
+    });
+    
+    console.log(urlArray);
+    //const noMactched = (urls.match(/NoMatchedDatasetName/g) || []).length;
+    const total = urlArray.length;
+    let completed = 1;
+    
+    for (var i = 0; i < urlArray.length; i++) {
+      let url = urlArray[i];
+      if (!url.startsWith('http')) {
+        continue;
+      }
+      let filename = url.substring(url.lastIndexOf('/')+1);
+      let oResponse = null; 
+      oResponse = await this.downloadWfsService.downloadTsgFile(url).toPromise();
+      //oResponse = await this.downloadWfsService.downloadTsgFile('https://nvcldb.blob.core.windows.net/nvcldb/GBD011_chips.zip').toPromise();
+      if (oResponse) {
+        const blob = new Blob([oResponse], {type: 'application/zip'});
+        saveAs(blob, filename);
+      } else {
+          alert('An error has occurred whilst attempting to download. Kindly contact cg-admin@csiro.au');
+      }
+      this.downloadWfsService.tsgDownloadBS.next(completed.toString() + ',' + total.toString());
+      completed++;
+    }
+  }
+   /**
+   * Download the layer using a polyon to specify desired area
+   */
   public download4Polygon(): void {
 
     if (this.download4pStarted) {
