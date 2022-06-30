@@ -35,7 +35,7 @@
 
 			</div>
             <div class="float-left">
-                <button  (click)= "onDownload()" class="btn btn-primary"  [disabled]="!tsgform.email">Download</button>
+                <button  (click)= "onDownload()" class="btn btn-primary"  [disabled]="!tsgform.email||isDownloading">{{downloadMsg}}</button>
             </div>
 		</form>
 		</div>
