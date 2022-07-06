@@ -377,6 +377,11 @@ export class CsMapComponent implements AfterViewInit {
               sldBody = '';
             }
 
+            // WMS 1.3.0 GetFeatureInfo requests will have had their lat,lng coords swapped to lng,lat
+            if (maplayer.sldBody130) {
+              sldBody = maplayer.sldBody130;
+            }
+
             // Layer specific SLD_BODY, INFO_FORMAT and postMethod
             if (onlineResource.name.indexOf('ProvinceFullExtent') >= 0) {
               infoFormat = 'application/vnd.ogc.gml';

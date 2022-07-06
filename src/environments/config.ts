@@ -215,11 +215,18 @@ export const config = {
     'pmd-crc-project-y2-appendix',
     'pmd-crc-project-y4-final-report',
     'leme-crc-maps',
-    'portal-geo-models'
+    'portal-geo-models',
+    'l180-mt-isa-deep-crus-seis-surv-qld-2006-stac-and-migr-data-and-imag-for-line-06ga-to-06ga',
+    'are-ther-any-sand-uran-syst-in-the-erom-basi',
+    'l164-curn-seis-surv-sa-2003-2004-stac-and-migr-seis-data-and-imag-for-line-03ga',
+    'lawn-hill-plat-and-leic-rive-faul-trou-meas-stra-sect-onli-gis',
+    'pred-mine-disc-in-the-east-yilg-crat-an-exam-of-dist-targ-of-an-orog-gold-mine-syst',
+    'fina-repo-3d-geol-mode-of-the-east-yilg-crat-proj-pmd-y2-sept-2001-dece-2004',
+    'cate-3-expl-lice-poly-of-tasm-min-reso-tasm'
   ],
   // Layers that require a JSON response for WMS GetFeature requests
   wmsGetFeatureJSON: [
-    // GSKY only returns JSON
+    // ASTER is served by GSKY which only returns JSON
     'aster-aloh', 'aster-ferrous', 'aster-opaque', 'aster-ferric-oxide-content',
     'aster-feoh', 'aster-ferric-oxide-comp', 'aster-group-index',
     'aster-quartz-index', 'aster-mgoh-content', 'aster-green-veg',
@@ -228,6 +235,11 @@ export const config = {
     // Loop3D has XML formatting issues on some layers issues due to incorrectly defined namespaces
     '2m_linear_structures', '2_5m_interpgeop15', '500k_geol_4326',
     '500k_geol_28350', '500k_faults_4326',
+    // GA/NCI National Geophysical Compilations is GSKY which only returns JSON
+    'ga-geophys-1', 'ga-geophys-2', 'ga-geophys-3', 'ga-geophys-4', 'ga-geophys-5',
+    'ga-geophys-6', 'ga-geophys-7', 'ga-geophys-8', 'ga-geophys-9', 'ga-geophys-10',
+    'ga-geophys-11', 'ga-geophys-12', 'ga-geophys-13', 'ga-geophys-14', 'ga-geophys-15',
+    'ga-geophys-16', 'ga-geophys-17', 'ga-geophys-18', 'ga-geophys-19'
   ],
   supportOpenInNewWindow: [
     'nvcl-v2-borehole',

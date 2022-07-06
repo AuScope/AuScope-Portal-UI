@@ -14,7 +14,7 @@ export const environment = {
   getCSWRecordEndP: 'getKnownLayers.do',
   portalBaseUrl: 'http://portal.auscope.org.au/api/',
   hostUrl: 'http://portal.auscope.org.au/index.htm',
-  nVCLAnalyticalUrl: 'https://aus-analytical.it.csiro.au/NVCLAnalyticalServices/',
+  nVCLAnalyticalUrl: 'https://nvclanalytics.azurewebsites.net/NVCLAnalyticalServices/',
   googleAnalyticsKey: null,
   bingMapsKey: 'Bing_Maps_Key',
   baseMapLayers: [
@@ -32,5 +32,10 @@ export const environment = {
   ],
   grace: {
     hostUrl: 'https://insargrace.geoanalytics.csiro.au:/grace/grace'
-  }
+  },
+  urlNeedProxy: ['http://ogc-jdlc.curtin.edu.au:80',
+                'https://geossdi.dmp.wa.gov.au',
+                'https://geology.data.vic.gov.au',
+                'http://geology.data.vic.gov.au',
+                'http://geoserver.octopusdata.org']
 };

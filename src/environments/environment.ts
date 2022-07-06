@@ -14,7 +14,7 @@ export const environment = {
   // portalBaseUrl: 'http://localhost:8080/AuScope-Portal/',
   portalBaseUrl: 'https://au-portal-dev.it.csiro.au/api/',
   hostUrl: 'http://localhost:4200/index.htm',
-  nVCLAnalyticalUrl: 'https://aus-analytical.it.csiro.au/NVCLAnalyticalServices/',
+  nVCLAnalyticalUrl: 'https://nvclanalytics.azurewebsites.net/NVCLAnalyticalServices/',
   googleAnalyticsKey: null,
   bingMapsKey: '',
   baseMapLayers: [
@@ -32,5 +32,11 @@ export const environment = {
   ],
   grace: {
     hostUrl: 'https://insargrace.geoanalytics.csiro.au:/grace/grace'
-  }
+  },
+  urlNeedProxy: ['http://ogc-jdlc.curtin.edu.au:80',
+                'https://geossdi.dmp.wa.gov.au',
+                'https://geology.data.vic.gov.au',
+                'http://geology.data.vic.gov.au',
+                'http://geoserver.octopusdata.org']
+
 };

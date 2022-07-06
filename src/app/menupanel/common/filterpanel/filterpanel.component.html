@@ -65,10 +65,23 @@
 	            <div *ngIf="optionalFilter.type=='OPTIONAL.DROPDOWNSELECTLIST'">
                     <div class="form-group  form-group-sm">
 	                    <label>{{optionalFilter.label}}</label>
-						<select class="form-control form-control-sm" [(ngModel)]="optionalFilter.value">
-							<option value="" selected="selected">-- choose a {{optionalFilter.label}} --</option>
-							<option *ngFor="let option of optionalFilter.options">{{getKey(option)}}</option>
-						</select>
+						<div *ngIf="optionalFilter.multiSelect; else singleSelect">
+							<!-- Can select multiple options -->
+							<mat-radio-group title="Select union or intersection of properties" aria-label="Select union or intersection of properties" [(ngModel)]="optionalFilter.boolOp">
+								<mat-radio-button value="OR">Union</mat-radio-button>
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<mat-radio-button value="AND">Intersect</mat-radio-button>
+							</mat-radio-group>
+							<ng-select [(ngModel)]="optionalFilter.value" [multiple]="true" placeholder="Select...">
+                                <ng-option *ngFor="let option of optionalFilter.options"  ng-if="option!=''" [value]="getValue(option)" >{{getKey(option)}}</ng-option>
+                            </ng-select>
+						</div>
+						<ng-template #singleSelect>
+							<!-- Can only select a single option -->
+							<select class="form-control form-control-sm" [(ngModel)]="optionalFilter.value">
+								<option value="" selected="selected">-- Choose a {{optionalFilter.label}} --</option>
+								<option *ngFor="let option of optionalFilter.options">{{getKey(option)}}</option>
+							</select>
+						</ng-template>
 	                </div>
 	            </div>
 	            <div *ngIf="optionalFilter.type=='OPTIONAL.DROPDOWNREMOTE'">

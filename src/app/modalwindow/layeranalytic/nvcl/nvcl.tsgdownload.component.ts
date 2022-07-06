@@ -1,18 +1,12 @@
-import { environment } from '../../../../environments/environment';
 import { LayerModel } from '@auscope/portal-core-ui';
 import { ManageStateService } from '@auscope/portal-core-ui';
-import { UtilitiesService } from '@auscope/portal-core-ui';
 import {
   Component,
   Input,
   AfterViewInit,
-  OnInit,
-  ViewChild,
-  EventEmitter,
-  Output
+  OnInit
 } from '@angular/core';
 import { LayerAnalyticInterface } from '../layer.analytic.interface';
-import { NgForm } from '@angular/forms';
 import { DownloadWfsService } from '@auscope/portal-core-ui';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 
@@ -32,20 +26,33 @@ export class NVCLTSGDownloadComponent implements AfterViewInit, OnInit, LayerAna
   public completed: number;
   public completePercentage: string;
   public tsgDownloadServiceMsg: string;
+  public downloadMsg = "Download";
+  public isDownloading = false;
+
 
   constructor( public bsModalRef: BsModalRef, private manageStateService: ManageStateService, private downloadWfsService: DownloadWfsService ) {
     this.tsgform = {};
   }
 
+  /**
+   * Reset download counters and subscribe to updates
+   */
   ngAfterViewInit(): void {
+    this.downloadWfsService.resetTSGDownloads();
     this.downloadWfsService.tsgDownloadBS.subscribe(
         (message) => {
           let progressData =  message.split(',');
           this.completed = parseInt(progressData[0]);
           this.total = parseInt(progressData[1]);
+          if (this.completed != 0 && this.completed === this.total) {
+            this.downloadMsg = "Completed";
+          }
         });
   }
 
+  /**
+   * Initialise UI
+   */
   ngOnInit() {
     this.ngSelectiveConfig = {
       labelField: 'label',
@@ -56,6 +63,8 @@ export class NVCLTSGDownloadComponent implements AfterViewInit, OnInit, LayerAna
     this.tsgform.ogcFilter = '';
     this.total = 100;
     this.completed =0;
+    this.downloadMsg = "Download";
+    this.isDownloading = false;
   }
 
   public getCompletePercentage(): String{
@@ -68,8 +77,13 @@ export class NVCLTSGDownloadComponent implements AfterViewInit, OnInit, LayerAna
     return this.completePercentage;
   }
 
+  /**
+   * Called when the "Download" button is hit
+   */
   public onDownload() {
     this.downloadWfsService.tsgDownloadStartBS.next({start:true,email:this.tsgform.email});
+    this.isDownloading = true;
+    this.downloadMsg = "Downloading...";
   }
 
 
