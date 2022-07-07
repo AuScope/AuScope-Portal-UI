@@ -13,6 +13,7 @@ import {
 } from '@angular/core';
 import { LayerAnalyticInterface } from '../layer.analytic.interface';
 import { NgForm } from '@angular/forms';
+import { Observable } from 'rx';
 
 @Component({
   templateUrl: './nvcl.boreholeanalytic.component.html',
@@ -144,30 +145,23 @@ export class NVCLBoreholeAnalyticComponent
     } else {
       this.nvclform.ogcFilter = '';
     }
+    let jobObserver;
     if (this.isExistingAlgorithm) {
       this.nvclform.algorithm = this.selectedAlgorithm.algorithmId;
-      this.nvclBoreholeAnalyticService
-        .submitNVCLAnalyticalJob(this.nvclform, this.layer)
-        .subscribe(response => {
-          if (response === true) {
-            alert(
-              'Job has been successfully submitted. The results will be send to your email'
-            );
-            this.nvclBoreholeAnalyticService.setUserEmail(this.nvclform.email);
-          }
-        });
+      jobObserver = this.nvclBoreholeAnalyticService.submitNVCLAnalyticalJob(this.nvclform, this.layer);
     } else {
-      this.nvclBoreholeAnalyticService
-        .submitNVCLTSGModJob(this.nvclform, this.layer)
-        .subscribe(response => {
-          if (response === true) {
-            alert(
-              'Job has been successfully submitted. The results will be send to your email'
-            );
-            this.nvclBoreholeAnalyticService.setUserEmail(this.nvclform.email);
-          }
-        });
+      jobObserver =this.nvclBoreholeAnalyticService.submitNVCLTSGModJob(this.nvclform, this.layer);
     }
+    jobObserver.subscribe(response => {
+      if (response === true) {
+        alert('Job has been successfully submitted. The results will be sent to your email.');
+        this.nvclBoreholeAnalyticService.setUserEmail(this.nvclform.email);
+      }
+      },
+      err => {
+        alert('Failed on the job submission. Please contact cg-admin@csiro.au for help!');
+      }
+    );
   }
 
   public checkStatus() {
