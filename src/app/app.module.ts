@@ -72,7 +72,7 @@ import { GraceAdvancedFilterComponent } from './menupanel/common/filterpanel/adv
 // Services
 import { AuscopeApiService } from './services/api/auscope-api.service';
 import { RectanglesEditorService } from '@auscope/angular-cesium';
-import { AdvancedMapComponentService } from './services/ui/advanced-map-component.service';
+import { AdvancedComponentService } from './services/ui/advanced-component.service';
 import { GraceService } from './services/wcustom/grace/grace.service';
 
 import * as PlotlyJS from 'plotly.js-dist-min/plotly.min.js';
@@ -134,7 +134,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
         DataExplorerComponent,
         RecordModalComponent
     ],
-    providers: [AuscopeApiService, RectanglesEditorService, AdvancedMapComponentService, NVCLService, GraceService],
+    providers: [AuscopeApiService, RectanglesEditorService, AdvancedComponentService, NVCLService, GraceService],
     imports: [
         PortalCoreModule.forRoot(environment, config),
         PortalCorePipesModule,

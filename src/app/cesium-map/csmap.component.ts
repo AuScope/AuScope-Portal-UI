@@ -8,7 +8,7 @@ import { CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageState
 import { Cartesian3, MapMode2D, Math, ScreenSpaceEventHandler, SceneMode, ScreenSpaceEventType, Rectangle, ImagerySplitDirection,
    Cartesian2, WebMapServiceImageryProvider, WebMercatorProjection, Cartographic, GeographicProjection } from 'cesium';
 import { IrisQuerierHandler } from './custom-querier-handler/iris-querier-handler.service';
-import { AdvancedMapComponentService } from 'app/services/ui/advanced-map-component.service';
+import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
 
 declare var Cesium: any;
 
@@ -66,7 +66,7 @@ export class CsMapComponent implements AfterViewInit {
 
   constructor(private csMapObject: CsMapObject, private csMapService: CsMapService, private modalService: BsModalService,
     private queryWFSService: QueryWFSService, private queryWMSService: QueryWMSService, private gmlParserService: GMLParserService,
-    private manageStateService: ManageStateService, private advancedMapComponentService: AdvancedMapComponentService,
+    private manageStateService: ManageStateService, private advancedMapComponentService: AdvancedComponentService,
     private viewerConf: ViewerConfiguration, private ngZone: NgZone) {
 
     const me = this;

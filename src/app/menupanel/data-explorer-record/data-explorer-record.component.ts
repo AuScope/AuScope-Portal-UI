@@ -1,7 +1,7 @@
 import { Component, Input, ViewContainerRef, OnInit } from "@angular/core";
 import {  CSWRecordModel,  CsMapService,  ManageStateService,  UtilitiesService,  LayerModel} from "@auscope/portal-core-ui";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { AdvancedMapComponentService } from "app/services/ui/advanced-map-component.service";
+import { AdvancedComponentService } from "app/services/ui/advanced-component.service";
 import { environment } from "environments/environment";
 import * as _ from "lodash";
 import { RecordModalComponent } from "../record-modal/record-modal.component";
@@ -28,7 +28,7 @@ export class DataExplorerRecordComponent implements OnInit {
   constructor(
     public csMapService: CsMapService,
     private manageStateService: ManageStateService,
-    private advancedMapComponentService: AdvancedMapComponentService,
+    private advancedMapComponentService: AdvancedComponentService,
     public modalService: NgbModal
   ) {
     this.optionalFilters = [];

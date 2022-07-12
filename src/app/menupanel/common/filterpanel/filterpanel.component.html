@@ -118,9 +118,8 @@
 	        </div>
 	    </fieldset>
 
-	    <div *ngIf="advancedFilterMap[layer.id]" class="hasEvent red" (click)="showAdvancedFilter=!showAdvancedFilter;">{{showAdvancedFilter?'Hide Advanced Filters':'Show Advanced Filters'}}</div>
-
-	    <app-advance-filter *ngIf="showAdvancedFilter" [layer]="layer" (advancedParam)="onAdvancedParamChange($event)"></app-advance-filter>
+		<!-- Toolbars specific to layer (Optional, defined in ref.ts) -->
+		<ng-template #advancedFilterComponents></ng-template>
 
 		<!-- WMS time periods (if time extents present in LayerModel.capabilityRecords or GetCapabilities) -->
 		<button *ngIf="loadingTimeExtent" type="button" class="btn btn-info btn-sm date-btn unclickable-btn"><i class="fa fa-spinner fa-spin" style="cursor:default;"></i>&nbsp;&nbsp;Querying time</button>

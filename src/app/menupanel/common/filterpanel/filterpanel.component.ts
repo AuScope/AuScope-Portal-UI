@@ -10,7 +10,7 @@ import { ref } from '../../../../environments/ref';
 import { LayerAnalyticModalComponent } from '../../../modalwindow/layeranalytic/layer.analytic.modal.component';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { GraceService } from 'app/services/wcustom/grace/grace.service';
-import { AdvancedMapComponentService } from 'app/services/ui/advanced-map-component.service';
+import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
 
 declare var gtag: Function;
 
@@ -33,6 +33,9 @@ export class FilterPanelComponent implements OnInit {
   public currentTime: Date;                   // Current selected WMS time (from timeExtent)
   public loadingTimeExtent = false;  // Flag for WMS times loading
 
+  // Layer toolbar
+  @ViewChild('advancedFilterComponents', { static: true, read: ViewContainerRef }) advancedFilterComponents: ViewContainerRef;
+
 
   constructor(private csMapService: CsMapService,
     private layerHandlerService: LayerHandlerService,
@@ -42,7 +45,7 @@ export class FilterPanelComponent implements OnInit {
     private csClipboardService: CsClipboardService,
     private csWMSService: CsWMSService,
     public layerStatus: LayerStatusService,
-    private advancedMapComponentService: AdvancedMapComponentService,
+    private advancedComponentService: AdvancedComponentService,
     private getCapsService: GetCapsService,
     private graceService: GraceService) {
     this.providers = [];
@@ -98,6 +101,9 @@ export class FilterPanelComponent implements OnInit {
         });
       }
     }
+
+    // Add any layer specific advanced filter components
+    this.advancedComponentService.addAdvancedFilterComponents(this.layer, this.advancedFilterComponents);
 
     // Get capability records
     this.getcapabilityRecord();
@@ -179,17 +185,14 @@ export class FilterPanelComponent implements OnInit {
     );
 
     // VT: append advance filter to mandatory filter.
-    // XXX Needs better check, advanced filter tab may be hidden
-    if (this.showAdvancedFilter) {
-      for (const idx in this.advancedParam) {
-        if (!this.layer.filterCollection.mandatoryFilters) {
-          this.layer.filterCollection.mandatoryFilters = [];
-        }
-        this.layer.filterCollection.mandatoryFilters.push({
-          parameter: idx,
-          value: this.advancedParam[idx]
-        });
+    for (const idx in this.advancedParam) {
+      if (!this.layer.filterCollection.mandatoryFilters) {
+        this.layer.filterCollection.mandatoryFilters = [];
       }
+      this.layer.filterCollection.mandatoryFilters.push({
+        parameter: idx,
+        value: this.advancedParam[idx]
+      });
     }
     // VT: End append
 
@@ -211,7 +214,7 @@ export class FilterPanelComponent implements OnInit {
     }
 
     // Add any advanced map components defined in refs.ts
-    this.advancedMapComponentService.addAdvancedMapComponents(this.layer);
+    this.advancedComponentService.addAdvancedMapComponents(this.layer);
   }
 
   /**

@@ -9,7 +9,7 @@ import { ImagerySplitDirection } from 'cesium';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { CSWRecordModel } from '@auscope/portal-core-ui';
-import { AdvancedMapComponentService } from 'app/services/ui/advanced-map-component.service';
+import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
 
 
 // Filter modes available in the dropdown layer filter selector
@@ -42,7 +42,7 @@ export class LayerPanelComponent implements OnInit {
       private activeModalService: NgbModal,
       private modalService: BsModalService, private csMapService: CsMapService,
       private manageStateService: ManageStateService, private CsClipboardService: CsClipboardService,
-      private uiLayerModelService: UILayerModelService, private advancedMapComponentService: AdvancedMapComponentService) {
+      private uiLayerModelService: UILayerModelService, private advancedMapComponentService: AdvancedComponentService) {
     this.searchMode = false;
     this.CsClipboardService.filterLayersBS.subscribe(filterLayers => {
       this.areLayersFiltered = filterLayers;

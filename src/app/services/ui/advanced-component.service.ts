@@ -1,13 +1,14 @@
 import { ComponentFactoryResolver, ComponentRef, Injectable, ViewContainerRef } from '@angular/core';
 import { LayerModel } from '@auscope/portal-core-ui';
 import { AdvancedMapComponent } from 'app/cesium-map/advanced/advanced-map.component';
+import { AdvancedFilterComponent } from 'app/menupanel/common/filterpanel/advance/advanced-filter.component';
 import { ref } from '../../../environments/ref';
 
 /**
  * Service for adding and removing advanced map components
  */
 @Injectable({ providedIn: 'root' })
-export class AdvancedMapComponentService {
+export class AdvancedComponentService {
 
   private mapViewContainerRef: ViewContainerRef;
   private mapComponents: Map<string, ComponentRef<AdvancedMapComponent>[]> = new Map<string, ComponentRef<AdvancedMapComponent>[]>();
@@ -40,6 +41,22 @@ export class AdvancedMapComponentService {
         const compArray = this.mapComponents.get(layer.id);
         compArray.push(componentRef);
         this.mapComponents.set(layer.id, compArray);
+      }
+    }
+  }
+
+  /**
+   * Add advanced filter component to filter panel, usually on FilterPanel init
+   *
+   * @param layer layer to add
+   * @param layerFilterPanelViewContainerRef the view container ref for the filter panel
+   */
+   public addAdvancedFilterComponents(layer: LayerModel, layerFilterPanelViewContainerRef: ViewContainerRef) {
+    if (ref.advancedFilter && layer.id in ref.advancedFilter) {
+      for (const advancedFilter of ref.advancedFilter[layer.id]) {
+        const componentFactory = this.componentFactoryResolver.resolveComponentFactory<AdvancedFilterComponent>(advancedFilter);
+        const componentRef: ComponentRef<AdvancedFilterComponent> = layerFilterPanelViewContainerRef.createComponent<AdvancedFilterComponent>(componentFactory);
+        componentRef.instance.layer = layer;
       }
     }
   }
