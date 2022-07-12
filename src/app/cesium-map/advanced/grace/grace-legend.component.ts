@@ -1,17 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { GraceService } from '../../../services/wcustom/grace/grace.service';
-import { GraceStyleSettings } from './grace-graph.models';
-import { ToolbarComponent } from '../../toolbar.component';
+import { AdvancedMapComponent } from '../advanced-map.component';
+import { GraceStyleSettings } from '../../../modalwindow/querier/customanalytic/grace/grace-graph.models';
 
 /**
- * GRACE legend map toolbar component
+ * GRACE legend advanced map component
  */
 @Component({
     selector: 'app-grace-legend',
     templateUrl: './grace-legend.component.html',
     styleUrls: ['./grace-legend.component.scss']
 })
-export class GraceLegendComponent extends ToolbarComponent implements OnInit {
+export class GraceLegendComponent extends AdvancedMapComponent implements OnInit {
 
     graceStyleSettings: GraceStyleSettings;
 
@@ -29,8 +29,9 @@ export class GraceLegendComponent extends ToolbarComponent implements OnInit {
             maxValue: 1,
             transparentNeutralColor: false
         };
-        this.graceService.currentGraceStyleSettings.subscribe(graceStyleSettintgs => {
+        this.graceService.currentGraceStyleSettingsBS.subscribe(graceStyleSettintgs => {
             this.graceStyleSettings = graceStyleSettintgs;
         });
     }
+
 }

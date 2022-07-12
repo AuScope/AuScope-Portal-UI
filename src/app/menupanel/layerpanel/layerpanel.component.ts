@@ -6,10 +6,10 @@ import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { MatSliderChange } from '@angular/material/slider';
 import { ImagerySplitDirection } from 'cesium';
-import { ToolbarComponentsService } from 'app/services/ui/toolbar-components.service';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { CSWRecordModel } from '@auscope/portal-core-ui';
+import { AdvancedMapComponentService } from 'app/services/ui/advanced-map-component.service';
 
 
 // Filter modes available in the dropdown layer filter selector
@@ -40,10 +40,9 @@ export class LayerPanelComponent implements OnInit {
 
   constructor(private layerHandlerService: LayerHandlerService, private renderStatusService: RenderStatusService,
       private activeModalService: NgbModal,
-
       private modalService: BsModalService, private csMapService: CsMapService,
       private manageStateService: ManageStateService, private CsClipboardService: CsClipboardService,
-      private uiLayerModelService: UILayerModelService, private toolbarService: ToolbarComponentsService) {
+      private uiLayerModelService: UILayerModelService, private advancedMapComponentService: AdvancedMapComponentService) {
     this.searchMode = false;
     this.CsClipboardService.filterLayersBS.subscribe(filterLayers => {
       this.areLayersFiltered = filterLayers;
@@ -258,8 +257,8 @@ export class LayerPanelComponent implements OnInit {
   public removeLayer(layer: LayerModel) {
     this.getUILayerModel(layer.id).opacity = 100;
     this.csMapService.removeLayer(layer);
-    // Remove any layer specific toolbars
-    this.toolbarService.removeMapToolbarComponents(layer.id);
+    // Remove any layer specific map components
+    this.advancedMapComponentService.removeAdvancedMapComponents(layer.id);
   }
 
   /**

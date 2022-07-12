@@ -9,9 +9,8 @@ import { environment } from '../../../../environments/environment';
 import { ref } from '../../../../environments/ref';
 import { LayerAnalyticModalComponent } from '../../../modalwindow/layeranalytic/layer.analytic.modal.component';
 import { BsModalService } from 'ngx-bootstrap/modal';
-import { ToolbarComponentsService } from 'app/services/ui/toolbar-components.service';
-import { GraceStyleService } from 'app/services/wcustom/grace/grace-style.service';
-import { ToolbarType } from 'app/toolbar/toolbar.component';
+import { GraceService } from 'app/services/wcustom/grace/grace.service';
+import { AdvancedMapComponentService } from 'app/services/ui/advanced-map-component.service';
 
 declare var gtag: Function;
 
@@ -25,17 +24,14 @@ export class FilterPanelComponent implements OnInit {
   private providers: Array<Object>;
   public optionalFilters: Array<Object>;
   public selectedFilter;
-  public advanceparam = [];
+  public advancedParam = [];
   public analyticMap;
-  public advanceFilterMap;
-  public showAdvanceFilter = false;
+  public advancedFilterMap;
+  public showAdvancedFilter = false;
   public bApplyClipboardBBox = true;
   public timeExtent: Date[] = [];             // WMS time extent (optional)
   public currentTime: Date;                   // Current selected WMS time (from timeExtent)
   public loadingTimeExtent = false;  // Flag for WMS times loading
-
-  // Layer toolbar
-  @ViewChild('toolbars', { static: true, read: ViewContainerRef }) filterToolbars: ViewContainerRef;
 
 
   constructor(private csMapService: CsMapService,
@@ -46,13 +42,13 @@ export class FilterPanelComponent implements OnInit {
     private csClipboardService: CsClipboardService,
     private csWMSService: CsWMSService,
     public layerStatus: LayerStatusService,
+    private advancedMapComponentService: AdvancedMapComponentService,
     private getCapsService: GetCapsService,
-    private toolbarService: ToolbarComponentsService,
-    private graceStyleService: GraceStyleService) {
+    private graceService: GraceService) {
     this.providers = [];
     this.optionalFilters = [];
     this.analyticMap = ref.layeranalytic;
-    this.advanceFilterMap = ref.advanceFilter;
+    this.advancedFilterMap = ref.advancedFilter;
   }
 
   ngOnInit(): void {
@@ -102,9 +98,6 @@ export class FilterPanelComponent implements OnInit {
         });
       }
     }
-
-    // Add any layer specific toolbars
-    this.toolbarService.addFilterPanelToolbarComponents(this.layer, this.filterToolbars);
 
     // Get capability records
     this.getcapabilityRecord();
@@ -186,14 +179,14 @@ export class FilterPanelComponent implements OnInit {
     );
 
     // VT: append advance filter to mandatory filter.
-    if (this.showAdvanceFilter) {
-      for (const idx in this.advanceparam) {
+    if (this.showAdvancedFilter) {
+      for (const idx in this.advancedParam) {
         if (!this.layer.filterCollection.mandatoryFilters) {
           this.layer.filterCollection.mandatoryFilters = [];
         }
         this.layer.filterCollection.mandatoryFilters.push({
           parameter: idx,
-          value: this.advanceparam[idx]
+          value: this.advancedParam[idx]
         });
       }
     }
@@ -205,7 +198,7 @@ export class FilterPanelComponent implements OnInit {
     }
 
     if (layer.id === 'grace-mascons') {
-      param['sld_body'] = this.graceStyleService.getGraceSld();
+      param['sld_body'] = this.graceService.getGraceSld();
     }
 
     // Add layer to map in Cesium
@@ -216,8 +209,8 @@ export class FilterPanelComponent implements OnInit {
       $('#sidebar-toggle-btn').click();
     }
 
-    // Add any toolbar components to map defined in refs.ts
-    this.toolbarService.addMapToolbarComponents(this.layer);
+    // Add any advanced map components defined in refs.ts
+    this.advancedMapComponentService.addAdvancedMapComponents(this.layer);
   }
 
   /**
@@ -289,8 +282,8 @@ export class FilterPanelComponent implements OnInit {
     return UtilitiesService.getValue(options);
   }
 
-  public onAdvanceParamChange($event) {
-    this.advanceparam = $event;
+  public onAdvancedParamChange($event) {
+    this.advancedParam = $event;
   }
 
   /**
@@ -522,13 +515,13 @@ export class FilterPanelComponent implements OnInit {
   }
 
   /**
-   * Check for a layer having a FilterPanel ToolbarComponent so we can disable the No Filter message.
+   * Check for a layer having a AdvancedFilterComponent so we can disable the No Filter message.
    *
-   * @param layerId ID of layer to check for toolbar components
-   * @returns true if the layer has a FilterPanel ToolbarComponent, false otherwise
+   * @param layerId ID of layer to check for advanced filter components
+   * @returns true if the layer has an AdvancedFilterComponent, false otherwise
    */
-  layerHasFilterPanelToolbarComponent(layerId: string): boolean {
-    return ref.toolbar[layerId] && ref.toolbar[layerId].find(t => t.type === ToolbarType.FilterPanel);
+  layerHasAdvancedFilterComponent(layerId: string): boolean {
+    return ref.advancedFilter[layerId];
   }
 
 }

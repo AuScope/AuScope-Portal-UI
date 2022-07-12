@@ -1,16 +1,15 @@
+import { Directive } from '@angular/core';
 import { LayerModel } from '@auscope/portal-core-ui';
 
 
-export enum ToolbarType {
-  'Map',
-  'FilterPanel'
-}
 /**
- * Abstract class tofrom which to extend tooolbar components
+ * Abstract class from which to extend advanced map components
  */
- export abstract class ToolbarComponent {
+@Directive()
+ export abstract class AdvancedMapComponent {
 
   layer: LayerModel;
+  public advancedParams = {};
 
   public getLayer(): LayerModel {
       return this.layer;
