@@ -27,7 +27,7 @@ export class FilterPanelComponent implements OnInit {
   public advancedParam = [];
   public analyticMap;
   public advancedFilterMap;
-  public showAdvancedFilter = false;
+  public showAdvancedFilter = true;
   public bApplyClipboardBBox = true;
   public timeExtent: Date[] = [];             // WMS time extent (optional)
   public currentTime: Date;                   // Current selected WMS time (from timeExtent)
@@ -179,6 +179,7 @@ export class FilterPanelComponent implements OnInit {
     );
 
     // VT: append advance filter to mandatory filter.
+    // XXX Needs better check, advanced filter tab may be hidden
     if (this.showAdvancedFilter) {
       for (const idx in this.advancedParam) {
         if (!this.layer.filterCollection.mandatoryFilters) {

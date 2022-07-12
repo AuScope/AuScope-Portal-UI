@@ -10,6 +10,7 @@ import { BehaviorSubject } from 'rxjs';
  export abstract class AdvancedFilterComponent {
 
   layer: LayerModel;
+  public advancedParamsBS = new BehaviorSubject<any>({});
   public advancedParams = {};
 
   public getLayer(): LayerModel {
@@ -18,6 +19,15 @@ import { BehaviorSubject } from 'rxjs';
 
   public setLayer(layer: LayerModel) {
       this.layer = layer;
+  }
+
+  public setAdvancedParams(params: any) {
+    this.advancedParams = params;
+    this.advancedParamsBS.next(params);
+  }
+
+  public getAdvancedParams(): any {
+    return this.advancedParams;
   }
 
 }

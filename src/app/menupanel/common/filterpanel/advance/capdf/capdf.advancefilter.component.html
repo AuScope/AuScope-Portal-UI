@@ -21,7 +21,4 @@
 		<label>Min/Max - {{sliderRange[0]}} to {{sliderRange[1]}}</label>
 		<nouislider [connect]="true" [min]="convertStringToNumber(selectedPOI[2])" [max]="convertStringToNumber(selectedPOI[3])" [step]="0.1" [(ngModel)]="sliderRange" (ngModelChange)="onRangeChange($event)"></nouislider>
 	</div>
-
-
-
 </fieldset>

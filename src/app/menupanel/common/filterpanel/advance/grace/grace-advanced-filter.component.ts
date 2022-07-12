@@ -18,8 +18,7 @@ import { AdvancedFilterComponent } from '../advanced-filter.component';
     styleGroup: FormGroup;
 
 
-    constructor(
-                @Inject(CsMapObject)private csMapObject: CsMapObject, @Inject(CsMapService)private csMapService: CsMapService,
+    constructor(@Inject(CsMapObject)private csMapObject: CsMapObject, @Inject(CsMapService)private csMapService: CsMapService,
                 private graceService: GraceService, private formBuilder: FormBuilder, private modalService: BsModalService) {
         super();
     }
@@ -35,6 +34,7 @@ import { AdvancedFilterComponent } from '../advanced-filter.component';
             maxValue: [this.graceService.currentGraceStyleSettings.maxValue, [Validators.required, Validators.pattern(this.DECIMAL_REGEX)]],
             transparentNeutralColor: this.graceService.currentGraceStyleSettings.transparentNeutralColor
         });
+        this.setAdvancedParams(this.graceService.currentGraceStyleSettings);
     }
 
     /**

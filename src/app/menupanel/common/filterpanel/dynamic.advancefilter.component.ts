@@ -8,7 +8,9 @@ import { Input, Component, ViewChild, ViewContainerRef, ComponentFactoryResolver
    template: `<div #dynamicAdvanceFilterPlaceholder></div>`
 })
 
-
+/**
+ * Deprecated. Use AdvancedFilterComponent if possibe
+ */
 export class DynamicAdvancefilterComponent {
   @Input() _layer: LayerModel;
   @Output() advanceparam: EventEmitter<any> = new EventEmitter<any>();
@@ -25,7 +27,6 @@ export class DynamicAdvancefilterComponent {
       this.loadComponent();
     }
   }
-
 
 
   loadComponent() {
@@ -46,8 +47,6 @@ export class DynamicAdvancefilterComponent {
     })
 
     this.changeDetectorRef.detectChanges();
-
-
   }
 
 }
