@@ -9,7 +9,7 @@ import { Input, Component, ViewChild, ViewContainerRef, ComponentFactoryResolver
 })
 
 /**
- * Deprecated. Use AdvancedFilterComponent if possibe
+ * Deprecated. Use AdvancedFilterDirective if possibe
  */
 export class DynamicAdvancefilterComponent {
   @Input() _layer: LayerModel;

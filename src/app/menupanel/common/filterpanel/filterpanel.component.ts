@@ -55,10 +55,7 @@ export class FilterPanelComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (
-      this.layer.filterCollection &&
-      this.layer.filterCollection['mandatoryFilters']
-    ) {
+    if (this.layer.filterCollection && this.layer.filterCollection['mandatoryFilters']) {
       const mandatoryFilters = this.layer.filterCollection['mandatoryFilters'];
 
       for (const mandatoryFilter of mandatoryFilters) {
@@ -68,6 +65,15 @@ export class FilterPanelComponent implements OnInit {
       }
     }
 
+    // Get capability records
+    this.getcapabilityRecord();
+
+    // Set time extent if WMS and present
+    this.setLayerTimeExtent();
+
+    // Add any layer specific advanced filter components
+    this.advancedComponentService.addAdvancedFilterComponents(this.layer, this.advancedFilterComponents);
+
     // This sets the filter parameters using the state data in the permanent link
     const state = UtilitiesService.getUrlParameterByName('state');
     if (state) {
@@ -76,6 +82,16 @@ export class FilterPanelComponent implements OnInit {
         if (layerStateObj) {
           if (UtilitiesService.isEmpty(me.providers)) {
             me.getProvider();
+          }
+          // Time (if present)
+          if (layerStateObj[me.layer.id] && layerStateObj[me.layer.id].time) {
+            this.currentTime = layerStateObj[me.layer.id].time;
+          }
+          // Advanced filter
+          if (layerStateObj[me.layer.id] && layerStateObj[me.layer.id].advancedFilter) {
+            if (layerStateObj[me.layer.id].advancedFilter !== {}) {
+              this.advancedComponentService.getAdvancedFilterComponentForLayer(me.layer.id).setAdvancedParams(layerStateObj[me.layer.id].advancedFilter);
+            }
           }
           if (layerStateObj.hasOwnProperty(me.layer.id)) {
             me.optionalFilters = me.optionalFilters.concat(layerStateObj[me.layer.id].optionalFilters);
@@ -102,14 +118,6 @@ export class FilterPanelComponent implements OnInit {
       }
     }
 
-    // Add any layer specific advanced filter components
-    this.advancedComponentService.addAdvancedFilterComponents(this.layer, this.advancedFilterComponents);
-
-    // Get capability records
-    this.getcapabilityRecord();
-
-    // Set time extent if WMS and present
-    this.setLayerTimeExtent();
   }
 
   /**
@@ -168,23 +176,9 @@ export class FilterPanelComponent implements OnInit {
       optionalFilters: _.cloneDeep(this.optionalFilters)
     };
 
-    // Remove filters without values
-    param.optionalFilters = param.optionalFilters.filter(f => this.filterHasValue(f));
-
-    for (const optFilter of param.optionalFilters) {
-      if (optFilter['options']) {
-        optFilter['options'] = [];
-      }
-    }
-
-    // Add a new layer in the layer state service
-    this.manageStateService.addLayer(
-      layer.id,
-      layer.filterCollection,
-      this.optionalFilters
-    );
-
     // VT: append advance filter to mandatory filter.
+    /*
+    // deprecated, use AdvanceFilterDirective
     for (const idx in this.advancedParam) {
       if (!this.layer.filterCollection.mandatoryFilters) {
         this.layer.filterCollection.mandatoryFilters = [];
@@ -194,8 +188,10 @@ export class FilterPanelComponent implements OnInit {
         value: this.advancedParam[idx]
       });
     }
+    */
     // VT: End append
 
+    // TODO: Store time period with state
     // WMS layers may have a time set
     if (this.currentTime) {
       param['time'] = this.currentTime;
@@ -204,6 +200,31 @@ export class FilterPanelComponent implements OnInit {
     if (layer.id === 'grace-mascons') {
       param['sld_body'] = this.graceService.getGraceSld();
     }
+
+    // Remove filters without values
+    param.optionalFilters = param.optionalFilters.filter(f => this.filterHasValue(f));
+
+    for (const optFilter of param.optionalFilters) {
+      if (optFilter['options']) {
+        optFilter['options'] = [];
+      }
+    }
+
+    // Get AdvancedFilter params if applicable
+    let advancedFilterParams = null;
+    const advancedFilter = this.advancedComponentService.getAdvancedFilterComponentForLayer(layer.id);
+    if (advancedFilter) {
+      advancedFilterParams = advancedFilter.getAdvancedParams();
+    }
+
+    // Add a new layer in the layer state service
+    this.manageStateService.addLayer(
+      layer.id,
+      this.currentTime,
+      layer.filterCollection,
+      this.optionalFilters,
+      advancedFilterParams
+    );
 
     // Add layer to map in Cesium
     this.csMapService.addLayer(layer, param);
@@ -451,7 +472,7 @@ export class FilterPanelComponent implements OnInit {
     let wmsEndpointUrl = null;
     let layerName = null;
 
-    // Check if WMS capability record present 
+    // Check if WMS capability record present
     if (!(this.layer.capabilityRecords && this.layer.capabilityRecords.length > 0)) {
       this.getcapabilityRecord();
     }
@@ -493,7 +514,10 @@ export class FilterPanelComponent implements OnInit {
             this.timeExtent = responseLayers[0].timeExtent.sort((a, b) => {
               return <any>new Date(b) - <any>new Date(a);
             });
-            this.currentTime = this.timeExtent[0];
+            // Time may have already been set from retrieving state
+            if (!this.currentTime) {
+              this.currentTime = this.timeExtent[0];
+            }
           }
         }
         this.loadingTimeExtent = false;

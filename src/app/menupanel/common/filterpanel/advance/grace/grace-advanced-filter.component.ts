@@ -4,13 +4,14 @@ import { CsMapObject, CsMapService } from '@auscope/portal-core-ui';
 import { GraceService } from 'app/services/wcustom/grace/grace.service';
 import { GraceGraphModalComponent } from 'app/modalwindow/querier/customanalytic/grace/grace-graph.modal.component';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
-import { AdvancedFilterComponent } from '../advanced-filter.component';
+import { AdvancedFilterDirective } from '../advanced-filter.directive';
+import { GraceStyleSettings } from 'app/modalwindow/querier/customanalytic/grace/grace-graph.models';
 
 @Component({
     templateUrl: './grace-advanced-filter.component.html',
     styleUrls: ['./grace-advanced-filter.component.scss']
   })
-  export class GraceAdvancedFilterComponent extends AdvancedFilterComponent implements OnInit {
+  export class GraceAdvancedFilterComponent extends AdvancedFilterDirective implements OnInit {
 
     timeSeriesGraphModalRef?: BsModalRef;
 
@@ -102,6 +103,20 @@ import { AdvancedFilterComponent } from '../advanced-filter.component';
      */
     layerAdded(): boolean {
         return this.csMapService.layerExists(this.layer.id);
+    }
+
+    /**
+     * Override the abstract method so we can grab params from the GraceService
+     *
+     * @returns current style settings
+     */
+    public getAdvancedParams(): GraceStyleSettings {
+        return this.graceService.currentGraceStyleSettings;
+    }
+
+    public setAdvancedParams(params: any) {
+        super.setAdvancedParams(params);
+        this.graceService.setCurrentGraceStyleSettings(params);
     }
 
 }

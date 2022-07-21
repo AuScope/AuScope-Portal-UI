@@ -110,7 +110,6 @@ export class DataExplorerRecordComponent implements OnInit {
    * Add layer to map
    * @param layer the layer to add to map
    */
-
   public addLayer(layer): void {
     if (environment.googleAnalyticsKey && typeof gtag === "function") {
       gtag("event", "Addlayer", {
@@ -131,8 +130,11 @@ export class DataExplorerRecordComponent implements OnInit {
 
     this.manageStateService.addLayer(
       layer.id,
+      null,
       layer.filterCollection,
-      this.optionalFilters
+      this.optionalFilters,
+      // No advanced filters in data search panel
+      null
     );
 
     // Add layer

@@ -7,18 +7,19 @@ import { BehaviorSubject } from 'rxjs';
  * Abstract class from which to extend advanced filter components
  */
 @Directive()
- export abstract class AdvancedFilterComponent {
+ export abstract class AdvancedFilterDirective {
 
   layer: LayerModel;
-  public advancedParamsBS = new BehaviorSubject<any>({});
+  // This will be used when saving/fetching states, can be overridden in sub-classes if necessary
   public advancedParams = {};
+  public advancedParamsBS = new BehaviorSubject<any>({});
 
   public getLayer(): LayerModel {
       return this.layer;
   }
 
   public setLayer(layer: LayerModel) {
-      this.layer = layer;
+    this.layer = layer;
   }
 
   public setAdvancedParams(params: any) {

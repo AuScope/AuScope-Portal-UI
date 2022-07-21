@@ -130,7 +130,7 @@ export class LayerPanelComponent implements OnInit {
           continue;
         }
         let cond = false;
-        switch(mode) {
+        switch (mode) {
           case FilterMode.Active:
             cond = this.getUILayerModel(layer.id).statusMap.getRenderStarted();
             break;
@@ -212,10 +212,10 @@ export class LayerPanelComponent implements OnInit {
                   me.layerGroups[group].expanded = true;
                   me.layerGroups[group].loaded = me.layerGroups[group];
                   me.layerGroups[group][layer_idx].expanded = true;
-                  if (layerStateObj[uiLayerModel.id].filterCollection.hasOwnProperty('hiddenParams')) {
+                  if (layerStateObj[uiLayerModel.id].filterCollection && layerStateObj[uiLayerModel.id].filterCollection.hasOwnProperty('hiddenParams')) {
                     me.layerGroups[group][layer_idx].filterCollection.hiddenParams = layerStateObj[uiLayerModel.id].filterCollection.hiddenParams;
                   }
-                  if (layerStateObj[uiLayerModel.id].filterCollection.hasOwnProperty('mandatoryFilter')) {
+                  if (layerStateObj[uiLayerModel.id].filterCollection && layerStateObj[uiLayerModel.id].filterCollection.hasOwnProperty('mandatoryFilter')) {
                     me.layerGroups[group][layer_idx].filterCollection.mandatoryFilters = layerStateObj[uiLayerModel.id].filterCollection.mandatoryFilters;
                   }
                 }
@@ -379,5 +379,25 @@ export class LayerPanelComponent implements OnInit {
     }
   }
 
+  public isInfoPanelExpanded(layerId: string): boolean {
+    if (this.getUILayerModel(layerId)) {
+      return this.getUILayerModel(layerId).tabpanel.infopanel.expanded;
+    }
+    return false;
+  }
+
+  public isFilterPanelExpanded(layerId: string): boolean {
+    if (this.getUILayerModel(layerId)) {
+      return this.getUILayerModel(layerId).tabpanel.filterpanel.expanded;
+    }
+    return false;
+  }
+
+  public isDownloadPanelExpanded(layerId: string): boolean {
+    if (this.getUILayerModel(layerId)) {
+      return this.getUILayerModel(layerId).tabpanel.downloadpanel.expanded;
+    }
+    return false;
+  }
 
 }

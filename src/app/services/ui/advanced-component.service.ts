@@ -1,7 +1,7 @@
 import { ComponentFactoryResolver, ComponentRef, Injectable, ViewContainerRef } from '@angular/core';
 import { LayerModel } from '@auscope/portal-core-ui';
 import { AdvancedMapComponent } from 'app/cesium-map/advanced/advanced-map.component';
-import { AdvancedFilterComponent } from 'app/menupanel/common/filterpanel/advance/advanced-filter.component';
+import { AdvancedFilterDirective } from 'app/menupanel/common/filterpanel/advance/advanced-filter.directive';
 import { ref } from '../../../environments/ref';
 
 /**
@@ -12,6 +12,7 @@ export class AdvancedComponentService {
 
   private mapViewContainerRef: ViewContainerRef;
   private mapComponents: Map<string, ComponentRef<AdvancedMapComponent>[]> = new Map<string, ComponentRef<AdvancedMapComponent>[]>();
+  private filterComponents: Map<string, ComponentRef<AdvancedFilterDirective>> = new Map<string, ComponentRef<AdvancedFilterDirective>>();
 
   constructor(private componentFactoryResolver: ComponentFactoryResolver) {}
 
@@ -53,11 +54,10 @@ export class AdvancedComponentService {
    */
    public addAdvancedFilterComponents(layer: LayerModel, layerFilterPanelViewContainerRef: ViewContainerRef) {
     if (ref.advancedFilter && layer.id in ref.advancedFilter) {
-      for (const advancedFilter of ref.advancedFilter[layer.id]) {
-        const componentFactory = this.componentFactoryResolver.resolveComponentFactory<AdvancedFilterComponent>(advancedFilter);
-        const componentRef: ComponentRef<AdvancedFilterComponent> = layerFilterPanelViewContainerRef.createComponent<AdvancedFilterComponent>(componentFactory);
-        componentRef.instance.layer = layer;
-      }
+      const componentFactory = this.componentFactoryResolver.resolveComponentFactory<AdvancedFilterDirective>(ref.advancedFilter[layer.id]);
+      const componentRef: ComponentRef<AdvancedFilterDirective> = layerFilterPanelViewContainerRef.createComponent<AdvancedFilterDirective>(componentFactory);
+      componentRef.instance.layer = layer;
+      this.filterComponents.set(layer.id, componentRef);
     }
   }
 
@@ -73,6 +73,35 @@ export class AdvancedComponentService {
       }
     }
     this.mapComponents.set(layerId, []);
+  }
+
+  /**
+   * Retrieve the AdvancedFilterComponent for a given layer
+   *
+   * @param layerId the ID of the layer
+   * @returns an AdvancedFilterComponent for the layer
+   */
+  public getAdvancedFilterComponentForLayer(layerId: string): AdvancedFilterDirective {
+    if (this.filterComponents.get(layerId)) {
+      return this.filterComponents.get(layerId).instance;
+    }
+    return null;
+  }
+
+  /**
+   * Retrieve the AdvancedMapComponents for a given layer
+   *
+   * @param layerId the ID of the layer
+   * @returns an array of AdvancedMapComponents
+   */
+  public getAdvancedMapComponentsForLayer(layerId: string): AdvancedMapComponent[] {
+    const mapArray: AdvancedMapComponent[] = [];
+    if (this.mapComponents.get(layerId)) {
+      for (const m of this.mapComponents.get(layerId)) {
+        mapArray.push(m.instance);
+      }
+    }
+    return mapArray;
   }
 
 }

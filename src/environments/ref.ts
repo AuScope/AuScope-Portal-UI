@@ -26,8 +26,8 @@ export const ref = {
     'capdf-hydrogeochem': CapdfAnalyticComponent
   },
   advancedFilter: {
-    'capdf-hydrogeochem': [CapdfAdvanceFilterComponent],
-    'grace-mascons': [GraceAdvancedFilterComponent]
+    'capdf-hydrogeochem': CapdfAdvanceFilterComponent,
+    'grace-mascons': GraceAdvancedFilterComponent
   },
   advancedMapComponent: {
     // Make sure AdvancedMapComponents are in an array

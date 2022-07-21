@@ -39,9 +39,9 @@
 			<li *ngFor="let layer of layerGroup.value.loaded" [ngClass]="{'active': layer.expanded}">
 				<a [hidden]="layer.hide" (click)="layer.expanded = !layer.expanded;" [ngClass]="{'highlight': layer.expanded}">
 					<div class="layerLoadCtrl">
-						<span *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="float-right project-percentage hasEvent light-blue">
-							<i *ngIf="!getUILayerModel(layer.id).statusMap.getRenderComplete()" class="fa fa-spin fa-spinner"></i>
-                    		<i *ngIf="getUILayerModel(layer.id).statusMap.getContainsError()" class="fa fa-warning text-warning"></i>
+						<span *ngIf="getUILayerModel(layer.id) && getUILayerModel(layer.id).statusMap.getRenderStarted()" class="float-right project-percentage hasEvent light-blue">
+							<i *ngIf="getUILayerModel(layer.id) && !getUILayerModel(layer.id).statusMap.getRenderComplete()" class="fa fa-spin fa-spinner"></i>
+                    		<i *ngIf="getUILayerModel(layer.id) && getUILayerModel(layer.id).statusMap.getContainsError()" class="fa fa-warning text-warning"></i>
 							<!--
 							<u (click)="openStatusReport(getUILayerModel(layer.id)); $event.stopPropagation();">{{getUILayerModel(layer.id).statusMap.getCompletePercentage()}}
 								<i *ngIf="getUILayerModel(layer.id).statusMap.getContainsError()" class="fa fa-warning text-warning">
@@ -51,15 +51,15 @@
 						</span>
 						<div class="layerLoadClickable">
 							{{layer.name}}
-							<i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-trash float-right red" title="Remove layer from map" (click)="removeLayer(layer);$event.stopPropagation()"></i>
-							<i *ngIf="layer.expanded && !getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-arrow-circle-down"></i>
+							<i *ngIf="getUILayerModel(layer.id) && getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-trash float-right red" title="Remove layer from map" (click)="removeLayer(layer);$event.stopPropagation()"></i>
+							<i *ngIf="layer.expanded && getUILayerModel(layer.id) && !getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-arrow-circle-down"></i>
 						</div>
 						<!--
 						<div *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="progress progress-xs" style="height: 5px">
 							<div class="progress-bar bg-gradient-blue-purple" [style.width]="getUILayerModel(layer.id).statusMap.getCompletePercentage()" role="progressbar"></div>
 						</div>
 						-->
-						<div *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted() || getUILayerModel(layer.id).statusMap.getRenderComplete()" class="opacity-slider-panel d-flex" (click)="$event.stopPropagation()">
+						<div *ngIf="getUILayerModel(layer.id) && (getUILayerModel(layer.id).statusMap.getRenderStarted() || getUILayerModel(layer.id).statusMap.getRenderComplete())" class="opacity-slider-panel d-flex" (click)="$event.stopPropagation()">
 							<div class="opacity-label">Opacity {{ getUILayerModel(layer.id).opacity }}%&nbsp;</div>
 							<mat-slider [min]="0" [max]="100" class="opacity-slider flex-grow-1" [(ngModel)]="getUILayerModel(layer.id).opacity" (input)="layerOpacityChange($event, layer)"></mat-slider>
 						</div>
@@ -80,21 +80,21 @@
 					<div class="card card-info card-with-tabs layer-card animated  slideInRight">
 						<div class="card-header">
 							<ul id="card-tab" class="nav nav-tabs">
-								<li (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': getUILayerModel(layer.id).tabpanel.filterpanel.expanded}"><a data-toggle="tab"><i class="fa fa-filter"></i> <span class="d-none d-sm-inline">Filter</span></a></li>
+								<li (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.filterpanel.expanded}"><a data-toggle="tab"><i class="fa fa-filter"></i> <span class="d-none d-sm-inline">Filter</span></a></li>
 								<!-- <li (click)="selectTabPanel(layer.id,'infopanel')" [ngClass]="{'active': getUILayerModel(layer.id).tabpanel.infopanel.expanded}"><a data-toggle="tab"><i class="fa fa-info-circle"></i> <span class="d-none d-sm-inline">Info</span></a></li> -->
-								<li (click)="displayRecordInformation(layer)" [ngClass]="{'active': getUILayerModel(layer.id).tabpanel.infopanel.expanded}"><a data-toggle="tab"><i class="fa fa-info-circle"></i> <span class="d-none d-sm-inline">Info</span></a></li>
-								<li (click)="selectTabPanel(layer.id,'downloadpanel')" [ngClass]="{'active': getUILayerModel(layer.id).tabpanel.downloadpanel.expanded}" class="d-none d-md-block"><a data-toggle="tab"><i class="fa fa-download"></i> <span>Download</span></a></li>
+								<li (click)="displayRecordInformation(layer)" [ngClass]="{'active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.infopanel.expanded}"><a data-toggle="tab"><i class="fa fa-info-circle"></i> <span class="d-none d-sm-inline">Info</span></a></li>
+								<li (click)="selectTabPanel(layer.id,'downloadpanel')" [ngClass]="{'active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.downloadpanel.expanded}" class="d-none d-md-block"><a data-toggle="tab"><i class="fa fa-download"></i> <span>Download</span></a></li>
 							</ul>
 						</div>
 						<div id="card-tab-content" class="tab-content ">
-							<div class="tab-pane fade" [ngClass]="{'show active': getUILayerModel(layer.id).tabpanel.filterpanel.expanded}">
-								<app-filter-panel *ngIf="getUILayerModel(layer.id).tabpanel.filterpanel.expanded" [layer]=layer></app-filter-panel>
+							<div class="tab-pane fade" [ngClass]="{'show active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.filterpanel.expanded}">
+								<app-filter-panel *ngIf="getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.filterpanel.expanded" [layer]=layer></app-filter-panel>
 							</div>
-							<div class="tab-pane fade" [ngClass]="{'show active': getUILayerModel(layer.id).tabpanel.infopanel.expanded}">
-								<info-panel *ngIf="getUILayerModel(layer.id).tabpanel.infopanel.expanded" [expanded]="getUILayerModel(layer.id).tabpanel.infopanel.expanded" [cswRecords]=layer.cswRecords [layer]=layer></info-panel>
+							<div class="tab-pane fade" [ngClass]="{'show active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.infopanel.expanded}">
+								<info-panel *ngIf="getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.infopanel.expanded" [expanded]="getUILayerModel(layer.id).tabpanel.infopanel.expanded" [cswRecords]=layer.cswRecords [layer]=layer></info-panel>
 							</div>
-							<div class="tab-pane fade" [ngClass]="{'show active': getUILayerModel(layer.id).tabpanel.downloadpanel.expanded}">
-								<app-download-panel *ngIf="getUILayerModel(layer.id).tabpanel.downloadpanel.expanded" [layer]=layer></app-download-panel>
+							<div class="tab-pane fade" [ngClass]="{'show active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.downloadpanel.expanded}">
+								<app-download-panel *ngIf="getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.downloadpanel.expanded" [layer]=layer></app-download-panel>
 							</div>
 						</div>
 					</div>

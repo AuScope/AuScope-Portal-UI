@@ -3,7 +3,7 @@ import { LayerHandlerService } from '@auscope/portal-core-ui';
 import { CapdfFilterService } from './capdf.filter.service';
 import { Component, Input, OnInit, ChangeDetectorRef } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { AdvancedFilterComponent } from '../advanced-filter.component';
+import { AdvancedFilterDirective } from '../advanced-filter.directive';
 
 
 @Component({
@@ -11,7 +11,7 @@ import { AdvancedFilterComponent } from '../advanced-filter.component';
   providers: [CapdfFilterService],
   styleUrls: ['./capdf.advancefilter.component.scss', '../../../../menupanel.scss']
 })
-export class CapdfAdvanceFilterComponent extends AdvancedFilterComponent implements OnInit {
+export class CapdfAdvanceFilterComponent extends AdvancedFilterDirective implements OnInit {
 
   @Input() layer: LayerModel;
   public advanceparamBS = new BehaviorSubject<any>({});
