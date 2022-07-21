@@ -46,10 +46,10 @@ jobs:
           
       - name: Inject Google Analytics key into environment file
         run: >
-          sed "s~googleAnalyticsKey: null~googleAnalyticsKey: '${{ secrets.PROD_GOOGLE_ANALYTICS_KEY }}'~" project/src/environments/environment.prod.ts > project/src/environments/environment.prod.ts.temp
+          sed "s~googleAnalyticsKey: null~googleAnalyticsKey: '${{ secrets.PROD_GOOGLE_ANALYTICS_KEY }}'~" src/environments/environment.prod.ts > src/environments/environment.prod.ts.temp
           
       - name: Install new environment file
-        run: cp project/src/environments/environment.prod.ts.temp project/src/environments/environment.prod.ts
+        run: cp src/environments/environment.prod.ts.temp src/environments/environment.prod.ts
         
       - name: Build image
         run: docker build . --file docker/Dockerfile --tag $IMAGE_NAME --build-arg BUILDTYPE=build-prod --build-arg PCUIBUILDTAG=${{ github.event.inputs.pcui-buildtag }}

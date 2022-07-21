@@ -17,6 +17,7 @@ import { timeoutWith, map, catchError } from 'rxjs/operators';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { NVCLTSGDownloadComponent } from 'app/modalwindow/layeranalytic/nvcl/nvcl.tsgdownload.component';
 import { data } from 'jquery';
+import { isNumber } from '@turf/helpers';
 
 @Component({
   selector: 'app-download-panel',
@@ -33,6 +34,7 @@ export class DownloadPanelComponent implements OnInit {
   downloadStarted: boolean;
   download4pStarted: boolean;
   download4tStarted: boolean;
+  download4PolygonKMLStarted: boolean;
   isPolygonSupportedLayer: boolean;
   isCsvSupportedLayer: boolean;  // Supports CSV downloads of WFS Features
   isDatasetURLSupportedLayer: boolean; // Supports dataset downloads using a URL in the WFS GetFeature response
@@ -120,6 +122,7 @@ export class DownloadPanelComponent implements OnInit {
           if (polygonBBox && polygonBBox.coordinates) {
             this.clearBound();
             this.polygonFilter = '<ogc:Filter  xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:gml=\"http://www.opengis.net/gml\"><ogc:Intersects><ogc:PropertyName>gsmlp:shape</ogc:PropertyName>' + polygonBBox.coordinates + '</ogc:Intersects></ogc:Filter>';
+            console.log(this.polygonFilter);
           } else {
             this.polygonFilter = null;
           }
@@ -388,7 +391,7 @@ export class DownloadPanelComponent implements OnInit {
       }
     } else {
       this.downloadStarted = true;
-      observableResponse = this.downloadWfsService.downloadCSV(this.layer, this.bbox, null);
+      observableResponse = this.downloadWfsService.downloadCSV(this.layer, this.bbox, null, true);
     }
 
     // Kick off the download process and save zip file in browser
@@ -411,7 +414,114 @@ export class DownloadPanelComponent implements OnInit {
       }
     });
   }
+  /**
+   * export2KML 
+   */
+  public saveKML(csv: string):void {
+    const coordsEPSG4326LngLat = this.csClipboardService.getCoordinates(this.polygonFilter);
+    // Lingbo: Need to swap from [Lng,Lat Lng,Lat] to [Lat,Lng Lat,Lng]
+    let coordsListLngLat = [];
+    let coordsListLatLng = [];
+    const coordsList = coordsEPSG4326LngLat.split(' ');        
 
+    for (let i = 0; i<coordsList.length; i++) {
+      const coord = coordsList[i].split(',')
+      const lng = parseFloat(coord[0]).toFixed(3);
+      const lat = parseFloat(coord[1]).toFixed(3)
+      if (isNumber(lng) && isNumber(lat)) {
+        coordsListLngLat.push(lng);
+        coordsListLngLat.push(lat);
+        coordsListLatLng.push(lat.toString() + ',' + lng.toString())
+      }
+    } 
+    const coordsEPSG4326LatLng = coordsListLatLng.join(' ');
+    //console.log(coordsEPSG4326LatLng);
+    //149.096503,-31.845448 149.821601,-31.124050 
+    const kmlHeader = '<?xml version=\"1.0\" encoding=\"UTF-8\"?>' + 
+                      '<kml xmlns=\"http://www.opengis.net/kml/2.2\">' + 
+                      '<Document><name>AuScope-Portal-KML</name><description>Content</description>' +
+                      '<Style id=\"markerstyle\"><IconStyle><Icon><href>http://maps.google.com/intl/en_us/mapfiles/ms/micons/red-dot.png</href></Icon></IconStyle></Style>' ;                      
+    const kmlTail = '</Document></kml>';
+    const kmlPlaceMarkPolygon = '<Placemark><name>Polygon</name><description>AuScope-Portal Export</description><styleUrl>#Path</styleUrl>' +
+                                '<Polygon><tessellate>1</tessellate><altitudeMode>clampToGround</altitudeMode><outerBoundaryIs><LinearRing><coordinates>' +
+                                coordsEPSG4326LatLng +
+                                '</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>';
+
+    const kmlPlaceMarkBHTemplate = '<Placemark><name>${GMLID}</name><styleUrl>#icon-1899-0288D1</styleUrl><ExtendedData>${METADATA}</ExtendedData><Point><coordinates>${GSMLPSHAPE}</coordinates></Point></Placemark>';
+    const bhMetaDataTemplate = '<Data name="${NAME}"><value>${VALUE}</value></Data>';
+    let kml = "";
+    let kmlPlaceMarkBHarray=[];
+    let gmlid = "";
+    let gsmlpshape = "";
+    let gsmlpidentifier = "";
+    let metaData = "";
+    let name = "";
+    let value = "";
+    //csv data process
+    let csvArray = csv.split(/\r?\n/g);    
+    console.log(csvArray);    
+    let csvHeader = csvArray[0].split(",");
+    let indexGsmlpShape = csvHeader.indexOf("gsmlp:shape");
+    let indexGmlId = csvHeader.indexOf("gml:id");
+    let indexGsmlpIdentifier = csvHeader.indexOf("gsmlp:identifier")
+
+    if (indexGsmlpShape < 0 || indexGmlId < 0) {
+      console.log("saveKML:error to find gsmlp:shape");
+      return;
+    }
+    kmlPlaceMarkBHarray.push(kmlHeader);
+    kmlPlaceMarkBHarray.push(kmlPlaceMarkPolygon);
+
+    for (var i = 1; i < csvArray.length; i++) {
+      metaData = "";
+      let csvline = csvArray[i].split(",");
+      gmlid = csvline[indexGmlId]; 
+      gsmlpshape = csvline[indexGsmlpShape];
+      //skip the invalid line
+      if (csvline.length < indexGsmlpShape || gsmlpshape.indexOf("POINT")<0) {
+        continue;
+      }
+      gsmlpshape = gsmlpshape.substring(gsmlpshape.indexOf('(')+1, gsmlpshape.indexOf(')')).split(' ').join(',');
+
+      for(var j = 0; j< csvline.length; j++) {
+        if (UtilitiesService.isEmpty(csvline[j])) {
+          continue;
+        }
+        metaData = metaData + bhMetaDataTemplate.replace("${NAME}",csvHeader[j]).replace("${VALUE}",csvline[j]);
+      }
+      kmlPlaceMarkBHarray.push(kmlPlaceMarkBHTemplate.replace("${GMLID}",gmlid).replace("${GSMLPSHAPE}",gsmlpshape).replace("${METADATA}",metaData));
+    }
+    kmlPlaceMarkBHarray.push(kmlTail);
+
+    var blob = new Blob([kmlPlaceMarkBHarray.join('\n')], {type: "text/plain;charset=utf-8"});
+    saveAs(blob, "AuScope-Portal-BHPolygon.kml");  
+  }
+    /**
+   * Download the layer
+   */
+  public download4PolygonKML(): string {
+    if (this.download4PolygonKMLStarted) {
+      alert('Download in progress, kindly wait for it to completed');
+      return;
+    }
+    if (this.polygonFilter === null) {
+      return;
+    }
+    let observableResponse = null;
+    // fetch polygon filter
+    this.download4PolygonKMLStarted = true;
+    observableResponse = this.downloadWfsService.downloadCSV(this.layer, null, this.polygonFilter, false);
+ 
+    // Kick off the download process and save zip file in browser
+    observableResponse.subscribe(csv => {
+      //console.log(csv);
+      this.saveKML(csv);
+      this.download4PolygonKMLStarted = false;
+    }, err => {
+      this.download4PolygonKMLStarted = false;
+      alert('export2KML: An error has occurred whilst attempting to download. (' + err.message + ') Kindly contact cg-admin@csiro.au');
+    });
+  }
   /**
    * Popup the TSGDownload Model window.
    */
@@ -510,7 +620,7 @@ export class DownloadPanelComponent implements OnInit {
 
       // Download WFS features as CSV files 
     } else {
-      observableResponse = this.downloadWfsService.downloadCSV(this.layer, null, this.polygonFilter);
+      observableResponse = this.downloadWfsService.downloadCSV(this.layer, null, this.polygonFilter, true);
     }
 
     // Kick off the download process and save zip file in browser

@@ -126,8 +126,8 @@ export class NVCLBoreholeAnalyticService {
     return this.http.get(environment.nVCLAnalyticalUrl + 'submitNVCLAnalyticalJob.do', {
       params: httpParams
     }).pipe(map(response => {
-      if (response['success'] === true) {
-        return response['success'];
+      if (response['response'] ==="SUCCESS") {
+        return true;
       } else {
         return observableThrowError(response['msg']);
       }
@@ -160,11 +160,11 @@ export class NVCLBoreholeAnalyticService {
     return this.http.get(environment.nVCLAnalyticalUrl + 'submitNVCLTSGModJob.do', {
       params: httpParams
     }).pipe(map(response => {
-      if (response['success'] === true) {
-        return response['success'];
+      if (response['response'] ==="SUCCESS") {
+        return true;
       } else {
         return observableThrowError(response['msg']);
-      }
+      }      
     }), catchError(
       (error: HttpResponse<any>) => {
         return observableThrowError(error);

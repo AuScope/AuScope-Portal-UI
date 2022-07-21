@@ -1,5 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { CsClipboardService, Polygon } from '@auscope/portal-core-ui';
+import { CsClipboardService, DownloadWfsService, Polygon } from '@auscope/portal-core-ui';
 import { Component, OnInit } from '@angular/core';
 import { isNumber } from '@turf/helpers';
 import { saveAs } from 'file-saver';
@@ -30,7 +30,7 @@ export class CsMapClipboardComponent implements OnInit {
   kmlFileName = '';
 
 
-  constructor(private csClipboardService: CsClipboardService) {
+  constructor(private csClipboardService: CsClipboardService,private downloadWfsService: DownloadWfsService,) {
     this.polygonBBox = null;
     this.isFilterLayerShown = false;
     this.csClipboardService.filterLayersBS.subscribe(filterLayerStatus => {
@@ -54,8 +54,6 @@ export class CsMapClipboardComponent implements OnInit {
   }
   
   onKmlFileSave(event) {
-    const csvData = 'Name;Description;Address1;Address2;City;State/Province/Region;ZIP/PostalCode;Country\nFirst Address;This place is not real;aaaa;;bbbbb;ee;333333333;Italy\nSecond Place;;Via Roma 10;;Belluno;;;;;\n A Random Place in Venice;;Campiello del Spezier;;Venice;VE;30135;\n';
-
     if (this.polygonBBox === null) return;
 
     const coordsEPSG4326LngLat = this.csClipboardService.getCoordinates(this.polygonBBox.coordinates);

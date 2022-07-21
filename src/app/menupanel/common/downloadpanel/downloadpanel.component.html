@@ -83,11 +83,13 @@
 			<i *ngIf="downloadStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!downloadStarted" class="fa fa-cloud-download"></i>&nbsp;Download
 		</button>
 
-
 		<div [hidden]='!isPolygonSupportedLayer' class="form-group">
 			<p *ngIf="!polygonFilter" class="small text-danger">If you want to download from Polygon Filter, please draw or pick a polygon first from the PolygonFilter Panel. (Hint: look for <i class="fa fa-edit"></i> on map)</p>
 			<button *ngIf="polygonFilter" type="button" class="btn btn-info btn-xs float-left" title="Download data" (click)="download4Polygon()">
 				<i *ngIf="download4pStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!download4pStarted" class="fa fa-cloud-download"></i>&nbsp;Download4Polygon
+			</button>
+			<button *ngIf="polygonFilter" type="button" class="btn btn-info btn-xs" title="Download as KML. GoogleMap's maxium KML size is 5M!" (click)="download4PolygonKML()">
+				<i *ngIf="download4PolygonKMLStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!download4PolygonKMLStarted" class="fa fa-cloud-download"></i>&nbsp;download4PolygonKML
 			</button>
 		</div>
 		<!-- NVCL TSG Download -->
