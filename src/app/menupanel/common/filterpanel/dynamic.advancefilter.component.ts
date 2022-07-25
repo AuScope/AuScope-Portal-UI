@@ -8,7 +8,9 @@ import { Input, Component, ViewChild, ViewContainerRef, ComponentFactoryResolver
    template: `<div #dynamicAdvanceFilterPlaceholder></div>`
 })
 
-
+/**
+ * Deprecated. Use AdvancedFilterDirective if possibe
+ */
 export class DynamicAdvancefilterComponent {
   @Input() _layer: LayerModel;
   @Output() advanceparam: EventEmitter<any> = new EventEmitter<any>();
@@ -27,14 +29,13 @@ export class DynamicAdvancefilterComponent {
   }
 
 
-
   loadComponent() {
 
-    if (!ref.advanceFilter[this._layer.id]) {
+    if (!ref.advancedFilter[this._layer.id]) {
       return;
     }
 
-    const componentFactory = this.componentFactoryResolver.resolveComponentFactory(ref.advanceFilter[this._layer.id]);
+    const componentFactory = this.componentFactoryResolver.resolveComponentFactory(ref.advancedFilter[this._layer.id]);
 
     const viewContainerRef = this.dyanmicAnalyticHost
     viewContainerRef.clear();
@@ -46,8 +47,6 @@ export class DynamicAdvancefilterComponent {
     })
 
     this.changeDetectorRef.detectChanges();
-
-
   }
 
 }

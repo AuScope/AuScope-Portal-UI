@@ -65,9 +65,15 @@ import { MSCLAnalyticComponent } from './modalwindow/layeranalytic/mscl/mscl.ana
 
 import { HelpMenuComponent } from './toppanel/help-menu/help-menu.component';
 
+import { GraceLegendComponent } from './cesium-map/advanced/grace/grace-legend.component';
+import { GraceGraphModalComponent } from './modalwindow/querier/customanalytic/grace/grace-graph.modal.component';
+import { GraceAdvancedFilterComponent } from './menupanel/common/filterpanel/advance/grace/grace-advanced-filter.component';
+
 // Services
 import { AuscopeApiService } from './services/api/auscope-api.service';
 import { RectanglesEditorService } from '@auscope/angular-cesium';
+import { AdvancedComponentService } from './services/ui/advanced-component.service';
+import { GraceService } from './services/wcustom/grace/grace.service';
 
 import * as PlotlyJS from 'plotly.js-dist-min/plotly.min.js';
 import { PlotlyModule } from 'angular-plotly.js';
@@ -77,9 +83,10 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DataExplorerComponent } from './menupanel/data-explorer/data-explorer.component';
 import { DataExplorerdRecordModule } from './menupanel/data-explorer-record/data-explorer-record.modules';
 import { RecordModalComponent } from './menupanel/record-modal/record-modal.component';
-import { ToolbarModule } from './toolbar/toolbar.module';
 import { NVCLService } from './modalwindow/querier/customanalytic/nvcl/nvcl.service';
 import { NVCLTSGDownloadComponent } from './modalwindow/layeranalytic/nvcl/nvcl.tsgdownload.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgxColorsModule } from 'ngx-colors';
 
 
 PlotlyModule.plotlyjs = PlotlyJS;
@@ -116,6 +123,9 @@ PlotlyModule.plotlyjs = PlotlyJS;
         DynamicAdvancefilterComponent,
         CapdfAdvanceFilterComponent,
         CapdfAnalyticComponent,
+        GraceAdvancedFilterComponent,
+        GraceGraphModalComponent,
+        GraceLegendComponent,
         DisclaimerModalComponent,
         PortalDetailsPanelComponent,
         MSCLComponent,
@@ -124,7 +134,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
         DataExplorerComponent,
         RecordModalComponent
     ],
-    providers: [AuscopeApiService, RectanglesEditorService,,NVCLService],
+    providers: [AuscopeApiService, RectanglesEditorService, AdvancedComponentService, NVCLService, GraceService],
     imports: [
         PortalCoreModule.forRoot(environment, config),
         PortalCorePipesModule,
@@ -141,6 +151,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
         MatRadioModule,
         MatSliderModule,
         NgxChartsModule,
+        NgxColorsModule,
         BrowserAnimationsModule,
         BsDropdownModule.forRoot(),
         CommonModule,
@@ -150,7 +161,8 @@ PlotlyModule.plotlyjs = PlotlyJS;
         AngularCesiumWidgetsModule,
         MatTooltipModule,
         NgbModule,
-        ToolbarModule
+        FormsModule,
+        ReactiveFormsModule
     ],
     bootstrap: [
         CsMapComponent,

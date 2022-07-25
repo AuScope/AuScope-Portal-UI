@@ -5,8 +5,8 @@ import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { MatSliderChange } from '@angular/material/slider';
+import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
 import { SplitDirection } from 'cesium';
-import { ToolbarComponentsService } from 'app/services/ui/toolbar-components.service';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 
@@ -39,10 +39,9 @@ export class LayerPanelComponent implements OnInit {
 
   constructor(private layerHandlerService: LayerHandlerService, private renderStatusService: RenderStatusService,
       private activeModalService: NgbModal,
-
       private modalService: BsModalService, private csMapService: CsMapService,
       private manageStateService: ManageStateService, private CsClipboardService: CsClipboardService,
-      private uiLayerModelService: UILayerModelService, private toolbarService: ToolbarComponentsService) {
+      private uiLayerModelService: UILayerModelService, private advancedMapComponentService: AdvancedComponentService) {
     this.searchMode = false;
     this.CsClipboardService.filterLayersBS.subscribe(filterLayers => {
       this.areLayersFiltered = filterLayers;
@@ -130,7 +129,7 @@ export class LayerPanelComponent implements OnInit {
           continue;
         }
         let cond = false;
-        switch(mode) {
+        switch (mode) {
           case FilterMode.Active:
             cond = this.getUILayerModel(layer.id).statusMap.getRenderStarted();
             break;
@@ -212,10 +211,10 @@ export class LayerPanelComponent implements OnInit {
                   me.layerGroups[group].expanded = true;
                   me.layerGroups[group].loaded = me.layerGroups[group];
                   me.layerGroups[group][layer_idx].expanded = true;
-                  if (layerStateObj[uiLayerModel.id].filterCollection.hasOwnProperty('hiddenParams')) {
+                  if (layerStateObj[uiLayerModel.id].filterCollection && layerStateObj[uiLayerModel.id].filterCollection.hasOwnProperty('hiddenParams')) {
                     me.layerGroups[group][layer_idx].filterCollection.hiddenParams = layerStateObj[uiLayerModel.id].filterCollection.hiddenParams;
                   }
-                  if (layerStateObj[uiLayerModel.id].filterCollection.hasOwnProperty('mandatoryFilter')) {
+                  if (layerStateObj[uiLayerModel.id].filterCollection && layerStateObj[uiLayerModel.id].filterCollection.hasOwnProperty('mandatoryFilter')) {
                     me.layerGroups[group][layer_idx].filterCollection.mandatoryFilters = layerStateObj[uiLayerModel.id].filterCollection.mandatoryFilters;
                   }
                 }
@@ -257,8 +256,8 @@ export class LayerPanelComponent implements OnInit {
   public removeLayer(layer: LayerModel) {
     this.getUILayerModel(layer.id).opacity = 100;
     this.csMapService.removeLayer(layer);
-    // Remove any layer specific toolbars
-    this.toolbarService.removeMapToolbarComponents(layer.id);
+    // Remove any layer specific map components
+    this.advancedMapComponentService.removeAdvancedMapComponents(layer.id);
   }
 
   /**
@@ -379,5 +378,25 @@ export class LayerPanelComponent implements OnInit {
     }
   }
 
+  public isInfoPanelExpanded(layerId: string): boolean {
+    if (this.getUILayerModel(layerId)) {
+      return this.getUILayerModel(layerId).tabpanel.infopanel.expanded;
+    }
+    return false;
+  }
+
+  public isFilterPanelExpanded(layerId: string): boolean {
+    if (this.getUILayerModel(layerId)) {
+      return this.getUILayerModel(layerId).tabpanel.filterpanel.expanded;
+    }
+    return false;
+  }
+
+  public isDownloadPanelExpanded(layerId: string): boolean {
+    if (this.getUILayerModel(layerId)) {
+      return this.getUILayerModel(layerId).tabpanel.downloadpanel.expanded;
+    }
+    return false;
+  }
 
 }

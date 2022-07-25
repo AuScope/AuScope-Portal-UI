@@ -10,7 +10,6 @@
 								{{mandatoryFilter.label}}
 							</label>
 						</div>
-
 	                </div>
 	            </div>
 	            <div *ngIf="mandatoryFilter.type == 'MANDATORY.DROPDOWNSELECTLIST'">
@@ -29,12 +28,10 @@
 	                </div>
 	            </div>
 	        </div>
-
         </div>
 
-        <div *ngIf="!layer.filterCollection && !layerHasFilterPanelToolbarComponent(layer.id)">
+        <div *ngIf="!layer.filterCollection && !layerHasAdvancedFilterComponent(layer.id)">
 	        <div class="alert alert-warning fade show">
-
                 <i class="ti-bell float-left"></i>
                 <p>There are no filters associated with this layer</p>
             </div>
@@ -121,12 +118,8 @@
 	        </div>
 	    </fieldset>
 
-	    <div *ngIf="advanceFilterMap[layer.id]" class="hasEvent red" (click)="showAdvanceFilter=!showAdvanceFilter;">{{showAdvanceFilter?'Hide Advanced Filters':'Show Advanced Filters'}}</div>
-
-	    <app-advance-filter *ngIf="showAdvanceFilter" [layer]="layer" (advanceparam)="onAdvanceParamChange($event)"></app-advance-filter>
-
 		<!-- Toolbars specific to layer (Optional, defined in ref.ts) -->
-		<ng-template #toolbars></ng-template>
+		<ng-template #advancedFilterComponents></ng-template>
 
 		<!-- WMS time periods (if time extents present in LayerModel.capabilityRecords or GetCapabilities) -->
 		<button *ngIf="loadingTimeExtent" type="button" class="btn btn-info btn-sm date-btn unclickable-btn"><i class="fa fa-spinner fa-spin" style="cursor:default;"></i>&nbsp;&nbsp;Querying time</button>

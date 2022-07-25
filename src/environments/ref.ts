@@ -8,9 +8,8 @@ import { RemanentAnomaliesComponent } from '../app/modalwindow/querier/customana
 import { NVCLDatasetListComponent } from '../app/modalwindow/querier/customanalytic/nvcl/nvcl.datasetlist.component';
 import { TIMAComponent } from '../app/modalwindow/querier/customanalytic/tima/tima.component';
 import { MSCLComponent } from '../app/modalwindow/querier/customanalytic/mscl/mscl.component';
-import { ToolbarType } from '../app/toolbar/toolbar.component';
-import { GraceToolbarComponent } from '../app/toolbar/components/grace/grace-toolbar.component';
-import { GraceLegendComponent } from '../app/toolbar/components/grace/grace-legend.component';
+import { GraceLegendComponent } from '../app/cesium-map/advanced/grace/grace-legend.component';
+import { GraceAdvancedFilterComponent } from 'app/menupanel/common/filterpanel/advance/grace/grace-advanced-filter.component';
 
 
 export const ref = {
@@ -26,19 +25,12 @@ export const ref = {
     'nvcl-v2-borehole': NVCLBoreholeAnalyticComponent,
     'capdf-hydrogeochem': CapdfAnalyticComponent
   },
-  advanceFilter: {
-    'capdf-hydrogeochem': CapdfAdvanceFilterComponent
+  advancedFilter: {
+    'capdf-hydrogeochem': CapdfAdvanceFilterComponent,
+    'grace-mascons': GraceAdvancedFilterComponent
   },
-  toolbar: {
-    'grace-mascons': [
-      {
-        'component': GraceToolbarComponent,
-        'type': ToolbarType.FilterPanel
-      },
-      {
-        'component': GraceLegendComponent,
-        'type': ToolbarType.Map
-      }
-    ]
+  advancedMapComponent: {
+    // Make sure AdvancedMapComponents are in an array
+    'grace-mascons': [GraceLegendComponent]
   }
 };
