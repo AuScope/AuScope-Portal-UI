@@ -10,7 +10,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 // Components
 import { CsMapComponent } from './cesium-map/csmap.component';
-import { OlMapPreviewComponent } from './menupanel/common/infopanel/openlayermappreview/olmap.preview.component';
+import { CesiumMapPreviewComponent } from './menupanel/common/infopanel/cesiummappreview/cesium.preview.component';
 import { LayerPanelComponent } from './menupanel/layerpanel/layerpanel.component';
 import { CustomPanelComponent } from './menupanel/custompanel/custompanel.component';
 import { ActiveLayersPanelComponent } from './menupanel/activelayers/activelayerspanel.component';
@@ -95,7 +95,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
 @NgModule({
     declarations: [
         CsMapComponent,
-        OlMapPreviewComponent,
+        CesiumMapPreviewComponent,
         LayerPanelComponent,
         CustomPanelComponent,
         ActiveLayersPanelComponent,

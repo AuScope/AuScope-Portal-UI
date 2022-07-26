@@ -708,7 +708,7 @@ fieldset.show-fieldset-borders-whitebg legend{
         height: $navbar-more-height;
     }
 
-    /* In the sidebar, under info tab, openlayers map */
+    /* In the sidebar, under info tab, cesium map */
     #previewMapElement {
         height: 270px!important;
         width: 270px!important;
@@ -810,25 +810,6 @@ fieldset.show-fieldset-borders-whitebg legend{
     content: unset !important;
 }
 /** End of range slider css */
-
-/*
- * Start of OpenLayers map settings
- */
-
-.ol-mouse-position {
-	position: unset !important;
-}
-
-.ol-zoom {
-	bottom: .5em;
-	right: .5em;
-	top: unset !important;
-	left: unset !important;
-}
-
-/*
- * End of OpenLayers map settings
- */
 
 
 /* START  modal dialog rules */
