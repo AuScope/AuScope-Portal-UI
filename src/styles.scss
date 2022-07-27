@@ -795,23 +795,6 @@ fieldset.show-fieldset-borders-whitebg legend{
  */
 
 
-/** Start of range slider css used in capdf filters */
-.noUi-horizontal {
-    height: 8px! important;
-}
-
-.noUi-horizontal .noUi-handle {
-    width: 17px !important;
-    height: 14px !important;
-    top: -4px !important;
-}
-
-.noUi-handle:after, .noUi-handle:before {
-    content: unset !important;
-}
-/** End of range slider css */
-
-
 /* START  modal dialog rules */
 .modal-dialog {
     .card, .card-body {
