@@ -6,6 +6,7 @@ import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
+import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
 
 @Component({
   selector: '[appActiveLayers]',
@@ -19,16 +20,16 @@ export class ActiveLayersPanelComponent {
 
   constructor(private csClipboardService: CsClipboardService, private csMapService: CsMapService,
     private uiLayerModelService: UILayerModelService, private layerHandlerService: LayerHandlerService,
-    private modalService: BsModalService) { }
+    private advancedComponentService: AdvancedComponentService, private modalService: BsModalService) { }
 
   /**
    * Get active layers
    */
   public getActiveLayers(): LayerModel[] {
     const activeLayers: LayerModel[] = [];
-    let activeLayerKeys: string[] = Object.keys(this.csMapService.getLayerModelList());
-    for(const layer of activeLayerKeys) {
-      let currentLayer = this.csMapService.getLayerModelList()[layer];
+    const activeLayerKeys: string[] = Object.keys(this.csMapService.getLayerModelList());
+    for (const layer of activeLayerKeys) {
+      const currentLayer = this.csMapService.getLayerModelList()[layer];
       activeLayers.push(currentLayer);
     }
     return activeLayers;
@@ -43,14 +44,16 @@ export class ActiveLayersPanelComponent {
   }
 
   /**
-   * Remove the layer 
+   * Remove the layer
    *
    * @layerId layerId ID of LayerModel
    */
   removeLayer(layerId: string): void {
-    let layerModelList = this.csMapService.getLayerModelList();
+    const layerModelList = this.csMapService.getLayerModelList();
     if (layerModelList.hasOwnProperty(layerId)) {
       this.csMapService.removeLayer(layerModelList[layerId]);
+      // Remove any layer specific components
+      this.advancedComponentService.removeAdvancedMapComponents(layerId);
     }
     // Remove polygon filter if was opened and no layers present
     /*
