@@ -1,8 +1,6 @@
 // This file contains references between classes for the purpose of configuration.
 // I.E. when a layer has an additional analytic or advanced filter component it is linked to the layer here.
 
-import { CapdfAdvanceFilterComponent } from '../app/menupanel/common/filterpanel/advance/capdf/capdf.advancefilter.component';
-import { CapdfAnalyticComponent } from '../app/modalwindow/layeranalytic/capdf/capdf.analytic.component';
 import { NVCLBoreholeAnalyticComponent } from '../app/modalwindow/layeranalytic/nvcl/nvcl.boreholeanalytic.component';
 import { RemanentAnomaliesComponent } from '../app/modalwindow/querier/customanalytic/RemanentAnomalies/remanentanomalies.component';
 import { NVCLDatasetListComponent } from '../app/modalwindow/querier/customanalytic/nvcl/nvcl.datasetlist.component';
@@ -22,11 +20,9 @@ export const ref = {
     'mscl-borehole': MSCLComponent
   },
   layeranalytic: {
-    'nvcl-v2-borehole': NVCLBoreholeAnalyticComponent,
-    'capdf-hydrogeochem': CapdfAnalyticComponent
+    'nvcl-v2-borehole': NVCLBoreholeAnalyticComponent
   },
   advancedFilter: {
-    'capdf-hydrogeochem': CapdfAdvanceFilterComponent,
     'grace-mascons': GraceAdvancedFilterComponent
   },
   advancedMapComponent: {

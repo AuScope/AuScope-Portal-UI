@@ -708,7 +708,7 @@ fieldset.show-fieldset-borders-whitebg legend{
         height: $navbar-more-height;
     }
 
-    /* In the sidebar, under info tab, openlayers map */
+    /* In the sidebar, under info tab, cesium map */
     #previewMapElement {
         height: 270px!important;
         width: 270px!important;
@@ -792,42 +792,6 @@ fieldset.show-fieldset-borders-whitebg legend{
 
 /*
  * End of 'slimscroll' scrollbar customisation
- */
-
-
-/** Start of range slider css used in capdf filters */
-.noUi-horizontal {
-    height: 8px! important;
-}
-
-.noUi-horizontal .noUi-handle {
-    width: 17px !important;
-    height: 14px !important;
-    top: -4px !important;
-}
-
-.noUi-handle:after, .noUi-handle:before {
-    content: unset !important;
-}
-/** End of range slider css */
-
-/*
- * Start of OpenLayers map settings
- */
-
-.ol-mouse-position {
-	position: unset !important;
-}
-
-.ol-zoom {
-	bottom: .5em;
-	right: .5em;
-	top: unset !important;
-	left: unset !important;
-}
-
-/*
- * End of OpenLayers map settings
  */
 
 

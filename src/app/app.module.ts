@@ -10,19 +10,16 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 // Components
 import { CsMapComponent } from './cesium-map/csmap.component';
-import { OlMapPreviewComponent } from './menupanel/common/infopanel/openlayermappreview/olmap.preview.component';
+import { CesiumMapPreviewComponent } from './menupanel/common/infopanel/cesiummappreview/cesium.preview.component';
 import { LayerPanelComponent } from './menupanel/layerpanel/layerpanel.component';
 import { CustomPanelComponent } from './menupanel/custompanel/custompanel.component';
 import { ActiveLayersPanelComponent } from './menupanel/activelayers/activelayerspanel.component';
 import { FilterPanelComponent } from './menupanel/common/filterpanel/filterpanel.component';
 import { DownloadPanelComponent } from './menupanel/common/downloadpanel/downloadpanel.component';
-import { CapdfAdvanceFilterComponent } from './menupanel/common/filterpanel/advance/capdf/capdf.advancefilter.component';
-import { DynamicAdvancefilterComponent } from './menupanel/common/filterpanel/dynamic.advancefilter.component';
 import { InfoPanelComponent } from './menupanel/common/infopanel/infopanel.component';
 import { InfoPanelSubComponent } from './menupanel/common/infopanel/subpanel/subpanel.component';
 import { PermanentLinkComponent } from './menupanel/permanentlink/permanentlink.component';
 import { ClipboardComponent } from './menupanel/clipboard/clipboard.component';
-import { CapdfAnalyticComponent } from './modalwindow/layeranalytic/capdf/capdf.analytic.component';
 import { DynamicLayerAnalyticComponent } from './modalwindow/layeranalytic/dynamic.layer.analytic.component';
 import { LayerAnalyticModalComponent } from './modalwindow/layeranalytic/layer.analytic.modal.component';
 import { NVCLBoreholeAnalyticComponent } from './modalwindow/layeranalytic/nvcl/nvcl.boreholeanalytic.component';
@@ -95,11 +92,10 @@ PlotlyModule.plotlyjs = PlotlyJS;
 @NgModule({
     declarations: [
         CsMapComponent,
-        OlMapPreviewComponent,
+        CesiumMapPreviewComponent,
         LayerPanelComponent,
         CustomPanelComponent,
         ActiveLayersPanelComponent,
-        // CatalogueSearchComponent,
         FilterPanelComponent,
         DownloadPanelComponent,
         NgbdModalStatusReportComponent,
@@ -120,9 +116,6 @@ PlotlyModule.plotlyjs = PlotlyJS;
         NVCLTSGDownloadComponent,
         PermanentLinkComponent,
         ClipboardComponent,
-        DynamicAdvancefilterComponent,
-        CapdfAdvanceFilterComponent,
-        CapdfAnalyticComponent,
         GraceAdvancedFilterComponent,
         GraceGraphModalComponent,
         GraceLegendComponent,
@@ -170,7 +163,6 @@ PlotlyModule.plotlyjs = PlotlyJS;
         CustomPanelComponent,
         ActiveLayersPanelComponent,
         PermanentLinkComponent,
-        // CatalogueSearchComponent,
         DataExplorerComponent,
         PortalDetailsPanelComponent,
         HelpMenuComponent
