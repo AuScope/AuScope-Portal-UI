@@ -3,7 +3,7 @@ import { LayerModel } from '@auscope/portal-core-ui';
 import { LayerHandlerService } from '@auscope/portal-core-ui';
 import { CsMapService } from '@auscope/portal-core-ui';
 import { DownloadWfsService } from '@auscope/portal-core-ui';
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { UtilitiesService } from '@auscope/portal-core-ui';
 import { ResourceType } from '@auscope/portal-core-ui';
 import { saveAs } from 'file-saver';
@@ -11,13 +11,13 @@ import { config } from '../../../../environments/config';
 import { RectangleEditorObservable } from '@auscope/angular-cesium';
 import { ChangeDetectorRef } from '@angular/core';
 import { DownloadWcsService, CsClipboardService, DownloadIrisService, CsIrisService } from '@auscope/portal-core-ui';
-import { HttpClient, HttpParams, HttpHeaders, HttpResponse } from '@angular/common/http';
-import {throwError as observableThrowError,  Observable } from 'rxjs';
-import { timeoutWith, map, catchError } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { NVCLTSGDownloadComponent } from 'app/modalwindow/layeranalytic/nvcl/nvcl.tsgdownload.component';
 import { data } from 'jquery';
 import { isNumber } from '@turf/helpers';
+import { NVCLService } from '../../../modalwindow/querier/customanalytic/nvcl/nvcl.service';
+
 
 @Component({
   selector: 'app-download-panel',
@@ -69,7 +69,8 @@ export class DownloadPanelComponent implements OnInit {
 
   constructor(private http: HttpClient, private cdRef: ChangeDetectorRef, private layerHandlerService: LayerHandlerService, private csMapService: CsMapService,
     private downloadWfsService: DownloadWfsService, private downloadWcsService: DownloadWcsService, private downloadIrisService: DownloadIrisService,
-    private csClipboardService: CsClipboardService, private csIrisService: CsIrisService, private modalService: BsModalService) {
+    private csClipboardService: CsClipboardService, private csIrisService: CsIrisService, private modalService: BsModalService,
+    private nvclService: NVCLService) {
     this.isNvclLayer = false;
     this.isTsgDownloadAvailable = false;
     this.bbox = null;
@@ -81,7 +82,7 @@ export class DownloadPanelComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.layer) {
-      if ( this.layer.id === 'nvcl-v2-borehole') {
+      if (this.nvclService.isNVCL(this.layer.id)) {
         this.isNvclLayer = true;
         //Setup TsgDownload Button if API is ready.
         const observableResponse = this.downloadWfsService.checkTsgDownloadAvailable();
