@@ -48,7 +48,7 @@ export class QuerierModalComponent  implements OnInit {
 
   /**
    * 
-   * reflects the value of nvclService.getAnalytic(); updates the html Analytic TAB
+   * Reflects the value of nvclService.getAnalytic(); updates the html Analytic TAB
    * 
    * When a "borehole name" is clicked on, onDataChange() is fired and a detectChanges() event causes
    * nvclService.getNVCLDatasets() to be called from nvcl.datasetlist.component.ts
@@ -72,8 +72,8 @@ export class QuerierModalComponent  implements OnInit {
   ngOnInit() {
 
   /**
-   * checks the state of "isAnalytic" variable in the nvclService - observable
-   * and updates the local varibale "flagAnalytic" - which updates the Analytic TAB in the html
+   * Checks the state of "isAnalytic" variable in the nvclService - observable
+   * and updates the local variable "flagAnalytic" - which updates the Analytic TAB in the html
    */
     this.nvclService.getAnalytic().subscribe((result) => {
       // console.log("[querier]ngOnInit().getAnalytic() = "+result);
@@ -82,6 +82,16 @@ export class QuerierModalComponent  implements OnInit {
       this.onDataChange();
     });
 
+  }
+
+  /**
+   * Returns true iff layer is NVCL layer
+   * 
+   * @param layer layer odentifier string
+   * @returns true iff layer is NVCL layer
+   */
+  public isNVCL(layer: string): boolean {
+    return this.nvclService.isNVCL(layer);
   }
 
   public getData() {return this.data}
