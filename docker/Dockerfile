@@ -35,13 +35,18 @@ RUN git clone https://github.com/AuScope/portal-core-ui-app.git && \
 COPY . ./
 
 # Install required npm packages
-RUN npm install
+# Pre-install an approximate version of portal-core-ui so npm install does not fail
+RUN echo "PCUIBUILDTAG=$PCUIBUILDTAG" && \
+    TEMP_PC_UI_VER=`echo "$PCUIBUILDTAG" | sed -E 's|^v([0-9]+.[0-9]+.[0-9]+).*$|\1|'` && \
+    echo "TEMP_PC_UI_VER=$TEMP_PC_UI_VER" && \
+    npm install @auscope/portal-core-ui@$TEMP_PC_UI_VER && \
+    npm install
 
 # Alter panel to show build date & time
 COPY docker/make_timestamp.sh make_timestamp.sh
 RUN ./make_timestamp.sh $BUILDTYPE > ./src/app/menupanel/portal-details-panel/portal-details-panel.component.html
 
-# Build Angular's static website files
+# Link in correct version of portal-core-ui and build Angular's static website files
 RUN npm link @auscope/portal-core-ui && npm run $BUILDTYPE
 
 # Second image, install website
