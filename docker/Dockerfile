@@ -36,11 +36,11 @@ COPY . ./
 
 # Install required npm packages
 # Pre-install an approximate version of portal-core-ui so npm install does not fail
-RUN echo "PCUIBUILDTAG=$PCUIBUILDTAG" && \
+RUN echo $PCUIBUILDTAG | grep '^v[0-9]' > /dev/null && \
     TEMP_PC_UI_VER=`echo "$PCUIBUILDTAG" | sed -E 's|^v([0-9]+.[0-9]+.[0-9]+).*$|\1|'` && \
     echo "TEMP_PC_UI_VER=$TEMP_PC_UI_VER" && \
-    npm install @auscope/portal-core-ui@$TEMP_PC_UI_VER && \
-    npm install
+    npm install @auscope/portal-core-ui@$TEMP_PC_UI_VER 
+RUN npm install
 
 # Alter panel to show build date & time
 COPY docker/make_timestamp.sh make_timestamp.sh
