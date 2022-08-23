@@ -1,13 +1,12 @@
 import { Component, Output, EventEmitter } from '@angular/core';
-import { LayerHandlerService } from '@auscope/portal-core-ui';
+import { CsMapService, LayerHandlerService, LayerModel, RenderStatusService } from '@auscope/portal-core-ui';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
-import { LayerModel } from '@auscope/portal-core-ui';
-import { CsMapService } from '@auscope/portal-core-ui';
-import { RenderStatusService } from '@auscope/portal-core-ui';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
+import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 
 @Component({
@@ -28,7 +27,8 @@ export class CustomPanelComponent {
     @Output() expanded: EventEmitter<any> = new EventEmitter();
 
     constructor(private layerHandlerService: LayerHandlerService, private renderStatusService: RenderStatusService,
-      private modalService: BsModalService, private csMapService: CsMapService, private uiLayerModelService: UILayerModelService) {
+      private modalService: BsModalService, private csMapService: CsMapService, private uiLayerModelService: UILayerModelService,
+      public activeModalService: NgbModal) {
       this.loading = false;
       this.statusmsg = 'Enter your WMS service endpoint URL and hit <i class="fa fa-search"></i>';
     }
@@ -36,7 +36,7 @@ export class CustomPanelComponent {
     public selectTabPanel(layerId: string, panelType: string) {
       this.uiLayerModelService.getUILayerModel(layerId).tabpanel.setPanelOpen(panelType);
     }
-    
+
     /**
      * Search list of wms layer given the wms url
      */
@@ -85,6 +85,22 @@ export class CustomPanelComponent {
      */
     public getUILayerModel(layerId: string): UILayerModel {
       return this.uiLayerModelService.getUILayerModel(layerId);
+    }
+
+    /**
+     * Display the record information dialog
+     *
+     * @param cswRecord CSW record for information
+     */
+    public displayRecordInformation(layer: any) {
+      if (layer) {
+        const modelRef = this.activeModalService.open(InfoPanelComponent, {
+          size: "lg",
+          backdrop: false
+        });
+        modelRef.componentInstance.cswRecords = layer.cswRecords;
+        modelRef.componentInstance.layer = layer;
+      }
     }
 
 }
