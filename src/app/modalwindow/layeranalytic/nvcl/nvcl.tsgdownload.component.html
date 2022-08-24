@@ -35,7 +35,7 @@
 
 			</div>
             <div class="float-left">
-                <button  (click)= "onDownload()" class="btn btn-primary"  [disabled]="!tsgform.email||isDownloading">{{downloadMsg}}</button>
+                <button  (click)= "onDownload()" class="btn btn-primary"  [disabled]="!email.valid||isDownloading">{{downloadMsg}}</button>
             </div>
 		</form>
 		</div>
@@ -43,5 +43,5 @@
 	<!-- END card-body -->
 </div>
 <div class="modal-footer">
-	<button type="button" class="btn btn-light" (click)="bsModalRef.hide()">Close</button>
+	<button type="button" class="btn btn-light" (click)="activeModal.dismiss('Cross click')">Close</button>
 </div>
