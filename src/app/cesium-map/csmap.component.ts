@@ -5,10 +5,10 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ViewerConfiguration } from '@auscope/angular-cesium';
 import { CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService, QueryWFSService,
   QueryWMSService, SimpleXMLService, UtilitiesService, CsMapObject, ResourceType } from '@auscope/portal-core-ui';
-import { Cartesian3, MapMode2D, Math, ScreenSpaceEventHandler, SceneMode, ScreenSpaceEventType, Rectangle, ImagerySplitDirection,
+import { Cartesian3, MapMode2D, Math, ScreenSpaceEventHandler, SceneMode, ScreenSpaceEventType, Rectangle, SplitDirection,
    Cartesian2, WebMapServiceImageryProvider, WebMercatorProjection, Cartographic, GeographicProjection } from 'cesium';
 import { IrisQuerierHandler } from './custom-querier-handler/iris-querier-handler.service';
-import { ToolbarComponentsService } from 'app/services/ui/toolbar-components.service';
+import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
 
 declare var Cesium: any;
 
@@ -29,8 +29,8 @@ declare var Cesium: any;
           <div class="mouse-coordinates" *ngIf="mouseLongitude !== undefined && mouseLatitude !== undefined">
               Longitude:&nbsp;{{ mouseLongitude }},&nbsp;Latitude:&nbsp;{{ mouseLatitude }}
           </div>
-          <div class="toolbar" style="position:absolute;z-index:1;">
-              <ng-template #toolbars></ng-template>
+          <div class="advancedmapcomponent" style="position:absolute;z-index:1;">
+              <ng-template #advancedmapcomponents></ng-template>
           </div>
       </ac-map>
     </div>
@@ -49,8 +49,8 @@ export class CsMapComponent implements AfterViewInit {
 
   @ViewChild('mapSlider', { static: false }) mapSlider: ElementRef;
 
-  // Map toolbars
-  @ViewChild('toolbars', { static: true, read: ViewContainerRef }) mapToolbars: ViewContainerRef;
+  // Advanced map components (legends etc.)
+  @ViewChild('advancedmapcomponents', { static: true, read: ViewContainerRef }) advancedMapComponents: ViewContainerRef;
 
   name = 'Angular';
   cesiumLoaded = true;
@@ -66,7 +66,7 @@ export class CsMapComponent implements AfterViewInit {
 
   constructor(private csMapObject: CsMapObject, private csMapService: CsMapService, private modalService: BsModalService,
     private queryWFSService: QueryWFSService, private queryWMSService: QueryWMSService, private gmlParserService: GMLParserService,
-    private manageStateService: ManageStateService, private toolbarComponentsService: ToolbarComponentsService,
+    private manageStateService: ManageStateService, private advancedMapComponentService: AdvancedComponentService,
     private viewerConf: ViewerConfiguration, private ngZone: NgZone) {
 
     const me = this;
@@ -192,8 +192,8 @@ export class CsMapComponent implements AfterViewInit {
       });
     }
 
-    // Set the map's ViewContainerRef for adding toolbars
-    this.toolbarComponentsService.setMapWidgetViewContainerRef(this.mapToolbars);
+    // Set the map's ViewContainerRef for adding advanced map components
+    this.advancedMapComponentService.setMapWidgetViewContainerRef(this.advancedMapComponents);
   }
 
   /**
@@ -655,7 +655,7 @@ export class CsMapComponent implements AfterViewInit {
     } else {
       const activeLayerKeys: string[] = Object.keys(this.csMapService.getLayerModelList());
       for(const layer of activeLayerKeys) {
-        this.csMapService.setLayerSplitDirection(this.csMapService.getLayerModelList()[layer], ImagerySplitDirection.NONE);
+        this.csMapService.setLayerSplitDirection(this.csMapService.getLayerModelList()[layer], SplitDirection.NONE);
       }
     }
   }

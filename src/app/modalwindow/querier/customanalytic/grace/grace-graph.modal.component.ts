@@ -1,7 +1,7 @@
 import { Component, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { CsMapObject } from '@auscope/portal-core-ui';
 import { Subscription } from 'rxjs';
-import { GraceService } from '../../../services/wcustom/grace/grace.service';
+import { GraceService } from '../../../../services/wcustom/grace/grace.service';
 import { saveAs } from 'file-saver';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 

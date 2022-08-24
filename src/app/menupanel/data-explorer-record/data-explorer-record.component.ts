@@ -1,7 +1,7 @@
 import { Component, Input, ViewContainerRef, OnInit } from "@angular/core";
 import {  CSWRecordModel,  CsMapService,  ManageStateService,  UtilitiesService,  LayerModel} from "@auscope/portal-core-ui";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { ToolbarComponentsService } from "app/services/ui/toolbar-components.service";
+import { AdvancedComponentService } from "app/services/ui/advanced-component.service";
 import { environment } from "environments/environment";
 import * as _ from "lodash";
 import { RecordModalComponent } from "../record-modal/record-modal.component";
@@ -28,7 +28,7 @@ export class DataExplorerRecordComponent implements OnInit {
   constructor(
     public csMapService: CsMapService,
     private manageStateService: ManageStateService,
-    private toolbarService: ToolbarComponentsService,
+    private advancedMapComponentService: AdvancedComponentService,
     public modalService: NgbModal
   ) {
     this.optionalFilters = [];
@@ -61,7 +61,7 @@ export class DataExplorerRecordComponent implements OnInit {
     if (cswRecord) {
       const modelRef = this.modalService.open(RecordModalComponent, {
         size: "lg",
-        backdrop:false
+        backdrop: false
       });
       modelRef.componentInstance.cswRecords = this.layer.cswRecords;
       modelRef.componentInstance.layer = this.layer;
@@ -110,7 +110,6 @@ export class DataExplorerRecordComponent implements OnInit {
    * Add layer to map
    * @param layer the layer to add to map
    */
-
   public addLayer(layer): void {
     if (environment.googleAnalyticsKey && typeof gtag === "function") {
       gtag("event", "Addlayer", {
@@ -131,8 +130,11 @@ export class DataExplorerRecordComponent implements OnInit {
 
     this.manageStateService.addLayer(
       layer.id,
+      null,
       layer.filterCollection,
-      this.optionalFilters
+      this.optionalFilters,
+      // No advanced filters in data search panel
+      null
     );
 
     // Add layer
@@ -143,8 +145,8 @@ export class DataExplorerRecordComponent implements OnInit {
       $("#sidebar-toggle-btn").click();
     }
 
-    // Add any toolbar components to map defined in refs.ts
-    this.toolbarService.addMapToolbarComponents(this.layer);
+    // Add any advanced map components to map defined in refs.ts
+    this.advancedMapComponentService.addAdvancedMapComponents(this.layer);
   }
 
   /**
@@ -156,8 +158,8 @@ export class DataExplorerRecordComponent implements OnInit {
     const layerModelList = this.csMapService.getLayerModelList();
     if (layerModelList.hasOwnProperty(layerId)) {
       this.csMapService.removeLayer(layerModelList[layerId]);
-      // Remove any layer specific toolbars
-      this.toolbarService.removeMapToolbarComponents(layerId);
+      // Remove any layer specific components
+      this.advancedMapComponentService.removeAdvancedMapComponents(layerId);
     }
   }
 }

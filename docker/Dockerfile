@@ -41,7 +41,7 @@ RUN npm install
 COPY docker/make_timestamp.sh make_timestamp.sh
 RUN ./make_timestamp.sh $BUILDTYPE > ./src/app/menupanel/portal-details-panel/portal-details-panel.component.html
 
-# Build Angular's static website files
+# Link in correct version of portal-core-ui and build Angular's static website files
 RUN npm link @auscope/portal-core-ui && npm run $BUILDTYPE
 
 # Second image, install website

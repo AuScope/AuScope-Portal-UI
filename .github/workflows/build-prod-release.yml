@@ -11,9 +11,15 @@ on:
       pcui-buildtag:
         description: 'portal-core-ui-app build tag:'
         required: true
+      env-file:
+        description: 'environment.*.ts property file:'
+        required: true
+      build-image-name:
+        description: 'Build image name:'
+        required: true
 
 env:
-  IMAGE_NAME: auscope-portal-ui-prod-release
+  IMAGE_NAME: ${{ github.event.inputs.build-image-name }}
 
 jobs:
   # Run tests.
@@ -46,7 +52,7 @@ jobs:
           
       - name: Inject Google Analytics key into environment file
         run: >
-          sed "s~googleAnalyticsKey: null~googleAnalyticsKey: '${{ secrets.PROD_GOOGLE_ANALYTICS_KEY }}'~" src/environments/environment.prod.ts > src/environments/environment.prod.ts.temp
+          sed "s~googleAnalyticsKey: null~googleAnalyticsKey: '${{ secrets.PROD_GOOGLE_ANALYTICS_KEY }}'~" src/environments/${{ github.event.inputs.env-file }} > src/environments/environment.prod.ts.temp
           
       - name: Install new environment file
         run: cp src/environments/environment.prod.ts.temp src/environments/environment.prod.ts

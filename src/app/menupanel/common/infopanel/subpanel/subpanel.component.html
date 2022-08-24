@@ -1,6 +1,7 @@
 <p><b>Title: </b>{{cswRecord.name}}</p>
 <p><b>Abstract: </b>{{cswRecord.description}}</p>
 <p><b>Contact org: </b>{{cswRecord.contactOrg}}</p>
+<p *ngIf="cswRecord.funderOrg !== 'Unknown'"><b>Funder: </b>{{cswRecord.funderOrg}}</p>
 <p *ngIf='cleanConstraints(cswRecord.constraints).length > 0'><b>Constraints: </b>{{cleanConstraints(cswRecord.constraints)}}</p>
 <p *ngIf='selectConstraints(layer.capabilityRecords, cswRecord.accessConstraints).length > 0'><b>Access Constraints: </b>{{selectConstraints(layer.capabilityRecords, cswRecord.accessConstraints)}}</p>
 <p><b>Info URL: </b><a target="_blank" href="{{cswRecord.recordInfoUrl}}">Link to Geonetwork Record</a></p>
@@ -12,7 +13,7 @@
 	</p>
 	<p *ngIf="onlineResource.type!='Unsupported' && onlineResource.type!='DOI'">
 		<span class="label label-default"><b>{{onlineResource.type}}: </b></span>
-		<a target="_blank" href="{{onlineResource.url}}">{{onlineResource.type}} endpoint URL</a>
+		<a target="_blank" href="{{onlineResource.url}}?service=WMS&request=getCapabilities">{{onlineResource.type}} GetCapabilities Info</a>
 	</p>
 </div>
 <p *ngIf="wmsUrl!=undefined">

@@ -18,7 +18,7 @@ export class NVCLService {
    */
   getAnalytic(): Observable<boolean> {
     //console.log("[nvclservice]getAnalytic().this.isAnalytic="+this.isAnalytic.asObservable()._isScalar);
-    return this.isAnalytic.asObservable(); //.pipe(delay(0));
+    return this.isAnalytic.asObservable();
   }
 
   /**
@@ -240,6 +240,16 @@ export class NVCLService {
     }
     nvclUrl = nvclUrl + '/NVCLDataServices/';
     return nvclUrl
+  }
+
+  /**
+   * Returns true iff this is an NVCL v2 layer
+   * 
+   * @param layer layer id string
+   * @returns true iff this is an NVCL v2 layer
+   */
+  public isNVCL(layer: string): boolean {
+    return layer === 'nvcl-v2-borehole'
   }
 
 }

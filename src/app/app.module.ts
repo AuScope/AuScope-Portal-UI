@@ -10,19 +10,16 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 // Components
 import { CsMapComponent } from './cesium-map/csmap.component';
-import { OlMapPreviewComponent } from './menupanel/common/infopanel/openlayermappreview/olmap.preview.component';
+import { CesiumMapPreviewComponent } from './menupanel/common/infopanel/cesiummappreview/cesium.preview.component';
 import { LayerPanelComponent } from './menupanel/layerpanel/layerpanel.component';
 import { CustomPanelComponent } from './menupanel/custompanel/custompanel.component';
 import { ActiveLayersPanelComponent } from './menupanel/activelayers/activelayerspanel.component';
 import { FilterPanelComponent } from './menupanel/common/filterpanel/filterpanel.component';
 import { DownloadPanelComponent } from './menupanel/common/downloadpanel/downloadpanel.component';
-import { CapdfAdvanceFilterComponent } from './menupanel/common/filterpanel/advance/capdf/capdf.advancefilter.component';
-import { DynamicAdvancefilterComponent } from './menupanel/common/filterpanel/dynamic.advancefilter.component';
 import { InfoPanelComponent } from './menupanel/common/infopanel/infopanel.component';
 import { InfoPanelSubComponent } from './menupanel/common/infopanel/subpanel/subpanel.component';
 import { PermanentLinkComponent } from './menupanel/permanentlink/permanentlink.component';
 import { ClipboardComponent } from './menupanel/clipboard/clipboard.component';
-import { CapdfAnalyticComponent } from './modalwindow/layeranalytic/capdf/capdf.analytic.component';
 import { DynamicLayerAnalyticComponent } from './modalwindow/layeranalytic/dynamic.layer.analytic.component';
 import { LayerAnalyticModalComponent } from './modalwindow/layeranalytic/layer.analytic.modal.component';
 import { NVCLBoreholeAnalyticComponent } from './modalwindow/layeranalytic/nvcl/nvcl.boreholeanalytic.component';
@@ -65,9 +62,15 @@ import { MSCLAnalyticComponent } from './modalwindow/layeranalytic/mscl/mscl.ana
 
 import { HelpMenuComponent } from './toppanel/help-menu/help-menu.component';
 
+import { GraceLegendComponent } from './cesium-map/advanced/grace/grace-legend.component';
+import { GraceGraphModalComponent } from './modalwindow/querier/customanalytic/grace/grace-graph.modal.component';
+import { GraceAdvancedFilterComponent } from './menupanel/common/filterpanel/advance/grace/grace-advanced-filter.component';
+
 // Services
 import { AuscopeApiService } from './services/api/auscope-api.service';
 import { RectanglesEditorService } from '@auscope/angular-cesium';
+import { AdvancedComponentService } from './services/ui/advanced-component.service';
+import { GraceService } from './services/wcustom/grace/grace.service';
 
 import * as PlotlyJS from 'plotly.js-dist-min/plotly.min.js';
 import { PlotlyModule } from 'angular-plotly.js';
@@ -77,9 +80,10 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DataExplorerComponent } from './menupanel/data-explorer/data-explorer.component';
 import { DataExplorerdRecordModule } from './menupanel/data-explorer-record/data-explorer-record.modules';
 import { RecordModalComponent } from './menupanel/record-modal/record-modal.component';
-import { ToolbarModule } from './toolbar/toolbar.module';
 import { NVCLService } from './modalwindow/querier/customanalytic/nvcl/nvcl.service';
 import { NVCLTSGDownloadComponent } from './modalwindow/layeranalytic/nvcl/nvcl.tsgdownload.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgxColorsModule } from 'ngx-colors';
 
 
 PlotlyModule.plotlyjs = PlotlyJS;
@@ -88,11 +92,10 @@ PlotlyModule.plotlyjs = PlotlyJS;
 @NgModule({
     declarations: [
         CsMapComponent,
-        OlMapPreviewComponent,
+        CesiumMapPreviewComponent,
         LayerPanelComponent,
         CustomPanelComponent,
         ActiveLayersPanelComponent,
-        // CatalogueSearchComponent,
         FilterPanelComponent,
         DownloadPanelComponent,
         NgbdModalStatusReportComponent,
@@ -113,9 +116,9 @@ PlotlyModule.plotlyjs = PlotlyJS;
         NVCLTSGDownloadComponent,
         PermanentLinkComponent,
         ClipboardComponent,
-        DynamicAdvancefilterComponent,
-        CapdfAdvanceFilterComponent,
-        CapdfAnalyticComponent,
+        GraceAdvancedFilterComponent,
+        GraceGraphModalComponent,
+        GraceLegendComponent,
         DisclaimerModalComponent,
         PortalDetailsPanelComponent,
         MSCLComponent,
@@ -124,7 +127,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
         DataExplorerComponent,
         RecordModalComponent
     ],
-    providers: [AuscopeApiService, RectanglesEditorService,,NVCLService],
+    providers: [AuscopeApiService, RectanglesEditorService, AdvancedComponentService, NVCLService, GraceService],
     imports: [
         PortalCoreModule.forRoot(environment, config),
         PortalCorePipesModule,
@@ -141,6 +144,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
         MatRadioModule,
         MatSliderModule,
         NgxChartsModule,
+        NgxColorsModule,
         BrowserAnimationsModule,
         BsDropdownModule.forRoot(),
         CommonModule,
@@ -150,7 +154,8 @@ PlotlyModule.plotlyjs = PlotlyJS;
         AngularCesiumWidgetsModule,
         MatTooltipModule,
         NgbModule,
-        ToolbarModule
+        FormsModule,
+        ReactiveFormsModule
     ],
     bootstrap: [
         CsMapComponent,
@@ -158,7 +163,6 @@ PlotlyModule.plotlyjs = PlotlyJS;
         CustomPanelComponent,
         ActiveLayersPanelComponent,
         PermanentLinkComponent,
-        // CatalogueSearchComponent,
         DataExplorerComponent,
         PortalDetailsPanelComponent,
         HelpMenuComponent
