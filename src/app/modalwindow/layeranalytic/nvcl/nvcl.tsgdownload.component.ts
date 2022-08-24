@@ -8,15 +8,22 @@ import {
 } from '@angular/core';
 import { LayerAnalyticInterface } from '../layer.analytic.interface';
 import { DownloadWfsService } from '@auscope/portal-core-ui';
-import { BsModalRef } from 'ngx-bootstrap/modal';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NVCLBoreholeAnalyticService } from './nvcl.boreholeanalytic.service';
 
 @Component({
   selector: 'nvcl-tsgdownload-component',
   templateUrl: './nvcl.tsgdownload.component.html',
+  styles: [
+    'input:invalid + span:after { content: \'✖\'; color: #f00; padding-left: 15px; }',
+    'input:valid + span:after { content: \'✓\'; color: #26b72b; padding-left: 15px;}',
+    'select:invalid + span:after { content: \'✖\'; color: #f00; padding-left: 15px; }',
+    'select:valid + span:after { content: \'✓\'; color: #26b72b; padding-left: 15px;}'
+  ],
   styleUrls: [
     '../../modalwindow.scss'
   ],
-  providers: []
+  providers: [NVCLBoreholeAnalyticService]
 })
 export class NVCLTSGDownloadComponent implements AfterViewInit, OnInit, LayerAnalyticInterface {
   @Input() layer: LayerModel;
@@ -30,8 +37,17 @@ export class NVCLTSGDownloadComponent implements AfterViewInit, OnInit, LayerAna
   public isDownloading = false;
 
 
-  constructor( public bsModalRef: BsModalRef, private manageStateService: ManageStateService, private downloadWfsService: DownloadWfsService ) {
+  constructor( public activeModal: NgbActiveModal, private manageStateService: ManageStateService, private downloadWfsService: DownloadWfsService , private nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService) {
     this.tsgform = {};
+    //this.tsgform.email = '';
+    if (this.nvclBoreholeAnalyticService.hasSavedEmail()) {
+      this.tsgform.email = this.nvclBoreholeAnalyticService.getUserEmail();
+    }
+    this.tsgform.ogcFilter = '';
+    this.total = 0;
+    this.completed =0;
+    this.downloadMsg = "Download";
+    this.isDownloading = false;
   }
 
   /**
@@ -47,7 +63,9 @@ export class NVCLTSGDownloadComponent implements AfterViewInit, OnInit, LayerAna
           if (this.completed != 0 && this.completed === this.total) {
             this.downloadMsg = "Completed";
           }
-        });
+        }
+    );
+
   }
 
   /**
@@ -59,12 +77,6 @@ export class NVCLTSGDownloadComponent implements AfterViewInit, OnInit, LayerAna
       valueField: 'value',
       maxItems: 5
     };
-    this.tsgform.email = '';
-    this.tsgform.ogcFilter = '';
-    this.total = 100;
-    this.completed =0;
-    this.downloadMsg = "Download";
-    this.isDownloading = false;
   }
 
   public getCompletePercentage(): String{
@@ -84,6 +96,7 @@ export class NVCLTSGDownloadComponent implements AfterViewInit, OnInit, LayerAna
     this.downloadWfsService.tsgDownloadStartBS.next({start:true,email:this.tsgform.email});
     this.isDownloading = true;
     this.downloadMsg = "Downloading...";
+    this.nvclBoreholeAnalyticService.setUserEmail(this.tsgform.email);
   }
 
 
