@@ -9,7 +9,6 @@ import { ImagerySplitDirection } from 'cesium';
 import { ToolbarComponentsService } from 'app/services/ui/toolbar-components.service';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { CSWRecordModel } from '@auscope/portal-core-ui';
 
 
 // Filter modes available in the dropdown layer filter selector
