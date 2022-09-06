@@ -18,7 +18,10 @@
 				<div class="tab-content" id="card-tab-content">
 					<!-- BEGIN tab-pane -->
 					<div class="tab-pane fade show active" id="nvcl-card-tab-image-{{nvclDataset.datasetId}}" role="tabpanel">
-						<div class="modal-card-size loading-iframe">						
+						<div class="modal-card-size loading-iframe">
+							<!-- Loading gif overlay if images aren't done loading -->
+							<div *ngIf="imagesLoading[nvclDataset.datasetId] && imagesLoading[nvclDataset.datasetId] === true" class="loading-image"></div>
+
 							<!-- Add definition -->
 							<button class="float-right" mat-stroked-button (click)="openLegend(nvclDataset.datasetId)" >Show Legend</button>                 
                               <ng-select *ngIf="nvclDataset.datasetId" [items] = "datasetScalars[nvclDataset.datasetId]" [multiple]="false" bindLabel="logName" bindValue="logId" placeholder="Select Scalar" (change)="changeScalarSelection(nvclDataset.datasetId)" [(ngModel)]="selectedScalar">                                
@@ -31,7 +34,7 @@
                                             <span *ngIf="datasetScalarDefinition[item.logName]!=null">
                                                 <div class="fake-link" [matTooltip]="datasetScalarDefinition[item.logName].definition"> ? </div>
                                             </span>
-                                            <span *ngIf="datasetScalarDefinition[item.logName] == null"> 
+                                            <span *ngIf="datasetScalarDefinition[item.logName] == null">
                                                 <div class="fake-link" (mouseover)="getDefinition(item.logName)" > ? </div>
                                             </span>
                                         </div>        
@@ -54,9 +57,11 @@
                                     </div>
                                 </ng-template>
                             </ng-select>
-					<!-- END Add definition -->
+							<!-- END Add definition -->
 
-					<iframe *ngIf="datasetImages[nvclDataset.datasetId]" frameborder="0" [src]="datasetImages[nvclDataset.datasetId] | trustResourceUrl"></iframe>
+							<!-- Images -->
+							<iframe (load)="setImagesLoading(nvclDataset.datasetId)" *ngIf="datasetImages[nvclDataset.datasetId]" frameborder="0" [src]="datasetImages[nvclDataset.datasetId] | trustResourceUrl"></iframe>
+
 						</div>
 					</div>
 					<!-- END tab-pane -->

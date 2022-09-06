@@ -119,8 +119,11 @@ dt {
 /* END WFS feature tree display rules */
 
 /* START NVCL core image display */
-.loading-iframe {
-	background:url(../../extension/images/loader.gif) center center no-repeat;
+.loading-image {
+    background:url(../../extension/images/loader.gif) center center no-repeat;
+    position: absolute;
+    height: 100%;
+    width: 100%;
 }
 
 .loading-iframe iframe {
