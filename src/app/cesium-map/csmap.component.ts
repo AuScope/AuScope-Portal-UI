@@ -357,7 +357,7 @@ export class CsMapComponent implements AfterViewInit {
 
         // Bail if no OnlineResources
         if (!cswRecord.onlineResources || cswRecord.onlineResources.length === 0) {
-          return;
+          continue;
         }
 
         // Get the WMS OnlineResource, if that fails use the first in the list
