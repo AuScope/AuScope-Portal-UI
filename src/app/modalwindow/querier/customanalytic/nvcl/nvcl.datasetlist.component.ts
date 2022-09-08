@@ -60,7 +60,7 @@ export class NVCLDatasetListComponent implements OnInit {
   public selectedScalar = '';
   public selectedScalarName = '';
   public selectedScalardata: any;
-  public imagesLoading: Map<string, boolean> = new Map<string, boolean>();
+  public imagesLoaded: string[] = [];
 
   public linPal: number[] = [255, 767, 1279, 1791, 2303, 3071, 3583, 4095, 4863, 5375, 5887, 6655, 7167, 7935, 8447, 9215, 9727, 10495, 11007, 11775, 12543, 13055, 13823, 14591,
      15103, 15871, 16639, 17407, 18175, 18943, 19711, 20223, 20991, 21759, 22527, 23295, 24319, 25087, 25855, 26623, 27391, 28159, 29183, 29951, 30719, 31743, 32511, 33279, 34303,
@@ -134,20 +134,26 @@ export class NVCLDatasetListComponent implements OnInit {
   }
 
   /**
-   * Test whether images are loading for a dataset's iframe. The iframe load
-   * method is called twice, once upon load start and again when finished. The
-   * first call will set imagesLoading to true, the second call to false.
+   * Sets a dataset's images as having completed loading
    *
+   * @param event the event that triggered this method
    * @param nvclDatasetId the ID of the dataset for which images have been loaded
    */
-  setImagesLoading(nvclDatasetId: string) {
-    setTimeout(() => {
-      if (!this.imagesLoading[nvclDatasetId]) {
-        this.imagesLoading[nvclDatasetId] = true;
-      } else {
-        this.imagesLoading[nvclDatasetId] = false;
-      }
-    });
+  setImagesLoaded(event: any, nvclDatasetId: string) {
+    // Chrome will fire this event when added to DOM, ignore that
+    if (event.target.src !== '') {
+      this.imagesLoaded.push(nvclDatasetId);
+    }
+  }
+
+  /**
+   * Check if images for a dataset have finished loading
+   *
+   * @param nvclDatasetId the ID of the dataset to check
+   * @returns true if images have been loaded, false if not
+   */
+  haveImagesLoaded(nvclDatasetId: string): boolean {
+    return (this.imagesLoaded.indexOf(nvclDatasetId) !== -1);
   }
 
   public drawGraph(logIds: Array<string>, logNames: Array<string>) {

@@ -20,7 +20,7 @@
 					<div class="tab-pane fade show active" id="nvcl-card-tab-image-{{nvclDataset.datasetId}}" role="tabpanel">
 						<div class="modal-card-size loading-iframe">
 							<!-- Loading gif overlay if images aren't done loading -->
-							<div *ngIf="imagesLoading[nvclDataset.datasetId] && imagesLoading[nvclDataset.datasetId] === true" class="loading-image"></div>
+							<div *ngIf="!haveImagesLoaded(nvclDataset.datasetId)" class="loading-image"></div>
 
 							<!-- Add definition -->
 							<button class="float-right" mat-stroked-button (click)="openLegend(nvclDataset.datasetId)" >Show Legend</button>                 
@@ -59,8 +59,8 @@
                             </ng-select>
 							<!-- END Add definition -->
 
-							<!-- Images -->
-							<iframe (load)="setImagesLoading(nvclDataset.datasetId)" *ngIf="datasetImages[nvclDataset.datasetId]" frameborder="0" [src]="datasetImages[nvclDataset.datasetId] | trustResourceUrl"></iframe>
+							<!-- Images -->							
+							<iframe (load)="setImagesLoaded($event, nvclDataset.datasetId)" frameborder="0" [src]="datasetImages[nvclDataset.datasetId] | trustResourceUrl"></iframe>
 
 						</div>
 					</div>
