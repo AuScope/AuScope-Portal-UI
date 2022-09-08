@@ -11,10 +11,7 @@ import { config } from '../../../../environments/config';
 import { RectangleEditorObservable } from '@auscope/angular-cesium';
 import { ChangeDetectorRef } from '@angular/core';
 import { DownloadWcsService, CsClipboardService, DownloadIrisService, CsIrisService } from '@auscope/portal-core-ui';
-import { HttpClient } from '@angular/common/http';
-import { BsModalService } from 'ngx-bootstrap/modal';
 import { NVCLTSGDownloadComponent } from 'app/modalwindow/layeranalytic/nvcl/nvcl.tsgdownload.component';
-import { data } from 'jquery';
 import { isNumber } from '@turf/helpers';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NVCLService } from '../../../modalwindow/querier/customanalytic/nvcl/nvcl.service';
@@ -67,7 +64,7 @@ export class DownloadPanelComponent implements OnInit {
   private rectangleObservable: RectangleEditorObservable;
 
 
-  constructor(private http: HttpClient, private cdRef: ChangeDetectorRef, private layerHandlerService: LayerHandlerService, private csMapService: CsMapService,
+  constructor(private cdRef: ChangeDetectorRef, private layerHandlerService: LayerHandlerService, private csMapService: CsMapService,
     private downloadWfsService: DownloadWfsService, private downloadWcsService: DownloadWcsService, private downloadIrisService: DownloadIrisService,
     private csClipboardService: CsClipboardService, private csIrisService: CsIrisService, public activeModalService: NgbModal, private nvclService: NVCLService) {
     this.isNvclLayer = false;
@@ -75,7 +72,7 @@ export class DownloadPanelComponent implements OnInit {
     this.bbox = null;
     this.drawStarted = false;
     this.downloadStarted = false;
-    this.download4tStarted = false;    
+    this.download4tStarted = false;
     this.wcsDownloadForm = {};
   }
 
@@ -130,11 +127,11 @@ export class DownloadPanelComponent implements OnInit {
 
       this.downloadWfsService.tsgDownloadStartBS.subscribe(
         (message) => {
-          if (message.start == true) {      
-            this.tsgDownloadEmail =  message.email;    
+          if (message.start === true) {
+            this.tsgDownloadEmail =  message.email;
             this.Download4TsgFiles();
           }
-        }); 
+        });
 
     } else {
       this.isCsvSupportedLayer = false;
@@ -159,15 +156,15 @@ export class DownloadPanelComponent implements OnInit {
         return;
       }
       if (vector.points.length < 2
-        || vector.points[0].getPosition().x == vector.points[1].getPosition().x
-        || vector.points[0].getPosition().y == vector.points[1].getPosition().y) {
+        || vector.points[0].getPosition().x === vector.points[1].getPosition().x
+        || vector.points[0].getPosition().y === vector.points[1].getPosition().y) {
         // drawing hasn't finished
         return;
       }
       const points = vector.points;
-      // calculate area from the 2 rectangle points 
-      var width = points[0].getPosition().x - points[1].getPosition().x;
-      var length = points[0].getPosition().y - points[1].getPosition().y;
+      // calculate area from the 2 rectangle points
+      const width = points[0].getPosition().x - points[1].getPosition().x;
+      const length = points[0].getPosition().y - points[1].getPosition().y;
       const area = Math.abs(width * length);
       if (config.wcsSupportedLayer[me.layer.id]) {
         // If 'downloadAreaMaxsize' is not set to Number.MAX_SAFE_INTEGER then download limits will apply
@@ -180,7 +177,7 @@ export class DownloadPanelComponent implements OnInit {
           return;
         }
       }
-      // Reproject to EPSG:4326      
+      // Reproject to EPSG:4326
       me.bbox = UtilitiesService.reprojectToWGS84(points);
 
       // Run the WCS 'DescribeCoverage' request to gather more information about the WCS resource
@@ -224,30 +221,30 @@ export class DownloadPanelComponent implements OnInit {
         }
 
         // If there is only one input CRS option, then that is selected
-        if (me.wcsDownloadListOption.inputCrsList.length == 1) {
+        if (me.wcsDownloadListOption.inputCrsList.length === 1) {
           me.wcsDownloadForm.inputCrs = me.wcsDownloadListOption.inputCrsList[0];
         } else {
           me.wcsDownloadForm.inputCrs = this.SELECT_DEFAULT_REF_SYSTEM;
         }
 
         // If there is only one download format option, then that is selected
-        if (me.wcsDownloadListOption.downloadFormatList.length == 1) {
+        if (me.wcsDownloadListOption.downloadFormatList.length === 1) {
           me.wcsDownloadForm.downloadFormat = me.wcsDownloadListOption.downloadFormatList[0];
         } else {
           me.wcsDownloadForm.downloadFormat = this.SELECT_DEFAULT_DOWNLOAD_FMT;
         }
 
         // If there is only one download format option, then that is selected
-        if (me.wcsDownloadListOption.outputCrsList.length == 1) {
+        if (me.wcsDownloadListOption.outputCrsList.length === 1) {
           me.wcsDownloadForm.outputCrs = me.wcsDownloadListOption.outputCrsList[0];
         } else {
           me.wcsDownloadForm.outputCrs = this.SELECT_DEFAULT_OUTPUT_CRS;
         }
 
         // If there is only one time position, then that is selected
-        if (me.wcsDownloadListOption.timePositionList.length == 1) {
+        if (me.wcsDownloadListOption.timePositionList.length === 1) {
           me.wcsDownloadForm.timePosition = me.wcsDownloadListOption.timePositionList[0];
-        } else if (me.wcsDownloadListOption.timePositionList.length == 0) {
+        } else if (me.wcsDownloadListOption.timePositionList.length === 0) {
           me.wcsDownloadForm.timePosition = null;
         } else {
           me.wcsDownloadForm.timePosition = this.SELECT_DEFAULT_TIME_POS;
@@ -266,10 +263,10 @@ export class DownloadPanelComponent implements OnInit {
    * Runs the getIrisStationFeature request to gather information about the IRIS stations and channels
    */
   private getIRISStationInfo() {
-    let serviceTypeList = Object.keys(config.datasetUrlAussPassLayer[this.layer.group.toLowerCase()]['serviceType']);
+    const serviceTypeList = Object.keys(config.datasetUrlAussPassLayer[this.layer.group.toLowerCase()]['serviceType']);
     this.csIrisService.getIrisStationFeature(this.layer).subscribe(response => {
 
-      let channelLst = this.getAvilChannel(response['data'][0].stationLst);
+      const channelLst = this.getAvilChannel(response['data'][0].stationLst);
 
       let stationLst = response['data'][0].stationLst;
       stationLst = [{ 'code': this.SELECT_ALL_CODE, 'name': this.SELECT_ALL_STATION }].concat(stationLst);
@@ -298,7 +295,7 @@ export class DownloadPanelComponent implements OnInit {
     stationLst.forEach(station => {
       if (station.channelLst && station.channelLst.length > 0) {
         station.channelLst.forEach(channel => {
-          if (!channelLst.find(r => r.code == channel.code)) {
+          if (!channelLst.find(r => r.code === channel.code)) {
             channelLst.push(channel);
           }
         });
@@ -422,7 +419,7 @@ export class DownloadPanelComponent implements OnInit {
     // Lingbo: Need to swap from [Lng,Lat Lng,Lat] to [Lat,Lng Lat,Lng]
     let coordsListLngLat = [];
     let coordsListLatLng = [];
-    const coordsList = coordsEPSG4326LngLat.split(' ');        
+    const coordsList = coordsEPSG4326LngLat.split(' ');
 
     for (let i = 0; i<coordsList.length; i++) {
       const coord = coordsList[i].split(',')
@@ -431,14 +428,14 @@ export class DownloadPanelComponent implements OnInit {
       if (isNumber(lng) && isNumber(lat)) {
         coordsListLngLat.push(lng);
         coordsListLngLat.push(lat);
-        coordsListLatLng.push(lat.toString() + ',' + lng.toString())
+        coordsListLatLng.push(lat.toString() + ',' + lng.toString());
       }
     } 
     const coordsEPSG4326LatLng = coordsListLatLng.join(' ');
     //console.log(coordsEPSG4326LatLng);
     //149.096503,-31.845448 149.821601,-31.124050 
-    const kmlHeader = '<?xml version=\"1.0\" encoding=\"UTF-8\"?>' + 
-                      '<kml xmlns=\"http://www.opengis.net/kml/2.2\">' + 
+    const kmlHeader = '<?xml version=\"1.0\" encoding=\"UTF-8\"?>' +
+                      '<kml xmlns=\"http://www.opengis.net/kml/2.2\">' +
                       '<Document><name>AuScope-Portal-KML</name><description>Content</description>' +
                       '<Style id=\"markerstyle\"><IconStyle><Icon><href>http://maps.google.com/intl/en_us/mapfiles/ms/micons/red-dot.png</href></Icon></IconStyle></Style>' ;                      
     const kmlTail = '</Document></kml>';
@@ -481,20 +478,20 @@ export class DownloadPanelComponent implements OnInit {
       if (csvline.length < indexGsmlpShape || gsmlpshape.indexOf("POINT")<0) {
         continue;
       }
-      gsmlpshape = gsmlpshape.substring(gsmlpshape.indexOf('(')+1, gsmlpshape.indexOf(')')).split(' ').join(',');
+      gsmlpshape = gsmlpshape.substring(gsmlpshape.indexOf('(') + 1, gsmlpshape.indexOf(')')).split(' ').join(',');
 
-      for(var j = 0; j< csvline.length; j++) {
+      for(var j = 0; j < csvline.length; j++) {
         if (UtilitiesService.isEmpty(csvline[j])) {
           continue;
         }
-        metaData = metaData + bhMetaDataTemplate.replace("${NAME}",csvHeader[j]).replace("${VALUE}",csvline[j]);
+        metaData = metaData + bhMetaDataTemplate.replace("${NAME}", csvHeader[j]).replace("${VALUE}", csvline[j]);
       }
-      kmlPlaceMarkBHarray.push(kmlPlaceMarkBHTemplate.replace("${GMLID}",gmlid).replace("${GSMLPSHAPE}",gsmlpshape).replace("${METADATA}",metaData));
+      kmlPlaceMarkBHarray.push(kmlPlaceMarkBHTemplate.replace("${GMLID}", gmlid).replace("${GSMLPSHAPE}", gsmlpshape).replace("${METADATA}", metaData));
     }
     kmlPlaceMarkBHarray.push(kmlTail);
 
     var blob = new Blob([kmlPlaceMarkBHarray.join('\n')], {type: "text/plain;charset=utf-8"});
-    saveAs(blob, "AuScope-Portal-BHPolygon.kml");  
+    saveAs(blob, "AuScope-Portal-BHPolygon.kml");
   }
     /**
    * Download the layer
@@ -514,7 +511,6 @@ export class DownloadPanelComponent implements OnInit {
  
     // Kick off the download process and save zip file in browser
     observableResponse.subscribe(csv => {
-      //console.log(csv);
       this.saveKML(csv);
       this.download4PolygonKMLStarted = false;
     }, err => {
@@ -526,18 +522,16 @@ export class DownloadPanelComponent implements OnInit {
    * Popup the TSGDownload Model window.
    */
   public PopupTSGDownload() {
-    if (this.polygonFilter === null && this.bbox ===null) {
+    if (this.polygonFilter === null && this.bbox === null) {
       alert('Please draw a boundary or polygon first, otherwise the TSG datasets will be too big to download.');
       return;
     }
-
-
-            const bsModalRef = this.activeModalService.open(NVCLTSGDownloadComponent, {
-              size: 'lg',
-              backdrop: false
-             });
-            bsModalRef.componentInstance.layer = this.layer;
-            bsModalRef.componentInstance.tsgDownloadServiceMsg = this.tsgDownloadServiceMsg;
+    const bsModalRef = this.activeModalService.open(NVCLTSGDownloadComponent, {
+      size: 'lg',
+      backdrop: false
+      });
+    bsModalRef.componentInstance.layer = this.layer;
+    bsModalRef.componentInstance.tsgDownloadServiceMsg = this.tsgDownloadServiceMsg;
   }
    /**
    * Download the TSG files filtering with a bbox or polyon filter
@@ -549,7 +543,7 @@ export class DownloadPanelComponent implements OnInit {
     }
     let observableResponse = null;
     this.download4tStarted = true;
-    // Download WFS features as CSV files 
+    // Download WFS features as CSV files
     if (this.polygonFilter) {
       observableResponse = this.downloadWfsService.downloadTsgFileUrls(this.layer, null, this.tsgDownloadEmail, this.polygonFilter);
     } else {
@@ -577,15 +571,14 @@ export class DownloadPanelComponent implements OnInit {
    * @param urls 
    */
   private async _DownloadTsgFiles ( urls: String) {
-    let urlArray = urls.split(/\r?\n/g).filter(function(url) {
+    const urlArray = urls.split(/\r?\n/g).filter(function(url) {
       return url.match(/^http/g);
     });
-    
-    console.log(urlArray);
+
     //const noMactched = (urls.match(/NoMatchedDatasetName/g) || []).length;
     const total = urlArray.length;
     let completed = 1;
-    
+
     for (var i = 0; i < urlArray.length; i++) {
       let url = urlArray[i];
       if (!url.startsWith('http')) {
@@ -621,7 +614,7 @@ export class DownloadPanelComponent implements OnInit {
     if (this.isDatasetURLSupportedLayer) {
       observableResponse = this.downloadWfsService.downloadDatasetURL(this.layer, null, this.polygonFilter);
 
-      // Download WFS features as CSV files 
+      // Download WFS features as CSV files
     } else {
       observableResponse = this.downloadWfsService.downloadCSV(this.layer, null, this.polygonFilter, true);
     }
@@ -656,7 +649,7 @@ export class DownloadPanelComponent implements OnInit {
     if (this.irisDownloadListOption.selectedStations.includes(this.SELECT_ALL_CODE)) {
       this.irisDownloadListOption.channelLst = this.getAvilChannel(this.irisDownloadListOption.stationLst);
     } else {
-      let stations = this.irisDownloadListOption.stationLst.filter(station => this.irisDownloadListOption.selectedStations.includes(station.code));
+      const stations = this.irisDownloadListOption.stationLst.filter(station => this.irisDownloadListOption.selectedStations.includes(station.code));
       this.irisDownloadListOption.channelLst = this.getAvilChannel(stations);
     }
   }
