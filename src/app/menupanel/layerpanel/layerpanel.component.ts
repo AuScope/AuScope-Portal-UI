@@ -62,7 +62,7 @@ export class LayerPanelComponent implements OnInit {
    */
   public layerClicked(layer: any) {
     layer.expanded = !layer.expanded;
-    if (!layer.getCapsLoaded && config.queryGetCapabiitiesTimes.indexOf(layer.id) > -1) {
+    if (!layer.getCapsLoaded && config.queryGetCapabilitiesTimes.indexOf(layer.id) > -1) {
       const layerFilter: FilterPanelComponent = this.filterComponents.find(fc => fc.layer.id === layer.id);
       if (layerFilter) {
         layerFilter.setLayerTimeExtent();
