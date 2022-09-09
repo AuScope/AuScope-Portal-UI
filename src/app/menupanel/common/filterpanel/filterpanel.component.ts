@@ -65,12 +65,6 @@ export class FilterPanelComponent implements OnInit {
       }
     }
 
-    // Get capability records
-    this.getcapabilityRecord();
-
-    // Set time extent if WMS and present
-    this.setLayerTimeExtent();
-
     // Add any layer specific advanced filter components
     this.advancedComponentService.addAdvancedFilterComponents(this.layer, this.advancedFilterComponents);
 
@@ -429,10 +423,10 @@ export class FilterPanelComponent implements OnInit {
   /**
    * Send a request to get the capability record and set layer's capability records
    */
-  private getcapabilityRecord() {
+  private getCapabilityRecord() {
     let wmsEndpointUrl = null;
     let layerName = null;
-    // Check if WMS capability record present 
+    // Check if WMS capability record present
     if (this.layer.capabilityRecords && this.layer.capabilityRecords.length > 0) {
       return;
     }
@@ -467,14 +461,14 @@ export class FilterPanelComponent implements OnInit {
    * Set time extent for a layer, first looking at the layer's capability records
    * and then the CSW records.
    */
-  private setLayerTimeExtent() {
+  public setLayerTimeExtent() {
     this.timeExtent = [];
     let wmsEndpointUrl = null;
     let layerName = null;
 
     // Check if WMS capability record present
     if (!(this.layer.capabilityRecords && this.layer.capabilityRecords.length > 0)) {
-      this.getcapabilityRecord();
+      this.getCapabilityRecord();
     }
 
     // Check if WMS capability record present and time extent set
