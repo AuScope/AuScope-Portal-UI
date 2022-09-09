@@ -265,7 +265,7 @@ export const config = {
     }
   },
   // If a layer has time periods that can be queried via GetCapabilities, add it here
-  queryGetCapabiitiesTimes: [
+  queryGetCapabilitiesTimes: [
     'grace-mascons'
   ]
 };
