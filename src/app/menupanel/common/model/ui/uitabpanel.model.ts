@@ -29,11 +29,11 @@ export class UITabPanel {
       this.filterpanel.expanded = true;
       this.infopanel.expanded = false;
       this.downloadpanel.expanded = false;
-    }else if (panelType === 'infopanel') {
+    } else if (panelType === 'infopanel') {
       this.filterpanel.expanded = false;
       this.infopanel.expanded = true;
       this.downloadpanel.expanded = false;
-    }else if (panelType === 'downloadpanel') {
+    } else if (panelType === 'downloadpanel') {
       this.filterpanel.expanded = false;
       this.infopanel.expanded = false;
       this.downloadpanel.expanded = true;

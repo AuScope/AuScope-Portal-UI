@@ -30,7 +30,7 @@ export const config = {
     },
   },
 
-  // Layers that download 
+  // Layers that download
   datasetUrlAussPassLayer: {
     'passive seismic': {
       'serviceType': {
@@ -263,5 +263,9 @@ export const config = {
       'nameKeyword': 'NAME',
       'geomKeyword': 'the_geom'
     }
-  }
+  },
+  // If a layer has time periods that can be queried via GetCapabilities, add it here
+  queryGetCapabiitiesTimes: [
+    'grace-mascons'
+  ]
 };
