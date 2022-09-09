@@ -354,9 +354,19 @@ export class CsMapComponent implements AfterViewInit {
     for (const maplayer of mapClickInfo.clickedLayerList) {
       for (const i of maplayer.clickCSWRecordsIndex ) {
         const cswRecord = maplayer.cswRecords[i];
-        const onlineResource = cswRecord.onlineResources[0];
-        if (onlineResource) {
 
+        // Bail if no OnlineResources
+        if (!cswRecord.onlineResources || cswRecord.onlineResources.length === 0) {
+          continue;
+        }
+
+        // Get the WMS OnlineResource, if that fails use the first in the list
+        let onlineResource = cswRecord.onlineResources.find(or => or.type === ResourceType.WMS);
+        if (!onlineResource && cswRecord.onlineResources[0]) {
+          onlineResource = cswRecord.onlineResources[0];
+        }
+
+        if (onlineResource) {
           // Display CSW record info
           if (config.cswrenderer.includes(maplayer.id)) {
             me.displayModal(mapClickInfo.clickCoord);
