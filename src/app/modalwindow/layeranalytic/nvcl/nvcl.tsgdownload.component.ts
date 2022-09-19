@@ -58,10 +58,12 @@ export class NVCLTSGDownloadComponent implements AfterViewInit, OnInit, LayerAna
     this.downloadWfsService.tsgDownloadBS.subscribe(
         (message) => {
           let progressData =  message.split(',');
-          this.completed = parseInt(progressData[0]);
-          this.total = parseInt(progressData[1]);
-          if (this.completed != 0 && this.completed === this.total) {
-            this.downloadMsg = "Completed";
+          if ('completed'.match(progressData[0])) {
+            this.isDownloading = false;
+            this.downloadMsg = "Download";
+          } else {
+            this.completed = parseInt(progressData[0]);
+            this.total = parseInt(progressData[1]);
           }
         }
     );
@@ -93,7 +95,7 @@ export class NVCLTSGDownloadComponent implements AfterViewInit, OnInit, LayerAna
    * Called when the "Download" button is hit
    */
   public onDownload() {
-    this.downloadWfsService.tsgDownloadStartBS.next({start:true,email:this.tsgform.email});
+    this.downloadWfsService.tsgDownloadStartBS.next('start,' + this.tsgform.email);
     this.isDownloading = true;
     this.downloadMsg = "Downloading...";
     this.nvclBoreholeAnalyticService.setUserEmail(this.tsgform.email);

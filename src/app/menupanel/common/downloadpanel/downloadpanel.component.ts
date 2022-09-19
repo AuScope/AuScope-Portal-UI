@@ -3,7 +3,7 @@ import { LayerModel } from '@auscope/portal-core-ui';
 import { LayerHandlerService } from '@auscope/portal-core-ui';
 import { CsMapService } from '@auscope/portal-core-ui';
 import { DownloadWfsService } from '@auscope/portal-core-ui';
-import { Component, Input, OnInit } from '@angular/core';
+import { ApplicationRef, Component, Input, OnInit } from '@angular/core';
 import { UtilitiesService } from '@auscope/portal-core-ui';
 import { ResourceType } from '@auscope/portal-core-ui';
 import { saveAs } from 'file-saver';
@@ -68,7 +68,7 @@ export class DownloadPanelComponent implements OnInit {
 
   constructor(private http: HttpClient, private cdRef: ChangeDetectorRef, private layerHandlerService: LayerHandlerService, private csMapService: CsMapService,
     private downloadWfsService: DownloadWfsService, private downloadWcsService: DownloadWcsService, private downloadIrisService: DownloadIrisService,
-    private csClipboardService: CsClipboardService, private csIrisService: CsIrisService, public activeModalService: NgbModal, private nvclService: NVCLService) {
+    private csClipboardService: CsClipboardService, private csIrisService: CsIrisService, public activeModalService: NgbModal, private nvclService: NVCLService,private appRef: ApplicationRef) {
     this.isNvclLayer = false;
     this.isTsgDownloadAvailable = false;
     this.bbox = null;
@@ -128,8 +128,9 @@ export class DownloadPanelComponent implements OnInit {
 
       this.downloadWfsService.tsgDownloadStartBS.subscribe(
         (message) => {
-          if (message.start == true) {      
-            this.tsgDownloadEmail =  message.email;    
+          let progressData =  message.split(',');
+          if ('start'.match(progressData[0])) {    
+            this.tsgDownloadEmail =  progressData[1];    
             this.Download4TsgFiles();
           }
         }); 
@@ -484,6 +485,7 @@ export class DownloadPanelComponent implements OnInit {
       }
       let filename = url.substring(url.lastIndexOf('/')+1);
       let oResponse = null; 
+      this.downloadWfsService.tsgDownloadBS.next(completed.toString() + ',' + total.toString());
       oResponse = await this.downloadWfsService.downloadTsgFile(url).toPromise();
       //oResponse = await this.downloadWfsService.downloadTsgFile('https://nvcldb.blob.core.windows.net/nvcldb/GBD011_chips.zip').toPromise();
       if (oResponse) {
@@ -492,9 +494,9 @@ export class DownloadPanelComponent implements OnInit {
       } else {
           alert('An error has occurred whilst attempting to download. Kindly contact cg-admin@csiro.au');
       }
-      this.downloadWfsService.tsgDownloadBS.next(completed.toString() + ',' + total.toString());
       completed++;
     }
+    this.downloadWfsService.tsgDownloadBS.next('completed,completed');
   }
    /**
    * Download the layer using a polyon to specify desired area
