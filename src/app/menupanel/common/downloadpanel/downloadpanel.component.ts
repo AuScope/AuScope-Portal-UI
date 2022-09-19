@@ -15,6 +15,9 @@ import { HttpClient } from '@angular/common/http';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { NVCLTSGDownloadComponent } from 'app/modalwindow/layeranalytic/nvcl/nvcl.tsgdownload.component';
 import { NVCLService } from '../../../modalwindow/querier/customanalytic/nvcl/nvcl.service';
+import { data } from 'jquery';
+import { isNumber } from '@turf/helpers';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-download-panel',
@@ -65,8 +68,7 @@ export class DownloadPanelComponent implements OnInit {
 
   constructor(private http: HttpClient, private cdRef: ChangeDetectorRef, private layerHandlerService: LayerHandlerService, private csMapService: CsMapService,
     private downloadWfsService: DownloadWfsService, private downloadWcsService: DownloadWcsService, private downloadIrisService: DownloadIrisService,
-    private csClipboardService: CsClipboardService, private csIrisService: CsIrisService, private modalService: BsModalService,
-    private nvclService: NVCLService) {
+    private csClipboardService: CsClipboardService, private csIrisService: CsIrisService, public activeModalService: NgbModal, private nvclService: NVCLService) {
     this.isNvclLayer = false;
     this.isTsgDownloadAvailable = false;
     this.bbox = null;
@@ -419,11 +421,14 @@ export class DownloadPanelComponent implements OnInit {
       alert('Please draw a boundary or polygon first, otherwise the TSG datasets will be too big to download.');
       return;
     }
-      const bsModalRef = this.modalService.show(NVCLTSGDownloadComponent, {
-        class: 'modal-lg'
-      });
-      bsModalRef.content.layer = this.layer;
-      bsModalRef.content.tsgDownloadServiceMsg = this.tsgDownloadServiceMsg;
+
+
+            const bsModalRef = this.activeModalService.open(NVCLTSGDownloadComponent, {
+              size: 'lg',
+              backdrop: false
+             });
+            bsModalRef.componentInstance.layer = this.layer;
+            bsModalRef.componentInstance.tsgDownloadServiceMsg = this.tsgDownloadServiceMsg;
   }
    /**
    * Download the TSG files filtering with a bbox or polyon filter
