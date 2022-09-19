@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ViewChildren, QueryList } from '@angular/core';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
 import { CsClipboardService, CsMapService, LayerHandlerService, LayerModel, ManageStateService, RenderStatusService, ResourceType, UtilitiesService } from '@auscope/portal-core-ui';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
@@ -9,6 +9,8 @@ import { ImagerySplitDirection } from 'cesium';
 import { ToolbarComponentsService } from 'app/services/ui/toolbar-components.service';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { FilterPanelComponent } from '../common/filterpanel/filterpanel.component';
+import { config } from '../../../environments/config';
 
 
 // Filter modes available in the dropdown layer filter selector
@@ -25,7 +27,9 @@ enum FilterMode {
 })
 export class LayerPanelComponent implements OnInit {
 
-  // Create a FilterMode that can be used in the HTML template 
+  @ViewChildren(FilterPanelComponent) filterComponents: QueryList<FilterPanelComponent>;
+
+  // Create a FilterMode that can be used in the HTML template
   eFilterMode = FilterMode;
 
   layerGroups: {};
@@ -34,7 +38,6 @@ export class LayerPanelComponent implements OnInit {
   searchText: string
   searchMode: boolean;
   areLayersFiltered: boolean;
-
 
 
   constructor(private layerHandlerService: LayerHandlerService, private renderStatusService: RenderStatusService,
@@ -51,6 +54,22 @@ export class LayerPanelComponent implements OnInit {
 
   public selectTabPanel(layerId: string, panelType: string) {
     this.getUILayerModel(layerId).tabpanel.setPanelOpen(panelType);
+  }
+
+  /**
+   * Toggle layer expanded and load GetCapabilities if not already loaded
+   *
+   * @param layer LayerModel for layer
+   */
+  public layerClicked(layer: any) {
+    layer.expanded = !layer.expanded;
+    if (!layer.getCapsLoaded && config.queryGetCapabilitiesTimes.indexOf(layer.id) > -1) {
+      const layerFilter: FilterPanelComponent = this.filterComponents.find(fc => fc.layer.id === layer.id);
+      if (layerFilter) {
+        layerFilter.setLayerTimeExtent();
+        layer.getCapsLoaded = true;
+      }
+    }
   }
 
   /**
@@ -113,7 +132,7 @@ export class LayerPanelComponent implements OnInit {
 
   /**
    * Search through the layers and filter layers by FilterMode
-   * 
+   *
    * @param mode FilterMode
    */
   public searchByFilterMode(mode: FilterMode) {
