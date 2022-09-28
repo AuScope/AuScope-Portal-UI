@@ -127,8 +127,9 @@ export class DownloadPanelComponent implements OnInit {
 
       this.downloadWfsService.tsgDownloadStartBS.subscribe(
         (message) => {
-          if (message.start === true) {
-            this.tsgDownloadEmail =  message.email;
+          let progressData =  message.split(',');
+          if ('start'.match(progressData[0])) {    
+            this.tsgDownloadEmail =  progressData[1];    
             this.Download4TsgFiles();
           }
         });
@@ -586,6 +587,7 @@ export class DownloadPanelComponent implements OnInit {
       }
       let filename = url.substring(url.lastIndexOf('/')+1);
       let oResponse = null; 
+      this.downloadWfsService.tsgDownloadBS.next(completed.toString() + ',' + total.toString());
       oResponse = await this.downloadWfsService.downloadTsgFile(url).toPromise();
       //oResponse = await this.downloadWfsService.downloadTsgFile('https://nvcldb.blob.core.windows.net/nvcldb/GBD011_chips.zip').toPromise();
       if (oResponse) {
@@ -597,6 +599,7 @@ export class DownloadPanelComponent implements OnInit {
       this.downloadWfsService.tsgDownloadBS.next(completed.toString() + ',' + total.toString());
       completed++;
     }
+    this.downloadWfsService.tsgDownloadBS.next('completed,completed');
   }
    /**
    * Download the layer using a polyon to specify desired area
