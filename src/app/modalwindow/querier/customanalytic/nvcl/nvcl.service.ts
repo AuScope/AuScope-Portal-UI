@@ -178,7 +178,13 @@ export class NVCLService {
     httpParams = httpParams.append('tsg', 'on');
     httpParams = httpParams.append('email', downloadEmail);
     if (environment.googleAnalyticsKey && typeof gtag === 'function') {
-      gtag('event', 'NVCLDownload',  {'event_category': 'NVCLDownload', 'event_action': serviceUrl, 'event_label': downloadEmail, 'value': datasetId});
+      /**
+       * do not "log" the "email" to "Google Analytics" - as this is an ethics issue
+       * 
+       * console.log("getNVCLTSGDownload() serviceUrl:"+serviceUrl+",downloadEmail:"+downloadEmail+",datasetId:"+datasetId);
+       * gtag('event', 'NVCLDownload',  {'event_category': 'NVCLDownload', 'event_action': serviceUrl, 'event_label': downloadEmail, 'value': datasetId});
+      */
+      gtag('event', 'NVCLDownload',  {'event_category': 'NVCLDownload', 'event_action': serviceUrl, 'value': datasetId});
     }
     return this.http.post(environment.portalBaseUrl + 'getNVCLTSGDownload.do', httpParams.toString(), {
       headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
