@@ -41,6 +41,7 @@ export class CustomPanelComponent {
      * Search list of wms layer given the wms url
      */
     public search() {
+      this.statusmsg = '';
       this.loading = true;
       if (this.searchUrl == undefined) {
         this.loading = false;
