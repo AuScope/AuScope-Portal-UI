@@ -5,7 +5,7 @@ import { NVCLService } from './nvcl.service';
 import { Component, Inject, Input, OnInit } from '@angular/core';
 import { HttpParams } from '@angular/common/http';
 import { DomSanitizer } from '@angular/platform-browser';
-import {saveAs} from 'file-saver';
+import { saveAs } from 'file-saver';
 import { NVCLBoreholeAnalyticService } from '../../../layeranalytic/nvcl/nvcl.boreholeanalytic.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { UtilitiesService } from '@auscope/portal-core-ui';
@@ -60,6 +60,7 @@ export class NVCLDatasetListComponent implements OnInit {
   public selectedScalar = '';
   public selectedScalarName = '';
   public selectedScalardata: any;
+  public imagesLoaded: string[] = [];
 
   public linPal: number[] = [255, 767, 1279, 1791, 2303, 3071, 3583, 4095, 4863, 5375, 5887, 6655, 7167, 7935, 8447, 9215, 9727, 10495, 11007, 11775, 12543, 13055, 13823, 14591,
      15103, 15871, 16639, 17407, 18175, 18943, 19711, 20223, 20991, 21759, 22527, 23295, 24319, 25087, 25855, 26623, 27391, 28159, 29183, 29951, 30719, 31743, 32511, 33279, 34303,
@@ -100,7 +101,6 @@ export class NVCLDatasetListComponent implements OnInit {
   public currentStatus = [];
   public checkingTSG = false;
 
-  
   constructor(public nvclService: NVCLService,
     public domSanitizer: DomSanitizer,
     private rickshawService: RickshawService,
@@ -108,8 +108,7 @@ export class NVCLDatasetListComponent implements OnInit {
     public dialog: MatDialog) {
     }
 
-    ngOnInit(): void {
-
+  ngOnInit(): void {
     this.nvclService.getNVCLDatasets(this.onlineResource.url, this.featureId).subscribe(result => {
       for (const nvclDataset of result) {
         nvclDataset.image = true;
@@ -122,20 +121,40 @@ export class NVCLDatasetListComponent implements OnInit {
         this._getNVCLScalar(this.onlineResource.url, nvclDataset.datasetId);
         this.nvclDatasets.push(nvclDataset);
       }
-      //console.log("nvcldataset]getNVCLDatasets.result.length = "+result.length);
-      if (result.length == 0) {
+      if (result.length === 0) {
         this.nvclService.setAnalytic(false);
       } else {
         this.nvclService.setAnalytic(true);
       }
-    })
+    });
 
     this.nvclService.getNVCL2_0_TsgJobsByBoreholeId(this.featureId).subscribe(result => {
       this.jobList[this.featureId] = result;
-    })
+    });
   }
 
+  /**
+   * Sets a dataset's images as having completed loading
+   *
+   * @param event the event that triggered this method
+   * @param nvclDatasetId the ID of the dataset for which images have been loaded
+   */
+  setImagesLoaded(event: any, nvclDatasetId: string) {
+    // Chrome will fire this event when added to DOM, ignore that
+    if (event.target.src !== '') {
+      this.imagesLoaded.push(nvclDatasetId);
+    }
+  }
 
+  /**
+   * Check if images for a dataset have finished loading
+   *
+   * @param nvclDatasetId the ID of the dataset to check
+   * @returns true if images have been loaded, false if not
+   */
+  haveImagesLoaded(nvclDatasetId: string): boolean {
+    return (this.imagesLoaded.indexOf(nvclDatasetId) !== -1);
+  }
 
   public drawGraph(logIds: Array<string>, logNames: Array<string>) {
     const me = this;
@@ -150,8 +169,7 @@ export class NVCLDatasetListComponent implements OnInit {
           this.processingGraph = false;
           this.drawGraphMode = false;
         }
-      })
-
+      });
   }
 
   public changeScalarSelection (datasetid) {
@@ -171,8 +189,7 @@ export class NVCLDatasetListComponent implements OnInit {
           this.processingGraph = false;
           this.drawGraphMode = false;
         }
-      })
-
+      });
   }
 
   public getDefinition(logName: string): void {
@@ -193,9 +210,6 @@ export class NVCLDatasetListComponent implements OnInit {
   }
 
   private _getNVCLImage(url: string, datasetId: string, scalarid: string) {
-   // if (this.datasetImages[datasetId]) {
-   //   return;
-  //  }
     this.nvclService.getNVCL2_0_Images(url, datasetId).subscribe(trayImages => {
       for (const trayImage of trayImages) {
         if (trayImage.logName === 'Tray Thumbnail Images') {
@@ -211,7 +225,7 @@ export class NVCLDatasetListComponent implements OnInit {
           this.datasetImages[datasetId].push(this.nvclService.getNVCLDataServiceUrl(this.onlineResource.url) + 'mosaic.html?' + httpParams.toString());
         }
       }
-    })
+    });
   }
 
   private _getNVCLScalar(url: string, datasetId: string) {
@@ -225,8 +239,8 @@ export class NVCLDatasetListComponent implements OnInit {
         const twoindex = scalarPriorityOrder.findIndex((element) => (element === two.logName));
         if (twoindex === -1 && oneindex === -1) { return (one.logName > two.logName) ? 1 : -1 }
         if (twoindex < 0) {return -1; } else if (oneindex < 0) {return 1; } else { return oneindex - twoindex; }
-      })
-    })
+      });
+    });
   }
 
   public changeDrawGraphMode(mode: boolean, datasetId: string) {
@@ -243,7 +257,7 @@ export class NVCLDatasetListComponent implements OnInit {
           }
         }
         if (jobIds.length <= 0) {
-          alert('no logs selected');
+          alert('No logs selected');
           return;
         }
 
@@ -263,13 +277,12 @@ export class NVCLDatasetListComponent implements OnInit {
         }
         this.selectedLogNames[datasetId] = logNames;
         if (logIds.length <= 0) {
-          alert('no logs selected');
+          alert('No logs selected');
         }
         const me = this;
         setTimeout(() => {
           me.processingGraph = true;
           me.drawGraph(logIds, logNames);
-
         }, 0);
       }
 
@@ -281,23 +294,21 @@ export class NVCLDatasetListComponent implements OnInit {
   public downloadCSV(datasetId: string) {
     const logs = this.datasetScalars[datasetId];
     const logIds = [];
-    const logNames = [];
 
     for (const log of logs) {
       if (log.value) {
         logIds.push(log.logId);
-
       }
     }
 
     if (logIds.length <= 0) {
-      alert('no logs selected');
+      alert('No logs selected');
     }
     this.nvclService.getNVCL2_0_CSVDownload(this.onlineResource.url, logIds).
       subscribe(response => {
         const blob = new Blob([response], {type: 'application/csv'});
         saveAs(blob, datasetId + '.csv');
-      })
+      });
   }
 
   public downloadTSG(datasetId: string) {
@@ -313,7 +324,7 @@ export class NVCLDatasetListComponent implements OnInit {
         this.nvclBoreholeAnalyticService.setUserEmail( this.downloadEmail );
       }, error => {
         this.downloadingTSG = false;
-      })
+      });
   }
 
   public checkStatus() {
@@ -329,7 +340,7 @@ export class NVCLDatasetListComponent implements OnInit {
         this.nvclBoreholeAnalyticService.setUserEmail( this.downloadEmail );
       }, error => {
         this.checkingTSG = false;
-      })
+      });
   }
 
   public clearCheckBox(datasetId: string) {

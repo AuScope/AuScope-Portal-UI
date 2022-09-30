@@ -37,7 +37,7 @@
 		</a>
 		<ul *ngIf="layerGroup.value.loaded" [ngClass]="{'submenu-open-block':layerGroup.value.expanded, 'hidden':!layerGroup.value.expanded}">
 			<li *ngFor="let layer of layerGroup.value.loaded">
-				<a [hidden]="layer.hide" (click)="layer.expanded = !layer.expanded;" [ngClass]="{'highlight': layer.expanded}">
+				<a [hidden]="layer.hide" (click)="layerClicked(layer)" [ngClass]="{'highlight': layer.expanded}">
 					<div class="layerLoadCtrl">
 						<span *ngIf="getUILayerModel(layer.id) && getUILayerModel(layer.id).statusMap.getRenderStarted()" class="float-right project-percentage hasEvent light-blue">
 							<i *ngIf="getUILayerModel(layer.id) && !getUILayerModel(layer.id).statusMap.getRenderComplete()" class="fa fa-spin fa-spinner"></i>
