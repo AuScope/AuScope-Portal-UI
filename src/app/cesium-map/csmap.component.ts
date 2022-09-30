@@ -17,6 +17,7 @@ declare var Cesium: any;
   template: `
     <div #mapElement id="map" class="h-100 w-100" (mouseout)="mouseLongitude=undefined;mouseLatitude=undefined;">
       <ac-map>
+          <app-search-panel></app-search-panel>
           <rectangles-editor></rectangles-editor>
           <app-cs-map-zoom></app-cs-map-zoom>
           <app-cs-map-split (toggleEvent)="toggleShowMapSplit()"></app-cs-map-split>

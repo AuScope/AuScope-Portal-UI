@@ -1,6 +1,7 @@
 import { Component, OnInit, Output, EventEmitter, ViewChildren, QueryList } from '@angular/core';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
-import { CsClipboardService, CsMapService, LayerHandlerService, LayerModel, ManageStateService, RenderStatusService, ResourceType, UtilitiesService } from '@auscope/portal-core-ui';
+import { CsClipboardService, CsMapService, LayerHandlerService, LayerModel, ManageStateService,
+         RenderStatusService, ResourceType, UtilitiesService } from '@auscope/portal-core-ui';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
@@ -8,7 +9,7 @@ import { MatSliderChange } from '@angular/material/slider';
 import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
 import { SplitDirection } from 'cesium';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
-import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FilterPanelComponent } from '../common/filterpanel/filterpanel.component';
 import { config } from '../../../environments/config';
 
@@ -32,16 +33,16 @@ export class LayerPanelComponent implements OnInit {
   // Create a FilterMode that can be used in the HTML template
   eFilterMode = FilterMode;
 
-  layerGroups: {};
+  layerGroups: {};  // TODO: This is a copy of what's in LayerHandlerService, we should just be using that
   bsModalRef: BsModalRef;
   @Output() expanded: EventEmitter<any> = new EventEmitter();
-  searchText: string
+  searchText: string;
   searchMode: boolean;
   areLayersFiltered: boolean;
 
 
-  constructor(private layerHandlerService: LayerHandlerService, private renderStatusService: RenderStatusService,
-      private activeModalService: NgbModal,
+  constructor(private layerHandlerService: LayerHandlerService,
+      private renderStatusService: RenderStatusService, private activeModalService: NgbModal,
       private modalService: BsModalService, private csMapService: CsMapService,
       private manageStateService: ManageStateService, private CsClipboardService: CsClipboardService,
       private uiLayerModelService: UILayerModelService, private advancedMapComponentService: AdvancedComponentService) {
@@ -169,7 +170,6 @@ export class LayerPanelComponent implements OnInit {
       }
     }
   }
-
 
   /**
    * Returns true if any layer in a layer group is visible in the sidebar
@@ -351,13 +351,13 @@ export class LayerPanelComponent implements OnInit {
   }
 
   /**
-   * Returns true if any layer in a layer group is active 
+   * Returns true if any layer in a layer group is active
    * "layerGroup" - an instance of this.layerGroups[key].value
    */
   public isLayerGroupActive(layerGroupValue): boolean {
-    let activeLayers: string[] = Object.keys(this.csMapService.getLayerModelList());
+    const activeLayers: string[] = Object.keys(this.csMapService.getLayerModelList());
     for (const layer of layerGroupValue) {
-      if(activeLayers.indexOf(layer.id)>-1){
+      if (activeLayers.indexOf(layer.id) > -1) {
         return true;
       }
     }

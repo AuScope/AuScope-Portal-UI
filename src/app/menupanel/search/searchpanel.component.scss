@@ -1,0 +1,45 @@
+.searchPanel {
+    position: absolute;
+    z-index: 1;
+    top: 9px;
+    left: 9px;
+
+    width: 30%;
+
+    .optionsPanel {
+        background-color: white;
+        padding: 8px;
+        border-bottom: solid #bbb 2px;
+    }
+    
+    .resultsPanel {
+        background-color: white;
+        padding: 8px;
+
+        .searchResult {
+            width: 100%;
+            
+            .textTruncate {
+                display: block;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
+    }
+    
+    .pagination {
+        padding-top: 5px;
+        border-top: solid #bbb 2px;
+
+        .pageLabel {
+            margin-left: 5px;
+            margin-right: 5px;
+        }
+
+        button {
+            margin: 0px 4px 0px 0px;
+        }
+    }
+}
+

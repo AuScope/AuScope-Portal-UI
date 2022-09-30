@@ -1,0 +1,39 @@
+<div class="searchPanel">
+    <div class="input-group">
+        <div class="input-group-prepend">
+            <button *ngIf="!showingSearchPanel" tabindex="-1" class="btn btn-primary" type="button" title="Show search" (click)="showSearchPanel(true)"><i class="fa fa-search"></i></button>
+            <button *ngIf="showingSearchPanel" tabindex="-1" class="btn btn-primary" type="button" title="Hide search" (click)="showSearchPanel(false)"><i class="fa fa-eye-slash"></i></button>
+        </div>
+        <input *ngIf="showingSearchPanel" type="text" class="form-control" placeholder="Enter search term here..." [(ngModel)]="queryText" [disabled]="searching">
+        <div *ngIf="showingSearchPanel">
+            <div class="input-group-append">
+                <button *ngIf="!showingAdvancedOptions" tabindex="-1" class="btn btn-primary" title="Show advanced search options" (click)="showAdvancedSearchOptions(true)"><i class="fa fa-sliders"></i></button>
+                <button *ngIf="showingAdvancedOptions" tabindex="-1" class="btn btn-primary" title="Hide advanced search options" (click)="showAdvancedSearchOptions(false)"><i class="fa fa-sliders"></i></button>
+                <button *ngIf="!searching" [disabled]="!queryText || queryText.trim() === ''" tabindex="-1" class="btn btn-primary" type="button" title="Search layers" (click)="search()"><i class="fa fa-search"></i></button>
+                <button *ngIf="searching" tabindex="-1" class="btn btn-primary" type="button" title="Clear search" (click)="clearSearch()"><i class="fa fa-ban"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="optionsPanel" *ngIf="showingSearchPanel && showingAdvancedOptions">
+        Advanced Options coming...
+    </div>
+    <div *ngIf="showingSearchPanel && !searching && searchResults" class="resultsPanel">
+        <div *ngIf="searchResults.length === 0">
+            <strong>No results found, try refining your search.</strong>
+        </div>
+        <div *ngIf="searchResults.length > 0">
+            <strong>Results</strong>
+            <div *ngFor="let layer of paginatedSearchResults()" class="searchResult">
+                <span title="{{ layer.name }}" class="textTruncate">{{ layer.name }}</span>
+            </div>
+            <!-- Use pagination if more than one page of search results -->
+            <div class="pagination" *ngIf="searchResults.length > resultsPerPage">
+                <button *ngIf="currentPage > 1" class="btn btn-sm btn-primary" title="Previous page" (click)="previousPage()"><i class="fa fa-arrow-left"></i></button>
+                <button *ngIf="currentPage < pageList.length" class="btn btn-sm btn-primary" title="Next page" (click)="nextPage()"><i class="fa fa-arrow-right"></i></button>
+                <select *ngIf="pageList.length > 1" [(ngModel)]="currentPage">
+                    <option *ngFor="let idx of pageList">{{idx}}</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
