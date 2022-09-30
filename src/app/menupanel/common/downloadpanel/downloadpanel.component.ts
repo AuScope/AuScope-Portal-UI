@@ -3,11 +3,12 @@ import { LayerModel } from '@auscope/portal-core-ui';
 import { LayerHandlerService } from '@auscope/portal-core-ui';
 import { CsMapService } from '@auscope/portal-core-ui';
 import { DownloadWfsService } from '@auscope/portal-core-ui';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Inject, Input, OnInit } from '@angular/core';
 import { UtilitiesService } from '@auscope/portal-core-ui';
 import { ResourceType } from '@auscope/portal-core-ui';
 import { saveAs } from 'file-saver';
 import { config } from '../../../../environments/config';
+import { environment } from '../../../../environments/environment'; //CVP
 import { RectangleEditorObservable } from '@auscope/angular-cesium';
 import { ChangeDetectorRef } from '@angular/core';
 import { DownloadWcsService, CsClipboardService, DownloadIrisService, CsIrisService } from '@auscope/portal-core-ui';
@@ -15,6 +16,8 @@ import { NVCLTSGDownloadComponent } from 'app/modalwindow/layeranalytic/nvcl/nvc
 import { isNumber } from '@turf/helpers';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NVCLService } from '../../../modalwindow/querier/customanalytic/nvcl/nvcl.service';
+
+declare var gtag: Function;
 
 @Component({
   selector: 'app-download-panel',
@@ -394,7 +397,7 @@ export class DownloadPanelComponent implements OnInit {
 
     // Kick off the download process and save zip file in browser
     observableResponse.subscribe(value => {
-      console.log(value)
+      //console.log("downloadpanel.component.ts().observableResponse.value:"+value);
       this.downloadStarted = false;
       const blob = new Blob([value], { type: 'application/zip' });
       saveAs(blob, 'download.zip');
@@ -575,7 +578,8 @@ export class DownloadPanelComponent implements OnInit {
     const urlArray = urls.split(/\r?\n/g).filter(function(url) {
       return url.match(/^http/g);
     });
-
+    
+    //console.log("downloadpanel.component.ts()._DownloadTsgFiles.urlArray:"+urlArray); //CVP
     //const noMactched = (urls.match(/NoMatchedDatasetName/g) || []).length;
     const total = urlArray.length;
     let completed = 1;
@@ -593,6 +597,20 @@ export class DownloadPanelComponent implements OnInit {
       if (oResponse) {
         const blob = new Blob([oResponse], {type: 'application/zip'});
         saveAs(blob, filename);
+
+
+      /**
+       * do not "log" the "email" to "Google Analytics" - as this is an ethics issue
+       * 
+       * console.log("environment.googleAnalyticsKey: "+environment.googleAnalyticsKey);
+       */
+      if (environment.googleAnalyticsKey && typeof gtag === "function") {
+        gtag('event', 'TSGDownload', {
+          event_category: 'TSGBulkDownload',
+          event_action: '['+completed+' of '+urlArray.length+']'+url
+          //event_label: this.tsgDownloadEmail
+        });
+      }
       } else {
           alert('An error has occurred whilst attempting to download. Kindly contact cg-admin@csiro.au');
       }
