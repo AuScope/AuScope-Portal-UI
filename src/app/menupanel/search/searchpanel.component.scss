@@ -1,38 +1,68 @@
-.searchPanel {
+.search-panel {
     position: absolute;
     z-index: 1;
     top: 9px;
     left: 9px;
+    width: 40%;
 
-    width: 30%;
-
-    .optionsPanel {
-        background-color: white;
+    .options-panel {
+        background-color: rgba(255,255,255,0.7);
         padding: 8px;
         border-bottom: solid #bbb 2px;
+
+        .options-checkbox {
+            margin-left: 4px;
+        }
     }
     
-    .resultsPanel {
-        background-color: white;
+    .results-panel {
+        background-color: rgba(255,255,255,0.7);
         padding: 8px;
 
-        .searchResult {
+        .search-result {
             width: 100%;
-            
-            .textTruncate {
+            flex-wrap: nowrap;
+
+            .search-result-label {
+                width: 100%;
+                text-align: start;
+                // truncate text
                 display: block;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
             }
+
+            button {
+                display: flex;
+                width: 5em;
+                color: white;
+                border-radius: 6px;
+                align-items: center;
+            }
+
+            .info-button {
+                margin-left: 6px;
+            }
+
+            .add-button {
+                background-color: green;
+                margin-left: 4px;
+            }
+
+            .add-button-warning {
+                background-color: orange;
+                margin-left: 4px;
+            }
+
         }
     }
     
     .pagination {
         padding-top: 5px;
-        border-top: solid #bbb 2px;
+        //border-top: solid #bbb 2px;
 
-        .pageLabel {
+        .page-label {
             margin-left: 5px;
             margin-right: 5px;
         }

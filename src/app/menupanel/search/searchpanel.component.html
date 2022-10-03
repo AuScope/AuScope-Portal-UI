@@ -1,10 +1,20 @@
-<div class="searchPanel">
+<div class="search-panel">
     <div class="input-group">
         <div class="input-group-prepend">
-            <button *ngIf="!showingSearchPanel" tabindex="-1" class="btn btn-primary" type="button" title="Show search" (click)="showSearchPanel(true)"><i class="fa fa-search"></i></button>
-            <button *ngIf="showingSearchPanel" tabindex="-1" class="btn btn-primary" type="button" title="Hide search" (click)="showSearchPanel(false)"><i class="fa fa-eye-slash"></i></button>
+            <button *ngIf="!showingSearchPanel" tabindex="-1" class="btn btn-primary" type="button" title="Show search" (click)="showSearchPanel(true)">
+                <span class="fa-layers fa-fw">
+                    <i class="fa fa-search"></i>
+                    <i class="fa fa-caret-right"></i>
+                </span>
+            </button>
+            <button *ngIf="showingSearchPanel" tabindex="-1" class="btn btn-primary" type="button" title="Hide search" (click)="showSearchPanel(false)">
+                <span class="fa-layers fa-fw">
+                    <i class="fa fa-search"></i>
+                    <i class="fa fa-caret-left"></i>
+                </span>
+            </button>
         </div>
-        <input *ngIf="showingSearchPanel" type="text" class="form-control" placeholder="Enter search term here..." [(ngModel)]="queryText" [disabled]="searching">
+        <input *ngIf="showingSearchPanel" type="text" class="form-control" placeholder="Enter search term here..." [(ngModel)]="queryText" (keyup.enter)="search()" [disabled]="searching">
         <div *ngIf="showingSearchPanel">
             <div class="input-group-append">
                 <button *ngIf="!showingAdvancedOptions" tabindex="-1" class="btn btn-primary" title="Show advanced search options" (click)="showAdvancedSearchOptions(true)"><i class="fa fa-sliders"></i></button>
@@ -14,17 +24,32 @@
             </div>
         </div>
     </div>
-    <div class="optionsPanel" *ngIf="showingSearchPanel && showingAdvancedOptions">
-        Advanced Options coming...
+    <div class="options-panel" *ngIf="showingSearchPanel && showingAdvancedOptions">
+        <strong>Advanced Options</strong>
+
+        <div ngbDropdown>
+            <button class="btn btn-sm btn-primary" type="button" ngbDropdownToggle>Search Fields</button>
+            <div ngbDropdownMenu>
+                <input type="checkbox" class="options-checkbox" [(ngModel)]="allSearchField.checked" (change)="allSearchFieldChange()" />&nbsp;All
+                <div *ngFor="let field of searchFields">
+                    <input type="checkbox" class="options-checkbox" [(ngModel)]="field.checked" [disabled]="allSearchField.checked" (change)="searchFieldChange(field.name)" />&nbsp;{{ field.name }}
+                </div>
+            </div>
+        </div>
     </div>
-    <div *ngIf="showingSearchPanel && !searching && searchResults" class="resultsPanel">
+    <div *ngIf="showingSearchPanel && !searching && searchResults" class="results-panel">
         <div *ngIf="searchResults.length === 0">
             <strong>No results found, try refining your search.</strong>
         </div>
         <div *ngIf="searchResults.length > 0">
             <strong>Results</strong>
-            <div *ngFor="let layer of paginatedSearchResults()" class="searchResult">
-                <span title="{{ layer.name }}" class="textTruncate">{{ layer.name }}</span>
+            <div *ngFor="let layer of paginatedSearchResults()" class="input-group search-result">
+                <span title="{{ layer.name }}" class="search-result-label input-group-text">{{ layer.name }}</span>
+                <div class="input-group-append">
+                    <button class="btn btn-sm btn-primary info-button" type="button" title="Show information" (click)="showLayerInformation(layer)"><i class="fa fa-info-circle fa-lg"></i>&nbsp;Info</button>
+                    <button *ngIf="!csMapService.isMapSupportedLayer(layer)" class="btn btn-sm add-button-warning" type="button" title="Add layer" (click)="layerWarning(layer)"><i class="fa fa-warning fa-lg"></i>&nbsp;Add</button>
+                    <button *ngIf="csMapService.isMapSupportedLayer(layer)" class="btn btn-sm add-button" type="button" title="Add layer" (click)="addLayer(layer)"><i class="fa fa-plus-circle fa-lg"></i>&nbsp;Add</button>
+                </div>
             </div>
             <!-- Use pagination if more than one page of search results -->
             <div class="pagination" *ngIf="searchResults.length > resultsPerPage">
