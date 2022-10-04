@@ -2,24 +2,24 @@
     <!-- Search bar and buttons -->
     <div class="input-group">
         <div class="input-group-prepend">
-            <button *ngIf="!showingSearchPanel" tabindex="-1" class="btn btn-primary" type="button" title="Show search" (click)="showSearchPanel(true)">
+            <button tabindex="-1" class="btn btn-primary" type="button" title="{{showingSearchPanel ? 'Hide search' : 'Show search'}}" (click)="showingSearchPanel = !showingSearchPanel">
                 <span class="fa-layers fa-fw">
                     <i class="fa fa-search"></i>
-                    <i class="fa fa-caret-right"></i>
-                </span>
-            </button>
-            <button *ngIf="showingSearchPanel" tabindex="-1" class="btn btn-primary" type="button" title="Hide search" (click)="showSearchPanel(false)">
-                <span class="fa-layers fa-fw">
-                    <i class="fa fa-search"></i>
-                    <i class="fa fa-caret-left"></i>
+                    <i *ngIf="!showingSearchPanel" class="fa fa-caret-right"></i>
+                    <i *ngIf="showingSearchPanel" class="fa fa-caret-left"></i>
                 </span>
             </button>
         </div>
         <input *ngIf="showingSearchPanel" type="text" class="form-control" placeholder="Enter search term here..." [(ngModel)]="queryText" (keyup.enter)="search()" [disabled]="searching">
         <div *ngIf="showingSearchPanel">
             <div class="input-group-append">
-                <button *ngIf="!showingAdvancedOptions" tabindex="-1" class="btn btn-primary" title="Show advanced search options" (click)="showAdvancedSearchOptions(true)"><i class="fa fa-sliders"></i></button>
-                <button *ngIf="showingAdvancedOptions" tabindex="-1" class="btn btn-primary" title="Hide advanced search options" (click)="showAdvancedSearchOptions(false)"><i class="fa fa-sliders"></i></button>
+                <button tabindex="-1" class="btn btn-primary" title="{{showingAdvancedOptions ? 'Hide advanced search options' : 'Show advanced search options'}}" (click)="showingAdvancedOptions = !showingAdvancedOptions">
+                    <span class="fa-layers">
+                        <i class="fa fa-sliders"></i>
+                        <i *ngIf="!showingAdvancedOptions" class="fa fa-caret-down"></i>
+                        <i *ngIf="showingAdvancedOptions" class="fa fa-caret-up"></i>
+                    </span>
+                </button>
                 <button *ngIf="!searching" [disabled]="!queryText || queryText.trim() === ''" tabindex="-1" class="btn btn-primary" type="button" title="Search layers" (click)="search()"><i class="fa fa-search"></i></button>
                 <button *ngIf="searching" tabindex="-1" class="btn btn-primary" type="button" title="Clear search" (click)="clearSearch()"><i class="fa fa-ban"></i></button>
             </div>

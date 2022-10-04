@@ -47,22 +47,6 @@ export class SearchPanelComponent implements OnInit {
     }
   }
 
-  /**
-   * Show/hide search panel
-   * @param showSearch true to show search panel, false to hide
-   */
-  public showSearchPanel(showSearch: boolean) {
-    this.showingSearchPanel = showSearch;
-  }
-
-  /**
-   * Show/hide options panel
-   * @param showOptions true to options panel, false to hide
-   */
-  public showAdvancedSearchOptions(showOptions: boolean) {
-    this.showingAdvancedOptions = showOptions;
-  }
-
   /*
   public wordMatchChange(event: any) {
     this.exactMatch = event.target.value;

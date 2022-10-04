@@ -41,7 +41,7 @@
 
             button {
                 display: flex;
-                //width: 5em;
+                //width: 5em;   // Set size looks better but issues with length of "Remove" compared to "Add"
                 color: white;
                 border-radius: 6px;
                 align-items: center;
