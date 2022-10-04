@@ -41,7 +41,13 @@ export class CustomPanelComponent {
      * Search list of wms layer given the wms url
      */
     public search() {
+      this.statusmsg = '';
       this.loading = true;
+      if (this.searchUrl == undefined) {
+        this.loading = false;
+        this.statusmsg = '<div class="text-danger">Please input the URL you want to search!.</div>';
+        return
+      }
       this.layerHandlerService.getCustomLayerRecord(this.searchUrl).subscribe(response => {
         this.loading = false;
         if (response != null) {
