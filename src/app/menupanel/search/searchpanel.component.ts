@@ -3,10 +3,12 @@ import { CsMapService, LayerHandlerService, LayerModel, ManageStateService } fro
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SearchService } from 'app/services/search/search.service';
 import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
+import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
 
 const DEFAULT_RESULTS_PER_PAGE = 10;
-const ALL_SEARCH_FIELDS = ['Name', 'Description', 'ID'];
+const ALL_SEARCH_FIELDS = ['Name', 'Description', 'Keyword', 'ID'];
+const ALL_OGC_SERVICES = ['WMS', 'IRIS', 'WFS', 'WCS', 'WWW'];
 
 @Component({
     selector: 'app-search-panel',
@@ -20,8 +22,11 @@ export class SearchPanelComponent implements OnInit {
   searching = false;
   searchResults: LayerModel[] = null;
   // Options
+  //exactMatch = false;
   allSearchField: SearchField = new SearchField('All', true);
   searchFields: SearchField[] = [];
+  allOGCServices: SearchField = new SearchField('All', true);
+  ogcServices: SearchField[] = [];
   // Pagination
   resultsPerPage: number = DEFAULT_RESULTS_PER_PAGE;
   pageList: number[] = [1];
@@ -29,41 +34,17 @@ export class SearchPanelComponent implements OnInit {
 
   constructor(private searchService: SearchService, private advancedComponentService: AdvancedComponentService,
               private csMapService: CsMapService, private layerHandlerService: LayerHandlerService,
-              private manageStateService: ManageStateService, private modalService: NgbModal) { }
+              private uiLayerModelService: UILayerModelService, private manageStateService: ManageStateService, private modalService: NgbModal) { }
 
   ngOnInit() {
     for (const searchField of ALL_SEARCH_FIELDS) {
       const field: SearchField = new SearchField(searchField, true);
       this.searchFields.push(field);
     }
-  }
-
-  /**
-   * Search index using specified fields and search query
-   */
-  public search() {
-    this.searching = true;
-    this.searchResults = null;
-    this.pageList = [];   // List of page numbers for pagination
-    this.currentPage = 1;
-
-    const selectedSearchFields: string[] = [];
-    for (const field of this.searchFields.filter(f => f.checked === true)) {
-      selectedSearchFields.push(field.name.toLowerCase());
+    for (const service of ALL_OGC_SERVICES) {
+      const field: SearchField = new SearchField(service, true);
+      this.ogcServices.push(field);
     }
-
-    this.searchService.search(selectedSearchFields, this.queryText).subscribe(searchResponse => {
-      this.layerHandlerService.getLayerModelsForIds(searchResponse).subscribe(layers => {
-        this.searchResults = layers;
-        for (let i = 1; i <= Math.ceil(this.searchResults.length / this.resultsPerPage); i++) {
-          this.pageList.push(i);
-        }
-        this.searching = false;
-      });
-    }, error => {
-      console.log(error);
-      this.searching = false;
-    });
   }
 
   /**
@@ -82,6 +63,12 @@ export class SearchPanelComponent implements OnInit {
     this.showingAdvancedOptions = showOptions;
   }
 
+  /*
+  public wordMatchChange(event: any) {
+    this.exactMatch = event.target.value;
+  }
+  */
+
   public searchFieldChange(fieldName: string) {
     const field = this.searchFields.find(f => f.name === fieldName);
     // If the last option was just un-checked, re-check it so we have at least one field
@@ -98,6 +85,27 @@ export class SearchPanelComponent implements OnInit {
   public allSearchFieldChange() {
     if (this.allSearchField.checked) {
       for (const field of this.searchFields) {
+        field.checked = true;
+      }
+    }
+  }
+
+  public ogcServiceChange(serviceName: string) {
+    const field = this.ogcServices.find(f => f.name === serviceName);
+    // If the last option was just un-checked, re-check it so we have at least one field
+    if (field && this.ogcServices.filter(f => f.checked === true).length === 0) {
+      setTimeout(() => {
+        field.checked = true;
+      });
+    }
+  }
+
+  /**
+   * All services has been checked or unchecked
+   */
+   public allOGCServicesChange() {
+    if (this.allSearchField.checked) {
+      for (const field of this.ogcServices) {
         field.checked = true;
       }
     }
@@ -144,11 +152,14 @@ export class SearchPanelComponent implements OnInit {
   }
 
   /**
-   * Display layer warning information popup
+   * Layer warning content
    *
    * @param layer LayerModel of layer
    */
-  public layerWarning(layer) {
+  public layerWarningMessage(layer): string {
+    return "This layer cannot be displayed. For Featured Layers, please wait for the layer cache to rebuild itself. " + 
+      "For Custom Layers please note that only the following online resource types can be added to the map: " +
+      this.csMapService.getSupportedOnlineResourceTypes();
   }
 
   /**
@@ -158,7 +169,9 @@ export class SearchPanelComponent implements OnInit {
    */
   public addLayer(layer: LayerModel) {
     // TODO: Do we need to apply clipboard like FilterPanel.addLayer(...) does?
-   const param = {};
+    const param = {
+      optionalFilters: []
+    };
 
     // Add a new layer in the layer state service
     this.manageStateService.addLayer(
@@ -181,8 +194,67 @@ export class SearchPanelComponent implements OnInit {
     this.advancedComponentService.addAdvancedMapComponents(layer);
   }
 
+  /**
+   * Remove a layer from the map
+   *
+   * @param layer the LayerModel for the layer
+   */
+  public removeLayer(layer: LayerModel) {
+    this.uiLayerModelService.getUILayerModel(layer.id).opacity = 100;
+    this.csMapService.removeLayer(layer);
+    // Remove any layer specific map components
+    this.advancedComponentService.removeAdvancedMapComponents(layer.id);
+  }
+
+  /**
+   * Search index using specified fields and search query
+   */
+   public search() {
+    this.searching = true;
+    this.searchResults = null;
+    this.pageList = [];   // List of page numbers for pagination
+    this.currentPage = 1;
+
+    const selectedSearchFields: string[] = [];
+    for (const field of this.searchFields.filter(f => f.checked === true)) {
+      selectedSearchFields.push(field.name.toLowerCase());
+    }
+
+    let textToQuery = this.queryText;
+
+    // Append service info to query if specific services have been selected
+    const checkedServices = this.ogcServices.filter(s => s.checked === true);
+    if (checkedServices.length < ALL_OGC_SERVICES.length) {
+      let appendQueryText = ' AND service:(';
+      for (let i = 0; i < checkedServices.length; i++) {
+        appendQueryText += checkedServices[i].name;
+        if (i !== checkedServices.length - 1) {
+          appendQueryText += ' OR ';
+        }
+      }
+      appendQueryText += ')';
+      textToQuery += appendQueryText;
+    }
+
+    this.searchService.search(selectedSearchFields, textToQuery).subscribe(searchResponse => {
+      this.layerHandlerService.getLayerModelsForIds(searchResponse).subscribe(layers => {
+        this.searchResults = layers;
+        for (let i = 1; i <= Math.ceil(this.searchResults.length / this.resultsPerPage); i++) {
+          this.pageList.push(i);
+        }
+        this.searching = false;
+      });
+    }, error => {
+      console.log(error);
+      this.searching = false;
+    });
+  }
+
 }
 
+/**
+ * Class to hold search option checkbox names/checked status
+ */
 export class SearchField {
   name: string;
   checked: boolean;

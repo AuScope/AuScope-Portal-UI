@@ -10,8 +10,14 @@
         padding: 8px;
         border-bottom: solid #bbb 2px;
 
-        .options-checkbox {
-            margin-left: 4px;
+        .options-dropdowns {
+            display: flex;
+            flex-direction: row;
+
+            .options-checkbox {
+                margin-left: 4px;
+                margin-right: 4px;
+            }
         }
     }
     
@@ -35,7 +41,7 @@
 
             button {
                 display: flex;
-                width: 5em;
+                //width: 5em;
                 color: white;
                 border-radius: 6px;
                 align-items: center;
@@ -55,12 +61,16 @@
                 margin-left: 4px;
             }
 
+            .delete-button {
+                background-color: red;
+                margin-left: 4px;
+            }
+
         }
     }
     
     .pagination {
         padding-top: 5px;
-        //border-top: solid #bbb 2px;
 
         .page-label {
             margin-left: 5px;
