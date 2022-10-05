@@ -3,10 +3,12 @@
     <div class="input-group">
         <div class="input-group-prepend">
             <button tabindex="-1" class="btn btn-primary" type="button" title="{{showingSearchPanel ? 'Hide search' : 'Show search'}}" (click)="showingSearchPanel = !showingSearchPanel">
-                <span class="fa-layers fa-fw">
+                <span *ngIf="!showingSearchPanel" class="fa-layers fa-fw">
                     <i class="fa fa-search"></i>
-                    <i *ngIf="!showingSearchPanel" class="fa fa-caret-right"></i>
-                    <i *ngIf="showingSearchPanel" class="fa fa-caret-left"></i>
+                    <i class="fa fa-caret-right caret-icon"></i>
+                </span>
+                <span *ngIf="showingSearchPanel" class="fa-fw">
+                    <i class="fa fa-caret-left"></i>
                 </span>
             </button>
         </div>
@@ -16,8 +18,8 @@
                 <button tabindex="-1" class="btn btn-primary" title="{{showingAdvancedOptions ? 'Hide advanced search options' : 'Show advanced search options'}}" (click)="showingAdvancedOptions = !showingAdvancedOptions">
                     <span class="fa-layers">
                         <i class="fa fa-sliders"></i>
-                        <i *ngIf="!showingAdvancedOptions" class="fa fa-caret-down"></i>
-                        <i *ngIf="showingAdvancedOptions" class="fa fa-caret-up"></i>
+                        <i *ngIf="!showingAdvancedOptions" class="fa fa-caret-down caret-icon"></i>
+                        <i *ngIf="showingAdvancedOptions" class="fa fa-caret-up caret-icon"></i>
                     </span>
                 </button>
                 <button *ngIf="!searching" [disabled]="!queryText || queryText.trim() === ''" tabindex="-1" class="btn btn-primary" type="button" title="Search layers" (click)="search()"><i class="fa fa-search"></i></button>

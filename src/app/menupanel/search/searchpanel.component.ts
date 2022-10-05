@@ -7,8 +7,28 @@ import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
 
 const DEFAULT_RESULTS_PER_PAGE = 10;
-const ALL_SEARCH_FIELDS = ['Name', 'Description', 'Keyword', 'ID'];
-const ALL_OGC_SERVICES = ['WMS', 'IRIS', 'WFS', 'WCS', 'WWW'];
+const SEARCH_FIELDS = [{
+    name: 'Name',
+    field: 'name',
+    checked: true
+  }, {
+    name: 'Description',
+    field: 'description',
+    checked: true
+  }, {
+    name: 'Keyword',
+    field: 'keyword',
+    checked: true
+  }, {
+    name: 'CSW Abstract',
+    field: 'abstract',
+    checked: true
+  }, {
+    name: 'ID',
+    field: 'id',
+    checked: true
+  }];
+const OGC_SERVICES = ['WMS', 'IRIS', 'WFS', 'WCS', 'WWW'];
 
 @Component({
     selector: 'app-search-panel',
@@ -23,9 +43,9 @@ export class SearchPanelComponent implements OnInit {
   searchResults: LayerModel[] = null;
   // Options
   //exactMatch = false;
-  allSearchField: SearchField = new SearchField('All', true);
-  searchFields: SearchField[] = [];
-  allOGCServices: SearchField = new SearchField('All', true);
+  allSearchField: SearchField = new SearchField('All', '', true);
+  searchFields: SearchField[] = SEARCH_FIELDS;
+  allOGCServices: SearchField = new SearchField('All', '', true);
   ogcServices: SearchField[] = [];
   // Pagination
   resultsPerPage: number = DEFAULT_RESULTS_PER_PAGE;
@@ -37,12 +57,8 @@ export class SearchPanelComponent implements OnInit {
               private uiLayerModelService: UILayerModelService, private manageStateService: ManageStateService, private modalService: NgbModal) { }
 
   ngOnInit() {
-    for (const searchField of ALL_SEARCH_FIELDS) {
-      const field: SearchField = new SearchField(searchField, true);
-      this.searchFields.push(field);
-    }
-    for (const service of ALL_OGC_SERVICES) {
-      const field: SearchField = new SearchField(service, true);
+    for (const service of OGC_SERVICES) {
+      const field: SearchField = new SearchField(service, service, true);
       this.ogcServices.push(field);
     }
   }
@@ -53,6 +69,11 @@ export class SearchPanelComponent implements OnInit {
   }
   */
 
+  /**
+   * A search field has been checked or unchecked
+   *
+   * @param fieldName the name of the field
+   */
   public searchFieldChange(fieldName: string) {
     const field = this.searchFields.find(f => f.name === fieldName);
     // If the last option was just un-checked, re-check it so we have at least one field
@@ -74,6 +95,11 @@ export class SearchPanelComponent implements OnInit {
     }
   }
 
+  /**
+   * A service has been checked/unchecked
+   *
+   * @param serviceName name of service
+   */
   public ogcServiceChange(serviceName: string) {
     const field = this.ogcServices.find(f => f.name === serviceName);
     // If the last option was just un-checked, re-check it so we have at least one field
@@ -141,8 +167,8 @@ export class SearchPanelComponent implements OnInit {
    * @param layer LayerModel of layer
    */
   public layerWarningMessage(layer): string {
-    return "This layer cannot be displayed. For Featured Layers, please wait for the layer cache to rebuild itself. " + 
-      "For Custom Layers please note that only the following online resource types can be added to the map: " +
+    return 'This layer cannot be displayed. For Featured Layers, please wait for the layer cache to rebuild itself. ' +
+      'For Custom Layers please note that only the following online resource types can be added to the map: ' +
       this.csMapService.getSupportedOnlineResourceTypes();
   }
 
@@ -200,18 +226,18 @@ export class SearchPanelComponent implements OnInit {
     this.currentPage = 1;
 
     const selectedSearchFields: string[] = [];
-    for (const field of this.searchFields.filter(f => f.checked === true)) {
-      selectedSearchFields.push(field.name.toLowerCase());
+    for (const sField of this.searchFields.filter(f => f.checked === true)) {
+      selectedSearchFields.push(sField.field);
     }
 
     let textToQuery = this.queryText;
 
     // Append service info to query if specific services have been selected
     const checkedServices = this.ogcServices.filter(s => s.checked === true);
-    if (checkedServices.length < ALL_OGC_SERVICES.length) {
+    if (checkedServices.length < OGC_SERVICES.length) {
       let appendQueryText = ' AND service:(';
       for (let i = 0; i < checkedServices.length; i++) {
-        appendQueryText += checkedServices[i].name;
+        appendQueryText += checkedServices[i].field;
         if (i !== checkedServices.length - 1) {
           appendQueryText += ' OR ';
         }
@@ -237,14 +263,17 @@ export class SearchPanelComponent implements OnInit {
 }
 
 /**
- * Class to hold search option checkbox names/checked status
+ * Class to hold search option checkbox names/fields/checked status
  */
 export class SearchField {
-  name: string;
-  checked: boolean;
+  name: string;     // Name of field for display
+  field: string;    // Field name in search index
+  checked: boolean; // Is field checked in UI?
 
-  constructor(name: string, checked: boolean) {
+  constructor(name: string, field: string, checked: boolean) {
     this.name = name;
+    this.field = field;
     this.checked = checked;
   }
+
 }

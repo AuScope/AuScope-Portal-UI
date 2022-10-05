@@ -5,6 +5,10 @@
     left: 9px;
     width: 40%;
 
+    .caret-icon {
+        transform: translateY(-2px) scale(0.8);
+    }
+
     .options-panel {
         background-color: rgba(255,255,255,0.7);
         padding: 8px;
@@ -44,6 +48,7 @@
                 //width: 5em;   // Set size looks better but issues with length of "Remove" compared to "Add"
                 color: white;
                 border-radius: 6px;
+                transform: translateY(2px);
                 align-items: center;
             }
 
