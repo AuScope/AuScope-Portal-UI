@@ -266,6 +266,13 @@ export const config = {
   },
   // If a layer has time periods that can be queried via GetCapabilities, add it here
   queryGetCapabilitiesTimes: [
-    'grace-mascons'
+    'grace-mascons', 'aster-aloh', 'aster-ferrous', 'aster-opaque', 'aster-ferric-oxide-content',
+    'aster-feoh', 'aster-ferric-oxide-comp', 'aster-group-index',
+    'aster-quartz-index', 'aster-mgoh-content', 'aster-green-veg',
+    'aster-ferr-carb', 'aster-mgoh-group-comp', 'aster-aloh-group-content',
+    'aster-silica-content', 'ga-geophys-1', 'ga-geophys-2', 'ga-geophys-3', 'ga-geophys-4', 'ga-geophys-5',
+    'ga-geophys-6', 'ga-geophys-7', 'ga-geophys-8', 'ga-geophys-9', 'ga-geophys-10',
+    'ga-geophys-11', 'ga-geophys-12', 'ga-geophys-13', 'ga-geophys-14', 'ga-geophys-15',
+    'ga-geophys-16', 'ga-geophys-17', 'ga-geophys-18', 'ga-geophys-19'
   ]
 };
