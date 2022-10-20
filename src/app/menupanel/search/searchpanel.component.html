@@ -2,7 +2,7 @@
     <!-- Search bar and buttons -->
     <div class="input-group">
         <div class="input-group-prepend">
-            <button tabindex="-1" class="btn btn-primary" type="button" title="{{showingSearchPanel ? 'Hide search' : 'Show search'}}" (click)="showingSearchPanel = !showingSearchPanel">
+            <button tabindex="-1" class="btn btn-primary" type="button" title="{{showingSearchPanel ? 'Hide search' : 'Show search'}}" (click)="toggleSearchPanel()">
                 <span *ngIf="!showingSearchPanel" class="fa-layers fa-fw">
                     <i class="fa fa-search"></i>
                     <i class="fa fa-caret-right caret-icon"></i>
@@ -11,10 +11,12 @@
                     <i class="fa fa-caret-left"></i>
                 </span>
             </button>
+            <div *ngIf="searchMessage !== '' && !showingSearchPanel" class="search-message"><label>{{ searchMessage }}</label></div>
         </div>
-        <input *ngIf="showingSearchPanel" type="text" class="form-control" placeholder="Enter search term here..." [(ngModel)]="queryText" (keyup.enter)="search()" [disabled]="searching">
+        <input *ngIf="showingSearchPanel" type="text" class="form-control" #queryinput placeholder="Enter search term here..." [(ngModel)]="queryText" (keyup.enter)="search()" [disabled]="searching">
         <div *ngIf="showingSearchPanel">
             <div class="input-group-append">
+                <!-- Advanced options dropdown next to search button
                 <button tabindex="-1" class="btn btn-primary" title="{{showingAdvancedOptions ? 'Hide advanced search options' : 'Show advanced search options'}}" (click)="showingAdvancedOptions = !showingAdvancedOptions">
                     <span class="fa-layers">
                         <i class="fa fa-sliders"></i>
@@ -22,69 +24,150 @@
                         <i *ngIf="showingAdvancedOptions" class="fa fa-caret-up caret-icon"></i>
                     </span>
                 </button>
-                <button *ngIf="!searching" [disabled]="!queryText || queryText.trim() === ''" tabindex="-1" class="btn btn-primary" type="button" title="Search layers" (click)="search()"><i class="fa fa-search"></i></button>
+                -->
+                <button *ngIf="!searching && queryText && queryText !== ''" class="clear-query-button" type="button" title="Clear search" (click)="clearQueryText()">&times;</button>
+
+                <button *ngIf="!searching" tabindex="-1" class="btn btn-primary" type="button" title="Search layers" (click)="search()"><i class="fa fa-search"></i></button>
                 <button *ngIf="searching" tabindex="-1" class="btn btn-primary" type="button" title="Clear search" (click)="clearSearch()"><i class="fa fa-ban"></i></button>
             </div>
         </div>
     </div>
+    <!-- Search alerts -->
+    <div *ngIf="alertMessage && alertMessage !== '' && showingSearchPanel" #alert class="search-alert">
+        <label class="search-alert-label">{{ alertMessage }}
+        <button type="button" class="search-alert-button close" aria-label="Close" (click)="alertMessage='';">
+          <span aria-hidden="true">&times;</span>
+        </button>
+    </label>
+    </div>
     <!-- Search options -->
+    <div class="show-options-panel" *ngIf="showingSearchPanel">
+        <button tabindex="-1" class="btn btn-sm btn-primary options-button" title="{{showingAdvancedOptions ? 'Hide advanced search options' : 'Show advanced search options'}}" (click)="showingAdvancedOptions = !showingAdvancedOptions">
+            <i class="fa fa-sliders"></i>
+            &nbsp;Advanced Options&nbsp;
+            <i *ngIf="!showingAdvancedOptions" class="fa fa-caret-down caret-icon"></i>
+            <i *ngIf="showingAdvancedOptions" class="fa fa-caret-up caret-icon"></i>
+        </button>
+
+        <ng-template #searchTipsContent>
+            Searches will attempt to match <strong>full words</strong> in the search bar <strong>in any order</strong>.<br><br>
+            <strong>Wilcards</strong> may be used, but not at the beginning of a word. Use <strong>?</strong> for a single character wildcard search, or <strong>*</strong> for multi-character. E.g.<br><br>
+            <strong>anom?lies</strong><br>
+            <strong>anom*</strong><br><br>
+            To match <strong>phrases</strong> (case-insenitive), use <strong>double-quotes</strong>. E.g.<br><br>
+            <strong>"mineral analyses"</strong><br>
+        </ng-template>
+        <ng-template #searchTipsTitle><strong>Search Tips</strong></ng-template>
+        <button type="button" class="btn btn-sm btn-info options-button tips-button" title="Search Tips" [ngbPopover]="searchTipsContent" [popoverTitle]="searchTipsTitle" popover-trigger="outsideClick">
+            <i class="fa fa-lg fa-info-circle"></i>&nbsp;Search Tips
+        </button>
+
+    </div>
     <div class="options-panel" *ngIf="showingSearchPanel && showingAdvancedOptions">
-        <label><strong>Advanced Options</strong></label>
         <div class="options-dropdowns">
-            <!--
+            <!-- Search fields -->
             <div ngbDropdown>
-                <button class="btn btn-sm btn-primary" type="button" ngbDropdownToggle>Word Match</button>
-                <div ngbDropdownMenu>
-                    <input type="radio" class="radio options-checkbox" name="matchType" value="0" (change)="wordMatchChange($event)" [checked]="true" />&nbsp;Contains<br>
-                    <input type="radio" class="radio options-checkbox" name="matchType" value="1" (change)="wordMatchChange($event)" />&nbsp;Exact
-                </div>
-            </div>
-            -->
-            <div ngbDropdown>
-                <button class="btn btn-sm btn-primary" type="button" ngbDropdownToggle>Search Fields</button>
-                <div ngbDropdownMenu>
-                    <input type="checkbox" class="options-checkbox" [(ngModel)]="allSearchField.checked" (change)="allSearchFieldChange()" />&nbsp;All
+                <button class="btn btn-sm btn-secondary" type="button" ngbDropdownToggle>{{ getSearchFieldTitle() }}</button>
+                <div ngbDropdownMenu class="advanced-options-panel">
+                    <input type="checkbox" class="options-checkbox" [(ngModel)]="allSearchField.checked" (change)="allSearchFieldChange()">&nbsp;All
                     <div *ngFor="let field of searchFields">
-                        <input type="checkbox" class="options-checkbox" [(ngModel)]="field.checked" [disabled]="allSearchField.checked" (change)="searchFieldChange(field.name)" />&nbsp;{{ field.name }}
+                        <input type="checkbox" class="options-checkbox" [(ngModel)]="field.checked" [disabled]="allSearchField.checked" (change)="searchFieldChange(field.name)">&nbsp;{{ field.name }}
                     </div>
                 </div>
             </div>
+            <!-- Services -->
             <div ngbDropdown>
-                <button class="btn btn-sm btn-primary" type="button" ngbDropdownToggle>Services</button>
-                <div ngbDropdownMenu>
-                    <input type="checkbox" class="options-checkbox" [(ngModel)]="allOGCServices.checked" (change)="allOGCServicesChange()" />&nbsp;All
+                <button class="btn btn-sm btn-secondary" type="button" ngbDropdownToggle>{{ getServicesTitle() }}</button>
+                <div ngbDropdownMenu class="advanced-options-panel">
+                    <input type="checkbox" class="options-checkbox" [(ngModel)]="allOGCServices.checked" (change)="allOGCServicesChange()">&nbsp;All
                     <div *ngFor="let service of ogcServices">
-                        <input type="checkbox" class="options-checkbox" [(ngModel)]="service.checked" [disabled]="allOGCServices.checked" (change)="ogcServiceChange(service.name)" />&nbsp;{{ service.name }}
+                        <input type="checkbox" class="options-checkbox" [(ngModel)]="service.checked" [disabled]="allOGCServices.checked" (change)="ogcServiceChange(service.name)">&nbsp;{{ service.name }}
                     </div>
                 </div>
             </div>
+            <!-- Spatial bounds -->
+            <div ngbDropdown #spatialOptionsDropdown="ngbDropdown">
+                <button class="btn btn-sm btn-secondary" type="button" ngbDropdownToggle>{{ getSpatialBoundsTitle() }}</button>
+                <div ngbDropdownMenu class="advanced-options-panel spatial-options-panel">
+                        <input type="checkbox" class="options-checkbox" title="Toggle bounds restriction" [(ngModel)]="restrictBounds"><label><strong>Restrict Spatial Bounds</strong></label>
+                        <div style="display:flex;">
+                            <button type="button" class="btn btn-sm btn-primary" title="Draw bounds on map" (click)="drawBounds()">Draw Bounds</button>
+                            <button type="button" class="btn btn-sm btn-primary" title="Clear bounds from map" (click)="clearBounds()" [disabled]="!bbox">Clear Bounds</button>
+                        </div>
+                        <div>
+                            <div ngbDropdown>
+                                <button class="btn btn-sm btn-primary" type="button" title="How layers relate to bounds" ngbDropdownToggle>Relationship: {{ boundsRelationship }}</button>
+                                <div ngbDropdownMenu style="padding:10px;">
+                                    <input type="radio" id="intersects-relation" name="relationship-radio" value="Intersects" [(ngModel)]="boundsRelationship">
+                                    <label for="intersects-relation">&nbsp;Intersects</label><br>
+                                    <input type="radio" id="contains-relation" name="relationship-radio" value="Contains" [(ngModel)]="boundsRelationship">
+                                    <label for="contains-relation">&nbsp;Contains</label><br>
+                                    <input type="radio" id="within-relation" name="relationship-radio" value="Within" [(ngModel)]="boundsRelationship">
+                                    <label for="within-relation">&nbsp;Within</label><br>
+                                </div>
+                            </div>
+                    </div>
+                    <div *ngIf="bbox" class="container">
+                        <div class="row">
+                            <label style="margin-left:8px;margin-top:4px;"><strong>Bounding Box</strong></label>
+                        </div>
+                        <label><span class="badge badge-secondary d-inline ml-5 line-height-1-8">North: {{bbox.northBoundLatitude | number:'1.0-4'}}</span></label>
+                        <label><span class="badge badge-secondary d-inline line-height-1-8">West: {{bbox.westBoundLongitude | number:'1.0-4'}}</span>
+                        <span class="badge badge-secondary d-inline ml-3 line-height-1-8">East: {{bbox.eastBoundLongitude | number:'1.0-4'}}</span></label>
+                        <label><span class="badge badge-secondary d-inline ml-5 line-height-1-8">South: {{bbox.southBoundLatitude | number:'1.0-4'}}</span></label>
+                    </div>
+                </div>
+            </div>
+            <!-- Reset advanced search options button -->
+            <button style="margin-left:auto;margin-right:6px;" class="btn btn-sm btn-secondary" (click)="resetAdvancedSearch()"><i class="fa fa-ban"></i>&nbsp;Reset All</button>
         </div>
     </div>
     <!-- Search results -->
     <div *ngIf="showingSearchPanel && !searching && searchResults" class="results-panel">
         <div *ngIf="searchResults.length === 0">
-            <strong>No results found, try refining your search.</strong>
+            <strong>No results found, try refining your search or adding a wildcard (*).</strong>
         </div>
         <div *ngIf="searchResults.length > 0">
             <label><strong>Results ({{ searchResults.length }})</strong></label>
-            <div *ngFor="let layer of paginatedSearchResults()" class="input-group search-result">
-                <span title="{{ layer.name }}" class="search-result-label input-group-text">{{ layer.name }}</span>
-                <div class="input-group-append">
-                    <button class="btn btn-sm btn-primary info-button" type="button" title="Show information" (click)="showLayerInformation(layer)"><i class="fa fa-info-circle fa-lg"></i>&nbsp;Info</button>
-                    <button *ngIf="!csMapService.isMapSupportedLayer(layer)" class="btn btn-sm add-button-warning" type="button" title="Add layer" ngbPopover="{{layerWarningMessage(layer)}}">
-                        <i class="fa fa-warning fa-lg"></i>&nbsp;Add
-                    </button>
-                    <button *ngIf="csMapService.isMapSupportedLayer(layer) && !csMapService.layerExists(layer.id)" class="btn btn-sm add-button" type="button" title="Add layer" (click)="addLayer(layer)"><i class="fa fa-plus-circle fa-lg"></i>&nbsp;Add</button>
-                    <button *ngIf="uiLayerModelService.getUILayerModel(layer.id) && uiLayerModelService.getUILayerModel(layer.id).statusMap.getRenderStarted()"
-                            class="btn btn-sm delete-button" type="button" title="Remove layer" (click)="removeLayer(layer)">
-                        <i class="fa fa-trash fa-lg"></i>&nbsp;Remove
-                    </button>
-                </div>
+            <div class="results-list">
+                <ngb-accordion #acc="ngbAccordion" (panelChange)="toggleSearchResultExpanded($event)">
+                        <ngb-panel *ngFor="let searchResult of paginatedSearchResults();" [id]="searchResult.layer.id">
+                            <ng-template ngbPanelHeader>
+                                <button ngbPanelToggle class="btn layer-header">
+                                    <span class="layer-header-label" title="{{searchResult.layer.name}}">{{ searchResult.layer.name }}</span>
+                                    <span style="display:contents;margin-left:auto;" class="fa-layers fa-fw">
+                                        <i class="fa fa-list"></i>
+                                        <i *ngIf="!searchResult.expanded" class="fa fa-caret-down caret-icon"></i>
+                                        <i *ngIf="searchResult.expanded" class="fa fa-caret-up caret-icon"></i>
+                                    </span>
+                                </button>
+                            </ng-template>
+                            <ng-template ngbPanelContent>
+                                <div class="card card-info card-with-tabs">
+                                    <div class="card-header">
+                                        <ul id="card-tab" class="nav nav-tabs">
+                                            <li (click)="searchResult.openTab = 'filter'" [ngClass]="{'active': searchResult.openTab === 'filter'}"><a data-toggle="tab"><i class="fa fa-filter"></i><span class="d-none d-sm-inline">&nbsp;Add Layer</span></a></li>
+                                            <li (click)="searchResult.openTab = 'download'" [ngClass]="{'active': searchResult.openTab === 'download'}"><a data-toggle="tab"><span class="d-none d-sm-inline"><i class="fa fa-download"></i>&nbsp;Download</span></a></li>
+                                            <button style="margin-left:auto;" class="btn btn-sm btn-outline-light" (click)="showLayerInformation(searchResult.layer)"><i class="fa fa-info-circle fa-fw"></i>&nbsp;Info</button>
+                                        </ul>
+                                    </div>
+                                    <div id="card-tab-content" class="tab-content">
+                                        <div class="tab-pane fade" [ngClass]="{'show active': searchResult.openTab === 'filter'}">
+                                            <app-filter-panel [layer]="searchResult.layer"></app-filter-panel>
+                                        </div>
+                                        <div class="tab-pane fade" [ngClass]="{'show active': searchResult.openTab === 'download'}">
+                                            <app-download-panel [layer]="searchResult.layer"></app-download-panel>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </ngb-panel>
+                </ngb-accordion>
             </div>
             <!-- Pagination if more than one page of search results -->
             <div class="pagination" *ngIf="searchResults.length > resultsPerPage">
-                <button *ngIf="currentPage > 1" class="btn btn-sm btn-primary" title="Previous page" (click)="previousPage()"><i class="fa fa-arrow-left"></i></button>
-                <button *ngIf="currentPage < pageList.length" class="btn btn-sm btn-primary" title="Next page" (click)="nextPage()"><i class="fa fa-arrow-right"></i></button>
+                <button class="btn btn-sm btn-primary" title="Previous page" (click)="previousPage()" [disabled]="currentPage <= 1"><i class="fa fa-arrow-left"></i></button>
+                <button class="btn btn-sm btn-primary" title="Next page" (click)="nextPage()" [disabled]="currentPage >= pageList.length"><i class="fa fa-arrow-right"></i></button>
                 <select *ngIf="pageList.length > 1" [(ngModel)]="currentPage">
                     <option *ngFor="let idx of pageList">{{idx}}</option>
                 </select>

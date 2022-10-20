@@ -150,6 +150,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
         MatCardModule,
         MatRadioModule,
         MatSliderModule,
+        MatTooltipModule,
         NgxChartsModule,
         NgxColorsModule,
         BrowserAnimationsModule,
@@ -159,7 +160,6 @@ PlotlyModule.plotlyjs = PlotlyJS;
         DataExplorerdRecordModule,
         AngularCesiumModule.forRoot(),
         AngularCesiumWidgetsModule,
-        MatTooltipModule,
         NgbModule,
         FormsModule,
         ReactiveFormsModule

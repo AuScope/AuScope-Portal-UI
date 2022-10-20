@@ -3,88 +3,146 @@
     z-index: 1;
     top: 9px;
     left: 9px;
-    width: 40%;
+    width: 50%;
+
+    .clear-query-button {
+        position: absolute;
+        top: 15%;
+        bottom: 15%;
+        right: 42px;
+        line-height: 0;
+        background: white;
+        color: gray;
+        font-size: large;
+        border-left: 1px solid lightgray;
+        border-top: none;
+        border-right: none;
+        border-bottom: none;
+        outline: none;
+        z-index: 10;
+    }
+
+    .search-message {
+        background: white;
+        padding: 4px 8px 0px 8px;
+        border-bottom-right-radius: 6px;
+        border-top-right-radius: 6px;
+    }
+
+    .search-alert {
+        display: block;
+        background: #ffc300;
+        padding: 8px;
+
+        .search-alert-label {
+            display: block;
+
+            .search-alert-button {
+                float: right;
+            }
+        }
+    }
 
     .caret-icon {
         transform: translateY(-2px) scale(0.8);
     }
 
+    .show-options-panel {
+        background-color: rgba(255, 255, 255, 0.8);
+        border-bottom: solid #bbb 2px;
+        width: 100%;
+        padding: 3px 3px 2px 3px;
+
+        .options-button {
+            margin: 0px;
+        }
+
+        .tips-button {
+            float: right;
+        }
+    }
+
     .options-panel {
-        background-color: rgba(255,255,255,0.7);
-        padding: 8px;
+        background-color: rgba(255, 255, 255, 0.8);
+        padding-top: 6px;
         border-bottom: solid #bbb 2px;
 
         .options-dropdowns {
             display: flex;
             flex-direction: row;
+            margin-left: -12px;
 
             .options-checkbox {
                 margin-left: 4px;
                 margin-right: 4px;
             }
+
+            .advanced-options-panel {
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+
+            .spatial-options-panel {
+                width: 240px;
+            }
         }
     }
     
     .results-panel {
-        background-color: rgba(255,255,255,0.7);
+        background-color: rgba(255, 255, 255, 0.8);
         padding: 8px;
 
-        .search-result {
-            width: 100%;
-            flex-wrap: nowrap;
+        .results-list {
+            overflow-y: auto;
+            height: 360px;
 
-            .search-result-label {
+            .layer-header {
+                display: flex;
                 width: 100%;
                 text-align: start;
-                // truncate text
-                display: block;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
+                background-color: #f2f4f4;
+                border-radius: 4px;
 
-            button {
-                display: flex;
-                //width: 5em;   // Set size looks better but issues with length of "Remove" compared to "Add"
-                color: white;
-                border-radius: 6px;
-                transform: translateY(2px);
-                align-items: center;
+                .layer-header-label {
+                    width: 100%;
+                    color: black;
+                    display: block;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
             }
-
-            .info-button {
-                margin-left: 6px;
+            .layer-header:hover {
+                background-color: lightgray;
             }
+    
+            // Overriding LayerPanel card styles to better fit this panel
+            .card {
+                margin-bottom: 0px;
 
-            .add-button {
-                background-color: green;
-                margin-left: 4px;
+                .nav-tabs {
+                    margin-top: 0px;
+                    padding-bottom: 0px;
+
+                    a {
+                        padding: 6px;
+                    }
+                }   
             }
+        }
 
-            .add-button-warning {
-                background-color: orange;
-                margin-left: 4px;
-            }
-
-            .delete-button {
-                background-color: red;
-                margin-left: 4px;
-            }
-
+        ::ng-deep .accordion-item {
+            margin-bottom: 2px;
         }
     }
     
     .pagination {
         padding-top: 5px;
 
-        .page-label {
-            margin-left: 5px;
-            margin-right: 5px;
-        }
-
         button {
             margin: 0px 4px 0px 0px;
         }
     }
+
 }
 

@@ -3,7 +3,7 @@ import { QuerierModalComponent } from '../modalwindow/querier/querier.modal.comp
 import { AfterViewInit, Component, ElementRef, NgZone, ViewChild, ViewContainerRef } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ViewerConfiguration } from '@auscope/angular-cesium';
-import { CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService, QueryWFSService,
+import { CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService,
   QueryWMSService, SimpleXMLService, UtilitiesService, CsMapObject, ResourceType } from '@auscope/portal-core-ui';
 import { Cartesian3, MapMode2D, Math, ScreenSpaceEventHandler, SceneMode, ScreenSpaceEventType, Rectangle, SplitDirection,
    Cartesian2, WebMapServiceImageryProvider, WebMercatorProjection, Cartographic, GeographicProjection } from 'cesium';
@@ -16,8 +16,8 @@ declare var Cesium: any;
   selector: 'app-cs-map',
   template: `
     <div #mapElement id="map" class="h-100 w-100" (mouseout)="mouseLongitude=undefined;mouseLatitude=undefined;">
+    <app-search-panel></app-search-panel>
       <ac-map>
-          <app-search-panel></app-search-panel>
           <rectangles-editor></rectangles-editor>
           <app-cs-map-zoom></app-cs-map-zoom>
           <app-cs-map-split (toggleEvent)="toggleShowMapSplit()"></app-cs-map-split>
@@ -66,7 +66,7 @@ export class CsMapComponent implements AfterViewInit {
   private modalDisplayed = false;
 
   constructor(private csMapObject: CsMapObject, private csMapService: CsMapService, private modalService: BsModalService,
-    private queryWFSService: QueryWFSService, private queryWMSService: QueryWMSService, private gmlParserService: GMLParserService,
+    private queryWMSService: QueryWMSService, private gmlParserService: GMLParserService,
     private manageStateService: ManageStateService, private advancedMapComponentService: AdvancedComponentService,
     private viewerConf: ViewerConfiguration, private ngZone: NgZone) {
 
