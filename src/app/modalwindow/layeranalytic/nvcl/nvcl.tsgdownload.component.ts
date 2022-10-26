@@ -59,14 +59,10 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
           if(me.completed<me.total){
             let url = me.urlsArray[me.completed];
             let filename = url.substring(url.lastIndexOf('/')+1);
-            url = 'https://nvclstore.z8.web.core.windows.net/WA/PLWDD001.zip';
-            //me.downloadWfsService.tsgDownloadBS.next(me.completed.toString() + ',' + me.total.toString());
             me.download1$ = me.tsgDownloadService.download(url, filename ).pipe(shareReplay(1));
             me.download1$.subscribe(value => {
               if (value.state.startsWith('DONE')) {
                 me.completed++;
-                //me.downloadWfsService.tsgDownloadBS.next(me.completed.toString() + ',' + me.total.toString());
-                //console.log(value);
                 me.tsgDownloadService.downloadOneCompletBS.next('downloadOne:'+me.completed);
               }
             });

@@ -36,7 +36,6 @@ export class DownloadPanelComponent implements OnInit {
   drawStarted: boolean;
   downloadStarted: boolean;
   download4pStarted: boolean;
-  download4tStarted: boolean;
   download4PolygonKMLStarted: boolean;
   isPolygonSupportedLayer: boolean;
   isCsvSupportedLayer: boolean;  // Supports CSV downloads of WFS Features
@@ -78,7 +77,6 @@ export class DownloadPanelComponent implements OnInit {
     this.bbox = null;
     this.drawStarted = false;
     this.downloadStarted = false;
-    this.download4tStarted = false;
     this.wcsDownloadForm = {};
   }
 
@@ -125,7 +123,6 @@ export class DownloadPanelComponent implements OnInit {
           if (polygonBBox && polygonBBox.coordinates) {
             this.clearBound();
             this.polygonFilter = '<ogc:Filter  xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:gml=\"http://www.opengis.net/gml\"><ogc:Intersects><ogc:PropertyName>gsmlp:shape</ogc:PropertyName>' + polygonBBox.coordinates + '</ogc:Intersects></ogc:Filter>';
-            console.log(this.polygonFilter);
           } else {
             this.polygonFilter = null;
           }
@@ -463,7 +460,6 @@ export class DownloadPanelComponent implements OnInit {
     let value = "";
     //csv data process
     let csvArray = csv.split(/\r?\n/g);    
-    console.log(csvArray);    
     let csvHeader = csvArray[0].split(",");
     let indexGsmlpShape = csvHeader.indexOf("gsmlp:shape");
     let indexGmlId = csvHeader.indexOf("gml:id");
@@ -561,12 +557,7 @@ export class DownloadPanelComponent implements OnInit {
    * Download the TSG files filtering with a bbox or polyon filter
    */
   public Download4TsgFiles() {
-    if (this.download4tStarted) {
-      alert('Download in progress, kindly wait for it to completed');
-      return;
-    }
     let observableResponse = null;
-    this.download4tStarted = true;
     // Download WFS features as CSV files
     if (this.polygonFilter) {
       observableResponse = this.downloadWfsService.downloadTsgFileUrls(this.layer, null, this.tsgDownloadEmail, this.polygonFilter);
@@ -586,11 +577,11 @@ export class DownloadPanelComponent implements OnInit {
       }
       if (!urls || total<1) {
         alert('TSGFilesDownload: No TSGFiles was found in the area. Please draw another boundary or polygon to search.');
+        this.downloadWfsService.tsgDownloadBS.next('completed,completed');        
         return;
       }
       this.bsModalRef.componentInstance.urlsArray = urlsArray;
       this.bsModalRef.componentInstance.BulkDownloadTsgFiles();
-      this.download4tStarted = false;
       /**
        * do not "log" the "email" to "Google Analytics" - as this is an ethics issue
        * 
@@ -604,7 +595,6 @@ export class DownloadPanelComponent implements OnInit {
         });
       }      
     }, err => {
-      this.download4tStarted = false;
       if (UtilitiesService.isEmpty(err.message)) {
         alert('An error has occurred whilst attempting to download. Kindly contact cg-admin@csiro.au');
       } else {

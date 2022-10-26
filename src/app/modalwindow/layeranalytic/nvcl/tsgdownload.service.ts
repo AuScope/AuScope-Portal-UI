@@ -13,7 +13,6 @@ export class TSGDownloadService {
   }
 
   download(url: string, filename?: string): Observable<Download> {
-    console.log(url);
     return this.http.get(url, {
       reportProgress: true,
       observe: 'events',
