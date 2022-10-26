@@ -85,7 +85,9 @@ import { NVCLTSGDownloadComponent } from './modalwindow/layeranalytic/nvcl/nvcl.
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxColorsModule } from 'ngx-colors';
 
-
+import {MatProgressBarModule} from '@angular/material/progress-bar'; 
+import {MatCardModule} from '@angular/material/card'; 
+import { getSaver, SAVER } from './modalwindow/layeranalytic/nvcl/saver.provider';
 PlotlyModule.plotlyjs = PlotlyJS;
 
 
@@ -127,7 +129,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
         DataExplorerComponent,
         RecordModalComponent
     ],
-    providers: [AuscopeApiService, RectanglesEditorService, AdvancedComponentService, NVCLService, GraceService],
+    providers: [AuscopeApiService, RectanglesEditorService, AdvancedComponentService, NVCLService, GraceService, {provide: SAVER, useFactory: getSaver}],
     imports: [
         PortalCoreModule.forRoot(environment, config),
         PortalCorePipesModule,
@@ -141,6 +143,8 @@ PlotlyModule.plotlyjs = PlotlyJS;
         MatButtonModule,
         MatDialogModule,
         MatMenuModule,
+        MatProgressBarModule,
+        MatCardModule,
         MatRadioModule,
         MatSliderModule,
         NgxChartsModule,

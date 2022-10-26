@@ -1,15 +1,14 @@
 import { LayerModel } from '@auscope/portal-core-ui';
 import { ManageStateService } from '@auscope/portal-core-ui';
-import {
-  Component,
-  Input,
-  AfterViewInit,
-  OnInit
-} from '@angular/core';
+import { Component, Input, AfterViewInit, OnInit, AfterContentChecked } from '@angular/core';
 import { LayerAnalyticInterface } from '../layer.analytic.interface';
 import { DownloadWfsService } from '@auscope/portal-core-ui';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { NVCLBoreholeAnalyticService } from './nvcl.boreholeanalytic.service';
+import { TSGDownloadService } from './tsgdownload.service';
+import { Download } from './tsgdownload';
+import { Observable } from 'rxjs';
+import { shareReplay } from 'rxjs/operators';
 
 @Component({
   selector: 'nvcl-tsgdownload-component',
@@ -25,29 +24,59 @@ import { NVCLBoreholeAnalyticService } from './nvcl.boreholeanalytic.service';
   ],
   providers: [NVCLBoreholeAnalyticService]
 })
-export class NVCLTSGDownloadComponent implements AfterViewInit, OnInit, LayerAnalyticInterface {
+export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewInit, OnInit, LayerAnalyticInterface {
   @Input() layer: LayerModel;
   public tsgform;
   public ngSelectiveConfig = {};
-  public total: number;
-  public completed: number;
+  public total = 0;
+  public completed = 0;
   public completePercentage: string;
   public tsgDownloadServiceMsg: string;
   public downloadMsg = "Download";
   public isDownloading = false;
+  public urlsArray =[];
+  public download1$: Observable<Download>;
 
-
-  constructor( public activeModal: NgbActiveModal, private manageStateService: ManageStateService, private downloadWfsService: DownloadWfsService , private nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService) {
+  constructor( public activeModal: NgbActiveModal, private manageStateService: ManageStateService, private downloadWfsService: DownloadWfsService , private nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService, private tsgDownloadService: TSGDownloadService,
+    ) {
     this.tsgform = {};
     //this.tsgform.email = '';
     if (this.nvclBoreholeAnalyticService.hasSavedEmail()) {
       this.tsgform.email = this.nvclBoreholeAnalyticService.getUserEmail();
     }
     this.tsgform.ogcFilter = '';
-    this.total = 0;
-    this.completed =0;
     this.downloadMsg = "Download";
-    this.isDownloading = false;
+    this.isDownloading = false;  
+  }
+
+  public BulkDownloadTsgFiles() {
+    const me = this;
+    me.total = me.urlsArray.length;
+    me.completed = 0;
+    me.tsgDownloadService.downloadOneCompletBS.subscribe(
+      (message) => {
+        if (message.startsWith('downloadOne')) {
+          if(me.completed<me.total){
+            let url = me.urlsArray[me.completed];
+            let filename = url.substring(url.lastIndexOf('/')+1);
+            url = 'https://nvclstore.z8.web.core.windows.net/WA/PLWDD001.zip';
+            //me.downloadWfsService.tsgDownloadBS.next(me.completed.toString() + ',' + me.total.toString());
+            me.download1$ = me.tsgDownloadService.download(url, filename ).pipe(shareReplay(1));
+            me.download1$.subscribe(value => {
+              if (value.state.startsWith('DONE')) {
+                me.completed++;
+                //me.downloadWfsService.tsgDownloadBS.next(me.completed.toString() + ',' + me.total.toString());
+                //console.log(value);
+                me.tsgDownloadService.downloadOneCompletBS.next('downloadOne:'+me.completed);
+              }
+            });
+          } else {
+            me.downloadWfsService.tsgDownloadBS.next('completed,completed');
+            me.isDownloading = false;
+          }
+        }
+      });
+      me.tsgDownloadService.downloadOneCompletBS.next('downloadOne:0');
   }
 
   /**
@@ -61,15 +90,16 @@ export class NVCLTSGDownloadComponent implements AfterViewInit, OnInit, LayerAna
           if ('completed'.match(progressData[0])) {
             this.isDownloading = false;
             this.downloadMsg = "Download";
-          } else {
-            this.completed = parseInt(progressData[0]);
-            this.total = parseInt(progressData[1]);
           }
         }
     );
 
   }
-
+  ngAfterContentChecked(): void{
+    if (this.urlsArray) {
+      this.total = this.urlsArray.length;
+    }      
+  }
   /**
    * Initialise UI
    */
@@ -83,7 +113,6 @@ export class NVCLTSGDownloadComponent implements AfterViewInit, OnInit, LayerAna
 
   public getCompletePercentage(): String{
     if (Math.floor(this.completed / this.total * 100) > 100) {
-      // VT: This is a problem when user adds and immediately delete the layer which corrupts the listeners
       this.completePercentage = '100%';
     } else {
       this.completePercentage = Math.floor(this.completed / this.total * 100) + '%';

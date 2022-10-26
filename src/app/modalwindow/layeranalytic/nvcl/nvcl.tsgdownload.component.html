@@ -30,6 +30,7 @@
                         <div class="progress progress-xs" style="height: 25px">
                             <div class="progress-bar bg-gradient-blue-purple" [style.width]= "getCompletePercentage()" role="progressbar"></div>
                         </div>
+						<mat-progress-bar *ngIf="download1$ | async as download" [mode]="download.state == 'PENDING' ? 'buffer' : 'determinate'" [value]="download.progress"></mat-progress-bar>
 				    </div>
 				</div>
 
