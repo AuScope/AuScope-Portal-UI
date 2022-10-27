@@ -2,7 +2,7 @@
     <!-- Search bar and buttons -->
     <div class="input-group">
         <div class="input-group-prepend">
-            <button tabindex="-1" class="btn btn-primary" type="button" title="{{showingSearchPanel ? 'Hide search' : 'Show search'}}" (click)="toggleSearchPanel()">
+            <button tabindex="-1" class="btn btn-primary search-toggle-button" type="button" title="{{showingSearchPanel ? 'Hide search' : 'Show search'}}" (click)="toggleSearchPanel()">
                 <span *ngIf="!showingSearchPanel" class="fa-layers fa-fw">
                     <i class="fa fa-search"></i>
                     <i class="fa fa-caret-right caret-icon"></i>
@@ -26,9 +26,8 @@
                 </button>
                 -->
                 <button *ngIf="!searching && queryText && queryText !== ''" class="clear-query-button" type="button" title="Clear search" (click)="clearQueryText()">&times;</button>
-
-                <button *ngIf="!searching" tabindex="-1" class="btn btn-primary" type="button" title="Search layers" (click)="search()"><i class="fa fa-search"></i></button>
-                <button *ngIf="searching" tabindex="-1" class="btn btn-primary" type="button" title="Clear search" (click)="clearSearch()"><i class="fa fa-ban"></i></button>
+                <button *ngIf="!searching" tabindex="-1" class="btn btn-primary search-button" type="button" title="Search layers" (click)="search()"><i class="fa fa-search"></i></button>
+                <!--<button *ngIf="searching" tabindex="-1" class="btn btn-primary" type="button" title="Clear search" (click)="clearSearch()"><i class="fa fa-ban"></i></button>-->
             </div>
         </div>
     </div>
@@ -123,12 +122,15 @@
         </div>
     </div>
     <!-- Search results -->
-    <div *ngIf="showingSearchPanel && !searching && searchResults" class="results-panel">
+    <div *ngIf="showingSearchPanel && !searching" class="results-panel">
         <div *ngIf="searchResults.length === 0">
             <strong>No results found, try refining your search or adding a wildcard (*).</strong>
         </div>
         <div *ngIf="searchResults.length > 0">
-            <label><strong>Results ({{ searchResults.length }})</strong></label>
+            <div class="search-results-title">
+                <label><strong>{{ getSearchResultsTitle() }}</strong></label>
+                <button *ngIf="!showingAllLayers" title="Show all layers" class="btn btn-sm clear-search-results-button" type="button" (click)="showAllLayers()"><i class="fa fa-ban"></i></button>
+            </div>
             <div class="results-list">
                 <ngb-accordion #acc="ngbAccordion" (panelChange)="toggleSearchResultExpanded($event)">
                         <ngb-panel *ngFor="let searchResult of paginatedSearchResults();" [id]="searchResult.layer.id">
@@ -166,11 +168,7 @@
             </div>
             <!-- Pagination if more than one page of search results -->
             <div class="pagination" *ngIf="searchResults.length > resultsPerPage">
-                <button class="btn btn-sm btn-primary" title="Previous page" (click)="previousPage()" [disabled]="currentPage <= 1"><i class="fa fa-arrow-left"></i></button>
-                <button class="btn btn-sm btn-primary" title="Next page" (click)="nextPage()" [disabled]="currentPage >= pageList.length"><i class="fa fa-arrow-right"></i></button>
-                <select *ngIf="pageList.length > 1" [(ngModel)]="currentPage">
-                    <option *ngFor="let idx of pageList">{{idx}}</option>
-                </select>
+                <ngb-pagination [collectionSize]="searchResults.length" [(page)]="currentPage" [maxSize]="5" [pageSize]="resultsPerPage" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>
             </div>
         </div>
     </div>

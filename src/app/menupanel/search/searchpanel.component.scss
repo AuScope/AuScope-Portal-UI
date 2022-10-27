@@ -22,6 +22,15 @@
         z-index: 10;
     }
 
+    .search-toggle-button {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+
+    .search-button {
+        border-bottom-right-radius: 0;
+    }
+
     .search-message {
         background: white;
         padding: 4px 8px 0px 8px;
@@ -31,14 +40,15 @@
 
     .search-alert {
         display: block;
-        background: #ffc300;
+        background: yellow;
         padding: 8px;
 
         .search-alert-label {
-            display: block;
+            display: flex;
 
             .search-alert-button {
-                float: right;
+                margin-left: auto;
+                align-self: baseline;
             }
         }
     }
@@ -92,6 +102,11 @@
         background-color: rgba(255, 255, 255, 0.8);
         padding: 8px;
 
+        .clear-search-results-button {
+            margin: 0px 0px 0px 10px;
+            color: red;
+        }
+
         .results-list {
             overflow-y: auto;
             height: 360px;
@@ -134,6 +149,7 @@
         ::ng-deep .accordion-item {
             margin-bottom: 2px;
         }
+        
     }
     
     .pagination {
@@ -141,6 +157,11 @@
 
         button {
             margin: 0px 4px 0px 0px;
+        }
+
+        // Mis-match of ng-bootstrap and bootstrap versions will show " (current)" next to current page number without this
+        ::ng-deep .visually-hidden {
+            display: none;
         }
     }
 

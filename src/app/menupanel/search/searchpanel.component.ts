@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { RectangleEditorObservable } from '@auscope/angular-cesium';
 import { Bbox, CsMapService, LayerHandlerService, LayerModel, ManageStateService, UtilitiesService } from '@auscope/portal-core-ui';
 import { NgbAccordion, NgbDropdown, NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -7,6 +7,9 @@ import { AdvancedComponentService } from 'app/services/ui/advanced-component.ser
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { Observable } from 'rxjs';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
+import { config } from '../../../environments/config';
+import { FilterPanelComponent } from '../common/filterpanel/filterpanel.component';
+import { take } from 'rxjs/operators';
 
 const DEFAULT_RESULTS_PER_PAGE = 10;
 const SEARCH_FIELDS = [{
@@ -41,18 +44,20 @@ const OGC_SERVICES = ['WMS', 'IRIS', 'WFS', 'WCS', 'WWW'];
 })
 export class SearchPanelComponent implements OnInit {
 
-  searchMessage = '';
-  alertMessage = '';
+  searchMessage = ''; // Message that can appear in panel next to minimised search panel button (currently just for drawing)
+  alertMessage = '';  // Alert messages
 
-  showingSearchPanel = true;
-  showingAdvancedOptions = false;
-  queryText = '';
-  searching = false;
-  searchResults: SearchResult[] = null;
+  showingSearchPanel = true;          // True when search panel is not minimised
+  showingAdvancedOptions = false;     // True when advanced options are being displayed
+  queryText = '';                     // User entered query text
+  searching = false;                  // True if search in progress
+  searchResults: SearchResult[] = []; // Search results
+  showingAllLayers = false;            // True if all layers being shown (no search)
 
   @ViewChild('queryinput') textQueryInput: ElementRef;
 
   @ViewChild(NgbAccordion) private searchAccordion: NgbAccordion;
+  @ViewChildren(FilterPanelComponent) filterComponents: QueryList<FilterPanelComponent>;
 
   // Options
   allSearchField: SearchField = new SearchField('All', '', true);
@@ -66,7 +71,6 @@ export class SearchPanelComponent implements OnInit {
 
   // Pagination
   resultsPerPage: number = DEFAULT_RESULTS_PER_PAGE;
-  pageList: number[] = [1];
   currentPage = 1;
 
   // Limit bounds
@@ -82,6 +86,10 @@ export class SearchPanelComponent implements OnInit {
       const field: SearchField = new SearchField(service, service, true);
       this.ogcServices.push(field);
     }
+
+    // Populate search results with all layers by default
+    this.showAllLayers();
+
     /*
     this.searchService.getSearchKeywords().subscribe(keywords => {
       console.log('keywords: ' + JSON.stringify(keywords));
@@ -91,12 +99,31 @@ export class SearchPanelComponent implements OnInit {
 
   /**
    * Clear query text input field
-   *
-   * TODO: Clear results as well?
    */
   public clearQueryText() {
     this.queryText = '';
     this.textQueryInput.nativeElement.focus();
+  }
+
+  /**
+   * Show all layers in search results
+   */
+  private showAllLayers() {
+    this.searchResults = [];
+    const layers = [];
+    this.layerHandlerService.getLayerRecord().pipe(take(1)).subscribe(records => {
+      for (const layerGroup in records) {
+        if (layerGroup) {
+          for (const layer of records[layerGroup]) {
+            layers.push(new SearchResult(layer));
+          }
+        }
+      }
+      // Sort alphabetically
+      layers.sort((a, b) => a.layer.name.localeCompare(b.layer.name));
+      this.searchResults = layers;
+      this.showingAllLayers = true;
+    });
   }
 
   /**
@@ -177,29 +204,14 @@ export class SearchPanelComponent implements OnInit {
   }
 
   /**
-   * Subset of search results matching current pagination values
-   * @returns sliced array of results for current page
+   * Subset of search results for current page
+   *
+   * @returns sliced array of results corresponding to current page
    */
   public paginatedSearchResults(): SearchResult[] {
     const startPos = (this.currentPage - 1) * this.resultsPerPage;
     const endPos = startPos + this.resultsPerPage;
     return this.searchResults.slice(startPos, endPos);
-  }
-
-  /**
-   * Advance results one page
-   */
-  public previousPage() {
-    this.currentPage--;
-    this.expandOpenSearchResultPanels();
-  }
-
-  /**
-   * Go back one page in results
-   */
-  public nextPage() {
-    this.currentPage++;
-    this.expandOpenSearchResultPanels();
   }
 
   /**
@@ -352,9 +364,7 @@ export class SearchPanelComponent implements OnInit {
           || vector.points[0].getPosition().x === vector.points[1].getPosition().x
           || vector.points[0].getPosition().y === vector.points[1].getPosition().y) {
           // drawing hasn't finished
-
           this.searchMessage = 'Click again to finish drawing bounds';
-
           return;
         }
         const points = vector.points;
@@ -390,6 +400,19 @@ export class SearchPanelComponent implements OnInit {
   }
 
   /**
+   * Search results title will either be "All Layers" or "Search Results (<number>)"
+   *
+   * @returns the search results title
+   */
+  private getSearchResultsTitle(): string {
+    if (this.showingAllLayers) {
+      return 'All Layers';
+    } else {
+      return 'Results (' + this.searchResults.length + ')';
+    }
+  }
+
+  /**
    * Check specific search conditions, such as only allowing no query text if a spatial search has been selected.
    * (Note we could make this a form and use validation to highlight areas that are invalid before submission)
    */
@@ -410,6 +433,15 @@ export class SearchPanelComponent implements OnInit {
     const searchResult: SearchResult = this.searchResults.find(r => r.layer.id === event.panelId);
     if (searchResult) {
       searchResult.expanded = event.nextState;
+      if (searchResult.expanded && config.queryGetCapabilitiesTimes.indexOf(event.panelId) > -1) {
+        // Timeout to give panel time to exist
+        setTimeout(() => {
+          const layerFilter: FilterPanelComponent = this.filterComponents.find(fc => fc.layer.id === event.panelId);
+          if (layerFilter) {
+            layerFilter.setLayerTimeExtent();
+          }
+        }, 100);
+      }
     }
   }
 
@@ -424,7 +456,6 @@ export class SearchPanelComponent implements OnInit {
 
     this.searching = true;
     this.searchResults = null;
-    this.pageList = [];   // List of page numbers for pagination
     this.currentPage = 1;
     this.alertMessage = '';
     this.searchMessage = '';
@@ -465,11 +496,8 @@ export class SearchPanelComponent implements OnInit {
         for (const l of layers) {
           this.searchResults.push(new SearchResult(l));
         }
-        // Create page list
-        for (let i = 1; i <= Math.ceil(this.searchResults.length / this.resultsPerPage); i++) {
-          this.pageList.push(i);
-        }
         this.searching = false;
+        this.showingAllLayers = false;
       });
     }, error => {
       this.alertMessage = error;

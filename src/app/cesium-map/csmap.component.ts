@@ -30,7 +30,7 @@ declare var Cesium: any;
           <div class="mouse-coordinates" *ngIf="mouseLongitude !== undefined && mouseLatitude !== undefined">
               Longitude:&nbsp;{{ mouseLongitude }},&nbsp;Latitude:&nbsp;{{ mouseLatitude }}
           </div>
-          <div class="advancedmapcomponent" style="position:absolute;z-index:1;">
+          <div class="advancedmapcomponent" style="position:absolute;right:0;z-index:1;">
               <ng-template #advancedmapcomponents></ng-template>
           </div>
       </ac-map>

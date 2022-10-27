@@ -1,16 +1,16 @@
-import {
-  CsClipboardService, CsMapService, CsWMSService, FilterPanelService, GetCapsService, LayerHandlerService,
-  LayerModel, LayerStatusService, ManageStateService, UtilitiesService
-} from '@auscope/portal-core-ui';
+import { CsClipboardService, CsMapService, CsWMSService, FilterPanelService, LayerHandlerService,
+         LayerModel, LayerStatusService, ManageStateService, UtilitiesService } from '@auscope/portal-core-ui';
 import * as $ from 'jquery';
 import { Component, Input, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import * as _ from 'lodash';
 import { environment } from '../../../../environments/environment';
+import { config } from '../../../../environments/config';
 import { ref } from '../../../../environments/ref';
 import { LayerAnalyticModalComponent } from '../../../modalwindow/layeranalytic/layer.analytic.modal.component';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { GraceService } from 'app/services/wcustom/grace/grace.service';
 import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
+import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
 
 declare var gtag: Function;
 
@@ -29,9 +29,8 @@ export class FilterPanelComponent implements OnInit {
   public advancedFilterMap;
   public showAdvancedFilter = true;
   public bApplyClipboardBBox = true;
-  public timeExtent: Date[] = [];             // WMS time extent (optional)
-  public currentTime: Date;                   // Current selected WMS time (from timeExtent)
-  public loadingTimeExtent = false;  // Flag for WMS times loading
+  public layerTimes: LayerTimes;
+  public layerFilterCollection: any;
 
   // Layer toolbar
   @ViewChild('advancedFilterComponents', { static: true, read: ViewContainerRef }) advancedFilterComponents: ViewContainerRef;
@@ -39,6 +38,7 @@ export class FilterPanelComponent implements OnInit {
 
   constructor(private csMapService: CsMapService,
     private layerHandlerService: LayerHandlerService,
+    private filterService: FilterService,
     private filterPanelService: FilterPanelService,
     private modalService: BsModalService,
     private manageStateService: ManageStateService,
@@ -46,7 +46,6 @@ export class FilterPanelComponent implements OnInit {
     private csWMSService: CsWMSService,
     public layerStatus: LayerStatusService,
     private advancedComponentService: AdvancedComponentService,
-    private getCapsService: GetCapsService,
     private graceService: GraceService) {
     this.providers = [];
     this.optionalFilters = [];
@@ -55,15 +54,36 @@ export class FilterPanelComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Register filters with service
+    if (this.layer.filterCollection) {
+      this.filterService.registerLayerFilterCollection(this.layer.id, this.layer.filterCollection).subscribe(filterCollection => {
+        this.layerFilterCollection = filterCollection;
+        this.optionalFilters = this.layerFilterCollection.optionalFilters.filter(f => f.added === true);
+        if (this.optionalFilters.length === 0) {
+          this.selectedFilter = {};
+        }
+      });
+    }
+
+    // XXX Sidebar only..?
     if (this.layer.filterCollection && this.layer.filterCollection['mandatoryFilters']) {
       const mandatoryFilters = this.layer.filterCollection['mandatoryFilters'];
-
       for (const mandatoryFilter of mandatoryFilters) {
         if (mandatoryFilter['type'] === 'MANDATORY.CHECKBOX') {
           mandatoryFilter['value'] = mandatoryFilter['value'] === 'true';
         }
       }
     }
+
+    // Set layer providers
+    this.filterService.registerLayerProviders(this.layer).subscribe(layerProviders => {
+      this.providers = layerProviders;
+    });
+
+    // Layer times
+    this.filterService.getLayerTimes(this.layer.id).subscribe(times => {
+      this.layerTimes = times;
+    });
 
     // Add any layer specific advanced filter components
     this.advancedComponentService.addAdvancedFilterComponents(this.layer, this.advancedFilterComponents);
@@ -74,18 +94,9 @@ export class FilterPanelComponent implements OnInit {
       const me = this;
       this.manageStateService.fetchStateFromDB(state).subscribe((layerStateObj: any) => {
         if (layerStateObj) {
-          if (UtilitiesService.isEmpty(me.providers)) {
-            me.getProvider();
-          }
-          // Time (if present)
-          if (layerStateObj[me.layer.id] && layerStateObj[me.layer.id].time) {
-            this.currentTime = layerStateObj[me.layer.id].time;
-          }
           // Advanced filter
           if (layerStateObj[me.layer.id] && layerStateObj[me.layer.id].advancedFilter) {
-            if (layerStateObj[me.layer.id].advancedFilter !== {}) {
-              this.advancedComponentService.getAdvancedFilterComponentForLayer(me.layer.id).setAdvancedParams(layerStateObj[me.layer.id].advancedFilter);
-            }
+            this.advancedComponentService.getAdvancedFilterComponentForLayer(me.layer.id).setAdvancedParams(layerStateObj[me.layer.id].advancedFilter);
           }
           if (layerStateObj.hasOwnProperty(me.layer.id)) {
             me.optionalFilters = me.optionalFilters.concat(layerStateObj[me.layer.id].optionalFilters);
@@ -102,9 +113,6 @@ export class FilterPanelComponent implements OnInit {
     if (nvclanid) {
       const me = this;
       if (me.layer.id === 'nvcl-v2-borehole') {
-        if (UtilitiesService.isEmpty(me.providers)) {
-          me.getProvider();
-        }
         me.layer.filterCollection['mandatoryFilters'][0].value = nvclanid;
         setTimeout(() => {
           me.addLayer(me.layer);
@@ -122,7 +130,7 @@ export class FilterPanelComponent implements OnInit {
    */
   private filterHasValue(filter: Object): boolean {
     let hasValue = false;
-    if (filter['type'] === "OPTIONAL.PROVIDER") {
+    if (filter['type'] === 'OPTIONAL.PROVIDER') {
       for (const provider in filter['value']) {
         if (filter['value'][provider] === true) {
           hasValue = true;
@@ -149,8 +157,8 @@ export class FilterPanelComponent implements OnInit {
    * containing a supported OnlineResource type.
    */
   public getUnsupportedLayerMessage(): string {
-    return "This layer cannot be displayed. For Featured Layers, please wait for the layer cache to rebuild itself. " + 
-      "For Custom Layers please note that only the following online resource types can be added to the map: " +
+    return 'This layer cannot be displayed. For Featured Layers, please wait for the layer cache to rebuild itself. ' +
+      'For Custom Layers please note that only the following online resource types can be added to the map: ' +
       this.csMapService.getSupportedOnlineResourceTypes();
   }
 
@@ -187,10 +195,11 @@ export class FilterPanelComponent implements OnInit {
 
     // TODO: Store time period with state
     // WMS layers may have a time set
-    if (this.currentTime) {
-      param['time'] = this.currentTime;
+    if (this.layerTimes.currentTime) {
+      param['time'] = this.layerTimes.currentTime;
     }
 
+    // TODO: Make more generic, perhaps have an SLD parameter that refers to a class or interface
     if (layer.id === 'grace-mascons') {
       param['sld_body'] = this.graceService.getGraceSld();
     }
@@ -214,8 +223,8 @@ export class FilterPanelComponent implements OnInit {
     // Add a new layer in the layer state service
     this.manageStateService.addLayer(
       layer.id,
-      this.currentTime,
-      layer.filterCollection,
+      this.layerTimes.currentTime,
+      this.layerFilterCollection,
       this.optionalFilters,
       advancedFilterParams
     );
@@ -254,7 +263,6 @@ export class FilterPanelComponent implements OnInit {
       }
       layer.wfsUrls.push(onlineResource.url);
     }
-    const me = this;
     try {
       this.csWMSService.getNvclFilter(layer, param).subscribe(response => {
         if (response.indexOf('<ogc:Intersects>') >= 0) {
@@ -271,7 +279,6 @@ export class FilterPanelComponent implements OnInit {
 
   /**
    * Draw a polygon layer to map
-   *
    */
   public onApplyClipboardBBox(): void {
     this.csClipboardService.polygonsBS.subscribe(polygon => {
@@ -305,6 +312,13 @@ export class FilterPanelComponent implements OnInit {
     this.advancedParam = $event;
   }
 
+  private updateFilter(filter: any, filterAdded: boolean) {
+    filter.added = filterAdded;
+    const i = this.layerFilterCollection.optionalFilters.indexOf(this.layerFilterCollection.optionalFilters.find(f => f.label === filter.label));
+    this.layerFilterCollection.optionalFilters[i] = filter;
+    this.filterService.updateLayerFilterCollection(this.layer.id, this.layerFilterCollection);
+  }
+
   /**
    * Adds a new filter to be displayed in the panel
    * @method addFilter
@@ -321,11 +335,8 @@ export class FilterPanelComponent implements OnInit {
         return;
       }
     }
-    // Initialise provider filter 
+    // Initialise provider filter
     if (filter.type === 'OPTIONAL.PROVIDER') {
-      if (UtilitiesService.isEmpty(this.providers)) {
-        this.getProvider();
-      }
       filter.value = {};
       for (const provider of this.providers) {
         filter.value[provider['value']] = false;
@@ -340,7 +351,7 @@ export class FilterPanelComponent implements OnInit {
         .getFilterRemoteParam(filter.url)
         .subscribe(response => {
           filter.options = response;
-          this.optionalFilters.push(filter);
+          this.updateFilter(filter, true);
         });
       return;
     }
@@ -350,43 +361,11 @@ export class FilterPanelComponent implements OnInit {
     }
     // Initialise multiselect boolean filter's radio button
     if (filter.type === 'OPTIONAL.DROPDOWNSELECTLIST' && filter.multiSelect) {
-      filter.boolOp = "OR";
+      filter.boolOp = 'OR';
     }
 
     // Add filter to panel
-    this.optionalFilters.push(filter);
-  }
-
-  /**
-   * Assembles a list of providers, which will be displayed in the panel
-   * @method getProvider
-   */
-  private getProvider(): void {
-    const cswRecords = this.layer.cswRecords;
-
-    // Set up a map of admin areas + URLs that belong to each
-    const adminAreasMap = {};
-    for (let i = 0; i < cswRecords.length; i++) {
-      const adminArea = cswRecords[i].adminArea;
-      if (adminArea !== null) {
-        const allOnlineResources = this.layerHandlerService.getOnlineResourcesFromCSW(
-          cswRecords[i]
-        );
-        if (allOnlineResources.length > 0) {
-          adminAreasMap[adminArea] = UtilitiesService.getUrlDomain(
-            allOnlineResources[0].url
-          );
-        }
-      }
-    }
-
-    // Set up a list of each unique admin area
-    for (const key in adminAreasMap) {
-      this.providers.push({
-        label: key,
-        value: adminAreasMap[key]
-      });
-    }
+    this.updateFilter(filter, true);
   }
 
   /**
@@ -401,11 +380,11 @@ export class FilterPanelComponent implements OnInit {
           filter['type'] === 'OPTIONAL.DROPDOWNREMOTE') {
         filter['value'] = null;
         if (filter['multiSelect']) {
-          filter['boolOp'] = "OR";
+          filter['boolOp'] = 'OR';
         }
       }
+      this.updateFilter(filter, false);
     }
-    this.optionalFilters = [];
     this.selectedFilter = {};
   }
 
@@ -421,103 +400,11 @@ export class FilterPanelComponent implements OnInit {
   }
 
   /**
-   * Send a request to get the capability record and set layer's capability records
+   * Set layer time extent
    */
-  private getCapabilityRecord() {
-    let wmsEndpointUrl = null;
-    let layerName = null;
-    // Check if WMS capability record present
-    if (this.layer.capabilityRecords && this.layer.capabilityRecords.length > 0) {
-      return;
-    }
-    // Look for WMS endpoint in CSW records if not already found
-    if (this.layer.cswRecords && this.layer.cswRecords.length > 0) {
-      for (const cswRecord of this.layer.cswRecords) {
-        if (cswRecord.onlineResources) {
-          const resource = cswRecord.onlineResources.find(o => o.type.toLowerCase() === 'wms');
-          if (resource) {
-            wmsEndpointUrl = resource.url;
-            layerName = resource.name;
-            continue;
-          }
-        }
-      }
-    }
-
-    // Query WMS GetCapabilities for timeExtent
-    if (wmsEndpointUrl !== null && layerName !== null) {
-      if (wmsEndpointUrl.indexOf('?') !== -1) {
-        wmsEndpointUrl = wmsEndpointUrl.substring(0, wmsEndpointUrl.indexOf('?'));
-      }
-      this.getCapsService.getCaps(wmsEndpointUrl).subscribe(response => {
-        if (response.data && response.data.capabilityRecords.length === 1) {
-          this.layer.capabilityRecords = response.data.capabilityRecords;
-        }
-      });
-    }
-  }
-
-  /**
-   * Set time extent for a layer, first looking at the layer's capability records
-   * and then the CSW records.
-   */
-  public setLayerTimeExtent() {
-    this.timeExtent = [];
-    let wmsEndpointUrl = null;
-    let layerName = null;
-
-    // Check if WMS capability record present
-    if (!(this.layer.capabilityRecords && this.layer.capabilityRecords.length > 0)) {
-      this.getCapabilityRecord();
-    }
-
-    // Check if WMS capability record present and time extent set
-    if (this.layer.capabilityRecords && this.layer.capabilityRecords.length > 0) {
-      const layerCapRec = this.layer.capabilityRecords.find(c => c.serviceType.toLowerCase() === 'wms');
-      if (layerCapRec && layerCapRec.layers.length > 0) {
-        if (layerCapRec.layers[0].timeExtent) {
-          this.timeExtent = layerCapRec.layers[0].timeExtent;
-          this.currentTime = this.timeExtent[0];
-        }
-      }
-    }
-    // Look for WMS endpoint in CSW records if not already found
-    if (!this.currentTime && this.layer.cswRecords && this.layer.cswRecords.length > 0) {
-      for (const cswRecord of this.layer.cswRecords) {
-        if (cswRecord.onlineResources) {
-          const resource = cswRecord.onlineResources.find(o => o.type.toLowerCase() === 'wms');
-          if (resource) {
-            wmsEndpointUrl = resource.url;
-            layerName = resource.name;
-            continue;
-          }
-        }
-      }
-    }
-    // Query WMS GetCapabilities for timeExtent
-    if (this.timeExtent.length === 0 && wmsEndpointUrl !== null && layerName !== null) {
-      this.loadingTimeExtent = true;
-      if (wmsEndpointUrl.indexOf('?') !== -1) {
-        wmsEndpointUrl = wmsEndpointUrl.substring(0, wmsEndpointUrl.indexOf('?'));
-      }
-      this.getCapsService.getCaps(wmsEndpointUrl).subscribe(response => {
-        if (response.data && response.data.capabilityRecords.length === 1 && response.data.capabilityRecords[0].layers.length > 0) {
-          const responseLayers = response.data.capabilityRecords[0].layers.filter(l => l.name === layerName);
-          if (responseLayers && responseLayers.length > 0 && responseLayers[0].timeExtent) {
-            // Sort by date (newest first)
-            this.timeExtent = responseLayers[0].timeExtent.sort((a, b) => {
-              return <any>new Date(b) - <any>new Date(a);
-            });
-            // Time may have already been set from retrieving state
-            if (!this.currentTime) {
-              this.currentTime = this.timeExtent[0];
-            }
-          }
-        }
-        this.loadingTimeExtent = false;
-      }, () => {
-        this.loadingTimeExtent = false;
-      });
+  setLayerTimeExtent() {
+    if (this.layerTimes.timeExtent.length === 0 && config.queryGetCapabilitiesTimes.indexOf(this.layer.id) > -1) {
+      this.filterService.updateLayerTimes(this.layer, this.layerTimes);
     }
   }
 
@@ -527,7 +414,8 @@ export class FilterPanelComponent implements OnInit {
    * @param newDate new date chosen from time extent
    */
   public changeCurrentTime(newDate: Date) {
-    this.currentTime = newDate;
+    this.layerTimes.currentTime = newDate;
+    this.filterService.setLayerTimes(this.layer.id, this.layerTimes);
     // Re-add layer to map
     const layerModelList = this.csMapService.getLayerModelList();
     if (layerModelList.hasOwnProperty(this.layer.id)) {
