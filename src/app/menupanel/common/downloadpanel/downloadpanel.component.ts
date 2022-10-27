@@ -539,20 +539,6 @@ export class DownloadPanelComponent implements OnInit {
 
   }
 
-  public async getTsgFileUrls(): Promise<string> {
-    let observableResponse = null;
-    // Download WFS features as CSV files
-    if (this.polygonFilter) {
-      observableResponse = await this.downloadWfsService.downloadTsgFileUrls(this.layer, null, this.tsgDownloadEmail, this.polygonFilter).toPromise();
-    } else {
-      observableResponse = await this.downloadWfsService.downloadTsgFileUrls(this.layer, this.bbox, this.tsgDownloadEmail, null).toPromise();
-    }
-    if(observableResponse) {
-      return observableResponse;
-    } else {
-      return null;
-    }
-  }
    /**
    * Download the TSG files filtering with a bbox or polyon filter
    */
@@ -560,9 +546,9 @@ export class DownloadPanelComponent implements OnInit {
     let observableResponse = null;
     // Download WFS features as CSV files
     if (this.polygonFilter) {
-      observableResponse = this.downloadWfsService.downloadTsgFileUrls(this.layer, null, this.tsgDownloadEmail, this.polygonFilter);
+      observableResponse = this.downloadWfsService.downloadTsgFileUrls(this.layer, null, this.tsgDownloadEmail, this.polygonFilter).pipe(shareReplay(1));
     } else {
-      observableResponse = this.downloadWfsService.downloadTsgFileUrls(this.layer, this.bbox, this.tsgDownloadEmail, null);
+      observableResponse = this.downloadWfsService.downloadTsgFileUrls(this.layer, this.bbox, this.tsgDownloadEmail, null).pipe(shareReplay(1));
     }
 
     // Kick off the download process and save zip file in browser
