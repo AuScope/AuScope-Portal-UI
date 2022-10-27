@@ -129,7 +129,7 @@
         <div *ngIf="searchResults.length > 0">
             <div class="search-results-title">
                 <label><strong>{{ getSearchResultsTitle() }}</strong></label>
-                <button *ngIf="!showingAllLayers" title="Show all layers" class="btn btn-sm clear-search-results-button" type="button" (click)="showAllLayers()"><i class="fa fa-ban"></i></button>
+                <button *ngIf="!showingAllLayers" title="Show all layers" class="btn btn-sm btn-outline-danger clear-search-results-button" type="button" (click)="showAllLayers()"><i class="fa fa-ban"></i>&nbsp;Clear Search</button>
             </div>
             <div class="results-list">
                 <ngb-accordion #acc="ngbAccordion" (panelChange)="toggleSearchResultExpanded($event)">

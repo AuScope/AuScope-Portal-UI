@@ -405,11 +405,14 @@ export class SearchPanelComponent implements OnInit {
    * @returns the search results title
    */
   private getSearchResultsTitle(): string {
+    let title = '';
     if (this.showingAllLayers) {
-      return 'All Layers';
+      title = 'All Layers ';
     } else {
-      return 'Results (' + this.searchResults.length + ')';
+      title = 'Results ';
     }
+    title += '(' + this.searchResults.length + ')';
+    return title;
   }
 
   /**
