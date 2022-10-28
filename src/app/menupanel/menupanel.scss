@@ -214,7 +214,7 @@ p a {
 /* Position checkboxes and labels e.g. providers, hylogged boreholes */
 input[type=checkbox] {
 	position: relative;
-	top: 10px;
+	top: -4px;
 }
 
 input[type=checkbox] + label {

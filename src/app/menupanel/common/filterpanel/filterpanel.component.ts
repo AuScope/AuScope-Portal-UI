@@ -83,9 +83,7 @@ export class FilterPanelComponent implements OnInit {
           }
           // Advanced filter
           if (layerStateObj[me.layer.id] && layerStateObj[me.layer.id].advancedFilter) {
-            if (layerStateObj[me.layer.id].advancedFilter !== {}) {
               this.advancedComponentService.getAdvancedFilterComponentForLayer(me.layer.id).setAdvancedParams(layerStateObj[me.layer.id].advancedFilter);
-            }
           }
           if (layerStateObj.hasOwnProperty(me.layer.id)) {
             me.optionalFilters = me.optionalFilters.concat(layerStateObj[me.layer.id].optionalFilters);
@@ -365,15 +363,15 @@ export class FilterPanelComponent implements OnInit {
     const cswRecords = this.layer.cswRecords;
 
     // Set up a map of admin areas + URLs that belong to each
-    const adminAreasMap = {};
+    const providerMap = {};
     for (let i = 0; i < cswRecords.length; i++) {
-      const adminArea = cswRecords[i].adminArea;
-      if (adminArea !== null) {
+      const contactOrg = cswRecords[i].contactOrg;
+      if (contactOrg !== null) {
         const allOnlineResources = this.layerHandlerService.getOnlineResourcesFromCSW(
           cswRecords[i]
         );
         if (allOnlineResources.length > 0) {
-          adminAreasMap[adminArea] = UtilitiesService.getUrlDomain(
+          providerMap[contactOrg] = UtilitiesService.getUrlDomain(
             allOnlineResources[0].url
           );
         }
@@ -381,10 +379,10 @@ export class FilterPanelComponent implements OnInit {
     }
 
     // Set up a list of each unique admin area
-    for (const key in adminAreasMap) {
+    for (const key in providerMap) {
       this.providers.push({
         label: key,
-        value: adminAreasMap[key]
+        value: providerMap[key]
       });
     }
   }

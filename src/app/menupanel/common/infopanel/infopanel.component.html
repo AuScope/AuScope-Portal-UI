@@ -28,7 +28,7 @@
                         <div class="card-header">
                                 <h4 class="card-title">
                                     <a class="accordion-link" data-toggle="collapse" href="#info-link{{i}}" (click)="cswRecord.expanded = !cswRecord.expanded" >
-                                    <i *ngIf='layerStatus.showInfoWarning(layer.id, cswRecord)' class="fa fa-warning text-warning"> </i>{{cswRecord.adminArea !='' && cswRecord.adminArea!=null ? cswRecord.adminArea : 'More Information'}}
+                                    <i *ngIf='layerStatus.showInfoWarning(layer.id, cswRecord)' class="fa fa-warning text-warning"> </i>{{cswRecord.contactOrg !='' && cswRecord.contactOrg != null ? cswRecord.contactOrg : 'More Information'}}
                                 </a>
                                 </h4>
                         </div>

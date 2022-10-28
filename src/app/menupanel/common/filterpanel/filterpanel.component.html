@@ -92,11 +92,15 @@
 	            </div>
 	            <div *ngIf="optionalFilter.type=='OPTIONAL.PROVIDER'">
 	                <div class="form-group">
-						<div *ngFor="let provider of providers;let idx = index">
-							<input class="form-control-sm" id="{{ 'filter-OPTIONAL.PROVIDER-' + idx + '-' + layer.id }}" type="checkbox" [(ngModel)]="optionalFilter.value[provider.value]"/>
-							<label for="{{ 'filter-OPTIONAL.PROVIDER-' + idx + '-' + layer.id }}">
-								{{provider.label}}
-							</label>
+						<div style="display: flex" *ngFor="let provider of providers;let idx = index">
+							<div style="width: 10%;">
+							    <input class="form-control-sm" id="{{ 'filter-OPTIONAL.PROVIDER-' + idx + '-' + layer.id }}" type="checkbox" [(ngModel)]="optionalFilter.value[provider.value]"/>
+						    </div>
+							<div style="width: 90%;">
+								<label for="{{ 'filter-OPTIONAL.PROVIDER-' + idx + '-' + layer.id }}">
+									{{provider.label}}
+								</label>
+							</div>
 						</div>
 					</div>
 				</div>
