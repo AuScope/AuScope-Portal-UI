@@ -44,7 +44,7 @@ export class DownloadPanelComponent implements OnInit {
   tsgDownloadServiceMsg: string;
   tsgDownloadEmail: string;
   downloadSizeLimit: number; // Limits the WCS download size
-
+  showDOIs: boolean;
   wcsDownloadListOption: any;
   wcsDownloadForm: any;
 
@@ -77,9 +77,13 @@ export class DownloadPanelComponent implements OnInit {
     this.downloadStarted = false;
     this.download4tStarted = false;
     this.wcsDownloadForm = {};
+    this.showDOIs = false;
   }
 
   ngOnInit(): void {
+    if (this.layer.group == "Passive Seismic") {
+      this.showDOIs = true;
+    }
     if (this.layer) {
       if (this.nvclService.isNVCL(this.layer.id)) {
         this.isNvclLayer = true;
