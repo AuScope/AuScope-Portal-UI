@@ -16,6 +16,8 @@ import { NVCLTSGDownloadComponent } from 'app/modalwindow/layeranalytic/nvcl/nvc
 import { isNumber } from '@turf/helpers';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NVCLService } from '../../../modalwindow/querier/customanalytic/nvcl/nvcl.service';
+import { TSGDownloadService } from 'app/modalwindow/layeranalytic/nvcl/tsgdownload.service';
+import { shareReplay } from 'rxjs/operators';
 
 declare var gtag: Function;
 
@@ -27,13 +29,13 @@ declare var gtag: Function;
 
 
 export class DownloadPanelComponent implements OnInit {
+  [x: string]: any;
   @Input() layer: LayerModel;
   bbox: Bbox;
   polygonFilter: any;
   drawStarted: boolean;
   downloadStarted: boolean;
   download4pStarted: boolean;
-  download4tStarted: boolean;
   download4PolygonKMLStarted: boolean;
   isPolygonSupportedLayer: boolean;
   isCsvSupportedLayer: boolean;  // Supports CSV downloads of WFS Features
@@ -65,9 +67,9 @@ export class DownloadPanelComponent implements OnInit {
 
   // the rectangle drawn on the map
   private rectangleObservable: RectangleEditorObservable;
+  private bsModalRef = null;
 
-
-  constructor(private cdRef: ChangeDetectorRef, private layerHandlerService: LayerHandlerService, private csMapService: CsMapService,
+  constructor(private tsgDownloadService: TSGDownloadService, private cdRef: ChangeDetectorRef, private layerHandlerService: LayerHandlerService, private csMapService: CsMapService,
     private downloadWfsService: DownloadWfsService, private downloadWcsService: DownloadWcsService, private downloadIrisService: DownloadIrisService,
     private csClipboardService: CsClipboardService, private csIrisService: CsIrisService, public activeModalService: NgbModal, private nvclService: NVCLService) {
     this.isNvclLayer = false;
@@ -75,7 +77,6 @@ export class DownloadPanelComponent implements OnInit {
     this.bbox = null;
     this.drawStarted = false;
     this.downloadStarted = false;
-    this.download4tStarted = false;
     this.wcsDownloadForm = {};
     this.showDOIs = false;
   }
@@ -126,7 +127,6 @@ export class DownloadPanelComponent implements OnInit {
           if (polygonBBox && polygonBBox.coordinates) {
             this.clearBound();
             this.polygonFilter = '<ogc:Filter  xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:gml=\"http://www.opengis.net/gml\"><ogc:Intersects><ogc:PropertyName>gsmlp:shape</ogc:PropertyName>' + polygonBBox.coordinates + '</ogc:Intersects></ogc:Filter>';
-            console.log(this.polygonFilter);
           } else {
             this.polygonFilter = null;
           }
@@ -464,7 +464,6 @@ export class DownloadPanelComponent implements OnInit {
     let value = "";
     //csv data process
     let csvArray = csv.split(/\r?\n/g);    
-    console.log(csvArray);    
     let csvHeader = csvArray[0].split(",");
     let indexGsmlpShape = csvHeader.indexOf("gsmlp:shape");
     let indexGmlId = csvHeader.indexOf("gml:id");
@@ -534,36 +533,58 @@ export class DownloadPanelComponent implements OnInit {
       alert('Please draw a boundary or polygon first, otherwise the TSG datasets will be too big to download.');
       return;
     }
-    const bsModalRef = this.activeModalService.open(NVCLTSGDownloadComponent, {
+
+    this.bsModalRef = this.activeModalService.open(NVCLTSGDownloadComponent, {
       size: 'lg',
       backdrop: false
       });
-    bsModalRef.componentInstance.layer = this.layer;
-    bsModalRef.componentInstance.tsgDownloadServiceMsg = this.tsgDownloadServiceMsg;
+    this.bsModalRef.componentInstance.layer = this.layer;
+    this.bsModalRef.componentInstance.tsgDownloadServiceMsg = this.tsgDownloadServiceMsg;
+
   }
+
    /**
    * Download the TSG files filtering with a bbox or polyon filter
    */
   public Download4TsgFiles() {
-    if (this.download4tStarted) {
-      alert('Download in progress, kindly wait for it to completed');
-      return;
-    }
     let observableResponse = null;
-    this.download4tStarted = true;
     // Download WFS features as CSV files
     if (this.polygonFilter) {
-      observableResponse = this.downloadWfsService.downloadTsgFileUrls(this.layer, null, this.tsgDownloadEmail, this.polygonFilter);
+      observableResponse = this.downloadWfsService.downloadTsgFileUrls(this.layer, null, this.tsgDownloadEmail, this.polygonFilter).pipe(shareReplay(1));
     } else {
-      observableResponse = this.downloadWfsService.downloadTsgFileUrls(this.layer, this.bbox, this.tsgDownloadEmail, null);
+      observableResponse = this.downloadWfsService.downloadTsgFileUrls(this.layer, this.bbox, this.tsgDownloadEmail, null).pipe(shareReplay(1));
     }
 
     // Kick off the download process and save zip file in browser
-    observableResponse.subscribe(value => {
-      this._DownloadTsgFiles(value);
-      this.download4tStarted = false;
+    observableResponse.subscribe(urls => {
+      let total = 0;
+      let urlsArray = [];
+      if (urls) {
+        urlsArray = urls.split(/\r?\n/g).filter(function(url) {
+          return url.match(/^http/g);
+        });    
+        total = urlsArray.length;
+      }
+      if (!urls || total<1) {
+        alert('TSGFilesDownload: No TSGFiles was found in the area. Please draw another boundary or polygon to search.');
+        this.downloadWfsService.tsgDownloadBS.next('completed,completed');        
+        return;
+      }
+      this.bsModalRef.componentInstance.urlsArray = urlsArray;
+      this.bsModalRef.componentInstance.BulkDownloadTsgFiles();
+      /**
+       * do not "log" the "email" to "Google Analytics" - as this is an ethics issue
+       * 
+       * console.log("environment.googleAnalyticsKey: "+environment.googleAnalyticsKey);
+       */
+        if (environment.googleAnalyticsKey && typeof gtag === "function") {
+        gtag('event', 'TSGDownload', {
+          event_category: 'TSGBulkDownload',
+          event_action: '['+total+' of '+urlsArray.length+']'+urls
+          //event_label: this.tsgDownloadEmail
+        });
+      }      
     }, err => {
-      this.download4tStarted = false;
       if (UtilitiesService.isEmpty(err.message)) {
         alert('An error has occurred whilst attempting to download. Kindly contact cg-admin@csiro.au');
       } else {
@@ -573,56 +594,7 @@ export class DownloadPanelComponent implements OnInit {
 
     return;
   }
-
-  /**
-   * Download the TSG files filtering with a bbox or polyon filter
-   * @param urls 
-   */
-  private async _DownloadTsgFiles ( urls: String) {
-    const urlArray = urls.split(/\r?\n/g).filter(function(url) {
-      return url.match(/^http/g);
-    });
-    
-    //console.log("downloadpanel.component.ts()._DownloadTsgFiles.urlArray:"+urlArray); //CVP
-    //const noMactched = (urls.match(/NoMatchedDatasetName/g) || []).length;
-    const total = urlArray.length;
-    let completed = 1;
-
-    for (var i = 0; i < urlArray.length; i++) {
-      let url = urlArray[i];
-      if (!url.startsWith('http')) {
-        continue;
-      }
-      let filename = url.substring(url.lastIndexOf('/')+1);
-      let oResponse = null; 
-      this.downloadWfsService.tsgDownloadBS.next(completed.toString() + ',' + total.toString());
-      oResponse = await this.downloadWfsService.downloadTsgFile(url).toPromise();
-      //oResponse = await this.downloadWfsService.downloadTsgFile('https://nvcldb.blob.core.windows.net/nvcldb/GBD011_chips.zip').toPromise();
-      if (oResponse) {
-        const blob = new Blob([oResponse], {type: 'application/zip'});
-        saveAs(blob, filename);
-
-
-      /**
-       * do not "log" the "email" to "Google Analytics" - as this is an ethics issue
-       * 
-       * console.log("environment.googleAnalyticsKey: "+environment.googleAnalyticsKey);
-       */
-      if (environment.googleAnalyticsKey && typeof gtag === "function") {
-        gtag('event', 'TSGDownload', {
-          event_category: 'TSGBulkDownload',
-          event_action: '['+completed+' of '+urlArray.length+']'+url
-          //event_label: this.tsgDownloadEmail
-        });
-      }
-      } else {
-          alert('An error has occurred whilst attempting to download. Kindly contact cg-admin@csiro.au');
-      }
-      this.downloadWfsService.tsgDownloadBS.next(completed.toString() + ',' + total.toString());
-      completed++;
-    }
-    this.downloadWfsService.tsgDownloadBS.next('completed,completed');
-  }
+  
    /**
    * Download the layer using a polyon to specify desired area
    */
