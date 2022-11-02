@@ -11,7 +11,11 @@ export class TSGDownloadService {
   constructor(private http: HttpClient, @Inject(SAVER) private save: Saver) {
 
   }
-
+ /**
+ * Download function to start the download and return the progress feedback.
+ * @param url the url for the source of download.
+ * @filename the filename to save to local
+ */
   download(url: string, filename?: string): Observable<Download> {
     return this.http.get(url, {
       reportProgress: true,

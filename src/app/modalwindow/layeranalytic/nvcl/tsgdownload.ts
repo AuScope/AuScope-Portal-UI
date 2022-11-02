@@ -19,13 +19,19 @@ import {
       event.type === HttpEventType.UploadProgress
     );
   }
-  
+  /**
+  * interface Download for message of the file downloading progress.
+  */
   export interface Download {
     content: Blob | null;
     progress: number;
     state: "PENDING" | "IN_PROGRESS" | "DONE";
   }
-  
+  /**
+   * tsgdownload function to pipe the download progress feedback.
+   * @param saver the saver.
+   * @return the progress messages.
+   */
   export function tsgdownload(saver?: (b: Blob) => void): (source: Observable<HttpEvent<Blob>>) => Observable<Download> {
     return (source: Observable<HttpEvent<Blob>>) =>
       source.pipe(

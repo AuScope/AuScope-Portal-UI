@@ -48,7 +48,11 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
     this.downloadMsg = "Download";
     this.isDownloading = false;  
   }
-
+  /**
+   * Start to sync TSGFiles download one by one.
+   * use downloadOneCompletBS message to sync the downloading progress one by one.
+   * use download1$ to show the downloading progress.
+   */
   public BulkDownloadTsgFiles() {
     const me = this;
     me.total = me.urlsArray.length;
@@ -91,6 +95,9 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
     );
 
   }
+  /**
+   * Automatically update the param total to reflex on the UI.
+   */
   ngAfterContentChecked(): void{
     if (this.urlsArray) {
       this.total = this.urlsArray.length;
