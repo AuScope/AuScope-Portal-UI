@@ -82,6 +82,11 @@
 		<button type="button" class="btn btn-info btn-xs" title="Download data" (click)="download()">
 			<i *ngIf="downloadStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!downloadStarted" class="fa fa-cloud-download"></i>&nbsp;Download
 		</button>
+		<p class="small text-danger ng-star-inserted" *ngIf="showDOIs">
+			If you use this dataset please cite:
+			Brian Kennett, & Herb McQueen. (2009). Mt Isa Northern Queensland - AuScope [Data set]. Australian Passive Seismic Server.
+			URL: <a class="text-danger" target="_blank" href="https://doi.org/10.7914/SN/ZR_2009">https://doi.org/10.7914/SN/ZR_2009</a>
+		</p>
 
 		<div [hidden]='!isPolygonSupportedLayer' class="form-group">
 			<p *ngIf="!polygonFilter" class="small text-danger">If you want to download from Polygon Filter, please draw or pick a polygon first from the PolygonFilter Panel. (Hint: look for <i class="fa fa-edit"></i> on map)</p>
@@ -95,7 +100,7 @@
 		<!-- NVCL TSG Download -->
 
 		<button *ngIf="isTsgDownloadAvailable" type="button" class="btn btn-info btn-xs float-left" (click)="PopupTSGDownload()">
-			<i *ngIf="download4tStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!download4tStarted" class="fa fa-cloud-download"></i> Download4TsgFiles
+			<i class="fa fa-cloud-download"></i> Download4TsgFiles
 		</button>
 	</div>
 
