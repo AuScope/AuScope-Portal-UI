@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, ViewChildren, QueryList } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ViewChildren, QueryList, Inject } from '@angular/core';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
 import { CsClipboardService, CsMapService, LayerHandlerService, LayerModel, ManageStateService,
          RenderStatusService, ResourceType, UtilitiesService } from '@auscope/portal-core-ui';
@@ -12,6 +12,7 @@ import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FilterPanelComponent } from '../common/filterpanel/filterpanel.component';
 import { config } from '../../../environments/config';
+import { DOCUMENT } from '@angular/common';
 
 
 // Filter modes available in the dropdown layer filter selector
@@ -36,8 +37,6 @@ export class LayerPanelComponent implements OnInit {
   layerGroups: {};  // TODO: This is a copy of what's in LayerHandlerService, we should just be using that
   bsModalRef: BsModalRef;
   @Output() expanded: EventEmitter<any> = new EventEmitter();
-  searchText: string;
-  searchMode: boolean;
   areLayersFiltered: boolean;
 
 
@@ -45,8 +44,8 @@ export class LayerPanelComponent implements OnInit {
       private renderStatusService: RenderStatusService, private activeModalService: NgbModal,
       private modalService: BsModalService, private csMapService: CsMapService,
       private manageStateService: ManageStateService, private CsClipboardService: CsClipboardService,
-      private uiLayerModelService: UILayerModelService, private advancedMapComponentService: AdvancedComponentService) {
-    this.searchMode = false;
+      private uiLayerModelService: UILayerModelService, private advancedMapComponentService: AdvancedComponentService,
+      @Inject(DOCUMENT) document: Document) {
     this.CsClipboardService.filterLayersBS.subscribe(filterLayers => {
       this.areLayersFiltered = filterLayers;
     });
@@ -83,95 +82,6 @@ export class LayerPanelComponent implements OnInit {
   }
 
   /**
-   * Filter layers based on polygon filter
-   */
-  public searchFilter() {
-    for (const group in this.layerGroups) {
-      this.layerGroups[group].hide = true;
-      for (const layer of this.layerGroups[group]) {
-        layer.hide = true;
-        this.layerGroups[group].loaded = undefined;
-        // Only layers with a polygon filter
-        if (this.layerHasPolygonFilter(layer)) {
-          layer.hide = false;
-          this.layerGroups[group].hide = false;
-          this.layerGroups[group].expanded = true;
-          this.layerGroups[group].loaded = this.layerGroups[group];
-        }
-      }
-    }
-  }
-
-  /**
-   * Search through the layers and filter out based on keyword
-   */
-  public search() {
-    if (this.searchText.trim() === '') {
-      this.searchMode = false;
-    } else {
-      this.searchMode = true;
-    }
-    for (const group in this.layerGroups) {
-      this.layerGroups[group].hide = true;
-      for (const layer of this.layerGroups[group]) {
-        layer.hide = true;
-        this.layerGroups[group].loaded = undefined;
-        if (this.areLayersFiltered && !this.layerHasPolygonFilter(layer)) {
-          continue;
-        }
-        if (group.toLowerCase().indexOf(this.searchText.toLowerCase()) >= 0
-            || layer.description.toLowerCase().indexOf(this.searchText.toLowerCase()) >= 0
-            || layer.name.toLowerCase().indexOf(this.searchText.toLowerCase()) >= 0) {
-          layer.hide = false;
-          this.layerGroups[group].hide = false;
-          this.layerGroups[group].loaded = this.layerGroups[group];
-        }
-      }
-    }
-  }
-
-  /**
-   * Search through the layers and filter layers by FilterMode
-   *
-   * @param mode FilterMode
-   */
-  public searchByFilterMode(mode: FilterMode) {
-    this.searchText = mode;
-    this.searchMode = true;
-
-    for (const group in this.layerGroups) {
-      this.layerGroups[group].hide = true;
-      for (const layer of this.layerGroups[group]) {
-        layer.hide = true;
-        layer.expanded = false;
-        this.layerGroups[group].loaded = undefined;
-        if (this.areLayersFiltered && !this.layerHasPolygonFilter(layer)) {
-          continue;
-        }
-        let cond = false;
-        switch (mode) {
-          case FilterMode.Active:
-            cond = this.getUILayerModel(layer.id).statusMap.getRenderStarted();
-            break;
-          case FilterMode.Image:
-            cond = this.layerHandlerService.contains(layer, ResourceType.WMS);
-            break;
-          case FilterMode.Data:
-            cond = this.layerHandlerService.contains(layer, ResourceType.WFS);
-            break;
-        }
-        if (cond) {
-          layer.hide = false;
-          this.layerGroups[group].hide = false;
-          this.layerGroups[group].expanded = true;
-          this.layerGroups[group].loaded = this.layerGroups[group];
-          layer.expanded = false;
-        }
-      }
-    }
-  }
-
-  /**
    * Returns true if any layer in a layer group is visible in the sidebar
    * "layerGroup" - an instance of this.layerGroups[key].value
    */
@@ -184,17 +94,6 @@ export class LayerPanelComponent implements OnInit {
           }
       }
       return false;
-  }
-
-  /**
-   * Clear the search result
-   */
-  public clearSearch() {
-    setTimeout(() => {
-      this.searchMode = false;
-      this.searchText = '';
-      this.search();
-    }, 0);
   }
 
   public ngOnInit() {
@@ -249,13 +148,24 @@ export class LayerPanelComponent implements OnInit {
           });
       });
 
-      this.CsClipboardService.filterLayersBS.subscribe(
-        (bFilterLayers) => {
-          if (bFilterLayers) {
-            this.searchFilter();
-          } else {
-            this.clearSearch();
+      // Groups/Layers can be expanded from the search panel
+      this.manageStateService.layerToExpand.subscribe(layerId => {
+        if (layerId !== null) {
+          for (const group in me.layerGroups) {
+            for (const layer in me.layerGroups[group]) {
+              if (me.layerGroups[group][layer].id === layerId) {
+                me.layerGroups[group].expanded = true;
+                me.layerGroups[group].loaded = me.layerGroups[group];
+                me.layerGroups[group][layer].expanded = true;
+                setTimeout(() => {
+                  const layerElement: HTMLElement = document.getElementById(me.layerGroups[group][layer].id + '-lp');
+                  layerElement.scrollIntoView();
+                });
+                return;
+              }
+            }
           }
+        }
       });
   }
 

@@ -22,4 +22,8 @@ export class SearchService {
                                                         southBoundLatitude, eastBoundLongitude, northBoundLatitude);
   }
 
+  public suggestTerm(query: string, num: number) {
+    return this.apiService.suggestTerms(query, num);
+  }
+
 }

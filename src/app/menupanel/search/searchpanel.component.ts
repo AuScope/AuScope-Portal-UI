@@ -1,15 +1,13 @@
-import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { RectangleEditorObservable } from '@auscope/angular-cesium';
 import { Bbox, CsMapService, LayerHandlerService, LayerModel, ManageStateService, UtilitiesService } from '@auscope/portal-core-ui';
-import { NgbAccordion, NgbDropdown, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdown, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SearchService } from 'app/services/search/search.service';
 import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
-import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
-import { config } from '../../../environments/config';
-import { FilterPanelComponent } from '../common/filterpanel/filterpanel.component';
 import { take } from 'rxjs/operators';
+import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 
 const DEFAULT_RESULTS_PER_PAGE = 10;
 const SEARCH_FIELDS = [{
@@ -28,14 +26,9 @@ const SEARCH_FIELDS = [{
     name: 'CSW Abstract',
     field: 'abstract',
     checked: true
-  }
-  // ID seems a bit useless, but maybe there's a scientist out there..?
-  /*, {
-    name: 'ID',
-    field: 'id',
-    checked: true
-  }*/];
+  }];
 const OGC_SERVICES = ['WMS', 'IRIS', 'WFS', 'WCS', 'WWW'];
+const NUMBER_OF_SUGGESTIONS = 5;
 
 @Component({
     selector: 'app-search-panel',
@@ -44,20 +37,16 @@ const OGC_SERVICES = ['WMS', 'IRIS', 'WFS', 'WCS', 'WWW'];
 })
 export class SearchPanelComponent implements OnInit {
 
-  searchMessage = ''; // Message that can appear in panel next to minimised search panel button (currently just for drawing)
-  alertMessage = '';  // Alert messages
+  @ViewChild('queryinput') textQueryInput: ElementRef;
+  @ViewChild('spatialOptionsDropdown') spatialOptionsDropdown: NgbDropdown;
 
-  showingSearchPanel = true;          // True when search panel is not minimised
+  alertMessage = '';                  // Alert messages
+  showingResultsPanel = false;        // True when results panel is being shown
   showingAdvancedOptions = false;     // True when advanced options are being displayed
   queryText = '';                     // User entered query text
   searching = false;                  // True if search in progress
   searchResults: SearchResult[] = []; // Search results
   showingAllLayers = false;            // True if all layers being shown (no search)
-
-  @ViewChild('queryinput') textQueryInput: ElementRef;
-
-  @ViewChild(NgbAccordion) private searchAccordion: NgbAccordion;
-  @ViewChildren(FilterPanelComponent) filterComponents: QueryList<FilterPanelComponent>;
 
   // Options
   allSearchField: SearchField = new SearchField('All', '', true);
@@ -67,34 +56,56 @@ export class SearchPanelComponent implements OnInit {
   restrictBounds = false; // Could probably just use bbox if set
   bbox: Bbox;
   boundsRelationship = 'Intersects';
-  @ViewChild('spatialOptionsDropdown') spatialOptionsDropdown: NgbDropdown;
 
   // Pagination
   resultsPerPage: number = DEFAULT_RESULTS_PER_PAGE;
   currentPage = 1;
 
+  // Need to keep track of internal clicks and close search results on external if info dialog not open
+  searchClick = false;
+  infoDialogOpen = false;
+
   // Limit bounds
   private boundsRectangleObservable: RectangleEditorObservable;
   private drawBoundsStarted = false;
 
+  // Term suggestions
+  @ViewChild('suggesterDropdown') suggesterDropdown: NgbDropdown;
+  suggesterSubscription: Subscription;
+  suggestedTerms: string[] = [];
+  highlightedSuggestionIndex = -1;
+
   constructor(private searchService: SearchService, private advancedComponentService: AdvancedComponentService,
               private csMapService: CsMapService, private layerHandlerService: LayerHandlerService,
-              private uiLayerModelService: UILayerModelService, private manageStateService: ManageStateService, private modalService: NgbModal) { }
+              private uiLayerModelService: UILayerModelService, private manageStateService: ManageStateService,
+              private modalService: NgbModal) { }
 
   ngOnInit() {
     for (const service of OGC_SERVICES) {
       const field: SearchField = new SearchField(service, service, true);
       this.ogcServices.push(field);
     }
-
     // Populate search results with all layers by default
     this.showAllLayers();
+  }
 
-    /*
-    this.searchService.getSearchKeywords().subscribe(keywords => {
-      console.log('keywords: ' + JSON.stringify(keywords));
-    });
-    */
+  /**
+   * Detect internal clicks so we can differntiate from external
+   */
+  @HostListener('click')
+  internalClick() {
+    this.searchClick = true;
+  }
+
+  /**
+   * Detect external component clicks so we can close components that need to be when this happens
+   */
+  @HostListener('document:click')
+  externalClick() {
+    if (!this.searchClick && this.showingResultsPanel && !this.infoDialogOpen) {
+      this.showingResultsPanel = false;
+    }
+    this.searchClick = false;
   }
 
   /**
@@ -109,6 +120,7 @@ export class SearchPanelComponent implements OnInit {
    * Show all layers in search results
    */
   private showAllLayers() {
+    this.queryText = '';
     this.searchResults = [];
     const layers = [];
     this.layerHandlerService.getLayerRecord().pipe(take(1)).subscribe(records => {
@@ -127,28 +139,10 @@ export class SearchPanelComponent implements OnInit {
   }
 
   /**
-   * When opening/closing the search panel or changing search result pages
-   * the open/close state of the search result accordion panels is lost.
-   * This re-opens any panels that should be open.
+   * Toggle the results panel
    */
-  expandOpenSearchResultPanels() {
-    if (this.showingSearchPanel && this.searchResults && this.searchResults.length > 0) {
-      setTimeout(() => {
-        for (const result of this.searchResults) {
-          if (result.expanded) {
-            this.searchAccordion.expand(result.layer.id);
-          }
-        }
-      });
-    }
-  }
-
-  /**
-   * Toggle the search panel
-   */
-  public toggleSearchPanel() {
-    this.showingSearchPanel = !this.showingSearchPanel;
-    this.expandOpenSearchResultPanels();
+   public toggleResultsPanel() {
+    this.showingResultsPanel = !this.showingResultsPanel;
   }
 
   /**
@@ -221,12 +215,19 @@ export class SearchPanelComponent implements OnInit {
    */
   public showLayerInformation(layer: LayerModel) {
     if (layer) {
-      const modelRef = this.modalService.open(InfoPanelComponent, {
+      const modalRef = this.modalService.open(InfoPanelComponent, {
         size: 'lg',
         backdrop: false
       });
-      modelRef.componentInstance.cswRecords = layer.cswRecords;
-      modelRef.componentInstance.layer = layer;
+      modalRef.componentInstance.cswRecords = layer.cswRecords;
+      modalRef.componentInstance.layer = layer;
+      this.infoDialogOpen = true;
+      modalRef.result.then(() => {
+        // Delay setting infoDialogOpen to false so external click handler has time to see it open
+        setTimeout(() => {
+          this.infoDialogOpen = false;
+        });
+      });
     }
   }
 
@@ -235,7 +236,7 @@ export class SearchPanelComponent implements OnInit {
    *
    * @param layer LayerModel of layer
    */
-  public layerWarningMessage(layer): string {
+  public layerWarningMessage(layer: LayerModel): string {
     return 'This layer cannot be displayed. For Featured Layers, please wait for the layer cache to rebuild itself. ' +
       'For Custom Layers please note that only the following online resource types can be added to the map: ' +
       this.csMapService.getSupportedOnlineResourceTypes();
@@ -244,7 +245,7 @@ export class SearchPanelComponent implements OnInit {
   /**
    * Add layer to map
    *
-   * @param layer LayerModel of layer
+   * @param layer LayerModel
    */
   public addLayer(layer: LayerModel) {
     // TODO: Do we need to apply clipboard like FilterPanel.addLayer(...) does?
@@ -252,7 +253,7 @@ export class SearchPanelComponent implements OnInit {
       optionalFilters: []
     };
 
-    // Add a new layer in the layer state service
+    // Add a new layer in the layer state service, no filters
     this.manageStateService.addLayer(
       layer.id,
       null,
@@ -271,6 +272,27 @@ export class SearchPanelComponent implements OnInit {
 
     // Add any advanced map components defined in refs.ts
     this.advancedComponentService.addAdvancedMapComponents(layer);
+
+    this.scrollToLayer(layer);
+  }
+
+  /**
+   * Scroll to the specified layer in sidebar (Featured Layers)
+   *
+   * @param layer the layer
+   */
+  public scrollToLayer(layer: LayerModel) {
+    this.manageStateService.setLayerToExpand(layer.id);
+  }
+
+  /**
+   * Check whether layer has been added to the map
+   *
+   * @param layerId ID of the layer
+   * @returns true if layer has been added to the map, false otherwise
+   */
+  isLayerAdded(layerId: string) {
+    return this.uiLayerModelService.getUILayerModel(layerId) && this.uiLayerModelService.getUILayerModel(layerId).statusMap.getRenderStarted();
   }
 
   /**
@@ -347,11 +369,9 @@ export class SearchPanelComponent implements OnInit {
    */
   public drawBounds(): void {
       this.clearBounds();
-
-      this.searchMessage = 'Click to start drawing bounds';
+      this.alertMessage = 'Click to start drawing bounds';
       this.restrictBounds = true;
-      this.showingSearchPanel = false;
-
+      this.showingResultsPanel = false;
       setTimeout(() => this.drawBoundsStarted = true, 0);
       this.boundsRectangleObservable = this.csMapService.drawBound();
       this.boundsRectangleObservable.subscribe((vector) => {
@@ -364,7 +384,8 @@ export class SearchPanelComponent implements OnInit {
           || vector.points[0].getPosition().x === vector.points[1].getPosition().x
           || vector.points[0].getPosition().y === vector.points[1].getPosition().y) {
           // drawing hasn't finished
-          this.searchMessage = 'Click again to finish drawing bounds';
+          //this.searchMessage = 'Click again to finish drawing bounds';
+          this.alertMessage = 'Click again to finish drawing bounds';
           return;
         }
         const points = vector.points;
@@ -372,10 +393,11 @@ export class SearchPanelComponent implements OnInit {
         // Reproject to EPSG:4326
         this.bbox = UtilitiesService.reprojectToWGS84(points);
 
-        this.searchMessage = '';
-        this.showingSearchPanel = true;
+        this.alertMessage = '';
+        this.showingResultsPanel = true;
         this.restrictBounds = true;
 
+        // Re-open bounds dropdown
         setTimeout(() => {
           this.spatialOptionsDropdown.open();
         });
@@ -404,7 +426,7 @@ export class SearchPanelComponent implements OnInit {
    *
    * @returns the search results title
    */
-  private getSearchResultsTitle(): string {
+  public getSearchResultsTitle(): string {
     let title = '';
     if (this.showingAllLayers) {
       title = 'All Layers ';
@@ -428,40 +450,29 @@ export class SearchPanelComponent implements OnInit {
   }
 
   /**
-   * Keep track of open/closed search result panels in accordion.
-   *
-   * @param event the NgbPanelChangeEvent
+   * Reset suggested terms/indices, close dropdown if open
    */
-  public toggleSearchResultExpanded(event: any) {
-    const searchResult: SearchResult = this.searchResults.find(r => r.layer.id === event.panelId);
-    if (searchResult) {
-      searchResult.expanded = event.nextState;
-      if (searchResult.expanded && config.queryGetCapabilitiesTimes.indexOf(event.panelId) > -1) {
-        // Timeout to give panel time to exist
-        setTimeout(() => {
-          const layerFilter: FilterPanelComponent = this.filterComponents.find(fc => fc.layer.id === event.panelId);
-          if (layerFilter) {
-            layerFilter.setLayerTimeExtent();
-          }
-        }, 100);
-      }
+  private resetSuggestedTerms() {
+    this.suggestedTerms = [];
+    this.highlightedSuggestionIndex = -1;
+    if (this.suggesterDropdown.isOpen()) {
+      this.suggesterDropdown.close();
     }
   }
 
   /**
-   * Search index using specified fields and search query
+   * Search index using specified fields and text query
    */
    public search() {
     // Validate parameters before continuing
     if (!this.validateSearchInputs()) {
       return;
     }
-
+    this.resetSuggestedTerms();
     this.searching = true;
     this.searchResults = null;
     this.currentPage = 1;
     this.alertMessage = '';
-    this.searchMessage = '';
 
     const selectedSearchFields: string[] = [];
     for (const sField of this.searchFields.filter(f => f.checked === true)) {
@@ -501,11 +512,106 @@ export class SearchPanelComponent implements OnInit {
         }
         this.searching = false;
         this.showingAllLayers = false;
+        if (!this.showingResultsPanel) {
+          this.showingResultsPanel = true;
+        }
       });
     }, error => {
       this.alertMessage = error;
       this.searching = false;
     });
+
+  }
+
+  /**
+   * Disable Escape key as it was throwing an error in the console when the suggester dropdown menu was open
+   *
+   * @param event the keydown event
+   */
+  public onKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      event.stopPropagation();
+    }
+  }
+
+  /**
+   * Call the suggester when a key has been pressed, or deal with suggestion navigation
+   *
+   * @param event the keyup event
+   */
+  public onKeyUp(event: KeyboardEvent) {
+    // Arrow keys scroll down/down through suggestions if they're open and Enter will select
+    if (this.suggesterDropdown.isOpen() && this.suggestedTerms.length > 0) {
+      switch (event.key) {
+        case 'ArrowDown':
+          if (this.highlightedSuggestionIndex === -1) {
+            this.highlightedSuggestionIndex = 0;
+          } else if (this.highlightedSuggestionIndex !== this.suggestedTerms.length - 1) {
+            this.highlightedSuggestionIndex += 1;
+          }
+          return;
+        case 'ArrowUp':
+          if (this.highlightedSuggestionIndex === -1) {
+            this.highlightedSuggestionIndex = 0;
+          } else if (this.highlightedSuggestionIndex !== 0) {
+            this.highlightedSuggestionIndex -= 1;
+          }
+          return;
+        case 'Enter':
+          if (this.highlightedSuggestionIndex !== -1) {
+            this.queryText = this.suggestedTerms[this.highlightedSuggestionIndex];
+            this.suggesterDropdown.close();
+            this.highlightedSuggestionIndex = -1;
+          }
+          break;
+      }
+    }
+
+    // Search if user has pressed Enter without a selected suggestion
+    if (event.key === 'Enter') {
+      this.search();
+      return;
+    }
+
+    // Populate suggester with query text
+    if (this.suggesterSubscription && !this.suggesterSubscription.closed) {
+      this.suggesterSubscription.unsubscribe();
+    }
+    this.suggesterSubscription = this.searchService.suggestTerm(this.queryText, NUMBER_OF_SUGGESTIONS).subscribe(terms => {
+      this.suggestedTerms = terms;
+      if (this.suggestedTerms.length > 0 && !this.suggesterDropdown.isOpen()) {
+        this.suggesterDropdown.open();
+      } else if (this.suggestedTerms.length === 0 && this.suggesterDropdown.isOpen()) {
+        this.suggesterDropdown.close();
+      }
+    });
+  }
+
+  /**
+   * A suggested term has been selected
+   *
+   * @param term the selected term
+   */
+  public suggestedTermSelected(term: string) {
+    this.suggesterDropdown.close();
+    this.resetSuggestedTerms();
+    this.queryText = term;
+    this.search();
+  }
+
+  /**
+   * Get layers that have been added to map
+   *
+   * @returns a list of LayerModels representing layers that have been added to the map
+   */
+  public getActiveLayers(): LayerModel[] {
+    const activeLayers: LayerModel[] = [];
+    const activeLayerKeys: string[] = Object.keys(this.csMapService.getLayerModelList());
+    for (const layer of activeLayerKeys) {
+      const currentLayer = this.csMapService.getLayerModelList()[layer];
+      activeLayers.push(currentLayer);
+    }
+    return activeLayers;
   }
 
 }

@@ -1,15 +1,27 @@
+@import 'app/globals';
+
+:host {
+    flex: 1;
+    width: 100%;
+    margin: 9px 50px 0px 50px;
+}
+
 .search-panel {
-    position: absolute;
     z-index: 1;
     top: 9px;
     left: 9px;
-    width: 50%;
+    width: 100%;
+
+    .suggestion-button {
+        width: 100%;
+        text-align: left;
+    }
 
     .clear-query-button {
         position: absolute;
         top: 15%;
         bottom: 15%;
-        right: 42px;
+        right: 132px;
         line-height: 0;
         background: white;
         color: gray;
@@ -40,7 +52,7 @@
 
     .search-alert {
         display: block;
-        background: yellow;
+        background: #FDEBD0;
         padding: 8px;
 
         .search-alert-label {
@@ -58,7 +70,7 @@
     }
 
     .show-options-panel {
-        background-color: rgba(255, 255, 255, 0.8);
+        background-color: #fdfdfd;
         border-bottom: solid #bbb 2px;
         width: 100%;
         padding: 3px 3px 2px 3px;
@@ -73,7 +85,7 @@
     }
 
     .options-panel {
-        background-color: rgba(255, 255, 255, 0.8);
+        background-color: #fdfdfd;
         padding-top: 6px;
         border-bottom: solid #bbb 2px;
 
@@ -99,7 +111,7 @@
     }
     
     .results-panel {
-        background-color: rgba(255, 255, 255, 0.8);
+        background-color: #fdfdfd;
         padding: 8px;
 
         .clear-search-results-button {
@@ -110,7 +122,6 @@
 
         .results-list {
             overflow-y: auto;
-            height: 360px;
 
             .layer-header {
                 display: flex;
@@ -167,4 +178,3 @@
     }
 
 }
-

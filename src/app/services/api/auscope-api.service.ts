@@ -97,4 +97,12 @@ export class AuscopeApiService {
     return this.apiGet<string[]>('getSearchKeywords.do');
   }
 
+  public suggestTerms(term: string, num: number): Observable<string[]> {
+    const params = {
+      term: term,
+      num: num
+    };
+    return this.apiGet<string[]>('suggestTerms.do', params);
+  }
+
 }

@@ -173,7 +173,8 @@ PlotlyModule.plotlyjs = PlotlyJS;
         PermanentLinkComponent,
         DataExplorerComponent,
         PortalDetailsPanelComponent,
-        HelpMenuComponent
+        HelpMenuComponent,
+        SearchPanelComponent
     ]
 })
 export class AppModule { }
