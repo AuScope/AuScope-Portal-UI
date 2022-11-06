@@ -1,7 +1,7 @@
-import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { Observable, of, throwError } from "rxjs";
-import { switchMap } from "rxjs/operators";
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable, of, throwError } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 interface ApiResponse<T> {
@@ -21,7 +21,7 @@ function apiData<T>(response: ApiResponse<T>): Observable<T> {
   return of(response.data);
 }
 
-@Injectable({ providedIn: "root" })
+@Injectable({ providedIn: 'root' })
 export class AuscopeApiService {
 
   constructor(private http: HttpClient) {}
@@ -67,6 +67,42 @@ export class AuscopeApiService {
       version: version
     };
     return this.apiGet<any>('getWMSCapabilities.do', params);
+  }
+
+  public searchLayersAndRecords(searchFields: string[], query: string): Observable<any> {
+    let params: HttpParams = new HttpParams();
+    params = params.append('query', query);
+    for (const field of searchFields) {
+      params = params.append('searchFields', field);
+    }
+    return this.apiGet<any>('searchLayersAndRecords.do', params);
+  }
+
+  public searchLayersAndRecordsBounds(searchFields: string[], query: string, spatialRelation: string, westBoundLongitude: number,
+                                southBoundLatitude: number, eastBoundLongitude: number, northBoundLatitude: number): Observable<any> {
+    let params: HttpParams = new HttpParams();
+    params = params.append('query', query);
+    for (const field of searchFields) {
+      params = params.append('searchFields', field);
+    }
+    params = params.append('spatialRelation', spatialRelation);
+    params = params.append('southBoundLatitude', southBoundLatitude);
+    params = params.append('westBoundLongitude', westBoundLongitude);
+    params = params.append('northBoundLatitude', northBoundLatitude);
+    params = params.append('eastBoundLongitude', eastBoundLongitude);
+    return this.apiGet<any>('searchLayersAndRecords.do', params);
+  }
+
+  public getSearchKeywords(): Observable<string[]> {
+    return this.apiGet<string[]>('getSearchKeywords.do');
+  }
+
+  public suggestTerms(term: string, num: number): Observable<string[]> {
+    const params = {
+      term: term,
+      num: num
+    };
+    return this.apiGet<string[]>('suggestTerms.do', params);
   }
 
 }

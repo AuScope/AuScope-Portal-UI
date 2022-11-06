@@ -18,7 +18,7 @@ import { AdvancedComponentService } from 'app/services/ui/advanced-component.ser
 export class ActiveLayersPanelComponent {
   bsModalRef: BsModalRef;
 
-  constructor(private csClipboardService: CsClipboardService, private csMapService: CsMapService,
+  constructor(private csMapService: CsMapService,
     private uiLayerModelService: UILayerModelService, private layerHandlerService: LayerHandlerService,
     private advancedComponentService: AdvancedComponentService, private modalService: BsModalService) { }
 

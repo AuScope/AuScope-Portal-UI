@@ -1,0 +1,180 @@
+@import 'app/globals';
+
+:host {
+    flex: 1;
+    width: 100%;
+    margin: 9px 50px 0px 50px;
+}
+
+.search-panel {
+    z-index: 1;
+    top: 9px;
+    left: 9px;
+    width: 100%;
+
+    .suggestion-button {
+        width: 100%;
+        text-align: left;
+    }
+
+    .clear-query-button {
+        position: absolute;
+        top: 15%;
+        bottom: 15%;
+        right: 132px;
+        line-height: 0;
+        background: white;
+        color: gray;
+        font-size: large;
+        border-left: 1px solid lightgray;
+        border-top: none;
+        border-right: none;
+        border-bottom: none;
+        outline: none;
+        z-index: 10;
+    }
+
+    .search-toggle-button {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+
+    .search-button {
+        border-bottom-right-radius: 0;
+    }
+
+    .search-message {
+        background: white;
+        padding: 4px 8px 0px 8px;
+        border-bottom-right-radius: 6px;
+        border-top-right-radius: 6px;
+    }
+
+    .search-alert {
+        display: block;
+        background: #FDEBD0;
+        padding: 8px;
+
+        .search-alert-label {
+            display: flex;
+
+            .search-alert-button {
+                margin-left: auto;
+                align-self: baseline;
+            }
+        }
+    }
+
+    .caret-icon {
+        transform: translateY(-2px) scale(0.8);
+    }
+
+    .show-options-panel {
+        background-color: #fdfdfd;
+        border-bottom: solid #bbb 2px;
+        width: 100%;
+        padding: 3px 3px 2px 3px;
+
+        .options-button {
+            margin: 0px;
+        }
+
+        .tips-button {
+            float: right;
+        }
+    }
+
+    .options-panel {
+        background-color: #fdfdfd;
+        padding-top: 6px;
+        border-bottom: solid #bbb 2px;
+
+        .options-dropdowns {
+            display: flex;
+            flex-direction: row;
+            margin-left: -12px;
+
+            .options-checkbox {
+                margin-left: 4px;
+                margin-right: 4px;
+            }
+
+            .advanced-options-panel {
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+
+            .spatial-options-panel {
+                width: 240px;
+            }
+        }
+    }
+    
+    .results-panel {
+        background-color: #fdfdfd;
+        padding: 8px;
+
+        .clear-search-results-button {
+            margin: 0px 0px 0px 20px;
+            padding: 0px 2px 0px 0px;
+            border-radius: 2px;
+        }
+
+        .results-list {
+            overflow-y: auto;
+
+            .layer-header {
+                display: flex;
+                width: 100%;
+                text-align: start;
+                background-color: #f2f4f4;
+                border-radius: 4px;
+
+                .layer-header-label {
+                    width: 100%;
+                    color: black;
+                    display: block;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+            }
+            .layer-header:hover {
+                background-color: lightgray;
+            }
+    
+            // Overriding LayerPanel card styles to better fit this panel
+            .card {
+                margin-bottom: 0px;
+
+                .nav-tabs {
+                    margin-top: 0px;
+                    padding-bottom: 0px;
+
+                    a {
+                        padding: 6px;
+                    }
+                }   
+            }
+        }
+
+        ::ng-deep .accordion-item {
+            margin-bottom: 2px;
+        }
+        
+    }
+    
+    .pagination {
+        padding-top: 5px;
+
+        button {
+            margin: 0px 4px 0px 0px;
+        }
+
+        // Mis-match of ng-bootstrap and bootstrap versions will show " (current)" next to current page number without this
+        ::ng-deep .visually-hidden {
+            display: none;
+        }
+    }
+
+}

@@ -3,7 +3,7 @@ import { QuerierModalComponent } from '../modalwindow/querier/querier.modal.comp
 import { AfterViewInit, Component, ElementRef, NgZone, ViewChild, ViewContainerRef } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ViewerConfiguration } from '@auscope/angular-cesium';
-import { CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService, QueryWFSService,
+import { CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService,
   QueryWMSService, SimpleXMLService, UtilitiesService, CsMapObject, ResourceType } from '@auscope/portal-core-ui';
 import { Cartesian3, MapMode2D, Math, ScreenSpaceEventHandler, SceneMode, ScreenSpaceEventType, Rectangle, SplitDirection,
    Cartesian2, WebMapServiceImageryProvider, WebMercatorProjection, Cartographic, GeographicProjection } from 'cesium';
@@ -29,7 +29,7 @@ declare var Cesium: any;
           <div class="mouse-coordinates" *ngIf="mouseLongitude !== undefined && mouseLatitude !== undefined">
               Longitude:&nbsp;{{ mouseLongitude }},&nbsp;Latitude:&nbsp;{{ mouseLatitude }}
           </div>
-          <div class="advancedmapcomponent" style="position:absolute;z-index:1;">
+          <div class="advancedmapcomponent" style="position:absolute;right:0;z-index:1;">
               <ng-template #advancedmapcomponents></ng-template>
           </div>
       </ac-map>
@@ -65,7 +65,7 @@ export class CsMapComponent implements AfterViewInit {
   private modalDisplayed = false;
 
   constructor(private csMapObject: CsMapObject, private csMapService: CsMapService, private modalService: BsModalService,
-    private queryWFSService: QueryWFSService, private queryWMSService: QueryWMSService, private gmlParserService: GMLParserService,
+    private queryWMSService: QueryWMSService, private gmlParserService: GMLParserService,
     private manageStateService: ManageStateService, private advancedMapComponentService: AdvancedComponentService,
     private viewerConf: ViewerConfiguration, private ngZone: NgZone) {
 
