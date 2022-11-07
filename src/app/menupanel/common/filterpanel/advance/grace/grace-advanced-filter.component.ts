@@ -25,7 +25,7 @@ import { GraceStyleSettings } from 'app/modalwindow/querier/customanalytic/grace
     }
 
     ngOnInit() {
-        // Construct form from current GRACE style
+        // Construct form current GRACE style
         this.styleGroup = this.formBuilder.group({
             minColor: this.graceService.currentGraceStyleSettings.minColor,
             minValue: [this.graceService.currentGraceStyleSettings.minValue, [Validators.required, Validators.pattern(this.DECIMAL_REGEX)]],
@@ -114,6 +114,10 @@ import { GraceStyleSettings } from 'app/modalwindow/querier/customanalytic/grace
         return this.graceService.currentGraceStyleSettings;
     }
 
+    /**
+     * 
+     * @param params 
+     */
     public setAdvancedParams(params: any) {
         super.setAdvancedParams(params);
         this.graceService.setCurrentGraceStyleSettings(params);

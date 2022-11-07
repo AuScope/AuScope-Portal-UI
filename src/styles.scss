@@ -111,6 +111,7 @@ label {
     position: fixed;
     z-index: 12;
     padding: 0;
+    align-items: baseline;
 
     .navbar-brand {
         color: #eee;
@@ -123,6 +124,7 @@ label {
 
     .navbar-header {
     	height: $navbar-height;
+        width: $sidebar-width;
     }
 
     .navbar-notify {
@@ -385,10 +387,6 @@ label {
     }
 }
 /* END map area rules */
-
-.input-group {
-    padding-right: 8px;
-}
 
 .nav-tabs {
     border-bottom-color: $text-highlight-colour;
