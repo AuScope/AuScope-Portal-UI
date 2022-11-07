@@ -63,22 +63,22 @@ export class FilterService {
         if (!existingLayerProviders) {
             const layerProviders = [];
             const cswRecords = layer.cswRecords;
-            // Set up a map of admin areas + URLs that belong to each
-            const adminAreasMap = {};
+            // Set up a map of contact orgs + URLs that belong to each
+            const contactOrgsMap = {};
             for (const record of cswRecords) {
-                const adminArea = record.adminArea;
-                if (adminArea !== null) {
+                const contactOrg = record.contactOrg;
+                if (contactOrg !== null) {
                     const allOnlineResources = this.layerHandlerService.getOnlineResourcesFromCSW(record);
                     if (allOnlineResources.length > 0) {
-                        adminAreasMap[adminArea] = UtilitiesService.getUrlDomain(allOnlineResources[0].url);
+                        contactOrgsMap[contactOrg] = UtilitiesService.getUrlDomain(allOnlineResources[0].url);
                     }
                 }
             }
-            // Set up a list of each unique admin area
-            for (const key in adminAreasMap) {
+            // Set up a list of each unique contact org
+            for (const key in contactOrgsMap) {
                 layerProviders.push({
                     label: key,
-                    value: adminAreasMap[key]
+                    value: contactOrgsMap[key]
                 });
             }
             const layerProvidersBS: BehaviorSubject<Array<Object>> = new BehaviorSubject(layerProviders);
