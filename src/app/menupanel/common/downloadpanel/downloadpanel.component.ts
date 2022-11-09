@@ -412,9 +412,13 @@ export class DownloadPanelComponent implements OnInit {
       } else {
         if (err.status === 413 && this.irisDownloadListOption) {
           alert('An error has occurred whilst attempting to download. (Request entity is too large, please reduce the size by limiting the stations, channels, or time period.) Kindly contact cg-admin@csiro.au');
-
         } else {
-          alert('An error has occurred whilst attempting to download. (' + err.message + ') Kindly contact cg-admin@csiro.au');
+            alert('There is an error, when downloading (' + this.layer.name + ') layer at location (' + 
+            'eLongitude:'+ Math.floor(this.bbox.eastBoundLongitude)
+            +' nLatitude: '+ Math.floor(this.bbox.northBoundLatitude) 
+            +' sLatitude:' + Math.floor(this.bbox.southBoundLatitude) 
+            +' wLongitude:' + Math.floor(this.bbox.westBoundLongitude) 
+            + '). Detail of the error: (' + err.message +')');
         }
       }
     });
