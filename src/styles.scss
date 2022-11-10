@@ -706,6 +706,10 @@ fieldset.show-fieldset-borders-whitebg legend{
         height: $navbar-more-height;
     }
 
+    .search-panel {
+        display: none;
+    }
+
     /* In the sidebar, under info tab, cesium map */
     #previewMapElement {
         height: 270px!important;
