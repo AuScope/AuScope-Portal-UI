@@ -211,9 +211,11 @@ export class SearchPanelComponent implements OnInit {
   /**
    * Display layer information dialog
    *
+   * @param event the click event
    * @param layer LayerModel for layer
    */
-  public showLayerInformation(layer: LayerModel) {
+  public showLayerInformation(event: any, layer: LayerModel) {
+    event.stopPropagation();
     if (layer) {
       const modalRef = this.modalService.open(InfoPanelComponent, {
         size: 'lg',
@@ -272,8 +274,6 @@ export class SearchPanelComponent implements OnInit {
 
     // Add any advanced map components defined in refs.ts
     this.advancedComponentService.addAdvancedMapComponents(layer);
-
-    this.scrollToLayer(layer);
   }
 
   /**
@@ -298,9 +298,11 @@ export class SearchPanelComponent implements OnInit {
   /**
    * Remove a layer from the map
    *
+   * @param event the click event
    * @param layer the LayerModel for the layer
    */
-  public removeLayer(layer: LayerModel) {
+  public removeLayer(event: any, layer: LayerModel) {
+    event.stopPropagation();
     this.uiLayerModelService.getUILayerModel(layer.id).opacity = 100;
     this.csMapService.removeLayer(layer);
     // Remove any layer specific map components
@@ -461,6 +463,16 @@ export class SearchPanelComponent implements OnInit {
   }
 
   /**
+   * Escape query text
+   *
+   * @param queryText the query text
+   * @returns an escaped query text string
+   */
+  private escapeQueryText(queryText: string): string {
+    return queryText.replace(/[-\/\\^+&!~\:()|[\]{}]/g, '\\$&');
+  }
+
+  /**
    * Search index using specified fields and text query
    */
    public search() {
@@ -478,8 +490,7 @@ export class SearchPanelComponent implements OnInit {
     for (const sField of this.searchFields.filter(f => f.checked === true)) {
       selectedSearchFields.push(sField.field);
     }
-
-    let textToQuery = this.queryText;
+    let textToQuery = this.escapeQueryText(this.queryText);
 
     // Append service info to query if specific services have been selected
     const checkedServices = this.ogcServices.filter(s => s.checked === true);
