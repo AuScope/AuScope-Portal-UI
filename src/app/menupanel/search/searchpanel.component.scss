@@ -7,9 +7,8 @@
 }
 
 .search-panel {
+    position: relative;
     z-index: 1;
-    top: 9px;
-    left: 9px;
     width: 100%;
 
     .suggestion-button {
@@ -111,6 +110,8 @@
     }
     
     .results-panel {
+        position: absolute;
+        width: 100%;
         background-color: #fdfdfd;
         padding: 8px;
 

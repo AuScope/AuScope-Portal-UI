@@ -135,8 +135,8 @@
                     <button style="line-height:1.7em;height:2.2em;padding:2px 5px 0px 5px;margin-bottom:2px;" class="btn layer-header" (click)="scrollToLayer(searchResult.layer)">
                         <span class="layer-header-label" title="{{searchResult.layer.name}}">{{ searchResult.layer.name }}</span>
                         <button *ngIf="!isLayerAdded(searchResult.layer.id)" [disabled]="!csMapService.isMapSupportedLayer(searchResult.layer)" style="float:right;width:6em;padding:2px;" class="btn btn-sm btn-success" type="button" title="Add layer" (click)="addLayer(searchResult.layer)"><i class="fa fa-plus-circle"></i>&nbsp;Add</button>
-                        <button *ngIf="isLayerAdded(searchResult.layer.id)" style="float:right;width:8em;padding:2px;" class="btn btn-sm btn-danger" type="button" title="Remove layer" (click)="removeLayer(searchResult.layer)"><i class="fa fa-trash"></i>&nbsp;Remove</button>
-                        <button style="float:right;width:6em;padding:2px;margin-left:8px;" class="btn btn-sm btn-info" type="button" title="Layer information" (click)="showLayerInformation(searchResult.layer)"><i class="fa fa-info-circle"></i>&nbsp;Info</button>
+                        <button *ngIf="isLayerAdded(searchResult.layer.id)" style="float:right;width:8em;padding:2px;" class="btn btn-sm btn-danger" type="button" title="Remove layer" (click)="removeLayer($event, searchResult.layer)"><i class="fa fa-trash"></i>&nbsp;Remove</button>
+                        <button style="float:right;width:6em;padding:2px;margin-left:8px;" class="btn btn-sm btn-info" type="button" title="Layer information" (click)="showLayerInformation($event, searchResult.layer)"><i class="fa fa-info-circle"></i>&nbsp;Info</button>
                     </button>
                 </div>
             </div>
