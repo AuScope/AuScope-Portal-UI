@@ -46,7 +46,7 @@ export class SearchPanelComponent implements OnInit {
   queryText = '';                     // User entered query text
   searching = false;                  // True if search in progress
   searchResults: SearchResult[] = []; // Search results
-  showingAllLayers = false;            // True if all layers being shown (no search)
+  showingAllLayers = false;           // True if all layers being shown (no search)
 
   // Options
   allSearchField: SearchField = new SearchField('All', '', true);
@@ -252,7 +252,6 @@ export class SearchPanelComponent implements OnInit {
    * @param layer LayerModel
    */
   public addLayer(layer: LayerModel) {
-    // TODO: Do we need to apply clipboard like FilterPanel.addLayer(...) does?
     const param = {
       optionalFilters: []
     };
@@ -388,7 +387,6 @@ export class SearchPanelComponent implements OnInit {
           || vector.points[0].getPosition().x === vector.points[1].getPosition().x
           || vector.points[0].getPosition().y === vector.points[1].getPosition().y) {
           // drawing hasn't finished
-          //this.searchMessage = 'Click again to finish drawing bounds';
           this.alertMessage = 'Click again to finish drawing bounds';
           return;
         }
