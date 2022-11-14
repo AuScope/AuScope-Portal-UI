@@ -229,6 +229,8 @@ export class SearchPanelComponent implements OnInit {
         setTimeout(() => {
           this.infoDialogOpen = false;
         });
+      }, () => {
+        this.infoDialogOpen = false;
       });
     }
   }
