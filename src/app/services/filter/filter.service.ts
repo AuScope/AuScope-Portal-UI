@@ -14,7 +14,7 @@ export class FilterService {
     private layerFilterCollections: Map<string, BehaviorSubject<any>> = new Map<string, BehaviorSubject<any>>();
     // Providers for a given layer
     private layerProviders: Map<string, BehaviorSubject<Array<Object>>> = new Map<string, BehaviorSubject<Array<Object>>>();
-
+    // Layer times retrieved from GetCaps
     private layerTimes: Map<string, BehaviorSubject<LayerTimes>> = new Map<string, BehaviorSubject<LayerTimes>>();
 
 
