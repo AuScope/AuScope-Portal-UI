@@ -54,19 +54,29 @@ export class InfoPanelSubComponent implements OnChanges {
     }
 
     /**
-     * Create a WMS/WFS GetCapabilities URL from the provided OnlineResource
+     * Is the OnlineResourceModel of a type that supports GetCapabilities?
      *
      * @param onlineResource the OnlineResourceModel
-     * @returns a WMS or WFS GetCapabilities URL as a string
+     * @returns true if OnlineResource is of type WMS, WFS or WCS
+     */
+    public isGetCapabilitiesType(onlineResource: OnlineResourceModel): boolean {
+        return onlineResource.type === 'WMS' || onlineResource.type === 'WFS' || onlineResource.type === 'WCS';
+    }
+
+    /**
+     * Create a WMS/WFS/WCS GetCapabilities URL from the provided OnlineResource
+     *
+     * @param onlineResource the OnlineResourceModel
+     * @returns a WMS, WFS or WCS GetCapabilities URL as a string
      */
     public onlineResourceGetCapabilitiesUrl(onlineResource: OnlineResourceModel): string {
         // Determine base path, append mandatory service and request parameters
         const paramIndex = onlineResource.url.indexOf('?');
-        let path = paramIndex !== -1 ? onlineResource.url.substr(0, onlineResource.url.indexOf('?')) : onlineResource.url;
+        let path = paramIndex !== -1 ? onlineResource.url.substring(0, onlineResource.url.indexOf('?')) : onlineResource.url;
         path += '?service=' + onlineResource.type + '&request=GetCapabilities';
         // Apend any other non-service or request parameters to path
         if (paramIndex !== -1 && onlineResource.url.length > paramIndex + 1) {
-            const paramString = onlineResource.url.substr(paramIndex + 1, onlineResource.url.length);
+            const paramString = onlineResource.url.substring(paramIndex + 1, onlineResource.url.length);
             const paramArray = paramString.split('&');
             for (const keyValueString of paramArray) {
                 const keyValue = keyValueString.split('=');

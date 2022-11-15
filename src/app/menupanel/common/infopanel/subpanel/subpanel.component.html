@@ -13,8 +13,8 @@
 	</p>
 	<p *ngIf="onlineResource.type!='Unsupported' && onlineResource.type!='DOI'">
 		<span class="label label-default"><b>{{onlineResource.type}}: </b></span>
-		<a *ngIf="onlineResource.type ==='WMS' || onlineResource.type ==='WFS'" target="_blank" href="{{ onlineResourceGetCapabilitiesUrl(onlineResource) }}">{{onlineResource.type}} GetCapabilities Info</a>
-		<a *ngIf="onlineResource.type !=='WMS' && onlineResource.type !=='WFS'" target="_blank" href="{{ onlineResource.url }}">{{onlineResource.type}} Info</a>
+		<a *ngIf="isGetCapabilitiesType(onlineResource)" target="_blank" href="{{ onlineResourceGetCapabilitiesUrl(onlineResource) }}">{{onlineResource.type}} GetCapabilities Info</a>
+		<a *ngIf="!isGetCapabilitiesType(onlineResource)" target="_blank" href="{{ onlineResource.url }}">{{onlineResource.type}} Info</a>
 	</p>
 </div>
 <p *ngIf="wmsUrl!=undefined">
