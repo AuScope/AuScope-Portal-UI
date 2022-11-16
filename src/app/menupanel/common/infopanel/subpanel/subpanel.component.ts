@@ -57,14 +57,14 @@ export class InfoPanelSubComponent implements OnChanges {
      * Is the OnlineResourceModel of a type that supports GetCapabilities?
      *
      * @param onlineResource the OnlineResourceModel
-     * @returns true if OnlineResource is of type WMS, WFS or WCS
+     * @returns true if OnlineResource is of type WMS, WFS, WCS or CSW
      */
     public isGetCapabilitiesType(onlineResource: OnlineResourceModel): boolean {
-        return onlineResource.type === 'WMS' || onlineResource.type === 'WFS' || onlineResource.type === 'WCS';
+        return onlineResource.type === 'WMS' || onlineResource.type === 'WFS' || onlineResource.type === 'WCS' || onlineResource.type === 'CSW';
     }
 
     /**
-     * Create a WMS/WFS/WCS GetCapabilities URL from the provided OnlineResource
+     * Create a WMS/WFS/WCS/CSW GetCapabilities URL from the provided OnlineResource
      *
      * @param onlineResource the OnlineResourceModel
      * @returns a WMS, WFS or WCS GetCapabilities URL as a string
