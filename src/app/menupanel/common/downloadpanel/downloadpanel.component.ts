@@ -3,7 +3,7 @@ import { LayerModel } from '@auscope/portal-core-ui';
 import { LayerHandlerService } from '@auscope/portal-core-ui';
 import { CsMapService } from '@auscope/portal-core-ui';
 import { DownloadWfsService } from '@auscope/portal-core-ui';
-import { Component, Inject, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { UtilitiesService } from '@auscope/portal-core-ui';
 import { ResourceType } from '@auscope/portal-core-ui';
 import { saveAs } from 'file-saver';
@@ -102,7 +102,7 @@ export class DownloadPanelComponent implements OnInit {
         });
       }
       this.isPolygonSupportedLayer = config.polygonSupportedLayer.indexOf(this.layer.id) >= 0;
-      this.isCsvSupportedLayer = config.csvSupportedLayer.indexOf(this.layer.id) >= 0;
+      this.isCsvSupportedLayer = this.layer.supportsCsvDownloads;
       this.isDatasetURLSupportedLayer = config.datasetUrlSupportedLayer[this.layer.id] !== undefined;
       // If it is an IRIS layer get the station information
       if (config.datasetUrlAussPassLayer[this.layer.group.toLowerCase()] !== undefined &&
@@ -371,12 +371,12 @@ export class DownloadPanelComponent implements OnInit {
       observableResponse = this.downloadWcsService.download(this.layer, this.bbox, this.wcsDownloadForm.inputCrs,
         this.wcsDownloadForm.downloadFormat, this.wcsDownloadForm.outputCrs, timePositions);
 
-      // Download datasets using a URL in the WFS GetFeature response
+    // Download datasets using a URL in the WFS GetFeature response
     } else if (this.isDatasetURLSupportedLayer) {
       this.downloadStarted = true;
       observableResponse = this.downloadWfsService.downloadDatasetURL(this.layer, this.bbox, null);
 
-      // Download datasets by constructing a data download URL. User can select the eigther Dataselect or Station
+    // Download IRIS datasets by constructing a data download URL. User can select the either Dataselect or Station
     } else if (this.irisDownloadListOption) {
       this.downloadStarted = true;
 
@@ -394,6 +394,7 @@ export class DownloadPanelComponent implements OnInit {
       } else {
         observableResponse = this.downloadIrisService.downloadIRISDataselect(this.layer, station, channel, start, end);
       }
+    // Standard WFS feature download as a CSV
     } else {
       this.downloadStarted = true;
       observableResponse = this.downloadWfsService.downloadCSV(this.layer, this.bbox, null, true);
