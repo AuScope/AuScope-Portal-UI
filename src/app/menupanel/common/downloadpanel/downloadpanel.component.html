@@ -84,8 +84,8 @@
 		</button>
 		<p class="small text-danger ng-star-inserted" *ngIf="showDOIs">
 			If you use this dataset please cite:
-			Brian Kennett, & Herb McQueen. (2009). Mt Isa Northern Queensland - AuScope [Data set]. Australian Passive Seismic Server.
-			URL: <a class="text-danger" target="_blank" href="https://doi.org/10.7914/SN/ZR_2009">https://doi.org/10.7914/SN/ZR_2009</a>
+			{{layer.cswRecords[0].onlineResources[1].name}}
+			URL: <a class="text-danger" target="_blank" href="{{layer.cswRecords[0].onlineResources[1].url}}">{{layer.cswRecords[0].onlineResources[1].url}}</a>
 		</p>
 
 		<div [hidden]='!isPolygonSupportedLayer' class="form-group">
