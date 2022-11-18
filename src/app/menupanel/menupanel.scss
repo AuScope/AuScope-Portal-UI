@@ -330,3 +330,7 @@ input + div.input-group-append  > button {
     padding: 5px 5px 0 0;
     margin: 5px 8px 5px 0;
 }
+
+/* "info" button - positioned in line and to the right of "map layer" and "download" tabs */
+.rh_info_wrap { display: inline-flex; }
+.rh_info { margin-left:auto; margin-top:auto; width: 60px; align-items: center; }
