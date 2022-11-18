@@ -3,7 +3,7 @@ import { LayerModel } from '@auscope/portal-core-ui';
 import { LayerHandlerService } from '@auscope/portal-core-ui';
 import { CsMapService } from '@auscope/portal-core-ui';
 import { DownloadWfsService } from '@auscope/portal-core-ui';
-import { Component, Inject, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { UtilitiesService } from '@auscope/portal-core-ui';
 import { ResourceType } from '@auscope/portal-core-ui';
 import { saveAs } from 'file-saver';
@@ -46,7 +46,7 @@ export class DownloadPanelComponent implements OnInit {
   tsgDownloadServiceMsg: string;
   tsgDownloadEmail: string;
   downloadSizeLimit: number; // Limits the WCS download size
-
+  showDOIs: boolean;
   wcsDownloadListOption: any;
   wcsDownloadForm: any;
 
@@ -78,9 +78,13 @@ export class DownloadPanelComponent implements OnInit {
     this.drawStarted = false;
     this.downloadStarted = false;
     this.wcsDownloadForm = {};
+    this.showDOIs = false;
   }
 
   ngOnInit(): void {
+    if (this.layer.group == "Passive Seismic") {
+      this.showDOIs = true;
+    }
     if (this.layer) {
       if (this.nvclService.isNVCL(this.layer.id)) {
         this.isNvclLayer = true;
@@ -98,7 +102,7 @@ export class DownloadPanelComponent implements OnInit {
         });
       }
       this.isPolygonSupportedLayer = config.polygonSupportedLayer.indexOf(this.layer.id) >= 0;
-      this.isCsvSupportedLayer = config.csvSupportedLayer.indexOf(this.layer.id) >= 0;
+      this.isCsvSupportedLayer = this.layer.supportsCsvDownloads;
       this.isDatasetURLSupportedLayer = config.datasetUrlSupportedLayer[this.layer.id] !== undefined;
       // If it is an IRIS layer get the station information
       if (config.datasetUrlAussPassLayer[this.layer.group.toLowerCase()] !== undefined &&
@@ -368,12 +372,12 @@ export class DownloadPanelComponent implements OnInit {
       observableResponse = this.downloadWcsService.download(this.layer, this.bbox, this.wcsDownloadForm.inputCrs,
         this.wcsDownloadForm.downloadFormat, this.wcsDownloadForm.outputCrs, timePositions);
 
-      // Download datasets using a URL in the WFS GetFeature response
+    // Download datasets using a URL in the WFS GetFeature response
     } else if (this.isDatasetURLSupportedLayer) {
       this.downloadStarted = true;
       observableResponse = this.downloadWfsService.downloadDatasetURL(this.layer, this.bbox, null);
 
-      // Download datasets by constructing a data download URL. User can select the eigther Dataselect or Station
+    // Download IRIS datasets by constructing a data download URL. User can select the either Dataselect or Station
     } else if (this.irisDownloadListOption) {
       this.downloadStarted = true;
 
@@ -391,6 +395,7 @@ export class DownloadPanelComponent implements OnInit {
       } else {
         observableResponse = this.downloadIrisService.downloadIRISDataselect(this.layer, station, channel, start, end);
       }
+    // Standard WFS feature download as a CSV
     } else {
       this.downloadStarted = true;
       observableResponse = this.downloadWfsService.downloadCSV(this.layer, this.bbox, null, true);
@@ -409,9 +414,13 @@ export class DownloadPanelComponent implements OnInit {
       } else {
         if (err.status === 413 && this.irisDownloadListOption) {
           alert('An error has occurred whilst attempting to download. (Request entity is too large, please reduce the size by limiting the stations, channels, or time period.) Kindly contact cg-admin@csiro.au');
-
         } else {
-          alert('An error has occurred whilst attempting to download. (' + err.message + ') Kindly contact cg-admin@csiro.au');
+            alert('There is an error, when downloading (' + this.layer.name + ') layer at location (' + 
+            'eLongitude:'+ Math.floor(this.bbox.eastBoundLongitude)
+            +' nLatitude: '+ Math.floor(this.bbox.northBoundLatitude) 
+            +' sLatitude:' + Math.floor(this.bbox.southBoundLatitude) 
+            +' wLongitude:' + Math.floor(this.bbox.westBoundLongitude) 
+            + '). Detail of the error: (' + err.message +')');
         }
       }
     });

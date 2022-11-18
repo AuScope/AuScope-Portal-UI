@@ -27,21 +27,21 @@ export class CsMapZoomComponent {
   public zoomToRectangle() {
     this.zoomToRectangleService.activate();
   }
-  
+
   /**
    * Tell the camera to go back to original map position.
    */
   public goHome() {
     this.cameraService.cameraFlyTo({destination: CsMapComponent.AUSTRALIA});
   }
-  
+
   /**
    * Tell the camera to zoom in.
    */
   public zoomIn() {
     this.cameraService.zoomIn(this.zoomAmount);
   }
-  
+
   /**
    * Tell the cmaera to zoom out.
    */

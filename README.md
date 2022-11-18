@@ -8,8 +8,8 @@ This project was generated with the [Angular CLI](https://github.com/angular/ang
 ## Prerequisites
 
 Install node v14 https://nodejs.org/en/download/ 
-Install npm v8 `npm install -g npm@7` 
-install the Angular CLI v11 `npm install -g @angular/cli@11`
+Install npm v8 `npm install -g npm@8` 
+install the Angular CLI v13 `npm install -g @angular/cli@13`
 
 ## Development server
 

@@ -39,7 +39,7 @@ export class InfoPanelSubComponent implements OnChanges {
 
 
     /**
-     * Remove unwanted strings from metadata constraints fields
+     * Remove unwanted and empty strings from metadata constraints fields
      * @param constraints string array of contraints
      * @return string constraints in string format
      */
@@ -47,8 +47,9 @@ export class InfoPanelSubComponent implements OnChanges {
 
         let outStr = "";
         for (const conStr of constraints) {
-            if (conStr.indexOf("#MD_RestrictionCode") < 0) {
-                outStr += conStr + ", ";
+            if (conStr.indexOf("no conditions apply") < 0 && 
+                conStr.indexOf("#MD_RestrictionCode") < 0 && conStr.trim() != "") {
+                outStr += conStr.trim() + ", ";
             }
         }
         // Remove trailing comma
