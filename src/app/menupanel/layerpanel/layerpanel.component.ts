@@ -13,6 +13,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FilterPanelComponent } from '../common/filterpanel/filterpanel.component';
 import { config } from '../../../environments/config';
 import { DOCUMENT } from '@angular/common';
+import { DownloadPanelComponent } from '../common/downloadpanel/downloadpanel.component';
 
 
 // Filter modes available in the dropdown layer filter selector
@@ -30,6 +31,7 @@ enum FilterMode {
 export class LayerPanelComponent implements OnInit {
 
   @ViewChildren(FilterPanelComponent) filterComponents: QueryList<FilterPanelComponent>;
+  @ViewChildren(DownloadPanelComponent) downloadComponents: QueryList<DownloadPanelComponent>;
 
   // Create a FilterMode that can be used in the HTML template
   eFilterMode = FilterMode;
@@ -52,6 +54,9 @@ export class LayerPanelComponent implements OnInit {
   }
 
   public selectTabPanel(layerId: string, panelType: string) {
+    if (panelType !== 'download') {
+      this.clearFilterBoundsAndPolygonsForOtherLayers(layerId);
+    }
     this.getUILayerModel(layerId).tabpanel.setPanelOpen(panelType);
   }
 
@@ -63,12 +68,39 @@ export class LayerPanelComponent implements OnInit {
   public layerClicked(layer: any) {
     layer.expanded = !layer.expanded;
 
-    if (layer.expanded && config.queryGetCapabilitiesTimes.indexOf(layer.id) > -1) {
-      const layerFilter: FilterPanelComponent = this.filterComponents.find(fc => fc.layer.id === layer.id);
-      if (layerFilter) {
-        layerFilter.setLayerTimeExtent();
+    if (layer.expanded) {
+      this.clearFilterBoundsAndPolygonsForOtherLayers(layer.id);
+
+      if (config.queryGetCapabilitiesTimes.indexOf(layer.id) > -1) {
+        const layerFilter: FilterPanelComponent = this.filterComponents.find(fc => fc.layer.id === layer.id);
+        if (layerFilter) {
+          layerFilter.setLayerTimeExtent();
+        }
       }
     }
+  }
+
+  /**
+   * Clear all existing filter panel bounds and polygons, excluding the specified layer.
+   *
+   * @param layerId the layer to NOT remove bounds and polygons from
+   */
+  private clearFilterBoundsAndPolygonsForOtherLayers(layerId: string) {
+    for (const layerDownloadPanel of this.downloadComponents) {
+      if (layerDownloadPanel.layer.id !== layerId) {
+        layerDownloadPanel.clearBound();
+        layerDownloadPanel.clearPolygon();
+      }
+    }
+  }
+
+  /**
+   * Detect when download panel has started drawing bounds so we can clear any from other panels.
+   *
+   * @param layerId the layer ID where the bounds are being drawn
+   */
+  public layerDrawingBounds(layerId: string) {
+    this.clearFilterBoundsAndPolygonsForOtherLayers(layerId);
   }
 
   /**
