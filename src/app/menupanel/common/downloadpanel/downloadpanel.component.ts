@@ -278,7 +278,8 @@ export class DownloadPanelComponent implements OnInit {
 
       let stationLst = response['data'][0].stationLst;
       stationLst = [{ 'code': this.SELECT_ALL_CODE, 'name': this.SELECT_ALL_STATION }].concat(stationLst);
-
+      //sort for stationLst
+      stationLst.sort((a,b) => a.name.charCodeAt(0) - b.name.charCodeAt(0));
       this.irisDownloadListOption = {
         serviceTypeList: serviceTypeList,
         stationLst: stationLst,
