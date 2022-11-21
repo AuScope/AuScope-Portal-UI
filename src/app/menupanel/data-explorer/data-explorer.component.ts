@@ -545,11 +545,9 @@ export class DataExplorerComponent implements OnInit{
       this.isValidDate(new Date(this.dateFrom)) &&
       this.isValidDate(new Date(this.dateTo))
     ) {
-      console.log("Valid dates, searching...");
       this.resetFacetedSearch();
     }
   }
-
 
     /**
    * Fires when a new keyword is selected from a keyword typeahead
@@ -557,10 +555,8 @@ export class DataExplorerComponent implements OnInit{
    * @param $event allows us to get the typeahead selection
    */
   public keywordChanged(): void {
-      console.log(this.selectedKeywords )
-      this.resetFacetedSearch();
+    this.resetFacetedSearch();
   }
-
 
   /**
    * Get service information

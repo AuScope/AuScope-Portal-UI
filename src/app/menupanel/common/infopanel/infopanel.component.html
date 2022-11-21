@@ -1,6 +1,6 @@
 <div class="modal-header" style="background: #EEE">
     <h5 class="modal-title" id="exampleModalLongTitle">Record Information</h5>
-    <button type="button" class="close" (click)="activeModal.dismiss('Cross click')" aria-label="Close">
+    <button type="button" class="close" (click)="activeModal.close()" aria-label="Close">
         <span aria-hidden="true">&times;</span>
     </button>
 </div>
@@ -28,7 +28,7 @@
                         <div class="card-header">
                                 <h4 class="card-title">
                                     <a class="accordion-link" data-toggle="collapse" href="#info-link{{i}}" (click)="cswRecord.expanded = !cswRecord.expanded" >
-                                    <i *ngIf='layerStatus.showInfoWarning(layer.id, cswRecord)' class="fa fa-warning text-warning"> </i>{{cswRecord.adminArea !='' && cswRecord.adminArea!=null ? cswRecord.adminArea : 'More Information'}}
+                                    <i *ngIf='layerStatus.showInfoWarning(layer.id, cswRecord)' class="fa fa-warning text-warning"> </i>{{cswRecord.contactOrg !='' && cswRecord.contactOrg != null ? cswRecord.contactOrg : 'More Information'}}
                                 </a>
                                 </h4>
                         </div>
@@ -45,5 +45,5 @@
 </div>
     
 <div class="modal-footer">
-    <button type="button" class="btn btn-light" (click)="activeModal.dismiss('Cross click')">Close</button>
+    <button type="button" class="btn btn-light" (click)="activeModal.close()">Close</button>
 </div>

@@ -3,25 +3,6 @@
 
 export const config = {
   nvclUrl: 'https://nvclwebservices.csiro.au/NVCLDataServices',
-  // Layers that support downloading WFS feature data as zipped CSV files
-  csvSupportedLayer: [
-    'mineral-tenements',
-    'tima-geosample',
-    'nvcl-v2-borehole',
-    'tima-shrimp-geosample',
-    'pressuredb-borehole',
-    'sf0-borehole-nvcl',
-    'erl-mineview',
-    'erl-mineraloccurrenceview',
-    'erl-commodityresourceview',
-    'ga-geophysicalsurveys-all',
-    'ga-geophysicalsurveys-grav',
-    'auslamp',
-    'ga-geophysicalsurveys-radio',
-    'ga-geophysicalsurveys-mag',
-    'gga-geophysicalsurveys-elev',
-    'grace-mascons'
-  ],
 
   // Layers that download zipped datasets using 'datasetURL' feature name in the WFS response
   datasetUrlSupportedLayer: {

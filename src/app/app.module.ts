@@ -15,6 +15,7 @@ import { LayerPanelComponent } from './menupanel/layerpanel/layerpanel.component
 import { CustomPanelComponent } from './menupanel/custompanel/custompanel.component';
 import { ActiveLayersPanelComponent } from './menupanel/activelayers/activelayerspanel.component';
 import { FilterPanelComponent } from './menupanel/common/filterpanel/filterpanel.component';
+import { SearchPanelComponent } from './menupanel/search/searchpanel.component';
 import { DownloadPanelComponent } from './menupanel/common/downloadpanel/downloadpanel.component';
 import { InfoPanelComponent } from './menupanel/common/infopanel/infopanel.component';
 import { InfoPanelSubComponent } from './menupanel/common/infopanel/subpanel/subpanel.component';
@@ -68,8 +69,10 @@ import { GraceAdvancedFilterComponent } from './menupanel/common/filterpanel/adv
 
 // Services
 import { AuscopeApiService } from './services/api/auscope-api.service';
+import { FilterService } from './services/filter/filter.service';
 import { RectanglesEditorService } from '@auscope/angular-cesium';
 import { AdvancedComponentService } from './services/ui/advanced-component.service';
+import { SearchService } from './services/search/search.service';
 import { GraceService } from './services/wcustom/grace/grace.service';
 
 import * as PlotlyJS from 'plotly.js-dist-min/plotly.min.js';
@@ -85,7 +88,9 @@ import { NVCLTSGDownloadComponent } from './modalwindow/layeranalytic/nvcl/nvcl.
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxColorsModule } from 'ngx-colors';
 
-
+import {MatProgressBarModule} from '@angular/material/progress-bar'; 
+import {MatCardModule} from '@angular/material/card'; 
+import { getSaver, SAVER } from './modalwindow/layeranalytic/nvcl/saver.provider';
 PlotlyModule.plotlyjs = PlotlyJS;
 
 
@@ -97,6 +102,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
         CustomPanelComponent,
         ActiveLayersPanelComponent,
         FilterPanelComponent,
+        SearchPanelComponent,
         DownloadPanelComponent,
         NgbdModalStatusReportComponent,
         CsMapClipboardComponent,
@@ -127,7 +133,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
         DataExplorerComponent,
         RecordModalComponent
     ],
-    providers: [AuscopeApiService, RectanglesEditorService, AdvancedComponentService, NVCLService, GraceService],
+    providers: [ AuscopeApiService, FilterService, RectanglesEditorService, AdvancedComponentService, SearchService, NVCLService, GraceService, {provide: SAVER, useFactory: getSaver} ],
     imports: [
         PortalCoreModule.forRoot(environment, config),
         PortalCorePipesModule,
@@ -141,8 +147,11 @@ PlotlyModule.plotlyjs = PlotlyJS;
         MatButtonModule,
         MatDialogModule,
         MatMenuModule,
+        MatProgressBarModule,
+        MatCardModule,
         MatRadioModule,
         MatSliderModule,
+        MatTooltipModule,
         NgxChartsModule,
         NgxColorsModule,
         BrowserAnimationsModule,
@@ -152,7 +161,6 @@ PlotlyModule.plotlyjs = PlotlyJS;
         DataExplorerdRecordModule,
         AngularCesiumModule.forRoot(),
         AngularCesiumWidgetsModule,
-        MatTooltipModule,
         NgbModule,
         FormsModule,
         ReactiveFormsModule
@@ -165,7 +173,8 @@ PlotlyModule.plotlyjs = PlotlyJS;
         PermanentLinkComponent,
         DataExplorerComponent,
         PortalDetailsPanelComponent,
-        HelpMenuComponent
+        HelpMenuComponent,
+        SearchPanelComponent
     ]
 })
 export class AppModule { }
