@@ -121,6 +121,10 @@ export class DownloadPanelComponent implements OnInit {
 
       // Capture polygon events from the clipboard service
       this.csClipboardService.isDrawingPolygonBS.subscribe(isDrawingPolygon => {
+        // Drawing may be triggered from clipboard, if so remove bounds
+        if (isDrawingPolygon) {
+          this.clearBound();
+        }
         this.drawPolygonStarted = isDrawingPolygon;
       });
       this.csClipboardService.polygonsBS.subscribe(
