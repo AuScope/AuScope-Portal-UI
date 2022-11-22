@@ -54,9 +54,7 @@ export class LayerPanelComponent implements OnInit {
   }
 
   public selectTabPanel(layerId: string, panelType: string) {
-    if (panelType !== 'download') {
-      this.clearFilterBoundsAndPolygonsForOtherLayers(layerId);
-    }
+    this.clearDownloadBoundsAndPolygonsForAllLayers();
     this.getUILayerModel(layerId).tabpanel.setPanelOpen(panelType);
   }
 
@@ -67,10 +65,8 @@ export class LayerPanelComponent implements OnInit {
    */
   public layerClicked(layer: any) {
     layer.expanded = !layer.expanded;
-
     if (layer.expanded) {
-      this.clearFilterBoundsAndPolygonsForOtherLayers(layer.id);
-
+      this.clearDownloadBoundsAndPolygonsForOtherLayers(layer.id);
       if (config.queryGetCapabilitiesTimes.indexOf(layer.id) > -1) {
         const layerFilter: FilterPanelComponent = this.filterComponents.find(fc => fc.layer.id === layer.id);
         if (layerFilter) {
@@ -81,11 +77,11 @@ export class LayerPanelComponent implements OnInit {
   }
 
   /**
-   * Clear all existing filter panel bounds and polygons, excluding the specified layer.
+   * Clear all existing download panel bounds and polygons, excluding the specified layer.
    *
    * @param layerId the layer to NOT remove bounds and polygons from
    */
-  private clearFilterBoundsAndPolygonsForOtherLayers(layerId: string) {
+  private clearDownloadBoundsAndPolygonsForOtherLayers(layerId: string) {
     for (const layerDownloadPanel of this.downloadComponents) {
       if (layerDownloadPanel.layer.id !== layerId) {
         layerDownloadPanel.clearBound();
@@ -95,12 +91,22 @@ export class LayerPanelComponent implements OnInit {
   }
 
   /**
+   * Clear all existing download panel bounds and polygons.
+   */
+  private clearDownloadBoundsAndPolygonsForAllLayers() {
+    for (const layerDownloadPanel of this.downloadComponents) {
+      layerDownloadPanel.clearBound();
+      layerDownloadPanel.clearPolygon();
+    }
+  }
+
+  /**
    * Detect when download panel has started drawing bounds so we can clear any from other panels.
    *
    * @param layerId the layer ID where the bounds are being drawn
    */
   public layerDrawingBounds(layerId: string) {
-    this.clearFilterBoundsAndPolygonsForOtherLayers(layerId);
+    this.clearDownloadBoundsAndPolygonsForOtherLayers(layerId);
   }
 
   /**
