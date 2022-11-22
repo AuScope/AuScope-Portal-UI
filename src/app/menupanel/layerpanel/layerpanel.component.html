@@ -58,7 +58,7 @@
 							<div class="card-header">
 								<ul id="card-tab" class="nav nav-tabs">
 									<li (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.filterpanel.expanded}"><a data-toggle="tab"><span class="d-none d-sm-inline">Map Layer</span></a></li>
-									<li (click)="selectTabPanel(layer.id,'downloadpanel')" [ngClass]="{'active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.downloadpanel.expanded}" class="d-none d-md-block"><a data-toggle="tab"><span>Download</span></a></li>	
+									<li *ngIf="isMapSupportedLayer(layer)" (click)="selectTabPanel(layer.id,'downloadpanel')" [ngClass]="{'active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.downloadpanel.expanded}" class="d-none d-md-block"><a data-toggle="tab"><span>Download</span></a></li>	
 								</ul>
 							</div>
 							<div class="rh_info">																	

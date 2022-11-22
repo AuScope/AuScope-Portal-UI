@@ -70,7 +70,14 @@ export class LayerPanelComponent implements OnInit {
       }
     }
   }
-
+  /**
+   * Check to see if a layer is supported to be added to the map
+   * @param layer layer to check
+   * @returns true if supported layer, false otherwise
+   */
+   public isMapSupportedLayer(layer: LayerModel): boolean {
+    return this.csMapService.isMapSupportedLayer(layer);
+   }
   /**
    * Check if a LayerModel contains a filter collection that has an optional filter of type "OPTIONAL.POLYGONBBOX"
    * @param layer the LayerModel
