@@ -30,7 +30,7 @@ export class CsMapClipboardComponent implements OnInit {
   kmlFileName = '';
 
 
-  constructor(private csClipboardService: CsClipboardService,private downloadWfsService: DownloadWfsService,) {
+  constructor(private csClipboardService: CsClipboardService, private downloadWfsService: DownloadWfsService) {
     this.polygonBBox = null;
     this.isFilterLayerShown = false;
     this.csClipboardService.filterLayersBS.subscribe(filterLayerStatus => {

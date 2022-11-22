@@ -13,6 +13,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FilterPanelComponent } from '../common/filterpanel/filterpanel.component';
 import { config } from '../../../environments/config';
 import { DOCUMENT } from '@angular/common';
+import { DownloadPanelComponent } from '../common/downloadpanel/downloadpanel.component';
 
 
 // Filter modes available in the dropdown layer filter selector
@@ -30,6 +31,7 @@ enum FilterMode {
 export class LayerPanelComponent implements OnInit {
 
   @ViewChildren(FilterPanelComponent) filterComponents: QueryList<FilterPanelComponent>;
+  @ViewChildren(DownloadPanelComponent) downloadComponents: QueryList<DownloadPanelComponent>;
 
   // Create a FilterMode that can be used in the HTML template
   eFilterMode = FilterMode;
@@ -52,6 +54,7 @@ export class LayerPanelComponent implements OnInit {
   }
 
   public selectTabPanel(layerId: string, panelType: string) {
+    this.clearDownloadBoundsAndPolygonsForAllLayers();
     this.getUILayerModel(layerId).tabpanel.setPanelOpen(panelType);
   }
 
@@ -62,11 +65,13 @@ export class LayerPanelComponent implements OnInit {
    */
   public layerClicked(layer: any) {
     layer.expanded = !layer.expanded;
-
-    if (layer.expanded && config.queryGetCapabilitiesTimes.indexOf(layer.id) > -1) {
-      const layerFilter: FilterPanelComponent = this.filterComponents.find(fc => fc.layer.id === layer.id);
-      if (layerFilter) {
-        layerFilter.setLayerTimeExtent();
+    if (layer.expanded) {
+      this.clearDownloadBoundsAndPolygonsForOtherLayers(layer.id);
+      if (config.queryGetCapabilitiesTimes.indexOf(layer.id) > -1) {
+        const layerFilter: FilterPanelComponent = this.filterComponents.find(fc => fc.layer.id === layer.id);
+        if (layerFilter) {
+          layerFilter.setLayerTimeExtent();
+        }
       }
     }
   }
@@ -78,6 +83,39 @@ export class LayerPanelComponent implements OnInit {
    public isMapSupportedLayer(layer: LayerModel): boolean {
     return this.csMapService.isMapSupportedLayer(layer);
    }
+  /**
+   * Clear all existing download panel bounds and polygons, excluding the specified layer.
+   *
+   * @param layerId the layer to NOT remove bounds and polygons from
+   */
+  private clearDownloadBoundsAndPolygonsForOtherLayers(layerId: string) {
+    for (const layerDownloadPanel of this.downloadComponents) {
+      if (layerDownloadPanel.layer.id !== layerId) {
+        layerDownloadPanel.clearBound();
+        layerDownloadPanel.clearPolygon();
+      }
+    }
+  }
+
+  /**
+   * Clear all existing download panel bounds and polygons.
+   */
+  private clearDownloadBoundsAndPolygonsForAllLayers() {
+    for (const layerDownloadPanel of this.downloadComponents) {
+      layerDownloadPanel.clearBound();
+      layerDownloadPanel.clearPolygon();
+    }
+  }
+
+  /**
+   * Detect when download panel has started drawing bounds so we can clear any from other panels.
+   *
+   * @param layerId the layer ID where the bounds are being drawn
+   */
+  public layerDrawingBounds(layerId: string) {
+    this.clearDownloadBoundsAndPolygonsForOtherLayers(layerId);
+  }
+
   /**
    * Check if a LayerModel contains a filter collection that has an optional filter of type "OPTIONAL.POLYGONBBOX"
    * @param layer the LayerModel
