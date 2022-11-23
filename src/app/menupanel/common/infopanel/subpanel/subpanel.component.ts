@@ -82,7 +82,7 @@ export class InfoPanelSubComponent implements OnChanges {
                 const keyValue = keyValueString.split('=');
                 if (keyValue.length === 2) {
                     if (keyValue[0].toLowerCase() !== 'service' && keyValue[0].toLowerCase() !== 'request') {
-                        path += keyValue[0] + '=' + keyValue[1];
+                        path += '&' + keyValue[0] + '=' + keyValue[1];
                     }
                 }
             }
