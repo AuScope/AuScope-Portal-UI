@@ -32,5 +32,10 @@ export const environment = {
   ],
   grace: {
     hostUrl: 'https://insargrace.geoanalytics.csiro.au:/grace/grace'
-  }
-};
+  },
+  urlNeedProxy: ['http://ogc-jdlc.curtin.edu.au:80',
+                'https://geossdi.dmp.wa.gov.au',
+                'https://geology.data.vic.gov.au',
+                'http://geology.data.vic.gov.au',
+                'http://geoserver.octopusdata.org']
+}

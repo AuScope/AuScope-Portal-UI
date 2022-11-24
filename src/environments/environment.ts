@@ -39,4 +39,4 @@ export const environment = {
                 'http://geology.data.vic.gov.au',
                 'http://geoserver.octopusdata.org']
 
-};
+}
