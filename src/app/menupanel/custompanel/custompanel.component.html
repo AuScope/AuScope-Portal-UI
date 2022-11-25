@@ -48,11 +48,15 @@
 			</a>
 			<div [hidden]="!layer.expanded" class="sidebar-card-menu-show">
 				 <div class="card card-info card-with-tabs layer-card animated slideInRight">
-					<div class="card-header">
-						<ul id="card-tab" class="nav nav-tabs float-right">
-							<li (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': getUILayerModel(layer.id).tabpanel.filterpanel.expanded}"><a data-toggle="tab"><i class="fa fa-filter"></i> <span class="d-none d-sm-inline">Filter</span></a></li>
-							<li (click)="displayRecordInformation(layer)" [ngClass]="{'active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.filterpanel.expanded}"><a data-toggle="tab"><i class="fa fa-info-circle"></i> <span class="d-none d-sm-inline">Info</span></a></li>
-						</ul>
+					<div class = "rh_info_wrap">
+						<div class="card-header">
+							<ul id="card-tab" class="nav nav-tabs float-right">
+								<li (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': getUILayerModel(layer.id).tabpanel.filterpanel.expanded}"><a data-toggle="tab"><span class="d-none d-sm-inline">Map Layer</span></a></li>
+							</ul>
+						</div>
+						<div class="rh_info">	
+							<button (click)="displayRecordInformation(layer)" class="btn-info" title="Information" [ngClass]="{'active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.filterpanel.expanded}">info</button>
+						</div>
 					</div>
 					<div id="card-tab-content" class="tab-content">
 						<div class="tab-pane fade" [ngClass]="{'show active': getUILayerModel(layer.id).tabpanel.filterpanel.expanded}">
