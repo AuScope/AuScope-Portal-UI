@@ -54,7 +54,7 @@ export class LayerPanelComponent implements OnInit {
   }
 
   public selectTabPanel(layerId: string, panelType: string) {
-    this.clearDownloadBoundsAndPolygonsForAllLayers();
+    this.clearDownloadBoundsForAllLayers();
     this.getUILayerModel(layerId).tabpanel.setPanelOpen(panelType);
   }
 
@@ -66,7 +66,7 @@ export class LayerPanelComponent implements OnInit {
   public layerClicked(layer: any) {
     layer.expanded = !layer.expanded;
     if (layer.expanded) {
-      this.clearDownloadBoundsAndPolygonsForOtherLayers(layer.id);
+      this.clearDownloadBoundsForOtherLayers(layer.id);
       if (config.queryGetCapabilitiesTimes.indexOf(layer.id) > -1) {
         const layerFilter: FilterPanelComponent = this.filterComponents.find(fc => fc.layer.id === layer.id);
         if (layerFilter) {
@@ -75,6 +75,7 @@ export class LayerPanelComponent implements OnInit {
       }
     }
   }
+
   /**
    * Check to see if a layer is supported to be added to the map
    * @param layer layer to check
@@ -83,27 +84,26 @@ export class LayerPanelComponent implements OnInit {
    public isMapSupportedLayer(layer: LayerModel): boolean {
     return this.csMapService.isMapSupportedLayer(layer);
    }
+
   /**
-   * Clear all existing download panel bounds and polygons, excluding the specified layer.
+   * Clear all existing download panel bounds, excluding the specified layer.
    *
-   * @param layerId the layer to NOT remove bounds and polygons from
+   * @param layerId the layer to NOT remove bounds from
    */
-  private clearDownloadBoundsAndPolygonsForOtherLayers(layerId: string) {
+  private clearDownloadBoundsForOtherLayers(layerId: string) {
     for (const layerDownloadPanel of this.downloadComponents) {
       if (layerDownloadPanel.layer.id !== layerId) {
         layerDownloadPanel.clearBound();
-        layerDownloadPanel.clearPolygon();
       }
     }
   }
 
   /**
-   * Clear all existing download panel bounds and polygons.
+   * Clear all existing download panel download bounds.
    */
-  private clearDownloadBoundsAndPolygonsForAllLayers() {
+  private clearDownloadBoundsForAllLayers() {
     for (const layerDownloadPanel of this.downloadComponents) {
       layerDownloadPanel.clearBound();
-      layerDownloadPanel.clearPolygon();
     }
   }
 
@@ -113,7 +113,7 @@ export class LayerPanelComponent implements OnInit {
    * @param layerId the layer ID where the bounds are being drawn
    */
   public layerDrawingBounds(layerId: string) {
-    this.clearDownloadBoundsAndPolygonsForOtherLayers(layerId);
+    this.clearDownloadBoundsForOtherLayers(layerId);
   }
 
   /**
@@ -323,7 +323,7 @@ export class LayerPanelComponent implements OnInit {
    * Gets a layers "UILayerModel"
    * 
    * @param layerId layer id string
-   * @returns UILayerModel object 
+   * @returns UILayerModel object
    */
   public getUILayerModel(layerId: string): UILayerModel {
     return this.uiLayerModelService.getUILayerModel(layerId);
