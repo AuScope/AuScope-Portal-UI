@@ -686,7 +686,7 @@ export class DownloadPanelComponent implements OnInit {
     } else {
       observableResponse = this.downloadWfsService.downloadTsgFileUrls(this.layer, this.bbox, this.tsgDownloadEmail, null).pipe(shareReplay(1));
     }
-
+    let me = this;
     // Kick off the download process and save zip file in browser
     observableResponse.subscribe(urls => {
       let total = 0;
@@ -699,11 +699,11 @@ export class DownloadPanelComponent implements OnInit {
       }
       if (!urls || total < 1) {
         alert('TSGFilesDownload: No TSGFiles was found in the area. Please draw another boundary or polygon to search.');
-        this.downloadWfsService.tsgDownloadBS.next('completed,completed');
+        me.downloadWfsService.tsgDownloadBS.next('completed,completed');
         return;
       }
-      this.bsModalRef.componentInstance.urlsArray = urlsArray;
-      this.bsModalRef.componentInstance.BulkDownloadTsgFiles();
+      me.bsModalRef.componentInstance.urlsArray = urlsArray;
+      me.bsModalRef.componentInstance.BulkDownloadTsgFiles();
       /**
        * do not "log" the "email" to "Google Analytics" - as this is an ethics issue
        *
@@ -713,7 +713,7 @@ export class DownloadPanelComponent implements OnInit {
         gtag('event', 'TSGDownload', {
           event_category: 'TSGBulkDownload',
           event_action: '[' + total + ' of ' + urlsArray.length + ']' + urls
-          //event_label: this.tsgDownloadEmail
+          //event_label: me.tsgDownloadEmail
         });
       }
     }, err => {
