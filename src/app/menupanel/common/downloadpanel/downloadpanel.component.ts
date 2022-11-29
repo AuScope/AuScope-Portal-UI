@@ -720,7 +720,7 @@ export class DownloadPanelComponent implements OnInit {
       if (UtilitiesService.isEmpty(err.message)) {
         alert('An error has occurred whilst attempting to download. Please contact cg-admin@csiro.au');
       } else {
-        alert('An error has occurred whilst attempting to download (' + err.message + '). Plese contact cg-admin@csiro.au');
+        alert('An error has occurred whilst attempting to download (' + err.message + '). Please contact cg-admin@csiro.au');
       }
     });
 

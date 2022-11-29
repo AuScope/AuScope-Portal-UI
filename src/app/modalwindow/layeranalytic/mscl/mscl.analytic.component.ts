@@ -15,6 +15,7 @@ export class MSCLAnalyticComponent implements OnInit {
     featureId: string;  // Identifier of the borehole
     metricList: string[];  // List of metric enums to plot
     closeGraphModal: () => null;  // Function to call when the modal dialogue must be closed
+    usesGMLObs: boolean; // Response has values nested within GeoSciML observations
     serviceUrl: string; // URL of MSCL service
     processingData = false;
 
@@ -42,7 +43,7 @@ export class MSCLAnalyticComponent implements OnInit {
         const error_display = this.error_display.nativeElement;
         // Fetch data from MSCL service
         this.processingData = true;
-        this.msclService.getMSCLDownload(this.serviceUrl, this.featureId, this.startDepth, this.endDepth, this.metricList).subscribe(valuesList => {
+        this.msclService.getMSCLDownload(this.serviceUrl, this.featureId, this.startDepth, this.endDepth, this.usesGMLObs, this.metricList).subscribe(valuesList => {
             // Check response
             if (valuesList == null || !(Symbol.iterator in Object(valuesList))) {
                 this.processingData = false;
@@ -60,7 +61,11 @@ export class MSCLAnalyticComponent implements OnInit {
             for (const values of valuesList) {
                 for (const metricEnum of this.metricList) {
                     const featName = this.msclService.getMetricInfoAttr(metricEnum, 'feat_elem');
-                    xLists[metricEnum].push(values[featName]);
+                    if (this.usesGMLObs) {
+                        xLists[metricEnum].push(values[featName.replace(/_/g, ' ')]);
+                    } else {
+                        xLists[metricEnum].push(values[featName]);
+                    }
                 }
                 yList.push(values.depth);
             }

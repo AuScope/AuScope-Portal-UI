@@ -1,7 +1,7 @@
 import { LayerModel } from '@auscope/portal-core-ui';
 import { OnlineResourceModel } from '@auscope/portal-core-ui';
 import { NVCLDatasetListComponent } from './customanalytic/nvcl/nvcl.datasetlist.component';
-import { Component, Input, ViewChild, ComponentFactoryResolver, ViewContainerRef, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, ViewChild, ViewContainerRef, ChangeDetectorRef } from '@angular/core';
 import {ref} from '../../../environments/ref';
 import { QuerierInfoModel } from '@auscope/portal-core-ui';
 import { RemanentAnomaliesComponent } from './customanalytic/RemanentAnomalies/remanentanomalies.component';
@@ -24,7 +24,7 @@ export class DynamicAnalyticComponent {
   dyanmicAnalyticHost: ViewContainerRef;
 
 
-  constructor(private componentFactoryResolver: ComponentFactoryResolver, private changeDetectorRef: ChangeDetectorRef ) { }
+  constructor(private changeDetectorRef: ChangeDetectorRef) { }
 
   @Input()
   set load(load: boolean) {
@@ -36,12 +36,9 @@ export class DynamicAnalyticComponent {
 
   loadComponent() {
 
-
-    const componentFactory = this.componentFactoryResolver.resolveComponentFactory(ref.analytic[this.layer.id]);
-
     const viewContainerRef = this.dyanmicAnalyticHost
     viewContainerRef.clear();
-    const componentRef = viewContainerRef.createComponent(componentFactory);
+    const componentRef = viewContainerRef.createComponent(ref.analytic[this.layer.id]);
 
     (<NVCLDatasetListComponent>componentRef.instance).layer = this.layer;
     (<NVCLDatasetListComponent>componentRef.instance).onlineResource = this.onlineResource;

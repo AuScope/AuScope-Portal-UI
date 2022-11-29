@@ -174,7 +174,8 @@ export const config = {
     'Octopus-Sahul-Sed-Archives-Fluvial-Osl',
     'Octopus-Sahul-Sed-Archives-Fluvial-Tl',
     'Octopus-Sahul-Sed-Archives-Lacustrine-Osl',
-    'Octopus-Sahul-Sed-Archives-Lacustrine-Tl'
+    'Octopus-Sahul-Sed-Archives-Lacustrine-Tl',
+    'mscl-gssa-borehole'
   ],
   // Layers that use CSW records to display a simple rectangle on map
   cswrenderer: [
@@ -229,6 +230,7 @@ export const config = {
     'tima-geosample',
     'tima-shrimp-geosample',
     'mscl-borehole',
+    'mscl-gssa-borehole',
     'pressuredb-borehole',
     'sf0-borehole-nvcl'
   ],

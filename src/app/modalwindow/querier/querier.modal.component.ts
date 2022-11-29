@@ -2,21 +2,28 @@ import { ApplicationRef, ChangeDetectorRef, Component, Inject, OnInit } from '@a
 import { environment } from '../../../environments/environment';
 import { config } from '../../../environments/config';
 import { ref } from '../../../environments/ref';
-import { CsClipboardService, GMLParserService, ManageStateService, Polygon, QuerierInfoModel, UtilitiesService } from '@auscope/portal-core-ui';
+import { CsClipboardService, GMLParserService, ManageStateService, Polygon, QuerierInfoModel } from '@auscope/portal-core-ui';
 import { NVCLService } from './customanalytic/nvcl/nvcl.service';
 import { BsModalRef } from 'ngx-bootstrap/modal';
-import { NestedTreeControl} from '@angular/cdk/tree';
-import { MatTreeNestedDataSource } from '@angular/material/tree';
-import { BehaviorSubject, of as observableOf } from 'rxjs';
+import { FlatTreeControl } from '@angular/cdk/tree';
+import { MatTreeFlatDataSource, MatTreeFlattener} from '@angular/material/tree';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import * as _ from 'lodash';
 import * as X2JS from 'x2js';
 import { DomSanitizer } from '@angular/platform-browser';
+import { MSCLService } from '../layeranalytic/mscl/mscl.service';
 
 export class FileNode {
   children: FileNode[];
   filename: string;
   type: any;
+}
+
+/** Flat node with expandable and level information */
+interface FlatNode {
+  expandable: boolean;
+  name: string;
+  level: number;
 }
 
 @Component({
@@ -36,15 +43,29 @@ export class QuerierModalComponent  implements OnInit {
   public analyticMap;
   public tab: {};
   public bToClipboard = false;
-  public data: FileNode[][] = [];
-  dataChange: BehaviorSubject<FileNode[]>[] = [];
-
-  nestedTreeControl: NestedTreeControl<FileNode>[] = [];
-
-  nestedDataSource: MatTreeNestedDataSource<FileNode>[] = [];
+  public hasMsclAnalytics = false; // Display 'Analytics' tab to analyse GML observations
 
   // Show a message to zoom in
   public showZoomMsg: boolean = false;
+
+  /* Transforms FileNode into displayable node */
+  private _transformer = (node: FileNode, level: number) => {
+    return {
+      expandable: !!node.children && node.children.length > 0,
+      filename: node.filename,
+      type: node.type,
+      level: level,
+    };
+  };
+
+  // Data Structures used to create a folding flat tree which displays feature data
+  public flatTreeControl = {};
+  public treeFlattener = new MatTreeFlattener(this._transformer, node => node.level, node => node.expandable, node => node.children);
+  public flatTreeDataSource = {}; // Tree structure is assigned to this
+
+  // Does the 'FlatNode' have children?
+  public hasChild = (_: number, node: FlatNode) => node.expandable;
+
 
   /**
    * 
@@ -65,8 +86,10 @@ export class QuerierModalComponent  implements OnInit {
   constructor(public nvclService: NVCLService, public bsModalRef: BsModalRef, public csClipboardService: CsClipboardService,
         private manageStateService: ManageStateService, private gmlParserService: GMLParserService,
         private http: HttpClient, @Inject('env') private env, private sanitizer: DomSanitizer,
-        private changeDetectorRef: ChangeDetectorRef, private appRef: ApplicationRef) {
+        private changeDetectorRef: ChangeDetectorRef, private appRef: ApplicationRef,
+        private msclService: MSCLService) {
     this.analyticMap = ref.analytic;
+    this.flagAnalytic = false;
   }
 
   ngOnInit() {
@@ -79,6 +102,7 @@ export class QuerierModalComponent  implements OnInit {
       // console.log("[querier]ngOnInit().getAnalytic() = "+result);
       this.flagAnalytic = result;
 
+      // Calling this to update the UI
       this.onDataChange();
     });
 
@@ -87,19 +111,19 @@ export class QuerierModalComponent  implements OnInit {
   /**
    * Returns true iff layer is NVCL layer
    * 
-   * @param layer layer odentifier string
+   * @param layer layer identifier string
    * @returns true iff layer is NVCL layer
    */
   public isNVCL(layer: string): boolean {
     return this.nvclService.isNVCL(layer);
   }
 
-  public getData() {return this.data}
-
-  private _getChildren = (node: FileNode) => observableOf(node.children);
-
-  hasNestedChild = (_: number, nodeData: FileNode) =>  (nodeData.children);
-
+  /**
+   * Returns true if this supports open in new window
+   * 
+   * @param doc 
+   * @returns boolean
+   */
   public supportOpenInNewWindow(doc: QuerierInfoModel): boolean {
     return config.supportOpenInNewWindow.includes(doc.layer.id);
   }
@@ -157,13 +181,24 @@ export class QuerierModalComponent  implements OnInit {
     }
   }
 
+  // Look for changes and update UI after brief delay
   public onDataChange(): void {
     setTimeout(() => {
       this.changeDetectorRef.detectChanges();
     }, 50);
   }
 
+  /**
+   * This gets called from the UI when user clicks on first link in popup
+   * 
+   * @param document
+   */
   public transformToHtml(document): void {
+
+    if (this.msclService.usesGMLObs(document.raw)) {
+      this.hasMsclAnalytics = true;
+    }
+
     if (!document.expanded) {
       document.expanded = true;
     } else {
@@ -223,7 +258,7 @@ export class QuerierModalComponent  implements OnInit {
     const name = document.key;
     const doc = document.value;
 
-    if (this.nestedDataSource[name]) {
+    if (this.flatTreeDataSource[name]) {
       return;
     }
 
@@ -238,18 +273,6 @@ export class QuerierModalComponent  implements OnInit {
     const reg = new RegExp(config.clipboard.supportedLayersRegKeyword, 'gi');
     this.bToClipboard = name.search(reg) === -1 ? false : true;
 
-    this.nestedTreeControl[name] = new NestedTreeControl<FileNode>(this._getChildren);
-    this.nestedDataSource[name] = new MatTreeNestedDataSource();
-    this.dataChange[name] = new BehaviorSubject<FileNode[]>(this.data[name]);
-    this.dataChange[name].subscribe(data => {
-      this.nestedDataSource[name].data = data;
-      if (data !== undefined) {
-        this.nestedTreeControl[name].expandDescendants(data[0]);
-        const geomnode = this.findtheGeom(data[0]);
-        if (geomnode) { this.nestedTreeControl[name].collapse(geomnode); }
-      }
-    });
-
     let result = doc;
     // If it is not JSON then convert to JSON
     if (document.hasOwnProperty('format') && document.format !== 'JSON') {
@@ -261,24 +284,11 @@ export class QuerierModalComponent  implements OnInit {
         console.log('XML to JSON conversion error: ', e);
       }
     }
+    // Parse the response and build a recursive tree of FileNode objects and assign them to the tree
     const data = this.buildFileTree(JSON.parse(`{"${name}":${JSON.stringify(result)}}`), 0);
-    this.dataChange[name].next(data);
-    this.onDataChange();
-  }
-
-
-  /**
-   * Recursively searches for geometry elements
-   * @param Node starts search here
-   * @returns a geometry FileNode or null
-   */
-  private findtheGeom(Node: FileNode): FileNode {
-    if (Node.filename === 'the_geom' || Node.filename === 'shape' ) { return Node; }
-    for (let i = 0; Node.children && i < Node.children.length; i++) {
-      const foundnode = this.findtheGeom(Node.children[i]);
-      if (foundnode) { return foundnode }
-    }
-    return null;
+    this.flatTreeControl[name] = new FlatTreeControl<FlatNode>(node => node.level, node => node.expandable); 
+    this.flatTreeDataSource[name] = new MatTreeFlatDataSource(this.flatTreeControl[name], this.treeFlattener);
+    this.flatTreeDataSource[name].data = data;
   }
 
   /**
