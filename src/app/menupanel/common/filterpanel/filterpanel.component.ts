@@ -178,21 +178,6 @@ export class FilterPanelComponent implements OnInit {
       optionalFilters: _.cloneDeep(this.optionalFilters)
     };
 
-    // VT: append advance filter to mandatory filter.
-    /*
-    // deprecated, use AdvanceFilterDirective
-    for (const idx in this.advancedParam) {
-      if (!this.layer.filterCollection.mandatoryFilters) {
-        this.layer.filterCollection.mandatoryFilters = [];
-      }
-      this.layer.filterCollection.mandatoryFilters.push({
-        parameter: idx,
-        value: this.advancedParam[idx]
-      });
-    }
-    */
-    // VT: End append
-
     // TODO: Store time period with state
     // WMS layers may have a time set
     if (this.layerTimes.currentTime) {

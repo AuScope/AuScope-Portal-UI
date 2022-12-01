@@ -17,8 +17,7 @@ export const ref = {
     'tima-geosample': TIMAComponent,
     'remanent-anomalies': RemanentAnomaliesComponent,
     'remanent-anomalies-EMAG': RemanentAnomaliesComponent,
-    'mscl-borehole': MSCLComponent,
-    'mscl-gssa-borehole': MSCLComponent
+    'mscl-borehole': MSCLComponent
   },
   layeranalytic: {
     'nvcl-v2-borehole': NVCLBoreholeAnalyticComponent

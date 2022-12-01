@@ -43,7 +43,7 @@
 							<div class="card-header">
 								<ul id="querier-card-tab" class="nav nav-tabs float-right">
 									<li (click)="doc.home=true;doc.analytic=false;onDataChange()" [ngClass]="{'active':doc.home}"><a href="#{{doc.key}}-card-tab-home" data-toggle="tab"><i class="fa fa-list"></i><span class="d-none d-md-inline"> WFS</span></a></li>
-									<li (click)="doc.home=false;doc.analytic=true;onDataChange()" [ngClass]="{'active':doc.analytic}" title="Show analytic" *ngIf="(isNVCL(doc.layer.id) && flagAnalytic || !isNVCL(doc.layer.id)) && analyticMap[doc.layer.id] || hasMsclAnalytics" ><a href="#{{doc.key}}-card-tab-profile" data-toggle="tab"><i class="fa fa-line-chart"></i><span class="d-none d-md-inline">&nbsp;Analytic</span></a></li>
+									<li (click)="doc.home=false;doc.analytic=true;onDataChange()" [ngClass]="{'active':doc.analytic}" title="Show analytic" *ngIf="(isNVCL(doc.layer.id) && flagNVCLAnalytic || !isNVCL(doc.layer.id)) && analyticMap[doc.layer.id] || hasMsclAnalytics" ><a href="#{{doc.key}}-card-tab-profile" data-toggle="tab"><i class="fa fa-line-chart"></i><span class="d-none d-md-inline">&nbsp;Analytic</span></a></li>
 								</ul>
 								<h4 *ngIf="doc.home" class="card-title">Feature Detail</h4>
 								<h4 *ngIf="doc.analytic" class="card-title">Analytic</h4>
@@ -53,6 +53,7 @@
 							<!-- BEGIN tab-content -->
 							<div id="card-tab-content" class="tab-content" style="max-height:calc(75vh)">
 								<!-- BEGIN tab-pane -->
+								<!-- Content of WFS Tab -->
 								<div *ngIf="doc.key !== 'Server Error'" class="tab-pane fade" [ngClass]="{'active show':doc.home}" id="{{doc.key}}-card-tab-home">
 									<div *ngIf="bToClipboard || supportOpenInNewWindow(doc)" style="position: inherit;padding-top: unset;margin-bottom: 20px;">
 										<div class="float-left d-none d-md-inline mt-0 w-100">
@@ -64,11 +65,10 @@
 									<!-- Show HTML if XML is transformed -->
 									<div *ngIf="doc.transformed" [innerHtml]="doc.transformed"></div>
 									<!-- Show default XML Tree if there is no HTML transformation -->
-									<mat-tree *ngIf="flatTreeDataSource[doc.key]" [dataSource]="flatTreeDataSource[doc.key]" [treeControl]="flatTreeControl[doc.key]"
-										class="example-tree">
+									<mat-tree *ngIf="flatTreeDataSource[doc.key]" [dataSource]="flatTreeDataSource[doc.key]" [treeControl]="flatTreeControl[doc.key]">
 										<dl>
 											<!-- Node without children -->
-											<mat-tree-node *matTreeNodeDef="let node" style="font-size: 12px !important; min-height: 0px"  [matTreeNodePaddingIndent]="15" matTreeNodePadding>
+											<mat-tree-node *matTreeNodeDef="let node" style="font-size: 12px !important; min-height: 0px"  [matTreeNodePaddingIndent]="10" matTreeNodePadding>
 												<dt style="flex: auto;">{{node.filename}}</dt>
 												<dd>{{node.type}}
 													<a *ngIf="node.type && node.type.toString().startsWith('http')" target="_blank" href="{{node.type}}">
@@ -77,7 +77,7 @@
 												</dd>
 											</mat-tree-node>
 											<!-- Node with children -->
-											<mat-tree-node *matTreeNodeDef="let node; when: hasChild"  [matTreeNodePaddingIndent]="15" matTreeNodePadding>
+											<mat-tree-node *matTreeNodeDef="let node; when: hasChild" [matTreeNodePaddingIndent]="10" matTreeNodePadding>
 												<dt style="flex: auto; font-size: 12px !important">
 													<button mat-icon-button matTreeNodeToggle [matTreeNodeToggleRecursive]="true" [attr.aria-label]="'toggle ' + node.filename">
 														<mat-icon class="mat-icon-rtl-mirror">
@@ -98,10 +98,11 @@
 								<div *ngIf="doc.key === 'Server Error'" class="tab-pane fade" [ngClass]="{'active show':doc.home}" id="{{doc.key}}-card-tab-home">
 									<p>Sorry - {{doc.onlineResource.url}} server has returned an error message. See browser console for more information</p>
 								</div>
-
 								<!-- END tab-pane -->
+
 								<!-- BEGIN tab-pane -->
-								<div *ngIf="analyticMap[doc.layer.id]" class="tab-pane fade" [ngClass]="{'active show':doc.analytic}" id="{{doc.key}}-card-tab-profile">
+								<!-- Content of Analytics Tab -->
+								<div *ngIf="analyticMap[doc.layer.id] || hasMsclAnalytics" class="tab-pane fade" [ngClass]="{'active show':doc.analytic}" id="{{doc.key}}-card-tab-profile">
 									<app-custom-analytic [layer]="doc.layer" [load]="doc.loadSubComponent" [onlineResource] = "doc.onlineResource" [featureId]="doc.key" [doc] = "doc"></app-custom-analytic>
 								</div>
 								<!-- END tab-pane -->

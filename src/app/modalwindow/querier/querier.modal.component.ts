@@ -81,7 +81,7 @@ export class QuerierModalComponent  implements OnInit {
    * 
    * If this was not done the two components would not see the same state of the service variable "isAnalytic"
   */
-  public flagAnalytic: boolean;
+  public flagNVCLAnalytic: boolean;
 
   constructor(public nvclService: NVCLService, public bsModalRef: BsModalRef, public csClipboardService: CsClipboardService,
         private manageStateService: ManageStateService, private gmlParserService: GMLParserService,
@@ -89,18 +89,18 @@ export class QuerierModalComponent  implements OnInit {
         private changeDetectorRef: ChangeDetectorRef, private appRef: ApplicationRef,
         private msclService: MSCLService) {
     this.analyticMap = ref.analytic;
-    this.flagAnalytic = false;
+    this.flagNVCLAnalytic = false;
   }
 
   ngOnInit() {
 
   /**
    * Checks the state of "isAnalytic" variable in the nvclService - observable
-   * and updates the local variable "flagAnalytic" - which updates the Analytic TAB in the html
+   * and updates the local variable "flagNVCLAnalytic" - which updates the Analytic TAB in the html
    */
     this.nvclService.getAnalytic().subscribe((result) => {
       // console.log("[querier]ngOnInit().getAnalytic() = "+result);
-      this.flagAnalytic = result;
+      this.flagNVCLAnalytic = result;
 
       // Calling this to update the UI
       this.onDataChange();
@@ -289,6 +289,8 @@ export class QuerierModalComponent  implements OnInit {
     this.flatTreeControl[name] = new FlatTreeControl<FlatNode>(node => node.level, node => node.expandable); 
     this.flatTreeDataSource[name] = new MatTreeFlatDataSource(this.flatTreeControl[name], this.treeFlattener);
     this.flatTreeDataSource[name].data = data;
+    this.flatTreeControl[name].expandAll();
+    this.changeDetectorRef.detectChanges();
   }
 
   /**

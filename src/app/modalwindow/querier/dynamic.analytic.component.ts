@@ -21,7 +21,7 @@ export class DynamicAnalyticComponent {
   @Input() doc: QuerierInfoModel;
   private _load: boolean;
   @ViewChild('dynamicContentAnalyticPlaceholder', { read: ViewContainerRef, static: true })
-  dyanmicAnalyticHost: ViewContainerRef;
+  dynamicAnalyticHost: ViewContainerRef;
 
 
   constructor(private changeDetectorRef: ChangeDetectorRef) { }
@@ -36,9 +36,11 @@ export class DynamicAnalyticComponent {
 
   loadComponent() {
 
-    const viewContainerRef = this.dyanmicAnalyticHost
+    const viewContainerRef = this.dynamicAnalyticHost
     viewContainerRef.clear();
-    const componentRef = viewContainerRef.createComponent(ref.analytic[this.layer.id]);
+    // Default to MSCLComponent
+    const component = this.layer.id in ref.analytic? ref.analytic[this.layer.id]: MSCLComponent;
+    const componentRef = viewContainerRef.createComponent(component);
 
     (<NVCLDatasetListComponent>componentRef.instance).layer = this.layer;
     (<NVCLDatasetListComponent>componentRef.instance).onlineResource = this.onlineResource;
