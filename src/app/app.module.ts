@@ -60,6 +60,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { MSCLComponent } from './modalwindow/querier/customanalytic/mscl/mscl.component';
 import { MSCLAnalyticComponent } from './modalwindow/layeranalytic/mscl/mscl.analytic.component';
+import { MSCLService } from './modalwindow/layeranalytic/mscl/mscl.service';
 
 import { HelpMenuComponent } from './toppanel/help-menu/help-menu.component';
 
@@ -133,7 +134,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
         DataExplorerComponent,
         RecordModalComponent
     ],
-    providers: [ AuscopeApiService, FilterService, RectanglesEditorService, AdvancedComponentService, SearchService, NVCLService, GraceService, {provide: SAVER, useFactory: getSaver} ],
+    providers: [ AuscopeApiService, FilterService, RectanglesEditorService, AdvancedComponentService, SearchService, NVCLService, MSCLService, GraceService, {provide: SAVER, useFactory: getSaver} ],
     imports: [
         PortalCoreModule.forRoot(environment, config),
         PortalCorePipesModule,

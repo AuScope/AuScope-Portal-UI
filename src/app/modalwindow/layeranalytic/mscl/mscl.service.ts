@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { Layout, Data } from 'plotly.js-dist-min';
+import { SimpleXMLService } from '@auscope/portal-core-ui';
 
 // Elements detectable via XRF
 const XRFElem = ['Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn', 'As', 'Se', 'Rb', 'Sr', 'Y', 'Zr', 'Nb', 'Mo',
@@ -20,6 +21,7 @@ export enum Metric { diameter = "diameter",
             pWaveAmp = "pWaveAmp",
             pWaveVel = "pWaveVel",
             density = "density",
+            specificGravity = "specificGravity",
             magSuscPoint = "magSuscPoint",
             magSuscLoopVC = "magSuscLoopVC",
             magSuscLoopDC = "magSuscLoopDC",
@@ -61,6 +63,7 @@ let metricMap: Map<string, Info> = new Map( [
     [ Metric.pWaveVel, { pname: 'P-Wave Vel.', group: 'P-Wave', desc: 'P-Wave Velocity', units: 'm/s', feat_elem: 'p_wave_velocity'}],
     [ Metric.pWaveAmp, { pname: 'P-Wave Amp.', group: 'P-Wave', desc: 'P-Wave Amplitude', units: '', feat_elem: 'p_wave_amplitude'}],
     [ Metric.density,  { pname: 'Density', group: '', desc: 'Density', units: '', feat_elem: 'density'} ],
+    [ Metric.specificGravity, { pname: 'Specific Gravity', group: '', desc: 'Specfic Gravity', units: '', feat_elem: 'specific_gravity'} ],
     [ Metric.magSuscPoint, { pname: 'Mag. Susc. Point', group: '', desc: 'Magnetic Susceptibility Point', units: 'SI x 10^-5', feat_elem: 'magnetic_susc_point'}  ],
     [ Metric.magSuscLoopVC, { pname: 'Mag. Susc. LoopVC', group: '', desc: 'Magnetic Susceptibility Loop Volume Corrected', units: 'SI x 10^-5', feat_elem: 'magnetic_susceptibility'}  ],
     [ Metric.magSuscLoopDC, { pname: 'Mag. Susc. LoopDC', group: '', desc: 'Magnetic Susceptibility Loop Density Corrected', units: 'SI x 10^-5', feat_elem: 'magnetic_susc_loop_dc'}  ],
@@ -134,7 +137,7 @@ export class MSCLService {
             // Convert feature name list to a list of names and group names
             for (let featElem of featList) {
                 for (let mm of metricMap.values()) {
-                    if (mm.feat_elem === featElem) {
+                    if (mm.feat_elem === featElem.replace(/ /g, '_')) {
                         if (!retList.includes(mm.pname)) {
                             retList.push(mm.pname);
                         }
@@ -441,6 +444,83 @@ export class MSCLService {
         return traceList;
     }
 
+    /**
+    * Checks to see if there are petrophysics observation sample values
+    * Assumes GeoSciML v4.1 WFS response format
+    *
+    * @param XML string WFS response
+    * @returns true if values could be found
+    */
+    public usesGMLObs(xmlStr: string): boolean {
+        const obsIdx = xmlStr.search(/<om:OM_Observation (gml:)?id="om.observation.petrophysicalproperty/);
+        return (obsIdx > 0);
+    }
+
+    /**
+    * Namespace resolver for XPATH parsing of GeoSciML v4.1 WFS response
+    */
+    private nsResolver(prefix: any) {
+        switch (prefix) {
+          case 'wfs':
+            return "http://www.opengis.net/wfs";
+          case "xs":
+            return "http://www.w3.org/2001/XMLSchema";
+          case "swe":
+            return "http://www.opengis.net/swe/2.0";
+          case "sams":
+            return "http://www.opengis.net/samplingSpatial/2.0";
+          case "gsmlp":
+            return "http://xmlns.geosciml.org/geosciml-portrayal/4.0";
+          case "gml":
+            return "http://www.opengis.net/gml";
+          case "mt":
+            return "http://xmlns.geoscience.gov.au/mineraltenementml/1.0";
+          case "cit":
+            return "http://standards.iso.org/iso/19115/-3/cit/1.0";
+          case "gco2":
+            return "http://www.isotc211.org/2005/gco";
+          case "gsmlb":
+            return "http://www.opengis.net/gsml/4.1/GeoSciML-Basic";
+          case "gsml":
+            return "urn:cgi:xmlns:CGI:GeoSciML:2.0";
+          case "gsmlbh":
+            return "http://www.opengis.net/gsml/4.1/Borehole";
+          case "erl":
+            return "http://xmlns.earthresourceml.org/earthresourceml-lite/2.0";
+          case "om":
+            return "http://www.opengis.net/om/2.0";
+          case "sam":
+            return "http://www.opengis.net/sampling/2.0";
+          case "xlink":
+            return "http://www.w3.org/1999/xlink";
+          case "gmd":
+            return "http://www.isotc211.org/2005/gmd";
+          case "xsi":
+            return "http://www.w3.org/2001/XMLSchema-instance";
+        }
+        return "http://www.http://www.w3.org/2001/XMLSchema-instance.net/wcs";
+      }
+
+      /**
+       * Parses an XML WFS response to find the set of metric types available
+       * Applies only to GeoSciML v4.1
+       * 
+       * @param xmlStr WFS response
+       * @returns a list of strings or empty list if not found
+      */
+      public findMetricTypes(xmlStr: string): any[] {
+        const rootNode = SimpleXMLService.parseStringToDOM(xmlStr);
+        const METRICS = '//gsmlbh:specification/om:OM_Observation/om:result/swe:Quantity/swe:label';
+        const nodeList = SimpleXMLService.evaluateXPathNodeArray(rootNode, rootNode, METRICS, this.nsResolver);
+        const metricVals = [];
+        for (const node of nodeList) {
+            metricVals.push(node.textContent);
+        }
+        const metricSet = new Set(metricVals);
+        const uniqueMetrics = [ ... metricSet ];
+        return uniqueMetrics;
+    }
+
 
     /**
      * Contacts the MSCL data service and retrieves plot data
@@ -449,10 +529,12 @@ export class MSCLService {
      * @param boreholeHeaderId borehole identifier
      * @param startDepth retrieve plot data starting at this depth
      * @param endDepth retrieve plot data ending at this depth
+     * @param useGMLObs if true then observations are hidden in complete GeoSciML data model
      * @param metricList list of metrics for which plotting data is required
      * @return Observable for waiting on
      */
-    public getMSCLDownload(serviceUrl: string, boreholeHeaderId: string, startDepth: number, endDepth: number, metricList: string[]): Observable<any> {
+    public getMSCLDownload(serviceUrl: string, boreholeHeaderId: string, startDepth: number, endDepth: number,
+        useGMLObs: boolean, metricList: string[]): Observable<any> {
         let httpParams = new HttpParams();
         httpParams = httpParams.append('serviceUrl', serviceUrl);
         httpParams = httpParams.append('boreholeHeaderId', boreholeHeaderId);
@@ -462,14 +544,20 @@ export class MSCLService {
         for (const metric of metricList) {
             const feat_elem = this.getMetricInfoAttr(metric, 'feat_elem');
             if (feat_elem != '') {
-                httpParams = httpParams.append('observationsToReturn', feat_elem);
+                const std_feat_elem = (useGMLObs) ? feat_elem.replace('_',' '): feat_elem;
+                httpParams = httpParams.append('observationsToReturn', std_feat_elem);
             // If user requested a group name, append all members of group
             } else if (this.isMetricGroup(metric)) {
                 const gMetricList = this.getInfoAttrsForGrp(metric, 'feat_elem');
                 for (let gMet of gMetricList) {
-                    httpParams = httpParams.append('observationsToReturn', gMet);
+                    const cleanMetric = (useGMLObs) ? gMet.replace('_',' '): gMet;
+                    httpParams = httpParams.append('observationsToReturn', cleanMetric);
                 }
             }
+        }
+        // Observations are hidden in complete GeoSciML data model
+        if (useGMLObs) {
+            httpParams = httpParams.append('useGMLObs', 'true');
         }
         // Send HTTP request for observations for a borehole
         return this.http.post(environment.portalBaseUrl + 'getMsclObservationsForGraph.do', httpParams.toString(), {

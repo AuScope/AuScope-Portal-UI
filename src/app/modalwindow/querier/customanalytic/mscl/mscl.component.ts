@@ -29,6 +29,7 @@ export class MSCLComponent implements OnInit {
     public allTicked = false; // Are all tickboxes ticked?
     public showSelectMetricError: boolean; // Show error if no metrics chosen when Draw Graph is pressed
 
+    private usesGMLObs = false; // Response has values nested within GeoSciML observations
     private bsModalRef: BsModalRef;
 
     constructor(public msclService: MSCLService, private modalService: BsModalService, private changeDetectorRef: ChangeDetectorRef) {
@@ -47,9 +48,19 @@ export class MSCLComponent implements OnInit {
         // Extract the available metrics from the "datasetProperties" XML element in the WFS response
         // "datasetProperties" is a list of the metrics available in this borehole's dataset
         // The members of the list take the form of XML element names  e.g. p_wave_velocity
-        const metrics = /<gsmlp:datasetProperties>[a-z_,]*<\/gsmlp:datasetProperties>/.exec(this.doc.raw).toString();
-        // Remove tags at ends and convert to a list
-        const metricList = metrics.substring(25, metrics.length - 26).split(",");
+        let metricList = [];
+        // Find out if values are nested within GeoSciML observations
+        this.usesGMLObs = this.msclService.usesGMLObs(this.doc.raw);
+        if (this.usesGMLObs) {
+            metricList = this.msclService.findMetricTypes(this.doc.raw);
+        } else {
+            const searchResult = /<gsmlp:datasetProperties>[a-z_,]*<\/gsmlp:datasetProperties>/.exec(this.doc.raw);
+            if (searchResult) {
+                const metricsStr = searchResult.toString(); 
+                // Remove tags at ends and convert to a list
+                metricList = metricsStr.substring(25, metricsStr.length - 26).split(",");
+            }
+        }
         this.metricPNameList = this.msclService.getMetricPNameList(metricList)
 
         // Given list of metrics, set up the data structures that support tickboxes
@@ -115,7 +126,8 @@ export class MSCLComponent implements OnInit {
                     'metricList': selecMetricList,
                     'featureId': this.featureId,
                     'closeGraphModal': this.closeGraphModal.bind(this),
-                    'serviceUrl': this.onlineResource.url
+                    'serviceUrl': this.onlineResource.url,
+                    'usesGMLObs': this.usesGMLObs
                 }
             });
             this.modalDisplayed = true;

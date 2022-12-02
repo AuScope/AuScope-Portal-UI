@@ -12,7 +12,7 @@ import { LayerAnalyticInterface } from './layer.analytic.interface';
 export class DynamicLayerAnalyticComponent {
   private _layer: LayerModel;
   @ViewChild('dynamicLayerContentAnalyticPlaceholder', { read: ViewContainerRef, static: true })
-  dyanmicAnalyticHost: ViewContainerRef;
+  dynamicAnalyticHost: ViewContainerRef;
 
 
   constructor(private componentFactoryResolver: ComponentFactoryResolver, private changeDetectorRef: ChangeDetectorRef ) { }
@@ -34,7 +34,7 @@ export class DynamicLayerAnalyticComponent {
 
     const componentFactory = this.componentFactoryResolver.resolveComponentFactory(ref.layeranalytic[this._layer.id]);
 
-    const viewContainerRef = this.dyanmicAnalyticHost
+    const viewContainerRef = this.dynamicAnalyticHost
     viewContainerRef.clear();
     const componentRef = viewContainerRef.createComponent(componentFactory);
 
