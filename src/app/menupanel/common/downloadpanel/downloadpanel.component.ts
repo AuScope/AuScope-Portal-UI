@@ -78,10 +78,11 @@ export class DownloadPanelComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.layer.group === "Passive Seismic") {
+    if (this.layer.group === "Passive Seismic" && this.layer.cswRecords[0].onlineResources[1].type == "DOI") {
       this.showDOIs = true;
     }
     if (this.layer) {
+      // console.log(this.layer.cswRecords)
       if (this.nvclService.isNVCL(this.layer.id)) {
         this.isNvclLayer = true;
         //Setup TsgDownload Button if API is ready.
