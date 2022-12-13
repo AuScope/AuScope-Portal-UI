@@ -86,6 +86,32 @@ export class LayerPanelComponent implements OnInit {
    }
 
   /**
+  * Check to see if a layer is support downloading
+  * @param layer layer to check
+  * @returns true if supported layer, false otherwise
+  */
+  public isDownloadSupportedLayer(layer: LayerModel): boolean {
+    let isWCSDownloadSupported = false;
+    let isCsvSupportedLayer = false;
+    let isDatasetURLSupportedLayer = false;
+    let isIRISDownloadSupported = false;
+
+    if (config.wcsSupportedLayer[layer.id]) {
+      isWCSDownloadSupported = true;
+    }
+    isCsvSupportedLayer = layer.supportsCsvDownloads;
+
+    isDatasetURLSupportedLayer = config.datasetUrlSupportedLayer[layer.id] !== undefined;
+
+    if (config.datasetUrlAussPassLayer[layer.group.toLowerCase()] !== undefined &&
+      this.layerHandlerService.contains(layer, ResourceType.IRIS)) {
+      isIRISDownloadSupported = true;
+    }
+
+    let isDownloadSupported = isCsvSupportedLayer || isWCSDownloadSupported || isDatasetURLSupportedLayer || isIRISDownloadSupported;
+    return isDownloadSupported;
+  }
+  /**
    * Clear all existing download panel bounds, excluding the specified layer.
    *
    * @param layerId the layer to NOT remove bounds from
