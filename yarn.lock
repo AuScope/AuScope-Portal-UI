@@ -306,10 +306,10 @@
   dependencies:
     "tslib" "^2.3.0"
 
-"@auscope/portal-core-ui@^1.0.60":
-  "integrity" "sha512-NJRHn1Y1NlC8N5ReT5chd48NpVzZXeKfM8k8cz4pSUPfXaPTnjoSLwLK8tSXfGkyzUA6hfkkIGkDfNNSMQwLUA=="
-  "resolved" "https://registry.npmjs.org/@auscope/portal-core-ui/-/portal-core-ui-1.0.60.tgz"
-  "version" "1.0.60"
+"@auscope/portal-core-ui@^1.0.61":
+  "integrity" "sha512-YuIOC4DZ8H8q60rri1R/Xfi1d3JunhxHE3hgcdvVGrLDC2Qbcf3rhIYl90YrSWdh5KicctdCCWZwsjd+2z7w1Q=="
+  "resolved" "https://registry.npmjs.org/@auscope/portal-core-ui/-/portal-core-ui-1.0.61.tgz"
+  "version" "1.0.61"
   dependencies:
     "tslib" "^2.4.1"
 
