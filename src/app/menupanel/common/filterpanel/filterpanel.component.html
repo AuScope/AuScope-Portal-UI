@@ -39,13 +39,13 @@
 	<fieldset *ngIf="layerFilterCollection && layerFilterCollection['optionalFilters']" class="show-fieldset-borders">
 		<legend><h5>Optional Filters</h5></legend>
 		<div class="form-group form-group-sm">
-			<label style="display:flex;" *ngIf="optionalFilters.length > 0" title="Remove filter"> Select Filter:<i style="margin-left:auto;" class="hasEvent red" (click)="refreshFilter()">Clear All</i></label>
+			<label style="display:flex;font-size:0.9rem;" *ngIf="optionalFilters.length > 0" title="Remove filter"> Select Filter:<i style="margin-left:auto;font-size:0.9rem;" class="hasEvent red" (click)="refreshFilter()">Clear All</i></label>
 			<select class="form-control form-control-sm" [ngModel]="selectedFilter" (ngModelChange)="addFilter($event)">
 				<option [ngValue]="filt" *ngFor="let filt of layerFilterCollection['optionalFilters']">{{filt.label}}</option>
 			</select>
 		</div>
-		<hr class="nav-divider">
-		<div *ngFor="let optionalFilter of optionalFilters">
+		<hr *ngIf="optionalFilters.length > 0" class="nav-divider filter-divider">
+		<div *ngFor="let optionalFilter of optionalFilters; let i = index;">
 			<div *ngIf="optionalFilter.type=='OPTIONAL.TEXT'">
 				<div class="form-group  form-group-sm">
 					<label>{{optionalFilter.label}}:</label>
@@ -105,10 +105,10 @@
 			</div>
 
 			<div  class="d-none d-md-block" *ngIf="optionalFilter.type=='OPTIONAL.POLYGONBBOX'">
-				<div class="form-group  form-group-sm">
+				<div class="form-group form-group-sm">
 					<div class="checkbox" >
-							<input class="form-control-sm" id="{{ 'filter-OPTIONAL.POLYGONBBOX-0-' + layer.id }}" type="checkbox" [(ngModel)]="bApplyClipboardBBox"/>
-							<label for="{{ 'filter-OPTIONAL.POLYGONBBOX-0-' + layer.id }}">Apply clipboard BBox</label>
+						<input class="form-control-sm" id="{{ 'filter-OPTIONAL.POLYGONBBOX-0-' + layer.id }}" type="checkbox" [(ngModel)]="bApplyClipboardBBox"/>
+						<label for="{{ 'filter-OPTIONAL.POLYGONBBOX-0-' + layer.id }}">Apply clipboard BBox</label>
 					</div>
 				</div>
 			</div>
@@ -118,6 +118,7 @@
 					<p>This filter is not supported on a small screen and would not return any results.</p>
 				</div>
 			</div>
+			<hr *ngIf="i < optionalFilters.length - 1" class="nav-divider filter-divider">
 		</div>
 	</fieldset>
 
@@ -138,8 +139,8 @@
 
 	<p *ngIf='layerStatus.isLayerDown(layer.id)' class='small text-danger'><i class="fa fa-warning text-warning"></i> One or more of the services used by this layer are reported to be experiencing issues at the moment. Click on the info panel for more information.</p>
 	<div>
-		<button *ngIf="analyticMap[layer.id]" type="button" class="btn btn-warning btn-sm" title="Display analytics" (click)="processLayerAnalytic(layer)"><i class="fa fa-bar-chart" aria-hidden="true"></i>&nbsp;Analytic</button>
-		<button type="button" *ngIf="isMapSupportedLayer(layer)" class="btn btn-info btn-sm float-right" (click)="addLayer(layer)"><i class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp;Add Layer</button>
+		<button *ngIf="analyticMap[layer.id]" type="button" class="btn btn-warning btn-sm analytic-btn" title="Display analytics" (click)="processLayerAnalytic(layer)"><i class="fa fa-bar-chart" aria-hidden="true"></i>&nbsp;Analytic</button>
+		<button type="button" *ngIf="isMapSupportedLayer(layer)" class="btn btn-info btn-sm add-layer-btn float-right" (click)="addLayer(layer)"><i class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp;Add Layer</button>
 		<div class="unsupported-layer-message" *ngIf="!isMapSupportedLayer(layer)">
 			<em class="fa fa-exclamation-triangle warning-icon"></em>
 			{{ getUnsupportedLayerMessage() }}

@@ -1,0 +1,28 @@
+:host {
+
+    ::ng-deep {
+        fieldset.show-fieldset-borders {
+            margin: 0 0 1em 0;
+            padding: 0 1.4em 0.5em 1.4em;
+        }
+
+        fieldset legend {
+            width: 50%;
+        }
+
+        .tab-content {
+            padding: 15px 15px 6px 15px;
+        }
+    }
+
+    .layer-card {
+        margin-left: 5px;
+    }
+
+    .layer-info-btn {
+        position: absolute;
+        top: 1.4em;
+        right: 1.3em;
+    }
+
+}

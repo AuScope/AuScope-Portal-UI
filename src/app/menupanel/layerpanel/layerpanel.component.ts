@@ -26,7 +26,7 @@ enum FilterMode {
 @Component({
     selector: '[appLayerPanel]',
     templateUrl: './layerpanel.component.html',
-    styleUrls: ['../menupanel.scss']
+    styleUrls: ['../menupanel.scss', './layerpanel.component.scss']
 })
 export class LayerPanelComponent implements OnInit {
 
