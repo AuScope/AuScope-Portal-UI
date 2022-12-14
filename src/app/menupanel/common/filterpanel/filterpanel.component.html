@@ -126,8 +126,8 @@
 	<ng-template #advancedFilterComponents></ng-template>
 
 	<!-- WMS time periods (if time extents present in LayerModel.capabilityRecords or GetCapabilities) -->
-	<button *ngIf="layerTimes && layerTimes.loadingTimeExtent" type="button" class="btn btn-info btn-sm date-btn unclickable-btn"><i class="fa fa-spinner fa-spin" style="cursor:default;"></i>&nbsp;&nbsp;Querying time</button>
-	<div ngbDropdown *ngIf="layerTimes && layerTimes.currentTime" dropdownClass="time-dropdown" container="body">
+	<button *ngIf="layerTimes && layerTimes.loadingTimeExtent" type="button" class="btn btn-info btn-sm unclickable-btn" style="position:absolute;left:0;"><i class="fa fa-spinner fa-spin" style="cursor:default;"></i>&nbsp;&nbsp;Querying time</button>
+	<div ngbDropdown *ngIf="layerTimes && layerTimes.currentTime" dropdownClass="time-dropdown" style="position:absolute;left:0;" container="body">
 		<button *ngIf="!layerTimes.loadingTimeExtent && layerTimes.timeExtent.length === 1" type="button" class="btn btn-info btn-sm date-btn unclickable-btn" style="cursor:default;"><i class="fa fa-calendar"></i>&nbsp;&nbsp;{{ layerTimes.currentTime | date }}</button>
 		<button *ngIf="!layerTimes.loadingTimeExtent && layerTimes.timeExtent.length > 1" type="button" class="btn btn-info btn-sm date-btn" ngbDropdownToggle><i class="fa fa-calendar"></i>&nbsp;&nbsp;{{ layerTimes.currentTime | date }}</button>
 		<div class="dropdown-menu" title="Select time to display" *ngIf="!layerTimes.loadingTimeExtent && layerTimes.timeExtent && layerTimes.timeExtent.length > 1" ngbDropdownMenu>
