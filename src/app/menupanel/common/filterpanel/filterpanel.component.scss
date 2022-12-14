@@ -22,6 +22,12 @@ div.red {
 
 ::ng-deep {
     .time-dropdown {
+
+        .dropdown {
+            position: absolute;
+            left: 0;
+        }
+
         .dropdown-menu {
             max-height: 200px;
             overflow-y: auto;
@@ -42,8 +48,7 @@ div.red {
 }
 
 .date-btn {
-    position: fixed;
-    left: 0;
+    position: initial;
 }
 
 .add-layer-btn {
