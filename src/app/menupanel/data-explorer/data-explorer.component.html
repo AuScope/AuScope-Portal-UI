@@ -2,6 +2,15 @@
     <div class="card">
         <div class="card-body" style="padding-left: 0px;padding-right: 0px;">
 
+            <!-- Searches aren't run automatically any more, hide results and display message until a search has been done -->
+            <div class="row" *ngIf="!searchConducted">
+                <div class="col">
+                    <div class="no-search-notification">
+                        To search CSW services enter a search term, add any desired filters and press the search button below.
+                    </div>
+                </div>
+            </div>
+
             <!-- Any text search -->
             <div class="row">
                 <div class="col">
@@ -175,9 +184,8 @@
             </div>
 
             <!-- Search results -->
-            <div class="row" #searchResults>
+            <div class="row" #searchResults *ngIf="searchConducted">
                 <div class="col">
-
                 <div class="submenu-header" (click)="searchResultsIsCollapsed = !searchResultsIsCollapsed">
                     Search Results
                     <span>
@@ -187,8 +195,9 @@
                         <i *ngIf="!searchResultsIsCollapsed" style="line-height:inherit;" class="fa fa-arrow-circle-up pull-right"></i>
                     </span>
                 </div>
-                <div [ngbCollapse]="searchResultsIsCollapsed" id="searchResults" >
-                    <fieldset >
+                <div [ngbCollapse]="searchResultsIsCollapsed" id="searchResults">
+                    <!-- Search results -->
+                    <fieldset>
                         <legend class="control-label small" >Results ({{ getTotalSearchResultCount() }} Total)</legend>
                         <div class="container-fluid" style="margin: 0px; padding: 0px;">
                             <ul ngbNav #nav="ngbNav" class="nav-pills" >
@@ -205,7 +214,7 @@
                                             </div>
                                         </div>
                                         <!-- Server error -->
-                                        <div *ngIf="!registry.value.searching && registry.value.searchError!==null">
+                                        <div *ngIf="!registry.value.searching && registry.value.searchError && registry.value.searchError!==''">
                                             <div class="row" style="padding:10px;">
                                                 <div class="col" style="padding:10px;border:solid 1px black;border-radius:8px;word-break:break-all;background:#EBF5FB;color: black;">
                                                     <label>This registry reported a problem:<br><br>{{ registry.value.searchError }}</label>
