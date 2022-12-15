@@ -27,6 +27,7 @@ export class DataExplorerComponent implements OnInit{
 
   // Search results
   cswSearchResults: Map<String, LayerModel[]> = new Map<String, LayerModel[]>();
+  searchConducted = false;  // Has a search has been conducted?
   layerOpacities: Map<String, number> = new Map<String, number>();
 
   // Collapsable menus
@@ -37,8 +38,6 @@ export class DataExplorerComponent implements OnInit{
   pubDateIsCollapsed: boolean = true;
   registriesIsCollapsed: boolean = true;
   searchResultsIsCollapsed: boolean = true;
-
-
 
   // Faceted search parameters
   anyTextValue: string = "";
@@ -87,7 +86,7 @@ export class DataExplorerComponent implements OnInit{
     this.dataExplorerService.updateRegistries().subscribe(
       (data: Registry[]) => {
         // Update registries
-        for (let registry of data) {
+        for (const registry of data) {
           registry.checked = true;
           registry.startIndex = 1;
           registry.prevIndices = [];
@@ -101,7 +100,7 @@ export class DataExplorerComponent implements OnInit{
         // facetedSearch to ensure at least 1 filter has been used or de-
         // selecting a registry will populate results)
         this.getFacetedKeywords();
-        this.facetedSearchAllRegistries();
+        //this.facetedSearchAllRegistries();
       },
       (error) => {
         // TODO: Proper error reporting
@@ -153,6 +152,8 @@ export class DataExplorerComponent implements OnInit{
    * Search all registries using current facets.
    */
   public facetedSearchAllRegistries(): void {
+
+    this.searchConducted = true;
 
     // Available registries and start
     let serviceIds: string[] = [];
@@ -270,7 +271,6 @@ export class DataExplorerComponent implements OnInit{
                   registry.searchError =
                     response["data"].searchErrors[registry.id];
                 }
-                
 
                   for (let i = 0; i < response["itemLayers"].length; i++) {
                     const uiLayerModel = new UILayerModel(
@@ -284,7 +284,7 @@ export class DataExplorerComponent implements OnInit{
                       uiLayerModel
                     );
                   }
-                        
+
                 this.cswSearchResults.set(registry.id, response["itemLayers"]);
                 registry.searching = false;
 
@@ -306,6 +306,8 @@ export class DataExplorerComponent implements OnInit{
    * @param registry the single registry to search
    */
   public facetedSearchSingleRegistry(registry: Registry): void {
+
+    this.searchConducted = true;
 
     let fields: string[] = [];
     let values: string[] = [];

@@ -187,8 +187,13 @@
                         <i *ngIf="!searchResultsIsCollapsed" style="line-height:inherit;" class="fa fa-arrow-circle-up pull-right"></i>
                     </span>
                 </div>
-                <div [ngbCollapse]="searchResultsIsCollapsed" id="searchResults" >
-                    <fieldset >
+                <div [ngbCollapse]="searchResultsIsCollapsed" id="searchResults">
+                    <!-- Searches aren't run automatically any more, hide results until a search has been done -->
+                    <div *ngIf="!searchConducted" class="no-search-notification">
+                        To search CSW services enter a search term, add any desired filters and press the search button above.
+                    </div>
+                    <!-- Search results -->
+                    <fieldset *ngIf="searchConducted">
                         <legend class="control-label small" >Results ({{ getTotalSearchResultCount() }} Total)</legend>
                         <div class="container-fluid" style="margin: 0px; padding: 0px;">
                             <ul ngbNav #nav="ngbNav" class="nav-pills" >
@@ -205,7 +210,7 @@
                                             </div>
                                         </div>
                                         <!-- Server error -->
-                                        <div *ngIf="!registry.value.searching && registry.value.searchError!==null">
+                                        <div *ngIf="!registry.value.searching && registry.value.searchError && registry.value.searchError!==''">
                                             <div class="row" style="padding:10px;">
                                                 <div class="col" style="padding:10px;border:solid 1px black;border-radius:8px;word-break:break-all;background:#EBF5FB;color: black;">
                                                     <label>This registry reported a problem:<br><br>{{ registry.value.searchError }}</label>

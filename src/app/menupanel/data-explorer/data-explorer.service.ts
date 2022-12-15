@@ -14,11 +14,11 @@ export class DataExplorerService {
 
   static RESULTS_PER_PAGE: number = 35;
 
-  constructor(private http: HttpClient) { }
-
   private _registries: BehaviorSubject<Registry[]> = new BehaviorSubject([]);
   public readonly registries: Observable<Registry[]> = this._registries.asObservable();
-  
+
+  constructor(private http: HttpClient) { }
+
   public getFilteredCSWKeywords(cswServiceId: string): Observable<any> {
     let httpParams = new HttpParams();
     httpParams = httpParams.append('cswServiceIds', cswServiceId);
@@ -153,11 +153,11 @@ export class DataExplorerService {
      * executes getFacetedCSWServices.do in vgl service
      */
     public updateRegistries(): Observable<Registry[]> {
-      let obs = this.getCSWServices();
+      const obs = this.getCSWServices();
       obs.subscribe(registryList => this._registries.next(registryList));
       return obs;
-  } 
-  
+  }
+
  /**
      * @param serviceId
      * @param start
@@ -225,10 +225,10 @@ export class DataExplorerService {
           // return response['data'];
           return {
             itemLayers: itemLayers,
-            data:response['data']
+            data: response['data']
           }
       }));
-  }  
+  }
 
     /**
      * Returns an array of keywords for specified service IDs
