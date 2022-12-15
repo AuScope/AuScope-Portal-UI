@@ -2,6 +2,15 @@
     <div class="card">
         <div class="card-body" style="padding-left: 0px;padding-right: 0px;">
 
+            <!-- Searches aren't run automatically any more, hide results and display message until a search has been done -->
+            <div class="row" *ngIf="!searchConducted">
+                <div class="col">
+                    <div class="no-search-notification">
+                        To search CSW services enter a search term, add any desired filters and press the search button below.
+                    </div>
+                </div>
+            </div>
+
             <!-- Any text search -->
             <div class="row">
                 <div class="col">
@@ -175,9 +184,8 @@
             </div>
 
             <!-- Search results -->
-            <div class="row" #searchResults>
+            <div class="row" #searchResults *ngIf="searchConducted">
                 <div class="col">
-
                 <div class="submenu-header" (click)="searchResultsIsCollapsed = !searchResultsIsCollapsed">
                     Search Results
                     <span>
@@ -188,12 +196,8 @@
                     </span>
                 </div>
                 <div [ngbCollapse]="searchResultsIsCollapsed" id="searchResults">
-                    <!-- Searches aren't run automatically any more, hide results until a search has been done -->
-                    <div *ngIf="!searchConducted" class="no-search-notification">
-                        To search CSW services enter a search term, add any desired filters and press the search button above.
-                    </div>
                     <!-- Search results -->
-                    <fieldset *ngIf="searchConducted">
+                    <fieldset>
                         <legend class="control-label small" >Results ({{ getTotalSearchResultCount() }} Total)</legend>
                         <div class="container-fluid" style="margin: 0px; padding: 0px;">
                             <ul ngbNav #nav="ngbNav" class="nav-pills" >
