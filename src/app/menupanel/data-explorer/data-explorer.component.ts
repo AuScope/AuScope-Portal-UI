@@ -100,7 +100,6 @@ export class DataExplorerComponent implements OnInit{
         // facetedSearch to ensure at least 1 filter has been used or de-
         // selecting a registry will populate results)
         this.getFacetedKeywords();
-        //this.facetedSearchAllRegistries();
       },
       (error) => {
         // TODO: Proper error reporting

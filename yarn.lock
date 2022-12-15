@@ -134,7 +134,7 @@
     "ora" "5.4.1"
     "rxjs" "6.6.7"
 
-"@angular/animations@^13.0.0", "@angular/animations@^13.0.0 || ^14.0.0-0", "@angular/animations@^13.3.11", "@angular/animations@>=10.0.4", "@angular/animations@>=12.0.0", "@angular/animations@~13.3.11", "@angular/animations@13.3.12":
+"@angular/animations@^13.0.0", "@angular/animations@^13.0.0 || ^14.0.0-0", "@angular/animations@^13.3.11", "@angular/animations@>=10.0.4", "@angular/animations@>=12.0.0", "@angular/animations@13.3.12":
   "integrity" "sha512-dc2JDokKJuuNxzzZa9FvuQU71kYC/e0xCLjGxEgX48sGKwajHRGBuzYFb8EmvLeA24SshYGmrxN0vGG9GhLK6g=="
   "resolved" "https://registry.npmjs.org/@angular/animations/-/animations-13.3.12.tgz"
   "version" "13.3.12"
@@ -198,7 +198,7 @@
     "tslib" "^2.3.0"
     "yargs" "^17.2.1"
 
-"@angular/compiler@^13.3.11", "@angular/compiler@~13.3.11", "@angular/compiler@13.3.12":
+"@angular/compiler@^13.3.11", "@angular/compiler@13.3.12":
   "integrity" "sha512-F5vJYrjbNvEWoVz9J/CqiT3Iod6g9bV0dGI5EeURcW4yHXHZ12ioQpfU3+bE7qXcTlnofbdDhK8cGxGx01SzBA=="
   "resolved" "https://registry.npmjs.org/@angular/compiler/-/compiler-13.3.12.tgz"
   "version" "13.3.12"
@@ -222,7 +222,7 @@
   "resolved" "https://registry.npmjs.org/@angular/core/-/core-9.0.0.tgz"
   "version" "9.0.0"
 
-"@angular/forms@^13.0.0", "@angular/forms@^13.0.0 || ^14.0.0-0", "@angular/forms@^13.3.11", "@angular/forms@>=10.0.4", "@angular/forms@>=12.0.0", "@angular/forms@>=13.0.0 <14.0.0", "@angular/forms@~13.3.11":
+"@angular/forms@^13.0.0", "@angular/forms@^13.0.0 || ^14.0.0-0", "@angular/forms@^13.3.11", "@angular/forms@>=10.0.4", "@angular/forms@>=12.0.0", "@angular/forms@>=13.0.0 <14.0.0":
   "integrity" "sha512-auow1TKZx44ha1ia8Jwg2xp2Q7BbpShG5Ft8tewL3T44aTmJY7svWOE/m+DkZ/SXHmTFnbZFobGU5aEfe0+pNw=="
   "resolved" "https://registry.npmjs.org/@angular/forms/-/forms-13.3.12.tgz"
   "version" "13.3.12"
@@ -250,14 +250,14 @@
   dependencies:
     "tslib" "^2.3.0"
 
-"@angular/platform-browser-dynamic@^13.3.11", "@angular/platform-browser-dynamic@>=12.0.0", "@angular/platform-browser-dynamic@~13.3.11", "@angular/platform-browser-dynamic@13.3.12":
+"@angular/platform-browser-dynamic@^13.3.11", "@angular/platform-browser-dynamic@>=12.0.0", "@angular/platform-browser-dynamic@13.3.12":
   "integrity" "sha512-/hBggov0PxK/KNJqIu3MVc5k8f0iDbygDP8Z1k/J0FcllOSRdO4LsQd1fsCfGfwIUf0YWGyD7KraSGpBBiWlFg=="
   "resolved" "https://registry.npmjs.org/@angular/platform-browser-dynamic/-/platform-browser-dynamic-13.3.12.tgz"
   "version" "13.3.12"
   dependencies:
     "tslib" "^2.3.0"
 
-"@angular/platform-browser@^13.0.0 || ^14.0.0-0", "@angular/platform-browser@^13.3.11", "@angular/platform-browser@>=12.0.0", "@angular/platform-browser@~13.3.11", "@angular/platform-browser@13.3.12":
+"@angular/platform-browser@^13.0.0 || ^14.0.0-0", "@angular/platform-browser@^13.3.11", "@angular/platform-browser@>=12.0.0", "@angular/platform-browser@13.3.12":
   "integrity" "sha512-sfhQqU4xjTJCjkH62TQeH5/gkay/KzvNDF95J6NHi/Q6p2dbtzZdXuLJKR/sHxtF2kc505z5v9RNm6XMSXM1KA=="
   "resolved" "https://registry.npmjs.org/@angular/platform-browser/-/platform-browser-13.3.12.tgz"
   "version" "13.3.12"
@@ -273,7 +273,7 @@
     "tslib" "^2.3.0"
     "xhr2" "^0.2.0"
 
-"@angular/router@^13.3.11", "@angular/router@~13.3.11":
+"@angular/router@^13.3.11":
   "integrity" "sha512-X+TAxTAlqUd2gPm6drFBGVzQsbQWM5wmZ8S5D5i+86x7Ku0v2CUFICT6AUPSl9+FTPiexlL4FdmvQV2CnGTSUw=="
   "resolved" "https://registry.npmjs.org/@angular/router/-/router-13.3.12.tgz"
   "version" "13.3.12"
@@ -306,10 +306,9 @@
   dependencies:
     "tslib" "^2.3.0"
 
-"@auscope/portal-core-ui@^1.0.61":
-  "integrity" "sha512-YuIOC4DZ8H8q60rri1R/Xfi1d3JunhxHE3hgcdvVGrLDC2Qbcf3rhIYl90YrSWdh5KicctdCCWZwsjd+2z7w1Q=="
-  "resolved" "https://registry.npmjs.org/@auscope/portal-core-ui/-/portal-core-ui-1.0.61.tgz"
-  "version" "1.0.61"
+"@auscope/portal-core-ui@file:../portal-core-ui-app/dist/portal-core-ui":
+  "resolved" "file:../portal-core-ui-app/dist/portal-core-ui"
+  "version" "0.0.0-watch+1670989006246"
   dependencies:
     "tslib" "^2.4.1"
 
@@ -2862,7 +2861,7 @@
   "resolved" "https://registry.npmjs.org/caseless/-/caseless-0.12.0.tgz"
   "version" "0.12.0"
 
-"cesium@>= 1.93.0", "cesium@1.93", "cesium@1.93.0":
+"cesium@>= 1.93.0", "cesium@1.93":
   "integrity" "sha512-y5+KkISn3+0MZxGj96mNaZc5LAfpiOs1fmZCInH2xHwYw43FaaRbvdSHXZs8OwJ5dZIlo/m1biMyOKr354L+UA=="
   "resolved" "https://registry.npmjs.org/cesium/-/cesium-1.93.0.tgz"
   "version" "1.93.0"
@@ -8407,7 +8406,7 @@
   "resolved" "https://registry.npmjs.org/websocket-extensions/-/websocket-extensions-0.1.4.tgz"
   "version" "0.1.4"
 
-"when@^3.7.8", "when@~3.7.8":
+"when@^3.7.8":
   "integrity" "sha512-5cZ7mecD3eYcMiCH4wtRPA5iFJZ50BJYDfckI5RRpQiktMiYTcn0ccLTZOvcbBume+1304fQztxeNzNS9Gvrnw=="
   "resolved" "https://registry.npmjs.org/when/-/when-3.7.8.tgz"
   "version" "3.7.8"
