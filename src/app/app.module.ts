@@ -74,6 +74,7 @@ import { FilterService } from './services/filter/filter.service';
 import { RectanglesEditorService } from '@auscope/angular-cesium';
 import { AdvancedComponentService } from './services/ui/advanced-component.service';
 import { SearchService } from './services/search/search.service';
+import { BoundsService } from './services/bounds/bounds.service';
 import { GraceService } from './services/wcustom/grace/grace.service';
 
 import * as PlotlyJS from 'plotly.js-dist-min/plotly.min.js';
@@ -134,7 +135,9 @@ PlotlyModule.plotlyjs = PlotlyJS;
         DataExplorerComponent,
         RecordModalComponent
     ],
-    providers: [ AuscopeApiService, FilterService, RectanglesEditorService, AdvancedComponentService, SearchService, NVCLService, MSCLService, GraceService, {provide: SAVER, useFactory: getSaver} ],
+    providers: [ AuscopeApiService, FilterService, RectanglesEditorService, AdvancedComponentService, SearchService,
+                 NVCLService, MSCLService, BoundsService, GraceService, { provide: SAVER, useFactory: getSaver }
+    ],
     imports: [
         PortalCoreModule.forRoot(environment, config),
         PortalCorePipesModule,
