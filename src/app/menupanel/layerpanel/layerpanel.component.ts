@@ -54,7 +54,6 @@ export class LayerPanelComponent implements OnInit {
   }
 
   public selectTabPanel(layerId: string, panelType: string) {
-    this.clearDownloadBoundsForAllLayers();
     this.getUILayerModel(layerId).tabpanel.setPanelOpen(panelType);
   }
 
@@ -66,7 +65,6 @@ export class LayerPanelComponent implements OnInit {
   public layerClicked(layer: any) {
     layer.expanded = !layer.expanded;
     if (layer.expanded) {
-      this.clearDownloadBoundsForOtherLayers(layer.id);
       if (config.queryGetCapabilitiesTimes.indexOf(layer.id) > -1) {
         const layerFilter: FilterPanelComponent = this.filterComponents.find(fc => fc.layer.id === layer.id);
         if (layerFilter) {
@@ -108,48 +106,8 @@ export class LayerPanelComponent implements OnInit {
       isIRISDownloadSupported = true;
     }
 
-    let isDownloadSupported = isCsvSupportedLayer || isWCSDownloadSupported || isDatasetURLSupportedLayer || isIRISDownloadSupported;
+    const isDownloadSupported = isCsvSupportedLayer || isWCSDownloadSupported || isDatasetURLSupportedLayer || isIRISDownloadSupported;
     return isDownloadSupported;
-  }
-  /**
-   * Clear all existing download panel bounds, excluding the specified layer.
-   *
-   * @param layerId the layer to NOT remove bounds from
-   */
-  private clearDownloadBoundsForOtherLayers(layerId: string) {
-    for (const layerDownloadPanel of this.downloadComponents) {
-      if (layerDownloadPanel.layer.id !== layerId) {
-        layerDownloadPanel.clearBound();
-      }
-    }
-  }
-
-  /**
-   * Clear all existing download panel download bounds.
-   */
-  private clearDownloadBoundsForAllLayers() {
-    for (const layerDownloadPanel of this.downloadComponents) {
-      layerDownloadPanel.clearBound();
-    }
-  }
-
-  /**
-   * Detect when download panel has started drawing bounds so we can clear any from other panels.
-   *
-   * @param layerId the layer ID where the bounds are being drawn
-   */
-  public layerDrawingBounds(layerId: string) {
-    this.clearDownloadBoundsForOtherLayers(layerId);
-  }
-
-  /**
-   * Check if a LayerModel contains a filter collection that has an optional filter of type "OPTIONAL.POLYGONBBOX"
-   * @param layer the LayerModel
-   * @returns true if a polygon filter is found, false otherwise
-   */
-  private layerHasPolygonFilter(layer: LayerModel): boolean {
-    return layer.filterCollection !== undefined && (layer.filterCollection.optionalFilters !== null &&
-      layer.filterCollection.optionalFilters.filter(f => f.type === 'OPTIONAL.POLYGONBBOX').length > 0);
   }
 
   /**

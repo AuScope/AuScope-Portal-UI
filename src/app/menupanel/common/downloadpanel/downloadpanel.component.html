@@ -57,12 +57,12 @@
 			</ng-select>
 		</div>
 
-		<div *ngIf="irisDownloadListOption" class="form-group  form-group-sm">
+		<div *ngIf="irisDownloadListOption" class="form-group form-group-sm">
 			<label>Start date: [from {{irisDownloadListOption.minDate}}]</label>
 			<input type="date" class="form-control form-control-sm" [(ngModel)]="irisDownloadListOption.dateFrom" placeholder="yyyy-mm-dd" dateFormat="yy-mm-dd" showIcon="true"/>
 		</div>
 
-		<div *ngIf="irisDownloadListOption " class="form-group  form-group-sm">
+		<div *ngIf="irisDownloadListOption " class="form-group form-group-sm">
 			<label>End date:[to {{irisDownloadListOption.maxDate}}]</label>
 			<input type="date" class="form-control form-control-sm" [(ngModel)]="irisDownloadListOption.dateTo" placeholder="yyyy-mm-dd" dateFormat="yy-mm-dd" showIcon="true"/>
 		</div>
@@ -71,21 +71,28 @@
 		<!-- Draw bounds/polygon -->
 		<div class="d-inline-block">
 			<button *ngIf="!bbox && (!irisDownloadListOption || (irisDownloadListOption && irisDownloadListOption.displayBbox)) " type="button" title="Draw bounding box"
-					class="btn btn-info btn-xs" [disabled]="downloadStarted || download4pStarted || download4PolygonKMLStarted" (click)="drawBound()"><i class="fa fa-edit"></i>&nbsp;Draw Bounds</button>
+					class="btn btn-info btn-xs" [disabled]="downloadStarted || download4pStarted || download4PolygonKMLStarted || drawBoundsStarted || drawPolygonStarted" (click)="drawBounds()">
+					<i class="fa fa-edit"></i>&nbsp;Draw Bounds
+			</button>
 			<button *ngIf="bbox && (!irisDownloadListOption || (irisDownloadListOption && irisDownloadListOption.displayBbox))" type="button" title="Remove bounds"
-					class="btn btn-danger btn-xs" [disabled]="downloadStarted || download4pStarted || download4PolygonKMLStarted" (click)="clearBound()"><i class="fa fa-refresh fa-sm"></i>&nbsp;Clear Bounds</button>
-			<button *ngIf="!polygonFilter && isPolygonSupportedLayer" type="button" class="btn btn-info btn-xs" [disabled]="downloadStarted || download4pStarted || download4PolygonKMLStarted" title="Draw polygon" (click)="drawPolygon()">
+					class="btn btn-danger btn-xs" [disabled]="downloadStarted || download4pStarted || download4PolygonKMLStarted || drawBoundsStarted || drawPolygonStarted" (click)="clearBounds()">
+					<i class="fa fa-refresh fa-sm"></i>&nbsp;Clear Bounds
+			</button>
+			<button *ngIf="!polygonFilter && isPolygonSupportedLayer" type="button" class="btn btn-info btn-xs" [disabled]="downloadStarted || download4pStarted || download4PolygonKMLStarted || drawBoundsStarted || drawPolygonStarted"
+							title="Draw polygon" (click)="drawPolygon()">
 				<i *ngIf="download4pStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!download4pStarted" class="fa fa-edit"></i>&nbsp;Draw Polygon
 			</button>
 			<button *ngIf="polygonFilter && isPolygonSupportedLayer" type="button" title="Remove polygon"
-					class="btn btn-danger btn-xs" [disabled]="downloadStarted || download4pStarted || download4PolygonKMLStarted" (click)="clearPolygon()"><i class="fa fa-refresh"></i>&nbsp;Clear Polygon
+					class="btn btn-danger btn-xs" [disabled]="downloadStarted || download4pStarted || download4PolygonKMLStarted || drawBoundsStarted || drawPolygonStarted" (click)="clearPolygon()"><i class="fa fa-refresh">
+					</i>&nbsp;Clear Polygon
 			</button>
 		</div>
 
 		<!-- Download options for bounds, polygon or all (if irisDownloadListOption) -->
 		<div *ngIf="bbox || polygonFilter || irisDownloadListOption" class="d-inline-block" ngbDropdown>
 			<button type="button" class="btn btn-info btn-xs" [disabled]="drawPolygonStarted || drawBoundsStarted || downloadStarted || download4pStarted || download4PolygonKMLStarted" title="Download data" ngbDropdownToggle>
-				<i *ngIf="downloadStarted || download4pStarted || download4PolygonKMLStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!downloadStarted && !download4pStarted && !download4PolygonKML" class="fa fa-cloud-download"></i>&nbsp;Download
+				<i *ngIf="downloadStarted || download4pStarted || download4PolygonKMLStarted" class="fa fa-spinner fa-spin fa-fw"></i>
+				<i *ngIf="!downloadStarted && !download4pStarted && !download4PolygonKML" class="fa fa-cloud-download"></i>&nbsp;Download
 			</button>
 			<div ngbDropdownMenu>
 				<button *ngIf="bbox || irisDownloadListOption" title="Download data" (click)="download()" ngbDropdownItem>Download Data</button>
@@ -159,9 +166,9 @@
 		<!-- Bounding box download -->
 		<div style="display:flex;">
 			<button *ngIf="!bbox && (!irisDownloadListOption || (irisDownloadListOption && irisDownloadListOption.displayBbox)) " type="button" title="Draw bounding box"
-					class="btn btn-info btn-xs" [disabled]="downloadStarted" (click)="drawBound()"><i class="fa fa-edit"></i>&nbsp;Draw Bounds</button>
+					class="btn btn-info btn-xs" [disabled]="downloadStarted || drawBoundsStarted" (click)="drawBounds()"><i class="fa fa-edit"></i>&nbsp;Draw Bounds</button>
 			<button *ngIf="bbox && (!irisDownloadListOption || (irisDownloadListOption && irisDownloadListOption.displayBbox))" type="button" title="Remove bounds"
-					class="btn btn-danger btn-xs" [disabled]="downloadStarted" (click)="clearBound()"><i class="fa fa-refresh"></i>&nbsp;Clear Bounds</button>
+					class="btn btn-danger btn-xs" [disabled]="downloadStarted" (click)="clearBounds()"><i class="fa fa-refresh"></i>&nbsp;Clear Bounds</button>
 			<button type="button" class="btn btn-info btn-xs" style="margin-left:auto;width:9rem;" [disabled]="!bbox || downloadStarted" title="Download data for bounding box" (click)="download()">
 				<i *ngIf="downloadStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!downloadStarted" class="fa fa-cloud-download"></i>&nbsp;Download
 			</button>

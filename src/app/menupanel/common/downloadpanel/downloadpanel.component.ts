@@ -2,13 +2,13 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { saveAs } from 'file-saver';
 import { config } from '../../../../environments/config';
 import { environment } from '../../../../environments/environment'; //CVP
-import { RectangleEditorObservable } from '@auscope/angular-cesium';
 import { ChangeDetectorRef } from '@angular/core';
-import { Bbox, DownloadWcsService, DownloadWfsService, CsClipboardService, CsIrisService, CsMapService,
+import { Bbox, DownloadWcsService, DownloadWfsService, CsClipboardService, CsIrisService,
          DownloadIrisService, LayerHandlerService, LayerModel, ResourceType, UtilitiesService, Polygon } from '@auscope/portal-core-ui';
 import { NVCLTSGDownloadComponent } from 'app/modalwindow/layeranalytic/nvcl/nvcl.tsgdownload.component';
 import { isNumber } from '@turf/helpers';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { BoundsService } from 'app/services/bounds/bounds.service';
 import { NVCLService } from '../../../modalwindow/querier/customanalytic/nvcl/nvcl.service';
 import { shareReplay } from 'rxjs/operators';
 
@@ -24,7 +24,7 @@ declare var gtag: Function;
 export class DownloadPanelComponent implements OnInit {
   [x: string]: any;
   @Input() layer: LayerModel;
-  @Output() boundsDrawnEvent: EventEmitter<string> = new EventEmitter<string>();
+
   bbox: Bbox;
   polygonBbox: Bbox;
   polygonFilter: any;
@@ -61,13 +61,13 @@ export class DownloadPanelComponent implements OnInit {
   public SELECT_DEFAULT_CHANNEL = "Choose a channel";
   public SELECT_ALL_CHANNEL = "All channels";
 
-  // the rectangle drawn on the map
-  private rectangleObservable: RectangleEditorObservable;
   private bsModalRef = null;
 
-  constructor(private cdRef: ChangeDetectorRef, private layerHandlerService: LayerHandlerService, private csMapService: CsMapService,
-      private downloadWfsService: DownloadWfsService, private downloadWcsService: DownloadWcsService, private downloadIrisService: DownloadIrisService,
-      private csClipboardService: CsClipboardService, private csIrisService: CsIrisService, public activeModalService: NgbModal, private nvclService: NVCLService) {
+  constructor(private cdRef: ChangeDetectorRef, private layerHandlerService: LayerHandlerService,
+      private downloadWfsService: DownloadWfsService, private downloadWcsService: DownloadWcsService,
+      private downloadIrisService: DownloadIrisService, private csClipboardService: CsClipboardService,
+      private boundsService: BoundsService, private csIrisService: CsIrisService,
+      public activeModalService: NgbModal, private nvclService: NVCLService) {
     this.isNvclLayer = false;
     this.isTsgDownloadAvailable = false;
     this.bbox = null;
@@ -78,11 +78,10 @@ export class DownloadPanelComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.layer.group === "Passive Seismic" && this.layer.cswRecords[0].onlineResources[1].type == "DOI") {
+    if (this.layer.group === 'Passive Seismic' && this.layer.cswRecords[0].onlineResources[1].type === 'DOI') {
       this.showDOIs = true;
     }
     if (this.layer) {
-      // console.log(this.layer.cswRecords)
       if (this.nvclService.isNVCL(this.layer.id)) {
         this.isNvclLayer = true;
         //Setup TsgDownload Button if API is ready.
@@ -116,15 +115,24 @@ export class DownloadPanelComponent implements OnInit {
         } else {
           this.downloadSizeLimit = 0;
         }
+        // Run the WCS 'DescribeCoverage' request to gather more information about the WCS resource
+        this.describeCoverage();
       } else {
         this.isWCSDownloadSupported = false;
       }
 
+      // Capture bounds events from the bounds service
+      this.boundsService.bbox.subscribe(bbox => {
+        this.bbox = bbox;
+      });
+      this.boundsService.drawingStarted.subscribe(drawBoundsStarted => {
+        this.drawBoundsStarted = drawBoundsStarted;
+      });
+
       // Capture polygon events from the clipboard service
       this.csClipboardService.isDrawingPolygonBS.subscribe(isDrawingPolygon => {
-        // Drawing may be triggered from clipboard, if so remove bounds
         if (isDrawingPolygon) {
-          this.clearBound();
+          this.clearBounds();
         }
         this.drawPolygonStarted = isDrawingPolygon;
       });
@@ -204,63 +212,16 @@ export class DownloadPanelComponent implements OnInit {
   /**
    * Draw bound to get the bbox for download
    */
-  public drawBound(): void {
-    // Let the layer panel know bounds are being drawn so it can erase existing ones from other panels
-    this.boundsDrawnEvent.emit(this.layer.id);
+  public drawBounds(): void {
     this.clearPolygon();
-    this.clearBound();
-    setTimeout(() => this.drawBoundsStarted = true, 0);
-    const me = this;
-    this.rectangleObservable = this.csMapService.drawBound();
-    this.rectangleObservable.subscribe((vector) => {
-      me.drawBoundsStarted = false;
-      if (!vector.points) {
-        // drawing hasn't started
-        return;
-      }
-      if (vector.points.length < 2
-        || vector.points[0].getPosition().x === vector.points[1].getPosition().x
-        || vector.points[0].getPosition().y === vector.points[1].getPosition().y) {
-        // drawing hasn't finished
-
-        me.drawBoundsStarted = true;
-
-        return;
-      }
-      const points = vector.points;
-      // calculate area from the 2 rectangle points
-      const width = points[0].getPosition().x - points[1].getPosition().x;
-      const length = points[0].getPosition().y - points[1].getPosition().y;
-      const area = Math.abs(width * length);
-      if (config.wcsSupportedLayer[me.layer.id]) {
-        // If 'downloadAreaMaxsize' is not set to Number.MAX_SAFE_INTEGER then download limits will apply
-        const maxSize = config.wcsSupportedLayer[me.layer.id].downloadAreaMaxSize;
-        if (maxSize !== Number.MAX_SAFE_INTEGER && maxSize < area) {
-          alert('The area size you have selected of ' + area + 'm2 exceed the limited size of ' +
-            config.wcsSupportedLayer[me.layer.id].downloadAreaMaxSize + 'm2. Due to the size of the dataset' +
-            ' we have to limit the download area');
-          me.bbox = null;
-          return;
-        }
-      }
-      // Reproject to EPSG:4326
-      me.bbox = UtilitiesService.reprojectToWGS84(points);
-
-      me.drawBoundsStarted = false;
-
-      // Run the WCS 'DescribeCoverage' request to gather more information about the WCS resource
-      if (me.isWCSDownloadSupported) {
-        me.describeCoverage();
-      }
-
-    });
+    this.boundsService.drawBounds(this.layer.id);
   }
 
   /**
    * Draw a polygon for polygon downloads
    */
   drawPolygon() {
-    this.clearBound();
+    this.clearBounds();
     this.csClipboardService.drawPolygon();
   }
 
@@ -327,7 +288,7 @@ export class DownloadPanelComponent implements OnInit {
 
         // somehow needs this to refresh the form with above
         me.cdRef.detectChanges();
-      })
+      });
     } else {
       alert('No coverage found. Please contact cg-admin@csiro.au');
     }
@@ -412,15 +373,10 @@ export class DownloadPanelComponent implements OnInit {
   /**
    * Clear the bounding box
    */
-  public clearBound(): void {
-    this.bbox = null;
+  public clearBounds(): void {
+    this.boundsService.clearBounds();
     this.wcsDownloadForm = {};
     this.wcsDownloadListOption = null;
-    // clear rectangle on the map
-    if (this.rectangleObservable) {
-      this.rectangleObservable.dispose();
-      this.rectangleObservable = null;
-    }
   }
 
   /**
