@@ -1,156 +1,44 @@
 <!doctype html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>AuScope Discovery Portal</title>
-    <base href="./">
+    <head>
+        <meta charset="utf-8">
+        <title>AuScope Discovery Portal</title>
+        <base href="/">
 
-    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
-    <meta content="Auscope Portal" name="description" />
-    <meta content="CSIRO" name="author" />
+        <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+        <meta content="Auscope Portal" name="description" />
+        <meta content="CSIRO" name="author" />
 
-    <!-- ================== BEGIN BASE CSS STYLE ================== -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/themify-icons/0.1.2/css/themify-icons.css" rel="stylesheet" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
-    <!-- ================== END BASE CSS STYLE ================== -->
+        <!-- ================== BEGIN BASE CSS STYLE ================== -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" rel="stylesheet" />
+        <link href="https://cdn.jsdelivr.net/themify-icons/0.1.2/css/themify-icons.css" rel="stylesheet" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+        <!-- ================== END BASE CSS STYLE ================== -->
 
-    <!-- ================== BEGIN BASE JS ================== -->
-    <script src="https://use.fontawesome.com/9f193e7fa1.js"></script>
-    <script src="https://apis.google.com/js/client.js"></script>
-    <!-- ================== END BASE JS ================== -->
+        <!-- ================== BEGIN BASE JS ================== -->
+        <script src="https://use.fontawesome.com/9f193e7fa1.js"></script>
+        <script src="https://apis.google.com/js/client.js"></script>
+        <!-- ================== END BASE JS ================== -->
 
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-</head>
-  <body>
-		<!-- BEGIN navbar -->
-		<div id="header" class="navbar fixed-top">
-            <!-- BEGIN navbar-header -->
-            <div class="navbar-header">
-                <!-- BEGIN organisation logo -->
-                <span class="navbar-brand">
-                    <img id="org-logo" src="extension/img/auscope_single-colour-1.png">
-                    <span><b>Au</b>Scope Discovery Portal</span>
-                </span>
-                <!-- END organisation logo -->
+        <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    </head>
+    <body>
 
-                <!-- START sidebar toggle -->
-                <!--
-                <button id="sidebar-toggle-btn" class="nav navbar-toggler d-inline d-md-none p-0 mb-0 mt-1" data-toggle="collapse" data-target=".sidebar-collapse">
-                    <div class="nav-index-btn">
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </div>
-                    <div class="nav-map-btn">
-                        <i class="ti-world"></i>
-                    </div>
-                </button>
-                -->
-                <!-- END sidebar toggle -->
-            </div>
-            <!-- END navbar-header -->
+        <!-- App contains routerOutlet -->
+        <app-component></app-component>
 
-            <!-- START search-panel -->
-            <app-search-panel></app-search-panel>
-            <!-- END search-panel -->
-
-            <!-- help dropdown menu -->
-            <ul class="nav navbar-nav mb-1 mr-3">
-                <li class="dropdown" app-help-menu></li>
-            </ul>
-		</div>
-		<!-- END navbar -->
-
-		<!-- BEGIN sidebar -->
-		<nav id="sidebar" class="sidebar slimscroll sidebar-collapse show" style="overflow: auto;" >
-            <!--
-			<li class="hasEvent d-none d-md-block" appFilterClipboard></li>
-            -->
-            <li class="hasEvent" appPermanentLink></li>
-
-            <!-- BEGIN Active Layers -->
-            <input type="checkbox" checked class="menuBtn" id="activeLayersBtn"/>
-            <h5 class="mb-1">
-                <label id="activeLayersLink" for="activeLayersBtn" class="mb-0" title="Layers added to map">
-                    <i class="ti-filter"></i>
-                    Active Layers
-                    <i class="fa fa-arrow-circle-down"></i>
-                </label>
-                <ul class="card-sub" appActiveLayers></ul>
-            </h5>
-            <!-- END Active Layers -->
-
-            <!-- BEGIN Featured Layers -->
-            <input type="checkbox" class="menuBtn" id="featuredLayersBtn"/>
-			<h5 class="mb-1">
-				<label id="featuredLayersLink" for="featuredLayersBtn" class="mb-0" title="Select predefined layers">
-				    <i class="ti-layers"></i>
-				    Featured Layers
-                    <i class="fa fa-arrow-circle-down"></i>
-				</label>
-				<ul class="card-sub" appLayerPanel></ul>
-			</h5>
-            <!-- END Featured Layers -->
-
-            <!-- BEGIN Custom Layers -->
-            <input type="checkbox" class="menuBtn" id="customLayersBtn"/>
-			<h5 class="mb-1">
-				<label for="customLayersBtn" class="mb-0" title="Enter a custom WMS endpoint">
-				    <i class="ti-pencil-alt"></i>
-				    Custom Layer
-                    <i class="fa fa-arrow-circle-down"></i>
-				</label>
-				<ul class="card-sub" appCustomPanel></ul>
-			</h5>
-            <!-- END Custom Layers -->
-
-            <!-- BEGIN Data Explorer -->
-            <input type="checkbox" class="menuBtn" id="dataBtn"/>
-            <h5 class="mb-1">
-                <label for="dataBtn" class="mb-0" title="Search CSW services for records">
-                    <i class="ti-book"></i>
-                    Data Search
-                    <i class="fa fa-arrow-circle-down"></i>
-                </label>
-                <ul class="card-sub" appDataExplorer></ul>
-            </h5>
-            <!-- END Data Explorer -->
-            
-            <hr/>
-			<li appPortalDetailsPanel></li>
-		</nav>
-		<!-- END sidebar -->
-
-		<!-- BEGIN #map-area -->
-		<div id="map-area" class="map-area">
-			<!-- BEGIN map-area-csmap -->
-            <div class="map-area-csmap">
-				 <app-cs-map class="h-100 w-100"></app-cs-map>
-            </div>
-			<!-- END map-area-csmap -->
-		</div>
-		<!-- END #content -->
-
-    <!-- Modal window used as a popup when map querying -->
-    <app-querier-modal-window></app-querier-modal-window>
-	<app-layer-modal-window></app-layer-modal-window>
-	<app-disclaimer-modal-window></app-disclaimer-modal-window>
-
-    <!-- ================== BEGIN BASE JS ================== -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-migrate/3.0.1/jquery-migrate.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.2/js/bootstrap.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-slimScroll/1.3.8/jquery.slimscroll.min.js"></script>
-    <script> $(document).ready(function(){$('#featuredLayersLink').click();});</script>
-	<!-- ================== END BASE JS ================== -->
-  </body>
+        <!-- ================== BEGIN BASE JS ================== -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-migrate/3.0.1/jquery-migrate.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.2/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-slimScroll/1.3.8/jquery.slimscroll.min.js"></script>
+        <script> $(document).ready(function(){$('#featuredLayersLink').click();});</script>
+        <!-- ================== END BASE JS ================== -->
+    </body>
 </html>

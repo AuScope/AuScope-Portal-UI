@@ -1,0 +1,37 @@
+import { Component } from '@angular/core';
+import { routerTransition } from '../../router.animations';
+import { environment } from '../../../environments/environment';
+
+@Component({
+    selector: 'app-login',
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.scss'],
+    animations: [routerTransition()]
+})
+export class LoginComponent {
+  constructor() {}
+
+  // TODO: We may need to store some user site settings to local storage if not saved to DB for post-auth
+
+  /**
+   * Google login
+   */
+  loginGoogle() {
+    window.location.href = environment.portalBaseUrl + 'oauth2/authorization/google';
+  }
+
+  /**
+   * Australia Access Federation (AAF) login
+   */
+  loginAaf() {
+    window.location.href = environment.portalBaseUrl + 'login/aaf';
+  }
+
+  /**
+   * Github login
+   */
+  loginGithub() {
+    window.location.href = environment.portalBaseUrl + 'oauth2/authorization/github';
+  }
+
+}

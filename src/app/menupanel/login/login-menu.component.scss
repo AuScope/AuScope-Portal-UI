@@ -1,0 +1,28 @@
+@import '../../globals';
+
+.user-menu {
+    color: $text-colour;
+}
+
+.user-button {
+    color: #d8d9d7;
+}
+
+.user-button:hover {
+    color: white;
+}
+
+.user-menu:hover {
+    color: $text-highlight-colour;
+}
+
+::ng-deep {
+    .mat-menu-panel {
+        margin-top: 10px;
+    }
+
+    .mat-menu-content {
+        background-color: $background-colour;
+    }
+
+}
