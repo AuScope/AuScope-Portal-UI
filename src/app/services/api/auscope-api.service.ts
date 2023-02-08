@@ -1,5 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { User } from 'app/models/user.model';
 import { Observable, of, throwError } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
@@ -34,8 +35,7 @@ export class AuscopeApiService {
   }
 
   private apiPost<T>(endpoint: string, params = {}, options = {}): Observable<T> {
-    const url = environment.portalBaseUrl + endpoint;
-
+    const url = environment.portalProxyUrl + endpoint;
     const body = new FormData();
     for (const key in params) {
       const val = params[key];
@@ -52,9 +52,8 @@ export class AuscopeApiService {
   }
 
   private apiGet<T>(endpoint: string, params = {}, options?): Observable<T> {
-    const url = environment.portalBaseUrl + endpoint;
+    const url = environment.portalProxyUrl + endpoint;
     const opts: { observe: 'body' } = { ...options, observe: 'body', params: params };
-
     return this.http.get<ApiResponse<T>>(url, opts).pipe(switchMap(apiData));
   }
 
@@ -103,6 +102,10 @@ export class AuscopeApiService {
       num: num
     };
     return this.apiGet<string[]>('suggestTerms.do', params);
+  }
+
+  public get user(): Observable<User> {
+    return this.apiGet<User>('secure/getUser.do');
   }
 
 }

@@ -13,6 +13,7 @@ export const environment = {
   getCSWRecordEndP: 'getKnownLayers.do',
   // portalBaseUrl: 'http://localhost:8080/AuScope-Portal/',
   portalBaseUrl: 'https://au-portal-dev.it.csiro.au/api/',
+  portalProxyUrl: '/api/',
   hostUrl: 'http://localhost:4200/index.htm',
   nVCLAnalyticalUrl: 'https://nvclanalytics.azurewebsites.net/NVCLAnalyticalServices/',
   googleAnalyticsKey: null,

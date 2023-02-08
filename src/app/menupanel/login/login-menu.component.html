@@ -1,0 +1,14 @@
+<div class="user-menu">
+    <div *ngIf="isUserLoggedIn()">
+        <button mat-button [matMenuTriggerFor]="loginMenu" class="user-menu" title="Log in">
+            <i class="fa fa-2x fa-user"></i>&nbsp;&nbsp;{{ username }} <b class="caret"></b>
+            <i class="fa fa-caret-down" style="margin-left:5px;"></i>
+        </button>
+        <mat-menu #loginMenu="matMenu" style="margin-top:12px;">
+            <h5 mat-menu-item><button (click)="logOut()" class="btn user-button">Log Out</button></h5>
+        </mat-menu>
+    </div>
+    <div *ngIf="!isUserLoggedIn()">
+        <button mat-button class="user-name" title="Log In" (click)="login()"><i class="fa fa-2x fa-users"></i>&nbsp;&nbsp;Log In<b class="caret"></b></button>
+    </div>
+</div>

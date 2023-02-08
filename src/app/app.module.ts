@@ -4,11 +4,17 @@ import { NgModule } from '@angular/core';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { NouisliderModule } from 'ng2-nouislider';
 import { CommonModule } from '@angular/common';
+import { BrowserModule } from '@angular/platform-browser';
 
 // Cesium icons
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 // Components
+import { AppComponent } from './app.component';
+import { PortalComponent } from './portal/portal.component';
+import { LoginMenuComponent } from './menupanel/login/login-menu.component';
+import { LoginComponent } from './menupanel/login/login.component';
+import { LoggedInComponent } from './menupanel/login/logged-in.component';
 import { CsMapComponent } from './cesium-map/csmap.component';
 import { CesiumMapPreviewComponent } from './menupanel/common/infopanel/cesiummappreview/cesium.preview.component';
 import { LayerPanelComponent } from './menupanel/layerpanel/layerpanel.component';
@@ -93,11 +99,25 @@ import { NgxColorsModule } from 'ngx-colors';
 import {MatProgressBarModule} from '@angular/material/progress-bar'; 
 import {MatCardModule} from '@angular/material/card'; 
 import { getSaver, SAVER } from './modalwindow/layeranalytic/nvcl/saver.provider';
+
+// Routing
+import { AppRoutingModule } from './app-routing.module';
+
+// Auth
+import { UserStateService } from './services/user/user-state.service';
+import { AuthGuard } from './services/auth/auth.guard';
+import { AuthService } from './services/auth/auth.service';
+
 PlotlyModule.plotlyjs = PlotlyJS;
 
 
 @NgModule({
     declarations: [
+        AppComponent,
+        PortalComponent,
+        LoginComponent,
+        LoggedInComponent,
+        LoginMenuComponent,
         CsMapComponent,
         CesiumMapPreviewComponent,
         LayerPanelComponent,
@@ -136,10 +156,12 @@ PlotlyModule.plotlyjs = PlotlyJS;
         RecordModalComponent
     ],
     providers: [ AuscopeApiService, FilterService, RectanglesEditorService, AdvancedComponentService, SearchService,
-                 NVCLService, MSCLService, BoundsService, GraceService, { provide: SAVER, useFactory: getSaver }
+                 NVCLService, MSCLService, BoundsService, GraceService, { provide: SAVER, useFactory: getSaver },
+                 UserStateService, AuthGuard, AuthService
     ],
     imports: [
         PortalCoreModule.forRoot(environment, config),
+        AppRoutingModule,
         PortalCorePipesModule,
         ClipboardModule,
         ModalModule.forRoot(),
@@ -167,18 +189,11 @@ PlotlyModule.plotlyjs = PlotlyJS;
         AngularCesiumWidgetsModule,
         NgbModule,
         FormsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        BrowserModule
     ],
     bootstrap: [
-        CsMapComponent,
-        LayerPanelComponent,
-        CustomPanelComponent,
-        ActiveLayersPanelComponent,
-        PermanentLinkComponent,
-        DataExplorerComponent,
-        PortalDetailsPanelComponent,
-        HelpMenuComponent,
-        SearchPanelComponent
+        AppComponent
     ]
 })
 export class AppModule { }
