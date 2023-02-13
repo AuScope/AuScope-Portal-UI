@@ -141,9 +141,14 @@ export class InfoPanelSubComponent implements OnChanges {
                         + ',' + bbox.eastBoundLongitude + ',' + bbox.northBoundLatitude
                         + '&WIDTH=400&HEIGHT=400';
                     this.wmsUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(onlineResources[j].url), params);
+                    console.log(this.wmsUrl)
                 }
             }
         }
+    }
+    public onImgError(event: Event) {
+        // (event.target as HTMLImageElement).style.display = 'none';
+        (event.target as HTMLImageElement).parentElement.style.display = 'none';
     }
 
 }
