@@ -18,8 +18,8 @@
 	</p>
 </div>
 <p *ngIf="wmsUrl!=undefined">
-	<b>WMS Preview: </b><img appImgLoading src="{{wmsUrl}}" height="100" width="100"/>
+	<b>WMS Preview: </b><img appImgLoading src="{{wmsUrl}}" (error)="onImgError($event)" height="100" width="100"/>
 </p>
 <p *ngIf="legendUrl!=undefined">
-	<b>Legend: </b><img appImgLoading src="{{legendUrl}}" class="infopanel-legend"/>
+	<b>Legend: </b><img appImgLoading src="{{legendUrl}}" (error)="onImgError($event)" class="infopanel-legend"/>
 </p>
