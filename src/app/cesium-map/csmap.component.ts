@@ -8,6 +8,7 @@ import { CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageState
 import { Cartesian3, MapMode2D, Math, ScreenSpaceEventHandler, SceneMode, ScreenSpaceEventType, Rectangle, SplitDirection,
    Cartesian2, WebMapServiceImageryProvider, WebMercatorProjection, Cartographic, GeographicProjection } from 'cesium';
 import { IrisQuerierHandler } from './custom-querier-handler/iris-querier-handler.service';
+import { KMLQuerierHandler } from './custom-querier-handler/kml-querier-handler.service';
 import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
 
 declare var Cesium: any;
@@ -309,7 +310,12 @@ export class CsMapComponent implements AfterViewInit {
         if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.IRIS))) {
           this.displayModal(mapClickInfo.clickCoord);
           const handler = new IrisQuerierHandler(layer, entity);
-          this.setModalHTML(handler.getHTML(), layer.name, entity, this.bsModalRef);
+          this.setModalHTML(handler.getHTML(), layer.name+": "+handler.getFeatureName(), entity, this.bsModalRef);
+        // KML layers
+        } else if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.KML))) {
+          this.displayModal(mapClickInfo.clickCoord);
+          const handler = new KMLQuerierHandler(entity);
+          this.setModalHTML(handler.getHTML(), layer.name+": "+handler.getFeatureName(), entity, this.bsModalRef);
         }
       }
       // TODO: Remove commented code, kept for yet to be re-implemented entity types
