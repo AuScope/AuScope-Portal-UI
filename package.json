@@ -30,7 +30,7 @@
     "@angular/platform-server": "^13.3.11",
     "@angular/router": "^13.3.11",
     "@auscope/angular-cesium": "^13.0.1",
-    "@auscope/portal-core-ui": "^1.0.61",
+    "@auscope/portal-core-ui": "^1.0.63",
     "@ng-bootstrap/ng-bootstrap": "^12.1.2",
     "@ng-select/ng-select": "^8.3.0",
     "@popperjs/core": "^2.11.6",

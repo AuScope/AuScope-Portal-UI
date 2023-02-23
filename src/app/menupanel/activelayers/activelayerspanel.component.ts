@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CsClipboardService, CsMapService, LayerHandlerService, LayerModel, ResourceType } from '@auscope/portal-core-ui';
+import { CsMapService, LayerHandlerService, LayerModel, ResourceType } from '@auscope/portal-core-ui';
 import { MatSliderChange } from '@angular/material/slider';
 import { SplitDirection } from 'cesium';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
@@ -7,20 +7,20 @@ import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
 import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
+import { LegendUiService } from 'app/services/legend/legend-ui.service';
 
 @Component({
   selector: '[appActiveLayers]',
   templateUrl: './activelayerspanel.component.html',
   styleUrls: ['../menupanel.scss']
 })
-
-
 export class ActiveLayersPanelComponent {
   bsModalRef: BsModalRef;
 
   constructor(private csMapService: CsMapService,
     private uiLayerModelService: UILayerModelService, private layerHandlerService: LayerHandlerService,
-    private advancedComponentService: AdvancedComponentService, private modalService: BsModalService) { }
+    private advancedComponentService: AdvancedComponentService, private legendUiService: LegendUiService,
+    private modalService: BsModalService) { }
 
   /**
    * Get active layers
@@ -55,6 +55,7 @@ export class ActiveLayersPanelComponent {
       // Remove any layer specific components
       this.advancedComponentService.removeAdvancedMapComponents(layerId);
     }
+    this.legendUiService.removeLegend(layerId);
     // Remove polygon filter if was opened and no layers present
     /*
     if (Object.keys(layerModelList).length === 0) {
@@ -66,7 +67,7 @@ export class ActiveLayersPanelComponent {
 
   /**
    * Layer opacity slider change event
-  */
+   */
   layerOpacityChange(event: MatSliderChange, layer: LayerModel) {
     this.csMapService.setLayerOpacity(layer, (event.value / 100));
   }
@@ -81,7 +82,7 @@ export class ActiveLayersPanelComponent {
 
   /**
    * Set a layer's split direction so that it will appear in either the left, right or both (none) panes.
-   * 
+   *
    * @param event the event trigger
    * @param layer the layer to set split direction on
    * @param direction the split direction for the layer to occupy
@@ -126,7 +127,7 @@ export class ActiveLayersPanelComponent {
 
   /**
    * Only show the split map buttons if the layer has a WMS resource.
-   * 
+   *
    * @param layer current LayerModel
    */
   public getApplicableSplitLayer(layer: LayerModel): boolean {
@@ -141,6 +142,47 @@ export class ActiveLayersPanelComponent {
     uiLayerModel.statusMap.getStatusBSubject().subscribe((value) => {
       this.bsModalRef.content.resourceMap = value.resourceMap;
     });
+  }
+
+  /**
+   * Check whether the layer has at least one associated WMS online resource
+   * that can be queried for a legend
+   *
+   * @param layer the layer
+   * @returns true if the layer has at least one WMS online resource, false otherwise
+   */
+  public hasLegend(layer: LayerModel): boolean {
+    // Hack for GRACE layer which uses a custom app-built legend
+    if (layer.id === 'grace-mascons') {
+      return false;
+    }
+    if (layer.cswRecords) {
+      for (const record of layer.cswRecords) {
+        if (record.onlineResources.find(r => r.type === 'WMS')) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Tell the LegendUiService to display the legend for a layer
+   *
+   * @param layer the layer
+   */
+  public showLegend(layer: LayerModel) {
+    this.legendUiService.showLegend(layer);
+  }
+
+  /**
+   * Check whether a legend is already being displayed for alyer
+   *
+   * @param layerId the ID of the layer
+   * @returns true if a legend is being displayed for the supplied layer, false otherwise
+   */
+  public isLegendShown(layerId: string): boolean {
+    return this.legendUiService.isLegendDisplayed(layerId);
   }
 
 }

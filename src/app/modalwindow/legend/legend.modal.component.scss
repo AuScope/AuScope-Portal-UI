@@ -1,0 +1,34 @@
+.legend-title-panel {
+  display:flex;
+
+  .legend-title {
+    width: 100%;
+    text-align: center;
+    margin: 6px 5px 0 10px;
+  }
+
+  .legend-spinner {
+    align-self: center;
+  }
+
+  .close-legend-button {
+    margin-left:auto;
+  }
+  
+  .close-legend-button:focus {
+    box-shadow: none;
+  }
+}
+
+.legend-content {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+
+  .legend-error {
+    text-align: center;
+  }
+}
+

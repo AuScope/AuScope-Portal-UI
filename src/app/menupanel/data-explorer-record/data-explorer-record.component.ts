@@ -1,6 +1,7 @@
 import { Component, Input, ViewContainerRef, OnInit } from "@angular/core";
 import {  CSWRecordModel,  CsMapService,  ManageStateService,  UtilitiesService,  LayerModel} from "@auscope/portal-core-ui";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { LegendUiService } from "app/services/legend/legend-ui.service";
 import { AdvancedComponentService } from "app/services/ui/advanced-component.service";
 import { environment } from "environments/environment";
 import * as _ from "lodash";
@@ -29,6 +30,7 @@ export class DataExplorerRecordComponent implements OnInit {
     public csMapService: CsMapService,
     private manageStateService: ManageStateService,
     private advancedMapComponentService: AdvancedComponentService,
+    private legendUiService: LegendUiService,
     public modalService: NgbModal
   ) {
     this.optionalFilters = [];
@@ -137,6 +139,9 @@ export class DataExplorerRecordComponent implements OnInit {
       null
     );
 
+    // Remove any existing legends in case map re-added with new style
+    this.legendUiService.removeLegend(layer.id);
+
     // Add layer
     this.csMapService.addLayer(layer, param);
 
@@ -161,5 +166,6 @@ export class DataExplorerRecordComponent implements OnInit {
       // Remove any layer specific components
       this.advancedMapComponentService.removeAdvancedMapComponents(layerId);
     }
+    this.legendUiService.removeLegend(layerId);
   }
 }

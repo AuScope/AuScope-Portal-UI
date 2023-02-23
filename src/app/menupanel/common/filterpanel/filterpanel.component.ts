@@ -11,6 +11,7 @@ import { BsModalService } from 'ngx-bootstrap/modal';
 import { GraceService } from 'app/services/wcustom/grace/grace.service';
 import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
 import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
+import { LegendUiService } from 'app/services/legend/legend-ui.service';
 
 declare var gtag: Function;
 
@@ -46,6 +47,7 @@ export class FilterPanelComponent implements OnInit {
     private csWMSService: CsWMSService,
     public layerStatus: LayerStatusService,
     private advancedComponentService: AdvancedComponentService,
+    private legendUiService: LegendUiService,
     private graceService: GraceService) {
     this.providers = [];
     this.optionalFilters = [];
@@ -213,6 +215,9 @@ export class FilterPanelComponent implements OnInit {
       this.optionalFilters,
       advancedFilterParams
     );
+
+    // Remove any existing legends in case map re-added with new style
+    this.legendUiService.removeLegend(layer.id);
 
     // Add layer to map in Cesium
     this.csMapService.addLayer(layer, param);

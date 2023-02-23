@@ -10,6 +10,7 @@ import { Component, AfterViewInit } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { RectangleEditorObservable } from '@auscope/angular-cesium';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
+import { LegendUiService } from 'app/services/legend/legend-ui.service';
 
 
 @Component({
@@ -42,7 +43,7 @@ export class CatalogueSearchComponent implements AfterViewInit {
 
   constructor(private csMapService: CsMapService, private cataloguesearchService: CataloguesearchService,
               private renderStatusService: RenderStatusService,  private modalService: BsModalService,
-              private uiLayerModelService: UILayerModelService) {
+              private uiLayerModelService: UILayerModelService, private legedUiService: LegendUiService) {
     this.drawStarted = false;
     this.searchMode = true;
     this.loading = false;
@@ -186,6 +187,7 @@ export class CatalogueSearchComponent implements AfterViewInit {
    */
   public removeLayer(layer: LayerModel) {
     this.csMapService.removeLayer(layer);
+    this.legedUiService.removeLegend(layer.id);
   }
 
   /**
