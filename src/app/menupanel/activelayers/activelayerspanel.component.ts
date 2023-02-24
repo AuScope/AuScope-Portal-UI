@@ -158,7 +158,7 @@ export class ActiveLayersPanelComponent {
     }
     if (layer.cswRecords) {
       for (const record of layer.cswRecords) {
-        if (record.onlineResources.find(r => r.type === 'WMS')) {
+        if (record.onlineResources.find(r => r.type.toLowerCase() === 'wms')) {
           return true;
         }
       }

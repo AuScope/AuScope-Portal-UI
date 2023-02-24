@@ -1,10 +1,10 @@
 <div style="padding:5px;" cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle>
 	<div class="legend-title-panel">
-		<h5 class="legend-title">{{ legendTitle }}</h5><i *ngIf="!legendLoaded && !legendError" class="fa fa-spin fa-spinner legend-spinner"></i><button class="btn btn-sm btn-outline close-legend-button" (click)="closeLegend()"><i class="fa fa-times"></i></button>
+		<h5 class="legend-title">{{ legendTitle }}</h5><i *ngIf="legendLoading" class="fa fa-spin fa-spinner legend-spinner"></i><button class="btn btn-sm btn-outline close-legend-button" (click)="closeLegend()"><i class="fa fa-times"></i></button>
 	</div>
 	<div mat-dialog-content class="legend-content">
-		<h4 class="legend-error" *ngIf="legendError">No legend available</h4>
-		<img *ngIf="legendUrl && legendUrl !== '' && !legendError" appImgLoading src="{{ legendUrl }}" alt="Legend" (load)="legendLoaded=true" (error)="legendUrlError()" />
-		<img *ngIf="legendImage && !legendError" [src]="legendImage" alt="Legend" (load)="legendLoaded=true" />
+		<h4 class="legend-error" *ngIf="urlLegendFailed && requestLegendFailed">No legend available</h4>
+		<img *ngIf="!urlLegendFailed && legendUrl && legendUrl !== ''" appImgLoading src="{{ legendUrl }}" alt="Legend" (load)="legendLoading=false" (error)="retrieveLegend()" />
+		<img *ngIf="!requestLegendFailed && legendImage" [src]="legendImage" alt="Legend" (load)="urlLegendFailed=true" />
 	</div>
 </div>

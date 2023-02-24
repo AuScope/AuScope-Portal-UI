@@ -179,25 +179,23 @@ export class LegendUiService {
         const legendUrlList: string[] = [];
         for (const resource of wmsOnlineResources) {
           if (!this.layerStatusService.isEndpointFailing(layer.id, wmsOnlineResource)) {
+            // Some GET URLs were being truncated at the server despite not being very long, other servers were outright rejecting POST
+            // requests, so create lists of GET URLs and POST requests to throw everything at the wall and see what sticks.
             const requestUrl = this.createRequestUrl(resource.url, resource.name, sldBody);
-            if (requestUrl.length > Constants.WMSMAXURLGET) {
-              // Too long for a browser GET URL so use a POST request
-              const httpParams = this.getHttpParams(wmsOnlineResource.name, sldBody, collatedParam);
-              const request = this.http.post(this.trimUrl(resource.url), httpParams, { responseType: 'blob' }).pipe(
-                catchError(err => {
-                  return of(undefined);
-                })
-              );
-              legendRequestList.push(request);
-            } else {
-              legendUrlList.push(requestUrl);
-            }
+            const httpParams = this.getHttpParams(wmsOnlineResource.name, sldBody, collatedParam);
+            const request = this.http.post(this.trimUrl(resource.url), httpParams, { responseType: 'blob' }).pipe(
+              catchError(err => {
+                return of(undefined);
+              })
+            );
+            legendRequestList.push(request);
+            legendUrlList.push(requestUrl);
           }
         }
         this.displayLegendDialog(layer.id, layer.name, legendUrlList, legendRequestList);
       } else {
         const requestUrl = this.createRequestUrl(wmsOnlineResource.url, wmsOnlineResource.name, null);
-        this.displayLegendDialog(layer.id, layer.name, [requestUrl], null);
+        this.displayLegendDialog(layer.id, layer.name, [requestUrl], []);
       }
     });
   }
