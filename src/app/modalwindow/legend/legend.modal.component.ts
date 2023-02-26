@@ -11,40 +11,31 @@ import { forkJoin, Observable } from 'rxjs';
 export class LegendModalComponent {
 
   // Supplied parameters
-  layerId: string;          // ID of layer that legend belongs to
-  legendTitle: string;      // Title of legend
-  legendUrlList: string[];              // Array of URL strings to try for legend
+  layerId: string;      // ID of layer that legend belongs to
+  legendTitle: string;  // Title of legend
   legendRequestList: Observable<any>[]; // Array of Requests to try for legend
 
   // Local
-  legendUrl: string;            // URL string used for images (from legendUrlList)
   legendImage: any;             // Legend image will be constructed from the supplied Blob (from legendRequestList)
-  legendLoading = true;         // True if legend is loading, false otherwise
-  urlLegendFailed = false;      // True if we've given up trying to load legends from the URL list
-  requestLegendFailed = false;  // True if we've given up trying to load legends from the request list
+  legendLoading = true;         // True if legend is loading
+  requestLegendFailed = false;  // True if all legend requests failed
 
 
   constructor(private legendUiService: LegendUiService, private dialogRef: MatDialogRef<LegendModalComponent>, @Inject(MAT_DIALOG_DATA) data) {
     this.layerId = data.layerId;
     this.legendTitle = data.legendTitle;
-    this.legendUrlList = data.legendUrlList;
     this.legendRequestList = data.legendRequestList;
     this.retrieveLegend();
   }
 
   /**
-   * Retrieve legend. First we try the URLs in the legendUrlList, failures will recurse. Failing that,
-   * we try POST requests from the legendRequestList which will all be fired at once and the first success
-   * used.
+   * Attempt to get images from all URLs in the legendRequestList
    */
   retrieveLegend() {
-    if (this.legendUrlList && this.legendUrlList.length > 0) {
-      // Try a URL from the URL list if one is available
-      this.legendUrl = this.legendUrlList.pop();
-    } else if (this.legendRequestList && this.legendRequestList.length > 0) {
-      this.urlLegendFailed = true;
-      // Run legend requests for all WMS (some may be down or not accept legend requests), use first success
+    if (this.legendRequestList && this.legendRequestList.length > 0) {
+      // Run legend requests for all WMS (some may be down or not accepting legend requests), use first success
       forkJoin(this.legendRequestList).subscribe(result => {
+        this.legendRequestList = [];
         let requestSuccess = false;
         for (const legendBlob of result) {
           if (legendBlob !== undefined) {
@@ -59,9 +50,6 @@ export class LegendModalComponent {
           this.legendLoading = false;
         }
       });
-    } else {
-      this.urlLegendFailed = true;
-      this.requestLegendFailed = true;
     }
   }
 

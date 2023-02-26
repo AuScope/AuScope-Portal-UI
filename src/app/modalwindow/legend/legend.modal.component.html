@@ -3,8 +3,7 @@
 		<h5 class="legend-title">{{ legendTitle }}</h5><i *ngIf="legendLoading" class="fa fa-spin fa-spinner legend-spinner"></i><button class="btn btn-sm btn-outline close-legend-button" (click)="closeLegend()"><i class="fa fa-times"></i></button>
 	</div>
 	<div mat-dialog-content class="legend-content">
-		<h4 class="legend-error" *ngIf="urlLegendFailed && requestLegendFailed">No legend available</h4>
-		<img *ngIf="!urlLegendFailed && legendUrl && legendUrl !== ''" appImgLoading src="{{ legendUrl }}" alt="Legend" (load)="legendLoading=false" (error)="retrieveLegend()" />
-		<img *ngIf="!requestLegendFailed && legendImage" [src]="legendImage" alt="Legend" (load)="urlLegendFailed=true" />
+		<h4 class="legend-error" *ngIf="!legendLoading && requestLegendFailed">No legend available</h4>
+		<img *ngIf="!requestLegendFailed && legendImage" [src]="legendImage" alt="Legend" (load)="legendLoading=false;" />
 	</div>
 </div>

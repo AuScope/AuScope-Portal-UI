@@ -28,7 +28,8 @@ export class LegendUiService {
     if (layer.cswRecords) {
       for (const cswRecord of layer.cswRecords) {
         if (cswRecord.onlineResources) {
-          wmsOnlineResource = cswRecord.onlineResources.find(r => r.type === 'WMS');
+          wmsOnlineResource = cswRecord.onlineResources.find(r => r.type.toLowerCase() === 'wms');
+          break;
         }
       }
     }
@@ -61,7 +62,7 @@ export class LegendUiService {
    * @param legendUrlList list of legend image URLs (either this or legendRequestList will be required)
    * @param legendRequestList list of image requests (either this or legendUrlList will be required)
    */
-  private displayLegendDialog(layerId: string, legendTitle: string, legendUrlList: string[], legendRequestList: Observable<any>[]) {
+  private displayLegendDialog(layerId: string, legendTitle: string, /*legendUrlList: string[], */legendRequestList: Observable<any>[]) {
     const dialogConfig = new MatDialogConfig();
       dialogConfig.autoFocus = true;
       dialogConfig.hasBackdrop = false;
@@ -69,7 +70,6 @@ export class LegendUiService {
       dialogConfig.data = {
         layerId: layerId,
         legendTitle: legendTitle,
-        legendUrlList: legendUrlList,
         legendRequestList: legendRequestList
       };
       const dialogRef = this.dialog.open(LegendModalComponent, dialogConfig);
@@ -89,11 +89,11 @@ export class LegendUiService {
   /**
    * Create HttpParams for the GetLegendGraphic requests
    * @param layerName the layer name
-   * @param sldBody the styled layer descriptor (SLD_BODY)
    * @param collatedParam other layer specific collated parameters
+   * @param sldBody the styled layer descriptor (SLD_BODY) - Optional
    * @returns a set of HttpParams for th eGetLegendGraphic request
    */
-  private getHttpParams(layerName: string, sldBody: string, collatedParam: any): HttpParams {
+  private getHttpParams(layerName: string, collatedParam: any, sldBody?: string): HttpParams {
     let httpParams = new HttpParams()
           .set('SERVICE', 'WMS')
           .append('REQUEST', 'GetLegendGraphic')
@@ -101,9 +101,11 @@ export class LegendUiService {
           .append('FORMAT', 'image/png')
           .append('LAYER', layerName)
           .append('LAYERS', layerName)
-          .append('SLD_BODY', sldBody)
           .append('SCALE', '1000000')
           .append('LEGEND_OPTIONS', 'forceLabels:on;minSymbolSize:16');
+          if (sldBody) {
+            httpParams = httpParams.append('SLD_BODY', sldBody);
+          }
 
     // Add mandatory filters, discard optional
     for (const p in collatedParam) {
@@ -136,7 +138,7 @@ export class LegendUiService {
    * @param sldBody the SLD_BODY (if one is to be used)
    * @returns a GetLegendGraphic URL for GET requests
    */
-  private createRequestUrl(wmsUrl: string, layerName: string, sldBody: string): string {
+  private createRequestUrl(wmsUrl: string, layerName: string, sldBody?: string): string {
     wmsUrl = this.trimUrl(wmsUrl);
     let requestUrl = wmsUrl + '?SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png&BGCOLOR=0xFFFFFF' +
                      '&LAYER=' + layerName + '&LAYERS=' + layerName + '&SCALE=1000000' + '&forceLabels=on&minSymbolSize=16';
@@ -176,26 +178,35 @@ export class LegendUiService {
         const wmsOnlineResources = this.getWMSOnlineResources(layer);
         // Compile list of legend requests and/or URLs
         const legendRequestList: Observable<any>[] = [];
-        const legendUrlList: string[] = [];
         for (const resource of wmsOnlineResources) {
           if (!this.layerStatusService.isEndpointFailing(layer.id, wmsOnlineResource)) {
             // Some GET URLs were being truncated at the server despite not being very long, other servers were outright rejecting POST
             // requests, so create lists of GET URLs and POST requests to throw everything at the wall and see what sticks.
-            const requestUrl = this.createRequestUrl(resource.url, resource.name, sldBody);
-            const httpParams = this.getHttpParams(wmsOnlineResource.name, sldBody, collatedParam);
-            const request = this.http.post(this.trimUrl(resource.url), httpParams, { responseType: 'blob' }).pipe(
+            const httpParams = this.getHttpParams(wmsOnlineResource.name, collatedParam, sldBody);
+            const postRequest = this.http.post(this.trimUrl(resource.url), httpParams, { responseType: 'blob' }).pipe(
               catchError(err => {
                 return of(undefined);
               })
             );
-            legendRequestList.push(request);
-            legendUrlList.push(requestUrl);
+            legendRequestList.push(postRequest);
+            const requestUrl = this.createRequestUrl(resource.url, resource.name, sldBody);
+            const getRequest = this.http.get(requestUrl, { responseType: 'blob' }).pipe(
+              catchError(err => {
+                return of(undefined);
+              })
+            );
+            legendRequestList.push(getRequest);
           }
         }
-        this.displayLegendDialog(layer.id, layer.name, legendUrlList, legendRequestList);
+        this.displayLegendDialog(layer.id, layer.name, legendRequestList);
       } else {
         const requestUrl = this.createRequestUrl(wmsOnlineResource.url, wmsOnlineResource.name, null);
-        this.displayLegendDialog(layer.id, layer.name, [requestUrl], []);
+        const getRequest = this.http.get(requestUrl, { responseType: 'blob' }).pipe(
+          catchError(err => {
+            return of(undefined);
+          })
+        );
+        this.displayLegendDialog(layer.id, layer.name, [getRequest]);
       }
     });
   }
