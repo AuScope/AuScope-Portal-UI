@@ -6,12 +6,17 @@ export class IrisQuerierHandler {
 
   constructor(private layer: LayerModel, private entity: KmlFeatureData) {}
 
+  /**
+   * Creates an HTML string using a feature's KMLFeatureData and CSW records info
+   * 
+   * @returns HTML string 
+   */
   public getHTML(): string {
     const extendedData = this.entity['kml']['extendedData'];
     let html = '<div class="row"><div class="col-md-3">Station</div><div class="col-md-9">' + this.entity['name'] + '</div></div><hr>';
     html += '<div class="row"><div class="col-md-3">Code</div><div class="col-md-9">' + extendedData['Code']['value'] + '</div></div><hr>';
     html += '<div class="row"><div class="col-md-3">Country</div><div class="col-md-9">' + extendedData['Country']['value'] + '</div></div><hr>';
-    html += '<div class="row"><div class="col-md-3">Parser</div><div class="col-md-9">' + this.layer.description + '</div></div><hr>';
+    html += '<div class="row"><div class="col-md-3">Brief Description</div><div class="col-md-9">' + this.layer.description + '</div></div><hr>';
     html += '<div class="row"><div class="col-md-3">Layer</div><div class="col-md-9">' + this.layer.group + '</div></div><hr>';
 
     html += '<div class="row"><div class="col-md-3">Record Info</div><div class="col-md-9">';
@@ -24,6 +29,15 @@ export class IrisQuerierHandler {
     }
     html += '</div></div>';
     return html;
+  }
+
+  /**
+   * Fetches a feature's name
+   * 
+   * @returns feature name string
+   */
+  public getFeatureName(): string {
+    return this.entity['name'];
   }
   
 }
