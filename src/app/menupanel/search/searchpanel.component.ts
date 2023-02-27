@@ -27,7 +27,7 @@ const SEARCH_FIELDS = [{
     field: 'abstract',
     checked: true
   }];
-const OGC_SERVICES = ['WMS', 'IRIS', 'WFS', 'WCS', 'WWW'];
+const OGC_SERVICES = ['WMS', 'IRIS', 'WFS', 'WCS', 'WWW', 'KML'];
 const NUMBER_OF_SUGGESTIONS = 5;
 
 @Component({
