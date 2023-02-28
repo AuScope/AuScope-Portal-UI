@@ -7,6 +7,7 @@ import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { LegendUiService } from 'app/services/legend/legend-ui.service';
 
 
 @Component({
@@ -28,7 +29,7 @@ export class CustomPanelComponent {
 
     constructor(private layerHandlerService: LayerHandlerService, private renderStatusService: RenderStatusService,
       private modalService: BsModalService, private csMapService: CsMapService, private uiLayerModelService: UILayerModelService,
-      public activeModalService: NgbModal) {
+      private legendUiService: LegendUiService, public activeModalService: NgbModal) {
       this.loading = false;
       this.statusmsg = 'Enter your WMS service endpoint URL and hit <i class="fa fa-search"></i>';
     }
@@ -83,6 +84,7 @@ export class CustomPanelComponent {
       */
     public removeLayer(layer: LayerModel) {
       this.csMapService.removeLayer(layer);
+      this.legendUiService.removeLegend(layer.id);
     }
 
     /**
