@@ -7,7 +7,6 @@ import { CSWRecordModel, LayerModel, OnlineResourceModel, UtilitiesService } fro
     templateUrl: './subpanel.component.html',
     styleUrls: ['../../../menupanel.scss']
 })
-
 export class InfoPanelSubComponent implements OnChanges {
     @Input() cswRecord: CSWRecordModel;
     @Input() layer: LayerModel;

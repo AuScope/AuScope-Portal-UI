@@ -842,3 +842,18 @@ fieldset.show-fieldset-borders-whitebg legend{
     font-size: xx-small;
 }
 /* END Rickshaw settings that work from here */
+
+/* Start LegendModal dialog */
+.legend-modal > mat-dialog-container {
+  // Remove LegendModal borders
+  padding: 0;
+  overflow: hidden;
+}
+
+::ng-deep {
+    // Reduce LegendModal z-index from 1000 to 100 so feature click dialogs aren't obscured
+    .cdk-overlay-container {
+        z-index: 100 !important;
+    }
+}
+/* End LegendModal dialog */

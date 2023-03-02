@@ -8,6 +8,7 @@ import { Observable, Subscription } from 'rxjs';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
 import { take } from 'rxjs/operators';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
+import { LegendUiService } from 'app/services/legend/legend-ui.service';
 
 const DEFAULT_RESULTS_PER_PAGE = 10;
 const SEARCH_FIELDS = [{
@@ -78,7 +79,7 @@ export class SearchPanelComponent implements OnInit {
   constructor(private searchService: SearchService, private advancedComponentService: AdvancedComponentService,
               private csMapService: CsMapService, private layerHandlerService: LayerHandlerService,
               private uiLayerModelService: UILayerModelService, private manageStateService: ManageStateService,
-              private modalService: NgbModal) { }
+              private legendUiService: LegendUiService, private modalService: NgbModal) { }
 
   ngOnInit() {
     for (const service of OGC_SERVICES) {
@@ -265,6 +266,9 @@ export class SearchPanelComponent implements OnInit {
       []
     );
 
+    // Remove any existing legends in case map re-added with new style
+    this.legendUiService.removeLegend(layer.id);
+
     // Add layer to map in Cesium
     this.csMapService.addLayer(layer, param);
 
@@ -308,6 +312,7 @@ export class SearchPanelComponent implements OnInit {
     this.csMapService.removeLayer(layer);
     // Remove any layer specific map components
     this.advancedComponentService.removeAdvancedMapComponents(layer.id);
+    this.legendUiService.removeLegend(layer.id);
   }
 
   /**

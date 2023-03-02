@@ -14,6 +14,7 @@ import { FilterPanelComponent } from '../common/filterpanel/filterpanel.componen
 import { config } from '../../../environments/config';
 import { DOCUMENT } from '@angular/common';
 import { DownloadPanelComponent } from '../common/downloadpanel/downloadpanel.component';
+import { LegendUiService } from 'app/services/legend/legend-ui.service';
 
 
 // Filter modes available in the dropdown layer filter selector
@@ -47,6 +48,7 @@ export class LayerPanelComponent implements OnInit {
       private modalService: BsModalService, private csMapService: CsMapService,
       private manageStateService: ManageStateService, private CsClipboardService: CsClipboardService,
       private uiLayerModelService: UILayerModelService, private advancedMapComponentService: AdvancedComponentService,
+      private legendUiService: LegendUiService,
       @Inject(DOCUMENT) document: Document) {
     this.CsClipboardService.filterLayersBS.subscribe(filterLayers => {
       this.areLayersFiltered = filterLayers;
@@ -216,6 +218,7 @@ export class LayerPanelComponent implements OnInit {
     this.csMapService.removeLayer(layer);
     // Remove any layer specific map components
     this.advancedMapComponentService.removeAdvancedMapComponents(layer.id);
+    this.legendUiService.removeLegend(layer.id);
   }
 
   /**

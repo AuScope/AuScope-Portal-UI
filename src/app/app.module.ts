@@ -56,6 +56,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatRadioModule } from '@angular/material/radio'
 import { MatTreeModule } from '@angular/material/tree';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { CdkTableModule } from '@angular/cdk/table';
 
 import { DisclaimerModalComponent } from './modalwindow/disclaimer/disclaimer.modal.component';
@@ -74,6 +75,8 @@ import { GraceLegendComponent } from './cesium-map/advanced/grace/grace-legend.c
 import { GraceGraphModalComponent } from './modalwindow/querier/customanalytic/grace/grace-graph.modal.component';
 import { GraceAdvancedFilterComponent } from './menupanel/common/filterpanel/advance/grace/grace-advanced-filter.component';
 
+import { LegendModalComponent } from './modalwindow/legend/legend.modal.component';
+
 // Services
 import { AuscopeApiService } from './services/api/auscope-api.service';
 import { FilterService } from './services/filter/filter.service';
@@ -82,6 +85,7 @@ import { AdvancedComponentService } from './services/ui/advanced-component.servi
 import { SearchService } from './services/search/search.service';
 import { BoundsService } from './services/bounds/bounds.service';
 import { GraceService } from './services/wcustom/grace/grace.service';
+import { LegendUiService } from './services/legend/legend-ui.service';
 
 import * as PlotlyJS from 'plotly.js-dist-min/plotly.min.js';
 import { PlotlyModule } from 'angular-plotly.js';
@@ -96,8 +100,8 @@ import { NVCLTSGDownloadComponent } from './modalwindow/layeranalytic/nvcl/nvcl.
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxColorsModule } from 'ngx-colors';
 
-import {MatProgressBarModule} from '@angular/material/progress-bar'; 
-import {MatCardModule} from '@angular/material/card'; 
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatCardModule } from '@angular/material/card';
 import { getSaver, SAVER } from './modalwindow/layeranalytic/nvcl/saver.provider';
 
 // Routing
@@ -153,11 +157,12 @@ PlotlyModule.plotlyjs = PlotlyJS;
         MSCLAnalyticComponent,
         HelpMenuComponent,
         DataExplorerComponent,
-        RecordModalComponent
+        RecordModalComponent,
+        LegendModalComponent
     ],
     providers: [ AuscopeApiService, FilterService, RectanglesEditorService, AdvancedComponentService, SearchService,
                  NVCLService, MSCLService, BoundsService, GraceService, { provide: SAVER, useFactory: getSaver },
-                 UserStateService, AuthGuard, AuthService
+                 LegendUiService, UserStateService, AuthGuard, AuthService
     ],
     imports: [
         PortalCoreModule.forRoot(environment, config),
@@ -190,7 +195,8 @@ PlotlyModule.plotlyjs = PlotlyJS;
         NgbModule,
         FormsModule,
         ReactiveFormsModule,
-        BrowserModule
+        BrowserModule,
+        DragDropModule
     ],
     bootstrap: [
         AppComponent
