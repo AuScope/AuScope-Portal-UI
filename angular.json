@@ -1,7 +1,8 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "cli": {
-    "analytics": false
+    "analytics": false,
+    "defaultCollection": "@angular-eslint/schematics"
   },
   "version": 1,
   "newProjectRoot": "projects",
@@ -26,7 +27,11 @@
               "src/extension",
               "src/favicon-16x16.png",
               "src/favicon-32x32.png",
-              { "glob": "**/*", "input": "./node_modules/cesium/Build/Cesium", "output": "./assets/cesium" }
+              {
+                "glob": "**/*",
+                "input": "./node_modules/cesium/Build/Cesium",
+                "output": "./assets/cesium"
+              }
             ],
             "styles": [
               "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
@@ -36,7 +41,7 @@
               "node_modules/nouislider/distribute/nouislider.min.css",
               "src/extension/css/d3.css",
               "node_modules/@ng-select/ng-select/themes/default.theme.css",
-              "./node_modules/cesium/Build/Cesium/Widgets/widgets.css"              
+              "./node_modules/cesium/Build/Cesium/Widgets/widgets.css"
             ],
             "scripts": [
               "node_modules/d3/d3.min.js",
@@ -50,7 +55,7 @@
               "src/extension/js/no-ie-support.js",
               "./node_modules/cesium/Build/Cesium/Cesium.js"
             ],
-	          "customWebpackConfig": {
+            "customWebpackConfig": {
               "path": "./extra-webpack.config.js"
             }
           },
@@ -142,7 +147,7 @@
             },
             "development": {
               "browserTarget": "project:build:development"
-             }
+            }
           },
           "defaultConfiguration": "development"
         },
@@ -182,6 +187,15 @@
               "src/extension",
               "src/favicon-16x16.png",
               "src/favicon-32x32.png"
+            ]
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
             ]
           }
         }
