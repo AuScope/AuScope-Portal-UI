@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - '**/AUS*'
 
   pull_request:
 
