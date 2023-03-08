@@ -1,7 +1,7 @@
 <div class="filter-form">
 	<div *ngIf="layerFilterCollection">
 		<div *ngFor="let mandatoryFilter of layerFilterCollection['mandatoryFilters']">
-			<div *ngIf="mandatoryFilter.type == 'MANDATORY.CHECKBOX'">
+			<div *ngIf="mandatoryFilter.type === 'MANDATORY.CHECKBOX'">
 				<div class="form-group form-group-sm">
 					<div>
 						<input class="form-control-sm" id="{{ 'filter-MANDATORY.CHECKBOX-' + mandatoryFilter.label }}" type="checkbox" [(ngModel)]="mandatoryFilter.value"/>
@@ -11,7 +11,7 @@
 					</div>
 				</div>
 			</div>
-			<div *ngIf="mandatoryFilter.type == 'MANDATORY.DROPDOWNSELECTLIST'">
+			<div *ngIf="mandatoryFilter.type === 'MANDATORY.DROPDOWNSELECTLIST'">
 				<div class="form-group  form-group-sm">
 					<label>{{mandatoryFilter.label}}</label>
 					<select class="form-control form-control-sm" [(ngModel)]="mandatoryFilter.value">
@@ -20,7 +20,7 @@
 					</select>
 				</div>
 			</div>
-			<div *ngIf="mandatoryFilter.type == 'MANDATORY.TEXTBOX'">
+			<div *ngIf="mandatoryFilter.type === 'MANDATORY.TEXTBOX'">
 				<div class="form-group  form-group-sm">
 					<label>{{mandatoryFilter.label}}</label>
 					<input type="text" class="form-control form-control-sm" [(ngModel)]="mandatoryFilter.value">
@@ -46,19 +46,19 @@
 		</div>
 		<hr *ngIf="optionalFilters.length > 0" class="nav-divider filter-divider">
 		<div *ngFor="let optionalFilter of optionalFilters; let i = index;">
-			<div *ngIf="optionalFilter.type=='OPTIONAL.TEXT'">
+			<div *ngIf="optionalFilter.type==='OPTIONAL.TEXT'">
 				<div class="form-group  form-group-sm">
 					<label>{{optionalFilter.label}}:</label>
 					<input type="text" class="form-control form-control-sm" [(ngModel)]="optionalFilter.value">
 				</div>
 			</div>
-			<div *ngIf="optionalFilter.type=='OPTIONAL.DATE'">
+			<div *ngIf="optionalFilter.type==='OPTIONAL.DATE'">
 				<div class="form-group">
 					<label class="control-label">{{optionalFilter.label}}:</label>
 					<input type="date" class="form-control form-control-sm" [(ngModel)]="optionalFilter.value"/>
 				</div>
 			</div>
-			<div *ngIf="optionalFilter.type=='OPTIONAL.DROPDOWNSELECTLIST'">
+			<div *ngIf="optionalFilter.type==='OPTIONAL.DROPDOWNSELECTLIST'">
 				<div class="form-group  form-group-sm">
 					<label>{{optionalFilter.label}}</label>
 					<div *ngIf="optionalFilter.multiSelect; else singleSelect">
@@ -80,7 +80,7 @@
 					</ng-template>
 				</div>
 			</div>
-			<div *ngIf="optionalFilter.type=='OPTIONAL.DROPDOWNREMOTE'">
+			<div *ngIf="optionalFilter.type==='OPTIONAL.DROPDOWNREMOTE'">
 				<div class="form-group  form-group-sm">
 					<label>{{optionalFilter.label}}</label>
 					<select class="form-control form-control-sm" [(ngModel)]="optionalFilter.value">
@@ -89,7 +89,7 @@
 					</select>
 				</div>
 			</div>
-			<div *ngIf="optionalFilter.type=='OPTIONAL.PROVIDER'">
+			<div *ngIf="optionalFilter.type==='OPTIONAL.PROVIDER'">
 				<div class="form-group">
 					<div style="display: flex" *ngFor="let provider of providers;let idx = index">
 						<div style="width: 10%;">
@@ -104,7 +104,7 @@
 				</div>
 			</div>
 
-			<div  class="d-none d-md-block" *ngIf="optionalFilter.type=='OPTIONAL.POLYGONBBOX'">
+			<div  class="d-none d-md-block" *ngIf="optionalFilter.type==='OPTIONAL.POLYGONBBOX'">
 				<div class="form-group form-group-sm">
 					<div class="checkbox" >
 						<input class="form-control-sm" id="{{ 'filter-OPTIONAL.POLYGONBBOX-0-' + layer.id }}" type="checkbox" [(ngModel)]="bApplyClipboardBBox"/>
@@ -112,7 +112,7 @@
 					</div>
 				</div>
 			</div>
-			<div  class="d-block d-md-none" *ngIf="optionalFilter.type=='OPTIONAL.POLYGONBBOX'">
+			<div  class="d-block d-md-none" *ngIf="optionalFilter.type==='OPTIONAL.POLYGONBBOX'">
 				<div class="alert alert-warning fade show">
 					<i class="ti-bell float-left"></i>
 					<p>This filter is not supported on a small screen and would not return any results.</p>

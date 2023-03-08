@@ -23,21 +23,21 @@
 							<div *ngIf="!haveImagesLoaded(nvclDataset.datasetId)" class="loading-image"></div>
 
 							<!-- Add definition -->
-							<button class="float-right" mat-stroked-button (click)="openLegend(nvclDataset.datasetId)" >Show Legend</button>                 
-                              <ng-select *ngIf="nvclDataset.datasetId" [items] = "datasetScalars[nvclDataset.datasetId]" [multiple]="false" bindLabel="logName" bindValue="logId" placeholder="Select Scalar" (change)="changeScalarSelection(nvclDataset.datasetId)" [(ngModel)]="selectedScalar">                                
+							<button class="float-right" mat-stroked-button (click)="openLegend(nvclDataset.datasetId)" >Show Legend</button>
+                              <ng-select *ngIf="nvclDataset.datasetId" [items] = "datasetScalars[nvclDataset.datasetId]" [multiple]="false" bindLabel="logName" bindValue="logId" placeholder="Select Scalar" (change)="changeScalarSelection(nvclDataset.datasetId)" [(ngModel)]="selectedScalar">
                                 <ng-template ng-label-tmp let-item="item">
                                     <div class="row" >
                                         <div class="col-8">
                                             <div  [matTooltip]="datasetScalarDefinition[item.logName]? datasetScalarDefinition[item.logName].definition : null">{{item.logName}}</div>
                                         </div>
                                         <div  class="col-4" *ngIf="item.logName">
-                                            <span *ngIf="datasetScalarDefinition[item.logName]!=null">
+                                            <span *ngIf="datasetScalarDefinition[item.logName]!==null">
                                                 <div class="fake-link" [matTooltip]="datasetScalarDefinition[item.logName].definition"> ? </div>
                                             </span>
-                                            <span *ngIf="datasetScalarDefinition[item.logName] == null">
+                                            <span *ngIf="datasetScalarDefinition[item.logName] === null">
                                                 <div class="fake-link" (mouseover)="getDefinition(item.logName)" > ? </div>
                                             </span>
-                                        </div>        
+                                        </div>
                                     </div>
                                 </ng-template>
 
@@ -47,19 +47,19 @@
                                             <div>{{item.logName}}</div>
                                         </div>
                                         <div  class="col-4">
-                                            <span *ngIf="datasetScalarDefinition[item.logName]!=null">
+                                            <span *ngIf="datasetScalarDefinition[item.logName]!==null">
                                                 <div class="fake-link" [matTooltip]="datasetScalarDefinition[item.logName].definition">?</div>
                                             </span>
-                                            <span *ngIf="datasetScalarDefinition[item.logName] == null"> 
+                                            <span *ngIf="datasetScalarDefinition[item.logName] === null">
                                                 <div class="fake-link" (mouseover)="getDefinition(item.logName)" >?</div>
                                             </span>
-                                        </div>        
+                                        </div>
                                     </div>
                                 </ng-template>
                             </ng-select>
 							<!-- END Add definition -->
 
-							<!-- Images -->							
+							<!-- Images -->
 							<iframe (load)="setImagesLoaded($event, nvclDataset.datasetId)" frameborder="0" [src]="datasetImages[nvclDataset.datasetId] | trustResourceUrl"></iframe>
 
 						</div>
@@ -68,7 +68,7 @@
 					<!-- BEGIN tab-pane -->
 					<div class="tab-pane fade " id="nvcl-card-tab-scalar-{{nvclDataset.datasetId}}" role="tabpanel">
 						<div class="modal-card-size">
-							<div *ngIf="drawGraphMode==false;" style="overflow: auto; width: 100%; height: 100%;">
+							<div *ngIf="drawGraphMode===false;" style="overflow: auto; width: 100%; height: 100%;">
 								<div>
 									<!-- BEGIN toolbar -->
 									<div class="container-fluid">
@@ -98,7 +98,7 @@
 									<!-- END toolbar -->
 
 									<!-- BEGIN jobView==false -->
-									<div *ngIf="jobView==false">
+									<div *ngIf="jobView===false">
 										<!-- BEGIN container -->
 										<div class="container-fluid card">
 											<!-- BEGIN row -->
@@ -123,7 +123,7 @@
 									<!-- END jobView==false -->
 
                                     <!-- BEGIN jobView==true -->
-									<div *ngIf="jobView==true">
+									<div *ngIf="jobView===true">
 										<!-- BEGIN container -->
 										<div class="container-fluid">
 											<!-- BEGIN row -->
@@ -147,7 +147,7 @@
 								</div>
 							</div>
 
-							<div *ngIf="drawGraphMode==true;" class="modal-card-size">
+							<div *ngIf="drawGraphMode===true;" class="modal-card-size">
 								<div style="overflow: auto; width: 100%; height: 100%;">
 									<div class="hasEvent light-blue window-close" (click)="changeDrawGraphMode(false, nvclDataset.datasetId)">
 										<i class="fa fa-window-close" aria-hidden="true"></i> close</div>
