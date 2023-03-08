@@ -34,13 +34,13 @@
 			</div>
 		</div>
 
-		<div *ngIf="!bbox&&drawStarted==false">
+		<div *ngIf="!bbox&&drawStarted===false">
 			 <div class="alert alert-warning fade show">
 	               <i class="ti-bell float-left"></i>
 	               <p>Click on 'Select Bounds' to filter your area of interest</p>
 	           </div>
 		</div>
-		<div *ngIf="drawStarted==true">
+		<div *ngIf="drawStarted===true">
 			 <div class="alert alert-success fade show">
 	               <i class="ti-bell float-left"></i>
 	               <p>Click on the map to select bounding box</p>

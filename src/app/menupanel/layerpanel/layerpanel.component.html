@@ -42,9 +42,9 @@
 						<div class="split-panel" *ngIf="getShowSplitMapButtons(layer)" (click)="$event.stopPropagation()">
 							Split Direction&nbsp;
 							<div *ngIf="getApplicableSplitLayer(layer)" class="split-button-panel">
-								<button [className]="getLayerSplitDirection(layer.id) == 'left' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'left')">Left</button>
-								<button [className]="getLayerSplitDirection(layer.id) == 'none' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'none')">Both</button>
-								<button [className]="getLayerSplitDirection(layer.id) == 'right' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'right')">Right</button>
+								<button [className]="getLayerSplitDirection(layer.id) === 'left' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'left')">Left</button>
+								<button [className]="getLayerSplitDirection(layer.id) === 'none' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'none')">Both</button>
+								<button [className]="getLayerSplitDirection(layer.id) === 'right' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'right')">Right</button>
 							</div>
 							<div *ngIf="!getApplicableSplitLayer(layer)" class="split-button-panel">
 								<button class="btn btn-split btn-primary" [disabled]="true">Layer not supported</button>
@@ -53,15 +53,15 @@
 					</div>
 				</a>
 				<div [hidden]="!layer.expanded || layer.hide" class="sidebar-card-menu-show">
-					<div class="card card-info card-with-tabs layer-card animated slideInRight">						
-						<div class = "rh_info_wrap">	
+					<div class="card card-info card-with-tabs layer-card animated slideInRight">
+						<div class = "rh_info_wrap">
 							<div class="card-header">
 								<ul id="card-tab" class="nav nav-tabs">
 									<li (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.filterpanel.expanded}"><a data-toggle="tab"><span class="d-none d-sm-inline">Map Layer</span></a></li>
-									<li *ngIf="isMapSupportedLayer(layer) && isDownloadSupportedLayer(layer)" (click)="selectTabPanel(layer.id,'downloadpanel')" [ngClass]="{'active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.downloadpanel.expanded}" class="d-none d-md-block"><a data-toggle="tab"><span>Download</span></a></li>	
+									<li *ngIf="isMapSupportedLayer(layer) && isDownloadSupportedLayer(layer)" (click)="selectTabPanel(layer.id,'downloadpanel')" [ngClass]="{'active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.downloadpanel.expanded}" class="d-none d-md-block"><a data-toggle="tab"><span>Download</span></a></li>
 								</ul>
 							</div>
-							<div class="rh_info">																	
+							<div class="rh_info">
 								<button (click)="displayRecordInformation(layer)" class="btn btn-sm btn-info layer-info-btn" title="Information" [ngClass]="{'active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.infopanel.expanded}">info</button>
 							</div>
 						</div>
