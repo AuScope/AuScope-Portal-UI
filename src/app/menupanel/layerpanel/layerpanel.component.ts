@@ -22,7 +22,7 @@ enum FilterMode {
   Active = "Active Layer",
   Image = "Image Layer",
   Data = "Data Layer"
-};
+}
 
 @Component({
     selector: '[appLayerPanel]',
@@ -238,7 +238,7 @@ export class LayerPanelComponent implements OnInit {
 
   /**
    * Set a layer's split direction so that it will appear in either the left, right or both (None) panes.
-   * 
+   *
    * @param event the event trigger
    * @param layer the layer to set split direction on
    * @param direction the split direction for the layer to occupy
@@ -264,7 +264,7 @@ export class LayerPanelComponent implements OnInit {
 
   /**
    * Gets the layer's split direction
-   * 
+   *
    * @param layerId layer id string
    * @returns a string "none" or "left" or "right"
    */
@@ -285,7 +285,7 @@ export class LayerPanelComponent implements OnInit {
 
   /**
    * Only show the split map buttons if the layer has a WMS resource.
-   * 
+   *
    * @param layer current LayerModel
    */
   public getApplicableSplitLayer(layer: LayerModel): boolean {
@@ -308,7 +308,7 @@ export class LayerPanelComponent implements OnInit {
 
   /**
    * Gets a layers "UILayerModel"
-   * 
+   *
    * @param layerId layer id string
    * @returns UILayerModel object
    */

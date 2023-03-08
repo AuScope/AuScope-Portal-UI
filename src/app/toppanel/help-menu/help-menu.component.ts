@@ -1,15 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: '[app-help-menu]',
   templateUrl: './help-menu.component.html',
   styleUrls: ['./help-menu.component.scss']
 })
-export class HelpMenuComponent implements OnInit {
+export class HelpMenuComponent {
 
   constructor() { }
-
-  ngOnInit(): void {
-  }
 
 }

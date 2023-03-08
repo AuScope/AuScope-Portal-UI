@@ -13,7 +13,7 @@ import { AdvancedComponentService } from 'app/services/ui/advanced-component.ser
 import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
 import { LegendUiService } from 'app/services/legend/legend-ui.service';
 
-declare var gtag: Function;
+declare let gtag: Function;
 
 @Component({
   selector: 'app-filter-panel',
@@ -257,7 +257,7 @@ export class FilterPanelComponent implements OnInit {
       this.csWMSService.getNvclFilter(layer, param).subscribe(response => {
         if (response.indexOf('<ogc:Intersects>') >= 0) {
           const ogcIntersects = UtilitiesService.getPolygonFilter(response);
-          // tslint:disable-next-line:max-line-length
+          // eslint-disable-next-line max-len
           response = '<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:gml=\"http://www.opengis.net/gml\">' + ogcIntersects + '</ogc:Filter>';
         }
         layer.ogcFilter = response;

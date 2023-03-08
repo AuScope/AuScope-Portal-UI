@@ -16,11 +16,11 @@
       ],
       "rules": {
         "@angular-eslint/component-selector": [
-          "error",
+          "warn",
           {
             "prefix": "app",
             "style": "kebab-case",
-            "type": "element"
+            "type": ["element", "attribute"]
           }
         ],
         "@angular-eslint/directive-selector": [
@@ -34,7 +34,11 @@
         "@typescript-eslint/no-explicit-any": "off", //Too Many, needed to turn off
         "@typescript-eslint/no-empty-function": "warn",
         "@typescript-eslint/no-unused-vars": "warn",
-        "prefer-const": "warn"
+        "prefer-const": "warn",
+        "@typescript-eslint/ban-types": "warn",
+        "no-var": "warn",
+        "@typescript-eslint/no-this-alias": "warn",
+        "@typescript-eslint/no-inferrable-types": "off"
       }
     },
     {

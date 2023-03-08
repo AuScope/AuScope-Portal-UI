@@ -168,15 +168,14 @@ export class NVCLBoreholeAnalyticComponent
     this.nvclBoreholeAnalyticService
       .checkNVCLAnalyticalJobStatus(this.nvclform.email)
       .subscribe(response => {
-        const me = this;
-        me.currentStatus = response;
+        this.currentStatus = response;
 
-        me.nvclBoreholeAnalyticService.setUserEmail(me.nvclform.email);
-        for (const i in me.currentStatus) {
-          me.nvclBoreholeAnalyticService
-            .getNVCLJobPublishStatus(me.currentStatus[i].jobid)
+        this.nvclBoreholeAnalyticService.setUserEmail(this.nvclform.email);
+        for (const i in this.currentStatus) {
+          this.nvclBoreholeAnalyticService
+            .getNVCLJobPublishStatus(this.currentStatus[i].jobid)
             .subscribe(response => {
-              me.currentStatus[i].published =
+              this.currentStatus[i].published =
                 response === 'true' ? true : false;
             });
         }
