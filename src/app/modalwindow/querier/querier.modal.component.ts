@@ -195,8 +195,21 @@ export class QuerierModalComponent  implements OnInit {
             htmldata.push(doc.getElementsByTagName('gml:name')[html].innerHTML)
           }
         }
-        this.docs[i]['node_name'] = htmldata[i]
+      } else if (doc.getElementsByTagName('gsmlp:name').length != 0) {
+        for (let html in doc.getElementsByTagName('gsmlp:name')) {
+          if(!objExp.test(doc.getElementsByTagName('gsmlp:name')[html].innerHTML)) {
+            htmldata.push(doc.getElementsByTagName('gsmlp:name')[html].innerHTML)
+          }
+        }
+      } else if (doc.getElementsByTagName('null:name').length != 0) {
+        for (let html in doc.getElementsByTagName('null:name')) {
+          if(!objExp.test(doc.getElementsByTagName('null:name')[html].innerHTML)) {
+            htmldata.push(doc.getElementsByTagName('null:name')[html].innerHTML)
+          }
+        }
       }
+      this.docs[i]['node_name'] = htmldata[i]
+
     }
     setTimeout(() => {
       this.changeDetectorRef.detectChanges();
