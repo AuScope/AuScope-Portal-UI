@@ -66,6 +66,15 @@ export class ActiveLayersPanelComponent {
   }
 
   /**
+   * Determine if a layer hsould have an opacity slider
+   * @param layer the layer
+   * @returns true if a layer should have an opacity slider, false otherwise
+   */
+  showOpacitySlider(layer: LayerModel): boolean {
+    return this.csMapService.layerHasOpacity(layer);
+  }
+
+  /**
    * Layer opacity slider change event
    */
   layerOpacityChange(event: MatSliderChange, layer: LayerModel) {
