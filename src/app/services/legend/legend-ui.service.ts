@@ -154,11 +154,24 @@ export class LegendUiService {
    * @param layer the layer
    */
   public showLegend(layer: LayerModel) {
+    // If a static image has been provided, use that
+    if (layer.legendImg && layer.legendImg !== '') {
+      const requestUrl = environment.portalBaseUrl + 'legend/' + layer.legendImg;
+      const getRequest = this.http.get(requestUrl, { responseType: 'blob' }).pipe(
+        catchError(err => {
+          return of(undefined);
+        })
+      );
+      this.displayLegendDialog(layer.id, layer.name, [getRequest]);
+      return;
+    }
+
     // Get first WMS online resource for layer name
     const wmsOnlineResource = this.getWMSOnlineResource(layer);
     if (!wmsOnlineResource || this.displayedLegends.has(layer.id)) {
       return;
     }
+
     // Get mandatory filters from layer state
     const layerState = this.manageStateService.getLayerState(layer.id);
     if (layerState['filterCollection']) {
