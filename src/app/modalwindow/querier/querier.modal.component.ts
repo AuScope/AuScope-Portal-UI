@@ -183,6 +183,21 @@ export class QuerierModalComponent  implements OnInit {
 
   // Look for changes and update UI after brief delay
   public onDataChange(): void {
+    let htmldata = []
+    let Expression=/http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+    let objExp=new RegExp(Expression);
+    for (let  i = 0; i < this.docs.length; i++) {
+      var doc = new DOMParser().parseFromString(this.docs[i].raw, "text/xml");
+      console.log(doc)
+      if (doc.getElementsByTagName('gml:name').length != 0) {
+        for (let html in doc.getElementsByTagName('gml:name')) {
+          if(!objExp.test(doc.getElementsByTagName('gml:name')[html].innerHTML)) {
+            htmldata.push(doc.getElementsByTagName('gml:name')[html].innerHTML)
+          }
+        }
+        this.docs[i]['node_name'] = htmldata[i]
+      }
+    }
     setTimeout(() => {
       this.changeDetectorRef.detectChanges();
     }, 50);
