@@ -1,6 +1,6 @@
-	<div *ngIf="areLayersFiltered" class="filtered-layers">
-		<div class="filter-text">Showing layers compatible with Polygon Filter</div>
-		<button class="btn btn-info btn-sm filter-btn" type="button" title="Show all layers" (click)="removeFilterLayers()">
+	<div *ngIf="areLayersPolygonFiltered" class="filtered-layers">
+		<div>Showing layers compatible with Polygon Filter</div>
+		<button class="btn btn-info btn-sm" type="button" title="Show all layers" (click)="removeFilterLayers()">
 			Show All
 		</button>
 	</div>

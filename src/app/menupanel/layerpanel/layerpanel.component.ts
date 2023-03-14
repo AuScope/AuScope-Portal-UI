@@ -43,7 +43,7 @@ export class LayerPanelComponent implements OnInit {
   layerGroups: {};  // TODO: This is a copy of what's in LayerHandlerService, we should just be using that
   bsModalRef: BsModalRef;
   @Output() expanded: EventEmitter<any> = new EventEmitter();
-  areLayersFiltered: boolean;
+  areLayersPolygonFiltered: boolean;
 
   // User bookmarks (if logged in and stored)
   bookmarks: Bookmark[];
@@ -53,12 +53,12 @@ export class LayerPanelComponent implements OnInit {
   constructor(private layerHandlerService: LayerHandlerService,
       private renderStatusService: RenderStatusService, private activeModalService: NgbModal,
       private modalService: BsModalService, private csMapService: CsMapService,
-      private manageStateService: ManageStateService, private CsClipboardService: CsClipboardService,
+      private manageStateService: ManageStateService, private csClipboardService: CsClipboardService,
       private uiLayerModelService: UILayerModelService, private advancedMapComponentService: AdvancedComponentService,
       private userstateService: UserStateService, private legendUiService: LegendUiService,
       private authService: AuthService, @Inject(DOCUMENT) document: Document) {
-    this.CsClipboardService.filterLayersBS.subscribe(filterLayers => {
-      this.areLayersFiltered = filterLayers;
+      this.csClipboardService.filterLayersBS.subscribe(filterLayers => {
+      this.areLayersPolygonFiltered = filterLayers;
     });
   }
 
@@ -206,6 +206,15 @@ export class LayerPanelComponent implements OnInit {
         }
       });
 
+      // Filter layers by ability to use polygon filter
+      this.csClipboardService.filterLayersBS.subscribe(
+        (bFilterLayers) => {
+          if (bFilterLayers) {
+            this.showLayersWithPolygonFilter();
+          } else {
+            this.showAllLayers();
+          }
+        });
       // Keep track of bookmarks
       this.userstateService.bookmarks.subscribe(bookmarks => {
         this.bookmarks = bookmarks;
@@ -341,7 +350,7 @@ export class LayerPanelComponent implements OnInit {
    * Turn off Filter Layers (Polygon Filter)
    */
   public removeFilterLayers() {
-    this.CsClipboardService.toggleFilterLayers(false);
+    this.csClipboardService.toggleFilterLayers(false);
   }
 
  /**
@@ -382,7 +391,49 @@ export class LayerPanelComponent implements OnInit {
   }
 
   /**
-   * Check is user is currently logged in
+   * Check if a LayerModel contains a filter collection that has an optional filter of type "OPTIONAL.POLYGONBBOX"
+   *
+   * @param layer the LayerModel
+   * @returns true if a polygon filter is found, false otherwise
+   */
+  private layerHasPolygonFilter(layer: LayerModel): boolean {
+    return layer.filterCollection !== undefined && (layer.filterCollection.optionalFilters !== null &&
+      layer.filterCollection.optionalFilters.find(f => f.type === 'OPTIONAL.POLYGONBBOX'));
+  }
+
+  /**
+   * Only display layers in the Featured Layers list that have a polygon filter
+   */
+  private showLayersWithPolygonFilter() {
+    for (const group in this.layerGroups) {
+      this.layerGroups[group].hide = true;
+      for (const layer of this.layerGroups[group]) {
+        layer.hide = true;
+        // Only layers with a polygon filter
+        if (this.layerHasPolygonFilter(layer)) {
+          layer.hide = false;
+          this.layerGroups[group].hide = false;
+          this.layerGroups[group].expanded = true;
+          this.layerGroups[group].loaded = this.layerGroups[group];
+        }
+      }
+    }
+  }
+
+  /**
+   * Display all layers in the Featured Layers list
+   */
+  private showAllLayers() {
+    for (const group in this.layerGroups) {
+      this.layerGroups[group].hide = false;
+      for (const layer of this.layerGroups[group]) {
+        layer.hide = false;
+        this.layerGroups[group].hide = false;
+        this.layerGroups[group].loaded = this.layerGroups[group];
+      }
+    }
+  }
+   /** Check is user is currently logged in
    *
    * @returns true if user is logge din, false otherwise
    */
