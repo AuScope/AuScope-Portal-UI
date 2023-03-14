@@ -1,5 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Bookmark } from 'app/models/bookmark.model';
 import { User } from 'app/models/user.model';
 import { Observable, of, throwError } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -106,6 +107,32 @@ export class AuscopeApiService {
 
   public get user(): Observable<User> {
     return this.apiGet<User>('secure/getUser.do');
+  }
+
+  // Add bookmark to database
+  public addBookmark(layerId: string): Observable<number> {
+    const options = {
+        params: {
+            fileIdentifier: layerId,
+            serviceId: ''
+        }
+    };
+    return this.apiRequest('addBookMark.do', options);
+  }
+
+  // Remove book mark information from database
+  public removeBookmark(bookmarkId: number) {
+    const options = {
+        params: {
+            id: bookmarkId.toString()
+        }
+    };
+    return this.apiRequest('deleteBookMark.do', options);
+  }
+
+  // Get list of bookmarks for a user
+  public getBookmarks(): Observable<Bookmark[]> {
+      return this.apiRequest('getBookMarks.do');
   }
 
 }

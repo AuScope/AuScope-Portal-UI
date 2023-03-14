@@ -14,7 +14,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('isLoggedIn');
     this.http.get(environment.portalProxyUrl + 'logout').subscribe(() => {
-      this.userStateService.removeUser();
+      this.userStateService.logoutUser();
       this.router.navigate(['']);
     });
   }
