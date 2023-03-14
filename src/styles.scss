@@ -305,6 +305,11 @@ label {
         margin-bottom: 5px;
     }
 
+    .menuBtn + h5 > ul {
+        /*opacity: 0.01; max-height: 0px; transition: opacity 1s, max-height 1s;*/
+        display: none;
+    }
+
     /* top level menu control in sidebar */
     .menuBtn:checked + h5 > ul {
         /*opacity: 1; max-height: 999px; transition: opacity 1s, max-height 1s;*/

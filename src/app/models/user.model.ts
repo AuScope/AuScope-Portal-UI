@@ -1,5 +1,5 @@
 /**
- * User Models
+ * User model
  */
 export interface User {
   fullName: string;

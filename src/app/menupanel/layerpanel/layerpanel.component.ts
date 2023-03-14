@@ -15,6 +15,9 @@ import { config } from '../../../environments/config';
 import { DOCUMENT } from '@angular/common';
 import { DownloadPanelComponent } from '../common/downloadpanel/downloadpanel.component';
 import { LegendUiService } from 'app/services/legend/legend-ui.service';
+import { UserStateService } from 'app/services/user/user-state.service';
+import { Bookmark } from 'app/models/bookmark.model';
+import { AuthService } from 'app/services/auth/auth.service';
 
 
 // Filter modes available in the dropdown layer filter selector
@@ -42,16 +45,20 @@ export class LayerPanelComponent implements OnInit {
   @Output() expanded: EventEmitter<any> = new EventEmitter();
   areLayersPolygonFiltered: boolean;
 
+  // User bookmarks (if logged in and stored)
+  bookmarks: Bookmark[];
+  showingOnlyBookmarkedLayers = false;
+
 
   constructor(private layerHandlerService: LayerHandlerService,
       private renderStatusService: RenderStatusService, private activeModalService: NgbModal,
       private modalService: BsModalService, private csMapService: CsMapService,
       private manageStateService: ManageStateService, private csClipboardService: CsClipboardService,
       private uiLayerModelService: UILayerModelService, private advancedMapComponentService: AdvancedComponentService,
-      private legendUiService: LegendUiService,
-      @Inject(DOCUMENT) document: Document) {
-    this.csClipboardService.filterLayersBS.subscribe(filterLayers => {
-      this.areLayersPolygonFiltered = filterLayers;
+      private userstateService: UserStateService, private legendUiService: LegendUiService,
+      private authService: AuthService, @Inject(DOCUMENT) document: Document) {
+    this.CsClipboardService.filterLayersBS.subscribe(filterLayers => {
+      this.areLayersFiltered = filterLayers;
     });
   }
 
@@ -207,6 +214,10 @@ export class LayerPanelComponent implements OnInit {
           } else {
             this.showAllLayers();
           }
+
+      // Keep track of bookmarks
+      this.userstateService.bookmarks.subscribe(bookmarks => {
+        this.bookmarks = bookmarks;
       });
   }
 
@@ -421,6 +432,79 @@ export class LayerPanelComponent implements OnInit {
         this.layerGroups[group].loaded = this.layerGroups[group];
       }
     }
+   * Check is user is currently logged in
+   *
+   * @returns true if user is logge din, false otherwise
+   */
+  public isUserLoggedIn(): boolean {
+    return this.authService.isLoggedIn;
+  }
+
+  /**
+   * Set whether to show all layers or only bookmarks (id user is logged in)
+   *
+   * @param showBookmarks true if only showing bookmarks, false for all layers
+   */
+  public setShowingOnlyBookmarkedLayers(onlyBookmarks: boolean) {
+    this.showingOnlyBookmarkedLayers = onlyBookmarks;
+  }
+
+  /**
+   * Get whether user has at least one bookmarked layer
+   *
+   * @returns true if user at least one bookmarked layer, false otherwise
+   */
+  public hasBookmarkedLayers(): boolean {
+    return this.bookmarks && this.bookmarks.length > 0;
+  }
+
+  /**
+   * See if a specific layer has been bookmarked
+   *
+   * @param layerId the layer ID
+   * @returns true if layer is bookmarked for current user, false otherwise
+   */
+  public isLayerBookmarked(layerId: string): boolean {
+    if (this.bookmarks && this.bookmarks.find(b => b.fileIdentifier === layerId)) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * See whether a layer group contains a layer that has been bookmarked by the user
+   *
+   * @param layerGroupKey the key (string) of the layer group
+   * @returns true if the layer group ocntains a layer that has been bookmarked, false otherwise
+   */
+  public layerGroupHasBookmarkedLayer(layerGroupKey: string): boolean {
+    if (this.layerGroups[layerGroupKey]) {
+      for (const layer of this.layerGroups[layerGroupKey]) {
+        if (this.bookmarks && this.bookmarks.find(b => b.fileIdentifier === layer.id)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Add a layer bookmark
+   *
+   * @param layerId layer ID
+   */
+  public 
+  (layerId: string) {
+    this.userstateService.addBookmark(layerId);
+  }
+
+  /**
+   * Remove a layer bookmark
+   *
+   * @param layerId layer ID
+   */
+  public removeLayerBookmark(layerId: string) {
+    this.userstateService.removeBookmark(layerId);
   }
 
 }
