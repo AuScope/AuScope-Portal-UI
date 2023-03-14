@@ -66,6 +66,15 @@ export class ActiveLayersPanelComponent {
   }
 
   /**
+   * Determine if a layer hsould have an opacity slider
+   * @param layer the layer
+   * @returns true if a layer should have an opacity slider, false otherwise
+   */
+  showOpacitySlider(layer: LayerModel): boolean {
+    return this.csMapService.layerHasOpacity(layer);
+  }
+
+  /**
    * Layer opacity slider change event
    */
   layerOpacityChange(event: MatSliderChange, layer: LayerModel) {
@@ -156,6 +165,11 @@ export class ActiveLayersPanelComponent {
     if (layer.id === 'grace-mascons') {
       return false;
     }
+    // Some layers have static legend images on the server
+    if (layer.legendImg && layer.legendImg !== '') {
+      return true;
+    }
+    // Look for a WMS URL
     if (layer.cswRecords) {
       for (const record of layer.cswRecords) {
         if (record.onlineResources.find(r => r.type.toLowerCase() === 'wms')) {
