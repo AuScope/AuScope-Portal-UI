@@ -57,8 +57,8 @@ export class LayerPanelComponent implements OnInit {
       private uiLayerModelService: UILayerModelService, private advancedMapComponentService: AdvancedComponentService,
       private userstateService: UserStateService, private legendUiService: LegendUiService,
       private authService: AuthService, @Inject(DOCUMENT) document: Document) {
-    this.CsClipboardService.filterLayersBS.subscribe(filterLayers => {
-      this.areLayersFiltered = filterLayers;
+      this.csClipboardService.filterLayersBS.subscribe(filterLayers => {
+      this.areLayersPolygonFiltered = filterLayers;
     });
   }
 
@@ -214,7 +214,7 @@ export class LayerPanelComponent implements OnInit {
           } else {
             this.showAllLayers();
           }
-
+        });
       // Keep track of bookmarks
       this.userstateService.bookmarks.subscribe(bookmarks => {
         this.bookmarks = bookmarks;
@@ -432,7 +432,8 @@ export class LayerPanelComponent implements OnInit {
         this.layerGroups[group].loaded = this.layerGroups[group];
       }
     }
-   * Check is user is currently logged in
+  }
+   /** Check is user is currently logged in
    *
    * @returns true if user is logge din, false otherwise
    */
@@ -493,8 +494,7 @@ export class LayerPanelComponent implements OnInit {
    *
    * @param layerId layer ID
    */
-  public 
-  (layerId: string) {
+  public addLayerBookmark(layerId: string) {
     this.userstateService.addBookmark(layerId);
   }
 
