@@ -234,6 +234,15 @@ export class LayerPanelComponent implements OnInit {
   }
 
   /**
+   * Determine if a layer hsould have an opacity slider
+   * @param layer the layer
+   * @returns true if a layer should have an opacity slider, false otherwise
+   */
+  showOpacitySlider(layer: LayerModel): boolean {
+    return this.csMapService.layerHasOpacity(layer);
+  }
+
+  /**
    * Layer opacity slider change event
    */
   public layerOpacityChange(event: MatSliderChange, layer: LayerModel) {
