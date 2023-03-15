@@ -55,7 +55,7 @@ export class LayerPanelComponent implements OnInit {
       private modalService: BsModalService, private csMapService: CsMapService,
       private manageStateService: ManageStateService, private csClipboardService: CsClipboardService,
       private uiLayerModelService: UILayerModelService, private advancedMapComponentService: AdvancedComponentService,
-      private userstateService: UserStateService, private legendUiService: LegendUiService,
+      private userStateService: UserStateService, private legendUiService: LegendUiService,
       private authService: AuthService, @Inject(DOCUMENT) document: Document) {
       this.csClipboardService.filterLayersBS.subscribe(filterLayers => {
       this.areLayersPolygonFiltered = filterLayers;
@@ -216,7 +216,7 @@ export class LayerPanelComponent implements OnInit {
           }
         });
       // Keep track of bookmarks
-      this.userstateService.bookmarks.subscribe(bookmarks => {
+      this.userStateService.bookmarks.subscribe(bookmarks => {
         this.bookmarks = bookmarks;
       });
   }
@@ -495,7 +495,7 @@ export class LayerPanelComponent implements OnInit {
    * @param layerId layer ID
    */
   public addLayerBookmark(layerId: string) {
-    this.userstateService.addBookmark(layerId);
+    this.userStateService.addBookmark(layerId);
   }
 
   /**
@@ -504,7 +504,7 @@ export class LayerPanelComponent implements OnInit {
    * @param layerId layer ID
    */
   public removeLayerBookmark(layerId: string) {
-    this.userstateService.removeBookmark(layerId);
+    this.userStateService.removeBookmark(layerId);
   }
 
 }

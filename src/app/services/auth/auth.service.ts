@@ -3,47 +3,34 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { UserStateService } from '../user/user-state.service';
 import { environment } from 'environments/environment';
+import { User } from 'app/models/user.model';
 
 @Injectable()
 export class AuthService {
 
+  user: User;
+
   constructor(private userStateService: UserStateService,
               private router: Router,
-              private http: HttpClient) {}
+              private http: HttpClient) {
+    this.userStateService.user.subscribe(user => {
+      this.user = user;
+    });
+  }
 
   logout(): void {
-    localStorage.removeItem('isLoggedIn');
     this.http.get(environment.portalProxyUrl + 'logout').subscribe(() => {
       this.userStateService.logoutUser();
       this.router.navigate(['']);
     });
   }
 
-  /**
-   * Update the local user object to see if the User has been logged out of
-   * the server, but the front end doesn't know it yet
-   */
-  checkServerLogin(): void {
-    this.userStateService.updateUser().subscribe(user => {
-      if (user === null) {
-        localStorage.removeItem('isLoggedIn');
-      } else {
-        localStorage.setItem('isLoggedIn', 'true');
-      }
-    }, () => {
-      localStorage.removeItem('isLoggedIn');
-    });
-  }
-
   onLoggedIn() {
-    this.userStateService.updateUser().subscribe(user => {
-      localStorage.setItem('isLoggedIn', 'true');
-      this.router.navigate(['/']);
-    });
+    this.router.navigate(['/']);
   }
 
   public get isLoggedIn(): boolean {
-    return localStorage.getItem('isLoggedIn') === 'true';
+    return this.user !== undefined;
   }
 
   public get redirectUrl(): string {
