@@ -12,7 +12,7 @@
             </u>
             <i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-trash float-right red layerLoadClickable" (click)="removeLayer(layer.id);$event.stopPropagation()"></i>
         </div>
-        <div *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="opacity-slider-panel d-flex" (click)="$event.stopPropagation()">
+        <div *ngIf="showOpacitySlider(layer) && getUILayerModel(layer.id).statusMap.getRenderStarted()" class="opacity-slider-panel d-flex" (click)="$event.stopPropagation()">
             <div class="opacity-label">Opacity {{ getUILayerModel(layer.id).opacity }}%&nbsp;</div>
             <mat-slider [min]="0" [max]="100" class="opacity-slider flex-grow-1" [(ngModel)]="getUILayerModel(layer.id).opacity" (input)="layerOpacityChange($event, layer)"></mat-slider>
             <div *ngIf="hasLegend(layer)">

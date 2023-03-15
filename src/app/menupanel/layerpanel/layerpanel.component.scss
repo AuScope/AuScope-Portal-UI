@@ -1,4 +1,13 @@
+@import '../../globals';
+
 :host {
+
+    .filter-text{
+        width: 100%;
+    }
+    .filter-btn {
+        margin-left: auto;
+    }
 
     ::ng-deep {
         fieldset.show-fieldset-borders {
@@ -15,10 +24,29 @@
         }
     }
 
-    .layer-info-btn {
-        position: absolute;
-        top: 1.4em;
-        right: 1.3em;
+    .top-layer-btn-panel {
+        display:flex;
+        position:relative;
+        margin-left:auto;
+        right:16px;
+
+        .top-layer-btn {
+            position: relative;
+            top: 16px;
+            height: fit-content;
+            margin-left: 5px;
+        }
+    }
+
+    .show-bookmark-btn {
+        position: relative;
+        top: 5px;
+    }
+
+    .bookmark-icon {
+        color: $auscope-teal;
+        margin-right: 4px;
+        vertical-align: middle;
     }
 
 }
