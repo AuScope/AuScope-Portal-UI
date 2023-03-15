@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/member-ordering */
 import { ApplicationRef, ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { config } from '../../../environments/config';
@@ -46,7 +47,7 @@ export class QuerierModalComponent  implements OnInit {
   public hasMsclAnalytics = false; // Display 'Analytics' tab to analyse GML observations
 
   // Show a message to zoom in
-  public showZoomMsg: boolean = false;
+  public showZoomMsg = false;
 
   /* Transforms FileNode into displayable node */
   private _transformer = (node: FileNode, level: number) => {
@@ -63,22 +64,23 @@ export class QuerierModalComponent  implements OnInit {
   public treeFlattener = new MatTreeFlattener(this._transformer, node => node.level, node => node.expandable, node => node.children);
   public flatTreeDataSource = {}; // Tree structure is assigned to this
 
+
   // Does the 'FlatNode' have children?
   public hasChild = (_: number, node: FlatNode) => node.expandable;
 
 
   /**
-   * 
+   *
    * Reflects the value of nvclService.getAnalytic(); updates the html Analytic TAB
-   * 
+   *
    * When a "borehole name" is clicked on, onDataChange() is fired and a detectChanges() event causes
    * nvclService.getNVCLDatasets() to be called from nvcl.datasetlist.component.ts
    * This will set the "isAnalytic" variable in the service nvcl.service.ts to be set (boolean).
-   * 
+   *
    * Note: to support this, nvcl.service was removed as a provide from this component and datasetlist
    * The reason for this is to prevent the service from being instantiated for each component.
    * The app.module.ts code was updated to add this service in the providers list - making it a global instance
-   * 
+   *
    * If this was not done the two components would not see the same state of the service variable "isAnalytic"
   */
   public flagNVCLAnalytic: boolean;
@@ -110,7 +112,7 @@ export class QuerierModalComponent  implements OnInit {
 
   /**
    * Returns true iff layer is NVCL layer
-   * 
+   *
    * @param layer layer identifier string
    * @returns true iff layer is NVCL layer
    */
@@ -120,8 +122,8 @@ export class QuerierModalComponent  implements OnInit {
 
   /**
    * Returns true if this supports open in new window
-   * 
-   * @param doc 
+   *
+   * @param doc
    * @returns boolean
    */
   public supportOpenInNewWindow(doc: QuerierInfoModel): boolean {
@@ -218,7 +220,7 @@ export class QuerierModalComponent  implements OnInit {
 
   /**
    * This gets called from the UI when user clicks on first link in popup
-   * 
+   *
    * @param document
    */
   public transformToHtml(document): void {
@@ -314,7 +316,7 @@ export class QuerierModalComponent  implements OnInit {
     }
     // Parse the response and build a recursive tree of FileNode objects and assign them to the tree
     const data = this.buildFileTree(JSON.parse(`{"${name}":${JSON.stringify(result)}}`), 0);
-    this.flatTreeControl[name] = new FlatTreeControl<FlatNode>(node => node.level, node => node.expandable); 
+    this.flatTreeControl[name] = new FlatTreeControl<FlatNode>(node => node.level, node => node.expandable);
     this.flatTreeDataSource[name] = new MatTreeFlatDataSource(this.flatTreeControl[name], this.treeFlattener);
     this.flatTreeDataSource[name].data = data;
     this.flatTreeControl[name].expandAll();

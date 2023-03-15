@@ -1,4 +1,4 @@
-<div class="select-layers-message" *ngIf="getActiveLayers().length==0">
+<div class="select-layers-message" *ngIf="getActiveLayers().length===0">
     Select layers below to add to map
 </div>
 <li *ngFor="let layer of getActiveLayers()">
@@ -22,9 +22,9 @@
         <div class="split-panel" *ngIf="getShowSplitMapButtons(layer)" (click)="$event.stopPropagation()">
             Split Direction&nbsp;
             <div *ngIf="getApplicableSplitLayer(layer)" class="split-button-panel">
-                <button [className]="getLayerSplitDirection(layer.id) == 'left' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'left')">Left</button>
-                <button [className]="getLayerSplitDirection(layer.id) == 'none' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'none')">Both</button>
-                <button [className]="getLayerSplitDirection(layer.id) == 'right' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'right')">Right</button>
+                <button [className]="getLayerSplitDirection(layer.id) === 'left' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'left')">Left</button>
+                <button [className]="getLayerSplitDirection(layer.id) === 'none' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'none')">Both</button>
+                <button [className]="getLayerSplitDirection(layer.id) === 'right' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'right')">Right</button>
             </div>
             <div *ngIf="!getApplicableSplitLayer(layer)" class="split-button-panel">
                 <button class="btn btn-split btn-primary" [disabled]="true">Layer not supported</button>

@@ -6,13 +6,13 @@
                 <p>Select an area of interest (bounding box or polygon) to reduce download time.</p>
             </div>
 		</div>
-		<div *ngIf="drawBoundsStarted==true">
+		<div *ngIf="drawBoundsStarted===true">
 			 <div class="alert alert-success fade show">
                 <i class="ti-bell float-left"></i>
                 <p>Click on the map to draw bounding box.</p>
             </div>
 		</div>
-		<div *ngIf="drawPolygonStarted==true">
+		<div *ngIf="drawPolygonStarted===true">
 			<div class="alert alert-success fade show">
 			   <i class="ti-bell float-left"></i>
 			   <p>Click on the map to draw polygon, double-click to end.</p>
@@ -44,7 +44,7 @@
 			<label>Station:</label>
 			<ng-select  [(ngModel)]="irisDownloadListOption.selectedStations" [multiple]="true" bindLabel="label" bindValue="value" placeholder="{{SELECT_DEFAULT_STATION}}" (ngModelChange)="onStationChange()">
 				<ng-option *ngFor="let station of irisDownloadListOption.stationLst"  ng-if="station.code!=''" [value]="station.code" >{{station.name}} : {{station.code}}</ng-option>
-			 </ng-select>			
+			 </ng-select>
 		</div>
 
 		<div *ngIf="irisDownloadListOption" class="form-group form-group-sm">
@@ -107,17 +107,17 @@
 			{{layer.cswRecords[0].onlineResources[1].name}}
 			URL: <a class="text-danger" target="_blank" href="{{layer.cswRecords[0].onlineResources[1].url}}">{{layer.cswRecords[0].onlineResources[1].url}}</a>
 		</p>
-		
+
 	</div>
 
 	<div [hidden]='!isWCSDownloadSupported' class="form-group">
-		<div *ngIf="!bbox&&drawBoundsStarted==false">
+		<div *ngIf="!bbox&&drawBoundsStarted===false">
 			 <div class="alert alert-warning fade show">
                 <i class="ti-bell float-left"></i>
                 <p>Select an area to download <span *ngIf="downloadSizeLimit > 0">not exceeding {{downloadSizeLimit}} m<sup>2</sup>.</span></p>
             </div>
 		</div>
-		<div *ngIf="drawBoundsStarted==true">
+		<div *ngIf="drawBoundsStarted===true">
 			 <div class="alert alert-success fade show">
                 <i class="ti-bell float-left"></i>
                 <p>Click on the map to draw bounding box.</p>

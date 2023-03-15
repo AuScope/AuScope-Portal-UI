@@ -1,5 +1,5 @@
 
-import { AfterViewInit, Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import { LayerModel } from '@auscope/portal-core-ui';
 
@@ -10,7 +10,7 @@ import { LayerModel } from '@auscope/portal-core-ui';
   templateUrl: './layer.analytic.modal.component.html'
 })
 
-export class LayerAnalyticModalComponent implements AfterViewInit {
+export class LayerAnalyticModalComponent {
   public analyticMap;
   public layer: LayerModel;
 
@@ -18,10 +18,6 @@ export class LayerAnalyticModalComponent implements AfterViewInit {
   constructor(public bsModalRef: BsModalRef) {
 
   }
-
-    ngAfterViewInit() {
-
-    }
 
 
 }

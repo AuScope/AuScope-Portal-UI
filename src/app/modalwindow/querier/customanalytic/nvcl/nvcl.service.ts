@@ -7,14 +7,14 @@ import { UtilitiesService } from '@auscope/portal-core-ui';
 import { Injectable, Inject} from '@angular/core';
 import {HttpClient, HttpParams, HttpHeaders, HttpResponse} from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
-declare var gtag: Function;
+declare let gtag: Function;
 @Injectable()
 export class NVCLService {
 
   public isAnalytic: BehaviorSubject<boolean>; // observable used in querier to control Analytic TAB
 
   /**
-   * returns the observable of "isAnalytic" variable 
+   * returns the observable of "isAnalytic" variable
    */
   getAnalytic(): Observable<boolean> {
     //console.log("[nvclservice]getAnalytic().this.isAnalytic="+this.isAnalytic.asObservable()._isScalar);
@@ -180,7 +180,7 @@ export class NVCLService {
     if (environment.googleAnalyticsKey && typeof gtag === 'function') {
       /**
        * do not "log" the "email" to "Google Analytics" - as this is an ethics issue
-       * 
+       *
        * console.log("getNVCLTSGDownload() serviceUrl:"+serviceUrl+",downloadEmail:"+downloadEmail+",datasetId:"+datasetId);
        * gtag('event', 'NVCLDownload',  {'event_category': 'NVCLDownload', 'event_action': serviceUrl, 'event_label': downloadEmail, 'value': datasetId});
       */
@@ -250,7 +250,7 @@ export class NVCLService {
 
   /**
    * Returns true iff this is an NVCL v2 layer
-   * 
+   *
    * @param layer layer id string
    * @returns true iff this is an NVCL v2 layer
    */

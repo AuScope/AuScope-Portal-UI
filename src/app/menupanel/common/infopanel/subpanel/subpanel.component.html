@@ -6,21 +6,21 @@
 <p *ngIf='selectConstraints(layer.capabilityRecords, cswRecord.accessConstraints).length > 0'><b>Access Constraints: </b>{{selectConstraints(layer.capabilityRecords, cswRecord.accessConstraints)}}</p>
 <p><b>Info URL: </b><a target="_blank" href="{{cswRecord.recordInfoUrl}}">Link to Geonetwork Record</a></p>
 <div *ngFor="let onlineResource of cswRecord.onlineResources">
-	<p *ngIf="onlineResource.type=='DOI'">
+	<p *ngIf="onlineResource.type==='DOI'">
 		<span class="label label-default"><b>DOI Name: </b></span> {{onlineResource.name}}<br>
 		<span class="label label-default"><b>Description: </b></span> {{onlineResource.description}}<br>
 		<span class="label label-default"><b>URL: </b></span><a target="_blank" href="{{onlineResource.url}}">{{onlineResource.url}}</a><br>
 	</p>
-	<p *ngIf="onlineResource.type!='Unsupported' && onlineResource.type!='DOI'">
+	<p *ngIf="onlineResource.type!=='Unsupported' && onlineResource.type!=='DOI'">
 		<span *ngIf="isGetCapabilitiesType(onlineResource)" class="label label-default"><b>{{onlineResource.type}}: </b></span>
 		<a *ngIf="isGetCapabilitiesType(onlineResource)" target="_blank" href="{{ onlineResourceGetCapabilitiesUrl(onlineResource) }}">{{onlineResource.type}} GetCapabilities Info</a>
 		<span *ngIf="!isGetCapabilitiesType(onlineResource)" class="label label-default"><b>{{onlineResource.name.split('_').join(' ')}}: </b></span>
 		<a *ngIf="!isGetCapabilitiesType(onlineResource)" target="_blank" href="{{ onlineResource.url }}">{{ onlineResource.url }}</a>
 	</p>
 </div>
-<p *ngIf="wmsUrl!=undefined">
+<p *ngIf="wmsUrl!==undefined">
 	<b>WMS Preview: </b><img appImgLoading src="{{wmsUrl}}" (error)="onImgError($event)" height="100" width="100"/>
 </p>
-<p *ngIf="legendUrl!=undefined">
+<p *ngIf="legendUrl!==undefined">
 	<b>Legend: </b><img appImgLoading src="{{legendUrl}}" (error)="onImgError($event)" class="infopanel-legend"/>
 </p>

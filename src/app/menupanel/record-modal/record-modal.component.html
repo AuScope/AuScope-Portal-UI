@@ -11,15 +11,15 @@
 
 <div class="modal-body" style="margin-left:10px;margin-right:10px;">
     <form>
-        <div *ngIf="layer.name != undefined">
+        <div *ngIf="layer.name !== undefined">
             <h4><span class="text-primary">Layer Name</span></h4>
             <p>{{layer.name}}</p>
         </div>
-        <div *ngIf="layer.description != undefined">
+        <div *ngIf="layer.description !== undefined">
             <h4><span class="text-primary">Brief Description</span></h4>
             <p>{{layer.description}}</p>
         </div>
-        <div *ngIf="layer.iconUrl != undefined">
+        <div *ngIf="layer.iconUrl !== undefined">
             <h4><span class="text-primary">Icon</span></h4>
             <img src="{{layer.iconUrl}}" width="20" height="20">
         </div>
@@ -32,7 +32,7 @@
                         <div class="card-header">
                                 <h4 class="card-title">
                                     <a class="accordion-link" data-toggle="collapse" href="#info-link{{i}}" (click)="cswRecord.expanded = !cswRecord.expanded" (mouseenter)="highlightOnPreviewMap(cswRecord.id)" (mouseleave)="lowlightOnPreviewMap(cswRecord.id)">
-                                    <i *ngIf='layerStatus.showInfoWarning(layer.id, cswRecord)' class="fa fa-warning text-warning"> </i>{{cswRecord.contactOrg !='' && cswRecord.contactOrg!=null ? cswRecord.contactOrg : 'More Information'}}
+                                    <i *ngIf='layerStatus.showInfoWarning(layer.id, cswRecord)' class="fa fa-warning text-warning"> </i>{{cswRecord.contactOrg !=='' && cswRecord.contactOrg!==null ? cswRecord.contactOrg : 'More Information'}}
                                 </a>
                                 </h4>
                         </div>
@@ -47,7 +47,7 @@
         </div>
     </form>
 </div>
-    
+
 <div class="modal-footer">
     <button type="button" class="btn btn-light" (click)="activeModal.dismiss('Cross click')">Close</button>
 </div>

@@ -157,7 +157,6 @@ export class NVCLDatasetListComponent implements OnInit {
   }
 
   public drawGraph(logIds: Array<string>, logNames: Array<string>) {
-    const me = this;
     this.processingGraph = true;
     this.nvclService.getNVCL2_0_JSONDataBinned(this.onlineResource.url, logIds).
       subscribe(response => {
@@ -177,7 +176,6 @@ export class NVCLDatasetListComponent implements OnInit {
   }
 
   public drawGraphJob(jobIds: Array<string>) {
-    const me = this;
     this.processingGraph = true;
     this.nvclService.getNVCL2_0_JobsScalarBinned(this.featureId, jobIds).
       subscribe(response => {
@@ -279,10 +277,10 @@ export class NVCLDatasetListComponent implements OnInit {
         if (logIds.length <= 0) {
           alert('No logs selected');
         }
-        const me = this;
+
         setTimeout(() => {
-          me.processingGraph = true;
-          me.drawGraph(logIds, logNames);
+          this.processingGraph = true;
+          this.drawGraph(logIds, logNames);
         }, 0);
       }
 

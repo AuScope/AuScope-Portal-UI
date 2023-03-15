@@ -95,14 +95,14 @@
 									<span class="validity" *ngIf="!selectedAlgorithmE.valid && selectedAlgorithmE.touched"></span>
 							    </div>
 							</div>
-							<div *ngIf="selectedAlgorithm && selectedAlgorithm!='nsa'" class="form-group form-group-md row">
+							<div *ngIf="selectedAlgorithm && selectedAlgorithm!=='nsa'" class="form-group form-group-md row">
 							    <label class="col-md-3">Version</label>
 							    <div class="col-md-8">
 									<ng-select [items] = "ngSelectiveOptions" [multiple]="true" bindLabel="label" bindValue="value" ngDefaultControl [(ngModel)]="nvclform.algorithmOutputIds" (ngModelChange)="onVersionChange($event)" name="algorithmOutputIds" ngModel #algorithmOutputIds="ngModel" aria-required="true"></ng-select>
 									<span class="validity" *ngIf="!algorithmOutputIds.valid && algorithmOutputIds.touched"></span>
 							    </div>
 							</div>
-							<div *ngIf="classifications && selectedAlgorithm!='nsa'" class="form-group form-group-md row">
+							<div *ngIf="classifications && selectedAlgorithm!=='nsa'" class="form-group form-group-md row">
 							    <label class="col-md-3">Classification</label>
 							    <div class="col-md-8">
 							    	<select class="form-control form-control-sm" [(ngModel)]="nvclform.classification" name="classification" ngModel #classificationE="ngModel" required>
@@ -221,7 +221,7 @@
 										</td>
 										<td>{{status.timeStamp}}</td>
 										<td>{{status.status}}</td>
-										<td *ngIf="status.status=='Success'" class="btn-col" style="white-space: nowrap">
+										<td *ngIf="status.status==='Success'" class="btn-col" style="white-space: nowrap">
 											<a class="btn btn-purple btn-xs" (click) = "viewOnMap(status.jobid)"><i class="ti-map-alt"></i></a>
 											<a class="btn btn-light btn-xs" (click)="nvclDownload(status.jobid)"><i class="ti-download"></i></a>
 											<a class="btn btn-light btn-xs" (click)="nvclDownloadData(status.jobid)"><i class="ti-zip"></i></a>
@@ -231,7 +231,7 @@
 							</table>
 						</div>
 						<div class="float-left">
-							<button *ngIf="currentStatus.length==0" (click) = "checkStatus()" class="btn btn-primary" [disabled]="!nvclform.email" >Check status</button>
+							<button *ngIf="currentStatus.length===0" (click) = "checkStatus()" class="btn btn-primary" [disabled]="!nvclform.email" >Check status</button>
 							<button *ngIf="currentStatus.length>0" (click) = "checkStatus()" class="btn btn-primary"  [disabled]="!nvclform.email">Refresh</button>
 							<p *ngIf="!nvclform.email" class="text-danger small">Make sure you have entered a valid email address</p>
 						</div>

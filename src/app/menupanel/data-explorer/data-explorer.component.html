@@ -21,11 +21,11 @@
                     </div>
                     <div [ngbCollapse]="anyTextIsCollapsed">
                         <div class="input-group input-group-sm">
-                            <input type="text" data-toggle="tooltip" title="Apply text filter"  class="form-control" placeholder="e.g. Geophysics" name="search"  [(ngModel)]="anyTextValue" (keyup.enter)="resetFacetedSearch()">        
+                            <input type="text" data-toggle="tooltip" title="Apply text filter"  class="form-control" placeholder="e.g. Geophysics" name="search"  [(ngModel)]="anyTextValue" (keyup.enter)="resetFacetedSearch()">
                             <div class="input-group-append">
                                 <button class="btn btn-light" type="button" (click)="resetFacetedSearch()">
                                     <i class="fa fa-search"></i>
-                                </button>   
+                                </button>
                             </div>
                           </div>
                     </div>
@@ -49,7 +49,7 @@
                                 </button>
                                 <button *ngIf="bbox" class="btn btn-light" type="button" data-toggle="tooltip" title="Clear Bounds" (click)="clearBound()">
                                     <i class="fa fa-refresh"></i>
-                                </button>                                                                                             
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -64,8 +64,8 @@
                         <i *ngIf="keywordsIsCollapsed" style="line-height:inherit;" class="fa fa-arrow-circle-down pull-right"></i>
                         <i *ngIf="!keywordsIsCollapsed" style="line-height:inherit;" class="fa fa-arrow-circle-up pull-right"></i>
                     </div>
-                    <div [ngbCollapse]="keywordsIsCollapsed">            
-                        <div class="form-group  form-group-sm" style="padding-right: 8px; position: relative; left: -8px;">                       
+                    <div [ngbCollapse]="keywordsIsCollapsed">
+                        <div class="form-group  form-group-sm" style="padding-right: 8px; position: relative; left: -8px;">
                             <ng-select  [(ngModel)]="selectedKeywords" (change)="keywordChanged()" [multiple]="true"  placeholder="Select Keywords" (click)="click$.next($event.target.value)">
                                 <ng-option *ngFor="let item of availableKeywords"  ng-if="item!=''" [value]="item" >{{item}}</ng-option>
                              </ng-select>
@@ -74,7 +74,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Publication date -->
             <div class="row">
                 <div class="col">
@@ -116,7 +116,7 @@
                                 </div>
                                 <label class="control-label small" for="check1">&nbsp;Web Coverage Service</label>
                             </div>
-                           
+
                             <div class="input-group input-group-sm" >
                                 <div class="input-group-prepend">
                                     <div class="input-group-text">
@@ -124,7 +124,7 @@
                                     </div>
                                 </div>
                                 <label class="control-label small" for="check2">&nbsp;NetCDF Subset Service</label>
-                            </div>                            
+                            </div>
                             <div class="input-group input-group-sm" >
                                 <div class="input-group-prepend">
                                     <div class="input-group-text">
@@ -202,11 +202,11 @@
                         <div class="container-fluid" style="margin: 0px; padding: 0px;">
                             <ul ngbNav #nav="ngbNav" class="nav-pills" >
                                 <li ngbNavItem *ngFor="let registry of availableRegistries | keyvalue">
-                                    <a ngbNavLink *ngIf="registry.value.checked && registry.value.searchError==null">{{ getRegistryTabTitle(registry.key) }}</a>
-                                    <a ngbNavLink *ngIf="registry.value.checked && registry.value.searchError!=null" title="{{ registry.value.searchError }}">{{ getRegistryTabTitle(registry.key) }}<i class="fa fa-exclamation-triangle" style="margin-left:10px;color:red;"></i></a>
+                                    <a ngbNavLink *ngIf="registry.value.checked && registry.value.searchError===null">{{ getRegistryTabTitle(registry.key) }}</a>
+                                    <a ngbNavLink *ngIf="registry.value.checked && registry.value.searchError!==null" title="{{ registry.value.searchError }}">{{ getRegistryTabTitle(registry.key) }}<i class="fa fa-exclamation-triangle" style="margin-left:10px;color:red;"></i></a>
                                     <ng-template ngbNavContent *ngIf="registry.value.checked">
                                         <!-- No results -->
-                                        <div *ngIf="!registry.value.searching && registry.value.searchError==null && cswSearchResults.get(registry.key) && cswSearchResults.get(registry.key).length===0">
+                                        <div *ngIf="!registry.value.searching && registry.value.searchError===null && cswSearchResults.get(registry.key) && cswSearchResults.get(registry.key).length===0">
                                             <div class="row" style="padding:10px">
                                                 <div class="col" style="padding:10px;border:solid 1px black;border-radius:8px;background:#EBF5FB;color: black;">
                                                     <label>The current filter(s) returned no results for this registry</label>
@@ -238,7 +238,7 @@
                                                         (click)="nextResultsPage(registry.key)">
                                                         <i class="fa fa-arrow-circle-right"></i>
                                                     </button>
-                                                    <button [disabled]="registry.value.currentPage==1" class="btn btn-sm pull-right" style="margin-left:2px;color:#fff" data-toggle="tooltip"
+                                                    <button [disabled]="registry.value.currentPage===1" class="btn btn-sm pull-right" style="margin-left:2px;color:#fff" data-toggle="tooltip"
                                                         title="Previous page" (click)="previousResultsPage(registry.key)">
                                                         <i class="fa fa-arrow-circle-left"></i>
                                                     </button>
@@ -253,7 +253,7 @@
                         </div>
                     </fieldset>
                 </div>
-            </div>        
+            </div>
         </div>
     </div>
 </div>
