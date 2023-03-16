@@ -63,8 +63,8 @@ COPY docker/000-default.conf /etc/apache2/sites-enabled/
 ## Install apache2
 RUN apt update && \
     apt upgrade -y && \
-    apt install -y apache2
-
+    apt install -y apache2 && \
+    a2enmod rewrite
 
 CMD ["/usr/sbin/apache2ctl","-D","FOREGROUND"]
 
