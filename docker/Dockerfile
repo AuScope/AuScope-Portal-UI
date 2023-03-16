@@ -54,6 +54,9 @@ WORKDIR ${appdir}
 # Copy in the static website files from first image
 COPY --chown=www-data:www-data --from=node /usr/src/ng /var/www/html/
 
+# Copy .htaccess to allow redirects to non-root routes work
+COPY --chown=www-data:www-data docker/.htaccess /var/www/html/
+
 # Website set up
 COPY docker/000-default.conf /etc/apache2/sites-enabled/
 
