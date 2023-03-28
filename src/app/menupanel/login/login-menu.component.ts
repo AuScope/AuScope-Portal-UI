@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { User } from 'app/models/user.model';
 import { AuthService } from 'app/services/auth/auth.service';
 import { UserStateService } from '../../services/user/user-state.service';
 
@@ -10,24 +11,12 @@ import { UserStateService } from '../../services/user/user-state.service';
 })
 export class LoginMenuComponent {
 
-  username: string;
+  user: User;
 
   constructor(private router: Router, private authService: AuthService, private userStateService: UserStateService) {
-    this.authService.checkServerLogin();
     this.userStateService.user.subscribe(user => {
-      if (user) {
-        this.username = user.fullName;
-      }
+      this.user = user;
     });
-  }
-
-  /**
-   * Check is a user is logged in.
-   *
-   * @returns true if user logged in, false otherwise
-   */
-  isUserLoggedIn(): boolean {
-    return this.authService.isLoggedIn;
   }
 
   /**

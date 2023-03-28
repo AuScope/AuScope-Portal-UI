@@ -117,22 +117,22 @@ export class AuscopeApiService {
             serviceId: ''
         }
     };
-    return this.apiRequest('addBookMark.do', options);
+    return this.apiRequest('secure/addBookMark.do', options);
   }
 
-  // Remove book mark information from database
+  // Remove bookmark information from database
   public removeBookmark(bookmarkId: number) {
     const options = {
         params: {
             id: bookmarkId.toString()
         }
     };
-    return this.apiRequest('deleteBookMark.do', options);
+    return this.apiRequest('secure/deleteBookMark.do', options);
   }
 
   // Get list of bookmarks for a user
   public getBookmarks(): Observable<Bookmark[]> {
-      return this.apiRequest('getBookMarks.do');
+      return this.apiRequest('secure/getBookMarks.do');
   }
 
 }
