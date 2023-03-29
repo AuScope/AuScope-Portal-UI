@@ -111,6 +111,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { UserStateService } from './services/user/user-state.service';
 import { AuthGuard } from './services/auth/auth.guard';
 import { AuthService } from './services/auth/auth.service';
+import { LayerGroupComponent } from './menupanel/custompanel/layergroup.component';
 
 PlotlyModule.plotlyjs = PlotlyJS;
 
@@ -126,6 +127,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
         CesiumMapPreviewComponent,
         LayerPanelComponent,
         CustomPanelComponent,
+        LayerGroupComponent,
         ActiveLayersPanelComponent,
         FilterPanelComponent,
         SearchPanelComponent,
