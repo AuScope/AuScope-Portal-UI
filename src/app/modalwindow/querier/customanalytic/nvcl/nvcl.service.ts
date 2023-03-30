@@ -2,8 +2,8 @@
 import {throwError as observableThrowError, Observable, BehaviorSubject, of, ReplaySubject, timer } from 'rxjs';
 
 import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
-import {catchError, delay, map} from 'rxjs/operators';
-import { UtilitiesService } from '@auscope/portal-core-ui';
+import {catchError, delay, map, mergeMap } from 'rxjs/operators';
+import { UtilitiesService,DownloadWfsService } from '@auscope/portal-core-ui';
 import { Injectable, Inject} from '@angular/core';
 import {HttpClient, HttpParams, HttpHeaders, HttpResponse} from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
@@ -29,7 +29,7 @@ export class NVCLService {
     this.isAnalytic.next(state);
   }
 
-  constructor(private http: HttpClient , @Inject(LOCAL_STORAGE) private storage: StorageService) {
+  constructor(private http: HttpClient , @Inject(LOCAL_STORAGE) private storage: StorageService, private downloadWfsService: DownloadWfsService) {
     this.isAnalytic = new BehaviorSubject<boolean>(false);
   }
 
@@ -169,6 +169,50 @@ export class NVCLService {
       }
       ), );
   }
+
+
+  public getTSGCachedDownloadUrl(serviceUrl: string, datasetName: string,) {
+    return this.downloadWfsService.checkTsgDownloadAvailable().pipe(map(response => {
+      if (response['success'] === true) {
+        let urlArrays: string[] = response['data'].split(",");
+        let baseurl: string = "";
+        let endpoint: string = "";
+        let cacheUrl: string = "";
+        let mp = new Map();
+        let start = 0;
+        if (urlArrays[0].indexOf("DEFAULT") >= 0) {
+          baseurl = urlArrays[1].trim();
+          start = 2; //skip the default;
+        }
+        for (let i = start; i < urlArrays.length; i += 2) {
+          endpoint = urlArrays[i].trim();
+          cacheUrl = urlArrays[i + 1].trim();
+          if (baseurl.length > 0) {
+            cacheUrl = cacheUrl.replace("$DEFAULT", baseurl);
+          }
+          mp.set(endpoint, cacheUrl);
+        }
+
+        let url: string = "";
+        for (let [key, value] of mp) {
+          if (serviceUrl.startsWith(key)) {
+            url = value + datasetName + ".zip";
+          }
+        }
+        return url
+      }
+    })).pipe(mergeMap(url => {
+      return this.http.head(url).pipe(map(_response => {
+        return url;
+      },() => {
+        url ="";
+        return url;
+      }));
+    }));
+
+
+  }
+
 
   public getNVCLTSGDownload(serviceUrl: string, datasetId: string, downloadEmail: string) {
     let httpParams = new HttpParams();
