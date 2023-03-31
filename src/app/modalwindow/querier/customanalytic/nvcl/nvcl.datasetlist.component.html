@@ -206,27 +206,31 @@
 					<!-- END tab-pane -->
 					<!-- BEGIN tab-pane -->
 					<div class="tab-pane fade" id="nvcl-card-tab-download-{{nvclDataset.datasetId}}" role="tabpanel">
-						<p>This data is best viewed with the free TSG Base. Available from <a target="_blank" style="color: blue;" href="https://research.csiro.au/thespectralgeologist/tsg/pricing/purchase-tsg/">here</a></p>
-						<form >
-							<div class="form-group  form-group-sm">
-								<label>EMAIL:</label>
-								<input type="text" class="form-control form-control-sm" [(ngModel)]="downloadEmail" name="email" ngModel #email="ngModel" required
-								 pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$">
-								<span class="validity" *ngIf="!email.valid && email.touched"></span>
-							</div>
-						</form>
-						<div class="float-left">
-							<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-								<div class="btn-group">
-									<button type="button" class="btn btn-info btn-xs" (click)="downloadTSG(nvclDataset.datasetId)"><i *ngIf="downloadingTSG"
-										class="fa fa-spinner fa-spin fa-fw"></i>Prepare Tsg Dataset</button>
+						<p>This data is best viewed with the <a target="_blank" style="color: blue;" href="https://research.csiro.au/thespectralgeologist/tsg/pricing/purchase-tsg/">free TSG Base.</a></p>
+						<a *ngIf="nvclDataset.TSGCacheDownloadurl" class="float-right btn btn-info btn-xs" href="{{nvclDataset.TSGCacheDownloadurl}}" title="Download TSG file from cache" >Download Immediately from the NVCL File Cache</a>
+						<div *ngIf="!nvclDataset.TSGCacheDownloadurl">
+							<p>Unfortunately, this dataset is not available in the NVCL cache.  You can request it from the State/Territory servers via the form below, but it might take some time to prepare.  Alternatively, you can check other datasets as over 99% are available via the cache.</p>
+							<form >
+								<div class="form-group  form-group-sm">
+									<label>Email:</label>
+									<input type="text" class="form-control form-control-sm" [(ngModel)]="downloadEmail" name="email" ngModel
+										#email="ngModel" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$">
+									<span class="validity" *ngIf="!email.valid && email.touched"></span>
 								</div>
-								<div class="btn-group">
-									<button type="button" class="btn btn-info btn-xs" (click)="checkStatus()" [disabled]="!downloadEmail"><i *ngIf="checkingTSG"
-										class="fa fa-spinner fa-spin fa-fw"></i>Check status</button>
+							</form>
+							<div class="float-right">
+								<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+									<div class="btn-group">
+										<button type="button" class="btn btn-info btn-xs" (click)="downloadTSG(nvclDataset.datasetId)"><i
+												*ngIf="downloadingTSG" class="fa fa-spinner fa-spin fa-fw"></i>Prepare Tsg Dataset</button>
+									</div>
+									<div class="btn-group">
+										<button type="button" class="btn btn-info btn-xs" (click)="checkStatus()" [disabled]="!downloadEmail"><i
+												*ngIf="checkingTSG" class="fa fa-spinner fa-spin fa-fw"></i>Check status</button>
+									</div>
 								</div>
+								<div [innerHTML]="downloadResponse | trustResourceHtml"></div>
 							</div>
-							<div [innerHTML]="downloadResponse | trustResourceHtml"></div>
 						</div>
 					</div>
 					<!-- BEGIN tab-pane -->

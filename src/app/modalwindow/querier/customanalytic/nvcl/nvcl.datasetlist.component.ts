@@ -114,11 +114,14 @@ export class NVCLDatasetListComponent implements OnInit {
         nvclDataset.image = true;
         nvclDataset.scalar = false;
         nvclDataset.download = false;
+        nvclDataset.TSGCacheDownloadurl="";
         if (this.nvclBoreholeAnalyticService.hasSavedEmail()) {
           this.downloadEmail = this.nvclBoreholeAnalyticService.getUserEmail();
         }
         this._getNVCLImage(this.onlineResource.url, nvclDataset.datasetId, null);
         this._getNVCLScalar(this.onlineResource.url, nvclDataset.datasetId);
+        this.isCachedTSGFileAvailable(nvclDataset);
+
         this.nvclDatasets.push(nvclDataset);
       }
       if (result.length === 0) {
@@ -287,6 +290,16 @@ export class NVCLDatasetListComponent implements OnInit {
     } else {
       this.selectedLogNames = [];
     }
+  }
+
+  public isCachedTSGFileAvailable(dataset: any) {
+    this.nvclService.getTSGCachedDownloadUrl(this.onlineResource.url, dataset.datasetName).
+      subscribe(url => {
+        dataset.TSGCacheDownloadurl = url;
+      },
+      () => {
+        // swallow error.  the file just isnt cached.
+      });
   }
 
   public downloadCSV(datasetId: string) {
