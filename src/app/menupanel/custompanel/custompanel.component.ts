@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, Inject, EventEmitter } from '@angular/core';
 import { LayerHandlerService, LayerModel, RenderStatusService, KMLDocService } from '@auscope/portal-core-ui';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
 import { BsModalService } from 'ngx-bootstrap/modal';
@@ -30,7 +30,7 @@ export class CustomPanelComponent {
   // Displays custom layers for URLs in sidebar
   urlLayerGroups: LayerGroups = { 'Results': [] };
 
-  // Displays custom layers for KML/KMZ file in sidebar
+  // Displays custom layers for KML file in sidebar
   fileLayerGroups: LayerGroups = { 'Results': [] };
 
   bsModalRef: BsModalRef;
@@ -38,9 +38,10 @@ export class CustomPanelComponent {
 
   constructor(private layerHandlerService: LayerHandlerService, private renderStatusService: RenderStatusService,
     private modalService: BsModalService, private uiLayerModelService: UILayerModelService,
-    public activeModalService: NgbModal, private kmlService: KMLDocService) {
+    public activeModalService: NgbModal, private kmlService: KMLDocService, 
+    @Inject('env') private env) {
     this.loading = false;
-    this.statusMsg = 'Enter your OGC WMS service endpoint or KML/KMZ URL and hit <i class="fa fa-search"></i>';
+    this.statusMsg = 'Enter your OGC WMS service endpoint</br>e.g. "https://server.gov.au/service/wms"</br>or KML URL and hit <i class="fa fa-search"></i>.';
   }
 
   public selectTabPanel(layerId: string, panelType: string) {
@@ -48,20 +49,30 @@ export class CustomPanelComponent {
   }
 
   /**
-   * Search list of available WMS layers given an OGC WMS URL or a KML/KMZ URL 
+   * Search list of available WMS layers given an OGC WMS URL or a KML URL 
    */
   public search() {
+    // Clear the status message
     this.statusMsg = '';
+
+    // Clear the results from the previous search, start the loading spinner
+    this.urlLayerGroups = { 'Results': [] };
     this.loading = true;
+
+    // Check for empty URL
     if (this.searchUrl == undefined) {
       this.loading = false;
       this.statusMsg = '<div class="text-danger">Please input the URL you want to search!</div>';
       return;
     }
-    // Trim whitespace from ends
-    const searchUrl = this.searchUrl.trim();
-    // If KML or KMZ URL
-    if (searchUrl.toLowerCase().endsWith('.kml')|| searchUrl.toLowerCase().endsWith('.kmz')) {
+
+    // Trim all whitespace, line terminators, quotes, back quotes and double quotes from ends of URL
+    const leftTrimRe = /^[\s"'`]+/gms;
+    const rightTrimRe = /[\s"'`]+$/gms;
+    const searchUrl = this.searchUrl.replace(leftTrimRe, '').replace(rightTrimRe, '');
+
+    // If KML URL ...
+    if (searchUrl.toLowerCase().endsWith('.kml')) {
       // Create up a special map layer for the KML document
       let url;
       try {
@@ -70,16 +81,22 @@ export class CustomPanelComponent {
         this.statusMsg = '<div class="text-danger">URL could not be parsed:' + error + '</div>';
         return;
       }
+      // Extract a layer name from URL
       const layerName = url.pathname.split('/').pop();
-      const layerRec: LayerModel = this.layerHandlerService.makeCustomKMLLayerRecord(layerName, searchUrl);
+      // Use the proxy
+      const proxyUrl = this.env.portalBaseUrl + "getViaProxy.do?url=" + searchUrl;
+      // Make a layer model object
+      const layerRec: LayerModel = this.layerHandlerService.makeCustomKMLLayerRecord(layerName, proxyUrl, null);
       // Configure layers so it can be added to map
       const uiLayerModel = new UILayerModel(layerRec.id, this.renderStatusService.getStatusBSubject(layerRec));
       this.uiLayerModelService.setUILayerModel(layerRec.id, uiLayerModel);
       // Make the layer group listing visible in the UI
       this.urlLayerGroups['Results'].unshift(layerRec);
-      
+      this.loading = false;
+
     } else {
-      // OGC WMS Service
+      // If OGC WMS Service ...
+      // Send an OGC WMS 'GetCapabilities' request
       this.layerHandlerService.getCustomLayerRecord(searchUrl).subscribe(layerRecs => {
         this.loading = false;
         if (layerRecs != null) {
@@ -132,7 +149,7 @@ export class CustomPanelComponent {
           const parser = new DOMParser();
           const kmlDoc = parser.parseFromString(kmlStr, "text/xml");
           // Create up a special map layer for the KML document 
-          const layerRec: LayerModel = this.layerHandlerService.makeCustomKMLLayerRecord(file.name, kmlDoc);
+          const layerRec: LayerModel = this.layerHandlerService.makeCustomKMLLayerRecord(file.name, "", kmlDoc);
           const uiLayerModel = new UILayerModel(layerRec.id, this.renderStatusService.getStatusBSubject(layerRec));
           this.uiLayerModelService.setUILayerModel(layerRec.id, uiLayerModel);
           // Make the layer group listing visible in the UI

@@ -1,9 +1,9 @@
 <!-- Custom Layer Input for WMS service -->
 <div class="form-group">
-	<label class="control-label" for="inputSuccess1"><small class="white">KML/KMZ URL or OGC WMS Service URL</small></label>
+	<label class="control-label" for="inputSuccess1"><small class="white">KML URL or OGC WMS Service URL</small></label>
 	<div class="input-group">
 		<input type="text" class="form-control" [(ngModel)] = "searchUrl" >
-		<div class="input-group-append" title="Add KML/KMZ or OGC WMS service URL layer to map" (click)="search()">
+		<div class="input-group-append" title="Add KML or OGC WMS service URL layer to map" (click)="search()">
 			<button class="btn btn-light" type="button" [disabled]="!searchUrl || searchUrl.trim() === ''">
 				<i *ngIf="!loading" class="fa fa-search"></i>
 				<i *ngIf="loading" class="fa fa-spinner fa-spin fa-fw"></i>
@@ -17,14 +17,14 @@
 <layer-group layerGroup [layerGroups]="urlLayerGroups"></layer-group>
 
 
-<!-- Custom Layer KML/KMZ File Input -->
+<!-- Custom Layer KML File Input -->
 <div class="form-group">
-	<label class="control-label" for="inputSuccess2"><small class="white">Upload KML or KMZ file</small></label>
+	<label class="control-label" for="inputSuccess2"><small class="white">Upload KML file</small></label>
 	<div class="input-group">
 		<input type="file" accept=".kml" style="display:none" class="file-input" (change)="onKmlFileSelected($event)" #CustomKmlFileLoader>
-		<button (click)="CustomKmlFileLoader.click()" type="button" title="Load KML/KMZ file"  class="btn-info btn-sm">
+		<button (click)="CustomKmlFileLoader.click()" type="button" title="Load KML file"  class="btn-info btn-sm">
 			<i class="fa fa-lg fa-file" aria-hidden="true"></i>
-			&nbsp;Load KML/KMZ
+			&nbsp;Load KML
 		</button>
 	</div>
 </div>
