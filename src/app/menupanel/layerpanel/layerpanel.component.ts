@@ -136,15 +136,16 @@ export class LayerPanelComponent implements OnInit {
 
   public ngOnInit() {
       const nvclanid = UtilitiesService.getUrlParameterByName('nvclanid');
-      const state = UtilitiesService.getUrlParameterByName('state');
+      const stateId = UtilitiesService.getUrlParameterByName('state');
       const me = this;
 
       // Attempt to fetch state from permanent link database
-      this.manageStateService.fetchStateFromDB(state).subscribe((layerStateObj: any) => {
-
+      this.userStateService.getPortalState(stateId).subscribe((layerStateObj: any) => {
         // If permanent link state is defined, then re-orient the camera
         if (!UtilitiesService.isEmpty(layerStateObj)) {
           me.manageStateService.resumeMapState(layerStateObj.map);
+        } else if(stateId !== undefined) {
+          alert('The specified state could not be found, it may have been deleted or made private.');
         }
 
         // Initialise layers and groups in sidebar

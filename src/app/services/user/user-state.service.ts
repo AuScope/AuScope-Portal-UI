@@ -1,9 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Bookmark } from 'app/models/bookmark.model';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { PermanentLink } from 'app/models/permanentlink.model';
+import { BehaviorSubject, Observable, of, throwError as observableThrowError } from 'rxjs';
+import { catchError, map, take } from 'rxjs/operators';
 import { User } from '../../models/user.model';
 import { AuscopeApiService } from '../api/auscope-api.service';
+import { ManageStateService, MapState } from '@auscope/portal-core-ui';
+import { v4 as uuidv4 } from 'uuid';
+import { HttpResponse } from '@angular/common/http';
 
 
 @Injectable()
@@ -17,7 +21,11 @@ export class UserStateService {
   private _bookmarks: BehaviorSubject<Bookmark[]> = new BehaviorSubject([]);
   public readonly bookmarks: Observable<Bookmark[]> = this._bookmarks.asObservable();
 
-  constructor(private apiService: AuscopeApiService) {}
+  // Portal map states for User
+  private _states: BehaviorSubject<PermanentLink[]> = new BehaviorSubject([]);
+  public readonly states: Observable<PermanentLink[]> = this._states.asObservable();
+
+  constructor(private apiService: AuscopeApiService, private manageStateService: ManageStateService) {}
 
   /**
    * Get the currently logged in user (if one is logged in)
@@ -31,8 +39,9 @@ export class UserStateService {
         user.fullName = user.email;
       }
       this._user.next(user);
-      // Update user's bookmarks
+      // Update user's bookmarks and map states
       this.updateBookmarks();
+      this.updateUserStates();
     }, err => {
       // Failure to retrieve User means no User logged in
       this.logoutUser();
@@ -45,6 +54,7 @@ export class UserStateService {
    */
   public logoutUser() {
     this._bookmarks.next([]);
+    this._states.next([]);
     this._user.next(undefined);
   }
 
@@ -120,6 +130,105 @@ export class UserStateService {
     });
   }
 
+  /**
+   * Retrieve a list of map states associated with the user
+   */
+  public updateUserStates() {
+    this.apiService.getUserPortalStates().subscribe(
+      statelist => this._states.next(statelist),
+      err => {
+        if (err.status === 403) {
+          this.logoutUser();
+          this.showSessionTimedOutAlert();
+        }
+      }
+    );
+  }
+
+  /**
+   * Add a map state associated with the user
+   *
+   * @param name the name of the state
+   * @param description optional state description
+   * @param isPublic whether the link is publically accessible
+   */
+  public addState(name: string, description: string, isPublic: boolean): Observable<any> {
+    const id = uuidv4();
+    const mapState: MapState = this.manageStateService.getState();
+    return this.apiService.saveUserPortalState(id, name, description, JSON.stringify(mapState), isPublic).pipe(map(response => {
+      if (response['success']) {
+        response['id'] = id;
+      }
+      return response;
+    }), catchError(
+      (error: HttpResponse<any>) => {
+        if (error.status === 403) {
+          this.logoutUser();
+          this.showSessionTimedOutAlert();
+        }
+        return observableThrowError(error);
+      }
+    ), );
+  }
+
+  public updateState(id: string, userId: string, name: string, description: string, isPublic: boolean): Observable<any> {
+    return this.apiService.updateUserPortalState(id, userId, name, description, isPublic).pipe(map(response => {
+      if (response['success']) {
+        response['id'] = id;
+      }
+      return response;
+    }), catchError(
+      (error: HttpResponse<any>) => {
+        if (error.status === 403) {
+          this.logoutUser();
+          this.showSessionTimedOutAlert();
+        }
+        return observableThrowError(error);
+      }
+    ), );
+  }
+
+  /**
+   * Remove map state associated with user
+   *
+   * @param id ID of the state
+   */
+  public removeState(id: string): Observable<any> {
+    return this.apiService.deleteUserPortalState(id).pipe(map(response => {
+      return response;
+    }), catchError(
+      (error: HttpResponse<any>) => {
+        if (error.status === 403) {
+          this.logoutUser();
+          this.showSessionTimedOutAlert();
+        }
+        return observableThrowError(error);
+      }
+    ), );
+  }
+
+  /**
+   * Get a specific State for the current user
+   *
+   * @param stateId 
+   * @returns 
+   */
+  getPortalState(stateId: string): Observable<any> {
+    if (!stateId) {
+      return of({});
+    }
+    return this.apiService.getPortalState(stateId).pipe(map(state => {
+      if (state) {
+        return state.jsonState;
+      }
+      return undefined;
+    }), catchError(
+      (error: HttpResponse<any>) => {
+        return of(undefined);
+      }),
+    );
+  }
+  
   /**
    * Show an alert when the session has timed out
    */

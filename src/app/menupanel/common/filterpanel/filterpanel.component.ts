@@ -12,6 +12,7 @@ import { GraceService } from 'app/services/wcustom/grace/grace.service';
 import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
 import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
 import { LegendUiService } from 'app/services/legend/legend-ui.service';
+import { UserStateService } from 'app/services/user/user-state.service';
 
 declare let gtag: Function;
 
@@ -46,6 +47,7 @@ export class FilterPanelComponent implements OnInit {
     private csClipboardService: CsClipboardService,
     private csWMSService: CsWMSService,
     public layerStatus: LayerStatusService,
+    private userStateService: UserStateService,
     private advancedComponentService: AdvancedComponentService,
     private legendUiService: LegendUiService,
     private graceService: GraceService) {
@@ -91,10 +93,10 @@ export class FilterPanelComponent implements OnInit {
     this.advancedComponentService.addAdvancedFilterComponents(this.layer, this.advancedFilterComponents);
 
     // This sets the filter parameters using the state data in the permanent link
-    const state = UtilitiesService.getUrlParameterByName('state');
-    if (state) {
+    const stateId = UtilitiesService.getUrlParameterByName('state');
+    if (stateId) {
       const me = this;
-      this.manageStateService.fetchStateFromDB(state).subscribe((layerStateObj: any) => {
+      this.userStateService.getPortalState(stateId).subscribe((layerStateObj: any) => {
         if (layerStateObj) {
           // Advanced filter
           if (layerStateObj[me.layer.id] && layerStateObj[me.layer.id].advancedFilter) {

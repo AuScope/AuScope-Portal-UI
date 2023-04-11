@@ -1,0 +1,36 @@
+	<div class="modal-header">
+		<h4>Create Permanent Link</h4><button class="btn btn-sm btn-outline pull-right" aria-label="Close" (click)="activeModal.close()"><i class="fa fa-times"></i></button>
+	</div>
+	<div class="modal-body">
+		<form [formGroup]="linkForm" (ngSubmit)="savePermanentLink()" class="text-left">
+			<div class="state-group">
+					<div class="form-pair">
+						<label class="form-label" for="name">Name</label>
+						<input id="name" formControlName="name" class="form-control" placeholder="Enter name..." type="text">
+					</div>
+					<div class="form-pair">
+						<label class="form-label" for="description">Description</label>
+						<input id="description" formControlName="description" class="form-control" placeholder="Enter description (optional)..." type="text">
+					</div>
+					<div class="form-pair">
+						<label class="form-label" for="isPublic">Make Public</label>
+						<input id="isPublic" formControlName="isPublic" class="form-control" style="width:auto;margin-right:auto;" type="checkbox">
+					</div>
+					<div *ngIf="linkForm.controls['link']" class="form-pair">
+						<label class="form-label" for="link">Link</label>
+						<div class="input-group">
+							<input id="link" formControlName="link" class="form-control" type="text">
+							<div class="input-group-append">
+								<button *ngIf="linkForm.controls['link'].value !== ''" for="link" class="btn btn-primary" title="Copy to Clipboard" ngxClipboard [cbContent]="linkForm.controls['link'].value" type="button">
+									<i class="fa fa-files-o"></i>
+								</button>
+							</div>
+						</div>
+					</div>
+			</div>
+			<div class="dialog-message" *ngIf="dialogMessage && dialogMessage !== ''" [ngStyle]="{'background-color': errorOccurred ? 'red' : 'palegreen'}">
+				{{ dialogMessage }}
+			</div>
+			<button class="btn btn-primary" type="submit" [disabled]="!linkForm.valid || savingState">Create Permanent Link<i *ngIf="savingState"class="fa fa-spin fa-spinner"></i></button>
+		</form>
+	</div>

@@ -5,7 +5,8 @@
             <i class="fa fa-caret-down" style="margin-left:5px;"></i>
         </button>
         <mat-menu #loginMenu="matMenu" style="margin-top:12px;">
-            <h5 mat-menu-item><button (click)="logOut()" class="btn user-button">Log Out</button></h5>
+            <h5 *ngIf="userHasStates()" mat-menu-item><button (click)="manageStates()" class="btn user-button"><i class="ti-link"></i>&nbsp;&nbsp;Manage Permanent Links</button></h5>
+            <h5 mat-menu-item><button (click)="logOut()" class="btn user-button"><i class="fa fa-power-off"></i>&nbsp;&nbsp;Log Out</button></h5>
         </mat-menu>
     </div>
     <div *ngIf="!user">

@@ -1,9 +1,10 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Bookmark } from 'app/models/bookmark.model';
+import { PermanentLink } from 'app/models/permanentlink.model';
 import { User } from 'app/models/user.model';
 import { Observable, of, throwError } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 interface ApiResponse<T> {
@@ -133,6 +134,73 @@ export class AuscopeApiService {
   // Get list of bookmarks for a user
   public getBookmarks(): Observable<Bookmark[]> {
       return this.apiRequest('secure/getBookMarks.do');
+  }
+
+  // List of map states for a user
+  public getUserPortalStates(): Observable<PermanentLink[]> {
+    return this.apiRequest<PermanentLink[]>('secure/getUserPortalStates.do').pipe(map(states => {
+      const stateArray = [];
+      for(const s of states) {
+        s.jsonState = JSON.parse(s.jsonState);
+        stateArray.push(s);
+      }
+      return stateArray;
+    }));
+  }
+
+  // Retrieve state, if it is private then mst belong to user
+  public getPortalState(stateId: string): Observable<PermanentLink> {
+    const options = {
+      params: {
+          stateId: stateId
+      }
+    };
+    return this.apiRequest<PermanentLink>('getPortalState.do', options).pipe(map(state => {
+      state.jsonState = JSON.parse(state.jsonState);
+      return state;
+    }), catchError(
+      (error: HttpResponse<any>) => {
+        return throwError(error);
+      }),
+    );
+  }
+
+  // Save a user map state
+  public saveUserPortalState(id: string, name: string, description: string, jsonState: string, isPublic: boolean) {
+    const options = {
+      params: {
+          id: id,
+          name: name,
+          description: description,
+          jsonState: jsonState,
+          isPublic: isPublic
+      }
+    };
+    return this.apiRequest<string>('savePortalState.do', options);
+  }
+
+  // Updarte existing user map state
+  public updateUserPortalState(id: string, userId: string, name: string, description: string, isPublic: boolean) {
+    const options = {
+      params: {
+          id: id,
+          userId: userId,
+          name: name,
+          description: description,
+          isPublic: isPublic
+      }
+    };
+    return this.apiRequest<string>('secure/updatePortalState.do', options);
+  }
+
+  // Delete a user map state
+  public deleteUserPortalState(stateId: string) {
+    const options = {
+      params: {
+          id: stateId,
+      }
+    };
+    return this.apiRequest<string>('secure/deletePortalState.do', options);
   }
 
 }

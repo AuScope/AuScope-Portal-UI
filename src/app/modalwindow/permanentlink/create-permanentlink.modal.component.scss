@@ -1,0 +1,33 @@
+.state-group {
+  border: none;
+  background-color: gainsboro;
+  border-radius: 6px;
+  padding: 0.6em;
+  margin-bottom: 1em;
+  display: flow-root;
+
+  .form-pair {
+    display:flex;
+    flex-direction:row;
+    justify-content:center;
+    align-items:center;
+    margin-bottom: 0.3em;
+  
+    .form-label {
+      margin-right: 1em;
+      width: 7em;
+    }
+  }
+
+  .state-form-button {
+    margin: -0.3em 0 0.5em 0.5em;
+  }
+}
+
+.dialog-message {
+  //background-color: palegreen;
+  border-radius: 6px;
+  padding: 1em 1em;
+  color: black;
+  margin-bottom: 1em;
+}
