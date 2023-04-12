@@ -14,7 +14,7 @@ export const environment = {
   getCSWRecordEndP: 'getKnownLayers.do',
   portalBaseUrl: 'https://au-portal-dev.it.csiro.au/api/',
   portalProxyUrl: '/api/',
-  hostUrl: 'https://au-portal-dev.it.csiro.au/index.htm',
+  hostUrl: 'https://au-portal-dev.it.csiro.au',
   nVCLAnalyticalUrl: 'https://nvclanalytics.azurewebsites.net/NVCLAnalyticalServices/',
   googleAnalyticsKey: null,
   bingMapsKey: '',
