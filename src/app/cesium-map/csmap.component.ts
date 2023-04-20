@@ -70,9 +70,8 @@ export class CsMapComponent implements AfterViewInit {
     private queryWMSService: QueryWMSService, private gmlParserService: GMLParserService,
     private manageStateService: ManageStateService, private advancedMapComponentService: AdvancedComponentService,
     private userStateService: UserStateService, private viewerConf: ViewerConfiguration, private ngZone: NgZone) {
-    const me = this;
     this.csMapService.getClickedLayerListBS().subscribe((mapClickInfo) => {
-      me.handleLayerClick(mapClickInfo);
+      this.handleLayerClick(mapClickInfo);
     });
     // viewerOptions will be passed the Cesium.Viewer constuctor
     this.viewerConf.viewerOptions = {
@@ -112,12 +111,12 @@ export class CsMapComponent implements AfterViewInit {
         this.ngZone.run(() => {
           if (cartesian) {
             const cartographic = ellipsoid.cartesianToCartographic(cartesian);
-            me.mouseLongitude = Cesium.Math.toDegrees(cartographic.longitude).toFixed(5);
-            me.mouseLatitude = Cesium.Math.toDegrees(cartographic.latitude).toFixed(5);
+            this.mouseLongitude = Cesium.Math.toDegrees(cartographic.longitude).toFixed(5);
+            this.mouseLatitude = Cesium.Math.toDegrees(cartographic.latitude).toFixed(5);
             //const elev = viewer.scene.globe.getHeight(cartographic); // In case we need 3D
           } else {
-            me.mouseLongitude = undefined;
-            me.mouseLatitude = undefined;
+            this.mouseLongitude = undefined;
+            this.mouseLatitude = undefined;
           }
         });
       }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
@@ -167,23 +166,22 @@ export class CsMapComponent implements AfterViewInit {
     // This code is used to display the map state stored in a permanent link
     const stateId = UtilitiesService.getUrlParameterByName('state');
     if (stateId) {
-      const me = this;
       this.userStateService.getPortalState(stateId).subscribe((layerStateObj: any) => {
         if (layerStateObj) {
-          me.modalDisplayed = false;
+          this.modalDisplayed = false;
           for (const layerKey in layerStateObj) {
             if (layerKey === 'map') {
               continue;
             }
             if (layerStateObj[layerKey] && layerStateObj[layerKey].hasOwnProperty('raw') && layerStateObj[layerKey].raw) {
-              me.csMapService.getAddLayerSubject().subscribe((layer: LayerModel) => {
+              this.csMapService.getAddLayerSubject().subscribe((layer: LayerModel) => {
                 setTimeout(() => {
                   if (layer.id === layerKey) {
                     const mapLayer = {
                       onlineResource: layerStateObj[layerKey].onlineResource,
                       layer: layer
                     }
-                    me.setModal(layerKey, layerStateObj[layerKey].raw, mapLayer, null, layerStateObj[layerKey].gmlid);
+                    this.setModal(layerKey, layerStateObj[layerKey].raw, mapLayer, null, layerStateObj[layerKey].gmlid);
                   }
                 }, 0);
               })
@@ -291,8 +289,6 @@ export class CsMapComponent implements AfterViewInit {
    * @param mapClickInfo object with map click information
    */
   private handleLayerClick(mapClickInfo) {
-    const me = this;
-
     if (this.csMapObject.getIgnoreMapClick()) {
       return;
     }
@@ -375,7 +371,7 @@ export class CsMapComponent implements AfterViewInit {
         if (onlineResource) {
           // Display CSW record info
           if (config.cswrenderer.includes(maplayer.id)) {
-            me.displayModal(mapClickInfo.clickCoord);
+            this.displayModal(mapClickInfo.clickCoord);
             this.setModalHTML(this.parseCSWtoHTML(cswRecord), cswRecord.name, maplayer, this.bsModalRef);
 
           // Display WMS layer info
@@ -429,18 +425,18 @@ export class CsMapComponent implements AfterViewInit {
                 result => {
                   const feature = {onlineResource: onlineResource, layer: maplayer};
                   // Display the modal, but only if there are features
-                  const num_feats = me.setModal(maplayer.id, result, feature, mapClickInfo.clickCoord);
+                  const num_feats = this.setModal(maplayer.id, result, feature, mapClickInfo.clickCoord);
 
                   // If zoom level is too low and nothing is found then show zoom message
                   if (num_feats === 0 && params.level <= 3) {
-                    me.displayModal(mapClickInfo.clickCoord);
-                    me.bsModalRef.content.downloading = false;
-                    me.bsModalRef.content.showZoomMsg = true;
+                    this.displayModal(mapClickInfo.clickCoord);
+                    this.bsModalRef.content.downloading = false;
+                    this.bsModalRef.content.showZoomMsg = true;
                   }
                 },
                 err => {
-                  me.bsModalRef.content.onDataChange();
-                  me.bsModalRef.content.downloading = false;
+                  this.bsModalRef.content.onDataChange();
+                  this.bsModalRef.content.downloading = false;
                 }
               );
           }
