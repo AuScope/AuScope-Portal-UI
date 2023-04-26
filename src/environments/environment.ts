@@ -11,10 +11,11 @@
 export const environment = {
   production: false,
   getCSWRecordEndP: 'getKnownLayers.do',
-  // portalBaseUrl: 'http://localhost:8080/AuScope-Portal/',
+  //portalBaseUrl: 'http://localhost:8080/AuScope-Portal/',
+  //portalBaseUrl: 'http://localhost:8080/api/',
   portalBaseUrl: 'https://au-portal-dev.it.csiro.au/api/',
   portalProxyUrl: '/api/',
-  hostUrl: 'http://localhost:4200/index.htm',
+  hostUrl: 'http://localhost:4200',
   nVCLAnalyticalUrl: 'https://nvclanalytics.azurewebsites.net/NVCLAnalyticalServices/',
   googleAnalyticsKey: null,
   bingMapsKey: '',

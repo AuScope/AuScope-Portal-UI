@@ -10,6 +10,7 @@ import { Cartesian3, MapMode2D, Math, ScreenSpaceEventHandler, SceneMode, Screen
 import { IrisQuerierHandler } from './custom-querier-handler/iris-querier-handler.service';
 import { KMLQuerierHandler } from './custom-querier-handler/kml-querier-handler.service';
 import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
+import { UserStateService } from 'app/services/user/user-state.service';
 
 declare var Cesium: any;
 
@@ -68,8 +69,7 @@ export class CsMapComponent implements AfterViewInit {
   constructor(private csMapObject: CsMapObject, private csMapService: CsMapService, private modalService: BsModalService,
     private queryWMSService: QueryWMSService, private gmlParserService: GMLParserService,
     private manageStateService: ManageStateService, private advancedMapComponentService: AdvancedComponentService,
-    private viewerConf: ViewerConfiguration, private ngZone: NgZone) {
-
+    private userStateService: UserStateService, private viewerConf: ViewerConfiguration, private ngZone: NgZone) {
     const me = this;
     this.csMapService.getClickedLayerListBS().subscribe((mapClickInfo) => {
       me.handleLayerClick(mapClickInfo);
@@ -91,7 +91,7 @@ export class CsMapComponent implements AfterViewInit {
       navigationInstructionsInitiallyVisible: false,
       mapMode2D: MapMode2D.INFINITE_SCROLL,
     };
-    // Will be called on viewer initialistion
+    // Will be called on viewer initialisation
     this.viewerConf.viewerModifier = (viewer: any) => {
       this.viewer = viewer;
       // Remove default double click zoom behaviour
@@ -165,10 +165,10 @@ export class CsMapComponent implements AfterViewInit {
     this.csMapService.init();
 
     // This code is used to display the map state stored in a permanent link
-    const state = UtilitiesService.getUrlParameterByName('state');
-    if (state) {
+    const stateId = UtilitiesService.getUrlParameterByName('state');
+    if (stateId) {
       const me = this;
-      this.manageStateService.fetchStateFromDB(state).subscribe((layerStateObj: any) => {
+      this.userStateService.getPortalState(stateId).subscribe((layerStateObj: any) => {
         if (layerStateObj) {
           me.modalDisplayed = false;
           for (const layerKey in layerStateObj) {

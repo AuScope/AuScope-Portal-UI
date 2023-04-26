@@ -77,6 +77,11 @@ import { GraceAdvancedFilterComponent } from './menupanel/common/filterpanel/adv
 
 import { LegendModalComponent } from './modalwindow/legend/legend.modal.component';
 
+import { PermanentLinksModalComponent } from './modalwindow/permanentlink/permenantlinks.modal.component';
+import { CreatePermanentLinkModalComponent } from './modalwindow/permanentlink/create-permanentlink.modal.component';
+
+import { ConfirmModalComponent } from './modalwindow/confirm/confirm.modal.component';
+
 // Services
 import { AuscopeApiService } from './services/api/auscope-api.service';
 import { FilterService } from './services/filter/filter.service';
@@ -160,7 +165,10 @@ PlotlyModule.plotlyjs = PlotlyJS;
         HelpMenuComponent,
         DataExplorerComponent,
         RecordModalComponent,
-        LegendModalComponent
+        LegendModalComponent,
+        PermanentLinksModalComponent,
+        CreatePermanentLinkModalComponent,
+        ConfirmModalComponent
     ],
     providers: [ AuscopeApiService, FilterService, RectanglesEditorService, AdvancedComponentService, SearchService,
                  NVCLService, MSCLService, BoundsService, GraceService, { provide: SAVER, useFactory: getSaver },

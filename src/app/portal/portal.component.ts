@@ -1,4 +1,4 @@
-import { AfterViewInit, Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { AuthService } from 'app/services/auth/auth.service';
 /**
  * Defines the overall app layout

@@ -3,6 +3,7 @@ import {  CSWRecordModel,  CsMapService,  ManageStateService,  UtilitiesService,
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { LegendUiService } from "app/services/legend/legend-ui.service";
 import { AdvancedComponentService } from "app/services/ui/advanced-component.service";
+import { UserStateService } from "app/services/user/user-state.service";
 import { environment } from "environments/environment";
 import * as _ from "lodash";
 import { RecordModalComponent } from "../record-modal/record-modal.component";
@@ -31,6 +32,7 @@ export class DataExplorerRecordComponent implements OnInit {
     private manageStateService: ManageStateService,
     private advancedMapComponentService: AdvancedComponentService,
     private legendUiService: LegendUiService,
+    private userStateService: UserStateService,
     public modalService: NgbModal
   ) {
     this.optionalFilters = [];
@@ -38,10 +40,10 @@ export class DataExplorerRecordComponent implements OnInit {
 
   ngOnInit() {
     // VT: permanent link
-    const state = UtilitiesService.getUrlParameterByName("state");
-    if (state) {
+    const stateId = UtilitiesService.getUrlParameterByName("state");
+    if (stateId) {
       const me = this;
-      this.manageStateService.fetchStateFromDB(state).subscribe((layerStateObj: any) => {
+      this.userStateService.getPortalState(stateId).subscribe((layerStateObj: any) => {
         if (layerStateObj) {
           if (layerStateObj[me.layer.id]) {
             me.optionalFilters = layerStateObj[me.layer.id].optionalFilters;

@@ -12,6 +12,7 @@ import { GraceService } from 'app/services/wcustom/grace/grace.service';
 import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
 import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
 import { LegendUiService } from 'app/services/legend/legend-ui.service';
+import { UserStateService } from 'app/services/user/user-state.service';
 
 declare let gtag: Function;
 
@@ -46,6 +47,7 @@ export class FilterPanelComponent implements OnInit {
     private csClipboardService: CsClipboardService,
     private csWMSService: CsWMSService,
     public layerStatus: LayerStatusService,
+    private userStateService: UserStateService,
     private advancedComponentService: AdvancedComponentService,
     private legendUiService: LegendUiService,
     private graceService: GraceService) {
@@ -91,19 +93,26 @@ export class FilterPanelComponent implements OnInit {
     this.advancedComponentService.addAdvancedFilterComponents(this.layer, this.advancedFilterComponents);
 
     // This sets the filter parameters using the state data in the permanent link
-    const state = UtilitiesService.getUrlParameterByName('state');
-    if (state) {
-      const me = this;
-      this.manageStateService.fetchStateFromDB(state).subscribe((layerStateObj: any) => {
-        if (layerStateObj) {
-          // Advanced filter
-          if (layerStateObj[me.layer.id] && layerStateObj[me.layer.id].advancedFilter) {
-            this.advancedComponentService.getAdvancedFilterComponentForLayer(me.layer.id).setAdvancedParams(layerStateObj[me.layer.id].advancedFilter);
+    const stateId = UtilitiesService.getUrlParameterByName('state');
+    if (stateId) {
+      this.userStateService.getPortalState(stateId).subscribe((layerStateObj: any) => {
+        if (layerStateObj && layerStateObj[this.layer.id]) {
+          // Populate layer times if necessary
+          if (config.queryGetCapabilitiesTimes.indexOf(this.layer.id) > -1) {
+            this.filterService.updateLayerTimes(this.layer, this.layerTimes);
           }
-          if (layerStateObj.hasOwnProperty(me.layer.id)) {
-            me.optionalFilters = me.optionalFilters.concat(layerStateObj[me.layer.id].optionalFilters);
+          // Current time
+          if (layerStateObj[this.layer.id].time) {
+            this.layerTimes.currentTime = layerStateObj[this.layer.id].time;
+          }
+          // Advanced filter
+          if (layerStateObj[this.layer.id] && layerStateObj[this.layer.id].advancedFilter) {
+            this.advancedComponentService.getAdvancedFilterComponentForLayer(this.layer.id).setAdvancedParams(layerStateObj[this.layer.id].advancedFilter);
+          }
+          if (layerStateObj.hasOwnProperty(this.layer.id)) {
+            this.optionalFilters = this.optionalFilters.concat(layerStateObj[this.layer.id].optionalFilters);
             setTimeout(() => {
-              me.addLayer(me.layer);
+              this.addLayer(this.layer);
             }, 100);
           }
         }
@@ -114,10 +123,10 @@ export class FilterPanelComponent implements OnInit {
     const nvclanid = UtilitiesService.getUrlParameterByName('nvclanid');
     if (nvclanid) {
       const me = this;
-      if (me.layer.id === 'nvcl-v2-borehole') {
-        me.layer.filterCollection['mandatoryFilters'][0].value = nvclanid;
+      if (this.layer.id === 'nvcl-v2-borehole') {
+        this.layer.filterCollection['mandatoryFilters'][0].value = nvclanid;
         setTimeout(() => {
-          me.addLayer(me.layer);
+          this.addLayer(this.layer);
         });
       }
     }
