@@ -29,8 +29,8 @@ export class GraceLegendComponent extends AdvancedMapComponent implements OnInit
             maxValue: 1,
             transparentNeutralColor: false
         };
-        this.graceService.currentGraceStyleSettingsBS.subscribe(graceStyleSettintgs => {
-            this.graceStyleSettings = graceStyleSettintgs;
+        this.graceService.currentGraceStyleSettingsBS.subscribe(graceStyleSettings => {
+            this.graceStyleSettings = graceStyleSettings;
         });
     }
 

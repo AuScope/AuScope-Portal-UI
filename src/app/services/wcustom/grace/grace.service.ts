@@ -135,7 +135,7 @@ export class GraceService {
      * @return style sheet in string form
      */
     public getGraceSld(): string {
-        this.setCurrentGraceStyleSettings(this.editedGraceStyleSettings);
+        this.setCurrentGraceStyleSettings({...this.editedGraceStyleSettings});
         const xmlHeader = serialize(['?xml', { 'version': '1.0', 'encoding': 'UTF-8' }]);
         const styledLayerAttrs = {
             'version': '1.0.0',
