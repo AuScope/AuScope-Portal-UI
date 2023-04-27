@@ -8,7 +8,6 @@ import { config } from '../../../../environments/config';
 import { ref } from '../../../../environments/ref';
 import { LayerAnalyticModalComponent } from '../../../modalwindow/layeranalytic/layer.analytic.modal.component';
 import { BsModalService } from 'ngx-bootstrap/modal';
-import { GraceService } from 'app/services/wcustom/grace/grace.service';
 import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
 import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
 import { LegendUiService } from 'app/services/legend/legend-ui.service';
@@ -49,8 +48,7 @@ export class FilterPanelComponent implements OnInit {
     public layerStatus: LayerStatusService,
     private userStateService: UserStateService,
     private advancedComponentService: AdvancedComponentService,
-    private legendUiService: LegendUiService,
-    private graceService: GraceService) {
+    private legendUiService: LegendUiService) {
     this.providers = [];
     this.optionalFilters = [];
     this.analyticMap = ref.layeranalytic;
@@ -109,12 +107,10 @@ export class FilterPanelComponent implements OnInit {
           if (layerStateObj[this.layer.id] && layerStateObj[this.layer.id].advancedFilter) {
             this.advancedComponentService.getAdvancedFilterComponentForLayer(this.layer.id).setAdvancedParams(layerStateObj[this.layer.id].advancedFilter);
           }
-          if (layerStateObj.hasOwnProperty(this.layer.id)) {
-            this.optionalFilters = this.optionalFilters.concat(layerStateObj[this.layer.id].optionalFilters);
-            setTimeout(() => {
-              this.addLayer(this.layer);
-            }, 100);
-          }
+          this.optionalFilters = this.optionalFilters.concat(layerStateObj[this.layer.id].optionalFilters);
+          setTimeout(() => {
+            this.addLayer(this.layer);
+          }, 100);
         }
       });
     }
@@ -122,7 +118,6 @@ export class FilterPanelComponent implements OnInit {
     // LJ: nvclAnalyticalJob external link
     const nvclanid = UtilitiesService.getUrlParameterByName('nvclanid');
     if (nvclanid) {
-      const me = this;
       if (this.layer.id === 'nvcl-v2-borehole') {
         this.layer.filterCollection['mandatoryFilters'][0].value = nvclanid;
         setTimeout(() => {
@@ -189,24 +184,9 @@ export class FilterPanelComponent implements OnInit {
       optionalFilters: _.cloneDeep(this.optionalFilters)
     };
 
-    // TODO: Store time period with state
     // WMS layers may have a time set
     if (this.layerTimes.currentTime) {
       param['time'] = this.layerTimes.currentTime;
-    }
-
-    // TODO: Make more generic, perhaps have an SLD parameter that refers to a class or interface
-    if (layer.id === 'grace-mascons') {
-      param['sld_body'] = this.graceService.getGraceSld();
-    }
-
-    // Remove filters without values
-    param.optionalFilters = param.optionalFilters.filter(f => this.filterHasValue(f));
-
-    for (const optFilter of param.optionalFilters) {
-      if (optFilter['options']) {
-        optFilter['options'] = [];
-      }
     }
 
     // Get AdvancedFilter params if applicable
@@ -214,6 +194,16 @@ export class FilterPanelComponent implements OnInit {
     const advancedFilter = this.advancedComponentService.getAdvancedFilterComponentForLayer(layer.id);
     if (advancedFilter) {
       advancedFilterParams = advancedFilter.getAdvancedParams();
+      // Append any call parameters the AdvancedFilter may add
+      Object.assign(param, advancedFilter.getCallParams());
+    }
+
+    // Remove filters without values
+    param.optionalFilters = param.optionalFilters.filter(f => this.filterHasValue(f));
+    for (const optFilter of param.optionalFilters) {
+      if (optFilter['options']) {
+        optFilter['options'] = [];
+      }
     }
 
     // Add a new layer in the layer state service

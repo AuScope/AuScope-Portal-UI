@@ -35,7 +35,19 @@ import { GraceStyleSettings } from 'app/modalwindow/querier/customanalytic/grace
             maxValue: [this.graceService.currentGraceStyleSettings.maxValue, [Validators.required, Validators.pattern(this.DECIMAL_REGEX)]],
             transparentNeutralColor: this.graceService.currentGraceStyleSettings.transparentNeutralColor
         });
-        this.setAdvancedParams(this.graceService.currentGraceStyleSettings);
+    }
+
+    /**
+     * Update the StyleGroup with the current GRACE style
+     */
+    private updateStyleGroup() {
+        const graceStyleSettings = this.graceService.currentGraceStyleSettings;
+        this.styleGroup.controls['minColor'].setValue(graceStyleSettings.minColor);
+        this.styleGroup.controls['neutralColor'].setValue(graceStyleSettings.neutralColor);
+        this.styleGroup.controls['maxColor'].setValue(graceStyleSettings.maxColor);
+        this.styleGroup.controls['minValue'].setValue(graceStyleSettings.minValue);
+        this.styleGroup.controls['neutralValue'].setValue(graceStyleSettings.neutralValue);
+        this.styleGroup.controls['maxValue'].setValue(graceStyleSettings.maxValue);
     }
 
     /**
@@ -77,7 +89,7 @@ import { GraceStyleSettings } from 'app/modalwindow/querier/customanalytic/grace
     /**
      * Update the grace layer style with the current editor settings
      */
-    setStyle() {
+    setEditedStyleAsCurrent() {
         this.graceService.setEditedGraceStyleSettings({
             minColor: this.styleGroup.value.minColor,
             minValue: this.styleGroup.value.minValue,
@@ -87,6 +99,15 @@ import { GraceStyleSettings } from 'app/modalwindow/querier/customanalytic/grace
             maxValue: this.styleGroup.value.maxValue,
             transparentNeutralColor: this.styleGroup.value.transparentNeutralColor
         });
+    }
+
+    /**
+     * Change detection for the edited GRACE style
+     * @param editKey the key of the StyleGroup that was changed
+     */
+    editedStyleChanged(editKey: string) {
+        const editVal = this.styleGroup.controls[editKey].value;
+        this.graceService.updateEditedGraceStyleSettings(editKey, editVal)
     }
 
     /**
@@ -115,12 +136,25 @@ import { GraceStyleSettings } from 'app/modalwindow/querier/customanalytic/grace
     }
 
     /**
-     * 
-     * @param params 
+     * Set advanced parameters, overrideen from superclass to allow setting GRACE styles on load
+     *
+     * @param params the GraceStyleSettings parameters
      */
     public setAdvancedParams(params: any) {
-        super.setAdvancedParams(params);
+        this.graceService.setEditedGraceStyleSettings(params);
         this.graceService.setCurrentGraceStyleSettings(params);
+        this.updateStyleGroup();
+    }
+
+    /**
+     * GRACE layers require a custom SLD_BODY parameter
+     *
+     * @returns the SLD_BODY parameter
+     */
+    public getCallParams(): any {
+        return {
+            'sld_body': this.graceService.getGraceSld()
+        }
     }
 
 }

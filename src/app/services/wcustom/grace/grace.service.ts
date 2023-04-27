@@ -102,13 +102,30 @@ export class GraceService {
         });
     }
 
+    /**
+     * Set the current active GRACE style
+     * @param graceStyleSettings the GRACE style
+     */
     public setCurrentGraceStyleSettings(graceStyleSettings: GraceStyleSettings) {
         this.currentGraceStyleSettings = graceStyleSettings;
         this.currentGraceStyleSettingsBS.next(graceStyleSettings);
     }
 
+    /**
+     * Set the GRACE style that the editor contains
+     * @param graceStyleSettings the GRACE style
+     */
     public setEditedGraceStyleSettings(graceStyleSettings: GraceStyleSettings) {
         this.editedGraceStyleSettings = graceStyleSettings;
+    }
+
+    /**
+     * Update a single parameter of the edited GRACE style settings
+     * @param editKey the key of the GRACE style settings
+     * @param editVal the new value
+     */
+    public updateEditedGraceStyleSettings(editKey: string, editVal: string) {
+        this.editedGraceStyleSettings[editKey] = editVal;
     }
 
     /**
@@ -118,7 +135,7 @@ export class GraceService {
      * @return style sheet in string form
      */
     public getGraceSld(): string {
-       this.setCurrentGraceStyleSettings(this.editedGraceStyleSettings);
+        this.setCurrentGraceStyleSettings({...this.editedGraceStyleSettings});
         const xmlHeader = serialize(['?xml', { 'version': '1.0', 'encoding': 'UTF-8' }]);
         const styledLayerAttrs = {
             'version': '1.0.0',
