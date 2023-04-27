@@ -58,6 +58,18 @@ export class InfoPanelSubComponent implements OnChanges {
         return onlineResource.type === 'WMS' || onlineResource.type === 'WFS' || onlineResource.type === 'WCS' || onlineResource.type === 'CSW';
     }
 
+    /** Removes proxy from URL for display purposes
+     * 
+     * e.g. "http://localhost:8080/getViaProxy.do?url=https://raw.githubusercontent.com/CesiumGS/cesium/main/Apps/SampleData/kml/bikeRide.kml"
+     * get converted to "https://raw.githubusercontent.com/CesiumGS/cesium/main/Apps/SampleData/kml/bikeRide.kml"
+     * 
+     * @param url URL which may be prepended with a reference to the proxy
+     * @returns URL without the proxy part
+     */
+    public removeProxy(url: string): string {
+        return url.replace(/^.+getViaProxy\.do\?url=/, "");
+    }
+
     /**
      * Create a WMS/WFS/WCS/CSW GetCapabilities URL from the provided OnlineResource
      *

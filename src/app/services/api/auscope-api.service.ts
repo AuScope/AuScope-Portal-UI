@@ -136,7 +136,10 @@ export class AuscopeApiService {
       return this.apiRequest('secure/getBookMarks.do');
   }
 
-  // List of map states for a user
+  /**
+   * List of map states for the currently logged in user
+   * @returns list of PermanentLinks
+   */
   public getUserPortalStates(): Observable<PermanentLink[]> {
     return this.apiRequest<PermanentLink[]>('secure/getUserPortalStates.do').pipe(map(states => {
       const stateArray = [];
@@ -148,7 +151,11 @@ export class AuscopeApiService {
     }));
   }
 
-  // Retrieve state, if it is private then mst belong to user
+  /**
+   * Retrieve a specific state, if it is private then it must belong to the currently logged in user
+   * @param stateId the ID of the state
+   * @returns the PermanentLink
+   */
   public getPortalState(stateId: string): Observable<PermanentLink> {
     const options = {
       params: {
@@ -165,7 +172,15 @@ export class AuscopeApiService {
     );
   }
 
-  // Save a user map state
+  /**
+   * Save a user map state
+   * @param id the state ID
+   * @param name the state name
+   * @param description optional state description
+   * @param jsonState the map state as a JSON string
+   * @param isPublic if true the state is accessible by all, false then only the currently logged in user
+   * @returns true response on success, false otherwise
+   */
   public saveUserPortalState(id: string, name: string, description: string, jsonState: string, isPublic: boolean) {
     const options = {
       params: {
@@ -179,7 +194,15 @@ export class AuscopeApiService {
     return this.apiRequest<string>('savePortalState.do', options);
   }
 
-  // Updarte existing user map state
+  /**
+   * Update existing user map state
+   * @param id the ID of the state to update
+   * @param userId the ID of the user
+   * @param name the name of the state
+   * @param description optional description of the state
+   * @param isPublic if true the state is accessible by all, false then only the currently logged in user
+   * @returns true response on success, false otherwise
+   */
   public updateUserPortalState(id: string, userId: string, name: string, description: string, isPublic: boolean) {
     const options = {
       params: {
@@ -193,7 +216,11 @@ export class AuscopeApiService {
     return this.apiRequest<string>('secure/updatePortalState.do', options);
   }
 
-  // Delete a user map state
+  /**
+   * Delete a user map state
+   * @param stateId the ID of the state to delete
+   * @returns true response on success, false otherwise
+   */
   public deleteUserPortalState(stateId: string) {
     const options = {
       params: {
