@@ -3,12 +3,11 @@ import { RectangleEditorObservable } from '@auscope/angular-cesium';
 import { Bbox, CsMapService, LayerHandlerService, LayerModel, ManageStateService, UtilitiesService } from '@auscope/portal-core-ui';
 import { NgbDropdown, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SearchService } from 'app/services/search/search.service';
-import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
 import { Observable, Subscription } from 'rxjs';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
 import { take } from 'rxjs/operators';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
-import { LegendUiService } from 'app/services/legend/legend-ui.service';
+import { LayerManagerService } from 'app/services/ui/layer-manager.service';
 
 const DEFAULT_RESULTS_PER_PAGE = 10;
 const SEARCH_FIELDS = [{
@@ -76,10 +75,10 @@ export class SearchPanelComponent implements OnInit {
   suggestedTerms: string[] = [];
   highlightedSuggestionIndex = -1;
 
-  constructor(private searchService: SearchService, private advancedComponentService: AdvancedComponentService,
+  constructor(private searchService: SearchService,
               private csMapService: CsMapService, private layerHandlerService: LayerHandlerService,
-              private uiLayerModelService: UILayerModelService, private manageStateService: ManageStateService,
-              private legendUiService: LegendUiService, private modalService: NgbModal) { }
+              private layerManagerService: LayerManagerService, private uiLayerModelService: UILayerModelService,
+              private manageStateService: ManageStateService, private modalService: NgbModal) { }
 
   ngOnInit() {
     for (const service of OGC_SERVICES) {
@@ -253,32 +252,7 @@ export class SearchPanelComponent implements OnInit {
    * @param layer LayerModel
    */
   public addLayer(layer: LayerModel) {
-    const param = {
-      optionalFilters: []
-    };
-
-    // Add a new layer in the layer state service, no filters
-    this.manageStateService.addLayer(
-      layer.id,
-      null,
-      layer.filterCollection,
-      [],
-      []
-    );
-
-    // Remove any existing legends in case map re-added with new style
-    this.legendUiService.removeLegend(layer.id);
-
-    // Add layer to map in Cesium
-    this.csMapService.addLayer(layer, param);
-
-    // If on a small screen, when a new layer is added, roll up the sidebar to expose the map */
-    if ($('#sidebar-toggle-btn').css('display') !== 'none') {
-      $('#sidebar-toggle-btn').click();
-    }
-
-    // Add any advanced map components defined in refs.ts
-    this.advancedComponentService.addAdvancedMapComponents(layer);
+    this.layerManagerService.addLayer(layer, [], layer.filterCollection, undefined);
   }
 
   /**
@@ -308,11 +282,7 @@ export class SearchPanelComponent implements OnInit {
    */
   public removeLayer(event: any, layer: LayerModel) {
     event.stopPropagation();
-    this.uiLayerModelService.getUILayerModel(layer.id).opacity = 100;
-    this.csMapService.removeLayer(layer);
-    // Remove any layer specific map components
-    this.advancedComponentService.removeAdvancedMapComponents(layer.id);
-    this.legendUiService.removeLegend(layer.id);
+    this.layerManagerService.removeLayer(layer);
   }
 
   /**
@@ -621,13 +591,7 @@ export class SearchPanelComponent implements OnInit {
    * @returns a list of LayerModels representing layers that have been added to the map
    */
   public getActiveLayers(): LayerModel[] {
-    const activeLayers: LayerModel[] = [];
-    const activeLayerKeys: string[] = Object.keys(this.csMapService.getLayerModelList());
-    for (const layer of activeLayerKeys) {
-      const currentLayer = this.csMapService.getLayerModelList()[layer];
-      activeLayers.push(currentLayer);
-    }
-    return activeLayers;
+    return this.csMapService.getLayerModelList();
   }
 
 }

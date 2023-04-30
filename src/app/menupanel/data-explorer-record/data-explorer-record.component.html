@@ -11,7 +11,7 @@
             <i class="fa fa-plus-circle" style="color:green;"></i>
         </button>            
         <button *ngIf="csMapService.layerExists(cswRecord.id)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Remove layer from map"
-            (click)="removeLayer(layer.id)">
+            (click)="removeLayer(layer)">
             <i class="fa fa-trash" style="color:red;"></i>
         </button>        
     </span>
