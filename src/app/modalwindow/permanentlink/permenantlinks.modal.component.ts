@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, ElementRef, OnInit, QueryList, ViewChildren } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PermanentLink } from 'app/models/permanentlink.model';
 import { UserStateService } from 'app/services/user/user-state.service';
@@ -24,12 +24,12 @@ export class PermanentLinksModalComponent implements OnInit {
   // Keep track of load state links so we can pass through button container's clicks
   @ViewChildren('loadStateLink') loadStateLinks: QueryList<ElementRef<HTMLElement>>;
 
-  statesForm: FormGroup;
-  statesFormArray: FormArray;
+  statesForm: UntypedFormGroup;
+  statesFormArray: UntypedFormArray;
 
   editingState: number = -1;  // Keep track of state being edited (-1 = none)
 
-  constructor(private formBuilder: FormBuilder, private modalService: NgbModal, public activeModal: NgbActiveModal,
+  constructor(private formBuilder: UntypedFormBuilder, private modalService: NgbModal, public activeModal: NgbActiveModal,
               private userStateService: UserStateService, private datePipe: DatePipe) {}
 
   ngOnInit() {
@@ -37,7 +37,7 @@ export class PermanentLinksModalComponent implements OnInit {
       this.userId = user.id;
     });
     this.userStateService.states.subscribe(states => {
-      this.statesFormArray = new FormArray([]);
+      this.statesFormArray = new UntypedFormArray([]);
       this.userStates = states;
       // Close if empty (only happens after delete)
       if (this.userStates.length === 0) {
