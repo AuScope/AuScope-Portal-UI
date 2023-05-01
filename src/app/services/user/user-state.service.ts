@@ -8,6 +8,7 @@ import { AuscopeApiService } from '../api/auscope-api.service';
 import { CsMapService, ManageStateService } from '@auscope/portal-core-ui';
 import { v4 as uuidv4 } from 'uuid';
 import { HttpResponse } from '@angular/common/http';
+import { environment } from 'environments/environment';
 
 
 @Injectable()
@@ -155,9 +156,15 @@ export class UserStateService {
   public addState(name: string, description: string, isPublic: boolean): Observable<any> {
     const id = uuidv4();
     const state = this.manageStateService.getState();
+    // Add the base map to the state
+    const baseMapImagery = this.csMapService.getViewer().baseLayerPicker.viewModel.selectedImagery;
+    const baseMap = environment.baseMapLayers.find(bm => bm.viewValue === baseMapImagery.name);
+    if (baseMap) {
+      state.baseMap = baseMap.value;
+    }
     // Add the index position of each layer to the state object
     for (const layerKey of Object.keys(state)) {
-      if (layerKey.toLowerCase() !== 'map') {
+      if (layerKey.toLowerCase() !== 'map' && layerKey.toLowerCase() !== 'basemap') {
         const layerIndex = this.csMapService.getLayerIndex(layerKey);
         state[layerKey].index = layerIndex;
       }
