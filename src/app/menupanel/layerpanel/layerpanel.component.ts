@@ -5,7 +5,7 @@ import { CsClipboardService, CsMapService, LayerHandlerService, LayerModel, Mana
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
-import { MatSliderChange } from '@angular/material/slider';
+import { MatLegacySliderChange as MatSliderChange } from '@angular/material/legacy-slider';
 import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
 import { SplitDirection } from 'cesium';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';

@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog, MatLegacyDialogConfig as MatDialogConfig, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog';
 import { Constants, LayerModel, LayerStatusService, ManageStateService, OnlineResourceModel, SldService, UtilitiesService } from '@auscope/portal-core-ui';
 import { LegendModalComponent } from 'app/modalwindow/legend/legend.modal.component';
 import { Observable, of } from 'rxjs';
