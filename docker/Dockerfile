@@ -2,7 +2,7 @@
 # A static Angular website served by apache2
 #
 # First image, build angular app
-FROM node:14.17.6-alpine as node
+FROM node:18.16.0-alpine as node
 
 ENV appdir /usr/src/app
 
@@ -18,7 +18,7 @@ RUN apk update && \
     apk upgrade && \
     apk add git python2 g++ make
 
-RUN npm install -g npm@7
+RUN npm install -g npm@9
 
 RUN npm --version && node --version
 
@@ -45,7 +45,7 @@ RUN ./make_timestamp.sh $BUILDTYPE > ./src/app/menupanel/portal-details-panel/po
 RUN npm link @auscope/portal-core-ui && npm run $BUILDTYPE
 
 # Second image, install website
-FROM debian:bullseye-20230227
+FROM debian:bullseye-20230411
 
 ENV appdir /usr/src/app
 
