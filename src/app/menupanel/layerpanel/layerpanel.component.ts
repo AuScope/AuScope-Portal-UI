@@ -109,7 +109,7 @@ export class LayerPanelComponent implements OnInit {
     isDatasetURLSupportedLayer = config.datasetUrlSupportedLayer[layer.id] !== undefined;
 
     if (config.datasetUrlAussPassLayer[layer.group.toLowerCase()] !== undefined &&
-      this.layerHandlerService.contains(layer, ResourceType.IRIS)) {
+      UtilitiesService.layerContainsResourceType(layer, ResourceType.IRIS)) {
       isIRISDownloadSupported = true;
     }
 
@@ -348,7 +348,7 @@ export class LayerPanelComponent implements OnInit {
    * @param layer current LayerModel
    */
   public getApplicableSplitLayer(layer: LayerModel): boolean {
-    return this.layerHandlerService.contains(layer, ResourceType.WMS);
+    return UtilitiesService.layerContainsResourceType(layer, ResourceType.WMS);
   }
 
   /**
