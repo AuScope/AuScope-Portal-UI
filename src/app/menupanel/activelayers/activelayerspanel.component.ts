@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CsMapService, LayerHandlerService, LayerModel, ResourceType } from '@auscope/portal-core-ui';
+import { CsMapService, LayerHandlerService, LayerModel, ResourceType, UtilitiesService } from '@auscope/portal-core-ui';
 import { MatSliderChange } from '@angular/material/slider';
 import { SplitDirection } from 'cesium';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
@@ -130,7 +130,7 @@ export class ActiveLayersPanelComponent {
    * @param layer current LayerModel
    */
   public getApplicableSplitLayer(layer: LayerModel): boolean {
-    return this.layerHandlerService.contains(layer, ResourceType.WMS);
+    return UtilitiesService.layerContainsResourceType(layer, ResourceType.WMS);
   }
 
   /**
