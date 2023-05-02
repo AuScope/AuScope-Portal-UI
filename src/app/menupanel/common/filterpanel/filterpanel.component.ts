@@ -1,17 +1,14 @@
 import { CsClipboardService, CsMapService, CsWMSService, FilterPanelService, LayerHandlerService,
-         LayerModel, LayerStatusService, ManageStateService, UtilitiesService } from '@auscope/portal-core-ui';
-import * as $ from 'jquery';
+         LayerModel, LayerStatusService, UtilitiesService } from '@auscope/portal-core-ui';
 import { Component, Input, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import * as _ from 'lodash';
-import { environment } from '../../../../environments/environment';
 import { config } from '../../../../environments/config';
 import { ref } from '../../../../environments/ref';
 import { LayerAnalyticModalComponent } from '../../../modalwindow/layeranalytic/layer.analytic.modal.component';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
 import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
-import { LegendUiService } from 'app/services/legend/legend-ui.service';
-import { UserStateService } from 'app/services/user/user-state.service';
+import { LayerManagerService } from 'app/services/ui/layer-manager.service';
 
 declare let gtag: Function;
 
@@ -39,16 +36,14 @@ export class FilterPanelComponent implements OnInit {
 
   constructor(private csMapService: CsMapService,
     private layerHandlerService: LayerHandlerService,
+    private layerManagerService: LayerManagerService,
     private filterService: FilterService,
     private filterPanelService: FilterPanelService,
     private modalService: BsModalService,
-    private manageStateService: ManageStateService,
     private csClipboardService: CsClipboardService,
     private csWMSService: CsWMSService,
     public layerStatus: LayerStatusService,
-    private userStateService: UserStateService,
-    private advancedComponentService: AdvancedComponentService,
-    private legendUiService: LegendUiService) {
+    private advancedComponentService: AdvancedComponentService) {
     this.providers = [];
     this.optionalFilters = [];
     this.analyticMap = ref.layeranalytic;
@@ -90,31 +85,6 @@ export class FilterPanelComponent implements OnInit {
     // Add any layer specific advanced filter components
     this.advancedComponentService.addAdvancedFilterComponents(this.layer, this.advancedFilterComponents);
 
-    // This sets the filter parameters using the state data in the permanent link
-    const stateId = UtilitiesService.getUrlParameterByName('state');
-    if (stateId) {
-      this.userStateService.getPortalState(stateId).subscribe((layerStateObj: any) => {
-        if (layerStateObj && layerStateObj[this.layer.id]) {
-          // Populate layer times if necessary
-          if (config.queryGetCapabilitiesTimes.indexOf(this.layer.id) > -1) {
-            this.filterService.updateLayerTimes(this.layer, this.layerTimes);
-          }
-          // Current time
-          if (layerStateObj[this.layer.id].time) {
-            this.layerTimes.currentTime = layerStateObj[this.layer.id].time;
-          }
-          // Advanced filter
-          if (layerStateObj[this.layer.id] && layerStateObj[this.layer.id].advancedFilter) {
-            this.advancedComponentService.getAdvancedFilterComponentForLayer(this.layer.id).setAdvancedParams(layerStateObj[this.layer.id].advancedFilter);
-          }
-          this.optionalFilters = this.optionalFilters.concat(layerStateObj[this.layer.id].optionalFilters);
-          setTimeout(() => {
-            this.addLayer(this.layer);
-          }, 100);
-        }
-      });
-    }
-
     // LJ: nvclAnalyticalJob external link
     const nvclanid = UtilitiesService.getUrlParameterByName('nvclanid');
     if (nvclanid) {
@@ -126,6 +96,29 @@ export class FilterPanelComponent implements OnInit {
       }
     }
 
+  }
+
+  /**
+   * Add layer from the saved layer state. Will be called by parent LayerPanel.
+   * @param layerState layer state is JSON
+   */
+  public addLayerFromState(layerState: any) {
+    // Populate layer times if necessary
+    if (config.queryGetCapabilitiesTimes.indexOf(this.layer.id) > -1) {
+      this.filterService.updateLayerTimes(this.layer, this.layerTimes);
+    }
+    // Current time
+    if (layerState.time) {
+      this.layerTimes.currentTime = layerState.time;
+    }
+    // Advanced filter
+    if (layerState.advancedFilter) {
+      this.advancedComponentService.getAdvancedFilterComponentForLayer(this.layer.id).setAdvancedParams(layerState.advancedFilter);
+    }
+    this.optionalFilters = this.optionalFilters.concat(layerState.optionalFilters);
+    setTimeout(() => {
+      this.addLayer(this.layer);
+    }, 100);
   }
 
   /**
@@ -174,60 +167,7 @@ export class FilterPanelComponent implements OnInit {
    */
   public addLayer(layer): void {
     this.onApplyClipboardBBox();
-    if (environment.googleAnalyticsKey && typeof gtag === 'function') {
-      gtag('event', 'Addlayer', {
-        event_category: 'Addlayer',
-        event_action: 'AddLayer:' + layer.id
-      });
-    }
-    const param = {
-      optionalFilters: _.cloneDeep(this.optionalFilters)
-    };
-
-    // WMS layers may have a time set
-    if (this.layerTimes.currentTime) {
-      param['time'] = this.layerTimes.currentTime;
-    }
-
-    // Get AdvancedFilter params if applicable
-    let advancedFilterParams = null;
-    const advancedFilter = this.advancedComponentService.getAdvancedFilterComponentForLayer(layer.id);
-    if (advancedFilter) {
-      advancedFilterParams = advancedFilter.getAdvancedParams();
-      // Append any call parameters the AdvancedFilter may add
-      Object.assign(param, advancedFilter.getCallParams());
-    }
-
-    // Remove filters without values
-    param.optionalFilters = param.optionalFilters.filter(f => this.filterHasValue(f));
-    for (const optFilter of param.optionalFilters) {
-      if (optFilter['options']) {
-        optFilter['options'] = [];
-      }
-    }
-
-    // Add a new layer in the layer state service
-    this.manageStateService.addLayer(
-      layer.id,
-      this.layerTimes.currentTime,
-      this.layerFilterCollection,
-      this.optionalFilters,
-      advancedFilterParams
-    );
-
-    // Remove any existing legends in case map re-added with new style
-    this.legendUiService.removeLegend(layer.id);
-
-    // Add layer to map in Cesium
-    this.csMapService.addLayer(layer, param);
-
-    // If on a small screen, when a new layer is added, roll up the sidebar to expose the map */
-    if ($('#sidebar-toggle-btn').css('display') !== 'none') {
-      $('#sidebar-toggle-btn').click();
-    }
-
-    // Add any advanced map components defined in refs.ts
-    this.advancedComponentService.addAdvancedMapComponents(this.layer);
+    this.layerManagerService.addLayer(layer, this.optionalFilters, this.layerFilterCollection, this.layerTimes.currentTime);
   }
 
   /**
@@ -406,10 +346,7 @@ export class FilterPanelComponent implements OnInit {
     this.layerTimes.currentTime = newDate;
     this.filterService.setLayerTimes(this.layer.id, this.layerTimes);
     // Re-add layer to map
-    const layerModelList = this.csMapService.getLayerModelList();
-    if (layerModelList.hasOwnProperty(this.layer.id)) {
-      this.csMapService.removeLayer(layerModelList[this.layer.id]);
-    }
+    this.csMapService.removeLayerById(this.layer.id);
     this.addLayer(this.layer);
   }
 

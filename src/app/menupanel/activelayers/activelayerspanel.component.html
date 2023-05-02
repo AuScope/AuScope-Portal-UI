@@ -1,34 +1,39 @@
 <div class="select-layers-message" *ngIf="getActiveLayers().length===0">
     Select layers below to add to map
 </div>
-<li *ngFor="let layer of getActiveLayers()">
-    <div class="layerLoadCtrl">
-        <div>
-            <u (click)="openStatusReport(getUILayerModel(layer.id)); $event.stopPropagation();">{{ layer.name }}
-                <span *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="float-right project-percentage hasEvent light-blue">
-                    <i *ngIf="!getUILayerModel(layer.id).statusMap.getRenderComplete()" class="fa fa-spin fa-spinner"></i>
-                    <i *ngIf="getUILayerModel(layer.id).statusMap.getContainsError()" class="fa fa-warning text-warning"></i>
-                </span>
-            </u>
-            <i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-trash float-right red layerLoadClickable" (click)="removeLayer(layer.id);$event.stopPropagation()"></i>
+<div class="activeLayersBoundary" cdkDropList (cdkDropListDropped)="layerDropped($event)">
+    <li class="activeLayerItem" *ngFor="let layer of getActiveLayers()" cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".activeLayersBoundary">
+        <div *ngIf="getActiveLayers().length > 1" cdkDragHandle>
+            <i class="activeLayerGrabber fa fa-arrows-v" title="Drag to reorder"></i>
         </div>
-        <div *ngIf="showOpacitySlider(layer) && getUILayerModel(layer.id).statusMap.getRenderStarted()" class="opacity-slider-panel d-flex" (click)="$event.stopPropagation()">
-            <div class="opacity-label">Opacity {{ getUILayerModel(layer.id).opacity }}%&nbsp;</div>
-            <mat-slider [min]="0" [max]="100" class="opacity-slider flex-grow-1" [(ngModel)]="getUILayerModel(layer.id).opacity" (input)="layerOpacityChange($event, layer)"></mat-slider>
-            <div *ngIf="hasLegend(layer)">
-                <button class="btn btn-primary btn-sm pull-right" style="margin-left:5px;margin-top:6px;font-size:0.8rem;padding:0 2px;" [disabled]="isLegendShown(layer.id)" (click)="showLegend(layer)">Legend</button>
+        <div class="activeLayerContent">
+            <div>
+                <u style="cursor:pointer;" (click)="openStatusReport(getUILayerModel(layer.id)); $event.stopPropagation();">{{ layer.name }}
+                    <span *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="float-right project-percentage hasEvent light-blue">
+                        <i *ngIf="!getUILayerModel(layer.id).statusMap.getRenderComplete()" class="fa fa-spin fa-spinner"></i>
+                        <i *ngIf="getUILayerModel(layer.id).statusMap.getContainsError()" class="fa fa-warning text-warning"></i>
+                    </span>
+                </u>
+                <i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-trash float-right red layerLoadClickable" (click)="removeLayer(layer);$event.stopPropagation()"></i>
+            </div>
+            <div *ngIf="showOpacitySlider(layer) && getUILayerModel(layer.id).statusMap.getRenderStarted()" class="opacity-slider-panel d-flex" (click)="$event.stopPropagation()">
+                <div class="opacity-label">Opacity {{ getUILayerModel(layer.id).opacity }}%&nbsp;</div>
+                <mat-slider [min]="0" [max]="100" class="opacity-slider flex-grow-1" [(ngModel)]="getUILayerModel(layer.id).opacity" (input)="layerOpacityChange($event, layer)"></mat-slider>
+                <div *ngIf="hasLegend(layer)">
+                    <button class="btn btn-primary btn-sm pull-right" style="margin-left:5px;margin-top:6px;font-size:0.8rem;padding:0 2px;" [disabled]="isLegendShown(layer.id)" (click)="showLegend(layer)">Legend</button>
+                </div>
+            </div>
+            <div class="split-panel" *ngIf="getShowSplitMapButtons(layer)" (click)="$event.stopPropagation()">
+                Split Direction&nbsp;
+                <div *ngIf="getApplicableSplitLayer(layer)" class="split-button-panel">
+                    <button [className]="getLayerSplitDirection(layer.id) === 'left' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'left')">Left</button>
+                    <button [className]="getLayerSplitDirection(layer.id) === 'none' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'none')">Both</button>
+                    <button [className]="getLayerSplitDirection(layer.id) === 'right' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'right')">Right</button>
+                </div>
+                <div *ngIf="!getApplicableSplitLayer(layer)" class="split-button-panel">
+                    <button class="btn btn-split btn-primary" [disabled]="true">Layer not supported</button>
+                </div>
             </div>
         </div>
-        <div class="split-panel" *ngIf="getShowSplitMapButtons(layer)" (click)="$event.stopPropagation()">
-            Split Direction&nbsp;
-            <div *ngIf="getApplicableSplitLayer(layer)" class="split-button-panel">
-                <button [className]="getLayerSplitDirection(layer.id) === 'left' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'left')">Left</button>
-                <button [className]="getLayerSplitDirection(layer.id) === 'none' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'none')">Both</button>
-                <button [className]="getLayerSplitDirection(layer.id) === 'right' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'right')">Right</button>
-            </div>
-            <div *ngIf="!getApplicableSplitLayer(layer)" class="split-button-panel">
-                <button class="btn btn-split btn-primary" [disabled]="true">Layer not supported</button>
-            </div>
-        </div>
-    </div>
-</li>
+    </li>
+</div>

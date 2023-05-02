@@ -665,10 +665,9 @@ export class CsMapComponent implements AfterViewInit {
         }, 10);
 
     } else {
-      const activeLayerKeys: string[] = Object.keys(this.csMapService.getLayerModelList());
-      for(const layer of activeLayerKeys) {
-        this.csMapService.setLayerSplitDirection(this.csMapService.getLayerModelList()[layer], SplitDirection.NONE);
-      }
+     for (const layer of this.csMapService.getLayerModelList()) {
+      this.csMapService.setLayerSplitDirection(layer, SplitDirection.NONE);
+     }
     }
   }
 

@@ -1,10 +1,10 @@
 import { Component, Input } from '@angular/core';
-import { CsMapService, LayerModel } from '@auscope/portal-core-ui';
+import { LayerModel } from '@auscope/portal-core-ui';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { LegendUiService } from 'app/services/legend/legend-ui.service';
+import { LayerManagerService } from 'app/services/ui/layer-manager.service';
 
 
 @Component({
@@ -17,8 +17,8 @@ export class LayerGroupComponent {
   // Contains the layers on display 
   @Input() layerGroups: { 'Results': LayerModel[] };
 
-  constructor(private csMapService: CsMapService, private uiLayerModelService: UILayerModelService,
-    private legendUiService: LegendUiService, public activeModalService: NgbModal) {
+  constructor(private uiLayerModelService: UILayerModelService, private layerManagerService: LayerManagerService,
+    public activeModalService: NgbModal) {
   }
 
   /**
@@ -36,8 +36,7 @@ export class LayerGroupComponent {
    * @param layer layer to be removed
    */
   public removeLayer(layer: LayerModel) {
-    this.csMapService.removeLayer(layer);
-    this.legendUiService.removeLegend(layer.id);
+    this.layerManagerService.removeLayer(layer);
   }
 
   /**

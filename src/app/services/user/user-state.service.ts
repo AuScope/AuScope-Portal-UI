@@ -5,7 +5,7 @@ import { BehaviorSubject, Observable, of, throwError as observableThrowError } f
 import { catchError, map, take } from 'rxjs/operators';
 import { User } from '../../models/user.model';
 import { AuscopeApiService } from '../api/auscope-api.service';
-import { ManageStateService, MapState } from '@auscope/portal-core-ui';
+import { CsMapService, ManageStateService } from '@auscope/portal-core-ui';
 import { v4 as uuidv4 } from 'uuid';
 import { HttpResponse } from '@angular/common/http';
 
@@ -25,7 +25,7 @@ export class UserStateService {
   private _states: BehaviorSubject<PermanentLink[]> = new BehaviorSubject([]);
   public readonly states: Observable<PermanentLink[]> = this._states.asObservable();
 
-  constructor(private apiService: AuscopeApiService, private manageStateService: ManageStateService) {}
+  constructor(private apiService: AuscopeApiService, private manageStateService: ManageStateService, private csMapService: CsMapService) {}
 
   /**
    * Get the currently logged in user (if one is logged in)
@@ -154,8 +154,15 @@ export class UserStateService {
    */
   public addState(name: string, description: string, isPublic: boolean): Observable<any> {
     const id = uuidv4();
-    const mapState: MapState = this.manageStateService.getState();
-    return this.apiService.saveUserPortalState(id, name, description, JSON.stringify(mapState), isPublic).pipe(map(response => {
+    const state = this.manageStateService.getState();
+    // Add the index position of each layer to the state object
+    for (const layerKey of Object.keys(state)) {
+      if (layerKey.toLowerCase() !== 'map') {
+        const layerIndex = this.csMapService.getLayerIndex(layerKey);
+        state[layerKey].index = layerIndex;
+      }
+    }
+    return this.apiService.saveUserPortalState(id, name, description, JSON.stringify(state), isPublic).pipe(map(response => {
       if (response['success']) {
         response['id'] = id;
       }
@@ -171,6 +178,16 @@ export class UserStateService {
     ), );
   }
 
+  /**
+   * Update an existing state (name, description and isPublic only)
+   *
+   * @param id ID of state
+   * @param userId ID of user
+   * @param name name of state
+   * @param description optional state description
+   * @param isPublic if false, only user can load state, if true there are no restrictions
+   * @returns ID of state on success
+   */
   public updateState(id: string, userId: string, name: string, description: string, isPublic: boolean): Observable<any> {
     return this.apiService.updateUserPortalState(id, userId, name, description, isPublic).pipe(map(response => {
       if (response['success']) {
@@ -208,10 +225,10 @@ export class UserStateService {
   }
 
   /**
-   * Get a specific State for the current user
+   * Get a specific State for the current user. If state layers contain an index field they will be sorted by this.
    *
-   * @param stateId 
-   * @returns 
+   * @param stateId state ID
+   * @returns the protal state as a JSON Object
    */
   getPortalState(stateId: string): Observable<any> {
     if (!stateId) {
