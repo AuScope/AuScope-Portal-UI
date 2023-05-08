@@ -85,11 +85,19 @@ select {
 }
 
 /* WFS feature tree display rules */
+mat-tree {
+    background-color: #fff;
+    color: #000;
+}
 
-.mat-tree-node:nth-of-type(odd){
+.mat-tree-node, .mat-nested-tree-node {
+    color: #000;
+}
+
+.mat-mdc-tree-node:nth-of-type(odd) {
     background-color: #eee;
 }
-.mat-tree-node:nth-of-type(even){
+.mat-mdc-tree-node:nth-of-type(even){
     background-color: $modal-background-colour;
 }
 
@@ -97,18 +105,26 @@ select {
     display: none;
 }
 
-button.mat-icon-button[mattreenodetoggle] .mat-icon, button.mat-icon-button {
+button.mat-mdc-icon-button[mattreenodetoggle] .mat-mdc-icon .button.mat-mdc-icon-button {
     font-size: 20px;
     height: 20px;
     width: 20px;
     line-height: 20px;
 }
 
-button.mat-icon-button:hover, button.mat-icon-button:active {
+button.mat-mdc-icon-button:hover, bu.mat-mdc-mat-icon-button:active {
     color: #000;
 }
 
-.mat-nested-tree-node {
+button.mat-mdc-outlined-button.mat-unthemed {
+    --mdc-outlined-button-label-text-color: #000;
+}
+
+.mat-mdc-outlined-button {
+    --mdc-outlined-button-outline-color: #AAA;
+}
+
+.mat-mdc-nested-tree-node {
     font-size: 12px;
 }
 
@@ -178,7 +194,7 @@ div.modal-card-size .btn {
 	background: #e4e4e4;
 }
 
-::ng-deep .mat-tooltip{
+::ng-deep .mat-mdc-tooltip {
     border: 1px solid $modal-tab-border-colour !important;
     border-radius: 3px;
     background: $modal-background-colour;

@@ -5,7 +5,6 @@ import { CsClipboardService, CsMapService, LayerHandlerService, LayerModel, Mana
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
-import { MatLegacySliderChange as MatSliderChange } from '@angular/material/legacy-slider';
 import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
 import { SplitDirection } from 'cesium';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
@@ -134,6 +133,9 @@ export class LayerPanelComponent implements OnInit {
       return false;
   }
 
+  /**
+   * Initialise component
+   */
   public ngOnInit() {
       const nvclanid = UtilitiesService.getUrlParameterByName('nvclanid');
       const stateId = UtilitiesService.getUrlParameterByName('state');
@@ -254,9 +256,11 @@ export class LayerPanelComponent implements OnInit {
 
   /**
    * Layer opacity slider change event
+   * @param value Event value object from slider change event
+   * @param layer the layer object
    */
-  public layerOpacityChange(event: MatSliderChange, layer: LayerModel) {
-    this.csMapService.setLayerOpacity(layer, (event.value / 100));
+  public layerOpacityChange(value: number, layer: LayerModel) {
+    this.csMapService.setLayerOpacity(layer, value / 100);
   }
 
   /**
