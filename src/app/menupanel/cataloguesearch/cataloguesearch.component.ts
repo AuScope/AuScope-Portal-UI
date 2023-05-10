@@ -1,8 +1,4 @@
-import { Bbox } from '@auscope/portal-core-ui';
-import { LayerModel } from '@auscope/portal-core-ui';
-import { CsMapService } from '@auscope/portal-core-ui';
-import { RenderStatusService } from '@auscope/portal-core-ui';
-import { UtilitiesService } from '@auscope/portal-core-ui';
+import { Bbox, CsMapService, LayerModel, RenderStatusService, UtilitiesService } from '@auscope/portal-core-ui';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { CataloguesearchService } from './cataloguesearch.service';
@@ -10,7 +6,7 @@ import { Component, AfterViewInit } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { RectangleEditorObservable } from '@auscope/angular-cesium';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
-import { LegendUiService } from 'app/services/legend/legend-ui.service';
+import { LayerManagerService } from 'app/services/ui/layer-manager.service';
 
 
 @Component({
@@ -43,7 +39,7 @@ export class CatalogueSearchComponent implements AfterViewInit {
 
   constructor(private csMapService: CsMapService, private cataloguesearchService: CataloguesearchService,
               private renderStatusService: RenderStatusService,  private modalService: BsModalService,
-              private uiLayerModelService: UILayerModelService, private legedUiService: LegendUiService) {
+              private layerManagerService: LayerManagerService, private uiLayerModelService: UILayerModelService) {
     this.drawStarted = false;
     this.searchMode = true;
     this.loading = false;
@@ -186,8 +182,7 @@ export class CatalogueSearchComponent implements AfterViewInit {
    * remove a layer from the map
    */
   public removeLayer(layer: LayerModel) {
-    this.csMapService.removeLayer(layer);
-    this.legedUiService.removeLegend(layer.id);
+    this.layerManagerService.removeLayer(layer);
   }
 
   /**

@@ -102,7 +102,7 @@ export class DownloadPanelComponent implements OnInit {
       this.isDatasetURLSupportedLayer = config.datasetUrlSupportedLayer[this.layer.id] !== undefined;
       // If it is an IRIS layer get the station information
       if (config.datasetUrlAussPassLayer[this.layer.group.toLowerCase()] !== undefined &&
-          this.layerHandlerService.contains(this.layer, ResourceType.IRIS)) {
+          UtilitiesService.layerContainsResourceType(this.layer, ResourceType.IRIS)) {
         this.isIRISDownloadSupported = true;
         this.getIRISStationInfo();
       }
@@ -229,7 +229,7 @@ export class DownloadPanelComponent implements OnInit {
    * Runs the WCS 'DescribeCoverage' request to gather more information about the WCS resource
    */
   public describeCoverage() {
-    if (this.layerHandlerService.contains(this.layer, ResourceType.WCS)) {
+    if (UtilitiesService.layerContainsResourceType(this.layer, ResourceType.WCS)) {
       const wcsResources = this.layerHandlerService.getWCSResource(this.layer);
       const me = this;
       this.downloadWcsService.describeCoverage(wcsResources[0].url, wcsResources[0].name).subscribe(response => {

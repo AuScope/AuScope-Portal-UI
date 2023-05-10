@@ -1,12 +1,9 @@
 import { Component, Input, ViewContainerRef, OnInit } from "@angular/core";
-import {  CSWRecordModel,  CsMapService,  ManageStateService,  UtilitiesService,  LayerModel} from "@auscope/portal-core-ui";
+import { CSWRecordModel, CsMapService,  UtilitiesService, LayerModel } from "@auscope/portal-core-ui";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { LegendUiService } from "app/services/legend/legend-ui.service";
-import { AdvancedComponentService } from "app/services/ui/advanced-component.service";
 import { UserStateService } from "app/services/user/user-state.service";
-import { environment } from "environments/environment";
-import * as _ from "lodash";
 import { RecordModalComponent } from "../record-modal/record-modal.component";
+import { LayerManagerService } from "app/services/ui/layer-manager.service";
 
 // List of valid online resource types that can be added to the map
 const VALID_ONLINE_RESOURCE_TYPES: string[] = ["WMS", "WFS", "CSW", "WWW"];
@@ -29,9 +26,7 @@ export class DataExplorerRecordComponent implements OnInit {
 
   constructor(
     public csMapService: CsMapService,
-    private manageStateService: ManageStateService,
-    private advancedMapComponentService: AdvancedComponentService,
-    private legendUiService: LegendUiService,
+    private layerManagerService: LayerManagerService,
     private userStateService: UserStateService,
     public modalService: NgbModal
   ) {
@@ -115,45 +110,7 @@ export class DataExplorerRecordComponent implements OnInit {
    * @param layer the layer to add to map
    */
   public addLayer(layer): void {
-    if (environment.googleAnalyticsKey && typeof gtag === "function") {
-      gtag("event", "Addlayer", {
-        event_category: "Addlayer",
-        event_action: "AddLayer:" + layer.id,
-      });
-    }
-    const param = {
-      optionalFilters: _.cloneDeep(this.optionalFilters),
-    };
-
-
-    for (const optFilter of param.optionalFilters) {
-      if (optFilter["options"]) {
-        optFilter["options"] = [];
-      }
-    }
-
-    this.manageStateService.addLayer(
-      layer.id,
-      null,
-      layer.filterCollection,
-      this.optionalFilters,
-      // No advanced filters in data search panel
-      null
-    );
-
-    // Remove any existing legends in case map re-added with new style
-    this.legendUiService.removeLegend(layer.id);
-
-    // Add layer
-    this.csMapService.addLayer(layer, param);
-
-    // If on a small screen, when a new layer is added, roll up the sidebar to expose the map */
-    if ($("#sidebar-toggle-btn").css("display") !== "none") {
-      $("#sidebar-toggle-btn").click();
-    }
-
-    // Add any advanced map components to map defined in refs.ts
-    this.advancedMapComponentService.addAdvancedMapComponents(this.layer);
+    this.layerManagerService.addLayer(layer, this.optionalFilters, layer.filterCollection, undefined);
   }
 
   /**
@@ -161,13 +118,8 @@ export class DataExplorerRecordComponent implements OnInit {
    *
    * @layerId layerId ID of LayerModel
    */
-  removeLayer(layerId: string): void {
-    const layerModelList = this.csMapService.getLayerModelList();
-    if (layerModelList.hasOwnProperty(layerId)) {
-      this.csMapService.removeLayer(layerModelList[layerId]);
-      // Remove any layer specific components
-      this.advancedMapComponentService.removeAdvancedMapComponents(layerId);
-    }
-    this.legendUiService.removeLegend(layerId);
+  removeLayer(layer: LayerModel): void {
+    this.layerManagerService.removeLayer(layer);
   }
+
 }

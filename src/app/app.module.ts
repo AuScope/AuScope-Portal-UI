@@ -91,6 +91,7 @@ import { SearchService } from './services/search/search.service';
 import { BoundsService } from './services/bounds/bounds.service';
 import { GraceService } from './services/wcustom/grace/grace.service';
 import { LegendUiService } from './services/legend/legend-ui.service';
+import { LayerManagerService } from './services/ui/layer-manager.service';
 
 import * as PlotlyJS from 'plotly.js-dist-min/plotly.min.js';
 import { PlotlyModule } from 'angular-plotly.js';
@@ -172,7 +173,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
     ],
     providers: [ AuscopeApiService, FilterService, RectanglesEditorService, AdvancedComponentService, SearchService,
                  NVCLService, MSCLService, BoundsService, GraceService, { provide: SAVER, useFactory: getSaver },
-                 LegendUiService, UserStateService, AuthGuard, AuthService
+                 LegendUiService, UserStateService, LayerManagerService, AuthGuard, AuthService
     ],
     imports: [
         PortalCoreModule.forRoot(environment, config),

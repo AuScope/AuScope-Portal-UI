@@ -5,7 +5,6 @@ import { CsClipboardService, CsMapService, LayerHandlerService, LayerModel, Mana
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
-import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
 import { SplitDirection } from 'cesium';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -13,10 +12,10 @@ import { FilterPanelComponent } from '../common/filterpanel/filterpanel.componen
 import { config } from '../../../environments/config';
 import { DOCUMENT } from '@angular/common';
 import { DownloadPanelComponent } from '../common/downloadpanel/downloadpanel.component';
-import { LegendUiService } from 'app/services/legend/legend-ui.service';
 import { UserStateService } from 'app/services/user/user-state.service';
 import { Bookmark } from 'app/models/bookmark.model';
 import { AuthService } from 'app/services/auth/auth.service';
+import { LayerManagerService } from 'app/services/ui/layer-manager.service';
 
 
 // Filter modes available in the dropdown layer filter selector
@@ -49,12 +48,11 @@ export class LayerPanelComponent implements OnInit {
   showingOnlyBookmarkedLayers = false;
 
 
-  constructor(private layerHandlerService: LayerHandlerService,
+  constructor(private layerHandlerService: LayerHandlerService, private layerManagerService: LayerManagerService,
       private renderStatusService: RenderStatusService, private activeModalService: NgbModal,
       private modalService: BsModalService, private csMapService: CsMapService,
       private manageStateService: ManageStateService, private csClipboardService: CsClipboardService,
-      private uiLayerModelService: UILayerModelService, private advancedMapComponentService: AdvancedComponentService,
-      private userStateService: UserStateService, private legendUiService: LegendUiService,
+      private uiLayerModelService: UILayerModelService, private userStateService: UserStateService,
       private authService: AuthService, @Inject(DOCUMENT) document: Document) {
       this.csClipboardService.filterLayersBS.subscribe(filterLayers => {
       this.areLayersPolygonFiltered = filterLayers;
@@ -110,7 +108,7 @@ export class LayerPanelComponent implements OnInit {
     isDatasetURLSupportedLayer = config.datasetUrlSupportedLayer[layer.id] !== undefined;
 
     if (config.datasetUrlAussPassLayer[layer.group.toLowerCase()] !== undefined &&
-      this.layerHandlerService.contains(layer, ResourceType.IRIS)) {
+      UtilitiesService.layerContainsResourceType(layer, ResourceType.IRIS)) {
       isIRISDownloadSupported = true;
     }
 
@@ -134,7 +132,36 @@ export class LayerPanelComponent implements OnInit {
   }
 
   /**
-   * Initialise component
+   * Load permanent link state layers from their respective FilterPanels
+   *
+   * @param layerStateObj the permanent link state JSON Object
+   */
+  private loadFilterPanelLayersFromState(layerStateObj: any) {
+    // Re-order layers by index field provided index field is present (it won't be in older states)
+    const orderedLayerKeys: string[] = [];
+    for (const layer of Object.keys(layerStateObj)) {
+      if (layer.toLowerCase() !== 'map') {
+        // Add layer at 'index' position of array, else just push
+        if (layerStateObj[layer].hasOwnProperty('index')) {
+          orderedLayerKeys[layerStateObj[layer].index] = layer;
+        } else {
+          orderedLayerKeys.push(layer);
+        }
+      }
+    }
+    // Add ordered layers to map
+    for (const layer of orderedLayerKeys) {
+      const layerFilterPanel: FilterPanelComponent = this.filterComponents.find(fc => fc.layer.id === layer);
+      if (layerFilterPanel) {
+        layerFilterPanel.addLayerFromState(layerStateObj[layer]);
+      } else {
+        console.log('Couldn\'t locate FilterPanel for layer: ' + layer);
+      }
+    }
+  }
+
+  /**
+   * Initialise Component
    */
   public ngOnInit() {
       const nvclanid = UtilitiesService.getUrlParameterByName('nvclanid');
@@ -150,6 +177,11 @@ export class LayerPanelComponent implements OnInit {
           alert('The specified state could not be found, it may have been deleted or made private.');
         }
 
+        // Load state layers in corresponding FilterPanels
+        setTimeout(() => {
+          this.loadFilterPanelLayersFromState(layerStateObj);
+        }, 100);
+        
         // Initialise layers and groups in sidebar
         me.layerHandlerService.getLayerRecord().subscribe(
           response => {
@@ -238,11 +270,7 @@ export class LayerPanelComponent implements OnInit {
    * Remove the layer from the map
    */
   public removeLayer(layer: LayerModel) {
-    this.getUILayerModel(layer.id).opacity = 100;
-    this.csMapService.removeLayer(layer);
-    // Remove any layer specific map components
-    this.advancedMapComponentService.removeAdvancedMapComponents(layer.id);
-    this.legendUiService.removeLegend(layer.id);
+    this.layerManagerService.removeLayer(layer);
   }
 
   /**
@@ -305,7 +333,7 @@ export class LayerPanelComponent implements OnInit {
    */
   public getLayerSplitDirection(layerId: string): string {
     let splitDir = "none";
-    if (this.csMapService.getLayerModel(layerId) !== null) {
+    if (this.csMapService.getLayerModel(layerId) !== undefined) {
       switch(this.csMapService.getLayerModel(layerId).splitDirection) {
         case SplitDirection.LEFT:
           splitDir = "left";
@@ -324,7 +352,7 @@ export class LayerPanelComponent implements OnInit {
    * @param layer current LayerModel
    */
   public getApplicableSplitLayer(layer: LayerModel): boolean {
-    return this.layerHandlerService.contains(layer, ResourceType.WMS);
+    return UtilitiesService.layerContainsResourceType(layer, ResourceType.WMS);
   }
 
   /**
@@ -332,13 +360,12 @@ export class LayerPanelComponent implements OnInit {
    * "layerGroup" - an instance of this.layerGroups[key].value
    */
   public isLayerGroupActive(layerGroupValue): boolean {
-    const activeLayers: string[] = Object.keys(this.csMapService.getLayerModelList());
     for (const layer of layerGroupValue) {
-      if (activeLayers.indexOf(layer.id) > -1) {
+      if (this.csMapService.getLayerModelList().findIndex(l => l.id === layer.id) > -1) {
         return true;
       }
     }
-   return false;
+    return false;
   }
 
   /**

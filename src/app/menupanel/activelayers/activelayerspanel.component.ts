@@ -1,37 +1,33 @@
 import { Component } from '@angular/core';
-import { CsMapService, LayerHandlerService, LayerModel, ResourceType } from '@auscope/portal-core-ui';
+import { CsMapService, LayerHandlerService, LayerModel, ResourceType, UtilitiesService } from '@auscope/portal-core-ui';
 import { SplitDirection } from 'cesium';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
-import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
 import { LegendUiService } from 'app/services/legend/legend-ui.service';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { LayerManagerService } from 'app/services/ui/layer-manager.service';
 
 @Component({
   selector: '[appActiveLayers]',
   templateUrl: './activelayerspanel.component.html',
-  styleUrls: ['../menupanel.scss']
+  styleUrls: ['../menupanel.scss', './activelayerspanel.component.scss']
 })
 export class ActiveLayersPanelComponent {
   bsModalRef: BsModalRef;
 
   constructor(private csMapService: CsMapService,
     private uiLayerModelService: UILayerModelService, private layerHandlerService: LayerHandlerService,
-    private advancedComponentService: AdvancedComponentService, private legendUiService: LegendUiService,
+    private layerManagerService: LayerManagerService, private legendUiService: LegendUiService,
     private modalService: BsModalService) { }
 
   /**
    * Get active layers
    */
   public getActiveLayers(): LayerModel[] {
-    const activeLayers: LayerModel[] = [];
-    const activeLayerKeys: string[] = Object.keys(this.csMapService.getLayerModelList());
-    for (const layer of activeLayerKeys) {
-      const currentLayer = this.csMapService.getLayerModelList()[layer];
-      activeLayers.push(currentLayer);
-    }
-    return activeLayers;
+    const reversedLayers = [...this.csMapService.getLayerModelList()].reverse();
+    return reversedLayers;
   }
 
   /**
@@ -47,14 +43,8 @@ export class ActiveLayersPanelComponent {
    *
    * @layerId layerId ID of LayerModel
    */
-  removeLayer(layerId: string): void {
-    const layerModelList = this.csMapService.getLayerModelList();
-    if (layerModelList.hasOwnProperty(layerId)) {
-      this.csMapService.removeLayer(layerModelList[layerId]);
-      // Remove any layer specific components
-      this.advancedComponentService.removeAdvancedMapComponents(layerId);
-    }
-    this.legendUiService.removeLegend(layerId);
+  removeLayer(layer: LayerModel): void {
+    this.layerManagerService.removeLayer(layer);
     // Remove polygon filter if was opened and no layers present
     /*
     if (Object.keys(layerModelList).length === 0) {
@@ -122,7 +112,7 @@ export class ActiveLayersPanelComponent {
    */
   public getLayerSplitDirection(layerId: string): string {
     let splitDir = "none";
-    if (this.csMapService.getLayerModel(layerId) !== null) {
+    if (this.csMapService.getLayerModel(layerId) !== undefined) {
       switch(this.csMapService.getLayerModel(layerId).splitDirection) {
         case SplitDirection.LEFT:
           splitDir = "left";
@@ -141,7 +131,7 @@ export class ActiveLayersPanelComponent {
    * @param layer current LayerModel
    */
   public getApplicableSplitLayer(layer: LayerModel): boolean {
-    return this.layerHandlerService.contains(layer, ResourceType.WMS);
+    return UtilitiesService.layerContainsResourceType(layer, ResourceType.WMS);
   }
 
   /**
@@ -198,6 +188,19 @@ export class ActiveLayersPanelComponent {
    */
   public isLegendShown(layerId: string): boolean {
     return this.legendUiService.isLegendDisplayed(layerId);
+  }
+
+  /**
+   * Event fired when a LayerModel has been been dropped after being dragged
+   * @param event the CdkDragDrop event
+   */
+  public layerDropped(event: CdkDragDrop<LayerModel[]>) {
+    // Active layers list was reversed so invert array indices
+    const fromIndex = this.getActiveLayers().length - event.previousIndex - 1;
+    const toIndex = this.getActiveLayers().length - event.currentIndex - 1;
+    if (fromIndex !== toIndex) {
+      this.csMapService.moveLayer(fromIndex, toIndex);
+    }
   }
 
 }

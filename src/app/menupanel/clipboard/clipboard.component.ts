@@ -23,7 +23,7 @@ export class ClipboardComponent {
   }
 
   public getActiveLayerCount(): number {
-    return Object.keys(this.csMapService.getLayerModelList()).length;
+    return this.csMapService.getLayerModelList().length;
   }
 
 }
