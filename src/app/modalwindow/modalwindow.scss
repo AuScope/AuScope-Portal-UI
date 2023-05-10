@@ -94,10 +94,10 @@ mat-tree {
     color: #000;
 }
 
-.mat-mdc-tree-node:nth-of-type(odd) {
+.mat-tree-node:nth-of-type(odd) {
     background-color: #eee;
 }
-.mat-mdc-tree-node:nth-of-type(even){
+.mat-tree-node:nth-of-type(even){
     background-color: $modal-background-colour;
 }
 
