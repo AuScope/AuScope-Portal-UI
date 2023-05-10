@@ -312,3 +312,8 @@ input + div.input-group-append  > button {
 /* "info" button - positioned in line and to the right of "map layer" and "download" tabs */
 .rh_info_wrap { display: inline-flex; }
 .rh_info { margin-left:auto; margin-top:auto; width: 60px; align-items: center; }
+
+/* Vertically align the opacity sliders with the "Opacity XX%" string */
+.opacity-slider-panel {
+    align-items: center;
+}
