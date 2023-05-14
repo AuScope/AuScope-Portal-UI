@@ -36,6 +36,8 @@ export class DownloadPanelComponent implements OnInit {
   isPolygonSupportedLayer: boolean;
   isCsvSupportedLayer: boolean;  // Supports CSV downloads of WFS Features
   isDatasetURLSupportedLayer: boolean; // Supports dataset downloads using a URL in the WFS GetFeature response
+  skipGslmpShapeProperty: boolean;
+  datasetUrl: string;
   isWCSDownloadSupported: boolean; // Supports WCS dataset downloads
   isNvclLayer: boolean;
   isTsgDownloadAvailable: boolean;
@@ -100,6 +102,16 @@ export class DownloadPanelComponent implements OnInit {
       this.isPolygonSupportedLayer = config.polygonSupportedLayer.indexOf(this.layer.id) >= 0;
       this.isCsvSupportedLayer = this.layer.supportsCsvDownloads;
       this.isDatasetURLSupportedLayer = config.datasetUrlSupportedLayer[this.layer.id] !== undefined;
+      if (this.isDatasetURLSupportedLayer) {
+        if (config.datasetUrlSupportedLayer[this.layer.id].hasOwnProperty('datasetURL')) {
+          this.datasetUrl = config.datasetUrlSupportedLayer[this.layer.id].datasetURL;
+        } else {
+          this.datasetUrl = 'datasetURL';
+        }
+        if (config.datasetUrlSupportedLayer[this.layer.id].hasOwnProperty('skipGsmlpShapeProperty')) {
+          this.skipGslmpShapeProperty = config.datasetUrlSupportedLayer[this.layer.id].skipGsmlpShapeProperty;
+        }
+      }
       // If it is an IRIS layer get the station information
       if (config.datasetUrlAussPassLayer[this.layer.group.toLowerCase()] !== undefined &&
           UtilitiesService.layerContainsResourceType(this.layer, ResourceType.IRIS)) {
@@ -432,7 +444,7 @@ export class DownloadPanelComponent implements OnInit {
     // Download datasets using a URL in the WFS GetFeature response
     } else if (this.isDatasetURLSupportedLayer) {
       this.downloadStarted = true;
-      observableResponse = this.downloadWfsService.downloadDatasetURL(this.layer, this.bbox, null);
+      observableResponse = this.downloadWfsService.downloadDatasetURL(this.layer, this.bbox, null, this.datasetUrl, this.skipGslmpShapeProperty);
 
     // Download IRIS datasets by constructing a data download URL. User can select the either Dataselect or Station
     } else if (this.irisDownloadListOption) {
@@ -698,7 +710,7 @@ export class DownloadPanelComponent implements OnInit {
 
     // Download datasets using a URL in the WFS GetFeature response
     if (this.isDatasetURLSupportedLayer) {
-      observableResponse = this.downloadWfsService.downloadDatasetURL(this.layer, null, this.polygonFilter);
+      observableResponse = this.downloadWfsService.downloadDatasetURL(this.layer, null, this.polygonFilter, this.datasetUrl, this.skipGslmpShapeProperty);
 
       // Download WFS features as CSV files
     } else {

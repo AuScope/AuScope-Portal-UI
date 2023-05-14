@@ -9,6 +9,26 @@ export const config = {
     'mscl-borehole': {
       datasetURL: 'datasetURL'
     },
+    'ga-geophysicalsurveys-all': {
+      datasetURL: 'FILE_DOWNLOAD',
+      skipGsmlpShapeProperty: true
+    },
+    'ga-geophysicalsurveys-grav': {
+      datasetURL: 'FILE_DOWNLOAD',
+      skipGsmlpShapeProperty: true
+    },
+    'ga-geophysicalsurveys-radio': {
+      datasetURL: 'FILE_DOWNLOAD',
+      skipGsmlpShapeProperty: true
+    },
+    'ga-geophysicalsurveys-mag': {
+      datasetURL: 'FILE_DOWNLOAD',
+      skipGsmlpShapeProperty: true
+    },
+    'ga-geophysicalsurveys-elev': {
+      datasetURL: 'FILE_DOWNLOAD',
+      skipGsmlpShapeProperty: true
+    }
   },
 
   // Layers that download
