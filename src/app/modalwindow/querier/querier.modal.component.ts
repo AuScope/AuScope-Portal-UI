@@ -190,7 +190,6 @@ export class QuerierModalComponent  implements OnInit {
     let objExp=new RegExp(Expression);
     for (let  i = 0; i < this.docs.length; i++) {
       var doc = new DOMParser().parseFromString(this.docs[i].raw, "text/xml");
-      console.log(doc)
       if (doc.getElementsByTagName('gml:name').length != 0) {
         for (let html in doc.getElementsByTagName('gml:name')) {
           if(!objExp.test(doc.getElementsByTagName('gml:name')[html].innerHTML)) {

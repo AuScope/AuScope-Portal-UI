@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { UserStateService } from 'app/services/user/user-state.service';
 import { environment } from '../../../environments/environment';
@@ -14,12 +14,12 @@ import { environment } from '../../../environments/environment';
 })
 export class CreatePermanentLinkModalComponent implements OnInit {
 
-  linkForm: FormGroup;
+  linkForm: UntypedFormGroup;
   dialogMessage: string;
   savingState = false;
   errorOccurred: boolean;
 
-  constructor(private userStateService: UserStateService, private formBuilder: FormBuilder, public activeModal: NgbActiveModal) {}
+  constructor(private userStateService: UserStateService, private formBuilder: UntypedFormBuilder, public activeModal: NgbActiveModal) {}
 
   ngOnInit() {
     this.linkForm = this.formBuilder.group({
