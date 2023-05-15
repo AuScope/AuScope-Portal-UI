@@ -5,7 +5,6 @@ import { CsClipboardService, CsMapService, LayerHandlerService, LayerModel, Mana
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
-import { MatSliderChange } from '@angular/material/slider';
 import { SplitDirection } from 'cesium';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -133,7 +132,7 @@ export class LayerPanelComponent implements OnInit {
   }
 
   /**
-   * Load permenanet link state layers from their respective FilterPanels
+   * Load permanent link state layers from their respective FilterPanels
    *
    * @param layerStateObj the permanent link state JSON Object
    */
@@ -161,6 +160,9 @@ export class LayerPanelComponent implements OnInit {
     }
   }
 
+  /**
+   * Initialise Component
+   */
   public ngOnInit() {
       const nvclanid = UtilitiesService.getUrlParameterByName('nvclanid');
       const stateId = UtilitiesService.getUrlParameterByName('state');
@@ -282,9 +284,11 @@ export class LayerPanelComponent implements OnInit {
 
   /**
    * Layer opacity slider change event
+   * @param value Event value object from slider change event
+   * @param layer the layer object
    */
-  public layerOpacityChange(event: MatSliderChange, layer: LayerModel) {
-    this.csMapService.setLayerOpacity(layer, (event.value / 100));
+  public layerOpacityChange(value: number, layer: LayerModel) {
+    this.csMapService.setLayerOpacity(layer, value / 100);
   }
 
   /**

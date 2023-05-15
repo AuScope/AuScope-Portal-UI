@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { CsMapService, LayerHandlerService, LayerModel, ResourceType, UtilitiesService } from '@auscope/portal-core-ui';
-import { MatSliderChange } from '@angular/material/slider';
 import { SplitDirection } from 'cesium';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
@@ -66,10 +65,12 @@ export class ActiveLayersPanelComponent {
 
   /**
    * Layer opacity slider change event
+   * @param value Event value object from slider change event
+   * @param layer the layer object
    */
-  layerOpacityChange(event: MatSliderChange, layer: LayerModel) {
-    this.csMapService.setLayerOpacity(layer, (event.value / 100));
-  }
+    public layerOpacityChange(value: number, layer: LayerModel) {
+      this.csMapService.setLayerOpacity(layer, value / 100);
+    }
 
   /**
    * Split buttons will only be displayed if the split map is shown and the layer has started (or completed) rendering.
