@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Inject, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CSWRecordModel, LayerModel, OnlineResourceModel, UtilitiesService } from '@auscope/portal-core-ui';
 
 
@@ -16,7 +16,7 @@ export class InfoPanelSubComponent implements OnChanges {
     wmsUrl: any;
     legendUrl: any;
 
-    constructor() {}
+    constructor(@Inject('env') private env) {}
 
     /**
      * Remove unwanted strings from metadata constraints fields
@@ -112,7 +112,9 @@ export class InfoPanelSubComponent implements OnChanges {
                     + '&LEGEND_OPTIONS=forceLabels:on;minSymbolSize:16';
                 this.legendUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(wmsOnlineResource.url), params);
             }
-
+            if (this.cswRecord.onlineResources.find(r => r.type.toLowerCase() === 'kml')) {
+                this.legendUrl = this.env.portalBaseUrl + 'legend/argon_map_legend.png';
+            }
             // Gather up BBOX coordinates to calculate the centre and envelope
             const bbox = this.cswRecord.geographicElements[0];
 
