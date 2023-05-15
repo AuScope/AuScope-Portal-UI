@@ -2,6 +2,15 @@
 
 .user-menu {
     color: $text-colour;
+
+    .user-login-button {
+        display: flex;
+        align-items: baseline;
+    }
+    .user-login-button-label {
+        display: flex;
+        align-items: center;
+    }
 }
 
 .user-button {
@@ -26,10 +35,3 @@
     }
 
 }
-
-
-.user-login-label {
-    position: relative;
-    left: 10px;
-    top: -5px;
-  }
