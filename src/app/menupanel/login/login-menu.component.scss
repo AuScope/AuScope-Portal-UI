@@ -2,6 +2,15 @@
 
 .user-menu {
     color: $text-colour;
+
+    .user-login-button {
+        display: flex;
+        align-items: baseline;
+    }
+    .user-login-button-label {
+        display: flex;
+        align-items: center;
+    }
 }
 
 .user-button {
@@ -17,11 +26,11 @@
 }
 
 ::ng-deep {
-    .mat-menu-panel {
+    .mat-mdc-menu-panel {
         margin-top: 10px;
     }
 
-    .mat-menu-content {
+    .mat-mdc-menu-content {
         background-color: $background-colour;
     }
 

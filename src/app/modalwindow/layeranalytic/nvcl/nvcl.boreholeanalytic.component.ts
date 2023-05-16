@@ -2,7 +2,6 @@ import { environment } from '../../../../environments/environment';
 import { saveAs } from 'file-saver';
 import { LayerModel } from '@auscope/portal-core-ui';
 import { ManageStateService } from '@auscope/portal-core-ui';
-import { UtilitiesService } from '@auscope/portal-core-ui';
 import { NVCLBoreholeAnalyticService } from './nvcl.boreholeanalytic.service';
 import {
   Component,
@@ -13,7 +12,7 @@ import {
 } from '@angular/core';
 import { LayerAnalyticInterface } from '../layer.analytic.interface';
 import { NgForm } from '@angular/forms';
-import { Observable } from 'rx';
+
 
 @Component({
   templateUrl: './nvcl.boreholeanalytic.component.html',

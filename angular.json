@@ -2,7 +2,9 @@
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "cli": {
     "analytics": false,
-    "defaultCollection": "@angular-eslint/schematics"
+    "schematicCollections": [
+      "@angular-eslint/schematics"
+    ]
   },
   "version": 1,
   "newProjectRoot": "projects",
@@ -34,7 +36,7 @@
               }
             ],
             "styles": [
-              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+              "./node_modules/@angular/material/prebuilt-themes/purple-green.css",
               "src/styles.scss",
               "node_modules/rickshaw/rickshaw.min.css",
               "src/extension/css/extensions.css",
@@ -64,7 +66,7 @@
               "budgets": [
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "6kb"
+                  "maximumWarning": "20kb"
                 }
               ],
               "fileReplacements": [
@@ -78,7 +80,7 @@
               "budgets": [
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "6kb"
+                  "maximumWarning": "20kb"
                 }
               ],
               "optimization": false,
@@ -100,7 +102,7 @@
               "budgets": [
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "6kb"
+                  "maximumWarning": "20kb"
                 }
               ],
               "optimization": false,
@@ -216,7 +218,6 @@
       }
     }
   },
-  "defaultProject": "project",
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "app",
