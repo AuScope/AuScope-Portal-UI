@@ -111,9 +111,8 @@ export class InfoPanelSubComponent implements OnChanges {
                     + '&LAYER=' + wmsOnlineResource.name + '&LAYERS=' + wmsOnlineResource.name + '&WIDTH=188&SCALE=1000000'
                     + '&LEGEND_OPTIONS=forceLabels:on;minSymbolSize:16';
                 this.legendUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(wmsOnlineResource.url), params);
-            }
-            if (this.cswRecord.onlineResources.find(r => r.type.toLowerCase() === 'kml')) {
-                this.legendUrl = this.env.portalBaseUrl + 'legend/argon_map_legend.png';
+            } else if (this.layer.legendImg && this.layer.legendImg !== '') {
+                this.legendUrl = this.env.portalBaseUrl + 'legend/' + this.layer.legendImg;
             }
             // Gather up BBOX coordinates to calculate the centre and envelope
             const bbox = this.cswRecord.geographicElements[0];
