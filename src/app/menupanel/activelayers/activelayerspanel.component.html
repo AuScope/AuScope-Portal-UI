@@ -2,7 +2,7 @@
     Select layers below to add to map
 </div>
 <div class="activeLayersBoundary" cdkDropList (cdkDropListDropped)="layerDropped($event)">
-    <li class="activeLayerItem" *ngFor="let layer of getActiveLayers()" cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".activeLayersBoundary">
+    <li class="activeLayerItem" *ngFor="let layer of getActiveLayers()" cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".activeLayersBoundary" [cdkDragDisabled]="getActiveLayers().length <= 1">
         <div *ngIf="getActiveLayers().length > 1" cdkDragHandle>
             <i class="activeLayerGrabber fa fa-arrows-v" title="Drag to reorder"></i>
         </div>
