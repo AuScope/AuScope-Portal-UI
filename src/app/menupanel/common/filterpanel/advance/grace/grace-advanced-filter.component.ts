@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { CsMapObject, CsMapService } from '@auscope/portal-core-ui';
 import { GraceService } from 'app/services/wcustom/grace/grace.service';
 import { GraceGraphModalComponent } from 'app/modalwindow/querier/customanalytic/grace/grace-graph.modal.component';
@@ -16,11 +16,11 @@ import { GraceStyleSettings } from 'app/modalwindow/querier/customanalytic/grace
     timeSeriesGraphModalRef?: BsModalRef;
 
     DECIMAL_REGEX = '^-?\\d*\.{0,1}\\d+$';
-    styleGroup: FormGroup;
+    styleGroup: UntypedFormGroup;
 
 
     constructor(@Inject(CsMapObject)private csMapObject: CsMapObject, @Inject(CsMapService)private csMapService: CsMapService,
-                private graceService: GraceService, private formBuilder: FormBuilder, private modalService: BsModalService) {
+                private graceService: GraceService, private formBuilder: UntypedFormBuilder, private modalService: BsModalService) {
         super();
     }
 
