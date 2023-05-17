@@ -119,10 +119,13 @@ export class InfoPanelSubComponent implements OnChanges {
 
             // Gather up lists of information URLs
             if (wmsOnlineResource) {
-                const params = 'SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&STYLES=&FORMAT=image/png&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&LAYERS='
+                let params = 'SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&STYLES=&FORMAT=image/png&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&LAYERS='
                     + encodeURIComponent(wmsOnlineResource.name) + '&SRS=EPSG:4326&BBOX=' + bbox.westBoundLongitude + ',' + bbox.southBoundLatitude
                     + ',' + bbox.eastBoundLongitude + ',' + bbox.northBoundLatitude
                     + '&WIDTH=400&HEIGHT=400';
+                if (this.layer.group == 'ASTER Maps') {
+                    params += '&TIME=' + this.layer['capabilityRecords'][0]['layers'][0]['timeExtent'][0];
+                }
                 this.wmsUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(wmsOnlineResource.url), params);
             }
         }
