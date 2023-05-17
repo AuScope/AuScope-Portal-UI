@@ -52,7 +52,7 @@ ENV appdir /usr/src/app
 WORKDIR ${appdir}
 
 # Copy in the static website files from first image
-COPY --chown=www-data:www-data --from=node /usr/src/ng /var/www/html/
+COPY --chown=www-data:www-data --from=node /usr/src/app/dist /var/www/html/
 
 # Copy .htaccess to allow redirects to non-root routes work
 COPY --chown=www-data:www-data docker/.htaccess /var/www/html/

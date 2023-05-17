@@ -19,8 +19,8 @@
           "options": {
             "preserveSymlinks": true,
             "aot": true,
-            "outputPath": "../ng",
-            "index": "src/index.htm",
+            "outputPath": "dist",
+            "index": "src/index.html",
             "main": "src/main.ts",
             "tsConfig": "src/tsconfig.app.json",
             "polyfills": "src/polyfills.ts",
