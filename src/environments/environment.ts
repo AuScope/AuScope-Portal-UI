@@ -26,11 +26,10 @@ export const environment = {
     { value: 'OSM', viewValue: 'OpenStreetMap',
       tooltip: 'OpenStreetMap (OSM) is a collaborative project to create a free editable\n' +
                'map of the world.\nhttp://www.openstreetmap.org', layerType: 'OSM' },
+    // Bing maps will only be available if the bingMapsKey property is set
     { value: 'Road', viewValue: 'Bing Roads', tooltip: 'Bing Maps Road', layerType: 'Bing' },
     { value: 'Aerial', viewValue: 'Bing Aerial', tooltip: 'Bing Maps Aerial', layerType: 'Bing' },
-    { value: 'AerialWithLabels', viewValue: 'Bing Aerial With Labels', tooltip: 'Bing Maps Aerial with Labels', layerType: 'Bing' },
-    { value: 'Natural_Earth_II', viewValue: 'Natural Earth II',
-      tooltip: 'Natural Earth II, darkened for contrast.\nhttp://www.naturalearthdata.com/', layerType: 'NEII' },
+    { value: 'AerialWithLabels', viewValue: 'Bing Aerial With Labels', tooltip: 'Bing Maps Aerial with Labels', layerType: 'Bing' }
   ],
   grace: {
     hostUrl: 'https://insargrace.geoanalytics.csiro.au:/grace/grace'
@@ -40,5 +39,4 @@ export const environment = {
                 'https://geology.data.vic.gov.au',
                 'http://geology.data.vic.gov.au',
                 'http://geoserver.octopusdata.org']
-
 }
