@@ -11,7 +11,7 @@ export const config = {
     'mscl-borehole': {
       datasetURL: 'datasetURL'
     }
-  }
+  },
 
   // Layers that download
   datasetUrlAussPassLayer: {
