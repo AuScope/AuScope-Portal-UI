@@ -18,14 +18,11 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: true
-      - name: Create context folder
-        run: |
-          mkdir -p dist/contexts
       - uses: jsdaniell/create-json@v1.2.2
         with:
           name: "context.json"
           json: '{"portalBaseUrl":"${{ secrets.AZURE_PORTAL_API_URL }}","hostUrl":"${{ secrets.AZURE_PORTAL_URL }}"}'
-          dir: 'dist/contexts/'
+          dir: 'src/contexts/'
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
