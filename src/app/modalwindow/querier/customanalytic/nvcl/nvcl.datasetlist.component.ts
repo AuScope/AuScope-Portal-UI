@@ -25,7 +25,7 @@ export class NVCLDatasetListDialogComponent implements OnInit {
     public dialogRef: MatDialogRef<NVCLDatasetListDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData) {}
   ngOnInit(): void {
-    throw new Error('Method not implemented.');
+    //throw new Error('Method not implemented.');
   }
 
   onNoClick(): void {
@@ -50,6 +50,7 @@ export class NVCLDatasetListComponent implements OnInit {
   public datasetImages: any[] = [];
   public datasetScalars: any[] = [];
   public datasetScalarDefinition = {};
+  public tipScalarDefinition = null;
   public drawGraphMode = false;
   public selectedLogNames = [];
   public processingGraph = false;
@@ -57,7 +58,7 @@ export class NVCLDatasetListComponent implements OnInit {
   public downloadResponse = '';
   public downloadingTSG = false;
   public jobView = false;
-  public selectedScalar = '';
+  public selectedScalar = null;
   public selectedScalarName = '';
   public selectedScalardata: any;
   public imagesLoaded: string[] = [];
@@ -192,7 +193,16 @@ export class NVCLDatasetListComponent implements OnInit {
         }
       });
   }
-
+  public onMouseoverScalarDefinition(logName: string): void {
+    if (this.datasetScalarDefinition[logName] !== undefined) {
+      this.tipScalarDefinition = logName+ ':' + this.datasetScalarDefinition[logName].definition;
+    } else {
+      this.tipScalarDefinition = null;
+    }
+  }
+  public onMouseoutScalarDefinition(): void {
+      this.tipScalarDefinition = null;
+  }
   public getDefinition(logName: string): void {
     this.datasetScalarDefinition[logName] = {
       definition: 'Loading ...'
