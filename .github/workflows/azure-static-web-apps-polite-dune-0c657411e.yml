@@ -21,8 +21,14 @@ jobs:
       - uses: jsdaniell/create-json@v1.2.2
         with:
           name: "context.json"
-          json: '{"portalBaseUrl":"${{ secrets.AZURE_PORTAL_API_URL }}","hostUrl":"${{ secrets.AZURE_PORTAL_URL }}","portalProxyUrl":"${{ secrets.AZURE_PORTAL_API_URL }}"}'
+          json: '{"portalBaseUrl":"${{ secrets.AZURE_PORTAL_API_URL }}","hostUrl":"${{ secrets.AZURE_PORTAL_URL }}"}'
           dir: 'src/contexts/'
+      - name: Update proxy.json file
+        uses: jossef/action-set-json-field@v2.1
+        with:
+          file: proxy.conf.json
+          field: target
+          value: ${{ secrets.AZURE_PORTAL_API_URL }}
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
