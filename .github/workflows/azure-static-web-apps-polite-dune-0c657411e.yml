@@ -21,7 +21,7 @@ jobs:
       - uses: jsdaniell/create-json@v1.2.2
         with:
           name: "context.json"
-          json: '{"portalBaseUrl":"${{ secrets.AZURE_PORTAL_API_URL }}","hostUrl":"${{ secrets.AZURE_PORTAL_URL }}"}'
+          json: '{"portalBaseUrl":"${{ secrets.AZURE_PORTAL_API_URL }}","hostUrl":"${{ secrets.AZURE_PORTAL_URL }}","portalProxyUrl":"${{ secrets.AZURE_PORTAL_API_URL }}"}'
           dir: 'src/contexts/'
       - name: Build And Deploy
         id: builddeploy
