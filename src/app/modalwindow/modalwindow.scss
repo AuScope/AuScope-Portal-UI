@@ -193,7 +193,15 @@ div.modal-card-size .btn {
 .lightgray-bg {
 	background: #e4e4e4;
 }
-
+.nvclover {
+    z-index: 10000;
+    position: relative;
+  }
+  
+.nvclunder {
+    position: fixed;
+    z-index: -1;
+}
 ::ng-deep .tooltip > .tooltip-inner {
     width:800px;
     max-width: 800px;
