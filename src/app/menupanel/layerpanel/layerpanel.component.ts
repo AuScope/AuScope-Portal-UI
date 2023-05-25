@@ -16,6 +16,7 @@ import { UserStateService } from 'app/services/user/user-state.service';
 import { Bookmark } from 'app/models/bookmark.model';
 import { AuthService } from 'app/services/auth/auth.service';
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
+import { environment } from 'environments/environment';
 
 
 // Filter modes available in the dropdown layer filter selector
@@ -121,14 +122,14 @@ export class LayerPanelComponent implements OnInit {
    * "layerGroup" - an instance of this.layerGroups[key].value
    */
   public isLayerGroupVisible(layerGroupValue): boolean {
-      if (layerGroupValue.expanded && layerGroupValue.loaded) {
-          for (const layer of layerGroupValue.loaded) {
-              if (layer.hide === false) {
-                  return true;
-              }
-          }
+    if (layerGroupValue.expanded && layerGroupValue.loaded) {
+      for (const layer of layerGroupValue.loaded) {
+        if (layer.hide === false) {
+          return true;
+        }
       }
-      return false;
+    }
+    return false;
   }
 
   /**
@@ -140,7 +141,7 @@ export class LayerPanelComponent implements OnInit {
     // Re-order layers by index field provided index field is present (it won't be in older states)
     const orderedLayerKeys: string[] = [];
     for (const layer of Object.keys(layerStateObj)) {
-      if (layer.toLowerCase() !== 'map') {
+      if (layer.toLowerCase() !== 'map' && layer.toLowerCase() !== 'basemap') {
         // Add layer at 'index' position of array, else just push
         if (layerStateObj[layer].hasOwnProperty('index')) {
           orderedLayerKeys[layerStateObj[layer].index] = layer;
@@ -175,6 +176,14 @@ export class LayerPanelComponent implements OnInit {
           me.manageStateService.resumeMapState(layerStateObj.map);
         } else if(stateId !== undefined) {
           alert('The specified state could not be found, it may have been deleted or made private.');
+        }
+
+        // Set base map if "baseMap" key is present
+        if (layerStateObj.hasOwnProperty('baseMap')) {
+          const baseMap = environment.baseMapLayers.find(bm => bm.value === layerStateObj['baseMap']);
+          if (baseMap) {
+            this.csMapService.setBaseMapLayer(baseMap.viewValue);
+          }
         }
 
         // Load state layers in corresponding FilterPanels
