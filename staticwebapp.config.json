@@ -2,6 +2,7 @@
   "routes": [
     {
       "route": "/login/*",
+      "methods": ["GET","HEAD","POST","OPTIONS"],
       "rewrite": "index.html"
     }
   ],  
