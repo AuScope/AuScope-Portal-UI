@@ -25,7 +25,7 @@ export class NVCLDatasetListDialogComponent implements OnInit {
     public dialogRef: MatDialogRef<NVCLDatasetListDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData) {}
   ngOnInit(): void {
-    throw new Error('Method not implemented.');
+    //throw new Error('Method not implemented.');
   }
 
   onNoClick(): void {
@@ -50,6 +50,7 @@ export class NVCLDatasetListComponent implements OnInit {
   public datasetImages: any[] = [];
   public datasetScalars: any[] = [];
   public datasetScalarDefinition = {};
+  public tipScalarDefinition = null;
   public drawGraphMode = false;
   public selectedLogNames = [];
   public processingGraph = false;
@@ -57,9 +58,10 @@ export class NVCLDatasetListComponent implements OnInit {
   public downloadResponse = '';
   public downloadingTSG = false;
   public jobView = false;
-  public selectedScalar = '';
+  public selectedScalar = null;
   public selectedScalarName = '';
   public selectedScalardata: any;
+  public legendDialogRef = null;
   public imagesLoaded: string[] = [];
 
   public linPal: number[] = [255, 767, 1279, 1791, 2303, 3071, 3583, 4095, 4863, 5375, 5887, 6655, 7167, 7935, 8447, 9215, 9727, 10495, 11007, 11775, 12543, 13055, 13823, 14591,
@@ -192,7 +194,16 @@ export class NVCLDatasetListComponent implements OnInit {
         }
       });
   }
-
+  public onMouseoverScalarDefinition(logName: string): void {
+    if (this.datasetScalarDefinition[logName] !== undefined) {
+      this.tipScalarDefinition = logName+ ': ' + this.datasetScalarDefinition[logName].definition;
+    } else {
+      this.tipScalarDefinition = null;
+    }
+  }
+  public onMouseoutScalarDefinition(): void {
+      this.tipScalarDefinition = null;
+  }
   public getDefinition(logName: string): void {
     this.datasetScalarDefinition[logName] = {
       definition: 'Loading ...'
@@ -202,7 +213,7 @@ export class NVCLDatasetListComponent implements OnInit {
         this.datasetScalarDefinition[logName] = result;
       } else {
         this.datasetScalarDefinition[logName] = {
-          definition: 'Error retriving definition',
+          definition: 'Error retrieving definition',
           label: 'Error unknown',
           scopeNote: 'Error unknown'
         }
@@ -370,6 +381,8 @@ export class NVCLDatasetListComponent implements OnInit {
   }
 
   public openLegend(datasetId: string) {
+    if (this.selectedScalar === null)
+      return;
     this.nvclService.getNVCL2_0_JSONDataBinned(this.onlineResource.url, [this.selectedScalar]).
       subscribe(response => {
         if ('success' in response && response.success === true && response.data.length > 0) {
@@ -418,11 +431,16 @@ export class NVCLDatasetListComponent implements OnInit {
           } // for
 
           if (has_data) {
-            const dialogRef = this.dialog.open(NVCLDatasetListDialogComponent, {
+            if (this.legendDialogRef!== null) {
+              this.legendDialogRef.close();
+              this.legendDialogRef = null;
+            }
+            this.legendDialogRef = this.dialog.open(NVCLDatasetListDialogComponent, {
               width: '250px',
               data: {name: 'junk', scalarClasses: metric_colours},
               panelClass: 'legenddialog'
             });
+            this.legendDialogRef.addPanelClass("nvclover");
           }
         } else {
           alert('Failed to render legend');

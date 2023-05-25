@@ -193,13 +193,19 @@ div.modal-card-size .btn {
 .lightgray-bg {
 	background: #e4e4e4;
 }
-
-::ng-deep .mat-mdc-tooltip {
-    border: 1px solid $modal-tab-border-colour !important;
-    border-radius: 3px;
-    background: $modal-background-colour;
-    color: $modal-text-colour !important;
-    padding: 5px;
-    text-align: justify;
-    font-size: 12px;
+.nvclover {
+    z-index: 10000;
+    position: relative;
+  }
+  
+.nvclunder {
+    position: fixed;
+    z-index: -1;
+}
+::ng-deep .tooltip > .tooltip-inner {
+    width:800px;
+    max-width: 800px;
+    height: 400px;
+    max-height: 400px;
+    background-color: rgb(8, 0, 255) !important;
 }

@@ -21,20 +21,22 @@
 						<div class="modal-card-size loading-iframe">
 							<!-- Loading gif overlay if images aren't done loading -->
 							<div *ngIf="!haveImagesLoaded(nvclDataset.datasetId)" class="loading-image"></div>
-
 							<!-- Add definition -->
-							<button class="float-right" mat-stroked-button (click)="openLegend(nvclDataset.datasetId)" >Show Legend</button>
-                              <ng-select *ngIf="nvclDataset.datasetId" [items] = "datasetScalars[nvclDataset.datasetId]" [multiple]="false" bindLabel="logName" bindValue="logId" placeholder="Select Scalar" (change)="changeScalarSelection(nvclDataset.datasetId)" [(ngModel)]="selectedScalar">
+							<div style="width:500px;height:10px;overflow-wrap:break-word;" >{{tipScalarDefinition}}</div>
+							<button class="float-right btn btn-lg btn-primary" mat-stroked-button (click)="openLegend(nvclDataset.datasetId)" [disabled]="selectedScalar===null">Show Legend</button>
+                              <ng-select *ngIf="nvclDataset.datasetId" style="z-index:10000;" [items] = "datasetScalars[nvclDataset.datasetId]" [multiple]="false" bindLabel="logName"
+							   bindValue="logId" placeholder="Select Scalar" (change)="changeScalarSelection(nvclDataset.datasetId)" (mouseout) = onMouseoutScalarDefinition() [(ngModel)]="selectedScalar">
+
                                 <ng-template ng-label-tmp let-item="item">
                                     <div class="row" >
                                         <div class="col-8">
-                                            <div  [matTooltip]="datasetScalarDefinition[item.logName]? datasetScalarDefinition[item.logName].definition : null">{{item.logName}}</div>
+                                            <div >{{item.logName}}</div>
                                         </div>
                                         <div  class="col-4" *ngIf="item.logName">
-                                            <span *ngIf="datasetScalarDefinition[item.logName]!==null">
-                                                <div class="fake-link" [matTooltip]="datasetScalarDefinition[item.logName].definition"> ? </div>
+                                            <span  *ngIf="datasetScalarDefinition[item.logName]!==undefined" (mouseover)=onMouseoverScalarDefinition(item.logName)>
+                                                <div class="fake-link" > ? </div>
                                             </span>
-                                            <span *ngIf="datasetScalarDefinition[item.logName] === null">
+                                            <span *ngIf="datasetScalarDefinition[item.logName] === undefined">
                                                 <div class="fake-link" (mouseover)="getDefinition(item.logName)" > ? </div>
                                             </span>
                                         </div>
@@ -44,13 +46,13 @@
                                 <ng-template ng-option-tmp let-item="item" >
                                     <div class="row" >
                                         <div class="col-8">
-                                            <div>{{item.logName}}</div>
+                                            <div >{{item.logName}}</div>
                                         </div>
                                         <div  class="col-4">
-                                            <span *ngIf="datasetScalarDefinition[item.logName]!==null">
-                                                <div class="fake-link" [matTooltip]="datasetScalarDefinition[item.logName].definition">?</div>
+                                            <span *ngIf="datasetScalarDefinition[item.logName]!==undefined" (mouseover)=onMouseoverScalarDefinition(item.logName)>
+                                                <div class="fake-link" >?</div>
                                             </span>
-                                            <span *ngIf="datasetScalarDefinition[item.logName] === null">
+                                            <span *ngIf="datasetScalarDefinition[item.logName] === undefined">
                                                 <div class="fake-link" (mouseover)="getDefinition(item.logName)" >?</div>
                                             </span>
                                         </div>
