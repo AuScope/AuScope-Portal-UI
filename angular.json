@@ -19,12 +19,13 @@
           "options": {
             "preserveSymlinks": true,
             "aot": true,
-            "outputPath": "../ng",
-            "index": "src/index.htm",
+            "outputPath": "dist",
+            "index": "src/index.html",
             "main": "src/main.ts",
             "tsConfig": "src/tsconfig.app.json",
             "polyfills": "src/polyfills.ts",
             "assets": [
+              "src/contexts",
               "src/template",
               "src/extension",
               "src/favicon-16x16.png",
