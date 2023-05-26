@@ -34,7 +34,11 @@ export class PermanentLinksModalComponent implements OnInit {
 
   ngOnInit() {
     this.userStateService.user.subscribe(user => {
-      this.userId = user.id;
+      if (user) {
+        this.userId = user.id;
+      } else {
+        this.userId = undefined;
+      }
     });
     this.userStateService.states.subscribe(states => {
       this.statesFormArray = new UntypedFormArray([]);
