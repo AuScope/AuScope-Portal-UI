@@ -5,10 +5,12 @@ export const config = {
   nvclUrl: 'https://nvclwebservices.csiro.au/NVCLDataServices',
 
   // Layers that download zipped datasets using 'datasetURL' feature name in the WFS response
+  // For GADDS 2.0 and other layers where including gsmlp:shape in the filter will cause problems, add:
+  //  omitGsmlpShapeProperty: true
   datasetUrlSupportedLayer: {
     'mscl-borehole': {
       datasetURL: 'datasetURL'
-    },
+    }
   },
 
   // Layers that download
