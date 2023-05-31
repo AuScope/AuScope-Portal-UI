@@ -81,7 +81,7 @@ export class UserStateService {
    */
   public addBookmark(layerId: string) {
     this.apiService.addBookmark(layerId).subscribe(newBookmarkId => {
-      this.bookmarks.subscribe(currentBookmarks => {
+      this.bookmarks.pipe(take(1)).subscribe(currentBookmarks => {
         if (!currentBookmarks.find(b => b.fileIdentifier === layerId)) {
           const newBookmark: Bookmark = {
             id: newBookmarkId,
@@ -105,28 +105,18 @@ export class UserStateService {
    * @param layerId layer ID
    */
   public removeBookmark(layerId: string) {
-    // Get bookmark ID
-    this.bookmarks.pipe(take(1)).subscribe(bookmarks => {
-      for (const b of bookmarks) {
-        if (b.fileIdentifier === layerId) {
-          const bookmarkId = b.id;
-          // Delete from DB
-          this.apiService.removeBookmark(bookmarkId).subscribe(() => {
-            const i = bookmarks.findIndex(item => {
-              return (item.id === bookmarkId);
-            });
-            if (i > -1) {
-              bookmarks.splice(i, 1);
-              this._bookmarks.next(bookmarks);
-            }
-          }, err => {
-            if (err.status === 403) {
-              this.logoutUser();
-              this.showSessionTimedOutAlert();
-            }
-          });
-          break;
-        }
+    this.bookmarks.pipe(take(1)).subscribe(currentBookmarks => {
+      const bm = currentBookmarks.find(b => b.fileIdentifier === layerId);
+      if (bm) {
+        this.apiService.removeBookmark(bm.id).subscribe(() => {
+          const newBookmarks = currentBookmarks.filter(b => b.id !== bm.id);
+          this._bookmarks.next(newBookmarks);
+        }, err => {
+          if (err.status === 403) {
+            this.logoutUser();
+            this.showSessionTimedOutAlert();
+          }
+        });
       }
     });
   }
