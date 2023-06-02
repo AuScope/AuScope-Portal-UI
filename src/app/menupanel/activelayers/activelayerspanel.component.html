@@ -18,11 +18,10 @@
             </div>
             <div *ngIf="(showOpacitySlider(layer) && getUILayerModel(layer.id).statusMap.getRenderStarted()) || hasLegend(layer)" class="opacity-slider-panel d-flex" (click)="$event.stopPropagation()">
                 <div class="opacity-label">Opacity {{ getUILayerModel(layer.id).opacity }}%&nbsp;</div>
-                <mat-slider min="0" max="100" class="opacity-slider flex-grow-1">
-                <input matSliderThumb
-                       [(ngModel)]="getUILayerModel(layer.id).opacity"
-                       (valueChange)="layerOpacityChange($event, layer)">
-            </mat-slider>
+                <mat-slider class="opacity-slider" min="0" max="100" class="opacity-slider flex-grow-1" (input)="layerOpacityChangeValue($event, layer)">
+                    <input matSliderThumb
+                        [(ngModel)]="getUILayerModel(layer.id).opacity">
+                </mat-slider>
                 <div *ngIf="hasLegend(layer)">
                     <button class="btn btn-primary btn-sm pull-right" style="margin-left:5px;margin-top:6px;font-size:0.8rem;padding:0 2px;" [disabled]="isLegendShown(layer.id)" (click)="showLegend(layer)">Legend</button>
                 </div>

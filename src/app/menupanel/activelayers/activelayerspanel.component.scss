@@ -7,6 +7,8 @@
   font-size: .85rem;
   color: #d8d9d7;
   margin: 0 5px 0 0;
+  padding: 0.5em 0;
+  border-bottom: 1px solid rgba(255 ,255, 255, 0.15);
 
   // Disbale text selection
   -webkit-user-select: none;  /* Safari */
@@ -24,8 +26,15 @@
   .activeLayerContent {
     width:100%;
   }
-}
 
+  // Slider min-width is 112px by default which can push components to right off the panel 
+  ::ng-deep {
+    mat-slider {
+      min-width: 80px;
+    }
+  }
+
+}
 
 .cdk-drag-preview {
   background-color: #6764ce;
