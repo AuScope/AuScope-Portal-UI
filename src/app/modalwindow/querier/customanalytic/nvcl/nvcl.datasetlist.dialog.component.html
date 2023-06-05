@@ -1,7 +1,6 @@
-<h1 mat-dialog-title>Legend</h1>
-<div mat-dialog-content>
+<div class="modal-body">
   <ul style="list-style: none; font-size:16px;">
-    <li *ngFor="let scalarClass of data.scalarClasses | getKey">
+    <li *ngFor="let scalarClass of scalarClasses | getKey">
       <span style="border: 1px solid #ccc; float: left; width: 12px; height: 12px; margin: 2px;" [style.background-color]="scalarClass.value"></span> {{scalarClass.key}}
     </li>
   </ul>

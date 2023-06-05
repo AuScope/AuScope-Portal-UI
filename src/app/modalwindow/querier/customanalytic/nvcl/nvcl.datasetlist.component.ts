@@ -2,36 +2,17 @@ import { RickshawService } from '@auscope/portal-core-ui';
 import { LayerModel } from '@auscope/portal-core-ui';
 import { OnlineResourceModel } from '@auscope/portal-core-ui';
 import { NVCLService } from './nvcl.service';
-import { Component, Inject, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { HttpParams } from '@angular/common/http';
 import { DomSanitizer } from '@angular/platform-browser';
 import { saveAs } from 'file-saver';
 import { NVCLBoreholeAnalyticService } from '../../../layeranalytic/nvcl/nvcl.boreholeanalytic.service';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { UtilitiesService } from '@auscope/portal-core-ui';
 
 export interface DialogData {
   scalarClasses: any[];
   name: string;
-}
-
-@Component({
-  selector: 'app-nvcl-datasetlist-component-dialog',
-  templateUrl: 'nvcl.datasetlist.dialog.component.html',
-})
-export class NVCLDatasetListDialogComponent implements OnInit {
-
-  constructor(
-    public dialogRef: MatDialogRef<NVCLDatasetListDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData) {}
-  ngOnInit(): void {
-    //throw new Error('Method not implemented.');
-  }
-
-  onNoClick(): void {
-    this.dialogRef.close();
-  }
-
 }
 
 @Component({
@@ -107,8 +88,8 @@ export class NVCLDatasetListComponent implements OnInit {
     public domSanitizer: DomSanitizer,
     private rickshawService: RickshawService,
     public nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService,
-    public dialog: MatDialog) {
-    }
+    private modalRef: BsModalRef, private modalService: BsModalService) {
+  }
 
   ngOnInit(): void {
     this.nvclService.getNVCLDatasets(this.onlineResource.url, this.featureId).subscribe(result => {
@@ -194,6 +175,7 @@ export class NVCLDatasetListComponent implements OnInit {
         }
       });
   }
+
   public onMouseoverScalarDefinition(logName: string): void {
     if (this.datasetScalarDefinition[logName] !== undefined) {
       this.tipScalarDefinition = logName+ ': ' + this.datasetScalarDefinition[logName].definition;
@@ -201,9 +183,11 @@ export class NVCLDatasetListComponent implements OnInit {
       this.tipScalarDefinition = null;
     }
   }
+
   public onMouseoutScalarDefinition(): void {
       this.tipScalarDefinition = null;
   }
+
   public getDefinition(logName: string): void {
     this.datasetScalarDefinition[logName] = {
       definition: 'Loading ...'
@@ -344,7 +328,7 @@ export class NVCLDatasetListComponent implements OnInit {
         this.downloadResponse = response;
         this.downloadingTSG = false;
         this.nvclBoreholeAnalyticService.setUserEmail( this.downloadEmail );
-      }, error => {
+      }, () => {
         this.downloadingTSG = false;
       });
   }
@@ -360,7 +344,7 @@ export class NVCLDatasetListComponent implements OnInit {
         this.downloadResponse = response;
         this.checkingTSG = false;
         this.nvclBoreholeAnalyticService.setUserEmail( this.downloadEmail );
-      }, error => {
+      }, () => {
         this.checkingTSG = false;
       });
   }
@@ -387,17 +371,17 @@ export class NVCLDatasetListComponent implements OnInit {
       subscribe(response => {
         if ('success' in response && response.success === true && response.data.length > 0) {
           const this_ptr = this;
-          const metric_colours: any[] = [];
+          const metricColours: any = {};
           let minval = 999999999;
           let maxval = -999999999;
-          let has_data = false;
+          let hasData = false;
           const jsonObj = JSON.parse(response.data);
           for (let i = 0; i < jsonObj.length; i++) {
             const bv = jsonObj[i];
-            ['stringValues', 'numericValues'].forEach(function (dataType) {
+            ['stringValues', 'numericValues'].forEach(dataType => {
               if (bv.hasOwnProperty(dataType) && bv[dataType].length > 0) {
                 // Find the log name for our log id, this will be our 'metric_name'
-                const metric_name = this_ptr.datasetScalars[datasetId].filter(x => x.logId === bv.logId)[0].logName
+                const metric_name = this_ptr.datasetScalars[datasetId].filter(x => x.logId === bv.logId)[0].logName;
                 if (metric_name.length > 0) {
                   bv[dataType].forEach(function (val) {
 
@@ -405,10 +389,10 @@ export class NVCLDatasetListComponent implements OnInit {
                     if (dataType === 'stringValues') {
                       const key = val.classText;
                       // Use the supplied colour for each metric
-                      if (!(key in metric_colours)) {
-                        metric_colours[key] = this_ptr._colourConvert(val.colour);
+                      if (!(key in metricColours)) {
+                        metricColours[key] = this_ptr._colourConvert(val.colour);
                       }
-                      has_data = true;
+                      hasData = true;
                     } else if (dataType === 'numericValues') {
                       if (val.averageValue < minval) {
                         minval = parseFloat(val.averageValue);
@@ -416,31 +400,24 @@ export class NVCLDatasetListComponent implements OnInit {
                       if (val.averageValue > maxval) {
                         maxval = parseFloat(val.averageValue);
                       }
-                      has_data = true;
+                      hasData = true;
                     } // if
                   }); // for each
                   if (dataType === 'numericValues') {
                     for (let j = 0; j < 9; j++) {
-                      metric_colours[(minval + (maxval - minval) * (j / 8)).toLocaleString()] = this_ptr._colourConvert(this_ptr.linPal[256 * (8 - j) / 8]);
+                      metricColours[(minval + (maxval - minval) * (j / 8)).toLocaleString()] = this_ptr._colourConvert(this_ptr.linPal[256 * (8 - j) / 8]);
                     }
-                    metric_colours.sort();
+                    metricColours.sort();
                   }
                 } // if
               } // if
             }); // for each
           } // for
 
-          if (has_data) {
-            if (this.legendDialogRef!== null) {
-              this.legendDialogRef.close();
-              this.legendDialogRef = null;
-            }
-            this.legendDialogRef = this.dialog.open(NVCLDatasetListDialogComponent, {
-              width: '250px',
-              data: {name: 'junk', scalarClasses: metric_colours},
-              panelClass: 'legenddialog'
-            });
-            this.legendDialogRef.addPanelClass("nvclover");
+          if (hasData) {
+            //this.modalRef = this.modalService.show(NVCLDatasetListDialogComponent, {class: 'modal-sm modal-dialog-centered'});
+            this.modalRef = this.modalService.show(NVCLDatasetListDialogComponent, {class: 'modal-sm'});
+            this.modalRef.content.scalarClasses = metricColours;
           }
         } else {
           alert('Failed to render legend');
@@ -450,3 +427,14 @@ export class NVCLDatasetListComponent implements OnInit {
 }
 
 
+@Component({
+  selector: 'app-nvcl-datasetlist-component-dialog',
+  templateUrl: 'nvcl.datasetlist.dialog.component.html',
+})
+export class NVCLDatasetListDialogComponent {
+
+  scalarClasses: any;
+
+  constructor(public modalRef: BsModalRef) {}
+
+}
