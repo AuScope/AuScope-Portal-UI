@@ -31,7 +31,7 @@
 					<div class="card-header">
 						<h4 class="card-title">
 							<a (click)="transformToHtml(doc)" *ngIf="doc.node_name !== null" class="accordion-link" data-toggle="collapse" href="#doc-collapse{{i}}">
-								{{doc.layer.name}} : {{doc.node_name}}&nbsp;<i *ngIf="transformingToHtml[doc.key] && doc.expanded" class="fa fa-spinner fa-spin"></i>
+								{{doc.layer.name}}{{doc.node_name ? ': ' + doc.node_name : ''}}&nbsp;<i *ngIf="transformingToHtml[doc.key] && doc.expanded" class="fa fa-spinner fa-spin"></i>
 							</a>
 							<a (click)="transformToHtml(doc)" *ngIf="doc.node_name === null" class="accordion-link" data-toggle="collapse" href="#doc-collapse{{i}}">
 								{{doc.layer.name}}&nbsp;<i *ngIf="transformingToHtml[doc.key] && doc.expanded" class="fa fa-spinner fa-spin"></i>

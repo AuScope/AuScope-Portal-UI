@@ -153,7 +153,6 @@ export class QuerierModalComponent  implements OnInit {
     });
   }
 
-
   /**
    * Copy drawn polygon to clipboard
    * @param document polygon as document
@@ -185,32 +184,37 @@ export class QuerierModalComponent  implements OnInit {
 
   // Look for changes and update UI after brief delay
   public onDataChange(): void {
-    let htmldata = []
-    let Expression=/http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
-    let objExp=new RegExp(Expression);
+    const htmldata = []
+    const Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+    const objExp = new RegExp(Expression);
     for (let  i = 0; i < this.docs.length; i++) {
-      var doc = new DOMParser().parseFromString(this.docs[i].raw, "text/xml");
+      const doc = new DOMParser().parseFromString(this.docs[i].raw, 'text/xml');
       if (doc.getElementsByTagName('gml:name').length != 0) {
-        for (let html in doc.getElementsByTagName('gml:name')) {
+        for (const html in doc.getElementsByTagName('gml:name')) {
           if(!objExp.test(doc.getElementsByTagName('gml:name')[html].innerHTML)) {
             htmldata.push(doc.getElementsByTagName('gml:name')[html].innerHTML)
           }
         }
+      } else if (doc.getElementsByTagName('gml:NAME').length != 0) {
+        for (const html in doc.getElementsByTagName('gml:NAME')) {
+          if(!objExp.test(doc.getElementsByTagName('gml:NAME')[html].innerHTML)) {
+            htmldata.push(doc.getElementsByTagName('gml:NAME')[html].innerHTML)
+          }
+        }
       } else if (doc.getElementsByTagName('gsmlp:name').length != 0) {
-        for (let html in doc.getElementsByTagName('gsmlp:name')) {
+        for (const html in doc.getElementsByTagName('gsmlp:name')) {
           if(!objExp.test(doc.getElementsByTagName('gsmlp:name')[html].innerHTML)) {
             htmldata.push(doc.getElementsByTagName('gsmlp:name')[html].innerHTML)
           }
         }
       } else if (doc.getElementsByTagName('null:name').length != 0) {
-        for (let html in doc.getElementsByTagName('null:name')) {
+        for (const html in doc.getElementsByTagName('null:name')) {
           if(!objExp.test(doc.getElementsByTagName('null:name')[html].innerHTML)) {
             htmldata.push(doc.getElementsByTagName('null:name')[html].innerHTML)
           }
         }
       }
       this.docs[i]['node_name'] = htmldata[i]
-
     }
     setTimeout(() => {
       this.changeDetectorRef.detectChanges();
@@ -223,7 +227,6 @@ export class QuerierModalComponent  implements OnInit {
    * @param document
    */
   public transformToHtml(document): void {
-
     if (this.msclService.usesGMLObs(document.raw)) {
       this.hasMsclAnalytics = true;
     }
@@ -269,15 +272,13 @@ export class QuerierModalComponent  implements OnInit {
       document.loadSubComponent = true;
       this.transformingToHtml[document.key] = false;
       this.changeDetectorRef.detectChanges();
-    },
-    // try default XML tree display
-    error => {
+    }, () => {
+      // try default XML tree display
       this.parseTree(document);
       this.transformingToHtml[document.key] = false;
       this.changeDetectorRef.detectChanges();
     });
   }
-
 
   /**
    * Parses server response and builds a document tree
@@ -372,7 +373,6 @@ export class QuerierModalComponent  implements OnInit {
     }
     return data;
   }
-
 
   /**
    * Reformats labels to make them more user-friendly
