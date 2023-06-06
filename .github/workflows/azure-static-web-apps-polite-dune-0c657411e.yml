@@ -28,7 +28,7 @@ jobs:
         with:
           file: proxy.conf.json
           field: target
-          value: ${{ secrets.AZURE_PORTAL_URL }}/api
+          value: "${{ secrets.AZURE_PORTAL_URL }}/api/"
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
