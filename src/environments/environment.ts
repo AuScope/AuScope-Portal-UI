@@ -15,6 +15,7 @@ export const environment = {
   //portalBaseUrl: 'http://localhost:8080/api/',
   portalBaseUrl: 'https://au-portal-dev.it.csiro.au/api/',
   portalProxyUrl: '/api/',
+  authBaseUrl: 'https://au-portal-dev.it.csiro.au/api/',
   hostUrl: 'http://localhost:4200',
   nVCLAnalyticalUrl: 'https://nvclanalytics.azurewebsites.net/NVCLAnalyticalServices/',
   googleAnalyticsKey: null,

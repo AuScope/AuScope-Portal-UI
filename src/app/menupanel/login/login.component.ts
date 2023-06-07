@@ -17,21 +17,21 @@ export class LoginComponent {
    * Google login
    */
   loginGoogle() {
-    window.location.href = environment.portalBaseUrl + 'oauth2/authorization/google';
+    window.location.href = environment.authBaseUrl + 'oauth2/authorization/google'
   }
 
   /**
    * Australia Access Federation (AAF) login
    */
   loginAaf() {
-    window.location.href = environment.portalBaseUrl + 'login/aaf';
+    window.location.href = environment.authBaseUrl + 'login/aaf';
   }
 
   /**
    * Github login
    */
   loginGithub() {
-    window.location.href = environment.portalBaseUrl + 'oauth2/authorization/github';
+    window.location.href = environment.authBaseUrl + 'oauth2/authorization/github';
   }
 
 }
