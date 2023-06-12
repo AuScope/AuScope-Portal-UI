@@ -2,7 +2,7 @@
   "routes": [
     {
       "route": "/geonetwork/*",
-      "rewrite": "https://augeonetwork-dev.geoanalytics.group/geonetwork/"
+      "redirect": "https://augeonetwork-dev.geoanalytics.group/geonetwork/"
     },
     {
       "route": "/login/*",
