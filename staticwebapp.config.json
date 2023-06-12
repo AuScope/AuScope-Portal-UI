@@ -1,6 +1,10 @@
 {
   "routes": [
     {
+      "route": "/geonetwork/*",
+      "rewrite": "https://auportal-dev.geoanalytics.group/geonetwork/"
+    },
+    {
       "route": "/login/*",
       "methods": ["GET","HEAD","POST","OPTIONS"],
       "rewrite": "index.html"
