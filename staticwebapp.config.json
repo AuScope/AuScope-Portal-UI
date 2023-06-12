@@ -2,7 +2,7 @@
   "routes": [
     {
       "route": "/geonetwork/*",
-      "rewrite": "https://auportal-dev.geoanalytics.group/geonetwork/"
+      "rewrite": "https://augeonetwork-dev.geoanalytics.group/geonetwork/"
     },
     {
       "route": "/login/*",
