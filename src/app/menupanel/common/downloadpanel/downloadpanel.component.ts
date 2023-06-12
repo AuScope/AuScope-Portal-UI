@@ -387,8 +387,6 @@ export class DownloadPanelComponent implements OnInit {
    */
   public clearBounds(): void {
     this.boundsService.clearBounds();
-    this.wcsDownloadForm = {};
-    this.wcsDownloadListOption = null;
   }
 
   /**
