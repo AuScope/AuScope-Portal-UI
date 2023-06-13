@@ -260,8 +260,8 @@ export class LayerPanelComponent implements OnInit {
           }
         });
       // Keep track of bookmarks
-      this.userStateService.bookmarks.subscribe(bookmarks => {
-        this.bookmarks = bookmarks;
+      this.userStateService.bookmarks.subscribe(bms => {
+        this.bookmarks = bms;
       });
   }
 
@@ -438,8 +438,7 @@ export class LayerPanelComponent implements OnInit {
    * @returns true if a polygon filter is found, false otherwise
    */
   private layerHasPolygonFilter(layer: LayerModel): boolean {
-    return layer.filterCollection !== undefined && (layer.filterCollection.optionalFilters !== null &&
-      layer.filterCollection.optionalFilters.find(f => f.type === 'OPTIONAL.POLYGONBBOX'));
+    return layer.filterCollection?.optionalFilters?.find(f => f.type === 'OPTIONAL.POLYGONBBOX');
   }
 
   /**
@@ -497,7 +496,7 @@ export class LayerPanelComponent implements OnInit {
    * @returns true if user at least one bookmarked layer, false otherwise
    */
   public hasBookmarkedLayers(): boolean {
-    return this.bookmarks && this.bookmarks.length > 0;
+    return this.bookmarks?.length > 0;
   }
 
   /**
@@ -507,7 +506,7 @@ export class LayerPanelComponent implements OnInit {
    * @returns true if layer is bookmarked for current user, false otherwise
    */
   public isLayerBookmarked(layerId: string): boolean {
-    if (this.bookmarks && this.bookmarks.find(b => b.fileIdentifier === layerId)) {
+    if (this.bookmarks?.find(b => b.fileIdentifier === layerId)) {
       return true;
     }
     return false;
@@ -522,7 +521,7 @@ export class LayerPanelComponent implements OnInit {
   public layerGroupHasBookmarkedLayer(layerGroupKey: string): boolean {
     if (this.layerGroups[layerGroupKey]) {
       for (const layer of this.layerGroups[layerGroupKey]) {
-        if (this.bookmarks && this.bookmarks.find(b => b.fileIdentifier === layer.id)) {
+        if (this.bookmarks?.find(b => b.fileIdentifier === layer.id)) {
           return true;
         }
       }
