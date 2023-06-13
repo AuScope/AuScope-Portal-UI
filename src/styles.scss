@@ -767,9 +767,9 @@ fieldset.show-fieldset-borders-whitebg legend{
 }
 
 /*
- * Start of 'slimscroll' scrollbar customisation
+ * Start of 'slimscroll' scrollbar customisation.
+ * Doesn't play nice with Firefox, see property following this one.
  */
-
 .slimscroll::-webkit-scrollbar-track
 {
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
@@ -788,6 +788,11 @@ fieldset.show-fieldset-borders-whitebg legend{
 	border-radius: 6px;
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
 	background-color: #707070;
+}
+
+// Firefox specific code
+.slimscroll {
+    scrollbar-width: thin;
 }
 
 /*

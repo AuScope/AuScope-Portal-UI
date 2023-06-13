@@ -65,12 +65,12 @@ export class ActiveLayersPanelComponent {
 
   /**
    * Layer opacity slider change event
-   * @param value Event value object from slider change event
+   * @param value slider change event
    * @param layer the layer object
    */
-    public layerOpacityChange(value: number, layer: LayerModel) {
-      this.csMapService.setLayerOpacity(layer, value / 100);
-    }
+  public layerOpacityChangeValue(event: any, layer: LayerModel) {
+    this.csMapService.setLayerOpacity(layer, Number(event.target.value) / 100);
+  }
 
   /**
    * Split buttons will only be displayed if the split map is shown and the layer has started (or completed) rendering.

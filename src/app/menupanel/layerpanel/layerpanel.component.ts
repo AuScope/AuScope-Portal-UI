@@ -283,7 +283,7 @@ export class LayerPanelComponent implements OnInit {
   }
 
   /**
-   * Determine if a layer hsould have an opacity slider
+   * Determine if a layer should have an opacity slider
    * @param layer the layer
    * @returns true if a layer should have an opacity slider, false otherwise
    */
@@ -293,11 +293,11 @@ export class LayerPanelComponent implements OnInit {
 
   /**
    * Layer opacity slider change event
-   * @param value Event value object from slider change event
+   * @param value slider change event
    * @param layer the layer object
    */
-  public layerOpacityChange(value: number, layer: LayerModel) {
-    this.csMapService.setLayerOpacity(layer, value / 100);
+  public layerOpacityChangeValue(event: any, layer: LayerModel) {
+    this.csMapService.setLayerOpacity(layer, Number(event.target.value) / 100);
   }
 
   /**
