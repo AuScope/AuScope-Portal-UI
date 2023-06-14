@@ -1,4 +1,4 @@
-name: Azure Static Web Apps CI/CD
+name: Azure Static Web Apps Dev CI/CD
 
 on:
   push:
@@ -21,14 +21,20 @@ jobs:
       - uses: jsdaniell/create-json@v1.2.2
         with:
           name: "context.json"
-          json: '{"portalBaseUrl":"${{ secrets.AZURE_PORTAL_URL }}/api/","hostUrl":"${{ secrets.AZURE_PORTAL_URL }}"}'
+          json: '{"portalBaseUrl":"${{ vars.AZURE_PORTAL_URL_DEV }}/api/","hostUrl":"${{ vars.AZURE_PORTAL_URL_DEV }}"}'
           dir: 'src/contexts/'
       - name: Update proxy.json file
         uses: jossef/action-set-json-field@v2.1
         with:
           file: proxy.conf.json
           field: target
-          value: "${{ secrets.AZURE_PORTAL_URL }}/api/"
+          value: "${{ vars.AZURE_PORTAL_URL_DEV }}/api/"
+      - name: Set redirect for geonetwork in staticwebapp.config.json
+        uses: jossef/action-set-json-field@v2.1
+        with:
+          file: staticwebapp.config.json
+          field: routes[0].redirect
+          value: "${{ vars.GEONETWORK_URL_DEV }}"
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
