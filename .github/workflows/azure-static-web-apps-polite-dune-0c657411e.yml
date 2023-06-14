@@ -35,7 +35,7 @@ jobs:
         uses: jossef/action-set-json-field@v2.1
         with:
           file: staticwebapp.config.json
-          field: routes[0].redirect
+          field: "routes[0].redirect"
           value: "${{ vars.GEONETWORK_URL_DEV }}"
       - name: print staticwebapp.config.json
         run: cat staticwebapp.config.json
