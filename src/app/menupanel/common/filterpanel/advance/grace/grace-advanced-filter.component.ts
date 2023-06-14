@@ -132,6 +132,7 @@ import { GraceStyleSettings } from 'app/modalwindow/querier/customanalytic/grace
      * @returns current style settings
      */
     public getAdvancedParams(): GraceStyleSettings {
+        this.graceService.setCurrentGraceStyleSettings(this.graceService.editedGraceStyleSettings);
         return this.graceService.currentGraceStyleSettings;
     }
 

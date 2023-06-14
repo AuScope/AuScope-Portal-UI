@@ -18,7 +18,6 @@ export class LayerManagerService {
   constructor(private csMapService: CsMapService, private manageStateService: ManageStateService, private uiLayerModelService: UILayerModelService,
               private advancedComponentService: AdvancedComponentService, private legendUiService: LegendUiService) {}
 
-
   /**
    * Add a layer
    *
@@ -62,6 +61,12 @@ export class LayerManagerService {
       }
     }
 
+    // Remove any existing legends in case map re-added with new style
+    this.legendUiService.removeLegend(layer.id);
+
+    // Add layer to map in Cesium
+    this.csMapService.addLayer(layer, param);
+
     // Add a new layer in the layer state service
     this.manageStateService.addLayer(
       layer.id,
@@ -70,12 +75,6 @@ export class LayerManagerService {
       optionalFilters,
       advancedFilterParams
     );
-
-    // Remove any existing legends in case map re-added with new style
-    this.legendUiService.removeLegend(layer.id);
-
-    // Add layer to map in Cesium
-    this.csMapService.addLayer(layer, param);
 
     // If on a small screen, when a new layer is added, roll up the sidebar to expose the map */
     if ($('#sidebar-toggle-btn').css('display') !== 'none') {
