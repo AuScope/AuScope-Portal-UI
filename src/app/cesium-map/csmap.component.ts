@@ -461,7 +461,7 @@ export class CsMapComponent implements AfterViewInit {
 
     html +=  '<div class="row"><div class="col-md-3">Resource link</div><div class="col-md-9">';
     for (const onlineResource of cswRecord.onlineResources) {
-      html += '<p><a style="color: #000000" href="' + onlineResource.url + '">' + (onlineResource.name ? onlineResource.name : 'Web resource link') + '</a></p>';
+      html += '<p><a style="color: #000000" target="_blank" href="' + onlineResource.url + '">' + (onlineResource.name ? onlineResource.name : 'Web resource link') + '</a></p>';
     }
     html += '</div></div>';
 
