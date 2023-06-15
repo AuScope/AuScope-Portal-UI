@@ -23,7 +23,7 @@ jobs:
       - uses: jsdaniell/create-json@v1.2.2
         with:
           name: "context.json"
-          json: '{"portalBaseUrl":"${{ vars.AZURE_PORTAL_URL_PROD }}/api/","hostUrl":"${{ vars.AZURE_PORTAL_URL_PROD }}"}'
+          json: '{"portalBaseUrl":"${{ vars.AZURE_PORTAL_API_URL_PROD }}","hostUrl":"${{ vars.AZURE_PORTAL_URL_PROD }}","authBaseUrl": "{{ vars.AZURE_PORTAL_URL_PROD }}/api/"}'
           dir: 'src/contexts/'
       - name: Update proxy.json file
         uses: jossef/action-set-json-field@v2.1
