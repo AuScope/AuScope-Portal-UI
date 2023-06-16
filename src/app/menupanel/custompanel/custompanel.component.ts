@@ -84,7 +84,7 @@ export class CustomPanelComponent {
       // Extract a layer name from URL
       const layerName = url.pathname.split('/').pop();
       // Use the proxy
-      const proxyUrl = this.env.portalBaseUrl + "getViaProxy.do?url=" + searchUrl;
+      const proxyUrl = this.env.portalBaseUrl + "getViaProxy.do?usewhitelist=false&url=" + searchUrl;
       // Make a layer model object
       const layerRec: LayerModel = this.layerHandlerService.makeCustomKMLLayerRecord(layerName, proxyUrl, null);
       // Configure layers so it can be added to map
@@ -144,8 +144,14 @@ export class CustomPanelComponent {
       // When file has been read this function is called
       reader.onload = () => {
           let kmlStr = reader.result.toString();
+
+          console.log('Unclean string: ' + kmlStr);
+
           // Remove unwanted characters and inject proxy for embedded URLs
           kmlStr = this.kmlService.cleanKML(kmlStr);
+
+          console.log('CLEAN KML FILE: ' + kmlStr);
+
           const parser = new DOMParser();
           const kmlDoc = parser.parseFromString(kmlStr, "text/xml");
           // Create up a special map layer for the KML document 
