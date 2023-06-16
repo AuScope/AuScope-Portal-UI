@@ -33,12 +33,8 @@ jobs:
           value: "${{ vars.AZURE_PORTAL_URL_PROD }}/api/"
       - name: print proxy.conf.json
         run: cat proxy.conf.json
-      - name: Set redirect for geonetwork in staticwebapp.config.json
-        uses: jossef/action-set-json-field@v2.1
-        with:
-          file: staticwebapp.config.json
-          field: "routes[0].redirect"
-          value: "${{ vars.GEONETWORK_URL_PROD }}"
+      - name: Update staticwebapp.config.json
+        run: echo "`jq '((.routes[] | select(.route == "/geonetwork/*") | .redirect) |= "${{ vars.GEONETWORK_URL_PROD }}")' staticwebapp.config.json`" > staticwebapp.config.json
       - name: print staticwebapp.config.json
         run: cat staticwebapp.config.json
       - name: Build And Deploy
