@@ -1,10 +1,6 @@
 {
   "routes": [
     {
-      "route": "/geonetwork/*",
-      "redirect": "https://augeonetwork-dev.geoanalytics.group/geonetwork/"
-    },
-    {
       "route": "/login/*",
       "methods": ["GET","HEAD","POST","OPTIONS"],
       "rewrite": "index.html"

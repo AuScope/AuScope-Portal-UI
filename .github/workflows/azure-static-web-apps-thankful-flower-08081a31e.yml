@@ -23,24 +23,8 @@ jobs:
       - uses: jsdaniell/create-json@v1.2.2
         with:
           name: "context.json"
-          json: '{"portalBaseUrl":"${{ vars.AZURE_PORTAL_URL_PROD }}/api/","hostUrl":"${{ vars.AZURE_PORTAL_URL_PROD }}"}'
+          json: '{"portalBaseUrl":"${{ vars.AZURE_PORTAL_API_URL_PROD }}","hostUrl":"${{ vars.AZURE_PORTAL_URL_PROD }}","authBaseUrl":"${{ vars.AZURE_PORTAL_URL_PROD }}/api/"}'
           dir: 'src/contexts/'
-      - name: Update proxy.json file
-        uses: jossef/action-set-json-field@v2.1
-        with:
-          file: proxy.conf.json
-          field: target
-          value: "${{ vars.AZURE_PORTAL_URL_PROD }}/api/"
-      - name: print proxy.conf.json
-        run: cat proxy.conf.json
-      - name: Set redirect for geonetwork in staticwebapp.config.json
-        uses: jossef/action-set-json-field@v2.1
-        with:
-          file: staticwebapp.config.json
-          field: "routes[0].redirect"
-          value: "${{ vars.GEONETWORK_URL_PROD }}"
-      - name: print staticwebapp.config.json
-        run: cat staticwebapp.config.json
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
