@@ -274,7 +274,6 @@ export class NVCLDatasetListComponent implements OnInit {
         this.selectedLogNames[datasetId] = logNames;
         if (logIds.length <= 0) {
           alert('No logs selected');
-          return;
         }
 
         setTimeout(() => {
@@ -310,7 +309,6 @@ export class NVCLDatasetListComponent implements OnInit {
 
     if (logIds.length <= 0) {
       alert('No logs selected');
-      return;
     }
     this.nvclService.getNVCL2_0_CSVDownload(this.onlineResource.url, logIds).
       subscribe(response => {
