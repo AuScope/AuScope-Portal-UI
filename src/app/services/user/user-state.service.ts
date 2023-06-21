@@ -9,6 +9,7 @@ import { CsMapService, ManageStateService } from '@auscope/portal-core-ui';
 import { v4 as uuidv4 } from 'uuid';
 import { HttpResponse } from '@angular/common/http';
 import { environment } from 'environments/environment';
+import { UILayerModelService } from '../ui/uilayer-model.service';
 
 
 @Injectable()
@@ -26,7 +27,7 @@ export class UserStateService {
   private _states: BehaviorSubject<PermanentLink[]> = new BehaviorSubject([]);
   public readonly states: Observable<PermanentLink[]> = this._states.asObservable();
 
-  constructor(private apiService: AuscopeApiService, private manageStateService: ManageStateService, private csMapService: CsMapService) {}
+  constructor(private apiService: AuscopeApiService, private manageStateService: ManageStateService, private csMapService: CsMapService, private uiLayerModelService: UILayerModelService) {}
 
   /**
    * Get the currently logged in user (if one is logged in)
@@ -157,6 +158,7 @@ export class UserStateService {
       if (layerKey.toLowerCase() !== 'map' && layerKey.toLowerCase() !== 'basemap') {
         const layerIndex = this.csMapService.getLayerIndex(layerKey);
         state[layerKey].index = layerIndex;
+        state[layerKey].opacity = this.uiLayerModelService.getUILayerModel(layerKey).opacity;
       }
     }
     return this.apiService.saveUserPortalState(id, name, description, JSON.stringify(state), isPublic).pipe(map(response => {

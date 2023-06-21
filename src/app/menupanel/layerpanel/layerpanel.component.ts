@@ -211,6 +211,16 @@ export class LayerPanelComponent implements OnInit {
                   me.layerGroups[group].expanded = true;
                   me.layerGroups[group].loaded = me.layerGroups[group];
                   me.layerGroups[group][layer_idx].expanded = true;
+                  if (layerStateObj[uiLayerModel.id].opacity) {
+                    // Load opacity from state
+                    const opacity = layerStateObj[uiLayerModel.id].opacity;
+                    uiLayerModel.opacity = opacity;
+                    me.uiLayerModelService.setUILayerModel(me.layerGroups[group][layer_idx].id, uiLayerModel);
+                    const layer = me.layerGroups[group].loaded[layer_idx];
+                    setTimeout(() => {
+                      me.csMapService.setLayerOpacity(layer, opacity / 100);
+                    }, 1000);
+                  }
                   if (layerStateObj[uiLayerModel.id].filterCollection && layerStateObj[uiLayerModel.id].filterCollection.hasOwnProperty('hiddenParams')) {
                     me.layerGroups[group][layer_idx].filterCollection.hiddenParams = layerStateObj[uiLayerModel.id].filterCollection.hiddenParams;
                   }
