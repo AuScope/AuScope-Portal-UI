@@ -30,7 +30,7 @@
     "@angular/platform-server": "^15.2.8",
     "@angular/router": "^15.2.8",
     "@auscope/angular-cesium": "^15.0.1",
-    "@auscope/portal-core-ui": "^3.0.11",
+    "@auscope/portal-core-ui": "^3.0.12",
     "@csiro-geoanalytics/ng": "^2.5.0",
     "@ng-bootstrap/ng-bootstrap": "^14.1.0",
     "@ng-select/ng-select": "^10.0.4",
