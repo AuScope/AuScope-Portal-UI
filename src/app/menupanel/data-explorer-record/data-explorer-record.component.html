@@ -1,19 +1,19 @@
 <div class="input-group input-group-sm" >
     <span class="input-group-prepend" >
         <!-- Record can not be added -->
-        <button *ngIf="!isAddableRecord(cswRecord) && !csMapService.layerExists(cswRecord.id)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip"
+        <button *ngIf="!isAddableRecord(cswRecord)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip"
             title="Layer has no appropriate online resources and as such, cannot be added" >
             <i class="fa fa-times"  ></i>
         </button>
         <!-- Add layer to map -->
-        <button *ngIf="isAddableRecord(cswRecord)"
+        <button *ngIf="isAddableRecord(cswRecord) && !csMapService.layerExists(cswRecord.id)"
             class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Add layer to map" (click)="addLayer(layer)">
             <i class="fa fa-plus-circle" style="color:green;"></i>
         </button>            
-        <button *ngIf="csMapService.layerExists(cswRecord.id)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Remove layer from map"
+        <button *ngIf="csMapService.layerExists(cswRecord.id) && isAddableRecord(cswRecord)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Remove layer from map"
             (click)="removeLayer(layer)">
             <i class="fa fa-trash" style="color:red;"></i>
-        </button>        
+        </button>
     </span>
     <label class="input-group-label text-truncate" data-toggle="tooltip" title="{{ cswRecord.name }}" readonly style="width: 100%;margin-left:4px;margin-right:4px;">
         {{ cswRecord.name }}
