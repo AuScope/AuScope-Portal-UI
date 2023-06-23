@@ -2,13 +2,14 @@ import { DataExplorerService } from "./data-explorer.service";
 import { Observable, Subject, merge } from "rxjs";
 import { Component, OnInit, ViewChild, ElementRef} from "@angular/core";
 import { filter, debounceTime, distinctUntilChanged,  map} from "rxjs/operators";
-import { Bbox, CsMapService, CSWRecordModel,  LayerModel,  UtilitiesService} from "@auscope/portal-core-ui";
+import { Bbox, CsMapService, CSWRecordModel,  LayerModel,  OnlineResourceModel,  UtilitiesService} from "@auscope/portal-core-ui";
 import { NgbTypeahead } from "@ng-bootstrap/ng-bootstrap";
 import { UILayerModelService } from "app/services/ui/uilayer-model.service";
 import { RenderStatusService } from "@auscope/portal-core-ui";
 import { Registry } from "./data-model";
 import { RectangleEditorObservable } from "@auscope/angular-cesium";
 import { UILayerModel } from "../common/model/ui/uilayer.model";
+import { environment } from "environments/environment";
 
 @Component({
   selector: "[appDataExplorer]",
@@ -26,9 +27,9 @@ export class DataExplorerComponent implements OnInit{
   readonly CSW_RECORD_PAGE_LENGTH = 10;
 
   // Search results
-  cswSearchResults: Map<String, LayerModel[]> = new Map<String, LayerModel[]>();
+  cswSearchResults: Map<string, LayerModel[]> = new Map<string, LayerModel[]>();
   searchConducted = false;  // Has a search has been conducted?
-  layerOpacities: Map<String, number> = new Map<String, number>();
+  layerOpacities: Map<string, number> = new Map<string, number>();
 
   // Collapsable menus
   anyTextIsCollapsed: boolean = true;
@@ -47,7 +48,7 @@ export class DataExplorerComponent implements OnInit{
   availableServices: any = [];
   dateTo: Date = null;
   dateFrom: Date = null;
-  availableRegistries: Map<String, Registry> = new Map<String, Registry>();
+  availableRegistries: Map<string, Registry> = new Map<string, Registry>();
 
   currentYear: number;
 
@@ -125,8 +126,8 @@ export class DataExplorerComponent implements OnInit{
    *
    * @param serviceId
    */
-  public getRegistryTabTitle(serviceId: String) {
-    let title: String = this.availableRegistries.get(serviceId).title;
+  public getRegistryTabTitle(serviceId: string) {
+    let title: string = this.availableRegistries.get(serviceId).title;
     if (this.availableRegistries.get(serviceId).searching) {
       title += " (Searching)";
     } else if (this.availableRegistries.get(serviceId).recordsMatched) {
@@ -151,7 +152,6 @@ export class DataExplorerComponent implements OnInit{
    * Search all registries using current facets.
    */
   public facetedSearchAllRegistries(): void {
-
     this.searchConducted = true;
 
     // Available registries and start
@@ -159,7 +159,7 @@ export class DataExplorerComponent implements OnInit{
     let starts: number[] = [];
     let registrySelected: boolean = false;
     this.availableRegistries.forEach(
-      (registry: Registry, serviceId: String) => {
+      (registry: Registry, serviceId: string) => {
         if (registry.checked) {
           registrySelected = true;
           serviceIds.push(registry.id);
@@ -242,7 +242,7 @@ export class DataExplorerComponent implements OnInit{
     }
 
     this.availableRegistries.forEach(
-      (registry: Registry, serviceId: String) => {
+      (registry: Registry, serviceId: string) => {
         if (registry.checked) {
           registry.searching = true;
           registry.searchError = null;
@@ -270,27 +270,19 @@ export class DataExplorerComponent implements OnInit{
                   registry.searchError =
                     response["data"].searchErrors[registry.id];
                 }
-
-                  for (let i = 0; i < response["itemLayers"].length; i++) {
-                    const uiLayerModel = new UILayerModel(
-                        response["itemLayers"][i].id,
-                      this.renderStatusService.getStatusBSubject(
-                        response["itemLayers"][i]
-                      )
-                    );
-                    this.uiLayerModelService.setUILayerModel(
-                        response["itemLayers"][i].id,
-                      uiLayerModel
-                    );
-                  }
+                for (const item of response["itemLayers"]) {
+                  const uiLayerModel = new UILayerModel(item.id, this.renderStatusService.getStatusBSubject(item));
+                  this.uiLayerModelService.setUILayerModel(item.id, uiLayerModel);                  
+                }
+                response["itemLayers"].useDefaultProxy = true;
+                response["itemLayers"].useProxyWhitelist = false;
 
                 this.cswSearchResults.set(registry.id, response["itemLayers"]);
                 registry.searching = false;
 
                 this.searchResultsIsCollapsed = false;
-                // this.searchResultsElement.nativeElement.scrollIntoView(false);
-              },
-              (error) => {
+                //this.searchResultsElement.nativeElement.scrollIntoView(false);
+              }, () => {
                 this.cswSearchResults.set(serviceId, null);
                 registry.searching = false;
               }
@@ -305,7 +297,6 @@ export class DataExplorerComponent implements OnInit{
    * @param registry the single registry to search
    */
   public facetedSearchSingleRegistry(registry: Registry): void {
-
     this.searchConducted = true;
 
     let fields: string[] = [];
@@ -396,6 +387,10 @@ export class DataExplorerComponent implements OnInit{
           registry.startIndex = response["data"].nextIndexes[registry.id];
           registry.recordsMatched = response["data"].recordsMatched;
           if ((<CSWRecordModel[]>response["data"].records).length > 0) {
+            for (let i = 0; i < response["itemLayers"].length; i++) {
+              response["itemLayers"].useDefaultProxy = true;
+              response["itemLayers"].useProxyWhitelist = false;
+            }
             this.cswSearchResults.set(registry.id, response["itemLayers"]);
           }
           if (
@@ -450,9 +445,9 @@ export class DataExplorerComponent implements OnInit{
    */
   public resetFacetedSearch(): void {
     // Reset results and registry indices
-    this.cswSearchResults = new Map<String, LayerModel[]>();
+    this.cswSearchResults = new Map<string, LayerModel[]>();
     this.availableRegistries.forEach(
-      (registry: Registry, serviceId: String) => {
+      (registry: Registry, serviceId: string) => {
         registry.startIndex = 1;
         registry.prevIndices = [];
         registry.currentPage = 1;
@@ -574,7 +569,7 @@ export class DataExplorerComponent implements OnInit{
    * @returns true if at least one registry has (nextIndex > 0), false
    *          otherwise
    */
-  public hasNextResultsPage(serviceId: String): boolean {
+  public hasNextResultsPage(serviceId: string): boolean {
     if (
       this.availableRegistries.get(serviceId).startIndex !== 0 &&
       this.availableRegistries.get(serviceId).startIndex !== 1
@@ -587,7 +582,7 @@ export class DataExplorerComponent implements OnInit{
   /**
    *
    */
-  public previousResultsPage(serviceId: String): void {
+  public previousResultsPage(serviceId: string): void {
     if (this.availableRegistries.get(serviceId).currentPage !== 1) {
       this.availableRegistries.get(serviceId).currentPage -= 1;
       if (this.availableRegistries.get(serviceId).prevIndices.length >= 2) {
@@ -609,7 +604,7 @@ export class DataExplorerComponent implements OnInit{
   /**
    *
    */
-  public nextResultsPage(serviceId: String): void {
+  public nextResultsPage(serviceId: string): void {
     this.availableRegistries.get(serviceId).currentPage += 1;
     this.facetedSearchSingleRegistry(this.availableRegistries.get(serviceId));
   }
