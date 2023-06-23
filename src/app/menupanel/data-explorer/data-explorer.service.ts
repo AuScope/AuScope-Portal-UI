@@ -14,6 +14,10 @@ export class DataExplorerService {
 
   static RESULTS_PER_PAGE: number = 35;
 
+  // List of valid online resource types that can be added to the map
+  static VALID_ONLINE_RESOURCE_TYPES: Array<string> = [ "WMS", "IRIS", "CSW", "KML" ];
+
+
   private _registries: BehaviorSubject<Registry[]> = new BehaviorSubject([]);
   public readonly registries: Observable<Registry[]> = this._registries.asObservable();
 
@@ -37,100 +41,6 @@ export class DataExplorerService {
       }
       ), );
   }
-
-  public getFilteredCSWRecords(param: any, page: number): Observable<any> {
-    let httpParams = new HttpParams();
-    httpParams = httpParams.append('key', 'cswServiceId');
-    httpParams = httpParams.append('key', 'keywordMatchType');
-
-    if (param.anyText) {
-      httpParams = httpParams.append('key', 'anyText');
-    }
-    if (param.title) {
-      httpParams = httpParams.append('key', 'title');
-    }
-    if (param.abstract) {
-      httpParams = httpParams.append('key', 'abstract');
-    }
-    if (param.north) {
-      httpParams = httpParams.append('key', 'north');
-    }
-    if (param.south) {
-      httpParams = httpParams.append('key', 'south');
-    }
-    if (param.east) {
-      httpParams = httpParams.append('key', 'east');
-    }
-    if (param.west) {
-      httpParams = httpParams.append('key', 'west');
-    }
-    if (param.keywords) {
-      httpParams = httpParams.append('key', 'keywords');
-    }
-
-    httpParams = httpParams.append('value', param.cswService.id);
-    httpParams = httpParams.append('value', 'Any');
-    if (param.anyText) {
-      httpParams = httpParams.append('value', param.anyText);
-    }
-    if (param.title) {
-      httpParams = httpParams.append('value', param.title);
-    }
-    if (param.abstract) {
-      httpParams = httpParams.append('value', param.abstract);
-    }
-    if (param.north) {
-      httpParams = httpParams.append('value', param.north);
-    }
-    if (param.south) {
-      httpParams = httpParams.append('value', param.south);
-    }
-    if (param.east) {
-      httpParams = httpParams.append('value', param.east);
-    }
-    if (param.west) {
-      httpParams = httpParams.append('value', param.west);
-    }
-    if (param.keywords) {
-      httpParams = httpParams.append('value', param.keywords);
-    }
-
-    const start = ((page - 1) * DataExplorerService.RESULTS_PER_PAGE);
-    httpParams = httpParams.append('page', page.toString());
-    httpParams = httpParams.append('start', start.toString());
-    httpParams = httpParams.append('limit', DataExplorerService.RESULTS_PER_PAGE.toString());
-
-    return this.http.post(environment.portalBaseUrl + 'getFilteredCSWRecords.do', httpParams.toString(), {
-      headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
-      responseType: 'json'
-    }).pipe(map(response => {
-      if (response['success'] === true) {
-        const cswRecords = response['data'];
-        const itemLayers = [];
-        itemLayers[param.cswService.title] = [];
-        cswRecords.forEach(function(item, i, ar) {
-          const itemLayer = new LayerModel();
-          itemLayer.cswRecords = [item];
-          itemLayer['expanded'] = false;
-          itemLayer.id = item.id;
-          itemLayer.description = item.description;
-          itemLayer.hidden = false;
-          itemLayer.layerMode = 'NA';
-          itemLayer.name = item.name;
-          itemLayers[param.cswService.title].push(itemLayer);
-        });
-        return {
-          itemLayers: itemLayers,
-          totalResults: parseInt(response['totalResults'], 10)
-        }
-      } else {
-        return observableThrowError(response['msg']);
-      }
-    }), catchError((error: HttpResponse<any>) => {
-      return observableThrowError(error);
-    }), );
-  }
-
 
   public getCSWServices(): Observable<any> {
     return this.http.post(environment.portalBaseUrl + 'getCSWServices.do', {
@@ -208,6 +118,7 @@ export class DataExplorerService {
       }).pipe(map(response => {
         const cswRecords = response['data'].records;
         const itemLayers = [];
+        const me = this;
 
         // itemLayers[title] = [];
         cswRecords.forEach(function(item, i, ar) {
@@ -219,14 +130,17 @@ export class DataExplorerService {
           itemLayer.hidden = false;
           itemLayer.layerMode = 'NA';
           itemLayer.name = item.name;
+          // All data search layers will use proxy
+          itemLayer.useDefaultProxy = true;
+          itemLayer.useProxyWhitelist = false;
           itemLayers.push(itemLayer);
         });
 
-          // return response['data'];
-          return {
-            itemLayers: itemLayers,
-            data: response['data']
-          }
+        // return response['data'];
+        return {
+          itemLayers: itemLayers,
+          data: response['data']
+        }
       }));
   }
 
@@ -245,6 +159,22 @@ export class DataExplorerService {
       }).pipe(map(response => {
           return response['data'];
       }));
+  }
+
+  /**
+   * Retrieve a list of addable OnlineResource types
+   *
+   * @returns a list of valid OnlineResourceTypes
+   */
+  public getValidOnlineResourceTypes(): string[] {
+    return DataExplorerService.VALID_ONLINE_RESOURCE_TYPES;
+  }
+
+  public isValidOnlineResourceType(type: string): boolean {
+    if (DataExplorerService.VALID_ONLINE_RESOURCE_TYPES.indexOf(type) > -1) {
+      return true;
+    }
+    return false;
   }
 
 }
