@@ -4,9 +4,7 @@ import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { UserStateService } from "app/services/user/user-state.service";
 import { RecordModalComponent } from "../record-modal/record-modal.component";
 import { LayerManagerService } from "app/services/ui/layer-manager.service";
-
-// List of valid online resource types that can be added to the map
-const VALID_ONLINE_RESOURCE_TYPES: string[] = ["WMS", "WFS", "CSW", "WWW"];
+import { DataExplorerService } from "../data-explorer/data-explorer.service";
 
 declare var gtag: Function;
 
@@ -25,6 +23,7 @@ export class DataExplorerRecordComponent implements OnInit {
   public optionalFilters: Array<Object>;
 
   constructor(
+    private dataExplorerService: DataExplorerService,
     public csMapService: CsMapService,
     private layerManagerService: LayerManagerService,
     private userStateService: UserStateService,
@@ -82,16 +81,13 @@ export class DataExplorerRecordComponent implements OnInit {
    */
   public isAddableRecord(cswRecord: CSWRecordModel): boolean {
     let addable: boolean = false;
-    if (
-      cswRecord.hasOwnProperty("onlineResources") &&
-      cswRecord.onlineResources != null &&
-      cswRecord.onlineResources.some(
-        (resource) => VALID_ONLINE_RESOURCE_TYPES.indexOf(resource.type) > -1
-      ) &&
-      cswRecord.geographicElements.length > 0 &&
-      !this.csMapService.layerExists(cswRecord.id)
-    ) {
-      addable = true;
+    if (cswRecord.hasOwnProperty("onlineResources")) {
+      for (const or of cswRecord.onlineResources) {
+        if (this.dataExplorerService.isValidOnlineResourceType(or.type) && or.name && or.name !== '') {
+          addable = true;
+          break;
+        }
+      }
     }
     return addable;
   }

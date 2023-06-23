@@ -96,7 +96,6 @@ import { LayerManagerService } from './services/ui/layer-manager.service';
 import * as PlotlyJS from 'plotly.js-dist-min/plotly.min.js';
 import { PlotlyModule } from 'angular-plotly.js';
 
-// import { CatalogueSearchComponent } from './menupanel/cataloguesearch/cataloguesearch.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DataExplorerComponent } from './menupanel/data-explorer/data-explorer.component';
 import { DataExplorerdRecordModule } from './menupanel/data-explorer-record/data-explorer-record.modules';
