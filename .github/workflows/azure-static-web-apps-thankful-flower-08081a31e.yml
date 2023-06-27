@@ -23,7 +23,7 @@ jobs:
       - uses: jsdaniell/create-json@v1.2.2
         with:
           name: "context.json"
-          json: '{"portalBaseUrl":"${{ vars.AZURE_PORTAL_API_URL_PROD }}","hostUrl":"${{ vars.AZURE_PORTAL_URL_PROD }}","authBaseUrl":"${{ vars.AZURE_PORTAL_URL_PROD }}/api/"}'
+          json: '{"portalBaseUrl":"${{ vars.AZURE_PORTAL_API_URL_PROD }}","hostUrl":"${{ vars.AZURE_PORTAL_URL_PROD }}","authBaseUrl":"${{ vars.AZURE_PORTAL_URL_PROD }}/api/", "googleAnalyticsKey": "${{ secrets.PROD_GOOGLE_ANALYTICS_KEY }}" }'
           dir: 'src/contexts/'
       - name: Build And Deploy
         id: builddeploy
