@@ -2,9 +2,7 @@
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "cli": {
     "analytics": false,
-    "schematicCollections": [
-      "@angular-eslint/schematics"
-    ]
+    "schematicCollections": ["@angular-eslint/schematics"]
   },
   "version": 1,
   "newProjectRoot": "projects",
@@ -23,6 +21,20 @@
             "index": "src/index.html",
             "main": "src/main.ts",
             "tsConfig": "src/tsconfig.app.json",
+            "outputHashing": "all",
+            "sourceMap": false,
+            "namedChunks": false,
+            "extractLicenses": true,
+            "vendorChunk": false,
+            "optimization": {
+              "scripts": false,
+              "styles": {
+                "minify": true,
+                "inlineCritical": true
+              },
+              "fonts": true
+            },
+            "buildOptimizer": false,
             "polyfills": "src/polyfills.ts",
             "assets": [
               "src/contexts",
@@ -84,14 +96,6 @@
                   "maximumWarning": "20kb"
                 }
               ],
-              "optimization": false,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -103,17 +107,9 @@
               "budgets": [
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "20kb"
+                  "maximumWarning": "50kb"
                 }
               ],
-              "optimization": false,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -196,10 +192,7 @@
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "src/**/*.ts",
-              "src/**/*.html"
-            ]
+            "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
           }
         }
       }

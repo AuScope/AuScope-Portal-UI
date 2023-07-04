@@ -177,7 +177,14 @@ export const config = {
     'Octopus-Sahul-Sed-Archives-Fluvial-Tl',
     'Octopus-Sahul-Sed-Archives-Lacustrine-Osl',
     'Octopus-Sahul-Sed-Archives-Lacustrine-Tl',
-    'mscl-gssa-borehole'
+    'mscl-gssa-borehole',
+    '2_5m_interpgeop15',
+    '2m_linear_structures',
+    '500k_faults_4326',
+    '500k_geol_28350',
+    '500k_geol_4326',
+    'bulkdensitypoint_4326',
+    'waroxi_wa_4326_bed'
   ],
   // Layers that use CSW records to display a simple rectangle on map
   cswrenderer: [
