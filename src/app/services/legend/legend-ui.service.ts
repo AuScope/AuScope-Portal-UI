@@ -24,7 +24,7 @@ export class LegendUiService {
    * @returns the first WMS OnlineResourceModel for the layer, or undefined if one doesn't exist
    */
   private getWMSOnlineResource(layer: LayerModel): OnlineResourceModel {
-    let wmsOnlineResource;
+    let wmsOnlineResource: OnlineResourceModel;
     if (layer.cswRecords) {
       for (const cswRecord of layer.cswRecords) {
         if (cswRecord.onlineResources) {
@@ -158,7 +158,7 @@ export class LegendUiService {
     if (layer.legendImg && layer.legendImg !== '') {
       const requestUrl = environment.portalBaseUrl + 'legend/' + layer.legendImg;
       const getRequest = this.http.get(requestUrl, { responseType: 'blob' }).pipe(
-        catchError(err => {
+        catchError(() => {
           return of(undefined);
         })
       );
@@ -180,6 +180,7 @@ export class LegendUiService {
         layer.filterCollection.mandatoryFilters = layerState['filterCollection']['mandatoryFilters'];
       }
     }
+
     // We don't need optional parameters for legend but it can't be empty
     const param: any = {};
     param.optionalFilters = [];
@@ -197,14 +198,14 @@ export class LegendUiService {
             // requests, so create lists of GET URLs and POST requests to throw everything at the wall and see what sticks.
             const httpParams = this.getHttpParams(wmsOnlineResource.name, collatedParam, sldBody);
             const postRequest = this.http.post(this.trimUrl(resource.url), httpParams, { responseType: 'blob' }).pipe(
-              catchError(err => {
+              catchError(() => {
                 return of(undefined);
               })
             );
             legendRequestList.push(postRequest);
             const requestUrl = this.createRequestUrl(resource.url, resource.name, sldBody);
             const getRequest = this.http.get(requestUrl, { responseType: 'blob' }).pipe(
-              catchError(err => {
+              catchError(() => {
                 return of(undefined);
               })
             );
@@ -215,7 +216,7 @@ export class LegendUiService {
       } else {
         const requestUrl = this.createRequestUrl(wmsOnlineResource.url, wmsOnlineResource.name, null);
         const getRequest = this.http.get(requestUrl, { responseType: 'blob' }).pipe(
-          catchError(err => {
+          catchError(() => {
             return of(undefined);
           })
         );
