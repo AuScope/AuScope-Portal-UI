@@ -117,6 +117,8 @@ import { UserStateService } from './services/user/user-state.service';
 import { AuthGuard } from './services/auth/auth.guard';
 import { AuthService } from './services/auth/auth.service';
 import { LayerGroupComponent } from './menupanel/custompanel/layergroup.component';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthErrorHandlerInterceptor } from './interceptors/auth-error.interceptor';
 
 PlotlyModule.plotlyjs = PlotlyJS;
 
@@ -172,7 +174,12 @@ PlotlyModule.plotlyjs = PlotlyJS;
     ],
     providers: [ AuscopeApiService, FilterService, RectanglesEditorService, AdvancedComponentService, SearchService,
                  NVCLService, MSCLService, BoundsService, GraceService, { provide: SAVER, useFactory: getSaver },
-                 LegendUiService, UserStateService, LayerManagerService, AuthGuard, AuthService
+                 LegendUiService, UserStateService, LayerManagerService, AuthGuard, AuthService,
+                 {
+                    provide: HTTP_INTERCEPTORS,
+                    useClass: AuthErrorHandlerInterceptor,
+                    multi: true,
+                 }
     ],
     imports: [
         PortalCoreModule.forRoot(environment, config),

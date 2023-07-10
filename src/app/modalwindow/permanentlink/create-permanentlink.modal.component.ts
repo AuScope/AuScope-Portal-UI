@@ -36,7 +36,7 @@ export class CreatePermanentLinkModalComponent implements OnInit {
     this.linkForm.get('description').disable();
     this.linkForm.get('isPublic').disable();
     this.savingState = true;
-    this.userStateService.addState(this.linkForm.get('name').value, this.linkForm.get('description').value, this.linkForm.get('isPublic').value).subscribe(response => {
+    this.userStateService.addState(this.linkForm.get('name').value, this.linkForm.get('description').value, this.linkForm.get('isPublic').value, false).subscribe(response => {
       this.errorOccurred = false;
       this.savingState = false;
       const link = environment.hostUrl + '?state=' + response;
