@@ -29,14 +29,14 @@
 		</div>
 	</div>
 
-	<div *ngIf="!layerFilterCollection && !layerHasAdvancedFilterComponent(layer.id)">
+	<div *ngIf="(!layerFilterCollection || layerFilterCollection.optionalFilters?.length === 0) && !layerHasAdvancedFilterComponent(layer.id)">
 		<div class="alert alert-warning fade show">
 			<i class="ti-bell float-left"></i>
 			<p>There are no filters associated with this layer</p>
 		</div>
 	</div>
 
-	<fieldset *ngIf="layerFilterCollection && layerFilterCollection['optionalFilters']" class="show-fieldset-borders">
+	<fieldset *ngIf="layerFilterCollection?.optionalFilters && layerFilterCollection.optionalFilters.length > 0" class="show-fieldset-borders">
 		<legend><h5>Optional Filters</h5></legend>
 		<div class="form-group form-group-sm">
 			<label style="display:flex;font-size:0.9rem;" *ngIf="optionalFilters.length > 0" title="Remove filter"> Select Filter:<i style="margin-left:auto;font-size:0.9rem;" class="hasEvent red" (click)="refreshFilter()">Clear All</i></label>

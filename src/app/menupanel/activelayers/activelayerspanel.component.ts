@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CsMapService, LayerHandlerService, LayerModel, ResourceType, UtilitiesService } from '@auscope/portal-core-ui';
+import { CsMapService, LayerModel, ResourceType, UtilitiesService } from '@auscope/portal-core-ui';
 import { SplitDirection } from 'cesium';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
@@ -18,9 +18,8 @@ export class ActiveLayersPanelComponent {
   bsModalRef: BsModalRef;
 
   constructor(private csMapService: CsMapService,
-    private uiLayerModelService: UILayerModelService, private layerHandlerService: LayerHandlerService,
-    private layerManagerService: LayerManagerService, private legendUiService: LegendUiService,
-    private modalService: BsModalService) { }
+    private uiLayerModelService: UILayerModelService, private layerManagerService: LayerManagerService,
+    private legendUiService: LegendUiService, private modalService: BsModalService) { }
 
   /**
    * Get active layers
