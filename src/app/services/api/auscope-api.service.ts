@@ -6,6 +6,7 @@ import { User } from 'app/models/user.model';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
+import { CSWRecordModel } from '@auscope/portal-core-ui';
 
 interface ApiResponse<T> {
   data: T;
@@ -16,7 +17,7 @@ interface ApiResponse<T> {
 function apiData<T>(response: ApiResponse<T>): Observable<T> {
   // Convert a VGL error into an Observable error
   if (!response.success) {
-    console.log('VGL response error: ' + JSON.stringify(response));
+    console.log('API response error: ' + JSON.stringify(response));
     return throwError(response.msg);
   }
 
@@ -182,6 +183,28 @@ export class AuscopeApiService {
    * @returns true response on success, false otherwise
    */
   public saveUserPortalState(id: string, name: string, description: string, jsonState: string, isPublic: boolean) {
+    const options = {
+      params: {
+          id: id,
+          name: name,
+          description: description,
+          jsonState: jsonState,
+          isPublic: isPublic
+      }
+    };
+    return this.apiRequest<string>('secure/savePortalState.do', options);
+  }
+
+  /**
+   * Save an anonymous user map state
+   * @param id the state ID
+   * @param name the state name
+   * @param description optional state description
+   * @param jsonState the map state as a JSON string
+   * @param isPublic if true the state is accessible by all, false then only the currently logged in user
+   * @returns true response on success, false otherwise
+   */
+  public saveAnonymousPortalState(id: string, name: string, description: string, jsonState: string, isPublic: boolean) {
     const options = {
       params: {
           id: id,

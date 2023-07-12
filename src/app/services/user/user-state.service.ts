@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Bookmark } from 'app/models/bookmark.model';
 import { PermanentLink } from 'app/models/permanentlink.model';
-import { BehaviorSubject, Observable, of, throwError as observableThrowError } from 'rxjs';
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { catchError, map, take } from 'rxjs/operators';
 import { User } from '../../models/user.model';
 import { AuscopeApiService } from '../api/auscope-api.service';
@@ -44,7 +44,7 @@ export class UserStateService {
       // Update user's bookmarks and map states
       this.updateBookmarks();
       this.updateUserStates();
-    }, err => {
+    }, () => {
       // Failure to retrieve User means no User logged in
       this.logoutUser();
       return of(undefined);
@@ -65,13 +65,7 @@ export class UserStateService {
    */
   private updateBookmarks() {
     this.apiService.getBookmarks().subscribe(
-      bookmarklist => this._bookmarks.next(bookmarklist),
-      err => {
-        if (err.status === 403) {
-          this.logoutUser();
-          this.showSessionTimedOutAlert();
-        }
-      }
+      bookmarklist => this._bookmarks.next(bookmarklist)
     );
   }
 
@@ -92,11 +86,6 @@ export class UserStateService {
           currentBookmarks.push(newBookmark);
         }
       });
-    }, err => {
-      if (err.status === 403) {
-        this.logoutUser();
-        this.showSessionTimedOutAlert();
-      }
     });
   }
 
@@ -112,11 +101,6 @@ export class UserStateService {
         this.apiService.removeBookmark(bm.id).subscribe(() => {
           const newBookmarks = currentBookmarks.filter(b => b.id !== bm.id);
           this._bookmarks.next(newBookmarks);
-        }, err => {
-          if (err.status === 403) {
-            this.logoutUser();
-            this.showSessionTimedOutAlert();
-          }
         });
       }
     });
@@ -127,13 +111,7 @@ export class UserStateService {
    */
   public updateUserStates() {
     this.apiService.getUserPortalStates().subscribe(
-      statelist => this._states.next(statelist),
-      err => {
-        if (err.status === 403) {
-          this.logoutUser();
-          this.showSessionTimedOutAlert();
-        }
-      }
+      statelist => this._states.next(statelist)
     );
   }
 
@@ -144,7 +122,7 @@ export class UserStateService {
    * @param description optional state description
    * @param isPublic whether the link is publically accessible
    */
-  public addState(name: string, description: string, isPublic: boolean): Observable<any> {
+  public addState(name: string, description: string, isPublic: boolean, anonymous: boolean): Observable<any> {
     const id = uuidv4();
     const state = this.manageStateService.getState();
     // Add the base map to the state
@@ -161,18 +139,20 @@ export class UserStateService {
         state[layerKey].opacity = this.uiLayerModelService.getUILayerModel(layerKey).opacity;
       }
     }
-    return this.apiService.saveUserPortalState(id, name, description, JSON.stringify(state), isPublic).pipe(map(response => {
+
+    // Differentiate between anonymous and user call
+    let apiCall = this.apiService.saveAnonymousPortalState(id, name, description, JSON.stringify(state), isPublic);
+    if (!anonymous) {
+      apiCall = this.apiService.saveUserPortalState(id, name, description, JSON.stringify(state), isPublic);
+    }
+    return apiCall.pipe(map(response => {
       if (response['success']) {
         response['id'] = id;
       }
       return response;
     }), catchError(
       (error: HttpResponse<any>) => {
-        if (error.status === 403) {
-          this.logoutUser();
-          this.showSessionTimedOutAlert();
-        }
-        return observableThrowError(error);
+        return throwError(error);
       }
     ), );
   }
@@ -193,15 +173,7 @@ export class UserStateService {
         response['id'] = id;
       }
       return response;
-    }), catchError(
-      (error: HttpResponse<any>) => {
-        if (error.status === 403) {
-          this.logoutUser();
-          this.showSessionTimedOutAlert();
-        }
-        return observableThrowError(error);
-      }
-    ), );
+    }));
   }
 
   /**
@@ -212,15 +184,7 @@ export class UserStateService {
   public removeState(id: string): Observable<any> {
     return this.apiService.deleteUserPortalState(id).pipe(map(response => {
       return response;
-    }), catchError(
-      (error: HttpResponse<any>) => {
-        if (error.status === 403) {
-          this.logoutUser();
-          this.showSessionTimedOutAlert();
-        }
-        return observableThrowError(error);
-      }
-    ), );
+    }));
   }
 
   /**
@@ -245,11 +209,4 @@ export class UserStateService {
     );
   }
   
-  /**
-   * Show an alert when the session has timed out
-   */
-  private showSessionTimedOutAlert() {
-    alert('Session has timed out, please log in again.');
-  }
-
 }

@@ -26,10 +26,10 @@ export class PermanentLinkComponent {
   /**
    * Generate the permanent link
    */
-  public generatePermanentLink() {
+  public generateAnonymousPermanentLink() {
     if (this.showPermanentLink) {
       this.shorteningMode = true;
-      this.userStateService.addState(null, null, true).subscribe(response => {
+      this.userStateService.addState(null, null, true, true).subscribe(response => {
         const link = environment.hostUrl + '?state=' + response;
         this.permanentlink = link;
         this.shorteningMode = false;
