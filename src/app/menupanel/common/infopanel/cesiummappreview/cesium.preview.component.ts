@@ -21,6 +21,7 @@ export class CesiumMapPreviewComponent {
 
     BBOX_HIGHLIGHT_COLOUR = new ColorMaterialProperty(Color.YELLOW.withAlpha(0.25));
     BBOX_STANDARD_COLOUR = new ColorMaterialProperty(Color.BLUE.withAlpha(0.25));
+    POINT_OFFSET_AMOUNT = 0.01;
 
     // 114.591, -45.837, 148.97, -5.73
     AUS_POLYGON = new PolygonHierarchy(Cartesian3.fromDegreesArray([
@@ -85,24 +86,40 @@ export class CesiumMapPreviewComponent {
         if (!this.maxNorth || coords[3] > this.maxNorth) {
             this.maxNorth = coords[3];
         }
-        // Add polygon
-        this.viewer.entities.add({
-            name: record.name,
-            id: record.id,
-            polygon: {
-                hierarchy: new PolygonHierarchy(Cartesian3.fromDegreesArray([
-                    coords[0], coords[1],
-                    coords[2], coords[1],
-                    coords[2], coords[3],
-                    coords[0], coords[3],
-                    coords[0], coords[1]
-                ])),
-                height: 0,
-                material: this.BBOX_STANDARD_COLOUR,
-                outline: true,
-                outlineColor: Color.BLACK
-            }
-        });
+
+        if (this.minWest === this.maxEast && this.minSouth === this.maxNorth) {
+            // If min/max lon and min/max lat are equal, add point, not poly
+            this.viewer.entities.add({
+                name: record.name,
+                id: record.id,
+                position: Cartesian3.fromDegrees(this.minWest, this.minSouth),
+                point: {
+                    pixelSize: 5,
+                    color: Color.WHITE,
+                    outlineColor: Color.BLACK,
+                    outlineWidth: 2,
+                }
+            });
+        } else {
+            // Add bbox polygon
+            this.viewer.entities.add({
+                name: record.name,
+                id: record.id,
+                polygon: {
+                    hierarchy: new PolygonHierarchy(Cartesian3.fromDegreesArray([
+                        coords[0], coords[1],
+                        coords[2], coords[1],
+                        coords[2], coords[3],
+                        coords[0], coords[3],
+                        coords[0], coords[1]
+                    ])),
+                    height: 0,
+                    material: this.BBOX_STANDARD_COLOUR,
+                    outline: true,
+                    outlineColor: Color.BLACK
+                }
+            });
+        }
     }
 
     /**
@@ -110,6 +127,22 @@ export class CesiumMapPreviewComponent {
      */
     fitMap() {
         let fitPolygon = this.AUS_POLYGON;
+
+        if (this.minWest === this.maxEast) {
+            if (this.maxEast !== 180 && this.maxEast + this.POINT_OFFSET_AMOUNT < 180) {
+                this.maxEast = this.maxEast + this.POINT_OFFSET_AMOUNT;
+            } else {
+                this.minWest = this.minWest - this.POINT_OFFSET_AMOUNT;
+            }
+        }
+        if (this.minSouth === this.maxNorth) {
+            if (this.minSouth > -90 && this.minSouth - this.POINT_OFFSET_AMOUNT > -90) {
+                this.minSouth = this.minSouth - this.POINT_OFFSET_AMOUNT;
+            } else {
+                this.maxNorth = this.maxNorth + this.POINT_OFFSET_AMOUNT;
+            }
+        }
+
         if (this.minWest && this.minWest !== -180 && this.maxEast && this.maxEast !== 180 &&
             this.minSouth && this.minSouth !== -90 && this.maxNorth && this.maxNorth !== 90 ) {
             fitPolygon = new PolygonHierarchy(Cartesian3.fromDegreesArray([

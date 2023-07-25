@@ -80,6 +80,7 @@ import { LegendModalComponent } from './modalwindow/legend/legend.modal.componen
 import { PermanentLinksModalComponent } from './modalwindow/permanentlink/permenantlinks.modal.component';
 import { CreatePermanentLinkModalComponent } from './modalwindow/permanentlink/create-permanentlink.modal.component';
 
+import { AddRegistryModalComponent } from './modalwindow/registry/add-registry.modal.component';
 import { ConfirmModalComponent } from './modalwindow/confirm/confirm.modal.component';
 
 // Services
@@ -170,6 +171,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
         LegendModalComponent,
         PermanentLinksModalComponent,
         CreatePermanentLinkModalComponent,
+        AddRegistryModalComponent,
         ConfirmModalComponent
     ],
     providers: [ AuscopeApiService, FilterService, RectanglesEditorService, AdvancedComponentService, SearchService,

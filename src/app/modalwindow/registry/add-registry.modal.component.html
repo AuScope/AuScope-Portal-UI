@@ -1,0 +1,50 @@
+<div class="modal-header">
+		<h3>Add Registry</h3><button class="btn btn-sm btn-outline pull-right" aria-label="Close" (click)="activeModal.close()"><i class="fa fa-times"></i></button>
+</div>
+<form [formGroup]="registryForm" class="text-left">
+	<div class="modal-body">
+			<div class="state-group">
+
+				<div class="row form-row">
+					<div class="col-label">
+						<label class="form-label" for="name">Name</label>
+					</div>
+					<div class="col">
+						<input id="name" formControlName="name" class="form-control" placeholder="Enter name..." type="text">
+					</div>
+				</div>
+				<div class="row form-row">
+					<div class="col-label">
+						<label class="form-label" for="serviceUrl">Service URL</label>
+					</div>
+					<div class="col">
+						<input id="serviceUrl" formControlName="serviceUrl" class="form-control" placeholder="E.g. https://geonetwork.nci.org.au/geonetwork/srv/eng/csw" type="text">
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-label"></div>
+					<div class="col form-tip">The Catalogue Service for the Web (CSW) URL.</div>
+				</div>
+				<div class="row form-row">
+					<div class="col-label">
+						<label class="form-label" for="recordUrl">Record URL</label>
+					</div>
+					<div class="col">
+						<input id="recordUrl" formControlName="recordUrl" class="form-control" placeholder="E.g. https://geonetwork.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s" type="text">
+					</div>
+					<div class="col-auto">
+						<input id="override-recordurl" type="checkbox" formControlName="overrideRecordUrl">&nbsp;Custom Record URL&nbsp;
+						<i class="fa fa-info-circle" title="The record URL will be constructed from the service URL unless this option is checked"></i>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-label"></div>
+					<div class="col form-tip">The record information URL. Note the "%1$s" pattern which is used for file identifier substitution.</div>
+				</div>
+			</div>			
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-secondary" (click)="activeModal.close()">Cancel</button>
+		<button class="btn btn-primary" (click)="saveRegistry()" type="submit" [disabled]="!registryForm.valid">Add Registry</button>
+	</div>
+</form>
