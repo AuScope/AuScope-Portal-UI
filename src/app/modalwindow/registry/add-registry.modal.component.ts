@@ -3,6 +3,9 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Registry } from 'app/menupanel/data-explorer/data-model';
 import { v4 as uuidv4 } from 'uuid';
+import { environment } from 'environments/environment';
+
+declare let gtag: Function;
 
 @Component({
   selector: 'add-registry-modal-window',
@@ -73,6 +76,12 @@ export class AddRegistryModalComponent implements OnInit {
    * Add registry to registry list
    */
   saveRegistry() {
+    if (environment.googleAnalyticsKey && typeof gtag === 'function') {
+      gtag('event', 'AddCustomRegistry',  {
+        event_category: 'AddCustomRegistry',
+        event_action: 'AddCustomRegistry:' + this.registryForm.get('serviceUrl').value
+      });
+    }
     const id = uuidv4();
     const registry: Registry = {
       id: 'user-registry-' + id,
