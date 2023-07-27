@@ -2,14 +2,14 @@ import { DataExplorerService } from "./data-explorer.service";
 import { Observable, Subject, merge } from "rxjs";
 import { Component, OnInit, ViewChild, ElementRef} from "@angular/core";
 import { filter, debounceTime, distinctUntilChanged,  map} from "rxjs/operators";
-import { Bbox, CsMapService, CSWRecordModel,  LayerModel,  OnlineResourceModel,  UtilitiesService} from "@auscope/portal-core-ui";
-import { NgbTypeahead } from "@ng-bootstrap/ng-bootstrap";
+import { Bbox, CsMapService, LayerModel,  UtilitiesService} from "@auscope/portal-core-ui";
+import { NgbModal, NgbTypeahead } from "@ng-bootstrap/ng-bootstrap";
 import { UILayerModelService } from "app/services/ui/uilayer-model.service";
 import { RenderStatusService } from "@auscope/portal-core-ui";
 import { Registry } from "./data-model";
 import { RectangleEditorObservable } from "@auscope/angular-cesium";
 import { UILayerModel } from "../common/model/ui/uilayer.model";
-import { environment } from "environments/environment";
+import { AddRegistryModalComponent } from "app/modalwindow/registry/add-registry.modal.component";
 
 @Component({
   selector: "[appDataExplorer]",
@@ -17,7 +17,7 @@ import { environment } from "environments/environment";
   styleUrls: ["../menupanel.scss", "./data-explorer.component.scss" ],
   providers: [DataExplorerService],
 })
-export class DataExplorerComponent implements OnInit{
+export class DataExplorerComponent implements OnInit {
   bbox: Bbox;
   public cswRegistries = [];
 
@@ -77,7 +77,8 @@ export class DataExplorerComponent implements OnInit{
     private csMapService: CsMapService,
     private dataExplorerService: DataExplorerService,
     private renderStatusService: RenderStatusService,
-    private uiLayerModelService: UILayerModelService
+    private uiLayerModelService: UILayerModelService,
+    private modalService: NgbModal
   ) { }
 
   ngOnInit() {
@@ -187,18 +188,17 @@ export class DataExplorerComponent implements OnInit{
     }
 
     // Spatial bounds
-    let me = this;
-    if (me.bbox != null) {
+    if (this.bbox != null) {
       fields.push("bbox");
       let boundsStr =
         '{"northBoundLatitude":' +
-        me.bbox.northBoundLatitude +
+        this.bbox.northBoundLatitude +
         ',"southBoundLatitude":' +
-        me.bbox.southBoundLatitude +
+        this.bbox.southBoundLatitude +
         ',"eastBoundLongitude":' +
-        me.bbox.eastBoundLongitude +
+        this.bbox.eastBoundLongitude +
         ',"westBoundLongitude":' +
-        me.bbox.westBoundLongitude +
+        this.bbox.westBoundLongitude +
         ',"crs":"EPSG:4326"}';
       values.push(boundsStr);
       types.push("bbox");
@@ -216,7 +216,7 @@ export class DataExplorerComponent implements OnInit{
     });
 
     // Available services
-    for (let service of this.availableServices) {
+    for (const service of this.availableServices) {
       if (service.checked) {
         fields.push("servicetype");
         values.push(service.name);
@@ -246,47 +246,35 @@ export class DataExplorerComponent implements OnInit{
         if (registry.checked) {
           registry.searching = true;
           registry.searchError = null;
-          this.dataExplorerService
-            .getFacetedSearch(
-              registry.id,
-              registry.startIndex,
-              this.CSW_RECORD_PAGE_LENGTH,
-              registry.title,
-              fields,
-              values,
-              types,
-              comparisons
-            )
-            //this.dataExplorerService.getFilteredCSWRecords(registry, this.CSW_RECORD_PAGE_LENGTH)
-            .subscribe(
-              (response) => {
-                registry.prevIndices.push(registry.startIndex);
-                registry.startIndex = response["data"].nextIndexes[registry.id];
-                registry.recordsMatched = response["data"].recordsMatched;
-                if (
-                  response["data"].hasOwnProperty("searchErrors") &&
-                  response["data"].searchErrors[registry.id] != null
-                ) {
-                  registry.searchError =
-                    response["data"].searchErrors[registry.id];
-                }
-                for (const item of response["itemLayers"]) {
-                  const uiLayerModel = new UILayerModel(item.id, this.renderStatusService.getStatusBSubject(item));
-                  this.uiLayerModelService.setUILayerModel(item.id, uiLayerModel);                  
-                }
-                response["itemLayers"].useDefaultProxy = true;
-                response["itemLayers"].useProxyWhitelist = false;
 
-                this.cswSearchResults.set(registry.id, response["itemLayers"]);
-                registry.searching = false;
+          this.dataExplorerService.getFacetedSearchForUserRegistry(registry.id, registry.title, registry.serviceUrl, registry.recordUrl, registry.type,
+                registry.startIndex, this.CSW_RECORD_PAGE_LENGTH, fields, values, types, comparisons).subscribe(response => {
+            registry.prevIndices.push(registry.startIndex);
+            registry.startIndex = response["data"].nextIndexes[registry.id];
+            registry.recordsMatched = response["data"].recordsMatched;
+            if (
+              response["data"].hasOwnProperty("searchErrors") &&
+              response["data"].searchErrors[registry.id] != null
+            ) {
+              registry.searchError =
+                response["data"].searchErrors[registry.id];
+            }
+            for (const item of response["itemLayers"]) {
+              const uiLayerModel = new UILayerModel(item.id, this.renderStatusService.getStatusBSubject(item));
+              this.uiLayerModelService.setUILayerModel(item.id, uiLayerModel);                  
+            }
+            response["itemLayers"].useDefaultProxy = true;
+            response["itemLayers"].useProxyWhitelist = false;
 
-                this.searchResultsIsCollapsed = false;
-                //this.searchResultsElement.nativeElement.scrollIntoView(false);
-              }, () => {
-                this.cswSearchResults.set(serviceId, null);
-                registry.searching = false;
-              }
-            );
+            this.cswSearchResults.set(registry.id, response["itemLayers"]);
+            registry.searching = false;
+
+            this.searchResultsIsCollapsed = false;
+            //this.searchResultsElement.nativeElement.scrollIntoView(false);
+          }, () => {
+            this.cswSearchResults.set(serviceId, null);
+            registry.searching = false;
+          });
         }
       }
     );
@@ -313,18 +301,17 @@ export class DataExplorerComponent implements OnInit{
     }
 
     // Spatial bounds
-    let me = this;
-    if (me.bbox != null) {
+    if (this.bbox != null) {
       fields.push("bbox");
       let boundsStr =
         '{"northBoundLatitude":' +
-        me.bbox.northBoundLatitude +
+        this.bbox.northBoundLatitude +
         ',"southBoundLatitude":' +
-        me.bbox.southBoundLatitude +
+        this.bbox.southBoundLatitude +
         ',"eastBoundLongitude":' +
-        me.bbox.eastBoundLongitude +
+        this.bbox.eastBoundLongitude +
         ',"westBoundLongitude":' +
-        me.bbox.westBoundLongitude +
+        this.bbox.westBoundLongitude +
         ',"crs":"EPSG:4326"}';
       values.push(boundsStr);
       types.push("bbox");
@@ -342,7 +329,7 @@ export class DataExplorerComponent implements OnInit{
     });
 
     // Available services
-    for (let service of this.availableServices) {
+    for (const service of this.availableServices) {
       if (service.checked) {
         fields.push("servicetype");
         values.push(service.name);
@@ -357,8 +344,8 @@ export class DataExplorerComponent implements OnInit{
       fields.push("dateto");
       // For some reason getMilliseconds doesn't work on these Date objects,
       // so parse from string
-      let fromDate = Date.parse(this.dateFrom.toString());
-      let toDate = Date.parse(this.dateTo.toString());
+      const fromDate = Date.parse(this.dateFrom.toString());
+      const toDate = Date.parse(this.dateTo.toString());
       values.push(fromDate.toString());
       values.push(toDate.toString());
       types.push("date");
@@ -370,45 +357,31 @@ export class DataExplorerComponent implements OnInit{
     registry.searching = true;
     registry.searchError = null;
 
-    this.dataExplorerService
-      .getFacetedSearch(
-        registry.id,
-        registry.startIndex,
-        this.CSW_RECORD_PAGE_LENGTH,
-        registry.title,
-        fields,
-        values,
-        types,
-        comparisons
-      )
-      .subscribe(
-        (response) => {
-          registry.prevIndices.push(registry.startIndex);
-          registry.startIndex = response["data"].nextIndexes[registry.id];
-          registry.recordsMatched = response["data"].recordsMatched;
-          if ((<CSWRecordModel[]>response["data"].records).length > 0) {
-            for (let i = 0; i < response["itemLayers"].length; i++) {
-              response["itemLayers"].useDefaultProxy = true;
-              response["itemLayers"].useProxyWhitelist = false;
-            }
-            this.cswSearchResults.set(registry.id, response["itemLayers"]);
-          }
-          if (
-            response["data"].searchErrors &&
-            response["data"].searchErrors.length > 0
-          ) {
-            registry.searchError = response["data"].searchErrors[registry.id];
-          }
-          registry.searching = false;
-          this.searchResultsIsCollapsed = false;
-          // this.searchResultsElement.nativeElement.scrollIntoView(false);
-        },
-        (error) => {
-          this.cswSearchResults.set(registry.id, null);
-          registry.searchError = error.message;
-          registry.searching = false;
-        }
-      );
+    this.dataExplorerService.getFacetedSearchForUserRegistry(registry.id, registry.title, registry.serviceUrl, registry.recordUrl, registry.type,
+      registry.startIndex, this.CSW_RECORD_PAGE_LENGTH, fields, values, types, comparisons).subscribe(response => {
+      registry.prevIndices.push(registry.startIndex);
+      registry.startIndex = response["data"].nextIndexes[registry.id];
+      registry.recordsMatched = response["data"].recordsMatched;
+
+      for (const item of response["itemLayers"]) {
+        const uiLayerModel = new UILayerModel(item.id, this.renderStatusService.getStatusBSubject(item));
+        this.uiLayerModelService.setUILayerModel(item.id, uiLayerModel);                  
+      }
+      response["itemLayers"].useDefaultProxy = true;
+      response["itemLayers"].useProxyWhitelist = false;
+      if (response["data"].searchErrors && response["data"].searchErrors.length > 0) {
+        registry.searchError = response["data"].searchErrors[registry.id];
+      }
+
+      this.cswSearchResults.set(registry.id, response["itemLayers"]);
+      registry.searching = false;
+      this.searchResultsIsCollapsed = false;
+      // this.searchResultsElement.nativeElement.scrollIntoView(false);
+    }, error => {
+      this.cswSearchResults.set(registry.id, null);
+      registry.searchError = error.message;
+      registry.searching = false;
+    });
   }
 
   /**
@@ -620,4 +593,20 @@ export class DataExplorerComponent implements OnInit{
     }
     return false;
   }
+
+  /**
+   * Add Registry button click, show dialog for adding new registry
+   */
+  public addRegistry() {
+    const modalRef = this.modalService.open(AddRegistryModalComponent, {
+      size: 'lg',
+      backdrop: false
+    });
+    modalRef.result.then((registry: Registry) => {
+      if (registry) {
+        this.availableRegistries.set(registry.id, registry);
+      }
+    }, () => {});
+  }
+
 }
