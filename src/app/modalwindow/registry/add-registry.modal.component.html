@@ -10,7 +10,7 @@
 						<label class="form-label" for="name">Name</label>
 					</div>
 					<div class="col">
-						<input id="name" formControlName="name" class="form-control" placeholder="Enter name..." type="text">
+						<input #nameField id="name" formControlName="name" class="form-control" placeholder="Enter name..." type="text" (keyup.enter)="onEnter()" autofocus>
 					</div>
 				</div>
 				<div class="row form-row">
@@ -18,7 +18,7 @@
 						<label class="form-label" for="serviceUrl">Service URL</label>
 					</div>
 					<div class="col">
-						<input id="serviceUrl" formControlName="serviceUrl" class="form-control" placeholder="E.g. https://geonetwork.nci.org.au/geonetwork/srv/eng/csw" type="text">
+						<input id="serviceUrl" formControlName="serviceUrl" class="form-control" placeholder="E.g. https://geonetwork.nci.org.au/geonetwork/srv/eng/csw" type="text" (keyup.enter)="onEnter()">
 					</div>
 				</div>
 				<div class="row">
@@ -30,7 +30,7 @@
 						<label class="form-label" for="recordUrl">Record URL</label>
 					</div>
 					<div class="col">
-						<input id="recordUrl" formControlName="recordUrl" class="form-control" placeholder="E.g. https://geonetwork.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s" type="text">
+						<input id="recordUrl" formControlName="recordUrl" class="form-control" placeholder="E.g. https://geonetwork.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s" type="text" (keyup.enter)="onEnter()">
 					</div>
 					<div class="col-auto">
 						<input id="override-recordurl" type="checkbox" formControlName="overrideRecordUrl">&nbsp;Custom Record URL&nbsp;
@@ -44,7 +44,7 @@
 			</div>			
 	</div>
 	<div class="modal-footer">
-		<button class="btn btn-secondary" (click)="activeModal.close()">Cancel</button>
+		<button class="btn btn-secondary" (click)="activeModal.close()" type="button">Cancel</button>
 		<button class="btn btn-primary" (click)="saveRegistry()" type="submit" [disabled]="!registryForm.valid">Add Registry</button>
 	</div>
 </form>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Registry } from 'app/menupanel/data-explorer/data-model';
@@ -12,7 +12,9 @@ declare let gtag: Function;
   templateUrl: './add-registry.modal.component.html',
   styleUrls: ['./add-registry.component.scss']
 })
-export class AddRegistryModalComponent implements OnInit {
+export class AddRegistryModalComponent implements OnInit, AfterViewInit {
+
+  @ViewChild('nameField') nameField: ElementRef;
 
   overrideRecordUrl = false;
 
@@ -37,6 +39,7 @@ export class AddRegistryModalComponent implements OnInit {
         this.registryForm.patchValue({recordUrl: url});
       }
     });
+    // Enable/disable record URL, attempt to build record URL if disabled
     this.registryForm.get('overrideRecordUrl').valueChanges.subscribe(override => {
       if (override) {
         this.registryForm.get('recordUrl').enable();
@@ -47,6 +50,13 @@ export class AddRegistryModalComponent implements OnInit {
         });
       }
     });
+  }
+
+  /**
+   * Focus name field by default
+   */
+  ngAfterViewInit() {
+    this.nameField.nativeElement.focus();
   }
 
   /**
@@ -97,6 +107,15 @@ export class AddRegistryModalComponent implements OnInit {
       currentPage: 1
     }
     this.activeModal.close(registry);
+  }
+
+  /**
+   * If the user presses Enter when in a text field and the form is valid, save registry
+   */
+  public onEnter() {
+    if (this.registryForm.valid) {
+      this.saveRegistry();
+    }
   }
 
 }
