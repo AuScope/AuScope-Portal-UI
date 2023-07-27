@@ -606,7 +606,7 @@ export class DataExplorerComponent implements OnInit {
       if (registry) {
         this.availableRegistries.set(registry.id, registry);
       }
-    });
+    }, () => {});
   }
 
 }
