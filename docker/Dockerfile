@@ -45,7 +45,7 @@ RUN ./make_timestamp.sh $BUILDTYPE > ./src/app/menupanel/portal-details-panel/po
 RUN npm link @auscope/portal-core-ui && npm run $BUILDTYPE
 
 # Second image, install website
-FROM debian:bullseye-20230502
+FROM debian:11
 
 ENV appdir /usr/src/app
 
