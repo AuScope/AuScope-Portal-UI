@@ -380,21 +380,10 @@ export class CsMapComponent implements AfterViewInit {
             if (!params) {
               continue;
             }
-            let sldBody = maplayer.sldBody;
             let postMethod = false;
             let infoFormat: string;
-            if (sldBody) {
-              postMethod = true;
-            } else {
-              sldBody = '';
-            }
 
-            // WMS 1.3.0 GetFeatureInfo requests will have had their lat,lng coords swapped to lng,lat
-            if (maplayer.sldBody130) {
-              sldBody = maplayer.sldBody130;
-            }
-
-            // Layer specific SLD_BODY, INFO_FORMAT and postMethod
+            // Layer specific INFO_FORMAT and postMethod
             if (onlineResource.name.indexOf('ProvinceFullExtent') >= 0) {
               infoFormat = 'application/vnd.ogc.gml';
             } else {
@@ -403,7 +392,6 @@ export class CsMapComponent implements AfterViewInit {
 
             if (UtilitiesService.isArcGIS(onlineResource)) {
               infoFormat = 'text/xml';
-              sldBody = '';
               postMethod = false;
             }
 
@@ -420,25 +408,22 @@ export class CsMapComponent implements AfterViewInit {
               infoFormat = 'text/xml';
             }
 
-            this.queryWMSService.getFeatureInfo(onlineResource, sldBody, infoFormat, postMethod,
-              maplayer.clickCoord[0], maplayer.clickCoord[1], params.x, params.y, params.width, params.height, params.bbox).subscribe(
-                result => {
-                  const feature = {onlineResource: onlineResource, layer: maplayer};
-                  // Display the modal, but only if there are features
-                  const num_feats = this.setModal(maplayer.id, result, feature, mapClickInfo.clickCoord);
+            this.queryWMSService.getFeatureInfo(onlineResource, infoFormat, postMethod, maplayer.clickCoord[0],
+              maplayer.clickCoord[1], params.x, params.y, params.width, params.height, params.bbox).subscribe(result => {
+                const feature = { onlineResource: onlineResource, layer: maplayer };
+                // Display the modal, but only if there are features
+                const num_feats = this.setModal(maplayer.id, result, feature, mapClickInfo.clickCoord);
 
-                  // If zoom level is too low and nothing is found then show zoom message
-                  if (num_feats === 0 && params.level <= 3) {
-                    this.displayModal(mapClickInfo.clickCoord);
-                    this.bsModalRef.content.downloading = false;
-                    this.bsModalRef.content.showZoomMsg = true;
-                  }
-                },
-                err => {
-                  this.bsModalRef.content.onDataChange();
+                // If zoom level is too low and nothing is found then show zoom message
+                if (num_feats === 0 && params.level <= 3) {
+                  this.displayModal(mapClickInfo.clickCoord);
                   this.bsModalRef.content.downloading = false;
+                  this.bsModalRef.content.showZoomMsg = true;
                 }
-              );
+              }, () => {
+                this.bsModalRef.content.onDataChange();
+                this.bsModalRef.content.downloading = false;
+              });
           }
         }
       }
