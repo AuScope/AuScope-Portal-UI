@@ -384,6 +384,7 @@ export class CsMapComponent implements AfterViewInit {
             let postMethod = false;
             let infoFormat: string;
             if (sldBody) {
+              sldBody = SimpleXMLService.extractIntersectsFiltersFromSld(sldBody);
               postMethod = true;
             } else {
               sldBody = '';
@@ -444,7 +445,6 @@ export class CsMapComponent implements AfterViewInit {
       }
     }
   }
-
 
   /**
    * Convert CSW record to HTML for display
