@@ -22,6 +22,21 @@
         .tab-content {
             padding: 15px 15px 6px 15px;
         }
+
+        .mat-ripple {
+            display: none !important;
+        }
+
+        .mdc-slider {
+            height: 24px;
+            margin: 0 6px;
+        }
+
+        .mdc-slider .mdc-slider__thumb {
+            left: -12px;
+            height: 24px;
+            width: 24px;
+        }
     }
 
     .top-layer-btn-panel {
