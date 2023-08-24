@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CsMapService, LayerModel, ManageStateService } from '@auscope/portal-core-ui';
+import { CsMapService, LayerModel, ManageStateService, ResourceType, UtilitiesService } from '@auscope/portal-core-ui';
 import { AdvancedComponentService } from './advanced-component.service';
 import { LegendUiService } from '../legend/legend-ui.service';
 import { UILayerModelService } from './uilayer-model.service';
@@ -65,8 +65,9 @@ export class LayerManagerService {
     this.legendUiService.removeLegend(layer.id);
 
     // Add layer to map in Cesium
-    this.csMapService.addLayer(layer, param);
 
+    this.csMapService.addLayer(layer, param);
+    
     // Add a new layer in the layer state service
     this.manageStateService.addLayer(
       layer.id,
