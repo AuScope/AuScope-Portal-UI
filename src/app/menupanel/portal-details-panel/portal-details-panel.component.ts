@@ -5,7 +5,7 @@ import { DisclaimerModalComponent } from '../../modalwindow/disclaimer/disclaime
 @Component({
   selector: '[appPortalDetailsPanel]',
   templateUrl: './portal-details-panel.component.html',
-  styleUrls: ['./portal-details-panel.component.css']
+  styleUrls: ['./portal-details-panel.component.scss']
 })
 export class PortalDetailsPanelComponent {
 
