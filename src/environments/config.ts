@@ -213,7 +213,11 @@ export const config = {
     'lawn-hill-plat-and-leic-rive-faul-trou-meas-stra-sect-onli-gis',
     'pred-mine-disc-in-the-east-yilg-crat-an-exam-of-dist-targ-of-an-orog-gold-mine-syst',
     'fina-repo-3d-geol-mode-of-the-east-yilg-crat-proj-pmd-y2-sept-2001-dece-2004',
-    'cate-3-expl-lice-poly-of-tasm-min-reso-tasm'
+    'cate-3-expl-lice-poly-of-tasm-min-reso-tasm',
+    'auscope-mt-collection-1',
+    'auscope-mt-collection-2',
+    'auscope-mt-collection-3',
+    'auscope-mt-collection-4'
   ],
   // Layers that require a JSON response for WMS GetFeature requests
   wmsGetFeatureJSON: [
