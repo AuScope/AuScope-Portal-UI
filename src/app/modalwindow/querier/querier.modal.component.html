@@ -1,7 +1,8 @@
 
 <!-- Modal for querier-->
-<div class="modal-header">
-	<h1 class="page-header">Response: <small>Feature Info result</small></h1>
+<div cdkDrag cdkDragRootElement=".modal-content" #childElement cdkDragBoundary="body">
+<div class="modal-header" cdkDragHandle>
+	<h1 class="page-header">Feature Information</h1>
 </div>
 <div class="modal-body">
 
@@ -28,7 +29,7 @@
 				</div>
 				<div *ngFor="let doc of docs | querierFeatureSearchPipe:selectLayerNameFilter; let i = index;" class="card card-default card-bordered">
 					<!-- BEGIN card-header -->
-					<div class="card-header">
+					<div class="card-header" >
 						<h4 class="card-title">
 							<a (click)="transformToHtml(doc)" *ngIf="doc.node_name !== null" class="accordion-link" data-toggle="collapse" href="#doc-collapse{{i}}">
 								{{doc.layer.name}}{{doc.node_name ? ': ' + doc.node_name : ''}}&nbsp;<i *ngIf="transformingToHtml[doc.key] && doc.expanded" class="fa fa-spinner fa-spin"></i>
@@ -120,7 +121,7 @@
 				<!-- BEGIN card -->
 				<div *ngFor="let html of htmls | querierFeatureSearchPipe:selectLayerNameFilter; let i = index" class="card card-default card-bordered">
 					<!-- BEGIN card-header -->
-					<div class="card-header">
+					<div class="card-header" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
 						<h4 class="card-title">
 							<a class="accordion-link"  data-toggle="collapse" href="#html-collapse{{i}}">
 								{{html.key}}
@@ -143,4 +144,5 @@
 </div>
 <div class="modal-footer">
 	<button type="button" class="btn btn-light" (click)="bsModalRef.hide()">Close</button>
+</div>
 </div>
