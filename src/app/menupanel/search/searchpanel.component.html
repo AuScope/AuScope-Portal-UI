@@ -129,6 +129,7 @@
                 <label><strong>{{ getSearchResultsTitle() }}</strong></label>
                 <button *ngIf="!showingAllLayers" title="Show all layers" class="btn btn-sm btn-danger clear-search-results-button" type="button" (click)="showAllLayers()"><i class="fa fa-ban"></i>&nbsp;Clear</button>
             </div>
+
             <div class="results-list">
                 <!-- Accordion layout with filter/download/info options -->
                 <div *ngFor="let searchResult of paginatedSearchResults();" [id]="searchResult.layer.id">
@@ -137,12 +138,32 @@
                         <button *ngIf="!isLayerAdded(searchResult.layer.id)" [disabled]="!csMapService.isMapSupportedLayer(searchResult.layer)" style="float:right;width:6em;padding:2px;" class="btn btn-sm btn-success" type="button" title="Add layer" (click)="addLayer(searchResult.layer)"><i class="fa fa-plus-circle"></i>&nbsp;Add</button>
                         <button *ngIf="isLayerAdded(searchResult.layer.id)" style="float:right;width:8em;padding:2px;" class="btn btn-sm btn-danger" type="button" title="Remove layer" (click)="removeLayer($event, searchResult.layer)"><i class="fa fa-trash"></i>&nbsp;Remove</button>
                         <button style="float:right;width:6em;padding:2px;margin-left:8px;" class="btn btn-sm btn-info" type="button" title="Layer information" (click)="showLayerInformation($event, searchResult.layer)"><i class="fa fa-info-circle"></i>&nbsp;Info</button>
-                    </button>
+                        <button style="float:right;width:6em;padding:2px;margin-left:8px;" class="btn btn-sm btn-primary" type="button" title="Add to download" ><input *ngIf="isCsvDownloadable(searchResult.layer)" type="checkbox" class="faChkSqr" [checked]="mapDownloadLayers.get(searchResult.layer.id)" (change)="OnChangeDownloadLayers(searchResult.layer)"></button>
+                   </button>
                 </div>
             </div>
-            <!-- Pagination if more than one page of search results -->
             <div class="pagination" *ngIf="searchResults.length > resultsPerPage">
                 <ngb-pagination [collectionSize]="searchResults.length" [(page)]="currentPage" [maxSize]="5" [pageSize]="resultsPerPage" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>
+            </div>
+            <div *ngIf="mapDownloadLayers.size > 0" class="results-list">
+                <hr/>
+                <div class="search-results-title">
+                    <label ><strong>Selected Layers To Download:</strong></label>
+                    <button title="Clear all layers" class="btn btn-sm btn-danger clear-search-results-button" type="button" (click)="clearDownloadLayers()"><i class="fa fa-ban"></i>&nbsp;Clear</button>
+                    <span class="layer-header-label">Layers:{{total0}}:{{completed0}}</span>
+                    <span class="layer-header-label">Files:{{total}}:{{completed}}</span>
+                    <button title="Download all layers" style="float:right;padding:2px;margin:2px;" class="btn btn-sm btn-success clear-search-results-button" type="button" (click)="downloadAll()"><i class="fa fa-download"></i>All</button>
+                </div>
+                <!-- DownloadLayers list -->
+                <div *ngFor="let downloadLayer of mapDownloadLayers | keyvalue">
+                    <button style="line-height:1.7em;height:2.2em;padding:2px 5px 0px 5px;margin-bottom:2px;" class="btn layer-header" >
+                        <button style="float:right;padding:2px;margin-left:8px;" class="btn btn-sm btn-primary" type="button" title="Click to remove" (click)="removeDownloadLayer(downloadLayer.value.Layer)"><i class="fa fa-close" style="color:red"></i></button>
+                        <span class="layer-header-label" title="{{downloadLayer.value.Layer.name}}">{{ downloadLayer.value.Layer.name }}</span>
+						<!--mat-progress-bar *ngIf= "downloadLayer.value.Ob | async as download" [mode]="download.state === 'PENDING' ? 'buffer' : 'determinate'" [value]="download.progress"></mat-progress-bar-->
+                        <mat-progress-bar *ngIf= "downloadLayer.value.Ob" style="height: 10px;" [mode]="determinate" [value]="downloadLayer.value.Ob.progress" ></mat-progress-bar>
+                        <button style="float:right;padding:2px;margin-left:8px;" class="btn btn-sm btn-primary" type="button" title="Click to download" (click)="downloadAsCSV(downloadLayer.value.Layer)"><i class="fa fa-download"></i></button>
+                   </button>
+                </div>
             </div>
         </div>
     </div>
