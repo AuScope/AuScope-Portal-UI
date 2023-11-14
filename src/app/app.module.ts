@@ -80,6 +80,7 @@ import { LegendModalComponent } from './modalwindow/legend/legend.modal.componen
 import { PermanentLinksModalComponent } from './modalwindow/permanentlink/permenantlinks.modal.component';
 import { CreatePermanentLinkModalComponent } from './modalwindow/permanentlink/create-permanentlink.modal.component';
 
+import { AddRegistryModalComponent } from './modalwindow/registry/add-registry.modal.component';
 import { ConfirmModalComponent } from './modalwindow/confirm/confirm.modal.component';
 
 // Services
@@ -96,7 +97,6 @@ import { LayerManagerService } from './services/ui/layer-manager.service';
 import * as PlotlyJS from 'plotly.js-dist-min/plotly.min.js';
 import { PlotlyModule } from 'angular-plotly.js';
 
-// import { CatalogueSearchComponent } from './menupanel/cataloguesearch/cataloguesearch.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DataExplorerComponent } from './menupanel/data-explorer/data-explorer.component';
 import { DataExplorerdRecordModule } from './menupanel/data-explorer-record/data-explorer-record.modules';
@@ -118,6 +118,8 @@ import { UserStateService } from './services/user/user-state.service';
 import { AuthGuard } from './services/auth/auth.guard';
 import { AuthService } from './services/auth/auth.service';
 import { LayerGroupComponent } from './menupanel/custompanel/layergroup.component';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthErrorHandlerInterceptor } from './interceptors/auth-error.interceptor';
 
 PlotlyModule.plotlyjs = PlotlyJS;
 
@@ -169,11 +171,17 @@ PlotlyModule.plotlyjs = PlotlyJS;
         LegendModalComponent,
         PermanentLinksModalComponent,
         CreatePermanentLinkModalComponent,
+        AddRegistryModalComponent,
         ConfirmModalComponent
     ],
     providers: [ AuscopeApiService, FilterService, RectanglesEditorService, AdvancedComponentService, SearchService,
                  NVCLService, MSCLService, BoundsService, GraceService, { provide: SAVER, useFactory: getSaver },
-                 LegendUiService, UserStateService, LayerManagerService, AuthGuard, AuthService
+                 LegendUiService, UserStateService, LayerManagerService, AuthGuard, AuthService,
+                 {
+                    provide: HTTP_INTERCEPTORS,
+                    useClass: AuthErrorHandlerInterceptor,
+                    multi: true,
+                 }
     ],
     imports: [
         PortalCoreModule.forRoot(environment, config),

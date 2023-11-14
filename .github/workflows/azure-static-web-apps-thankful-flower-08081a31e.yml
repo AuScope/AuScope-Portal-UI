@@ -4,12 +4,12 @@ on:
   push:
     branches:
       # this will be prod so set filters here to control when a release is pushed to the prod static web app
-      - master
+      - Release-6.3.0
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
       # and here
-      - master
+      - Release-6.3.0
 
 jobs:
   build_and_deploy_job:
@@ -23,7 +23,7 @@ jobs:
       - uses: jsdaniell/create-json@v1.2.2
         with:
           name: "context.json"
-          json: '{"portalBaseUrl":"${{ vars.AZURE_PORTAL_API_URL_PROD }}","hostUrl":"${{ vars.AZURE_PORTAL_URL_PROD }}","authBaseUrl":"${{ vars.AZURE_PORTAL_URL_PROD }}/api/"}'
+          json: '{"portalBaseUrl":"${{ vars.AZURE_PORTAL_API_URL_PROD }}","hostUrl":"${{ vars.AZURE_PORTAL_URL_PROD }}","authBaseUrl":"${{ vars.AZURE_PORTAL_URL_PROD }}/api/", "googleAnalyticsKey": "${{ secrets.PROD_GOOGLE_ANALYTICS_KEY }}" }'
           dir: 'src/contexts/'
       - name: Build And Deploy
         id: builddeploy

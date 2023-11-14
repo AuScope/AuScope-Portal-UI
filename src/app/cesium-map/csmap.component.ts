@@ -307,8 +307,9 @@ export class CsMapComponent implements AfterViewInit {
           this.displayModal(mapClickInfo.clickCoord);
           const handler = new IrisQuerierHandler(layer, entity);
           this.setModalHTML(handler.getHTML(), layer.name+": "+handler.getFeatureName(), entity, this.bsModalRef);
-        // KML layers
-        } else if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.KML))) {
+        // KML/KMZ layers
+        } else if ((layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.KML)))||
+                  (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.KMZ)))) {
           this.displayModal(mapClickInfo.clickCoord);
           const handler = new KMLQuerierHandler(entity);
           this.setModalHTML(handler.getHTML(), layer.name+": "+handler.getFeatureName(), entity, this.bsModalRef);
@@ -384,6 +385,7 @@ export class CsMapComponent implements AfterViewInit {
             let postMethod = false;
             let infoFormat: string;
             if (sldBody) {
+              sldBody = SimpleXMLService.extractIntersectsFiltersFromSld(sldBody);
               postMethod = true;
             } else {
               sldBody = '';
@@ -401,7 +403,7 @@ export class CsMapComponent implements AfterViewInit {
               infoFormat = 'application/vnd.ogc.gml/3.1.1';
             }
 
-            if (UtilitiesService.isArcGIS(onlineResource)) {
+            if (UtilitiesService.resourceIsArcGIS(onlineResource)) {
               infoFormat = 'text/xml';
               sldBody = '';
               postMethod = false;
@@ -421,30 +423,26 @@ export class CsMapComponent implements AfterViewInit {
             }
 
             this.queryWMSService.getFeatureInfo(onlineResource, sldBody, infoFormat, postMethod,
-              maplayer.clickCoord[0], maplayer.clickCoord[1], params.x, params.y, params.width, params.height, params.bbox).subscribe(
-                result => {
-                  const feature = {onlineResource: onlineResource, layer: maplayer};
-                  // Display the modal, but only if there are features
-                  const num_feats = this.setModal(maplayer.id, result, feature, mapClickInfo.clickCoord);
+              maplayer.clickCoord[0], maplayer.clickCoord[1], params.x, params.y, params.width, params.height, params.bbox).subscribe(result => {
+                const feature = {onlineResource: onlineResource, layer: maplayer};
+                // Display the modal, but only if there are features
+                const num_feats = this.setModal(maplayer.id, result, feature, mapClickInfo.clickCoord);
 
-                  // If zoom level is too low and nothing is found then show zoom message
-                  if (num_feats === 0 && params.level <= 3) {
-                    this.displayModal(mapClickInfo.clickCoord);
-                    this.bsModalRef.content.downloading = false;
-                    this.bsModalRef.content.showZoomMsg = true;
-                  }
-                },
-                err => {
-                  this.bsModalRef.content.onDataChange();
+                // If zoom level is too low and nothing is found then show zoom message
+                if (num_feats === 0 && params.level <= 3) {
+                  this.displayModal(mapClickInfo.clickCoord);
                   this.bsModalRef.content.downloading = false;
+                  this.bsModalRef.content.showZoomMsg = true;
                 }
-              );
+              }, () => {
+                this.bsModalRef.content.onDataChange();
+                this.bsModalRef.content.downloading = false;
+              });
           }
         }
       }
     }
   }
-
 
   /**
    * Convert CSW record to HTML for display
