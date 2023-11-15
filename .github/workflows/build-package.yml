@@ -2,10 +2,8 @@ name: Build package and archive
 
 on:
   push:
-    branches:
-      - master
   pull_request:
-    branches: [ main ]
+
 
 jobs:
   build:
