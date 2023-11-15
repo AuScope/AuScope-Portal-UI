@@ -7,7 +7,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { NVCLBoreholeAnalyticService } from './nvcl.boreholeanalytic.service';
 import { TSGDownloadService } from './tsgdownload.service';
 import { Download } from './tsgdownload';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { shareReplay } from 'rxjs/operators';
 
 @Component({
@@ -57,6 +57,11 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
     const me = this;
     me.total = me.urlsArray.length;
     me.completed = 0;
+    if (me.tsgDownloadService.downloadOneCompletBS) {
+      me.tsgDownloadService.downloadOneCompletBS.unsubscribe();
+      me.tsgDownloadService.downloadOneCompletBS = null;
+    }
+    me.tsgDownloadService.downloadOneCompletBS = new Subject<string>();
     me.tsgDownloadService.downloadOneCompletBS.subscribe(
       (message) => {
         if (message.startsWith('downloadOne')) {
@@ -64,6 +69,7 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
             let url = me.urlsArray[me.completed];
             let filename = url.substring(url.lastIndexOf('/')+1);
             me.download1$ = me.tsgDownloadService.download(url, filename ).pipe(shareReplay(1));
+            console.log('downloadOne:' + filename);
             me.download1$.subscribe(value => {
               if (value.state.startsWith('DONE')) {
                 me.completed++;
@@ -84,6 +90,11 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
    */
   ngAfterViewInit(): void {
     this.downloadWfsService.resetTSGDownloads();
+    if (this.downloadWfsService.tsgDownloadBS){
+      this.downloadWfsService.tsgDownloadBS.unsubscribe();
+      this.downloadWfsService.tsgDownloadBS = null;
+    }
+    this.downloadWfsService.tsgDownloadBS = new Subject<string>();
     this.downloadWfsService.tsgDownloadBS.subscribe(
         (message) => {
           let progressData =  message.split(',');

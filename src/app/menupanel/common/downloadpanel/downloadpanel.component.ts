@@ -11,6 +11,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { BoundsService } from 'app/services/bounds/bounds.service';
 import { NVCLService } from '../../../modalwindow/querier/customanalytic/nvcl/nvcl.service';
 import { shareReplay } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 declare var gtag: Function;
 
@@ -159,7 +160,13 @@ export class DownloadPanelComponent implements OnInit {
             this.polygonBbox = null;
           }
       });
-
+      //reset first this.downloadWfsService.tsgDownloadStartBS
+      if (this.downloadWfsService.tsgDownloadStartBS) {
+        this.downloadWfsService.tsgDownloadStartBS.unsubscribe();
+        this.downloadWfsService.tsgDownloadStartBS = null;
+      }
+      this.downloadWfsService.tsgDownloadStartBS = new Subject<string>();
+      //subscribe
       this.downloadWfsService.tsgDownloadStartBS.subscribe(
         (message) => {
           const progressData =  message.split(',');
@@ -649,8 +656,10 @@ export class DownloadPanelComponent implements OnInit {
     let observableResponse = null;
     // Download WFS features as CSV files
     if (this.polygonFilter) {
+      console.log('called:downloadTsgFileUrls.Polygon');
       observableResponse = this.downloadWfsService.downloadTsgFileUrls(this.layer, null, this.tsgDownloadEmail, this.polygonFilter).pipe(shareReplay(1));
     } else {
+      console.log('called:downloadTsgFileUrls');
       observableResponse = this.downloadWfsService.downloadTsgFileUrls(this.layer, this.bbox, this.tsgDownloadEmail, null).pipe(shareReplay(1));
     }
     let me = this;
