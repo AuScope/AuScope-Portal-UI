@@ -1,14 +1,17 @@
-import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, Inject, OnInit, ViewChild } from '@angular/core';
 import { RectangleEditorObservable } from '@auscope/angular-cesium';
 import { Bbox, CsMapService, LayerHandlerService, LayerModel, ManageStateService, UtilitiesService } from '@auscope/portal-core-ui';
 import { NgbDropdown, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SearchService } from 'app/services/search/search.service';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
-import { take } from 'rxjs/operators';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
 
+import { HttpClient, HttpHeaders, HttpParams, HttpUrlEncodingCodec } from '@angular/common/http';
+import { Download } from 'app/modalwindow/layeranalytic/nvcl/tsgdownload';
+import * as saveAs from 'file-saver';
+import { take } from 'rxjs/operators';
 const DEFAULT_RESULTS_PER_PAGE = 10;
 const SEARCH_FIELDS = [{
     name: 'Name',
@@ -69,6 +72,16 @@ export class SearchPanelComponent implements OnInit {
   private boundsRectangleObservable: RectangleEditorObservable;
   private drawBoundsStarted = false;
 
+  // DownloadLayers to CSV files.
+  private mapDownloadLayers = new Map<string, any>();
+  public total0: number=0;
+  public completed0:number=0;
+  public total:number=0;
+  public completed:number=0;
+  public isDownloading = false;
+  public downloadOneCompletS:Subject<string> = null;
+  public download1$: Observable<Download>;
+
   // Term suggestions
   @ViewChild('suggesterDropdown') suggesterDropdown: NgbDropdown;
   suggesterSubscription: Subscription;
@@ -78,7 +91,7 @@ export class SearchPanelComponent implements OnInit {
   constructor(private searchService: SearchService,
               private csMapService: CsMapService, private layerHandlerService: LayerHandlerService,
               private layerManagerService: LayerManagerService, private uiLayerModelService: UILayerModelService,
-              private manageStateService: ManageStateService, private modalService: NgbModal) { }
+              private manageStateService: ManageStateService, private modalService: NgbModal, private http: HttpClient, @Inject('env') private env) { }
 
   ngOnInit() {
     for (const service of OGC_SERVICES) {
@@ -208,6 +221,110 @@ export class SearchPanelComponent implements OnInit {
     return this.searchResults.slice(startPos, endPos);
   }
 
+  /**
+   * remove one Layer from  MapDownloadLayers
+   *
+   */
+  public removeDownloadLayer(layer: LayerModel){
+    console.log('removeDownloadLayer');
+    this.mapDownloadLayers.delete(layer.id);
+    return;
+  }
+  /**
+   * clearDownloadLayers
+   *
+   */
+  public clearDownloadLayers(){
+    console.log('clearDownloadLayers');
+    this.mapDownloadLayers.clear();
+    return;
+  }
+  /**
+   * OnChange for MapDownloadLayers
+   *
+   */
+  public OnChangeDownloadLayers(layer: LayerModel) {
+    if (!this.isCsvDownloadable(layer)) {
+      return;
+    }
+
+    if (layer.id) {
+      console.log(layer.name);
+      if (this.mapDownloadLayers.has(layer.id)) {
+        this.mapDownloadLayers.delete(layer.id);
+      } else {
+        let downloadOb = new Observable<Download>();
+        this.mapDownloadLayers.set(layer.id, {Layer:layer, Ob:null});
+      }
+    }
+  }
+  /**
+   * downloadAll event
+   *
+   */
+  public async downloadAll(){
+    console.log('downloadAll');
+    this.completed0 = 0;
+    this.total0 = this.mapDownloadLayers.size;
+    for(let key of this.mapDownloadLayers.keys()) {
+      await this.downloadAsCSV(this.mapDownloadLayers.get(key).Layer);
+      this.completed0++;
+    }
+    return;
+  }
+  /**
+   * isCsvDownloadable
+   *
+   */
+  public isCsvDownloadable(layer:LayerModel):boolean {
+    for (let i = 0; i < layer.cswRecords.length; i++) {
+      let cswRecord = layer.cswRecords[i];
+      let onlineResourcesWFS = cswRecord.onlineResources.find((item)=>item.type.toLowerCase().indexOf('wfs')>=0);
+      if (onlineResourcesWFS) {
+        return true;
+      }
+    }
+    return false;
+  }
+  /**
+   * downloadAsCSV for one layer.
+   * @param layer
+   */
+  public async downloadAsCSV(layer:LayerModel) {
+    //console.log("downloadAsCSV");
+    let me = this;
+    me.total = layer.cswRecords.length;
+    me.completed =0;
+    me.mapDownloadLayers.get(layer.id).Ob = {completed:me.completed,total:me.total};
+    for (let i = 0; i < layer.cswRecords.length; i++) {
+      let cswRecord = layer.cswRecords[i];
+      let onlineResourcesWFS = cswRecord.onlineResources.find((item)=>item.type.toLowerCase().indexOf('wfs')>=0);
+      if (!onlineResourcesWFS) {
+        continue;
+      }
+      let typename = onlineResourcesWFS.name;
+      let type = onlineResourcesWFS.type;
+      if (!type || type.toLowerCase().indexOf('wfs')<0 ) {
+        console.log('No WFS finded for');
+      }
+
+      let httpParams = new HttpParams({
+        encoder: new HttpUrlEncodingCodec(),
+      });
+
+      let url0 = onlineResourcesWFS.url;
+      let url1 = url0 + '?service=WFS&request=GetFeature&version=1.0.0&outputFormat=csv&maxFeatures=1000000&typeName=' + typename;
+      let url = me.env.portalBaseUrl + 'getViaProxy.do?usewhitelist=false&'+ httpParams.append('url',url1 ).toString();
+      let filename = typename + '.' + url0 + '.csv';
+      filename = filename.replace(/:|\/|\\/g,'-');
+      let ob = await this.http.get(url, { headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'), responseType: 'text'}).toPromise();
+      const blob = new Blob([ob], { type: 'application/csv' });
+      saveAs(blob, filename);
+      me.completed++;
+      me.mapDownloadLayers.get(layer.id).Ob.progress = Math.round(me.completed/me.total*100);
+      //console.log('downloaded:' + url);
+    }
+  }
   /**
    * Display layer information dialog
    *
