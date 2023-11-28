@@ -89,7 +89,7 @@ export class CustomPanelComponent {
     // Trim all whitespace, line terminators, quotes, back quotes and double quotes from ends of URL
     const leftTrimRe = /^[\s"'`]+/gms;
     const rightTrimRe = /[\s"'`]+$/gms;
-    const searchUrl = this.searchUrl.replace(leftTrimRe, '').replace(rightTrimRe, '');
+    let searchUrl = this.searchUrl.replace(leftTrimRe, '').replace(rightTrimRe, '');
 
     // If KML URL ...
     if (searchUrl.toLowerCase().endsWith('.kml')) {
@@ -239,6 +239,11 @@ export class CustomPanelComponent {
       } else {
         // If OGC WMS Service ...
         // Send an OGC WMS 'GetCapabilities' request
+        searchUrl = decodeURIComponent(searchUrl);
+        if (searchUrl.indexOf('?') > 0){
+          searchUrl = searchUrl.substring(0,searchUrl.indexOf('?'));
+          this.searchUrl = searchUrl;
+        }
         this.layerHandlerService.getCustomLayerRecord(searchUrl).subscribe(layerRecs => {
           this.loading = false;
           if (layerRecs != null) {
