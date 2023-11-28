@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/member-ordering */
-import { ApplicationRef, ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
+import { ApplicationRef, ChangeDetectorRef, Component, Inject, OnInit, ElementRef, ViewChild, AfterViewInit, Renderer2, HostListener } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { config } from '../../../environments/config';
 import { ref } from '../../../environments/ref';
@@ -13,7 +13,6 @@ import * as _ from 'lodash';
 import * as X2JS from 'x2js';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MSCLService } from '../layeranalytic/mscl/mscl.service';
-
 export class FileNode {
   children: FileNode[];
   filename: string;
@@ -34,7 +33,8 @@ interface FlatNode {
   styleUrls: ['../modalwindow.scss']
 })
 
-export class QuerierModalComponent  implements OnInit {
+export class QuerierModalComponent  implements OnInit, AfterViewInit {
+  @ViewChild('childElement', { static: false }) childElement: ElementRef;
   public downloading: boolean;
   public transformingToHtml: Map<string, boolean> = new Map<string, boolean>();
   public docs: QuerierInfoModel[] = [];
@@ -84,14 +84,29 @@ export class QuerierModalComponent  implements OnInit {
    * If this was not done the two components would not see the same state of the service variable "isAnalytic"
   */
   public flagNVCLAnalytic: boolean;
+  private screenWidth: number;
+
 
   constructor(public nvclService: NVCLService, public bsModalRef: BsModalRef, public csClipboardService: CsClipboardService,
         private manageStateService: ManageStateService, private gmlParserService: GMLParserService,
         private http: HttpClient, @Inject('env') private env, private sanitizer: DomSanitizer,
         private changeDetectorRef: ChangeDetectorRef, private appRef: ApplicationRef,
-        private msclService: MSCLService) {
+        private msclService: MSCLService,private renderer: Renderer2, private elementRef: ElementRef) {
     this.analyticMap = ref.analytic;
     this.flagNVCLAnalytic = false;
+    this.screenWidth = window.innerWidth;
+  }
+  ngAfterViewInit(): void {
+    const parentElement = this.childElement.nativeElement.parentElement.parentElement;
+    const left = this.screenWidth
+    const height = window.innerHeight
+    this.renderer.setStyle(parentElement, 'resize', 'both');
+    this.renderer.setStyle(parentElement, 'overflow', 'auto');
+    this.renderer.setStyle(parentElement, 'width', '500px');
+    this.renderer.setStyle(parentElement, 'min-height', '400px');
+    this.renderer.setStyle(parentElement, 'min-width', '400px');
+    this.renderer.setStyle(parentElement, 'left', left/2 + 'px');
+    this.renderer.setStyle(parentElement, 'height', height*0.8  + 'px');
   }
 
   ngOnInit() {

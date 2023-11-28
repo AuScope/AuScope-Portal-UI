@@ -29,7 +29,8 @@
 
         .mdc-slider {
             height: 24px;
-            margin: 0 6px;
+            margin: 0 24px;
+            min-width: 92px;
         }
 
         .mdc-slider .mdc-slider__thumb {
