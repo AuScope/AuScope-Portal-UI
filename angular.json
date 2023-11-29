@@ -103,20 +103,6 @@
                 }
               ]
             },
-            "au2": {
-              "budgets": [
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "50kb"
-                }
-              ],
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.au2.ts"
-                }
-              ]
-            },
             "development": {
               "buildOptimizer": false,
               "optimization": false,
@@ -140,9 +126,6 @@
             },
             "production": {
               "browserTarget": "project:build:production"
-            },
-            "au2": {
-              "browserTarget": "project:build:au2"
             },
             "development": {
               "browserTarget": "project:build:development"

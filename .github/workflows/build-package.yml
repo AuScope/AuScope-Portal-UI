@@ -1,0 +1,35 @@
+name: Build package and archive
+
+on:
+  push:
+  pull_request:
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        run: |
+          echo "::set-output name=dir::$(npm config get cache)"
+      - uses: actions/cache@v3
+        id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: npm install and npm run CI commands
+        run: |
+          npm i
+          npm run build-dev
+      - name: Zip artifact for deployment
+        run: zip release.zip ./dist/* -r
+      - name: file bundle artifact
+        if: contains(github.ref, 'master')
+        uses: actions/upload-artifact@v2
+        with:
+          name: portal UI dev bundle
+          path: release.zip

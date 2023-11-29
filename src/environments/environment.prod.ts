@@ -4,7 +4,7 @@
 
 // To us this prod profile run `ng build --configuration=prod`.
 
-// Available build profiles and their environment files can be found in the angular configuration (angular.json).
+// Available build profiles and their environment files can be found in the angular configuration in `angular.json`.
 // Note: environment files replace the default, they don't override.  So, any change in this file
 // will almost always need an equivalent change in all the other environment files.
 
@@ -12,10 +12,10 @@
 export const environment = {
   production: true,
   getCSWRecordEndP: 'getKnownLayers.do',
-  portalBaseUrl: 'http://portal.auscope.org.au/api/',
+  portalBaseUrl: 'https://portal.auscope.org.au/api/',
   portalProxyUrl: '/api/',
-  authBaseUrl: 'http://portal.auscope.org.au/api/',
-  hostUrl: 'http://portal.auscope.org.au',
+  authBaseUrl: 'https://portal.auscope.org.au/api/',
+  hostUrl: 'https://portal.auscope.org.au',
   nVCLAnalyticalUrl: 'https://nvclanalytics.azurewebsites.net/NVCLAnalyticalServices/',
   googleAnalyticsKey: null,
   bingMapsKey: 'Bing_Maps_Key',

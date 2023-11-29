@@ -12,13 +12,13 @@
 export const environment = {
   production: false,
   getCSWRecordEndP: 'getKnownLayers.do',
-  portalBaseUrl: 'https://au-portal-dev.it.csiro.au/api/',
+  portalBaseUrl: 'https://auportal-dev.geoanalytics.group/api/',
   portalProxyUrl: '/api/',
-  authBaseUrl: 'https://au-portal-dev.it.csiro.au/api/',
-  hostUrl: 'https://au-portal-dev.it.csiro.au',
+  authBaseUrl: 'https://auportal-dev.geoanalytics.group/api/',
+  hostUrl: 'https://auportal-dev.geoanalytics.group',
   nVCLAnalyticalUrl: 'https://nvclanalytics.azurewebsites.net/NVCLAnalyticalServices/',
   googleAnalyticsKey: null,
-  bingMapsKey: '',
+  bingMapsKey: 'Bing_Maps_Key',
   baseMapLayers: [
     { value: 'World_Imagery', viewValue: 'ESRI World Imagery', tooltip: 'ESRI World Imagery', layerType: 'ESRI' },
     { value: 'NatGeo_World_Map', viewValue: 'ESRI National Geographic Map', tooltip: 'ESRI National Geographic Map', layerType: 'ESRI' },
