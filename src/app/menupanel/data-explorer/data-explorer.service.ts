@@ -23,6 +23,7 @@ export class DataExplorerService {
 
   constructor(private http: HttpClient) { }
 
+  /*
   public getFilteredCSWKeywords(cswServiceId: string): Observable<any> {
     let httpParams = new HttpParams();
     httpParams = httpParams.append('cswServiceIds', cswServiceId);
@@ -39,6 +40,7 @@ export class DataExplorerService {
         return observableThrowError(error);
     }), );
   }
+  */
 
   public getCSWServices(): Observable<any> {
     return this.http.post(environment.portalBaseUrl + 'getCSWServices.do', {

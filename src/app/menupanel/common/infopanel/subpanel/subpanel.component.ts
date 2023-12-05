@@ -26,7 +26,7 @@ export class InfoPanelSubComponent implements OnChanges {
     public selectConstraints(capabilityRecords, cswConstraints: string[]) {
         if (capabilityRecords && capabilityRecords.length > 0 && capabilityRecords[0].accessConstraints && capabilityRecords[0].accessConstraints.length > 0) {
             return this.cleanConstraints(capabilityRecords[0].accessConstraints);
-        } else {
+        } else if (cswConstraints) {
             return this.cleanConstraints(cswConstraints);
         }
     }
@@ -38,10 +38,12 @@ export class InfoPanelSubComponent implements OnChanges {
      */
     public cleanConstraints(constraints: string[]) {
         let outStr = '';
-        for (const conStr of constraints) {
-            if (conStr.indexOf('no conditions apply') < 0 &&
-                conStr.indexOf('#MD_RestrictionCode') < 0 && conStr.trim() !== "") {
-                outStr += conStr.trim() + ', ';
+        if (constraints) {
+            for (const conStr of constraints) {
+                if (conStr.indexOf('no conditions apply') < 0 &&
+                    conStr.indexOf('#MD_RestrictionCode') < 0 && conStr.trim() !== "") {
+                    outStr += conStr.trim() + ', ';
+                }
             }
         }
         // Remove trailing comma

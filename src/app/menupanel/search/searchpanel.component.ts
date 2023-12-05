@@ -1,19 +1,33 @@
 import { Component, ElementRef, HostListener, Inject, OnInit, ViewChild } from '@angular/core';
 import { RectangleEditorObservable } from '@auscope/angular-cesium';
+
+/*
 import { Bbox, CsMapService, LayerHandlerService, LayerModel, 
          ManageStateService, UtilitiesService, Constants } from '@auscope/portal-core-ui';
 import { NgbDropdown, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SearchService } from 'app/services/search/search.service';
 import { Observable, Subject, Subscription } from 'rxjs';
+*/
+
+import { Bbox, CSWRecordModel, CsMapService, LayerHandlerService, LayerModel, ManageStateService, RenderStatusService, UtilitiesService, Constants } from '@auscope/portal-core-ui';
+import { NgbDropdown, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { SearchService } from 'app/services/search/search.service';
+import { Observable, Subject, Subscription } from 'rxjs';
+
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
+import { UILayerModel } from '../common/model/ui/uilayer.model';
 
 import { HttpClient, HttpHeaders, HttpParams, HttpUrlEncodingCodec } from '@angular/common/http';
 import { Download } from 'app/modalwindow/layeranalytic/nvcl/tsgdownload';
 import * as saveAs from 'file-saver';
 import { take } from 'rxjs/operators';
+
 const DEFAULT_RESULTS_PER_PAGE = 10;
+
+/*
+>>>>>>> 59bf604 (Moving search to Elasticsearch)
 const SEARCH_FIELDS = [{
     name: 'Name',
     field: 'name',
@@ -31,8 +45,91 @@ const SEARCH_FIELDS = [{
     field: 'abstract',
     checked: true
   }];
-const OGC_SERVICES = ['WMS', 'IRIS', 'WFS', 'WCS', 'WWW', 'KML'];
-const NUMBER_OF_SUGGESTIONS = 5;
+*/
+/*
+public static final List<String> KNOWNLAYERANDRECORDS_QUERY_FIELDS = Arrays.asList(new String[]{
+  "knownLayer.name", "knownLayer.description",
+  // belongingRecords fields (CSWRecords)
+  "belongingRecords.serviceName", "belongingRecords.descriptiveKeywords",
+  "belongingRecords.dataIdentificationAbstract", "belongingRecords.layerName",
+  // belongingRecords.onlineResources fields (OnlineResources)
+  "belongingRecords.onlineResources.name", "belongingRecords.onlineResources.description",
+  "belongingRecords.onlineResources.protocol", "belongingRecords.funder.organisationName"
+});
+
+// CSWRecord search fields
+public static final List<String> CSWRECORD_QUERY_FIELDS = Arrays.asList(new String[]{
+  "serviceName", "descriptiveKeywords", "dataIdentificationAbstract", "layerName",
+  // onlineResources fields (OnlineResource)
+  "onlineResources.name", "onlineResources.description", "onlineResources.protocol", "funder.organisationName"
+});
+*/
+
+// XXX Going to have make field an array ('fields') fo rhwn searching KnownLayerAndRecords AND CSWRecords
+const SEARCH_FIELDS = [{
+  name: 'Name',
+  fields: ['knownLayer.name'],
+  checked: true
+}, {
+  name: 'Description',
+  fields: ['knownLayer.description'],
+  checked: true
+}, {
+  name: 'CSW Keywords',
+  fields: ['belongingRecords.descriptiveKeywords', 'descriptiveKeywords'],
+  checked: true
+}, {
+  name: 'CSW Name',
+  fields: ['belongingRecords.serviceName', 'serviceName'],
+  checked: true
+}, {
+  name: 'CSW Abstract',
+  fields: ['dataIdentificationAbstract'],
+  checked: true
+}, {
+  name: 'Layer Name',
+  fields: ['belongingRecords.layerName', 'layerName'],
+  checked: true
+}, {
+  name: 'Online Resource Name',
+  fields: ['belongingRecords.onlineResources.name', 'onlineResources.name'],
+  checked: true
+}, {
+  name: 'Online Resource description',
+  fields: ['belongingRecords.onlineResources.description', 'onlineResources.description'],
+  checked: true
+}];
+
+//const OGC_SERVICES = ['WMS', 'IRIS', 'WFS', 'WCS', 'WWW', 'KML'];
+// XXX Check IRIS etc when matching KnownLayers (maybe others as well)
+const OGC_SERVICES = [
+  {
+    name: 'WMS',
+    fields: ['OGC:WMS'],
+    checked: true
+  }, {
+    name: 'IRIS',
+    fields: ['OGC:IRIS'],
+    checked: true
+  }, {
+    name: "KML",
+    fields: ['OGC:KML'],
+    checked: true
+  }, {
+    name: 'WFS',
+    fields: ['OGC:WFS'],
+    checked: true
+  }, {
+    name: 'WCS',
+    fields: ['OGC:WCS'],
+    checked: true
+  }, {
+    name: 'WWW',
+    fields: ['OGC:WWW'],
+    checked: true
+  }]
+
+//const NUMBER_OF_SUGGESTIONS = 5;
 
 @Component({
     selector: 'app-search-panel',
@@ -40,6 +137,8 @@ const NUMBER_OF_SUGGESTIONS = 5;
     styleUrls: ['./searchpanel.component.scss']
 })
 export class SearchPanelComponent implements OnInit {
+
+  RESULTS_PER_PAGE = 10;
 
   @ViewChild('queryinput') textQueryInput: ElementRef;
   @ViewChild('spatialOptionsDropdown') spatialOptionsDropdown: NgbDropdown;
@@ -53,17 +152,17 @@ export class SearchPanelComponent implements OnInit {
   showingAllLayers = false;           // True if all layers being shown (no search)
 
   // Options
-  allSearchField: SearchField = new SearchField('All', '', true);
+  allSearchField: SearchField = new SearchField('All', [], true);
   searchFields: SearchField[] = SEARCH_FIELDS;
-  allOGCServices: SearchField = new SearchField('All', '', true);
-  ogcServices: SearchField[] = [];
+  allOGCServices: SearchField = new SearchField('All', [], true);
+  ogcServices: SearchField[] = OGC_SERVICES;
   restrictBounds = false; // Could probably just use bbox if set
   bbox: Bbox;
   boundsRelationship = 'Intersects';
 
   // Pagination
-  resultsPerPage: number = DEFAULT_RESULTS_PER_PAGE;
   currentPage = 1;
+  totalSearchHits = 0;
 
   // Need to keep track of internal clicks and close search results on external if info dialog not open
   searchClick = false;
@@ -89,6 +188,8 @@ export class SearchPanelComponent implements OnInit {
   suggestedTerms: string[] = [];
   highlightedSuggestionIndex = -1;
 
+  /*
+<<<<<<< HEAD
   constructor(private searchService: SearchService,
               private csMapService: CsMapService,
               private layerHandlerService: LayerHandlerService,
@@ -99,14 +200,18 @@ export class SearchPanelComponent implements OnInit {
               private http: HttpClient,
               @Inject('env') private env
     ) { }
+=======
+*/
+  constructor(private searchService: SearchService, private csMapService: CsMapService,
+              private layerHandlerService: LayerHandlerService, private layerManagerService: LayerManagerService,
+              private uiLayerModelService: UILayerModelService, private renderStatusService: RenderStatusService,
+              private manageStateService: ManageStateService, private modalService: NgbModal,
+              private http: HttpClient, @Inject('env') private env) { }
+//>>>>>>> 59bf604 (Moving search to Elasticsearch)
 
   ngOnInit() {
-    for (const service of OGC_SERVICES) {
-      const field: SearchField = new SearchField(service, service, true);
-      this.ogcServices.push(field);
-    }
     // Populate search results with all layers by default
-    this.showAllLayers();
+    this.showFeaturedLayers();
   }
 
   /**
@@ -137,25 +242,33 @@ export class SearchPanelComponent implements OnInit {
   }
 
   /**
-   * Show all layers in search results
+   * Display featured layers in search results
    */
-  private showAllLayers() {
+  private showFeaturedLayers() {
     this.queryText = '';
     this.searchResults = [];
     const layers = [];
     this.layerHandlerService.getLayerRecord().pipe(take(1)).subscribe(records => {
+      let totalLayerCount = 0;
       for (const layerGroup in records) {
         if (layerGroup) {
           for (const layer of records[layerGroup]) {
+            totalLayerCount += 1;
             layers.push(new SearchResult(layer));
           }
         }
       }
+      this.currentPage = 1;
+      this.totalSearchHits = totalLayerCount;
       // Sort alphabetically
       layers.sort((a, b) => a.layer.name.localeCompare(b.layer.name));
-      this.searchResults = layers;
       this.showingAllLayers = true;
+      // Splice results to current page
+      //const indexForPage = (this.currentPage - 1) * this.RESULTS_PER_PAGE;
+      //this.searchResults = layers.splice(indexForPage, this.RESULTS_PER_PAGE);
+      this.searchResults = layers;
     });
+    
   }
 
   /**
@@ -223,8 +336,8 @@ export class SearchPanelComponent implements OnInit {
    * @returns sliced array of results corresponding to current page
    */
   public paginatedSearchResults(): SearchResult[] {
-    const startPos = (this.currentPage - 1) * this.resultsPerPage;
-    const endPos = startPos + this.resultsPerPage;
+    const startPos = (this.currentPage - 1) * this.RESULTS_PER_PAGE;
+    const endPos = startPos + this.RESULTS_PER_PAGE;
     return this.searchResults.slice(startPos, endPos);
   }
 
@@ -378,6 +491,11 @@ export class SearchPanelComponent implements OnInit {
    * @param layer LayerModel
    */
   public addLayer(layer: LayerModel) {
+    if (!this.uiLayerModelService.getUILayerModel(layer.id)) {
+      console.log('Adding UI Layer Model: XXX ALSO DATA SEARCH PANEL< FILTER PANEL ETC (and probably state load)');
+      const uiLayerModel = new UILayerModel(layer.id, this.renderStatusService.getStatusBSubject(layer));
+      this.uiLayerModelService.setUILayerModel(layer.id, uiLayerModel);
+    }
     this.layerManagerService.addLayer(layer, [], layer.filterCollection, undefined);
   }
 
@@ -532,11 +650,11 @@ export class SearchPanelComponent implements OnInit {
   public getSearchResultsTitle(): string {
     let title = '';
     if (this.showingAllLayers) {
-      title = 'All Layers ';
+      title = 'Featured Layers ';
     } else {
       title = 'Results ';
     }
-    title += '(' + this.searchResults.length + ')';
+    title += '(' + this.totalSearchHits + ')';
     return title;
   }
 
@@ -569,18 +687,284 @@ export class SearchPanelComponent implements OnInit {
    * @param queryText the query text
    * @returns an escaped query text string
    */
+  /*
   private escapeQueryText(queryText: string): string {
-    return queryText.replace(/[-\/\\^+&!~\:()|[\]{}]/g, '\\$&');
+    //return queryText.replace(/[-\/\\^+&!~\:()|[\]{}]/g, '\\$&');
+    let textToQuery = queryText;
+    if (!textToQuery.startsWith('"')) {
+      textToQuery = '\"' + textToQuery;
+    }
+    if (!textToQuery.endsWith('"')) {
+      textToQuery = textToQuery + '\"';
+    }
+    return textToQuery;
+  }
+  */
+
+  /**
+   * 
+   * @param cswRecord 
+   * @returns 
+   */
+  /*
+  private createLayerModelForCSWRecord(cswRecord: CSWRecordModel): LayerModel {
+    const layerModel: LayerModel = {
+      cswRecords: [cswRecord],
+      capabilityRecords: undefined,
+      description: cswRecord.description,
+      group: 'CSW',
+      id: cswRecord.id,
+      name: cswRecord.name + ' (CSW)',  // XXX Until we have a better way of delinieating
+      hidden: undefined,
+      csLayers: [],
+      layerMode: undefined,
+      order: undefined,
+      proxyDownloadUrl: undefined,
+      proxyStyleUrl: undefined,
+      proxyUrl: undefined,
+      useDefaultProxy: true,    // Use the default proxy (getViaProxy.do) if true (custom layers)
+      useProxyWhitelist: true,  // Use the default proxy whitelist if true (custom layers)
+      relatedRecords: undefined,
+      singleTile: undefined,
+      iconUrl: undefined,
+      filterCollection: undefined,
+      stackdriverFailingHosts: [],
+      ogcFilter: undefined,
+      wfsUrls: [],
+      sldBody: undefined,      // SLD_BODY for 1.1.1 GetMap/GetFeatureInfo requests
+      clickCSWRecordsIndex: [],
+      clickPixel: undefined,
+      clickCoord: undefined,
+      // Layer supports downloading, usually feature data in CSV form
+      supportsCsvDownloads: undefined,
+      kmlDoc: undefined, // Document object for custom KML layer
+    };
+    return layerModel;
+  }
+  */
+
+  private createLayerModelForCSWRecord(record: CSWRecordModel): LayerModel {
+    const layer = new LayerModel();
+    // This will allow us to easily identify CSW layers
+    layer.id = 'registry-csw:' + record.id;
+    layer.name = record.name;
+    layer.description = record.description;
+    //layer.useDefaultProxy = true;
+
+    layer.useDefaultProxy = true,    // Use the default proxy (getViaProxy.do) if true (custom layers)
+    layer.useProxyWhitelist = true,  // Use the default proxy whitelist if true (custom layers)
+
+
+    layer.cswRecords = [record];
+    return layer;
   }
 
   /**
    * Search index using specified fields and text query
    */
-   public search() {
+   public search(newSearch: boolean) {
+
+    this.showingAllLayers = false;
+
     // Validate parameters before continuing
     if (!this.validateSearchInputs()) {
       return;
     }
+
+    if (newSearch) {
+      this.currentPage = 1;
+      this.totalSearchHits = 0;
+    }
+
+    this.resetSuggestedTerms();
+    this.searching = true;
+    this.searchResults = [];
+    //this.currentPage = 1;
+    this.alertMessage = '';
+
+
+    // XXX ADD A CHECKBOX FOR THIS AND RETRIEVE VALUE
+    const includeCSWResults = true;
+
+
+    const selectedSearchFields: string[] = [];
+    for (const sField of this.searchFields.filter(f => f.checked === true)) {
+      selectedSearchFields.push(sField.fields[0]);
+      // If including CSW results and there's an associated CSWRecord field, add it
+      if (includeCSWResults && sField.fields.length === 2) {
+        selectedSearchFields.push(sField.fields[1]);
+      }
+    }
+
+    //let textToQuery = this.escapeQueryText(this.queryText);
+
+    // OGC services if selected
+    const selectedServices: string[] = [];
+    const checkedServices = this.ogcServices.filter(s => s.checked === true);
+    if (checkedServices.length < OGC_SERVICES.length) {
+      for (const service of checkedServices) {
+
+        console.log('Adding selectedService: ' + service.fields[0]);
+
+        selectedServices.push(service.fields[0]);
+      }
+    }
+
+    /*
+    const spatialRelation = undefined;
+    const west: number = undefined;
+    const east: number = undefined;
+    const south:number = undefined;
+    const north: number = undefined;
+    if (this.restrictBounds && this.bbox) {
+        spatialRelation = this.boundsRelationship;
+        west = this.bbox.westBoundLongitude, this.bbox.southBoundLatitude, this.bbox.eastBoundLongitude, this.bbox.northBoundLatitude);
+    }
+    */
+
+    //const page = this.currentPage > 1 ? this.currentPage - 1 : undefined;
+    //console.log('Searching with pageNo: ' + page);
+    console.log('Current page: ' + this.currentPage);
+
+    //this.searchService.queryKnownLayersAndCSWRecords(textToQuery, selectedSearchFields, pageNo, selectedServices, spatialRelation, west, east, south, north, includeCSWResults).subscribe(searchResponse => {
+    //this.searchService.queryKnownLayersAndCSWRecords(textToQuery, selectedSearchFields, pageNo, selectedServices,
+    /* Paged search
+    this.searchService.searchCSWRecords(this.queryText, selectedSearchFields, (this.currentPage - 1), this.RESULTS_PER_PAGE, selectedServices,
+        this.boundsRelationship.toLowerCase(), this.bbox?.westBoundLongitude, this.bbox?.eastBoundLongitude, this.bbox?.southBoundLatitude,
+        this.bbox?.northBoundLatitude).subscribe(searchResponse => {
+    */
+    this.searchService.searchCSWRecords(this.queryText, selectedSearchFields, null, null, selectedServices,
+        this.boundsRelationship.toLowerCase(), this.bbox?.westBoundLongitude, this.bbox?.eastBoundLongitude,
+        this.bbox?.southBoundLatitude, this.bbox?.northBoundLatitude).subscribe(searchResponse => {
+
+      console.log('Number of records: ' + searchResponse.cswRecords.length);
+
+      this.searchResults = [];
+      this.totalSearchHits = searchResponse.totalCSWRecordHits;
+
+      console.log('totalSearchHits (CSW): ' + this.totalSearchHits);
+
+      // Add KnownLayers to list first
+      if (searchResponse.knownLayerIds?.length > 0) {
+        console.log('Number of layers : ' + searchResponse.knownLayerIds.length);
+
+        console.log('IDs: ' + searchResponse.knownLayerIds);
+
+        this.totalSearchHits += searchResponse.knownLayerIds.length;
+      }
+        console.log('totalSearchHits (CSW + KL): ' + this.totalSearchHits);
+        
+        this.layerHandlerService.getLayerModelsForIds(searchResponse.knownLayerIds).subscribe(layers => {
+          for (const l of layers) {
+            this.searchResults.push(new SearchResult(l));
+          }
+
+          // Now add CSWRecords
+          for (const cswRecord of searchResponse.cswRecords) {
+            const layerModel: LayerModel = this.createLayerModelForCSWRecord(cswRecord);
+            this.searchResults.push(new SearchResult(layerModel));
+          }
+          this.searching = false;
+          this.showingAllLayers = false;
+          if (!this.showingResultsPanel) {
+            this.showingResultsPanel = true;
+          }
+
+        });
+      //} else {
+      //  // XXX
+      //  console.log('No layers');
+      //}
+
+      
+
+      console.log('search results length: ' + this.searchResults.length);
+      console.log('RESULTS_PER_PAGE: ' + this.RESULTS_PER_PAGE);
+
+      /*
+      const layerIds: string[] = [];
+      for (const k of searchResponse.knownLayerAndRecords) {
+        layerIds.push(k.knownLayer.id);
+      }
+
+      this.layerHandlerService.getLayerModelsForIds(layerIds).subscribe(layers => {
+        this.searchResults = [];
+
+        // Add KnownLayers
+        for (const l of layers) {
+          this.searchResults.push(new SearchResult(l));
+        }
+
+        // Now add CSWRecords
+        for (const cswRecord of searchResponse.cswRecords) {
+          const layerModel: LayerModel = this.createLayerModelForCSWRecord(cswRecord);
+          this.searchResults.push(new SearchResult(layerModel));
+        }
+
+        this.searching = false;
+        this.showingAllLayers = false;
+        if (!this.showingResultsPanel) {
+          this.showingResultsPanel = true;
+        }
+      });
+      */
+    }, error => {
+      this.alertMessage = error;
+      this.searching = false;
+    });
+
+    /*
+    // Append service info to query if specific services have been selected
+    const checkedServices = this.ogcServices.filter(s => s.checked === true);
+    if (checkedServices.length < OGC_SERVICES.length) {
+      let appendQueryText = ' AND service:(';
+      for (let i = 0; i < checkedServices.length; i++) {
+        appendQueryText += checkedServices[i].field;
+        if (i !== checkedServices.length - 1) {
+          appendQueryText += ' OR ';
+        }
+      }
+      appendQueryText += ')';
+      textToQuery += appendQueryText;
+    }
+
+    // XXX Other fields, Include CSW checkbox
+    this.searchService.queryKnownLayersAndCSWRecords(selectedSearchFields, textToQuery, true).subscribe(searchResponse => {
+      console.log('Number of records: ' + searchResponse.cswRecords.length);
+      console.log('Number of layers : ' + searchResponse.knownLayerAndRecords.length);
+
+      const layerIds: string[] = [];
+      for (const k of searchResponse.knownLayerAndRecords) {
+        layerIds.push(k.knownLayer.id);
+      }
+
+      this.layerHandlerService.getLayerModelsForIds(layerIds).subscribe(layers => {
+        this.searchResults = [];
+
+        // Add KnownLayers
+        for (const l of layers) {
+          this.searchResults.push(new SearchResult(l));
+        }
+
+        // Now add CSWRecords
+        for (const cswRecord of searchResponse.cswRecords) {
+          const layerModel: LayerModel = this.createLayerModelForCSWRecord(cswRecord);
+          this.searchResults.push(new SearchResult(layerModel));
+        }
+
+        this.searching = false;
+        this.showingAllLayers = false;
+        if (!this.showingResultsPanel) {
+          this.showingResultsPanel = true;
+        }
+      });
+    }, error => {
+      this.alertMessage = error;
+      this.searching = false;
+    });
+    */
+
+    /*
     this.resetSuggestedTerms();
     this.searching = true;
     this.searchResults = null;
@@ -632,6 +1016,7 @@ export class SearchPanelComponent implements OnInit {
       this.alertMessage = error;
       this.searching = false;
     });
+    */
 
   }
 
@@ -679,24 +1064,26 @@ export class SearchPanelComponent implements OnInit {
       }
     }
 
-    // Search if user has pressed Enter without a selected suggestion
-    if (event.key === 'Enter') {
-      this.search();
+    // Search if user has pressed on a suggestion
+    if (event.key === 'Enter' && this.queryText !== '') {
+      this.search(true);
       return;
     }
 
-    // Populate suggester with query text
-    if (this.suggesterSubscription && !this.suggesterSubscription.closed) {
-      this.suggesterSubscription.unsubscribe();
-    }
-    this.suggesterSubscription = this.searchService.suggestTerm(this.queryText, NUMBER_OF_SUGGESTIONS).subscribe(terms => {
-      this.suggestedTerms = terms;
-      if (this.suggestedTerms.length > 0 && !this.suggesterDropdown.isOpen()) {
-        this.suggesterDropdown.open();
-      } else if (this.suggestedTerms.length === 0 && this.suggesterDropdown.isOpen()) {
-        this.suggesterDropdown.close();
+    if(this.queryText !== '') {
+      // Populate suggester with query text
+      if (this.suggesterSubscription && !this.suggesterSubscription.closed) {
+        this.suggesterSubscription.unsubscribe();
       }
-    });
+      this.suggesterSubscription = this.searchService.suggestTerm(this.queryText.toLowerCase()/*, NUMBER_OF_SUGGESTIONS*/).subscribe(terms => {
+        this.suggestedTerms = terms;
+        if (this.suggestedTerms.length > 0 && !this.suggesterDropdown.isOpen()) {
+          this.suggesterDropdown.open();
+        } else if (this.suggestedTerms.length === 0 && this.suggesterDropdown.isOpen()) {
+          this.suggesterDropdown.close();
+        }
+      });
+    }
   }
 
   /**
@@ -708,7 +1095,7 @@ export class SearchPanelComponent implements OnInit {
     this.suggesterDropdown.close();
     this.resetSuggestedTerms();
     this.queryText = term;
-    this.search();
+    this.search(true);
   }
 
   /**
@@ -720,6 +1107,22 @@ export class SearchPanelComponent implements OnInit {
     return this.csMapService.getLayerModelList();
   }
 
+  /**
+   * 
+   * @param pageChangeEvent 
+   */
+  public pageChange(newPageNo) {
+    this.currentPage = newPageNo;
+
+    console.log('new page: ' + this.currentPage);
+
+    if (this.showingAllLayers) {
+      this.showFeaturedLayers();
+    } else {
+      this.search(false);
+    }
+  }
+
 }
 
 /**
@@ -727,12 +1130,12 @@ export class SearchPanelComponent implements OnInit {
  */
 export class SearchField {
   name: string;     // Name of field for display
-  field: string;    // Field name in search index
+  fields: string[];    // Field name in search index
   checked: boolean; // Is field checked in UI?
 
-  constructor(name: string, field: string, checked: boolean) {
+  constructor(name: string, fields: string[], checked: boolean) {
     this.name = name;
-    this.field = field;
+    this.fields = fields;
     this.checked = checked;
   }
 
