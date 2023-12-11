@@ -24,7 +24,7 @@
 			<!-- BEGIN querier accordion -->
 			<div id="querier-accordion">
 				<!-- BEGIN card -->
-				<div *ngIf="showZoomMsg">
+				<div *ngIf="showZoomMsg && !downloading">
 					<h2 style="margin-top:10px;">No results found, try zooming to improve accuracy</h2>
 				</div>
 				<div *ngFor="let doc of docs | querierFeatureSearchPipe:selectLayerNameFilter; let i = index;" class="card card-default card-bordered">

@@ -285,6 +285,23 @@ export class CsMapComponent implements AfterViewInit {
   }
 
   /**
+   * Update the modal with downloading or zoom messages if required
+   *
+   * @param numberOfLayersToProcess number of layers left to process
+   * @param foundFeatures whether features have been found for any of the layers
+   * @param mayRequireMapZoom whether anyy of the layers may require zooming for accuracy
+   */
+  setModalMessages(numberOfLayersToProcess: number, foundFeatures: boolean, mayRequireMapZoom: boolean) {
+    if (numberOfLayersToProcess === 0) {
+      this.bsModalRef.content.downloading = false;
+      if (!foundFeatures && mayRequireMapZoom) {
+        this.bsModalRef.content.showZoomMsg = true;
+      }
+    }
+    this.bsModalRef.content.onDataChange();
+  }
+
+  /**
    * Handles the map click event
    * @param mapClickInfo object with map click information
    */
@@ -353,7 +370,13 @@ export class CsMapComponent implements AfterViewInit {
       */
     }
 
+    // Open the modal for display
+    this.displayModal(mapClickInfo.clickCoord);
+
     // Process list of layers clicked
+    let foundFeatures = false;
+    let numberOfLayersToProcess = mapClickInfo.clickedLayerList.length;
+    let mayRequireMapZoom = false;
     for (const maplayer of mapClickInfo.clickedLayerList) {
       for (const i of maplayer.clickCSWRecordsIndex ) {
         const cswRecord = maplayer.cswRecords[i];
@@ -379,6 +402,7 @@ export class CsMapComponent implements AfterViewInit {
           } else {
             const params = this.getParams(maplayer.clickPixel[0], maplayer.clickPixel[1]);
             if (!params) {
+              numberOfLayersToProcess -= 1;
               continue;
             }
             let sldBody = maplayer.sldBody;
@@ -422,21 +446,24 @@ export class CsMapComponent implements AfterViewInit {
               infoFormat = 'text/xml';
             }
 
+            // Query GetFeatureInfo for current layer
             this.queryWMSService.getFeatureInfo(onlineResource, sldBody, infoFormat, postMethod,
               maplayer.clickCoord[0], maplayer.clickCoord[1], params.x, params.y, params.width, params.height, params.bbox).subscribe(result => {
+                numberOfLayersToProcess -= 1;
                 const feature = {onlineResource: onlineResource, layer: maplayer};
                 // Display the modal, but only if there are features
                 const num_feats = this.setModal(maplayer.id, result, feature, mapClickInfo.clickCoord);
-
-                // If zoom level is too low and nothing is found then show zoom message
-                if (num_feats === 0 && params.level <= 3) {
-                  this.displayModal(mapClickInfo.clickCoord);
-                  this.bsModalRef.content.downloading = false;
-                  this.bsModalRef.content.showZoomMsg = true;
+                if (num_feats > 0) {
+                  foundFeatures = true;
                 }
+                // If zoom level is too low and nothing is found then show zoom message (provided no other features found in other layers)
+                else if (num_feats === 0 && params.level <= 3) {
+                  mayRequireMapZoom = true;
+                }
+                this.setModalMessages(numberOfLayersToProcess, foundFeatures, mayRequireMapZoom);
               }, () => {
-                this.bsModalRef.content.onDataChange();
-                this.bsModalRef.content.downloading = false;
+                numberOfLayersToProcess -= 1;
+                this.setModalMessages(numberOfLayersToProcess, foundFeatures, mayRequireMapZoom);
               });
           }
         }
@@ -476,6 +503,7 @@ export class CsMapComponent implements AfterViewInit {
       this.bsModalRef = this.modalService.show(QuerierModalComponent, {class: 'modal-lg'});
       this.modalDisplayed = true;
       this.bsModalRef.content.downloading = true;
+      this.bsModalRef.content.showZoomMsg = false;
       /*
       if (clickCoord) {
         const vector = this.csMapService.drawDot(clickCoord);
