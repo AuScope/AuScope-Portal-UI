@@ -1,6 +1,6 @@
-import { CsClipboardService, CsMapService, CsWMSService, FilterPanelService, LayerHandlerService,
-         LayerModel, LayerStatusService, UtilitiesService } from '@auscope/portal-core-ui';
-import { Component, Input, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { CsClipboardService, CsMapService, CsWMSService, FilterPanelService, GeometryType, LayerHandlerService,
+         LayerModel, LayerStatusService, Polygon, UtilitiesService } from '@auscope/portal-core-ui';
+import { ApplicationRef, Component, Input, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import * as _ from 'lodash';
 import { config } from '../../../../environments/config';
 import { ref } from '../../../../environments/ref';
@@ -43,6 +43,7 @@ export class FilterPanelComponent implements OnInit {
     private csClipboardService: CsClipboardService,
     private csWMSService: CsWMSService,
     public layerStatus: LayerStatusService,
+    private appRef: ApplicationRef,
     private advancedComponentService: AdvancedComponentService) {
     this.providers = [];
     this.optionalFilters = [];
@@ -116,9 +117,26 @@ export class FilterPanelComponent implements OnInit {
       this.advancedComponentService.getAdvancedFilterComponentForLayer(this.layer.id).setAdvancedParams(layerState.advancedFilter);
     }
     this.optionalFilters = this.optionalFilters.concat(layerState.optionalFilters);
+    let me = this;
     setTimeout(() => {
-      this.addLayer(this.layer);
-    }, 100);
+      for (const optFilter of me.optionalFilters) {
+        if (optFilter['value'] && optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
+          const geometry = optFilter['value'];
+          const swapedGeometry = this.csClipboardService.swapGeometry(geometry);
+          const newPolygon:Polygon = {
+            name: 'Polygon created',
+            srs: 'EPSG:4326',
+            geometryType: GeometryType.POLYGON,
+            coordinates: swapedGeometry
+          };
+          this.csClipboardService.clearClipboard();
+          this.csClipboardService.addPolygon(newPolygon);
+          this.csClipboardService.toggleClipboard(true);
+          this.appRef.tick();
+        }
+      }
+      me.layerManagerService.addLayer(me.layer, me.optionalFilters, me.layerFilterCollection, me.layerTimes.currentTime);
+    }, 500);
   }
 
   /**
@@ -210,6 +228,7 @@ export class FilterPanelComponent implements OnInit {
    * Draw a polygon layer to map
    */
   public onApplyClipboardBBox(): void {
+
     this.csClipboardService.polygonsBS.subscribe(polygon => {
       if (polygon !== null && this.bApplyClipboardBBox) {
         if (!UtilitiesService.isEmpty(polygon)) {
