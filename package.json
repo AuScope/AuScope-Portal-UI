@@ -31,6 +31,7 @@
     "@auscope/angular-cesium": "^15.0.1",
     "@auscope/portal-core-ui": "^6.4.10",
     "@csiro-geoanalytics/ng": "^2.5.0",
+    "@csiro-geoanalytics/utils-rxjs": "^2.0.1",
     "@ng-bootstrap/ng-bootstrap": "^14.1.0",
     "@ng-select/ng-select": "^10.0.4",
     "@popperjs/core": "^2.11.6",

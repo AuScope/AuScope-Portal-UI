@@ -358,6 +358,7 @@ export class SearchPanelComponent implements OnInit {
    * @param layer LayerModel of layer
    */
   public layerWarningMessage(layer: LayerModel): string {
+    console.log("[searchpanel.component.ts]layerWarningMessage()");
     return 'This layer cannot be displayed. For Featured Layers, please wait for the layer cache to rebuild itself. ' +
       'For Custom Layers please note that only the following online resource types can be added to the map: ' +
       this.csMapService.getSupportedOnlineResourceTypes();

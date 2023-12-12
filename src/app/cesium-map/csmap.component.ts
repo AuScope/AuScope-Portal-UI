@@ -3,14 +3,19 @@ import { QuerierModalComponent } from '../modalwindow/querier/querier.modal.comp
 import { AfterViewInit, Component, ElementRef, NgZone, ViewChild, ViewContainerRef } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ViewerConfiguration } from '@auscope/angular-cesium';
-import { CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService,
-  QueryWMSService, SimpleXMLService, UtilitiesService, CsMapObject, ResourceType } from '@auscope/portal-core-ui';
-import { Cartesian3, MapMode2D, Math, ScreenSpaceEventHandler, SceneMode, ScreenSpaceEventType, Rectangle, SplitDirection,
-   Cartesian2, WebMapServiceImageryProvider, WebMercatorProjection, Cartographic, GeographicProjection } from 'cesium';
+import {
+  CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService,
+  QueryWMSService, SimpleXMLService, UtilitiesService, CsMapObject, ResourceType
+} from '@auscope/portal-core-ui';
+import {
+  Cartesian3, MapMode2D, Math, ScreenSpaceEventHandler, SceneMode, ScreenSpaceEventType, Rectangle, SplitDirection,
+  Cartesian2, WebMapServiceImageryProvider, WebMercatorProjection, Cartographic, GeographicProjection
+} from 'cesium';
 import { IrisQuerierHandler } from './custom-querier-handler/iris-querier-handler.service';
 import { KMLQuerierHandler } from './custom-querier-handler/kml-querier-handler.service';
 import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
 import { UserStateService } from 'app/services/user/user-state.service';
+import { VMFQuerierHandler } from './custom-querier-handler/vmf-querier-handler.service';
 
 declare var Cesium: any;
 
@@ -37,8 +42,8 @@ declare var Cesium: any;
       </ac-map>
     </div>
     `,
-    providers: [ViewerConfiguration], // Don't forget to Provide it
-    styleUrls: ['./csmap.component.scss']
+  providers: [ViewerConfiguration], // Don't forget to Provide it
+  styleUrls: ['./csmap.component.scss']
   // The "#" (template reference variable) matters to access the map element with the ViewChild decorator!
 })
 
@@ -97,7 +102,7 @@ export class CsMapComponent implements AfterViewInit {
       viewer.screenSpaceEventHandler.removeInputAction(ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
       const scene = viewer.scene;
       if (!scene.pickPositionSupported) {
-          window.alert('This browser does not support pickPosition.');
+        window.alert('This browser does not support pickPosition.');
       }
       const handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
       handler.setInputAction((movement) => {
@@ -139,9 +144,9 @@ export class CsMapComponent implements AfterViewInit {
         }
         const pitch = this.viewer.camera._mode === SceneMode.COLUMBUS_VIEW ? Math.toRadians(-45.0) : Math.toRadians(-90.0);
         const orient = {
-          heading : Math.toRadians(0.0),
-          pitch : pitch,
-          roll : 0.0
+          heading: Math.toRadians(0.0),
+          pitch: pitch,
+          roll: 0.0
         }
         const SOUTH_OF_AUSTRALIA = Cartesian3.fromDegrees(133.7751, -60.0, 3000000.0);
         const destination = this.viewer.camera._mode === SceneMode.COLUMBUS_VIEW ? SOUTH_OF_AUSTRALIA : CsMapComponent.AUSTRALIA;
@@ -201,7 +206,7 @@ export class CsMapComponent implements AfterViewInit {
    * @param mouseY y position in screen
    * @returns {x: y: width: height: bbox:} or undefined if could not calculate
    */
-  public getParams(mouseX: number, mouseY: number): {x: number, y: number, width: number, height: number, bbox: number[], level: number} {
+  public getParams(mouseX: number, mouseY: number): { x: number, y: number, width: number, height: number, bbox: number[], level: number } {
 
     // Convert mouse coords to X,Y,Z cartesian
     const mousePosition = new Cartesian2(mouseX, mouseY);
@@ -280,7 +285,7 @@ export class CsMapComponent implements AfterViewInit {
       // Assemble params
       const width = imagery.imageryLayer.imageryProvider.tileWidth;
       const height = imagery.imageryLayer.imageryProvider.tileHeight;
-      return { x: ijScratch.x, y: ijScratch.y, width: width, height: height, bbox: bbox, level: imagery.level};
+      return { x: ijScratch.x, y: ijScratch.y, width: width, height: height, bbox: bbox, level: imagery.level };
     }
   }
 
@@ -323,13 +328,18 @@ export class CsMapComponent implements AfterViewInit {
         if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.IRIS))) {
           this.displayModal(mapClickInfo.clickCoord);
           const handler = new IrisQuerierHandler(layer, entity);
-          this.setModalHTML(handler.getHTML(), layer.name+": "+handler.getFeatureName(), entity, this.bsModalRef);
-        // KML/KMZ layers
-        } else if ((layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.KML)))||
-                  (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.KMZ)))) {
+          this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.bsModalRef);
+          // KML/KMZ layers
+        } else if ((layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.KML))) ||
+          (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.KMZ)))) {
           this.displayModal(mapClickInfo.clickCoord);
           const handler = new KMLQuerierHandler(entity);
-          this.setModalHTML(handler.getHTML(), layer.name+": "+handler.getFeatureName(), entity, this.bsModalRef);
+          this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.bsModalRef);
+          // KML/KMZ layers
+        } else if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.VMF))) {
+          this.displayModal(mapClickInfo.clickCoord);
+          const handler = new VMFQuerierHandler(entity);
+          this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.bsModalRef);
         }
       }
       // TODO: Remove commented code, kept for yet to be re-implemented entity types
@@ -378,7 +388,7 @@ export class CsMapComponent implements AfterViewInit {
     let numberOfLayersToProcess = mapClickInfo.clickedLayerList.length;
     let mayRequireMapZoom = false;
     for (const maplayer of mapClickInfo.clickedLayerList) {
-      for (const i of maplayer.clickCSWRecordsIndex ) {
+      for (const i of maplayer.clickCSWRecordsIndex) {
         const cswRecord = maplayer.cswRecords[i];
 
         // Bail if no OnlineResources
@@ -398,7 +408,7 @@ export class CsMapComponent implements AfterViewInit {
             this.displayModal(mapClickInfo.clickCoord);
             this.setModalHTML(this.parseCSWtoHTML(cswRecord), cswRecord.name, maplayer, this.bsModalRef);
 
-          // Display WMS layer info
+            // Display WMS layer info
           } else {
             const params = this.getParams(maplayer.clickPixel[0], maplayer.clickPixel[1]);
             if (!params) {
@@ -449,8 +459,7 @@ export class CsMapComponent implements AfterViewInit {
             // Query GetFeatureInfo for current layer
             this.queryWMSService.getFeatureInfo(onlineResource, sldBody, infoFormat, postMethod,
               maplayer.clickCoord[0], maplayer.clickCoord[1], params.x, params.y, params.width, params.height, params.bbox).subscribe(result => {
-                numberOfLayersToProcess -= 1;
-                const feature = {onlineResource: onlineResource, layer: maplayer};
+                const feature = { onlineResource: onlineResource, layer: maplayer };
                 // Display the modal, but only if there are features
                 const num_feats = this.setModal(maplayer.id, result, feature, mapClickInfo.clickCoord);
                 if (num_feats > 0) {
@@ -477,14 +486,14 @@ export class CsMapComponent implements AfterViewInit {
    * @returns HTML string
    */
   private parseCSWtoHTML(cswRecord: CSWRecordModel): string {
-    let html =  '<div class="row"><div class="col-md-3">Source</div><div class="col-md-9"><a style="color: #000000" href="' + cswRecord.recordInfoUrl + '">Full Metadata and download</a></div></div><hr>';
-    html +=  '<div class="row"><div class="col-md-3">Title</div><div class="col-md-9">' + cswRecord.name + '</div></div><hr>';
-    html +=  '<div class="row"><div class="col-md-3">Abstract</div><div class="col-md-8"><div class="row" style="height: 100px;overflow-y: scroll;margin-left:0">' +
-       cswRecord.description + '</div></div></div><hr>';
-    html +=  '<div class="row"><div class="col-md-3">Keywords</div><div class="col-md-9">' + cswRecord.descriptiveKeywords + '</div></div><hr>';
-    html +=  '<div class="row"><div class="col-md-3">Organization</div><div class="col-md-9">' + cswRecord.contactOrg + '</div></div><hr>';
+    let html = '<div class="row"><div class="col-md-3">Source</div><div class="col-md-9"><a style="color: #000000" href="' + cswRecord.recordInfoUrl + '">Full Metadata and download</a></div></div><hr>';
+    html += '<div class="row"><div class="col-md-3">Title</div><div class="col-md-9">' + cswRecord.name + '</div></div><hr>';
+    html += '<div class="row"><div class="col-md-3">Abstract</div><div class="col-md-8"><div class="row" style="height: 100px;overflow-y: scroll;margin-left:0">' +
+      cswRecord.description + '</div></div></div><hr>';
+    html += '<div class="row"><div class="col-md-3">Keywords</div><div class="col-md-9">' + cswRecord.descriptiveKeywords + '</div></div><hr>';
+    html += '<div class="row"><div class="col-md-3">Organization</div><div class="col-md-9">' + cswRecord.contactOrg + '</div></div><hr>';
 
-    html +=  '<div class="row"><div class="col-md-3">Resource link</div><div class="col-md-9">';
+    html += '<div class="row"><div class="col-md-3">Resource link</div><div class="col-md-9">';
     for (const onlineResource of cswRecord.onlineResources) {
       html += '<p><a style="color: #000000" target="_blank" href="' + onlineResource.url + '">' + (onlineResource.name ? onlineResource.name : 'Web resource link') + '</a></p>';
     }
@@ -498,9 +507,9 @@ export class CsMapComponent implements AfterViewInit {
    * Display the querier modal on map click
    * @param clickCoord map click coordinates
    */
-  private displayModal(clickCoord: {x: number, y: number, z: number}|null) {
+  private displayModal(clickCoord: { x: number, y: number, z: number } | null) {
     if (!this.modalDisplayed) {
-      this.bsModalRef = this.modalService.show(QuerierModalComponent, {class: 'modal-lg'});
+      this.bsModalRef = this.modalService.show(QuerierModalComponent, { class: 'modal-lg' });
       this.modalDisplayed = true;
       this.bsModalRef.content.downloading = true;
       this.bsModalRef.content.showZoomMsg = false;
@@ -572,7 +581,7 @@ export class CsMapComponent implements AfterViewInit {
         }
       }
     } catch (err) {
-        return [];
+      return [];
     }
     return treeCollections;
   }
@@ -586,7 +595,7 @@ export class CsMapComponent implements AfterViewInit {
    * @param clickCoord map click coordinates
    * @param gmlid a optional filter to only display the gmlId specified
    */
-  private setModal(layerId: string, result: string, feature: any, clickCoord: {x: number, y: number, z: number}|null, gmlid?: string) {
+  private setModal(layerId: string, result: string, feature: any, clickCoord: { x: number, y: number, z: number } | null, gmlid?: string) {
     let treeCollections = [];
     // Some layers return JSON
     if (config.wmsGetFeatureJSON.indexOf(layerId) !== -1) {
@@ -630,16 +639,16 @@ export class CsMapComponent implements AfterViewInit {
    * @param bsModalRef modal dialog reference
    */
   private setModalHTML(html: string, key: any, layer: LayerModel, bsModalRef: BsModalRef) {
-      bsModalRef.content.htmls.push({
-        key: key,
-        layer: layer,
-        value: html
-      });
-      if (bsModalRef.content.uniqueLayerNames.indexOf(layer.name) === -1) {
-        bsModalRef.content.uniqueLayerNames.push(layer.name)
-      }
-     this.bsModalRef.content.downloading = false;
-     this.bsModalRef.content.onDataChange();
+    bsModalRef.content.htmls.push({
+      key: key,
+      layer: layer,
+      value: html
+    });
+    if (bsModalRef.content.uniqueLayerNames.indexOf(layer.name) === -1) {
+      bsModalRef.content.uniqueLayerNames.push(layer.name)
+    }
+    this.bsModalRef.content.downloading = false;
+    this.bsModalRef.content.onDataChange();
   }
 
   /**
@@ -671,29 +680,29 @@ export class CsMapComponent implements AfterViewInit {
   public toggleShowMapSplit() {
     this.csMapService.setSplitMapShown(!this.csMapService.getSplitMapShown());
     if (this.csMapService.getSplitMapShown()) {
-        setTimeout(() => {
-          this.viewer.scene.imagerySplitPosition = this.mapSlider.nativeElement.offsetLeft / this.mapElement.nativeElement.offsetWidth;
-          const handler = new ScreenSpaceEventHandler(this.mapSlider.nativeElement);
-          handler.setInputAction(() => {
-            this.sliderMoveActive = true;
-          }, ScreenSpaceEventType.LEFT_DOWN);
-          handler.setInputAction(() => {
-            this.sliderMoveActive = true;
-          }, ScreenSpaceEventType.PINCH_START);
-          handler.setInputAction(this.moveSlider, ScreenSpaceEventType.MOUSE_MOVE);
-          handler.setInputAction(this.moveSlider, ScreenSpaceEventType.PINCH_MOVE);
-          handler.setInputAction(() => {
-            this.sliderMoveActive = false;
-          }, ScreenSpaceEventType.LEFT_UP);
-          handler.setInputAction(() => {
-            this.sliderMoveActive = false;
-          }, ScreenSpaceEventType.PINCH_END);
-        }, 10);
+      setTimeout(() => {
+        this.viewer.scene.imagerySplitPosition = this.mapSlider.nativeElement.offsetLeft / this.mapElement.nativeElement.offsetWidth;
+        const handler = new ScreenSpaceEventHandler(this.mapSlider.nativeElement);
+        handler.setInputAction(() => {
+          this.sliderMoveActive = true;
+        }, ScreenSpaceEventType.LEFT_DOWN);
+        handler.setInputAction(() => {
+          this.sliderMoveActive = true;
+        }, ScreenSpaceEventType.PINCH_START);
+        handler.setInputAction(this.moveSlider, ScreenSpaceEventType.MOUSE_MOVE);
+        handler.setInputAction(this.moveSlider, ScreenSpaceEventType.PINCH_MOVE);
+        handler.setInputAction(() => {
+          this.sliderMoveActive = false;
+        }, ScreenSpaceEventType.LEFT_UP);
+        handler.setInputAction(() => {
+          this.sliderMoveActive = false;
+        }, ScreenSpaceEventType.PINCH_END);
+      }, 10);
 
     } else {
-     for (const layer of this.csMapService.getLayerModelList()) {
-      this.csMapService.setLayerSplitDirection(layer, SplitDirection.NONE);
-     }
+      for (const layer of this.csMapService.getLayerModelList()) {
+        this.csMapService.setLayerSplitDirection(layer, SplitDirection.NONE);
+      }
     }
   }
 
