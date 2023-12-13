@@ -16,6 +16,8 @@ import { KMLQuerierHandler } from './custom-querier-handler/kml-querier-handler.
 import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
 import { UserStateService } from 'app/services/user/user-state.service';
 import { VMFQuerierHandler } from './custom-querier-handler/vmf-querier-handler.service';
+import { Observable, forkJoin } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 declare var Cesium: any;
 
@@ -290,23 +292,6 @@ export class CsMapComponent implements AfterViewInit {
   }
 
   /**
-   * Update the modal with downloading or zoom messages if required
-   *
-   * @param numberOfLayersToProcess number of layers left to process
-   * @param foundFeatures whether features have been found for any of the layers
-   * @param mayRequireMapZoom whether anyy of the layers may require zooming for accuracy
-   */
-  setModalMessages(numberOfLayersToProcess: number, foundFeatures: boolean, mayRequireMapZoom: boolean) {
-    if (numberOfLayersToProcess === 0) {
-      this.bsModalRef.content.downloading = false;
-      if (!foundFeatures && mayRequireMapZoom) {
-        this.bsModalRef.content.showZoomMsg = true;
-      }
-    }
-    this.bsModalRef.content.onDataChange();
-  }
-
-  /**
    * Handles the map click event
    * @param mapClickInfo object with map click information
    */
@@ -383,10 +368,12 @@ export class CsMapComponent implements AfterViewInit {
     // Open the modal for display
     this.displayModal(mapClickInfo.clickCoord);
 
+    // Build list of GetFeatureInfo requests
+    const getFeatureInfoRequests: Observable<any>[] = [];
+    // Total number of features returned from GetFeatureInfo requests
+    let numberOfFeatures = 0;
+
     // Process list of layers clicked
-    let foundFeatures = false;
-    let numberOfLayersToProcess = mapClickInfo.clickedLayerList.length;
-    let mayRequireMapZoom = false;
     for (const maplayer of mapClickInfo.clickedLayerList) {
       for (const i of maplayer.clickCSWRecordsIndex) {
         const cswRecord = maplayer.cswRecords[i];
@@ -412,7 +399,6 @@ export class CsMapComponent implements AfterViewInit {
           } else {
             const params = this.getParams(maplayer.clickPixel[0], maplayer.clickPixel[1]);
             if (!params) {
-              numberOfLayersToProcess -= 1;
               continue;
             }
             let sldBody = maplayer.sldBody;
@@ -456,28 +442,33 @@ export class CsMapComponent implements AfterViewInit {
               infoFormat = 'text/xml';
             }
 
-            // Query GetFeatureInfo for current layer
-            this.queryWMSService.getFeatureInfo(onlineResource, sldBody, infoFormat, postMethod,
-              maplayer.clickCoord[0], maplayer.clickCoord[1], params.x, params.y, params.width, params.height, params.bbox).subscribe(result => {
+            // Build GetFeatureInfo requests
+            getFeatureInfoRequests.push(
+              this.queryWMSService.getFeatureInfo(onlineResource, sldBody, infoFormat, postMethod, maplayer.clickCoord[0],
+                    maplayer.clickCoord[1], params.x, params.y, params.width, params.height, params.bbox).pipe(tap(result => {
+                // Update the modal features as each request completes
                 const feature = { onlineResource: onlineResource, layer: maplayer };
-                // Display the modal, but only if there are features
-                const num_feats = this.setModal(maplayer.id, result, feature, mapClickInfo.clickCoord);
-                if (num_feats > 0) {
-                  foundFeatures = true;
+                const numberOfLayerFeatures = this.setModal(maplayer.id, result, feature, mapClickInfo.clickCoord);
+                if (numberOfLayerFeatures > 0) {
+                  numberOfFeatures += numberOfLayerFeatures;
                 }
-                // If zoom level is too low and nothing is found then show zoom message (provided no other features found in other layers)
-                else if (num_feats === 0 && params.level <= 3) {
-                  mayRequireMapZoom = true;
-                }
-                this.setModalMessages(numberOfLayersToProcess, foundFeatures, mayRequireMapZoom);
-              }, () => {
-                numberOfLayersToProcess -= 1;
-                this.setModalMessages(numberOfLayersToProcess, foundFeatures, mayRequireMapZoom);
-              });
+              }))
+            );
           }
         }
       }
     }
+
+    // All requests completed, add zoom message to modal if no results were found
+    if (getFeatureInfoRequests.length > 0) {
+      forkJoin(getFeatureInfoRequests).subscribe(() => {
+        this.bsModalRef.content.downloading = false;
+        if (numberOfFeatures === 0) {
+            this.bsModalRef.content.showZoomMsg = true;
+        }
+      });
+    }
+
   }
 
   /**
@@ -611,7 +602,7 @@ export class CsMapComponent implements AfterViewInit {
       }
       featureCount++;
       if (featureCount >= 10) {
-        this.setModalHTML('<p>Too many features to list, zoom in the map to get a more precise location</p>',
+        this.setModalHTML('<p>One or more layers returned too many features to list, use map zoom to get a more precise location</p>',
           '...', feature, this.bsModalRef);
         break;
 

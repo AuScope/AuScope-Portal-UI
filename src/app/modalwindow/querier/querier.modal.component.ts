@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/member-ordering */
-import { ApplicationRef, ChangeDetectorRef, Component, Inject, OnInit, ElementRef, ViewChild, AfterViewInit, Renderer2, HostListener } from '@angular/core';
+import { ApplicationRef, ChangeDetectorRef, Component, Inject, OnInit, ElementRef, ViewChild, AfterViewInit, Renderer2 } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { config } from '../../../environments/config';
 import { ref } from '../../../environments/ref';
@@ -96,6 +96,7 @@ export class QuerierModalComponent  implements OnInit, AfterViewInit {
     this.flagNVCLAnalytic = false;
     this.screenWidth = window.innerWidth;
   }
+
   ngAfterViewInit(): void {
     const parentElement = this.childElement.nativeElement.parentElement.parentElement;
     const left = this.screenWidth
