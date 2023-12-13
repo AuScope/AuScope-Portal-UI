@@ -466,7 +466,11 @@ export class CsMapComponent implements AfterViewInit {
         if (numberOfFeatures === 0) {
             this.bsModalRef.content.showZoomMsg = true;
         }
+        this.bsModalRef.content.onDataChange();
       });
+    } else {
+      this.bsModalRef.content.downloading = false;
+      this.bsModalRef.content.onDataChange();
     }
 
   }
