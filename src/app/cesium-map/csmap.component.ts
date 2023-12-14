@@ -17,7 +17,7 @@ import { AdvancedComponentService } from 'app/services/ui/advanced-component.ser
 import { UserStateService } from 'app/services/user/user-state.service';
 import { VMFQuerierHandler } from './custom-querier-handler/vmf-querier-handler.service';
 import { Observable, forkJoin } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { finalize, tap, timeout } from 'rxjs/operators';
 
 declare var Cesium: any;
 
@@ -445,32 +445,34 @@ export class CsMapComponent implements AfterViewInit {
             // Build GetFeatureInfo requests
             getFeatureInfoRequests.push(
               this.queryWMSService.getFeatureInfo(onlineResource, sldBody, infoFormat, postMethod, maplayer.clickCoord[0],
-                    maplayer.clickCoord[1], params.x, params.y, params.width, params.height, params.bbox).pipe(tap(result => {
-                // Update the modal features as each request completes
-                const feature = { onlineResource: onlineResource, layer: maplayer };
-                const numberOfLayerFeatures = this.setModal(maplayer.id, result, feature, mapClickInfo.clickCoord);
-                if (numberOfLayerFeatures > 0) {
-                  numberOfFeatures += numberOfLayerFeatures;
-                }
-              }))
+                maplayer.clickCoord[1], params.x, params.y, params.width, params.height, params.bbox).pipe(
+                  timeout(5000),
+                  tap(result => {
+                    // Update the modal features as each request completes
+                    const feature = { onlineResource: onlineResource, layer: maplayer };
+                    const numberOfLayerFeatures = this.setModal(maplayer.id, result, feature, mapClickInfo.clickCoord);
+                    if (numberOfLayerFeatures > 0) {
+                      numberOfFeatures += numberOfLayerFeatures;
+                    }
+                  })
+                )
             );
           }
         }
       }
     }
 
-    // All requests completed, add zoom message to modal if no results were found
     if (getFeatureInfoRequests.length > 0) {
-      forkJoin(getFeatureInfoRequests).subscribe(() => {
-        this.bsModalRef.content.downloading = false;
-        if (numberOfFeatures === 0) {
-            this.bsModalRef.content.showZoomMsg = true;
-        }
-        this.bsModalRef.content.onDataChange();
-      });
-    } else {
-      this.bsModalRef.content.downloading = false;
-      this.bsModalRef.content.onDataChange();
+      // All requests completed, add zoom message to modal if no results were found
+      forkJoin(getFeatureInfoRequests).pipe(
+        finalize(() => {
+          this.bsModalRef.content.downloading = false;
+          if (numberOfFeatures === 0) {
+              this.bsModalRef.content.showZoomMsg = true;
+          }
+          this.bsModalRef.content.onDataChange();
+        })
+      ).subscribe();
     }
 
   }
