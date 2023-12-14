@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
 import { Constants, LayerModel, LayerStatusService, ManageStateService, OnlineResourceModel, SldService, UtilitiesService } from '@auscope/portal-core-ui';
 import { LegendModalComponent } from 'app/modalwindow/legend/legend.modal.component';
@@ -14,8 +14,13 @@ export class LegendUiService {
   // Track which legends are open
   displayedLegends: Map<string, MatDialogRef<LegendModalComponent>> = new Map<string, MatDialogRef<LegendModalComponent>>();
 
-  constructor(private manageStateService: ManageStateService, private sldService: SldService,
-              private layerStatusService: LayerStatusService, private http: HttpClient, private dialog: MatDialog) {}
+  constructor(private manageStateService: ManageStateService,
+              private sldService: SldService,
+              private layerStatusService: LayerStatusService,
+              private http: HttpClient,
+              private dialog: MatDialog,
+              @Inject('env') private env
+  ) {}
 
   /**
    * Get the first WMS OnlineResource for a layer
@@ -59,10 +64,9 @@ export class LegendUiService {
    *
    * @param layerId the ID of the relevant layer
    * @param legendTitle the title for the dialog
-   * @param legendUrlList list of legend image URLs (either this or legendRequestList will be required)
    * @param legendRequestList list of image requests (either this or legendUrlList will be required)
    */
-  private displayLegendDialog(layerId: string, legendTitle: string, /*legendUrlList: string[], */legendRequestList: Observable<any>[]) {
+  private displayLegendDialog(layerId: string, legendTitle: string, legendRequestList: Observable<any>[]) {
     const dialogConfig = new MatDialogConfig();
       dialogConfig.autoFocus = true;
       dialogConfig.hasBackdrop = false;
@@ -77,23 +81,14 @@ export class LegendUiService {
   }
 
   /**
-   * Retrieve the legend image data as a blob
-   *
-   * @param legendUrl the URL from which to retrieve the image data
-   * @returns a Blob observable of legend image data
-   */
-  private getLegendImageData(legendUrl: string): Observable<Blob> {
-    return this.http.post<Blob>(legendUrl, { responseType: 'blob' });
-  }
-
-  /**
    * Create HttpParams for the GetLegendGraphic requests
+   * @param url URL parameter for proxy request
    * @param layerName the layer name
    * @param collatedParam other layer specific collated parameters
    * @param sldBody the styled layer descriptor (SLD_BODY) - Optional
    * @returns a set of HttpParams for th eGetLegendGraphic request
    */
-  private getHttpParams(layerName: string, collatedParam: any, sldBody?: string): HttpParams {
+  private getLegendHttpParams(url: string, layerName: string, collatedParam: any, sldBody?: string): HttpParams {
     let httpParams = new HttpParams()
           .set('SERVICE', 'WMS')
           .append('REQUEST', 'GetLegendGraphic')
@@ -102,7 +97,9 @@ export class LegendUiService {
           .append('LAYER', layerName)
           .append('LAYERS', layerName)
           .append('SCALE', '1000000')
-          .append('LEGEND_OPTIONS', 'forceLabels:on;minSymbolSize:16');
+          .append('LEGEND_OPTIONS', 'forceLabels:on;minSymbolSize:16')
+          .append('url', url)
+          .append('usewhitelist', 'false');
           if (sldBody) {
             httpParams = httpParams.append('SLD_BODY', sldBody);
           }
@@ -138,9 +135,10 @@ export class LegendUiService {
    * @param sldBody the SLD_BODY (if one is to be used)
    * @returns a GetLegendGraphic URL for GET requests
    */
-  private createRequestUrl(wmsUrl: string, layerName: string, sldBody?: string): string {
+  private createLegendUrl(wmsUrl: string, layerName: string, sldBody?: string): string {
     wmsUrl = this.trimUrl(wmsUrl);
     let requestUrl = wmsUrl + '?SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png&BGCOLOR=0xFFFFFF' +
+                     '&WIDTH=40&HEIGHT=40' +
                      '&LAYER=' + layerName + '&LAYERS=' + layerName + '&SCALE=1000000' + '&forceLabels=on&minSymbolSize=16';
     if (sldBody) {
       requestUrl += '&SLD_BODY=' + encodeURI(sldBody);
@@ -196,14 +194,20 @@ export class LegendUiService {
           if (!this.layerStatusService.isEndpointFailing(layer.id, wmsOnlineResource)) {
             // Some GET URLs were being truncated at the server despite not being very long, other servers were outright rejecting POST
             // requests, so create lists of GET URLs and POST requests to throw everything at the wall and see what sticks.
-            const httpParams = this.getHttpParams(wmsOnlineResource.name, collatedParam, sldBody);
-            const postRequest = this.http.post(this.trimUrl(resource.url), httpParams, { responseType: 'blob' }).pipe(
+
+            // Assemble params, including 'GetLegend' params
+            let httpParams = this.getLegendHttpParams(this.trimUrl(resource.url), wmsOnlineResource.name, collatedParam, sldBody);
+            // Make a POST request with proxy
+            let proxyUrl = this.env.portalBaseUrl + Constants.PROXY_API;
+            const postRequest = this.http.post(proxyUrl, httpParams, { responseType: 'blob' }).pipe(
               catchError(() => {
                 return of(undefined);
               })
             );
             legendRequestList.push(postRequest);
-            const requestUrl = this.createRequestUrl(resource.url, resource.name, sldBody);
+
+            // Make a GET request, no proxy
+            const requestUrl = this.createLegendUrl(resource.url, resource.name, sldBody);
             const getRequest = this.http.get(requestUrl, { responseType: 'blob' }).pipe(
               catchError(() => {
                 return of(undefined);
@@ -214,13 +218,26 @@ export class LegendUiService {
         }
         this.displayLegendDialog(layer.id, layer.name, legendRequestList);
       } else {
-        const requestUrl = this.createRequestUrl(wmsOnlineResource.url, wmsOnlineResource.name, null);
+        // It comes here when there is no SLD_BODY parameter
+
+        // Create a POST request with proxy, with the proxy this enables us to use HTTP services
+        // Assemble params, including 'GetLegend' params
+        let httpParams = this.getLegendHttpParams(this.trimUrl(wmsOnlineResource.url), wmsOnlineResource.name, collatedParam);
+        let proxyUrl = this.env.portalBaseUrl + Constants.PROXY_API;
+        const postRequest = this.http.post(proxyUrl, httpParams, { responseType: 'blob' }).pipe(
+          catchError(() => {
+            return of(undefined);
+          })
+        );
+
+        // Create a GET request, no proxy
+        const requestUrl = this.createLegendUrl(wmsOnlineResource.url, wmsOnlineResource.name);
         const getRequest = this.http.get(requestUrl, { responseType: 'blob' }).pipe(
           catchError(() => {
             return of(undefined);
           })
         );
-        this.displayLegendDialog(layer.id, layer.name, [getRequest]);
+        this.displayLegendDialog(layer.id, layer.name, [getRequest, postRequest]);
       }
     });
   }
