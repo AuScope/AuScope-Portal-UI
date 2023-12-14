@@ -237,6 +237,9 @@ export class LayerPanelComponent implements OnInit {
                 }
               }
             }
+            Object.keys(me.layerGroups).forEach(group => {
+              me.layerGroups[group].sort((a, b) => a.name.localeCompare(b.name));
+            });
           });
       });
 
