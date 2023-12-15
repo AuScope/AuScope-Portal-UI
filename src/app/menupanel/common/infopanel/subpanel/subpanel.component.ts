@@ -116,6 +116,20 @@ export class InfoPanelSubComponent implements OnChanges {
             }
             // Gather up BBOX coordinates to calculate the centre and envelope
             const bbox = this.cswRecord.geographicElements[0];
+            // Make sure that the view is only of Australia
+            // On most maps if we use world-wide bounds it will make the Australian features too small
+            if (bbox.westBoundLongitude < 100) {
+                bbox.westBoundLongitude = 100;
+            }
+            if (bbox.eastBoundLongitude > 160) {
+                bbox.eastBoundLongitude = 160;
+            }
+            if (bbox.southBoundLatitude < -50) {
+                bbox.southBoundLatitude = -50;
+            }
+            if (bbox.northBoundLatitude > -5) {
+                bbox.northBoundLatitude = -5;
+            }
 
             // Gather up lists of information URLs
             if (wmsOnlineResource) {

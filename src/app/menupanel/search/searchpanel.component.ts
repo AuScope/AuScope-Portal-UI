@@ -1,6 +1,7 @@
 import { Component, ElementRef, HostListener, Inject, OnInit, ViewChild } from '@angular/core';
 import { RectangleEditorObservable } from '@auscope/angular-cesium';
-import { Bbox, CsMapService, LayerHandlerService, LayerModel, ManageStateService, UtilitiesService } from '@auscope/portal-core-ui';
+import { Bbox, CsMapService, LayerHandlerService, LayerModel, 
+         ManageStateService, UtilitiesService, Constants } from '@auscope/portal-core-ui';
 import { NgbDropdown, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SearchService } from 'app/services/search/search.service';
 import { Observable, Subject, Subscription } from 'rxjs';
@@ -89,9 +90,15 @@ export class SearchPanelComponent implements OnInit {
   highlightedSuggestionIndex = -1;
 
   constructor(private searchService: SearchService,
-              private csMapService: CsMapService, private layerHandlerService: LayerHandlerService,
-              private layerManagerService: LayerManagerService, private uiLayerModelService: UILayerModelService,
-              private manageStateService: ManageStateService, private modalService: NgbModal, private http: HttpClient, @Inject('env') private env) { }
+              private csMapService: CsMapService,
+              private layerHandlerService: LayerHandlerService,
+              private layerManagerService: LayerManagerService,
+              private uiLayerModelService: UILayerModelService,
+              private manageStateService: ManageStateService,
+              private modalService: NgbModal,
+              private http: HttpClient,
+              @Inject('env') private env
+    ) { }
 
   ngOnInit() {
     for (const service of OGC_SERVICES) {
@@ -314,7 +321,7 @@ export class SearchPanelComponent implements OnInit {
 
       let url0 = onlineResourcesWFS.url;
       let url1 = url0 + '?service=WFS&request=GetFeature&version=1.0.0&outputFormat=csv&maxFeatures=1000000&typeName=' + typename;
-      let url = me.env.portalBaseUrl + 'getViaProxy.do?usewhitelist=false&'+ httpParams.append('url',url1 ).toString();
+      let url = me.env.portalBaseUrl + Constants.PROXY_API + '?usewhitelist=false&' + httpParams.append('url',url1 ).toString();
       let filename = typename + '.' + url0 + '.csv';
       filename = filename.replace(/:|\/|\\/g,'-');
       let ob = await this.http.get(url, { headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'), responseType: 'text'}).toPromise();
@@ -325,6 +332,7 @@ export class SearchPanelComponent implements OnInit {
       //console.log('downloaded:' + url);
     }
   }
+
   /**
    * Display layer information dialog
    *

@@ -1,5 +1,6 @@
 import { Component, Output, Inject, EventEmitter } from '@angular/core';
-import { LayerHandlerService, LayerModel, RenderStatusService, KMLDocService, ResourceType } from '@auscope/portal-core-ui';
+import { LayerHandlerService, LayerModel, RenderStatusService, KMLDocService, ResourceType,
+         Constants } from '@auscope/portal-core-ui';
 import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal';
@@ -7,8 +8,7 @@ import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import * as JSZip from 'jszip';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { saveAs } from 'file-saver';
+import { HttpClient } from '@angular/common/http';
 import { throwError as observableThrowError, Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { HttpResponse } from '@angular/common/http';
@@ -42,10 +42,15 @@ export class CustomPanelComponent {
   bsModalRef: BsModalRef;
   @Output() expanded: EventEmitter<any> = new EventEmitter();
 
-  constructor(private http: HttpClient, private layerHandlerService: LayerHandlerService, private renderStatusService: RenderStatusService,
-    private modalService: BsModalService, private uiLayerModelService: UILayerModelService,
-    public activeModalService: NgbModal, private kmlService: KMLDocService,
-    @Inject('env') private env) {
+  constructor(private http: HttpClient,
+              private layerHandlerService: LayerHandlerService,
+              private renderStatusService: RenderStatusService,
+              private modalService: BsModalService,
+              private uiLayerModelService: UILayerModelService,
+              public activeModalService: NgbModal,
+              private kmlService: KMLDocService,
+              @Inject('env') private env
+  ) {
     this.loading = false;
     this.statusMsg = 'Enter your OGC WMS service endpoint</br>e.g. "https://server.gov.au/service/wms"</br>or KML/KMZ URL and hit <i class="fa fa-search"></i>.';
   }
@@ -69,7 +74,7 @@ export class CustomPanelComponent {
   }
 
   /**
-   * Search list of available WMS layers given an OGC WMS URL or a KML URL 
+   * Search list of available WMS layers given an OGC WMS URL, or try to load a KML/KMZ URL 
    */
   public search() {
     // Clear the status message
@@ -104,7 +109,7 @@ export class CustomPanelComponent {
       // Extract a layer name from URL
       const layerName = url.pathname.split('/').pop();
       // Use the proxy
-      const proxyUrl = this.env.portalBaseUrl + "getViaProxy.do?usewhitelist=false&url=" + searchUrl;
+      const proxyUrl = this.env.portalBaseUrl + Constants.PROXY_API + "?usewhitelist=false&url=" + searchUrl;
 
       this.getGoogleMapDoc(proxyUrl).subscribe(response => {
         let kml = response;
@@ -151,7 +156,7 @@ export class CustomPanelComponent {
         // Extract a layer name from URL
         const layerName = url.pathname.split('/').pop();
         // Use the proxy
-        const proxyUrl = this.env.portalBaseUrl + "getViaProxy.do?usewhitelist=false&url=" + searchUrl;
+        const proxyUrl = this.env.portalBaseUrl + Constants.PROXY_API + "?usewhitelist=false&url=" + searchUrl;
 
         // Add KMZ to map
         this.getGoogleMapDoc(proxyUrl).subscribe(response => {
