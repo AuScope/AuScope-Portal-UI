@@ -10,8 +10,8 @@ import { isNumber } from '@turf/helpers';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { BoundsService } from 'app/services/bounds/bounds.service';
 import { NVCLService } from '../../../modalwindow/querier/customanalytic/nvcl/nvcl.service';
-import { shareReplay } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { catchError, shareReplay } from 'rxjs/operators';
+import { Subject, throwError } from 'rxjs';
 
 declare var gtag: Function;
 
@@ -467,7 +467,14 @@ export class DownloadPanelComponent implements OnInit {
       if (this.irisDownloadListOption.selectedserviceType === 'Station') {
         observableResponse = this.downloadIrisService.downloadIRISStation(this.layer, this.bbox, station, channel, start, end);
       } else {
-        observableResponse = this.downloadIrisService.downloadIRISDataselect(this.layer, station, channel, start, end);
+        observableResponse = this.downloadIrisService.downloadIRISDataselect(this.layer, station, channel, start, end)
+        .pipe(
+          catchError(err => {
+            // Handle the error or log it
+            alert('Please narrow down the date range, as the request data is too large.')
+            return throwError(err);
+          })
+        );
       }
     // Standard WFS feature download as a CSV
     } else {
