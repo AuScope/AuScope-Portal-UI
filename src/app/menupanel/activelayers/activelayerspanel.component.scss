@@ -50,3 +50,14 @@
 .cdk-drop-list-dragging {
   cursor: grabbing;
 }
+
+u {
+  text-decoration: none;
+}
+
+.legend, .status {
+  font-size: 0.8rem;
+  padding: 0 2px;
+  margin-left: 12px;
+  margin-top:6px;
+}
