@@ -134,6 +134,11 @@ export class NVCLBoreholeAnalyticComponent
     this.nvclBoreholeAnalyticService
       .getNVCLClassifications(algorithmOutputIds)
       .subscribe(classifications => {
+        classifications = classifications.sort((a,b)=> {
+          var a1 = a.classText.toLowerCase();
+          var b1 = b.classText.toLowerCase();
+          return a1<b1 ?-1:a1> b1? 1 :0;
+          })
         this.classifications = classifications;
       });
   }
