@@ -416,7 +416,8 @@ export class LayerPanelComponent implements OnInit {
     if (layer) {
       const modelRef = this.activeModalService.open(InfoPanelComponent, {
         size: "lg",
-        backdrop: false
+        backdrop: false,
+        scrollable: true
       });
       modelRef.componentInstance.cswRecords = layer.cswRecords;
       modelRef.componentInstance.layer = layer;
