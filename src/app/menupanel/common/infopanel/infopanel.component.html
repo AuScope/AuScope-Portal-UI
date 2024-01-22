@@ -1,4 +1,4 @@
-<div class="modal-header" style="background: #EEE">
+<div cdkDrag cdkDragRootElement=".modal-content" #childElement cdkDragBoundary="body" class="modal-header" style="background: #EEE;">
     <h5 class="modal-title" id="exampleModalLongTitle">Record Information</h5>
     <button type="button" class="close" (click)="activeModal.close()" aria-label="Close">
         <span aria-hidden="true">&times;</span>
