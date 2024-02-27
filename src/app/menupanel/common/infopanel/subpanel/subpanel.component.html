@@ -1,5 +1,32 @@
-<p><b>Title: </b>{{cswRecord.name}}</p>
-<p><b>Abstract: </b>{{cswRecord.description}}</p>
+<!-- Title -->
+<p><b>{{cswRecord.name}}</b></p>
+
+<!-- Preview -->
+<div *ngIf="wmsUrl!==undefined">
+	<b>WMS Preview: </b>
+	<!-- Place images one on top of the other -->
+	<div style="display: inline-block; position: relative; opacity: 50%;">
+		<img appImgLoading src="{{outlineUrl}}" (error)="onImgError($event)" height="200" width="200"/>
+	</div>
+	<div style="display: inline-block; position: relative; top: -200px; left: 100px; opacity: 50%;">
+		<img appImgLoading src="{{wmsUrl}}" (error)="onImgError($event)" height="200" width="200"/>
+	</div>
+</div>
+
+<!-- Move div up the page if there is a valid WMS Preview -->
+<div style="display: inline-block; position: relative;"  [ngStyle]="{'top': wmsUrl===undefined? '0px':'-200px'}">
+
+
+<!-- Legend -->
+<p *ngIf="legendUrl!==undefined">
+	<b>Legend: </b>
+	<img appImgLoading src="{{legendUrl}}" (error)="onImgError($event)" class="infopanel-legend"/>
+</p>
+
+<!-- Abstract -->
+<p>{{cswRecord.description}}</p>
+
+<!-- Organisation etc. -->
 <p><b>Contact org: </b>{{cswRecord.contactOrg}}</p>
 <p *ngIf="cswRecord.funderOrg && cswRecord.funderOrg !== 'Unknown'"><b>Funder: </b>{{cswRecord.funderOrg}}</p>
 <p *ngIf='cleanConstraints(cswRecord.constraints).length > 0'><b>Constraints: </b>{{cleanConstraints(cswRecord.constraints)}}</p>
@@ -18,9 +45,5 @@
 		<a *ngIf="!isGetCapabilitiesType(onlineResource)" target="_blank" href="{{ removeProxy(onlineResource.url) }}">{{ removeProxy(onlineResource.url) }}</a>
 	</p>
 </div>
-<p *ngIf="wmsUrl!==undefined">
-	<b>WMS Preview: </b><img appImgLoading src="{{wmsUrl}}" (error)="onImgError($event)" height="100" width="100"/>
-</p>
-<p *ngIf="legendUrl!==undefined">
-	<b>Legend: </b><img appImgLoading src="{{legendUrl}}" (error)="onImgError($event)" class="infopanel-legend"/>
-</p>
+
+</div>

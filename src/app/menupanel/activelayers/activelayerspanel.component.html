@@ -26,7 +26,8 @@
                     <button class="btn btn-primary btn-sm legend"  [disabled]="isLegendShown(layer.id)" (click)="showLegend(layer)">Legend</button>
                     <button class="btn btn-primary btn-sm status"  (click)="openStatusReport(getUILayerModel(layer.id)); $event.stopPropagation();">Status</button>
                 </div>
-            </div>            <div class="split-panel" *ngIf="getShowSplitMapButtons(layer)" (click)="$event.stopPropagation()">
+            </div>
+            <div class="split-panel" *ngIf="getShowSplitMapButtons(layer)" (click)="$event.stopPropagation()">
                 Split Direction&nbsp;
                 <div *ngIf="getApplicableSplitLayer(layer)" class="split-button-panel">
                     <button [className]="getLayerSplitDirection(layer.id) === 'left' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'left')">Left</button>
