@@ -31,6 +31,7 @@ declare var Cesium: any;
           <app-cs-map-zoom></app-cs-map-zoom>
           <app-cs-map-split (toggleEvent)="toggleShowMapSplit()"></app-cs-map-split>
           <app-cs-clipboard></app-cs-clipboard>
+          <app-permanent-link></app-permanent-link>
           <div #mapSlider id="mapSlider" *ngIf="getSplitMapShown()">
             <div class="slider-grabber">
               <div class="slider-grabber-inner"></div>
