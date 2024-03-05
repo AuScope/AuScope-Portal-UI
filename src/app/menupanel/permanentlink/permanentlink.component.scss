@@ -1,0 +1,24 @@
+@import '../../../app/globals';
+
+/* Editor toggle map buton */
+.editor-toggle-button {
+    display: block;
+    position: absolute;
+    left: 5px;
+    top: 50px;
+    z-index: 5;
+    font-size: 21px;
+}
+/* Main editor panel */
+.editor-box {
+    position: fixed;
+    top: 144px;
+    //left: 50px;
+    width: 280px;
+    z-index: 100;
+    padding: 6px;
+    background-color:rgba(38,38,38,0.75);
+    opacity: 0.95;
+    border: 1px solid #444444;
+    border-radius: .8rem!important;
+}
