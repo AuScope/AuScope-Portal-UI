@@ -1,14 +1,6 @@
 import { Component, ElementRef, HostListener, Inject, OnInit, ViewChild } from '@angular/core';
 import { RectangleEditorObservable } from '@auscope/angular-cesium';
 
-/*
-import { Bbox, CsMapService, LayerHandlerService, LayerModel, 
-         ManageStateService, UtilitiesService, Constants } from '@auscope/portal-core-ui';
-import { NgbDropdown, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { SearchService } from 'app/services/search/search.service';
-import { Observable, Subject, Subscription } from 'rxjs';
-*/
-
 import { Bbox, CSWRecordModel, CsMapService, LayerHandlerService, LayerModel, ManageStateService, RenderStatusService, UtilitiesService, Constants } from '@auscope/portal-core-ui';
 import { NgbDropdown, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SearchService } from 'app/services/search/search.service';
@@ -24,48 +16,7 @@ import { Download } from 'app/modalwindow/layeranalytic/nvcl/tsgdownload';
 import * as saveAs from 'file-saver';
 import { take } from 'rxjs/operators';
 
-const DEFAULT_RESULTS_PER_PAGE = 10;
-
-/*
->>>>>>> 59bf604 (Moving search to Elasticsearch)
-const SEARCH_FIELDS = [{
-    name: 'Name',
-    field: 'name',
-    checked: true
-  }, {
-    name: 'Description',
-    field: 'description',
-    checked: true
-  }, {
-    name: 'Keyword',
-    field: 'keyword',
-    checked: true
-  }, {
-    name: 'CSW Abstract',
-    field: 'abstract',
-    checked: true
-  }];
-*/
-/*
-public static final List<String> KNOWNLAYERANDRECORDS_QUERY_FIELDS = Arrays.asList(new String[]{
-  "knownLayer.name", "knownLayer.description",
-  // belongingRecords fields (CSWRecords)
-  "belongingRecords.serviceName", "belongingRecords.descriptiveKeywords",
-  "belongingRecords.dataIdentificationAbstract", "belongingRecords.layerName",
-  // belongingRecords.onlineResources fields (OnlineResources)
-  "belongingRecords.onlineResources.name", "belongingRecords.onlineResources.description",
-  "belongingRecords.onlineResources.protocol", "belongingRecords.funder.organisationName"
-});
-
-// CSWRecord search fields
-public static final List<String> CSWRECORD_QUERY_FIELDS = Arrays.asList(new String[]{
-  "serviceName", "descriptiveKeywords", "dataIdentificationAbstract", "layerName",
-  // onlineResources fields (OnlineResource)
-  "onlineResources.name", "onlineResources.description", "onlineResources.protocol", "funder.organisationName"
-});
-*/
-
-// XXX Going to have make field an array ('fields') fo rhwn searching KnownLayerAndRecords AND CSWRecords
+// Search fields
 const SEARCH_FIELDS = [{
   name: 'Name',
   fields: ['knownLayer.name'],
@@ -100,8 +51,7 @@ const SEARCH_FIELDS = [{
   checked: true
 }];
 
-//const OGC_SERVICES = ['WMS', 'IRIS', 'WFS', 'WCS', 'WWW', 'KML'];
-// XXX Check IRIS etc when matching KnownLayers (maybe others as well)
+// OGC Services
 const OGC_SERVICES = [
   {
     name: 'WMS',
@@ -128,8 +78,6 @@ const OGC_SERVICES = [
     fields: ['OGC:WWW'],
     checked: true
   }]
-
-//const NUMBER_OF_SUGGESTIONS = 5;
 
 @Component({
     selector: 'app-search-panel',
@@ -188,26 +136,11 @@ export class SearchPanelComponent implements OnInit {
   suggestedTerms: string[] = [];
   highlightedSuggestionIndex = -1;
 
-  /*
-<<<<<<< HEAD
-  constructor(private searchService: SearchService,
-              private csMapService: CsMapService,
-              private layerHandlerService: LayerHandlerService,
-              private layerManagerService: LayerManagerService,
-              private uiLayerModelService: UILayerModelService,
-              private manageStateService: ManageStateService,
-              private modalService: NgbModal,
-              private http: HttpClient,
-              @Inject('env') private env
-    ) { }
-=======
-*/
   constructor(private searchService: SearchService, private csMapService: CsMapService,
               private layerHandlerService: LayerHandlerService, private layerManagerService: LayerManagerService,
               private uiLayerModelService: UILayerModelService, private renderStatusService: RenderStatusService,
               private manageStateService: ManageStateService, private modalService: NgbModal,
               private http: HttpClient, @Inject('env') private env) { }
-//>>>>>>> 59bf604 (Moving search to Elasticsearch)
 
   ngOnInit() {
     // Populate search results with all layers by default
@@ -263,9 +196,6 @@ export class SearchPanelComponent implements OnInit {
       // Sort alphabetically
       layers.sort((a, b) => a.layer.name.localeCompare(b.layer.name));
       this.showingAllLayers = true;
-      // Splice results to current page
-      //const indexForPage = (this.currentPage - 1) * this.RESULTS_PER_PAGE;
-      //this.searchResults = layers.splice(indexForPage, this.RESULTS_PER_PAGE);
       this.searchResults = layers;
     });
     
@@ -350,6 +280,7 @@ export class SearchPanelComponent implements OnInit {
     this.mapDownloadLayers.delete(layer.id);
     return;
   }
+
   /**
    * clearDownloadLayers
    *
@@ -359,6 +290,7 @@ export class SearchPanelComponent implements OnInit {
     this.mapDownloadLayers.clear();
     return;
   }
+
   /**
    * OnChange for MapDownloadLayers
    *
@@ -367,17 +299,16 @@ export class SearchPanelComponent implements OnInit {
     if (!this.isCsvDownloadable(layer)) {
       return;
     }
-
     if (layer.id) {
       console.log(layer.name);
       if (this.mapDownloadLayers.has(layer.id)) {
         this.mapDownloadLayers.delete(layer.id);
       } else {
-        let downloadOb = new Observable<Download>();
         this.mapDownloadLayers.set(layer.id, {Layer:layer, Ob:null});
       }
     }
   }
+
   /**
    * downloadAll event
    *
@@ -386,20 +317,21 @@ export class SearchPanelComponent implements OnInit {
     console.log('downloadAll');
     this.completed0 = 0;
     this.total0 = this.mapDownloadLayers.size;
-    for(let key of this.mapDownloadLayers.keys()) {
+    for(const key of this.mapDownloadLayers.keys()) {
       await this.downloadAsCSV(this.mapDownloadLayers.get(key).Layer);
       this.completed0++;
     }
     return;
   }
+
   /**
    * isCsvDownloadable
    *
    */
   public isCsvDownloadable(layer:LayerModel):boolean {
     for (let i = 0; i < layer.cswRecords.length; i++) {
-      let cswRecord = layer.cswRecords[i];
-      let onlineResourcesWFS = cswRecord.onlineResources.find((item)=>item.type.toLowerCase().indexOf('wfs')>=0);
+      const cswRecord = layer.cswRecords[i];
+      const onlineResourcesWFS = cswRecord.onlineResources.find((item)=>item.type.toLowerCase().indexOf('wfs')>=0);
       if (onlineResourcesWFS) {
         return true;
       }
@@ -417,32 +349,31 @@ export class SearchPanelComponent implements OnInit {
     me.completed =0;
     me.mapDownloadLayers.get(layer.id).Ob = {completed:me.completed,total:me.total};
     for (let i = 0; i < layer.cswRecords.length; i++) {
-      let cswRecord = layer.cswRecords[i];
-      let onlineResourcesWFS = cswRecord.onlineResources.find((item)=>item.type.toLowerCase().indexOf('wfs')>=0);
+      const cswRecord = layer.cswRecords[i];
+      const onlineResourcesWFS = cswRecord.onlineResources.find((item)=>item.type.toLowerCase().indexOf('wfs')>=0);
       if (!onlineResourcesWFS) {
         continue;
       }
-      let typename = onlineResourcesWFS.name;
-      let type = onlineResourcesWFS.type;
+      const typename = onlineResourcesWFS.name;
+      const type = onlineResourcesWFS.type;
       if (!type || type.toLowerCase().indexOf('wfs')<0 ) {
         console.log('No WFS finded for');
       }
 
-      let httpParams = new HttpParams({
+      const httpParams = new HttpParams({
         encoder: new HttpUrlEncodingCodec(),
       });
 
-      let url0 = onlineResourcesWFS.url;
-      let url1 = url0 + '?service=WFS&request=GetFeature&version=1.0.0&outputFormat=csv&maxFeatures=1000000&typeName=' + typename;
-      let url = me.env.portalBaseUrl + Constants.PROXY_API + '?usewhitelist=false&' + httpParams.append('url',url1 ).toString();
+      const url0 = onlineResourcesWFS.url;
+      const url1 = url0 + '?service=WFS&request=GetFeature&version=1.0.0&outputFormat=csv&maxFeatures=1000000&typeName=' + typename;
+      const url = me.env.portalBaseUrl + Constants.PROXY_API + '?usewhitelist=false&' + httpParams.append('url',url1 ).toString();
       let filename = typename + '.' + url0 + '.csv';
       filename = filename.replace(/:|\/|\\/g,'-');
-      let ob = await this.http.get(url, { headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'), responseType: 'text'}).toPromise();
+      const ob = await this.http.get(url, { headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'), responseType: 'text'}).toPromise();
       const blob = new Blob([ob], { type: 'application/csv' });
       saveAs(blob, filename);
       me.completed++;
       me.mapDownloadLayers.get(layer.id).Ob.progress = Math.round(me.completed/me.total*100);
-      //console.log('downloaded:' + url);
     }
   }
 
@@ -675,6 +606,9 @@ export class SearchPanelComponent implements OnInit {
    */
   private resetSuggestedTerms() {
     this.suggestedTerms = [];
+    if (this.suggesterSubscription && !this.suggesterSubscription.closed) {
+      this.suggesterSubscription.unsubscribe();
+    }
     this.highlightedSuggestionIndex = -1;
     if (this.suggesterDropdown.isOpen()) {
       this.suggesterDropdown.close();
@@ -682,79 +616,18 @@ export class SearchPanelComponent implements OnInit {
   }
 
   /**
-   * Escape query text
-   *
-   * @param queryText the query text
-   * @returns an escaped query text string
+   * Create a LayerModel object for the supplied CSWRecordModel
+   * @param record the CSWRecordModel
+   * @returns a LayerModel wrapper for the CSWRecordModel
    */
-  /*
-  private escapeQueryText(queryText: string): string {
-    //return queryText.replace(/[-\/\\^+&!~\:()|[\]{}]/g, '\\$&');
-    let textToQuery = queryText;
-    if (!textToQuery.startsWith('"')) {
-      textToQuery = '\"' + textToQuery;
-    }
-    if (!textToQuery.endsWith('"')) {
-      textToQuery = textToQuery + '\"';
-    }
-    return textToQuery;
-  }
-  */
-
-  /**
-   * 
-   * @param cswRecord 
-   * @returns 
-   */
-  /*
-  private createLayerModelForCSWRecord(cswRecord: CSWRecordModel): LayerModel {
-    const layerModel: LayerModel = {
-      cswRecords: [cswRecord],
-      capabilityRecords: undefined,
-      description: cswRecord.description,
-      group: 'CSW',
-      id: cswRecord.id,
-      name: cswRecord.name + ' (CSW)',  // XXX Until we have a better way of delinieating
-      hidden: undefined,
-      csLayers: [],
-      layerMode: undefined,
-      order: undefined,
-      proxyDownloadUrl: undefined,
-      proxyStyleUrl: undefined,
-      proxyUrl: undefined,
-      useDefaultProxy: true,    // Use the default proxy (getViaProxy.do) if true (custom layers)
-      useProxyWhitelist: true,  // Use the default proxy whitelist if true (custom layers)
-      relatedRecords: undefined,
-      singleTile: undefined,
-      iconUrl: undefined,
-      filterCollection: undefined,
-      stackdriverFailingHosts: [],
-      ogcFilter: undefined,
-      wfsUrls: [],
-      sldBody: undefined,      // SLD_BODY for 1.1.1 GetMap/GetFeatureInfo requests
-      clickCSWRecordsIndex: [],
-      clickPixel: undefined,
-      clickCoord: undefined,
-      // Layer supports downloading, usually feature data in CSV form
-      supportsCsvDownloads: undefined,
-      kmlDoc: undefined, // Document object for custom KML layer
-    };
-    return layerModel;
-  }
-  */
-
   private createLayerModelForCSWRecord(record: CSWRecordModel): LayerModel {
     const layer = new LayerModel();
-    // This will allow us to easily identify CSW layers
+    // Identify CSW layers
     layer.id = 'registry-csw:' + record.id;
     layer.name = record.name;
     layer.description = record.description;
-    //layer.useDefaultProxy = true;
-
-    layer.useDefaultProxy = true,    // Use the default proxy (getViaProxy.do) if true (custom layers)
+    layer.useDefaultProxy = false,    // Use the default proxy (getViaProxy.do) if true (custom layers)
     layer.useProxyWhitelist = true,  // Use the default proxy whitelist if true (custom layers)
-
-
     layer.cswRecords = [record];
     return layer;
   }
@@ -762,7 +635,7 @@ export class SearchPanelComponent implements OnInit {
   /**
    * Search index using specified fields and text query
    */
-   public search(newSearch: boolean) {
+  public search(newSearch: boolean) {
 
     this.showingAllLayers = false;
 
@@ -779,13 +652,10 @@ export class SearchPanelComponent implements OnInit {
     this.resetSuggestedTerms();
     this.searching = true;
     this.searchResults = [];
-    //this.currentPage = 1;
     this.alertMessage = '';
 
-
-    // XXX ADD A CHECKBOX FOR THIS AND RETRIEVE VALUE
+    // TODO: ADD A CHECKBOX FOR INCLUDING CSWRECORDS
     const includeCSWResults = true;
-
 
     const selectedSearchFields: string[] = [];
     for (const sField of this.searchFields.filter(f => f.checked === true)) {
@@ -796,101 +666,29 @@ export class SearchPanelComponent implements OnInit {
       }
     }
 
-    //let textToQuery = this.escapeQueryText(this.queryText);
-
     // OGC services if selected
     const selectedServices: string[] = [];
     const checkedServices = this.ogcServices.filter(s => s.checked === true);
     if (checkedServices.length < OGC_SERVICES.length) {
       for (const service of checkedServices) {
-
-        console.log('Adding selectedService: ' + service.fields[0]);
-
         selectedServices.push(service.fields[0]);
       }
     }
 
-    /*
-    const spatialRelation = undefined;
-    const west: number = undefined;
-    const east: number = undefined;
-    const south:number = undefined;
-    const north: number = undefined;
-    if (this.restrictBounds && this.bbox) {
-        spatialRelation = this.boundsRelationship;
-        west = this.bbox.westBoundLongitude, this.bbox.southBoundLatitude, this.bbox.eastBoundLongitude, this.bbox.northBoundLatitude);
-    }
-    */
-
-    //const page = this.currentPage > 1 ? this.currentPage - 1 : undefined;
-    //console.log('Searching with pageNo: ' + page);
-    console.log('Current page: ' + this.currentPage);
-
-    //this.searchService.queryKnownLayersAndCSWRecords(textToQuery, selectedSearchFields, pageNo, selectedServices, spatialRelation, west, east, south, north, includeCSWResults).subscribe(searchResponse => {
-    //this.searchService.queryKnownLayersAndCSWRecords(textToQuery, selectedSearchFields, pageNo, selectedServices,
-    /* Paged search
-    this.searchService.searchCSWRecords(this.queryText, selectedSearchFields, (this.currentPage - 1), this.RESULTS_PER_PAGE, selectedServices,
-        this.boundsRelationship.toLowerCase(), this.bbox?.westBoundLongitude, this.bbox?.eastBoundLongitude, this.bbox?.southBoundLatitude,
-        this.bbox?.northBoundLatitude).subscribe(searchResponse => {
-    */
+    // Search CSW records
     this.searchService.searchCSWRecords(this.queryText, selectedSearchFields, null, null, selectedServices,
         this.boundsRelationship.toLowerCase(), this.bbox?.westBoundLongitude, this.bbox?.eastBoundLongitude,
         this.bbox?.southBoundLatitude, this.bbox?.northBoundLatitude).subscribe(searchResponse => {
 
-      console.log('Number of records: ' + searchResponse.cswRecords.length);
-
       this.searchResults = [];
       this.totalSearchHits = searchResponse.totalCSWRecordHits;
 
-      console.log('totalSearchHits (CSW): ' + this.totalSearchHits);
-
       // Add KnownLayers to list first
       if (searchResponse.knownLayerIds?.length > 0) {
-        console.log('Number of layers : ' + searchResponse.knownLayerIds.length);
-
-        console.log('IDs: ' + searchResponse.knownLayerIds);
-
         this.totalSearchHits += searchResponse.knownLayerIds.length;
       }
-        console.log('totalSearchHits (CSW + KL): ' + this.totalSearchHits);
         
-        this.layerHandlerService.getLayerModelsForIds(searchResponse.knownLayerIds).subscribe(layers => {
-          for (const l of layers) {
-            this.searchResults.push(new SearchResult(l));
-          }
-
-          // Now add CSWRecords
-          for (const cswRecord of searchResponse.cswRecords) {
-            const layerModel: LayerModel = this.createLayerModelForCSWRecord(cswRecord);
-            this.searchResults.push(new SearchResult(layerModel));
-          }
-          this.searching = false;
-          this.showingAllLayers = false;
-          if (!this.showingResultsPanel) {
-            this.showingResultsPanel = true;
-          }
-
-        });
-      //} else {
-      //  // XXX
-      //  console.log('No layers');
-      //}
-
-      
-
-      console.log('search results length: ' + this.searchResults.length);
-      console.log('RESULTS_PER_PAGE: ' + this.RESULTS_PER_PAGE);
-
-      /*
-      const layerIds: string[] = [];
-      for (const k of searchResponse.knownLayerAndRecords) {
-        layerIds.push(k.knownLayer.id);
-      }
-
-      this.layerHandlerService.getLayerModelsForIds(layerIds).subscribe(layers => {
-        this.searchResults = [];
-
-        // Add KnownLayers
+      this.layerHandlerService.getLayerModelsForIds(searchResponse.knownLayerIds).subscribe(layers => {
         for (const l of layers) {
           this.searchResults.push(new SearchResult(l));
         }
@@ -900,123 +698,17 @@ export class SearchPanelComponent implements OnInit {
           const layerModel: LayerModel = this.createLayerModelForCSWRecord(cswRecord);
           this.searchResults.push(new SearchResult(layerModel));
         }
-
         this.searching = false;
         this.showingAllLayers = false;
         if (!this.showingResultsPanel) {
           this.showingResultsPanel = true;
         }
-      });
-      */
-    }, error => {
-      this.alertMessage = error;
-      this.searching = false;
-    });
 
-    /*
-    // Append service info to query if specific services have been selected
-    const checkedServices = this.ogcServices.filter(s => s.checked === true);
-    if (checkedServices.length < OGC_SERVICES.length) {
-      let appendQueryText = ' AND service:(';
-      for (let i = 0; i < checkedServices.length; i++) {
-        appendQueryText += checkedServices[i].field;
-        if (i !== checkedServices.length - 1) {
-          appendQueryText += ' OR ';
-        }
-      }
-      appendQueryText += ')';
-      textToQuery += appendQueryText;
-    }
-
-    // XXX Other fields, Include CSW checkbox
-    this.searchService.queryKnownLayersAndCSWRecords(selectedSearchFields, textToQuery, true).subscribe(searchResponse => {
-      console.log('Number of records: ' + searchResponse.cswRecords.length);
-      console.log('Number of layers : ' + searchResponse.knownLayerAndRecords.length);
-
-      const layerIds: string[] = [];
-      for (const k of searchResponse.knownLayerAndRecords) {
-        layerIds.push(k.knownLayer.id);
-      }
-
-      this.layerHandlerService.getLayerModelsForIds(layerIds).subscribe(layers => {
-        this.searchResults = [];
-
-        // Add KnownLayers
-        for (const l of layers) {
-          this.searchResults.push(new SearchResult(l));
-        }
-
-        // Now add CSWRecords
-        for (const cswRecord of searchResponse.cswRecords) {
-          const layerModel: LayerModel = this.createLayerModelForCSWRecord(cswRecord);
-          this.searchResults.push(new SearchResult(layerModel));
-        }
-
-        this.searching = false;
-        this.showingAllLayers = false;
-        if (!this.showingResultsPanel) {
-          this.showingResultsPanel = true;
-        }
       });
     }, error => {
       this.alertMessage = error;
       this.searching = false;
     });
-    */
-
-    /*
-    this.resetSuggestedTerms();
-    this.searching = true;
-    this.searchResults = null;
-    this.currentPage = 1;
-    this.alertMessage = '';
-
-    const selectedSearchFields: string[] = [];
-    for (const sField of this.searchFields.filter(f => f.checked === true)) {
-      selectedSearchFields.push(sField.field);
-    }
-    let textToQuery = this.escapeQueryText(this.queryText);
-
-    // Append service info to query if specific services have been selected
-    const checkedServices = this.ogcServices.filter(s => s.checked === true);
-    if (checkedServices.length < OGC_SERVICES.length) {
-      let appendQueryText = ' AND service:(';
-      for (let i = 0; i < checkedServices.length; i++) {
-        appendQueryText += checkedServices[i].field;
-        if (i !== checkedServices.length - 1) {
-          appendQueryText += ' OR ';
-        }
-      }
-      appendQueryText += ')';
-      textToQuery += appendQueryText;
-    }
-
-    // Create a call to the search api based on whether spatial bounds are required or not
-    let searchObservable: Observable<[]>;
-    if (this.restrictBounds && this.bbox) {
-      searchObservable = this.searchService.searchBounds(selectedSearchFields, textToQuery,
-        this.boundsRelationship, this.bbox.westBoundLongitude, this.bbox.southBoundLatitude, this.bbox.eastBoundLongitude, this.bbox.northBoundLatitude);
-    } else {
-      searchObservable = this.searchService.search(selectedSearchFields, textToQuery);
-    }
-
-    searchObservable.subscribe(searchResponse => {
-      this.layerHandlerService.getLayerModelsForIds(searchResponse).subscribe(layers => {
-        this.searchResults = [];
-        for (const l of layers) {
-          this.searchResults.push(new SearchResult(l));
-        }
-        this.searching = false;
-        this.showingAllLayers = false;
-        if (!this.showingResultsPanel) {
-          this.showingResultsPanel = true;
-        }
-      });
-    }, error => {
-      this.alertMessage = error;
-      this.searching = false;
-    });
-    */
 
   }
 
@@ -1108,14 +800,11 @@ export class SearchPanelComponent implements OnInit {
   }
 
   /**
-   * 
+   * Search page change
    * @param pageChangeEvent 
    */
   public pageChange(newPageNo) {
     this.currentPage = newPageNo;
-
-    console.log('new page: ' + this.currentPage);
-
     if (this.showingAllLayers) {
       this.showFeaturedLayers();
     } else {

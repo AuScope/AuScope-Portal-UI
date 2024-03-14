@@ -9,59 +9,33 @@ export class SearchService {
 
   constructor(private apiService: AuscopeApiService) {}
 
-  /*
-   * Lucene search
-   */
-
   public getSearchKeywords(): Observable<string[]> {
     return this.apiService.getSearchKeywords();
   }
 
-  public search(searchFields: string[], query: string): Observable<[]> {
-    return this.apiService.searchLayersAndRecords(searchFields, query);
-  }
-
-  public searchBounds(searchFields: string[], query: string, spatialRelation, westBoundLongitude: number,
-                      southBoundLatitude: number, eastBoundLongitude: number, northBoundLatitude: number) {
-    return this.apiService.searchLayersAndRecordsBounds(searchFields, query, spatialRelation, westBoundLongitude,
-                                                        southBoundLatitude, eastBoundLongitude, northBoundLatitude);
-  }
-
-  /*
-  public suggestTerm(query: string, num: number) {
-    return this.apiService.suggestTerms(query, num);
-  }
-  */
+  /**
+   * Suggest terms for search completion
+   * @param query the query text
+   * @returns a list of completion suggestion strings
+   */
   public suggestTerm(query: string) {
     return this.apiService.suggestTerms(query);
   }
 
-  /*
-   * Elasticsearch search
+  /**
+   * Search CSW records and known layers
+   * @param queryText the query text
+   * @param searchFields the CSWRecordModel fields to search
+   * @param page current page
+   * @param pageSize page size
+   * @param ogcServices list of OGC services to include
+   * @param spatialRelation spatial relation (e.g. "intersects")
+   * @param westBoundLongitude West bound
+   * @param eastBoundLongitude East bound
+   * @param southBoundLatitude South bound
+   * @param northBoundLatitude North bound
+   * @returns a list of CSW records and known layers
    */
-
-  /*
-  public queryKnownLayersAndCSWRecords(searchFields: string[], query: string, includeCSWRecordResults: boolean): Observable<SearchResponse> {
-    return this.apiService.queryKnownLayersAndCswRecords(searchFields, query, includeCSWRecordResults);
-  }
-  */
-
-  /*
-  public facetedSearchKnownLayersAndCSWRecordsMultiSearch(queryText: string, searchFields: string[], ogcServices: string[], spatialRelation: string, westBoundLongitude: number,
-      eastBoundLongitude: number, southBoundLatitude: number, northBoundLatitude: number, includeCSWRecordResults: boolean): Observable<SearchResponse> {
-    return this.apiService.facetedSearchKnownLayersAndCswRecordsMultiSearch(queryText, searchFields, ogcServices, spatialRelation, westBoundLongitude,
-                                eastBoundLongitude, southBoundLatitude, northBoundLatitude, includeCSWRecordResults);
-  }
-  */
-
-  /*
-  public queryKnownLayersAndCSWRecords(queryText: string, searchFields: string[], pageNo: number,
-              ogcServices: string[], spatialRelation: string, westBoundLongitude: number, eastBoundLongitude: number, southBoundLatitude: number,
-              northBoundLatitude: number, includeCSWRecordResults: boolean): Observable<SearchResponse> {
-    return this.apiService.queryKnownLayersAndCswRecords(queryText, searchFields, pageNo, ogcServices,
-              spatialRelation, westBoundLongitude, eastBoundLongitude, southBoundLatitude, northBoundLatitude, includeCSWRecordResults);
-  }
-  */
   public searchCSWRecords(queryText: string, searchFields: string[], page: number, pageSize: number, ogcServices: string[], spatialRelation: string,
           westBoundLongitude: number, eastBoundLongitude: number, southBoundLatitude: number, northBoundLatitude: number): Observable<SearchResponse> {
   return this.apiService.searchCSWRecords(queryText, searchFields, page, pageSize, ogcServices,

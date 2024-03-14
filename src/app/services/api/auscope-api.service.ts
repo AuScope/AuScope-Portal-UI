@@ -71,51 +71,19 @@ export class AuscopeApiService {
     return this.apiGet<any>('getWMSCapabilities.do', params);
   }
 
-  public searchLayersAndRecords(searchFields: string[], query: string): Observable<any> {
-    let params: HttpParams = new HttpParams();
-    params = params.append('query', query);
-    for (const field of searchFields) {
-      params = params.append('searchFields', field);
-    }
-    return this.apiGet<any>('searchCSWRecords.do', params);
-  }
-
-  public searchLayersAndRecordsBounds(searchFields: string[], query: string, spatialRelation: string, westBoundLongitude: number,
-                                southBoundLatitude: number, eastBoundLongitude: number, northBoundLatitude: number): Observable<any> {
-    let params: HttpParams = new HttpParams();
-    params = params.append('query', query);
-    for (const field of searchFields) {
-      params = params.append('searchFields', field);
-    }
-    params = params.append('spatialRelation', spatialRelation);
-    params = params.append('southBoundLatitude', southBoundLatitude);
-    params = params.append('westBoundLongitude', westBoundLongitude);
-    params = params.append('northBoundLatitude', northBoundLatitude);
-    params = params.append('eastBoundLongitude', eastBoundLongitude);
-    return this.apiGet<any>('searchCSWRecords.do', params);
-  }
-
   public getSearchKeywords(): Observable<string[]> {
     return this.apiGet<string[]>('getSearchKeywords.do');
   }
 
-  /*
-  public suggestTerms(term: string, num: number): Observable<string[]> {
-    const params = {
-      term: term,
-      num: num
-    };
-    return this.apiGet<string[]>('suggestTerms.do', params);
-  }
-  */
+  // Suggest terms for search completion
   public suggestTerms(term: string): Observable<string[]> {
     const params = {
       query: term
     };
-    //return this.apiGet<string[]>('suggestTerms.do', params);
-    return this.apiGet<string[]>('getIndexSuggestions.do', params);
+    return this.apiGet<string[]>('suggestTerms.do', params);
   }
 
+  // Current logged in user
   public get user(): Observable<User> {
     return this.apiGet<User>('secure/getUser.do');
   }
@@ -263,78 +231,19 @@ export class AuscopeApiService {
   }
 
   /**
-   * 
-   * @param searchFields 
-   * @param queryText 
-   * @param includeCSWRecordResults 
+   * Search Elasticsearch index for CSW records and KnownLayers
+   * @param queryText query string
+   * @param searchFields search fields
+   * @param page page number
+   * @param pageSize page size
+   * @param ogcServices OGC services to match
+   * @param spatialRelation spatial relation (e.g. "intersects")
+   * @param westBoundLongitude West bounds
+   * @param eastBoundLongitude East bounds
+   * @param southBoundLatitude South bounds
+   * @param northBoundLatitude North bounds
    * @returns 
    */
-  /*
-  public queryKnownLayersAndCswRecords(searchFields: string[], queryText: string, includeCSWRecordResults: boolean): Observable<SearchResponse> {
-    let params: HttpParams = new HttpParams();
-    params = params.append('query', queryText);
-    for (const field of searchFields) {
-      params = params.append('fields', field);
-    }
-    params = params.append('includeCSWRecordResults', includeCSWRecordResults);
-    return this.apiGet<any>('queryKnownLayersAndCSWRecords.do', params);
-  }
-  */
-  /*
-  public facetedSearchKnownLayersAndCswRecordsMultiSearch(queryText: string, searchFields: string[], ogcServices: string[], spatialRelation: string, westBoundLongitude: number,
-      eastBoundLongitude: number, southBoundLatitude: number, northBoundLatitude: number, includeCSWRecordResults: boolean): Observable<SearchResponse> {
-    let params: HttpParams = new HttpParams();
-    params = params.append('query', queryText);
-    for (const field of searchFields) {
-      params = params.append('fields', field);
-    }
-    if (spatialRelation && spatialRelation !== '') {
-      params = params.append('spatialRelation', spatialRelation);
-    }
-    if (ogcServices && ogcServices.length > 0) {
-      for (const service of ogcServices) {
-        params = params.append('ogcServices', service);
-      }
-    }
-    if (westBoundLongitude && eastBoundLongitude && southBoundLatitude && northBoundLatitude) {
-      params = params.append('westBoundLongitude', westBoundLongitude);
-      params = params.append('eastBoundLongitude', eastBoundLongitude);
-      params = params.append('southBoundLatitude', southBoundLatitude);
-      params = params.append('northBoundLatitude', northBoundLatitude);
-    }
-    params = params.append('includeCSWRecordResults', includeCSWRecordResults);
-    return this.apiGet<any>('facetedSearchKnownLayersAndCSWRecords.do', params);
-  }
-  */
-
-  public queryKnownLayersAndCswRecords(queryText: string, searchFields: string[], pageNo: number, ogcServices: string[], spatialRelation: string, westBoundLongitude: number,
-            eastBoundLongitude: number, southBoundLatitude: number, northBoundLatitude: number, includeCSWRecordResults: boolean): Observable<SearchResponse> {
-    let params: HttpParams = new HttpParams();
-    params = params.append('query', queryText);
-    for (const field of searchFields) {
-      params = params.append('fields', field);
-    }
-    if (pageNo && pageNo !== 0) {
-      params = params.append('pageNo', pageNo);
-    }
-    if (spatialRelation && spatialRelation !== '') {
-      params = params.append('spatialRelation', spatialRelation);
-    }
-    if (ogcServices && ogcServices.length > 0) {
-      for (const service of ogcServices) {
-        params = params.append('ogcServices', service);
-      }
-    }
-    if (westBoundLongitude && eastBoundLongitude && southBoundLatitude && northBoundLatitude) {
-      params = params.append('westBoundLongitude', westBoundLongitude);
-      params = params.append('eastBoundLongitude', eastBoundLongitude);
-      params = params.append('southBoundLatitude', southBoundLatitude);
-      params = params.append('northBoundLatitude', northBoundLatitude);
-    }
-    params = params.append('includeCSWRecordResults', includeCSWRecordResults);
-    return this.apiGet<any>('queryKnownLayersAndCSWRecords.do', params);
-  }
-
   public searchCSWRecords(queryText: string, searchFields: string[], page: number, pageSize: number, ogcServices: string[], spatialRelation: string, westBoundLongitude: number,
       eastBoundLongitude: number, southBoundLatitude: number, northBoundLatitude: number): Observable<SearchResponse> {
     let params: HttpParams = new HttpParams();

@@ -123,7 +123,7 @@
     <!-- Search results -->
     <div *ngIf="showingResultsPanel && !searching" class="results-panel">
         <div *ngIf="!searchResults || searchResults.length === 0">
-            <strong>No results found, try refining your search or adding a wildcard (*).</strong>
+            <strong>No results found, try refining your search.</strong>
         </div>
         <div *ngIf="searchResults?.length > 0">
             <div class="search-results-title">
@@ -136,15 +136,8 @@
                 <div *ngFor="let searchResult of paginatedSearchResults();" [id]="searchResult.layer.id">
                     <button style="line-height:1.7em;height:2.2em;padding:2px 5px 0px 5px;margin-bottom:2px;" class="btn layer-header" (click)="scrollToLayer(searchResult.layer)">
                         <span class="layer-header-label" title="{{searchResult.layer.name}}">{{ searchResult.layer.name }}</span>
-                        <!-- XXX registry-csw code can probably be removed if that's all we have -->
-                        
                         <span class="csw-label" *ngIf="searchResult.layer.id.startsWith('registry-csw:')">CSW</span>
                         <span class="layer-label" *ngIf="!searchResult.layer.id.startsWith('registry-csw:')">Featured</span>
-                        
-                        <!-- Add Group - get rid of
-                        <button *ngIf="searchResult.layer.cswRecords?.length === 1 && searchResult.layer.cswRecords[0].knownLayerIds?.length > 0" style="float:right;width:9em;padding:2px;" class="btn btn-sm btn-success" type="button" title="Add group" (click)="addLayer(searchResult.layer)"><i class="fa fa-plus-circle"></i>&nbsp;Add Group</button>
-                        -->
-
                         <button *ngIf="!isLayerAdded(searchResult.layer.id)" [disabled]="!csMapService.isMapSupportedLayer(searchResult.layer)" style="float:right;width:6em;padding:2px;" class="btn btn-sm btn-success" type="button" title="Add layer" (click)="addLayer(searchResult.layer)"><i class="fa fa-plus-circle"></i>&nbsp;Add</button>
                         <button *ngIf="isLayerAdded(searchResult.layer.id)" style="float:right;width:8em;padding:2px;" class="btn btn-sm btn-danger" type="button" title="Remove layer" (click)="removeLayer($event, searchResult.layer)"><i class="fa fa-trash"></i>&nbsp;Remove</button>
                         <button style="float:right;width:6em;padding:2px;margin-left:8px;" class="btn btn-sm btn-info" type="button" title="Layer information" (click)="showLayerInformation($event, searchResult.layer)"><i class="fa fa-info-circle"></i>&nbsp;Info</button>
@@ -178,19 +171,9 @@
             </div>
 
             <!-- Pagination if more than one page of search results -->
-
-            <!-- MERGE
             <div class="pagination" *ngIf="searchResults.length > RESULTS_PER_PAGE">
                 <ngb-pagination [collectionSize]="searchResults.length" [(page)]="currentPage" [maxSize]="5" [pageSize]="RESULTS_PER_PAGE" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>
             </div>
-            -->
-            
-            <!--
-            <div class="pagination" *ngIf="totalSearchHits > RESULTS_PER_PAGE">
-                <ngb-pagination [collectionSize]="totalSearchHits" [(page)]="currentPage" [maxSize]="5" [pageSize]="RESULTS_PER_PAGE" [rotate]="true" [boundaryLinks]="true" (pageChange)="pageChange($event)"></ngb-pagination>
-            </div>
-            -->
-
         </div>
     </div>
 </div>
