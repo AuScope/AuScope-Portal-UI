@@ -82,7 +82,7 @@
 									<div class="top-layer-btn-panel">
 										<button *ngIf="isUserLoggedIn() && !isLayerBookmarked(layer.id)" (click)="addLayerBookmark(layer.id)" type="button" class="btn btn-sm btn-info top-layer-btn" title="Bookmark Layer"><i class="fa fa-sm fa-bookmark-o"></i></button>
 										<button *ngIf="isUserLoggedIn() && isLayerBookmarked(layer.id)" (click)="removeLayerBookmark(layer.id)" type="button" class="btn btn-sm btn-info top-layer-btn" title="Remove Layer Bookmark"><i class="fa fa-sm fa-bookmark"></i></button>
-											<button (click)="displayRecordInformation(layer)" type="button" class="btn btn-sm btn-info top-layer-btn" title="Information" [ngClass]="{'active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.infopanel.expanded}">info</button>
+											<button (click)="displayRecordInformation(layer)" type="button" class="btn btn-sm btn-primary top-layer-btn" title="Information" [ngClass]="{'active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.infopanel.expanded}">info</button>
 									</div>
 								</div>
 								<div id="card-tab-content" class="tab-content ">
