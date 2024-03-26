@@ -27,7 +27,8 @@
         <button *ngIf="!searching && queryText && queryText !== ''" class="clear-query-button" type="button" title="Clear search" (click)="clearQueryText()">&times;</button>
         <div class="input-group-append">
             <!-- Search button -->
-            <button *ngIf="!searching" tabindex="-1" class="btn btn-primary search-button" type="button" title="Search layers" (click)="search()"><i class="fa fa-search"></i></button>
+            <button *ngIf="!searching" tabindex="-1" class="btn btn-primary search-button" type="button" title="Search layers" (click)="search(true)"><i class="fa fa-search"></i></button>
+            <button *ngIf="searching" tabindex="-1" class="btn btn-primary search-button" type="button" title="Searching layers"><i class="fa fa-spin fa-spinner"></i></button>
             <!-- Search tips -->
             <ng-template #searchTipsContent>
                 Searches will attempt to match <strong>full words</strong> in the search bar <strong>in any order</strong>.<br><br>
@@ -116,18 +117,19 @@
                 </div>
             </div>
             <!-- Reset advanced search options button -->
-            <button style="margin-left:auto;margin-right:6px;" class="btn btn-sm btn-secondary" (click)="resetAdvancedSearch()"><i class="fa fa-ban"></i>&nbsp;Reset All</button>
+            <button style="margin-left:auto;margin-right:6px;" class="btn btn-sm btn-secondary" (click)="resetAdvanced
+            "><i class="fa fa-ban"></i>&nbsp;Reset All</button>
         </div>
     </div>
     <!-- Search results -->
     <div *ngIf="showingResultsPanel && !searching" class="results-panel">
-        <div *ngIf="searchResults.length === 0">
-            <strong>No results found, try refining your search or adding a wildcard (*).</strong>
+        <div *ngIf="!searchResults || searchResults.length === 0">
+            <strong>No results found, try refining your search.</strong>
         </div>
-        <div *ngIf="searchResults.length > 0">
+        <div *ngIf="searchResults?.length > 0">
             <div class="search-results-title">
                 <label><strong>{{ getSearchResultsTitle() }}</strong></label>
-                <button *ngIf="!showingAllLayers" title="Show all layers" class="btn btn-sm btn-danger clear-search-results-button" type="button" (click)="showAllLayers()"><i class="fa fa-ban"></i>&nbsp;Clear</button>
+                <button *ngIf="!showingAllLayers" title="Show all layers" class="btn btn-sm btn-danger clear-search-results-button" type="button" (click)="showFeaturedLayers()"><i class="fa fa-ban"></i>&nbsp;Clear</button>
             </div>
 
             <div class="results-list">
@@ -135,6 +137,8 @@
                 <div *ngFor="let searchResult of paginatedSearchResults();" [id]="searchResult.layer.id">
                     <button style="line-height:1.7em;height:2.2em;padding:2px 5px 0px 5px;margin-bottom:2px;" class="btn layer-header" (click)="scrollToLayer(searchResult.layer)">
                         <span class="layer-header-label" title="{{searchResult.layer.name}}">{{ searchResult.layer.name }}</span>
+                        <span class="csw-label" *ngIf="searchResult.layer.id.startsWith('registry-csw:')">CSW</span>
+                        <span class="layer-label" *ngIf="!searchResult.layer.id.startsWith('registry-csw:')">Featured</span>
                         <button *ngIf="!isLayerAdded(searchResult.layer.id)" [disabled]="!csMapService.isMapSupportedLayer(searchResult.layer)" style="float:right;width:6em;padding:2px;" class="btn btn-sm btn-success" type="button" title="Add layer" (click)="addLayer(searchResult.layer)"><i class="fa fa-plus-circle"></i>&nbsp;Add</button>
                         <button *ngIf="isLayerAdded(searchResult.layer.id)" style="float:right;width:8em;padding:2px;" class="btn btn-sm btn-danger" type="button" title="Remove layer" (click)="removeLayer($event, searchResult.layer)"><i class="fa fa-trash"></i>&nbsp;Remove</button>
                         <button style="float:right;width:6em;padding:2px;margin-left:8px;" class="btn btn-sm btn-info" type="button" title="Layer information" (click)="showLayerInformation($event, searchResult.layer)"><i class="fa fa-info-circle"></i>&nbsp;Info</button>
@@ -142,6 +146,7 @@
                    </button>
                 </div>
             </div>
+
             <div class="pagination" *ngIf="searchResults.length > resultsPerPage">
                 <ngb-pagination [collectionSize]="searchResults.length" [(page)]="currentPage" [maxSize]="5" [pageSize]="resultsPerPage" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>
             </div>
@@ -164,6 +169,11 @@
                         <button style="float:right;padding:2px;margin-left:8px;" class="btn btn-sm btn-primary" type="button" title="Click to download" (click)="downloadAsCSV(downloadLayer.value.Layer)"><i class="fa fa-download"></i></button>
                    </button>
                 </div>
+            </div>
+
+            <!-- Pagination if more than one page of search results -->
+            <div class="pagination" *ngIf="searchResults.length > RESULTS_PER_PAGE">
+                <ngb-pagination [collectionSize]="searchResults.length" [(page)]="currentPage" [maxSize]="5" [pageSize]="RESULTS_PER_PAGE" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>
             </div>
         </div>
     </div>

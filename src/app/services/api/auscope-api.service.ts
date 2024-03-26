@@ -6,7 +6,7 @@ import { User } from 'app/models/user.model';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { CSWRecordModel } from '@auscope/portal-core-ui';
+import { SearchResponse } from 'app/models/searchresponse.model';
 
 interface ApiResponse<T> {
   data: T;
@@ -71,42 +71,19 @@ export class AuscopeApiService {
     return this.apiGet<any>('getWMSCapabilities.do', params);
   }
 
-  public searchLayersAndRecords(searchFields: string[], query: string): Observable<any> {
-    let params: HttpParams = new HttpParams();
-    params = params.append('query', query);
-    for (const field of searchFields) {
-      params = params.append('searchFields', field);
-    }
-    return this.apiGet<any>('searchLayersAndRecords.do', params);
-  }
-
-  public searchLayersAndRecordsBounds(searchFields: string[], query: string, spatialRelation: string, westBoundLongitude: number,
-                                southBoundLatitude: number, eastBoundLongitude: number, northBoundLatitude: number): Observable<any> {
-    let params: HttpParams = new HttpParams();
-    params = params.append('query', query);
-    for (const field of searchFields) {
-      params = params.append('searchFields', field);
-    }
-    params = params.append('spatialRelation', spatialRelation);
-    params = params.append('southBoundLatitude', southBoundLatitude);
-    params = params.append('westBoundLongitude', westBoundLongitude);
-    params = params.append('northBoundLatitude', northBoundLatitude);
-    params = params.append('eastBoundLongitude', eastBoundLongitude);
-    return this.apiGet<any>('searchLayersAndRecords.do', params);
-  }
-
   public getSearchKeywords(): Observable<string[]> {
     return this.apiGet<string[]>('getSearchKeywords.do');
   }
 
-  public suggestTerms(term: string, num: number): Observable<string[]> {
+  // Suggest terms for search completion
+  public suggestTerms(term: string): Observable<string[]> {
     const params = {
-      term: term,
-      num: num
+      query: term
     };
     return this.apiGet<string[]>('suggestTerms.do', params);
   }
 
+  // Current logged in user
   public get user(): Observable<User> {
     return this.apiGet<User>('secure/getUser.do');
   }
@@ -251,6 +228,50 @@ export class AuscopeApiService {
       }
     };
     return this.apiRequest<string>('secure/deletePortalState.do', options);
+  }
+
+  /**
+   * Search Elasticsearch index for CSW records and KnownLayers
+   * @param queryText query string
+   * @param searchFields search fields
+   * @param page page number
+   * @param pageSize page size
+   * @param ogcServices OGC services to match
+   * @param spatialRelation spatial relation (e.g. "intersects")
+   * @param westBoundLongitude West bounds
+   * @param eastBoundLongitude East bounds
+   * @param southBoundLatitude South bounds
+   * @param northBoundLatitude North bounds
+   * @returns 
+   */
+  public searchCSWRecords(queryText: string, searchFields: string[], page: number, pageSize: number, ogcServices: string[], spatialRelation: string, westBoundLongitude: number,
+      eastBoundLongitude: number, southBoundLatitude: number, northBoundLatitude: number): Observable<SearchResponse> {
+    let params: HttpParams = new HttpParams();
+    params = params.append('query', queryText);
+    for (const field of searchFields) {
+      params = params.append('fields', field);
+    }
+    if (page) {
+      params = params.append('page', page);
+    }
+    if (pageSize) {
+      params = params.append('pageSize', pageSize);
+    }
+    if (spatialRelation && spatialRelation !== '') {
+      params = params.append('spatialRelation', spatialRelation);
+    }
+    if (ogcServices && ogcServices.length > 0) {
+    for (const service of ogcServices) {
+      params = params.append('ogcServices', service);
+    }
+    }
+    if (westBoundLongitude && eastBoundLongitude && southBoundLatitude && northBoundLatitude) {
+      params = params.append('westBoundLongitude', westBoundLongitude);
+      params = params.append('eastBoundLongitude', eastBoundLongitude);
+      params = params.append('southBoundLatitude', southBoundLatitude);
+      params = params.append('northBoundLatitude', northBoundLatitude);
+    }
+    return this.apiGet<any>('searchCSWRecords.do', params);
   }
 
 }
