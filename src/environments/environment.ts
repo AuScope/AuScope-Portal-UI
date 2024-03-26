@@ -8,6 +8,8 @@
 // Note: environment files replace the default, they don't override.  So, any change in this file
 // will almost always need an equivalent change in all the other environment files.
 
+import packagejson from '../../package.json';
+
 export const environment = {
   production: false,
   getCSWRecordEndP: 'getKnownLayers.do',
@@ -37,5 +39,7 @@ export const environment = {
                 'https://geossdi.dmp.wa.gov.au',
                 'https://geology.data.vic.gov.au',
                 'http://geology.data.vic.gov.au',
-                'http://geoserver.octopusdata.org']
+                'http://geoserver.octopusdata.org'],
+  appVersion: packagejson.version
+
 }
