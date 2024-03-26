@@ -19,11 +19,11 @@ import { take } from 'rxjs/operators';
 // Search fields
 const SEARCH_FIELDS = [{
   name: 'Name',
-  fields: ['knownLayer.name'],
+  fields: ['knownLayerNames'],
   checked: true
 }, {
   name: 'Description',
-  fields: ['knownLayer.description'],
+  fields: ['knownLayerDescriptions'],
   checked: true
 }, {
   name: 'CSW Keywords',
@@ -706,7 +706,7 @@ export class SearchPanelComponent implements OnInit {
 
       });
     }, error => {
-      this.alertMessage = error;
+      this.alertMessage = error.error;
       this.searching = false;
     });
 

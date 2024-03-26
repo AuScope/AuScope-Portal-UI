@@ -249,7 +249,7 @@ export class AuscopeApiService {
     let params: HttpParams = new HttpParams();
     params = params.append('query', queryText);
     for (const field of searchFields) {
-    params = params.append('fields', field);
+      params = params.append('fields', field);
     }
     if (page) {
       params = params.append('page', page);
@@ -258,18 +258,18 @@ export class AuscopeApiService {
       params = params.append('pageSize', pageSize);
     }
     if (spatialRelation && spatialRelation !== '') {
-    params = params.append('spatialRelation', spatialRelation);
+      params = params.append('spatialRelation', spatialRelation);
     }
     if (ogcServices && ogcServices.length > 0) {
     for (const service of ogcServices) {
-    params = params.append('ogcServices', service);
+      params = params.append('ogcServices', service);
     }
     }
     if (westBoundLongitude && eastBoundLongitude && southBoundLatitude && northBoundLatitude) {
-    params = params.append('westBoundLongitude', westBoundLongitude);
-    params = params.append('eastBoundLongitude', eastBoundLongitude);
-    params = params.append('southBoundLatitude', southBoundLatitude);
-    params = params.append('northBoundLatitude', northBoundLatitude);
+      params = params.append('westBoundLongitude', westBoundLongitude);
+      params = params.append('eastBoundLongitude', eastBoundLongitude);
+      params = params.append('southBoundLatitude', southBoundLatitude);
+      params = params.append('northBoundLatitude', northBoundLatitude);
     }
     return this.apiGet<any>('searchCSWRecords.do', params);
   }

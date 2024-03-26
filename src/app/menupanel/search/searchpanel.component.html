@@ -28,6 +28,7 @@
         <div class="input-group-append">
             <!-- Search button -->
             <button *ngIf="!searching" tabindex="-1" class="btn btn-primary search-button" type="button" title="Search layers" (click)="search(true)"><i class="fa fa-search"></i></button>
+            <button *ngIf="searching" tabindex="-1" class="btn btn-primary search-button" type="button" title="Searching layers"><i class="fa fa-spin fa-spinner"></i></button>
             <!-- Search tips -->
             <ng-template #searchTipsContent>
                 Searches will attempt to match <strong>full words</strong> in the search bar <strong>in any order</strong>.<br><br>
