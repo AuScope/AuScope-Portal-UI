@@ -2,7 +2,7 @@
     <!-- Search bar and buttons -->
     <div class="input-group">
         <div class="input-group-prepend">
-            <button tabindex="-1" class="btn btn-primary search-toggle-button" type="button" title="{{showingResultsPanel ? 'Hide results' : 'Show results'}}" (click)="toggleResultsPanel()">
+            <button tabindex="-1" class="btn btn-primary search-toggle-button" type="button" title="{{showingResultsPanel ? 'Hide results' : 'Show results'}}" (click)="setShowingResultsPanel(!showingResultsPanel)">
                 <span *ngIf="!showingResultsPanel" class="fa-layers fa-fw">
                     <i class="fa fa-list"></i>
                     <i class="fa fa-caret-down caret-icon"></i>
@@ -48,6 +48,14 @@
                     <i class="fa fa-sliders"></i>
                     <i *ngIf="!showingAdvancedOptions" class="fa fa-caret-down caret-icon"></i>
                     <i *ngIf="showingAdvancedOptions" class="fa fa-caret-up caret-icon"></i>
+                </span>
+            </button>
+            <!-- KML/OGC -->
+            <button tabindex="-1" class="btn btn-primary" title="{{showingKmlOgcOptions ? 'Hide KML/OGC options' : 'Show KML/OGC options'}}" (click)="setShowingKmlOgcOptions(!showingKmlOgcOptions)">
+                <span class="fa-layers">
+                    <span style="font-size:small;">KML / OGC</span>
+                    <i *ngIf="!showingKmlOgcOptions" class="fa fa-caret-down caret-icon"></i>
+                    <i *ngIf="showingKmlOgcOptions" class="fa fa-caret-up caret-icon"></i>
                 </span>
             </button>
         </div>
@@ -119,6 +127,10 @@
             <!-- Reset advanced search options button -->
             <button style="margin-left:auto;margin-right:6px;" class="btn btn-sm btn-secondary" (click)="resetAdvancedSearch()"><i class="fa fa-ban"></i>&nbsp;Reset All</button>
         </div>
+    </div>
+    <!-- KML/OGC options -->
+    <div class="options-panel" *ngIf="showingKmlOgcOptions" style="padding:1em 1em 0 1em;">
+        <ul class="card-sub" appCustomPanel style="display:contents;"></ul>
     </div>
     <!-- Search results -->
     <div *ngIf="showingResultsPanel && !searching" class="results-panel">

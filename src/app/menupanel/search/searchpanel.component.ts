@@ -94,6 +94,7 @@ export class SearchPanelComponent implements OnInit {
   alertMessage = '';                  // Alert messages
   showingResultsPanel = false;        // True when results panel is being shown
   showingAdvancedOptions = false;     // True when advanced options are being displayed
+  showingKmlOgcOptions = false;       // True when KML/OGC panel is displayed
   queryText = '';                     // User entered query text
   searching = false;                  // True if search in progress
   searchResults: SearchResult[] = []; // Search results
@@ -161,7 +162,7 @@ export class SearchPanelComponent implements OnInit {
   @HostListener('document:click')
   externalClick() {
     if (!this.searchClick && this.showingResultsPanel && !this.infoDialogOpen) {
-      this.showingResultsPanel = false;
+      this.setShowingResultsPanel(false);
     }
     this.searchClick = false;
   }
@@ -201,11 +202,18 @@ export class SearchPanelComponent implements OnInit {
     
   }
 
-  /**
-   * Toggle the results panel
-   */
-   public toggleResultsPanel() {
-    this.showingResultsPanel = !this.showingResultsPanel;
+  public setShowingResultsPanel(showingOptions: boolean) {
+    this.showingResultsPanel = showingOptions;
+    if (showingOptions && this.showingKmlOgcOptions) {
+      this.showingKmlOgcOptions = false;
+    }
+  }
+
+  public setShowingKmlOgcOptions(showingOptions: boolean) {
+    this.showingKmlOgcOptions = showingOptions;
+    if (showingOptions && this.showingResultsPanel) {
+      this.showingResultsPanel = false;
+    }
   }
 
   /**
@@ -524,7 +532,7 @@ export class SearchPanelComponent implements OnInit {
       this.clearBounds();
       this.alertMessage = 'Click to start drawing bounds';
       this.restrictBounds = true;
-      this.showingResultsPanel = false;
+      this.setShowingResultsPanel(false);
       setTimeout(() => this.drawBoundsStarted = true, 0);
       this.boundsRectangleObservable = this.csMapService.drawBound();
       this.boundsRectangleObservable.subscribe((vector) => {
@@ -546,7 +554,7 @@ export class SearchPanelComponent implements OnInit {
         this.bbox = UtilitiesService.reprojectToWGS84(points);
 
         this.alertMessage = '';
-        this.showingResultsPanel = true;
+        this.setShowingResultsPanel(true);
         this.restrictBounds = true;
 
         // Re-open bounds dropdown
@@ -701,7 +709,7 @@ export class SearchPanelComponent implements OnInit {
         this.searching = false;
         this.showingAllLayers = false;
         if (!this.showingResultsPanel) {
-          this.showingResultsPanel = true;
+          this.setShowingResultsPanel(true);
         }
 
       });
