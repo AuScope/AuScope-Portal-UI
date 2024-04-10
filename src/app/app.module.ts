@@ -17,7 +17,6 @@ import { LoginComponent } from './menupanel/login/login.component';
 import { LoggedInComponent } from './menupanel/login/logged-in.component';
 import { CsMapComponent } from './cesium-map/csmap.component';
 import { CesiumMapPreviewComponent } from './menupanel/common/infopanel/cesiummappreview/cesium.preview.component';
-import { LayerPanelComponent } from './menupanel/layerpanel/layerpanel.component';
 import { BrowsePanelComponent } from './browsepanel/browsepanel.component';
 import { CustomPanelComponent } from './menupanel/custompanel/custompanel.component';
 import { ActiveLayersPanelComponent } from './menupanel/activelayers/activelayerspanel.component';
@@ -134,7 +133,6 @@ PlotlyModule.plotlyjs = PlotlyJS;
         LoginMenuComponent,
         CsMapComponent,
         CesiumMapPreviewComponent,
-        LayerPanelComponent,
         BrowsePanelComponent,
         CustomPanelComponent,
         LayerGroupComponent,

@@ -1,63 +1,139 @@
-.activeLayerItem {
-  display: flex;
-  position: relative;
-  right: 5px;
-  width: 100%;
-  align-items: center;
-  font-size: .85rem;
-  color: #d8d9d7;
-  margin: 0 5px 0 0;
-  padding: 0.5em 0;
-  border-bottom: 1px solid rgba(255 ,255, 255, 0.15);
+@import '../../globals';
 
-  // Disbale text selection
-  -webkit-user-select: none;  /* Safari */
-  -ms-user-select: none;      /* IE 10 and IE 11 */
-  user-select: none;          /* Standard syntax */
+:host {
 
-  .activeLayerGrabber {
-    cursor: grab;
-    margin-right: 0.5em;
-    border: 1px solid white;
-    border-radius: 0.5em;
-    padding: 0.2em 0.4em;
-  }
-
-  .activeLayerContent {
-    width:100%;
-  }
-
-  // Slider min-width is 112px by default which can push components to right off the panel 
-  ::ng-deep {
-    mat-slider {
-      min-width: 80px;
+    .filter-text{
+        width: 100%;
     }
+    .filter-btn {
+        margin-left: auto;
+    }
+
+    ::ng-deep {
+        fieldset.show-fieldset-borders {
+            margin: 0 0 1em 0;
+            padding: 0 1.4em 0.5em 1.4em;
+        }
+
+        fieldset legend {
+            width: 50%;
+        }
+
+        .tab-content {
+            padding: 15px 15px 6px 15px;
+        }
+
+        .mat-ripple {
+            display: none !important;
+        }
+
+        .mdc-slider {
+            height: 24px;
+            margin: 0 24px;
+            min-width: 92px;
+        }
+
+        .mdc-slider .mdc-slider__thumb {
+            left: -12px;
+            height: 24px;
+            width: 24px;
+        }
+    }
+
+    .top-layer-btn-panel {
+        display:flex;
+        position:relative;
+        margin-left:auto;
+        right:16px;
+
+        .top-layer-btn {
+            position: relative;
+            top: 16px;
+            height: fit-content;
+            margin-left: 5px;
+        }
+    }
+
+    .show-bookmark-btn {
+        position: relative;
+        top: 5px;
+    }
+
+    .bookmark-icon {
+        color: $auscope-teal;
+        margin-right: 4px;
+        vertical-align: middle;
+    }
+
+    .layer-card {
+        left: -50px;
+        width: 310px;
+    }
+
+
+
+  .activeLayerItem {
+    display: flex;
+    position: relative;
+    right: 5px;
+    width: 100%;
+    align-items: center;
+    font-size: .85rem;
+    color: #d8d9d7;
+    margin: 0 5px 0 0;
+    padding: 0.5em 0;
+    border-bottom: 1px solid rgba(255 ,255, 255, 0.15);
+
+    // Disbale text selection
+    -webkit-user-select: none;  /* Safari */
+    -ms-user-select: none;      /* IE 10 and IE 11 */
+    user-select: none;          /* Standard syntax */
+
+    .activeLayerGrabber {
+      cursor: grab;
+      margin-right: 0.5em;
+      border: 1px solid white;
+      border-radius: 0.5em;
+      padding: 0.2em 0.4em;
+    }
+
+    .activeLayerContent {
+      width:100%;
+    }
+
+    // Slider min-width is 112px by default which can push components to right off the panel 
+    ::ng-deep {
+      mat-slider {
+        min-width: 80px;
+      }
+    }
+
   }
 
-}
+  .cdk-drag-preview {
+    background-color: #6764ce;
+    color: #d8d9d7;
+    box-sizing: border-box;
+    border: 1px solid white;
+    border-radius: 4px;
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+                0 8px 10px 1px rgba(0, 0, 0, 0.14),
+                0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  }
 
-.cdk-drag-preview {
-  background-color: #6764ce;
-  color: #d8d9d7;
-  box-sizing: border-box;
-  border: 1px solid white;
-  border-radius: 4px;
-  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
-              0 8px 10px 1px rgba(0, 0, 0, 0.14),
-              0 3px 14px 2px rgba(0, 0, 0, 0.12);
-}
+  .cdk-drop-list-dragging {
+    cursor: grabbing;
+  }
 
-.cdk-drop-list-dragging {
-  cursor: grabbing;
-}
+  u {
+    text-decoration: none;
+  }
 
-u {
-  text-decoration: none;
-}
+  .legend, .status {
+    font-size: 0.8rem;
+    padding: 0 2px;
+    margin-left: 12px;
+    margin-top:6px;
+  }
 
-.legend, .status {
-  font-size: 0.8rem;
-  padding: 0 2px;
-  margin-left: 12px;
-  margin-top:6px;
 }

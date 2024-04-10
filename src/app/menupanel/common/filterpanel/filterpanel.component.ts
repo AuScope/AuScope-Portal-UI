@@ -1,6 +1,7 @@
 import { CsClipboardService, CsMapService, CsWMSService, FilterPanelService, GeometryType, LayerHandlerService,
-         LayerModel, LayerStatusService, Polygon, UtilitiesService } from '@auscope/portal-core-ui';
-import { ApplicationRef, Component, Input, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+         LayerModel, LayerStatusService, Polygon, UtilitiesService, ResourceType, 
+         CsCSWService} from '@auscope/portal-core-ui';
+import { ApplicationRef, Component, Inject, Input, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import * as _ from 'lodash';
 import { config } from '../../../../environments/config';
 import { ref } from '../../../../environments/ref';
@@ -20,7 +21,7 @@ declare let gtag: Function;
 export class FilterPanelComponent implements OnInit {
   @Input() layer: LayerModel;
   private providers: Array<Object>;
-  public optionalFilters: Array<Object>;
+  public optionalFilters: Array<Object>; // Optional filters currently rendered by this component
   public selectedFilter;
   public advancedParam = [];
   public analyticMap;
@@ -28,7 +29,7 @@ export class FilterPanelComponent implements OnInit {
   public showAdvancedFilter = true;
   public bApplyClipboardBBox = true;
   public layerTimes: LayerTimes;
-  public layerFilterCollection: any;
+  public layerFilterCollection: any; // List of all filters that maybe rendered by this component
 
   // Layer toolbar
   @ViewChild('advancedFilterComponents', { static: true, read: ViewContainerRef }) advancedFilterComponents: ViewContainerRef;
@@ -42,9 +43,11 @@ export class FilterPanelComponent implements OnInit {
     private modalService: BsModalService,
     private csClipboardService: CsClipboardService,
     private csWMSService: CsWMSService,
+    private csCSWService: CsCSWService,
     public layerStatus: LayerStatusService,
     private appRef: ApplicationRef,
-    private advancedComponentService: AdvancedComponentService) {
+    private advancedComponentService: AdvancedComponentService,
+    @Inject('conf') private conf) {
     this.providers = [];
     this.optionalFilters = [];
     this.analyticMap = ref.layeranalytic;
@@ -96,7 +99,6 @@ export class FilterPanelComponent implements OnInit {
         });
       }
     }
-
   }
 
   /**
@@ -104,6 +106,7 @@ export class FilterPanelComponent implements OnInit {
    * @param layerState layer state is JSON
    */
   public addLayerFromState(layerState: any) {
+
     // Populate layer times if necessary
     if (config.queryGetCapabilitiesTimes.indexOf(this.layer.id) > -1) {
       this.filterService.updateLayerTimes(this.layer, this.layerTimes);
@@ -116,18 +119,26 @@ export class FilterPanelComponent implements OnInit {
     if (layerState.advancedFilter) {
       this.advancedComponentService.getAdvancedFilterComponentForLayer(this.layer.id).setAdvancedParams(layerState.advancedFilter);
     }
-    this.optionalFilters = this.optionalFilters.concat(layerState.optionalFilters);
-    let me = this;
+    // Merge state filters with optional filters
+    this.optionalFilters = this.optionalFilters.map( optFilt => {
+        const filt = layerState.optionalFilters.find((filt) => filt.label === optFilt['label']);
+        if (filt) {
+          return filt;
+        }
+        return optFilt;
+    });
+
+    const me = this;
     setTimeout(() => {
       for (const optFilter of me.optionalFilters) {
         if (optFilter['value'] && optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
           const geometry = optFilter['value'];
-          const swapedGeometry = this.csClipboardService.swapGeometry(geometry);
+          const swappedGeometry = this.csClipboardService.swapGeometry(geometry);
           const newPolygon:Polygon = {
             name: 'Polygon created',
             srs: 'EPSG:4326',
             geometryType: GeometryType.POLYGON,
-            coordinates: swapedGeometry
+            coordinates: swappedGeometry
           };
           this.csClipboardService.clearClipboard();
           this.csClipboardService.addPolygon(newPolygon);
@@ -136,6 +147,13 @@ export class FilterPanelComponent implements OnInit {
         }
       }
       me.layerManagerService.addLayer(me.layer, me.optionalFilters, me.layerFilterCollection, me.layerTimes.currentTime);
+
+      // Set opacity of the layer on the map
+      if (UtilitiesService.layerContainsResourceType(me.layer, ResourceType.WMS)) {
+        me.csWMSService.setOpacity(this.layer, layerState.opacity / 100.0 );
+      } else if (this.conf.cswrenderer && this.conf.cswrenderer.includes(me.layer.id)) {
+        me.csCSWService.setOpacity(this.layer, layerState.opacity / 100.0 );
+      }
     }, 500);
   }
 
@@ -350,7 +368,7 @@ export class FilterPanelComponent implements OnInit {
   /**
    * Set layer time extent
    */
-  setLayerTimeExtent() {
+  public setLayerTimeExtent() {
     if (this.layerTimes.timeExtent.length === 0 && config.queryGetCapabilitiesTimes.indexOf(this.layer.id) > -1) {
       this.filterService.updateLayerTimes(this.layer, this.layerTimes);
     }

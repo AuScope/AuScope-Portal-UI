@@ -2,8 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { LayerHandlerService, RenderStatusService } from '@auscope/portal-core-ui';
 import { UILayerModel } from '../menupanel/common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
-
+import { LayerModel } from '@auscope/portal-core-ui'
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
+import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
+import { config } from '../../environments/config';
 
 
 @Component({
@@ -24,6 +26,7 @@ export class BrowsePanelComponent implements OnInit {
       private layerManagerService: LayerManagerService,
       private renderStatusService: RenderStatusService,
       private uiLayerModelService: UILayerModelService,
+      private filterService: FilterService
       ) {
   }
 
@@ -53,8 +56,16 @@ export class BrowsePanelComponent implements OnInit {
    * 
    * @param layer the layer to add to map
    */
-  public addLayer(layer): void {
-    this.layerManagerService.addLayer(layer, [], null, null);
+  public addLayer(layer: LayerModel): void {
+    // Fetch layer times and add layer
+    this.filterService.getLayerTimes(layer.id).subscribe(layerTimes => {
+      if (config.queryGetCapabilitiesTimes.indexOf(layer.id) > -1) {
+        this.filterService.updateLayerTimes(layer, layerTimes);
+      }
+      this.layerManagerService.addLayer(layer, [], null, layerTimes.currentTime);
+    });
+
+    // Close panel once layer is added, unless user requests it stay open
     if (!this.panelStayOpen) {
       this.toggleBrowsePanel(false);
     }
