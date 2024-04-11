@@ -4,8 +4,7 @@ import { UILayerModel } from '../menupanel/common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { LayerModel } from '@auscope/portal-core-ui'
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
-import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
-import { config } from '../../environments/config';
+import { FilterService } from 'app/services/filter/filter.service';
 
 
 @Component({
@@ -29,6 +28,35 @@ export class BrowsePanelComponent implements OnInit {
       private filterService: FilterService
       ) {
   }
+
+  /**
+   * Initialise Component
+   */
+    public ngOnInit() {
+      const me = this;
+  
+      // Initialise layers and groups in sidebar
+      this.layerHandlerService.getLayerRecord().subscribe(
+        response => {
+          me.layerGroupColumn = response;
+          // Loop over each group of layers
+          for (const group in me.layerGroupColumn) {
+            // Loop over each layer in a group
+            for (let layer_idx = 0; layer_idx < me.layerGroupColumn[group].length; layer_idx++) {
+  
+              // Initialise a list of cesium layers
+              me.layerGroupColumn[group][layer_idx].csLayers = [];
+              // Initialise UILayerModel
+              const uiLayerModel = new UILayerModel(me.layerGroupColumn[group][layer_idx].id, me.renderStatusService.getStatusBSubject(me.layerGroupColumn[group][layer_idx]));
+              me.uiLayerModelService.setUILayerModel(me.layerGroupColumn[group][layer_idx].id, uiLayerModel);
+  
+            }
+          }
+          Object.keys(me.layerGroupColumn).forEach(group => {
+            me.layerGroupColumn[group].sort((a, b) => a.name.localeCompare(b.name));
+          });
+      });
+    }
 
   /**
    * Select a group
@@ -58,10 +86,7 @@ export class BrowsePanelComponent implements OnInit {
    */
   public addLayer(layer: LayerModel): void {
     // Fetch layer times and add layer
-    this.filterService.getLayerTimes(layer.id).subscribe(layerTimes => {
-      if (config.queryGetCapabilitiesTimes.indexOf(layer.id) > -1) {
-        this.filterService.updateLayerTimes(layer, layerTimes);
-      }
+    this.filterService.getLayerTimesBS(layer.id).subscribe(layerTimes => {
       this.layerManagerService.addLayer(layer, [], null, layerTimes.currentTime);
     });
 
@@ -104,34 +129,4 @@ export class BrowsePanelComponent implements OnInit {
   public isGroupSelected(layerGroup: any) {
     return this.layerColumn === layerGroup.value;
   }
-
-  /**
-   * Initialise Component
-   */
-  public ngOnInit() {
-    const me = this;
-
-    // Initialise layers and groups in sidebar
-    this.layerHandlerService.getLayerRecord().subscribe(
-      response => {
-        me.layerGroupColumn = response;
-        // Loop over each group of layers
-        for (const group in me.layerGroupColumn) {
-          // Loop over each layer in a group
-          for (let layer_idx = 0; layer_idx < me.layerGroupColumn[group].length; layer_idx++) {
-
-            // Initialise a list of cesium layers
-            me.layerGroupColumn[group][layer_idx].csLayers = [];
-            // Initialise UILayerModel
-            const uiLayerModel = new UILayerModel(me.layerGroupColumn[group][layer_idx].id, me.renderStatusService.getStatusBSubject(me.layerGroupColumn[group][layer_idx]));
-            me.uiLayerModelService.setUILayerModel(me.layerGroupColumn[group][layer_idx].id, uiLayerModel);
-
-          }
-        }
-        Object.keys(me.layerGroupColumn).forEach(group => {
-          me.layerGroupColumn[group].sort((a, b) => a.name.localeCompare(b.name));
-        });
-    });
-  }
-
 }

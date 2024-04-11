@@ -77,7 +77,7 @@ import { GraceAdvancedFilterComponent } from './menupanel/common/filterpanel/adv
 
 import { LegendModalComponent } from './modalwindow/legend/legend.modal.component';
 
-import { PermanentLinksModalComponent } from './modalwindow/permanentlink/permenantlinks.modal.component';
+import { PermanentLinksModalComponent } from './modalwindow/permanentlink/permanentlinks.modal.component';
 import { CreatePermanentLinkModalComponent } from './modalwindow/permanentlink/create-permanentlink.modal.component';
 
 import { AddRegistryModalComponent } from './modalwindow/registry/add-registry.modal.component';

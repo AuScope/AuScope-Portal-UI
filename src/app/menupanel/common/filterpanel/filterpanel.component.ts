@@ -1,7 +1,7 @@
 import { CsClipboardService, CsMapService, CsWMSService, FilterPanelService, GeometryType, LayerHandlerService,
          LayerModel, LayerStatusService, Polygon, UtilitiesService, ResourceType, 
          CsCSWService} from '@auscope/portal-core-ui';
-import { ApplicationRef, Component, Inject, Input, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { ApplicationRef, Component, Inject, Input, OnInit, AfterViewInit, ViewChild, ViewContainerRef } from '@angular/core';
 import * as _ from 'lodash';
 import { config } from '../../../../environments/config';
 import { ref } from '../../../../environments/ref';
@@ -11,14 +11,13 @@ import { AdvancedComponentService } from 'app/services/ui/advanced-component.ser
 import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
 
-declare let gtag: Function;
 
 @Component({
   selector: 'app-filter-panel',
   templateUrl: './filterpanel.component.html',
   styleUrls: ['./filterpanel.component.scss', '../../menupanel.scss']
 })
-export class FilterPanelComponent implements OnInit {
+export class FilterPanelComponent implements OnInit, AfterViewInit {
   @Input() layer: LayerModel;
   private providers: Array<Object>;
   public optionalFilters: Array<Object>; // Optional filters currently rendered by this component
@@ -54,7 +53,7 @@ export class FilterPanelComponent implements OnInit {
     this.advancedFilterMap = ref.advancedFilter;
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     // Register filters with service
     if (this.layer.filterCollection) {
       this.filterService.registerLayerFilterCollection(this.layer.id, this.layer.filterCollection).subscribe(filterCollection => {
@@ -81,8 +80,8 @@ export class FilterPanelComponent implements OnInit {
       this.providers = layerProviders;
     });
 
-    // Layer times
-    this.filterService.getLayerTimes(this.layer.id).subscribe(times => {
+    // Subscribe to receiving the layer's time extent, if it has one
+    this.filterService.getLayerTimesBS(this.layer.id).subscribe(times => {
       this.layerTimes = times;
     });
 
@@ -99,6 +98,14 @@ export class FilterPanelComponent implements OnInit {
         });
       }
     }
+  }
+
+  /**
+   * Called once the panel has been drawn
+   */
+  public ngAfterViewInit() {
+        // Update the time extent button/selector
+        this.setLayerTimeExtent();
   }
 
   /**
@@ -192,8 +199,7 @@ export class FilterPanelComponent implements OnInit {
    * containing a supported OnlineResource type.
    */
   public getUnsupportedLayerMessage(): string {
-    return 'This layer cannot be displayed. For Featured Layers, please wait for the layer cache to rebuild itself. ' +
-      'For Custom Layers please note that only the following online resource types can be added to the map: ' +
+    return 'This layer cannot be displayed. Only the following online resource types can be added to the map: ' +
       this.csMapService.getSupportedOnlineResourceTypes();
   }
 
@@ -278,6 +284,12 @@ export class FilterPanelComponent implements OnInit {
     this.advancedParam = $event;
   }
 
+  /**
+   * Update the filter service with a new filter or remove one
+   * 
+   * @param filter filter 
+   * @param filterAdded boolean, if 'true' will add, if 'false' remove
+   */
   private updateFilter(filter: any, filterAdded: boolean) {
     filter.added = filterAdded;
     const i = this.layerFilterCollection.optionalFilters.indexOf(this.layerFilterCollection.optionalFilters.find(f => f.label === filter.label));
