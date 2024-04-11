@@ -27,7 +27,7 @@ export class InfoPanelSubComponent implements OnInit {
     public selectConstraints(capabilityRecords, cswConstraints: string[]) {
         if (capabilityRecords && capabilityRecords.length > 0 && capabilityRecords[0].accessConstraints && capabilityRecords[0].accessConstraints.length > 0) {
             return this.cleanConstraints(capabilityRecords[0].accessConstraints);
-        } else {
+        } else if (cswConstraints) {
             return this.cleanConstraints(cswConstraints);
         }
     }

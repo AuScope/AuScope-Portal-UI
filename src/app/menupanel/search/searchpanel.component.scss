@@ -143,6 +143,22 @@
             .layer-header:hover {
                 background-color: lightgray;
             }
+
+            .csw-label {
+                border-radius: 5px;
+                background-color: #AED6F1;
+                font-size: smaller;
+                padding: 0px 4px;
+                margin-left: 2px;
+            }
+
+            .layer-label {
+                border-radius: 5px;
+                background-color: #A9DFBF;
+                font-size: smaller;
+                padding: 0px 4px;
+                margin-left: 2px;
+            }
     
             // Overriding LayerPanel card styles to better fit this panel
             .card {

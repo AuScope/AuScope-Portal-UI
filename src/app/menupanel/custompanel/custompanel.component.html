@@ -22,7 +22,7 @@
 	<label class="control-label" for="inputSuccess2"><small class="white">Upload KML/KMZ file</small></label>
 	<div class="input-group">
 		<input type="file" accept=".kml, .kmz" style="display:none" class="file-input" (change)="onKmlFileSelected($event)" #CustomKmlFileLoader>
-		<button (click)="CustomKmlFileLoader.click()" type="button" title="Load KML/KMZ file"  class="btn-info btn-sm">
+		<button (click)="CustomKmlFileLoader.click()" type="button" title="Load KML/KMZ file"  class="btn-primary btn-sm">
 			<i class="fa fa-lg fa-file" aria-hidden="true"></i>
 			&nbsp;Load KML/KMZ
 			<i *ngIf="!loading" class="fa"></i>
