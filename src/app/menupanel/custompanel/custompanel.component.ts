@@ -55,6 +55,12 @@ export class CustomPanelComponent {
     this.statusMsg = 'Enter your OGC WMS service endpoint</br>e.g. "https://server.gov.au/service/wms"</br>or KML/KMZ URL and hit <i class="fa fa-search"></i>.';
   }
 
+  /**
+   * Makes a filter or download tab panel visible
+   * 
+   * @param layerId layer id string
+   * @param panelType panel type string, either 'filterpanel' or 'downloadpanel'
+   */
   public selectTabPanel(layerId: string, panelType: string) {
     this.uiLayerModelService.getUILayerModel(layerId).tabpanel.setPanelOpen(panelType);
   }

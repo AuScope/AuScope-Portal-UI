@@ -6,8 +6,6 @@ import { RecordModalComponent } from "../record-modal/record-modal.component";
 import { LayerManagerService } from "app/services/ui/layer-manager.service";
 import { DataExplorerService } from "../data-explorer/data-explorer.service";
 
-declare var gtag: Function;
-
 @Component({
   selector: "app-data-explorer-record",
   templateUrl: "./data-explorer-record.component.html",

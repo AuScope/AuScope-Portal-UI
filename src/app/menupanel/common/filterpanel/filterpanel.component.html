@@ -1,4 +1,5 @@
 <div class="filter-form">
+	<!-- Mandatory filters, if supported -->
 	<div *ngIf="layerFilterCollection">
 		<div *ngFor="let mandatoryFilter of layerFilterCollection['mandatoryFilters']">
 			<div *ngIf="mandatoryFilter.type === 'MANDATORY.CHECKBOX'">
@@ -29,6 +30,7 @@
 		</div>
 	</div>
 
+	<!-- If there are no filters display a warning -->
 	<div *ngIf="(!layerFilterCollection || layerFilterCollection.optionalFilters?.length === 0) && !layerHasAdvancedFilterComponent(layer.id)">
 		<div class="alert alert-warning fade show">
 			<i class="ti-bell float-left"></i>
@@ -36,14 +38,17 @@
 		</div>
 	</div>
 
+	<!-- Optional filters, if supported -->
 	<fieldset *ngIf="layerFilterCollection?.optionalFilters && layerFilterCollection.optionalFilters.length > 0" class="show-fieldset-borders">
 		<legend><h5>Optional Filters</h5></legend>
 		<div class="form-group form-group-sm">
 			<label style="display:flex;font-size:0.9rem;" *ngIf="optionalFilters.length > 0" title="Remove filter"> Select Filter:<i style="margin-left:auto;font-size:0.9rem;" class="hasEvent red" (click)="refreshFilter()">Clear All</i></label>
+			<!-- Render the filter selector -->
 			<select class="form-control form-control-sm" [ngModel]="selectedFilter" (ngModelChange)="addFilter($event)">
 				<option [ngValue]="filt" *ngFor="let filt of layerFilterCollection['optionalFilters']">{{filt.label}}</option>
 			</select>
 		</div>
+		<!-- Already selected optional filters are rendered here -->
 		<hr *ngIf="optionalFilters.length > 0" class="nav-divider filter-divider">
 		<div *ngFor="let optionalFilter of optionalFilters; let i = index;">
 			<div *ngIf="optionalFilter.type==='OPTIONAL.TEXT'">
@@ -137,10 +142,15 @@
 		</div>
 	</div>
 
+	<!-- If layer services are unresponsive then display a warning message -->
 	<p *ngIf='layerStatus.isLayerDown(layer.id)' class='small text-danger'><i class="fa fa-warning text-warning"></i> One or more of the services used by this layer are reported to be experiencing issues at the moment. Click on the info panel for more information.</p>
+	
 	<div>
+		<!-- Optional layer analytics button -->
 		<button *ngIf="analyticMap[layer.id]" type="button" class="btn btn-warning btn-sm analytic-btn" title="Display analytics" (click)="processLayerAnalytic(layer)"><i class="fa fa-bar-chart" aria-hidden="true"></i>&nbsp;Analytic</button>
-		<button type="button" *ngIf="isMapSupportedLayer(layer)" class="btn btn-primary btn-sm add-layer-btn float-right" (click)="addLayer(layer)"><i class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp;Add Layer</button>
+		<!-- Update layer button -->
+		<button type="button" *ngIf="isMapSupportedLayer(layer)" class="btn btn-primary btn-sm add-layer-btn float-right" (click)="addLayer(layer)"><i class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp;Update Layer</button>
+		<!-- Optional unsupported layer message & icon -->
 		<div class="unsupported-layer-message" *ngIf="!isMapSupportedLayer(layer)">
 			<em class="fa fa-exclamation-triangle warning-icon"></em>
 			{{ getUnsupportedLayerMessage() }}

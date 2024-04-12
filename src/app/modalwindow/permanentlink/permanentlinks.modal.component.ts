@@ -12,8 +12,8 @@ import { ConfirmModalComponent } from '../confirm/confirm.modal.component';
  */
 @Component({
   selector: 'app-state-form',
-  templateUrl: './permenantlinks.modal.component.html',
-  styleUrls: ['./permenantlinks.modal.component.scss'],
+  templateUrl: './permanentlinks.modal.component.html',
+  styleUrls: ['./permanentlinks.modal.component.scss'],
   providers: [ DatePipe ]
 })
 export class PermanentLinksModalComponent implements OnInit {
