@@ -74,7 +74,7 @@
                 </div>
             </div>
             <!-- Services -->
-            <div ngbDropdown>
+            <!-- <div ngbDropdown>
                 <button class="btn btn-sm btn-secondary" type="button" ngbDropdownToggle>{{ getServicesTitle() }}</button>
                 <div ngbDropdownMenu class="advanced-options-panel">
                     <input type="checkbox" class="options-checkbox" [(ngModel)]="allOGCServices.checked" (change)="allOGCServicesChange()">&nbsp;All
@@ -82,7 +82,7 @@
                         <input type="checkbox" class="options-checkbox" [(ngModel)]="service.checked" [disabled]="allOGCServices.checked" (change)="ogcServiceChange(service.name)">&nbsp;{{ service.name }}
                     </div>
                 </div>
-            </div>
+            </div> -->
             <!-- Spatial bounds -->
             <div ngbDropdown #spatialOptionsDropdown="ngbDropdown">
                 <button class="btn btn-sm btn-secondary" type="button" ngbDropdownToggle>{{ getSpatialBoundsTitle() }}</button>
@@ -141,7 +141,9 @@
                         <button *ngIf="!isLayerAdded(searchResult.layer.id)" [disabled]="!csMapService.isMapSupportedLayer(searchResult.layer)" style="float:right;width:6em;padding:2px;" class="btn btn-sm btn-success" type="button" title="Add layer" (click)="addLayer(searchResult.layer)"><i class="fa fa-plus-circle"></i>&nbsp;Add</button>
                         <button *ngIf="isLayerAdded(searchResult.layer.id)" style="float:right;width:8em;padding:2px;" class="btn btn-sm btn-danger" type="button" title="Remove layer" (click)="removeLayer($event, searchResult.layer)"><i class="fa fa-trash"></i>&nbsp;Remove</button>
                         <button style="float:right;width:6em;padding:2px;margin-left:8px;" class="btn btn-sm btn-info" type="button" title="Layer information" (click)="showLayerInformation($event, searchResult.layer)"><i class="fa fa-info-circle"></i>&nbsp;Info</button>
-                        <button style="float:right;width:6em;padding:2px;margin-left:8px;" class="btn btn-sm btn-primary" type="button" title="Add to download" ><input *ngIf="isCsvDownloadable(searchResult.layer)" type="checkbox" class="faChkSqr" [checked]="mapDownloadLayers.get(searchResult.layer.id)" (change)="OnChangeDownloadLayers(searchResult.layer)"></button>
+                        <button style="float:right;width:6em;padding:2px;margin-left:8px; min-height: 8px;" class="btn btn-sm btn-primary" type="button" title="Add to download" [style.visibility]="isCsvDownloadable(searchResult.layer) ? 'visible' : 'hidden'">
+                            <input type="checkbox" class="faChkSqr" [checked]="mapDownloadLayers.get(searchResult.layer.id)" (change)="OnChangeDownloadLayers(searchResult.layer)">
+                          </button>
                    </button>
                 </div>
             </div>
