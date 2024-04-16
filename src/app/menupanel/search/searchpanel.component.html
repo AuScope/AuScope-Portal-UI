@@ -2,7 +2,7 @@
     <!-- Search bar and buttons -->
     <div class="input-group">
         <div class="input-group-prepend">
-            <button tabindex="-1" class="btn btn-primary search-toggle-button" type="button" title="{{showingResultsPanel ? 'Hide results' : 'Show results'}}" (click)="setShowingResultsPanel(!showingResultsPanel)">
+            <button tabindex="-1" class="btn btn-primary search-toggle-button" style="border-top-left-radius:0.25rem;border-bottom-left-radius:0.25rem;" type="button" title="{{showingResultsPanel ? 'Hide results' : 'Show results'}}" (click)="setShowingResultsPanel(!showingResultsPanel)">
                 <span *ngIf="!showingResultsPanel" class="fa-layers fa-fw">
                     <i class="fa fa-list"></i>
                     <i class="fa fa-caret-down caret-icon"></i>
@@ -29,31 +29,19 @@
             <!-- Search button -->
             <button *ngIf="!searching" tabindex="-1" class="btn btn-primary search-button" type="button" title="Search layers" (click)="search(true)"><i class="fa fa-search"></i></button>
             <button *ngIf="searching" tabindex="-1" class="btn btn-primary search-button" type="button" title="Searching layers"><i class="fa fa-spin fa-spinner"></i></button>
-            <!-- Search tips -->
-            <ng-template #searchTipsContent>
-                Searches will attempt to match <strong>full words</strong> in the search bar <strong>in any order</strong>.<br><br>
-                <strong>Wilcards</strong> may be used, but not at the beginning of a word. Use <strong>?</strong> for a single character wildcard search, or <strong>*</strong> for multi-character. E.g.<br><br>
-                <strong>anom?lies</strong><br>
-                <strong>anom*</strong><br><br>
-                To match <strong>phrases</strong> (case-insenitive), use <strong>double-quotes</strong>. E.g.<br><br>
-                <strong>"mineral analyses"</strong><br>
-            </ng-template>
-            <ng-template #searchTipsTitle><strong>Search Tips</strong></ng-template>
-            <button tabindex="-1" class="btn btn-info" type="button" title="Search Tips" [ngbPopover]="searchTipsContent" [popoverTitle]="searchTipsTitle" popover-trigger="outsideClick">
-                <i class="fa fa-lg fa-question-circle"></i>
-            </button>
             <!-- Advanced options selection -->
-            <button tabindex="-1" class="btn btn-primary" title="{{showingAdvancedOptions ? 'Hide advanced search options' : 'Show advanced search options'}}" (click)="showingAdvancedOptions = !showingAdvancedOptions">
+            <button tabindex="-1" class="btn btn-primary" style="border-top-right-radius:0.25rem;border-bottom-right-radius:0.25rem;" title="{{showingAdvancedOptions ? 'Hide advanced search options' : 'Show advanced search options'}}" (click)="showingAdvancedOptions=!showingAdvancedOptions">
                 <span class="fa-layers">
                     <i class="fa fa-sliders"></i>
                     <i *ngIf="!showingAdvancedOptions" class="fa fa-caret-down caret-icon"></i>
                     <i *ngIf="showingAdvancedOptions" class="fa fa-caret-up caret-icon"></i>
                 </span>
             </button>
+            <!-- small gap -->
             <!-- KML/OGC -->
-            <button tabindex="-1" class="btn btn-primary" title="{{showingKmlOgcOptions ? 'Hide KML/OGC options' : 'Show KML/OGC options'}}" (click)="setShowingKmlOgcOptions(!showingKmlOgcOptions)">
+            <button tabindex="-1" class="btn btn-primary" style="margin-left:0.25rem;border-radius:0.25rem;" title="{{showingKmlOgcOptions ? 'Hide custom layer options' : 'Add custom layers'}}" (click)="setShowingKmlOgcOptions(!showingKmlOgcOptions)">
                 <span class="fa-layers">
-                    <span style="font-size:small;">KML / OGC</span>
+                    <span style="font-size:small;">Custom Layers</span>
                     <i *ngIf="!showingKmlOgcOptions" class="fa fa-caret-down caret-icon"></i>
                     <i *ngIf="showingKmlOgcOptions" class="fa fa-caret-up caret-icon"></i>
                 </span>
@@ -82,7 +70,7 @@
                 </div>
             </div>
             <!-- Services -->
-            <!-- <div ngbDropdown>
+            <div ngbDropdown>
                 <button class="btn btn-sm btn-secondary" type="button" ngbDropdownToggle>{{ getServicesTitle() }}</button>
                 <div ngbDropdownMenu class="advanced-options-panel">
                     <input type="checkbox" class="options-checkbox" [(ngModel)]="allOGCServices.checked" (change)="allOGCServicesChange()">&nbsp;All
@@ -90,7 +78,7 @@
                         <input type="checkbox" class="options-checkbox" [(ngModel)]="service.checked" [disabled]="allOGCServices.checked" (change)="ogcServiceChange(service.name)">&nbsp;{{ service.name }}
                     </div>
                 </div>
-            </div> -->
+            </div>
             <!-- Spatial bounds -->
             <div ngbDropdown #spatialOptionsDropdown="ngbDropdown">
                 <button class="btn btn-sm btn-secondary" type="button" ngbDropdownToggle>{{ getSpatialBoundsTitle() }}</button>
