@@ -15,7 +15,11 @@
         </div>
         <div ngbDropdown #suggesterDropdown="ngbDropdown" style="flex:1;">
             <!-- Search text field -->
-            <input type="text" class="form-control" #queryinput placeholder="Enter search term here..." [(ngModel)]="queryText" (keyup)="onKeyUp($event)" (keydown)="onKeyDown($event)" [disabled]="searching">
+            <div>
+                <input type="text" class="form-control" #queryinput placeholder="Enter search term here..." [(ngModel)]="queryText" (keyup)="onKeyUp($event)" (keydown)="onKeyDown($event)" [disabled]="searching">
+                <!-- Clear query text button -->
+                <button *ngIf="!searching && queryText && queryText !== ''" class="clear-query-button" type="button" title="Clear search" (click)="clearQueryText()">&times;</button>
+            </div>
             <!-- Suggester -->
 			<div ngbDropdownMenu>
                 <div *ngFor="let term of suggestedTerms; let i = index;">
@@ -23,8 +27,6 @@
                 </div>
             </div>
         </div>
-        <!-- Clear query text button -->
-        <button *ngIf="!searching && queryText && queryText !== ''" class="clear-query-button" type="button" title="Clear search" (click)="clearQueryText()">&times;</button>
         <div class="input-group-append">
             <!-- Search button -->
             <button *ngIf="!searching" tabindex="-1" class="btn btn-primary search-button" type="button" title="Search layers" (click)="search(true)"><i class="fa fa-search"></i></button>
