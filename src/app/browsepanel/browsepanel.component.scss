@@ -46,6 +46,11 @@
     .col:hover {
         background-color: rgba(220, 220, 220, 0.8);
         border-radius: 0.3rem;
+        color: #ce348a; /* From AuScope style guide */
+    }
+
+    .col:hover span {
+        color: #ce348a; /* From AuScope style guide */
     }
 
     a, span {
