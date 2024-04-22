@@ -112,15 +112,13 @@
     }
   }
 
-  .activeLayerFilterPanel {
-    .cdk-drag-preview {
-      display: none;
-    }
-  }
-  
   .activeLayerContent {
     width:100%;
     color: $text-colour;  // XXX Needs to be darker but may be fixed at a higher level
+  }
+
+  .activeLayerDragMessagePanel {
+    display: none;
   }
   
   // Slider min-width is 112px by default which can push components to right off the panel 
@@ -140,6 +138,27 @@
   box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
               0 8px 10px 1px rgba(0, 0, 0, 0.14),
               0 3px 14px 2px rgba(0, 0, 0, 0.12);
+
+  .activeLayerFilterPanel {
+    display: none;
+  }
+
+  .activeLayerOpacityLegendStatusBar {
+    display: none;
+  }
+
+  .split-panel {
+    display: none;
+  }
+
+  .activeLayerDragMessagePanel {
+    text-align: center;
+    display: block;
+    position: relative;
+    font-size: larger;
+    top: 3rem;
+  }
+
 }
 
 .cdk-drop-list-dragging {
