@@ -1,7 +1,5 @@
 @import '../../globals';
 
-
-
 :host {
   .filter-text {
     width: 100%;
@@ -21,7 +19,7 @@
     }
 
     .tab-content {
-        padding: 15px 15px 6px 15px;
+        padding: 0 15px 0 15px;
     }
 
     .mat-ripple {
@@ -30,7 +28,7 @@
 
     .mdc-slider {
         height: 24px;
-        margin: 0 24px;
+        margin: 0 0.5rem;
         min-width: 92px;
     }
 
@@ -72,37 +70,59 @@
   }
 }
 
-
 .activeLayerItem {
-  display: flex;
-  position: relative;
-  right: 5px;
-  width: 100%;
-  align-items: center;
-  font-size: .85rem;
-  color: #d8d9d7;
-  margin: 0 5px 0 0;
-  padding: 0.5em 0;
-  border-bottom: 1px solid rgba(255 ,255, 255, 0.15);
+  padding: 0.8rem 0.8rem 0 0.8rem;
 
   // Disable text selection
   -webkit-user-select: none;  /* Safari */
   -ms-user-select: none;      /* IE 10 and IE 11 */
   user-select: none;          /* Standard syntax */
 
-  .activeLayerGrabber {
-    cursor: grab;
-    margin-right: 0.5em;
-    border: 1px solid white;
-    border-radius: 0.5em;
-    padding: 0.2em 0.4em;
+  .activeLayerTitleBar {
+    display:flex;
+    flex-direction:row;
+    width:100%;
+    align-items: center;
+
+    .activeLayerGrabber {
+      align-self:center;
+      cursor: grab;
+      margin-right: 0.5em;
+      margin-left: 0;
+    }
+
+    .activeLayerTitle {
+      font-size: 1.1rem;
+      margin-right: 2px;
+    }
   }
 
+  .activeLayerOpacityLegendStatusBar {
+    display:flex;
+    flex-direction:row;
+    width:100%;
+    margin-bottom: 0.3rem;
+    align-items: center;
+
+    .legend, .status {
+      font-size: 0.8rem;
+      padding: 0 2px;
+      margin-left: 12px;
+      margin-top:6px;
+    }
+  }
+
+  .activeLayerFilterPanel {
+    .cdk-drag-preview {
+      display: none;
+    }
+  }
+  
   .activeLayerContent {
     width:100%;
-    color: $text-colour;
+    color: $text-colour;  // XXX Needs to be darker but may be fixed at a higher level
   }
-
+  
   // Slider min-width is 112px by default which can push components to right off the panel 
   ::ng-deep {
     mat-slider {
@@ -113,7 +133,7 @@
 
 .cdk-drag-preview {
   background-color: #6764ce;
-  color: #d8d9d7;
+  //color: #d8d9d7;
   box-sizing: border-box;
   border: 1px solid white;
   border-radius: 4px;
@@ -128,11 +148,4 @@
 
 u {
   text-decoration: none;
-}
-
-.legend, .status {
-  font-size: 0.8rem;
-  padding: 0 2px;
-  margin-left: 12px;
-  margin-top:6px;
 }

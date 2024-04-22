@@ -1,7 +1,85 @@
-<div class="select-layers-message" *ngIf="getActiveLayers().length===0">
-    Click on "Browse" on map to add layers
+<div style="padding: 0.5rem;" class="select-layers-message" *ngIf="getActiveLayers().length===0">
+    Click "Browse" on map to add layers
 </div>
 
+<div class="activeLayersBoundary" cdkDropList (cdkDropListDropped)="layerDropped($event)">
+    <div class="activeLayerItem" *ngFor="let layer of getActiveLayers()" cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".activeLayersBoundary" [cdkDragDisabled]="getActiveLayers().length <= 1">
+        <!-- Active layer info column -->
+        <div class="activeLayerContent">
+        <div class="activeLayerTitleBar">
+            <!-- Grabber in first column if more than one layer -->
+            <div class="btn btn-sm btn-primary activeLayerGrabber" *ngIf="getActiveLayers().length > 1" cdkDragHandle>
+                <i style="margin-left: 0;" class="ti-exchange-vertical" title="Drag to reorder"></i>
+            </div>
+            <!-- Title, loader spinner and delete button -->
+            <div class="activeLayerTitle">{{ layer.name }}</div>
+            <span style="margin-left: auto;" *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="project-percentage hasEvent light-blue">
+                <i *ngIf="!getUILayerModel(layer.id).statusMap.getRenderComplete()" class="fa fa-spin fa-spinner"></i>
+                <i *ngIf="getUILayerModel(layer.id).statusMap.getContainsError()" class="fa fa-warning text-warning"></i>
+            </span>
+            <i style="margin-left: auto;" *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-trash red layerLoadClickable" (click)="removeLayer(layer);$event.stopPropagation()"></i>
+        </div>
+        <!-- Opacity, legend and status buttons -->
+        <div class="activeLayerOpacityLegendStatusBar">
+            <div style="font-size: small;">Opacity {{ getUILayerModel(layer.id).opacity }}%&nbsp;</div>
+            <!-- Opacity slider -->
+            <mat-slider class="opacity-slider" min="0" max="100"  (input)="layerOpacityChangeValue($event, layer)">
+                <input matSliderThumb
+                    [(ngModel)]="getUILayerModel(layer.id).opacity">
+            </mat-slider>
+            <div style="display: flex;" *ngIf="hasLegend(layer)">
+                <!-- Display legend button -->
+                <button class="btn btn-primary btn-sm legend"  [disabled]="isLegendShown(layer.id)" (click)="showLegend(layer)">Legend</button>
+                <!-- Display status button -->
+                <button class="btn btn-primary btn-sm status"  (click)="openStatusReport(getUILayerModel(layer.id)); $event.stopPropagation();">Status</button>
+            </div>
+        </div>
+        <!-- Filter panel -->
+        <div class="activeLayerFilterPanel"> <!--  this div seems unnecessary, but remove it and drag breaks (more) -->
+            <div style="position: inherit;" class="card card-info card-with-tabs layer-card">
+                <div class="rh_info_wrap">
+                    <div class="card-header">
+                        <ul id="card-tab" class="nav nav-tabs">
+                            <!-- Layer Styling tab -->
+                            <li (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.filterpanel.expanded}">
+                                <a data-toggle="tab">
+                                    <span class="d-none d-sm-inline">Layer Styling</span>
+                                </a>
+                            </li>
+                            <!-- Layer Download tab -->
+                            <li *ngIf="isMapSupportedLayer(layer) && isDownloadSupportedLayer(layer)" (click)="selectTabPanel(layer.id,'downloadpanel')" [ngClass]="{'active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.downloadpanel.expanded}" class="d-none d-md-block">
+                                <a data-toggle="tab">
+                                    <span>Download</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="top-layer-btn-panel">
+                        <!-- Add bookmark button -->
+                        <button *ngIf="isUserLoggedIn() && !isLayerBookmarked(layer.id)" (click)="addLayerBookmark(layer.id)" type="button" class="btn btn-sm btn-info top-layer-btn" title="Bookmark Layer"><i class="fa fa-sm fa-bookmark-o"></i></button>
+                        <!-- Remove bookmark button -->
+                        <button *ngIf="isUserLoggedIn() && isLayerBookmarked(layer.id)" (click)="removeLayerBookmark(layer.id)" type="button" class="btn btn-sm btn-info top-layer-btn" title="Remove Layer Bookmark"><i class="fa fa-sm fa-bookmark"></i></button>
+                        <!-- Info button  -->
+                        <button (click)="displayRecordInformation(layer)" type="button" class="btn btn-sm btn-info top-layer-btn" title="Information" [ngClass]="{'active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.infopanel.expanded}">Info</button>
+                    </div>
+                </div>
+                <div id="card-tab-content" class="tab-content">
+                    <!-- Panel for layer styling -->
+                    <div class="tab-pane fade" [ngClass]="{'show active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.filterpanel.expanded}">
+                        <app-filter-panel *ngIf="getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.filterpanel.expanded" [layer]=layer></app-filter-panel>
+                    </div>
+                    <!-- Panel for layer download -->
+                    <div class="tab-pane fade" [ngClass]="{'show active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.downloadpanel.expanded}">
+                        <app-download-panel *ngIf="getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.downloadpanel.expanded" [layer]=layer></app-download-panel>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+<!--
 <div class="activeLayersBoundary" cdkDropList (cdkDropListDropped)="layerDropped($event)">
     <li class="activeLayerItem" *ngFor="let layer of getActiveLayers()" cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".activeLayersBoundary" [cdkDragDisabled]="getActiveLayers().length <= 1">
         <div *ngIf="getActiveLayers().length > 1" cdkDragHandle>
@@ -9,7 +87,7 @@
         </div>
         <div class="activeLayerContent">
             <div>
-                <!-- Layer name, status and warning icons -->
+                // Layer name, status and warning icons
                 <u>{{ layer.name }}
                     <span *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="float-right project-percentage hasEvent light-blue">
                         <i *ngIf="!getUILayerModel(layer.id).statusMap.getRenderComplete()" class="fa fa-spin fa-spinner"></i>
@@ -20,19 +98,19 @@
             </div>
             <div style="clear: right" *ngIf="(showOpacitySlider(layer) && getUILayerModel(layer.id).statusMap.getRenderStarted()) || hasLegend(layer)" class="opacity-slider-panel d-flex" (click)="$event.stopPropagation()">
                 <div class="opacity-label">Opacity {{ getUILayerModel(layer.id).opacity }}%&nbsp;</div>
-                <!-- Opacity slider -->
+                // Opacity slider
                 <mat-slider class="opacity-slider" min="0" max="100"  (input)="layerOpacityChangeValue($event, layer)">
                     <input matSliderThumb
                         [(ngModel)]="getUILayerModel(layer.id).opacity">
                 </mat-slider>
                 <div style="display: flex;" *ngIf="hasLegend(layer)">
-                    <!-- Display legend button -->
+                    // Display legend button
                     <button class="btn btn-primary btn-sm legend"  [disabled]="isLegendShown(layer.id)" (click)="showLegend(layer)">Legend</button>
-                    <!-- Display status button -->
+                    // Display status button
                     <button class="btn btn-primary btn-sm status"  (click)="openStatusReport(getUILayerModel(layer.id)); $event.stopPropagation();">Status</button>
                 </div>
             </div>
-            <!-- Map split controls -->
+            // Map split controls
             <div class="split-panel" *ngIf="getShowSplitMapButtons(layer)" (click)="$event.stopPropagation()">
                 Split Direction&nbsp;
                 <div *ngIf="getApplicableSplitLayer(layer)" class="split-button-panel">
@@ -50,13 +128,13 @@
                     <div class = "rh_info_wrap">
                         <div class="card-header">
                             <ul id="card-tab" class="nav nav-tabs">
-                                <!-- Layer Styling tab -->
+                                // Layer Styling tab
                                 <li (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.filterpanel.expanded}">
                                     <a data-toggle="tab">
                                         <span class="d-none d-sm-inline">Layer Styling</span>
                                     </a>
                                 </li>
-                                <!-- Layer Download tab -->
+                                // Layer Download tab
                                 <li *ngIf="isMapSupportedLayer(layer) && isDownloadSupportedLayer(layer)" (click)="selectTabPanel(layer.id,'downloadpanel')" [ngClass]="{'active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.downloadpanel.expanded}" class="d-none d-md-block">
                                     <a data-toggle="tab">
                                         <span>Download</span>
@@ -65,20 +143,20 @@
                             </ul>
                         </div>
                         <div class="top-layer-btn-panel">
-                            <!-- Add bookmark button-->
+                            // Add bookmark button
                             <button *ngIf="isUserLoggedIn() && !isLayerBookmarked(layer.id)" (click)="addLayerBookmark(layer.id)" type="button" class="btn btn-sm btn-info top-layer-btn" title="Bookmark Layer"><i class="fa fa-sm fa-bookmark-o"></i></button>
-                            <!-- Remove bookmark button -->
+                            // Remove bookmark button
                             <button *ngIf="isUserLoggedIn() && isLayerBookmarked(layer.id)" (click)="removeLayerBookmark(layer.id)" type="button" class="btn btn-sm btn-info top-layer-btn" title="Remove Layer Bookmark"><i class="fa fa-sm fa-bookmark"></i></button>
-                            <!-- Info button -->
+                            // Info button
                             <button (click)="displayRecordInformation(layer)" type="button" class="btn btn-sm btn-info top-layer-btn" title="Information" [ngClass]="{'active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.infopanel.expanded}">Info</button>
                         </div>
                     </div>
                     <div id="card-tab-content" class="tab-content">
-                        <!-- Panel for layer styling -->
+                        // Panel for layer styling
                         <div class="tab-pane fade" [ngClass]="{'show active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.filterpanel.expanded}">
                             <app-filter-panel *ngIf="getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.filterpanel.expanded" [layer]=layer></app-filter-panel>
                         </div>
-                        <!-- Panel for layer download -->
+                        // Panel for layer download
                         <div class="tab-pane fade" [ngClass]="{'show active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.downloadpanel.expanded}">
                             <app-download-panel *ngIf="getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.downloadpanel.expanded" [layer]=layer></app-download-panel>
                         </div>
@@ -89,3 +167,4 @@
         </div>
     </li>
 </div>
+-->

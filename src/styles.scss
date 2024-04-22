@@ -68,7 +68,7 @@ label {
 }
 
 .text-danger {
-	color: #e89f32!important;
+	color: #d35400 !important;
 }
 
 .alert-danger {
@@ -215,7 +215,6 @@ label {
     background-color: $background-colour;
     bottom: 0;
     overflow-x: hidden !important;
-    padding-bottom: 40px;
     transition: all .2s ease-in-out;
 
     .red {

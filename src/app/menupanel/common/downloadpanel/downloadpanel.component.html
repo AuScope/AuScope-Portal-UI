@@ -1,6 +1,6 @@
 <div class="filter-form">
 	<div [hidden]='!(isCsvSupportedLayer || isDatasetURLSupportedLayer || isIRISDownloadSupported)' class="form-group">
-		<div *ngIf="(!bbox && !drawBoundsStarted) && (!polygonFilter && !drawPolygonStarted)">
+		<div style="font-size:small;" *ngIf="(!bbox && !drawBoundsStarted) && (!polygonFilter && !drawPolygonStarted)">
 			 <div class="alert alert-warning fade show">
                 <i class="ti-bell float-left"></i>
                 <p>Select an area of interest (bounding box or polygon) to reduce download time.</p>

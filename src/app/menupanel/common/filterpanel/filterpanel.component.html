@@ -31,7 +31,7 @@
 	</div>
 
 	<!-- If there are no filters display a warning -->
-	<div *ngIf="(!layerFilterCollection || layerFilterCollection.optionalFilters?.length === 0) && !layerHasAdvancedFilterComponent(layer.id)">
+	<div style="font-size: small;" *ngIf="(!layerFilterCollection || layerFilterCollection.optionalFilters?.length === 0) && !layerHasAdvancedFilterComponent(layer.id)">
 		<div class="alert alert-warning fade show">
 			<i class="ti-bell float-left"></i>
 			<p>There are no filters associated with this layer</p>
@@ -109,7 +109,7 @@
 				</div>
 			</div>
 
-			<div  class="d-none d-md-block" *ngIf="optionalFilter.type==='OPTIONAL.POLYGONBBOX'">
+			<div class="d-none d-md-block" *ngIf="optionalFilter.type==='OPTIONAL.POLYGONBBOX'">
 				<div class="form-group form-group-sm">
 					<div class="checkbox" >
 						<input class="form-control-sm" id="{{ 'filter-OPTIONAL.POLYGONBBOX-0-' + layer.id }}" type="checkbox" [(ngModel)]="bApplyClipboardBBox"/>
@@ -117,7 +117,7 @@
 					</div>
 				</div>
 			</div>
-			<div  class="d-block d-md-none" *ngIf="optionalFilter.type==='OPTIONAL.POLYGONBBOX'">
+			<div class="d-block d-md-none" *ngIf="optionalFilter.type==='OPTIONAL.POLYGONBBOX'">
 				<div class="alert alert-warning fade show">
 					<i class="ti-bell float-left"></i>
 					<p>This filter is not supported on a small screen and would not return any results.</p>
@@ -143,7 +143,7 @@
 	</div>
 
 	<!-- If layer services are unresponsive then display a warning message -->
-	<p *ngIf='layerStatus.isLayerDown(layer.id)' class='small text-danger'><i class="fa fa-warning text-warning"></i> One or more of the services used by this layer are reported to be experiencing issues at the moment. Click on the info panel for more information.</p>
+	<p *ngIf='layerStatus.isLayerDown(layer.id)' class='small text-danger'><i class="fa fa-warning text-warning"></i>One or more of the services used by this layer are reported to be experiencing issues at the moment. Click on the info panel for more information.</p>
 	
 	<div>
 		<!-- Optional layer analytics button -->
