@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input, ViewChildren, ViewChild, QueryList, AfterViewInit } from '@angular/core';
+import { Component, Input, ViewChildren, QueryList, AfterViewInit } from '@angular/core';
 import { CsMapService, LayerModel, ResourceType, UtilitiesService } from '@auscope/portal-core-ui';
 import { ManageStateService, LayerHandlerService, CsClipboardService } from '@auscope/portal-core-ui';
 import { SplitDirection } from 'cesium';
@@ -364,7 +364,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
 
     isDatasetURLSupportedLayer = config.datasetUrlSupportedLayer[layer.id] !== undefined;
 
-    if (config.datasetUrlAussPassLayer[layer.group.toLowerCase()] !== undefined &&
+    if (config.datasetUrlAussPassLayer && config.datasetUrlAussPassLayer[layer.group.toLowerCase()] !== undefined &&
       UtilitiesService.layerContainsResourceType(layer, ResourceType.IRIS)) {
       isIRISDownloadSupported = true;
     }

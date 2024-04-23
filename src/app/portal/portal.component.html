@@ -23,14 +23,12 @@
 <!-- BEGIN sidebar -->
 <nav id="sidebar" class="sidebar slimscroll sidebar-collapse show" style="overflow: auto;" >
     <!-- BEGIN Active Layers -->
-    <input type="checkbox" checked class="menuBtn" id="activeLayersBtn"/>
     <h5 class="mb-1">
-        <label id="activeLayersLink" for="activeLayersBtn" class="mb-0" title="Layers added to map">
-            <i class="ti-filter"></i>
+        <label style="font-size: larger;" id="activeLayersLink" for="activeLayersBtn" class="mb-0" title="Layers added to map">
+            <i class="ti-layers-alt"></i>
             Active Layers
-            <i class="fa fa-arrow-circle-down"></i>
         </label>
-        <ul class="card-sub" appActiveLayers></ul>
+        <div appActiveLayers></div>
     </h5>
     <!-- END Active Layers -->
 
