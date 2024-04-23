@@ -4,16 +4,16 @@
 .editor-toggle-button {
     display: block;
     position: absolute;
-    left: 5px;
-    top: 50px;
+    right: 143px;
+    top: 5px;
     z-index: 5;
     font-size: 21px;
 }
 /* Main editor panel */
 .editor-box {
     position: fixed;
-    top: 144px;
-    //left: 50px;
+    top: 100px;
+    right: 140px;
     width: 280px;
     z-index: 100;
     padding: 6px;

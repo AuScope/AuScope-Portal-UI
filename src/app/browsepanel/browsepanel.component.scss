@@ -39,6 +39,20 @@
         max-width: 200px !important;
     }
 
+    .col {
+        cursor: pointer;
+    }
+
+    .col:hover {
+        background-color: rgba(220, 220, 220, 0.8);
+        border-radius: 0.3rem;
+        color: #ce348a; /* From AuScope style guide */
+    }
+
+    .col:hover span {
+        color: #ce348a; /* From AuScope style guide */
+    }
+
     a, span {
         font-size: 16px;
         color: black;
