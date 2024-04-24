@@ -5,7 +5,7 @@
 
 <div *ngIf="bShowBrowsePanel" class="browse-menu">
 	<!-- Layer Groups column -->
-	<div class="container text-left">
+	<div class="container text-left browse-menu-col">
 		<a style="font-weight: bold">Featured Layer Groups</a>
 		<div class="row align-items-start" *ngFor="let layerGroup of layerGroupColumn | keyvalue">
 			<div class="col" (click)="selectGroup(layerGroup)">
@@ -17,7 +17,7 @@
 	</div>
 
 	<!-- Layers column -->
-	<div style="width:100%" class="container text-left">
+	<div [style.display]="layerColumnHeader === '' && !panelStayOpen ? 'none' : 'block'" class="container text-left browse-menu-col">
 		<a *ngIf="!layerColumnHeader" style="font-weight: bold">Layers</a>
 		<a *ngIf="layerColumnHeader"><span style="font-weight: bold;" class="truncate-layer">{{layerColumnHeader}} Layers</span></a>
 		<div class="row align-items-start" *ngFor="let layer of layerColumn">
@@ -34,7 +34,7 @@
 	</div>
 
 	<!-- Info column -->
-	<div style="width:100%" class="info-col">
+	<div [style.display]="selectedLayer || panelStayOpen ? 'block' : 'none'" class="info-col">
 		<a style="font-weight: bold">Information</a>
 		<!-- 'Stay Open' check box -->
 		<div style="float: right;" class="form-check">

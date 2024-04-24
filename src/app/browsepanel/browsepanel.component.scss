@@ -3,8 +3,8 @@
 :host {
 
     .browse-menu {
-        display: grid;
-        grid-template-columns: 300px 340px 420px;
+        display: flex;
+        flex-direction: row;
         position: fixed;
         line-height: 1.2;
         top: 130px;
@@ -15,6 +15,10 @@
         opacity: 0.9;
         border: 1px solid #444444;
         border-radius: .8rem!important;
+
+        .browse-menu-col {
+            flex: fit-content;
+        }
     }
 
     .browse-menu-button {
@@ -77,6 +81,8 @@
     }
 
     .info-col {
+        max-width: 420px;
+        min-width: 420px;
         height: 700px;
         overflow-x: hidden;
         overflow-y: auto;
