@@ -72,6 +72,15 @@
 
 .activeLayerItem {
   padding: 0.8rem 0.8rem 0 0.8rem;
+  display: flex;
+  position: relative;
+  right: 5px;
+  width: 100%;
+  align-items: center;
+  font-size: 1rem;
+  color: #d8d9d7;
+  margin: 0 5px 0 0;
+  border-bottom: 1px solid rgba(255 ,255, 255, 0.15);
 
   // Disable text selection
   -webkit-user-select: none;  /* Safari */
