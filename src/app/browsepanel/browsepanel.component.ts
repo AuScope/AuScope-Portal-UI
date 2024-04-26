@@ -5,6 +5,7 @@ import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { LayerModel } from '@auscope/portal-core-ui'
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
 import { FilterService } from 'app/services/filter/filter.service';
+import { SidebarService } from 'app/portal/sidebar.service';
 
 
 @Component({
@@ -25,10 +26,13 @@ export class BrowsePanelComponent implements OnInit {
       private layerManagerService: LayerManagerService,
       private renderStatusService: RenderStatusService,
       private uiLayerModelService: UILayerModelService,
-      private filterService: FilterService
+      private filterService: FilterService,
+      private sidebarService: SidebarService
       ) {
   }
-
+  toggleSidebar() {
+    this.sidebarService.toggleSidebar();
+  }
   /**
    * Initialise Component
    */
@@ -94,6 +98,7 @@ export class BrowsePanelComponent implements OnInit {
     if (!this.panelStayOpen) {
       this.toggleBrowsePanel(false);
     }
+    this.sidebarService.setOpenState(true);
   }
 
   /**

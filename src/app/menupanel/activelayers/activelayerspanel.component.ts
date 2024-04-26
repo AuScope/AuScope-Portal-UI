@@ -47,6 +47,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
   // User bookmarks (if logged in and stored)
   bookmarks: Bookmark[];
   showingOnlyBookmarkedLayers = false;
+  isSidebarOpen = false;
 
   constructor(private csMapService: CsMapService,
     private uiLayerModelService: UILayerModelService, private layerManagerService: LayerManagerService,
@@ -58,7 +59,17 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
         this.areLayersPolygonFiltered = filterLayers;
       });
     }
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
+    console.log(this.isSidebarOpen);
+  }
+  openSidebar() {
+    this.isSidebarOpen = true;
+  }
 
+  closeSidebar() {
+    this.isSidebarOpen = false;
+  }
   public ngAfterViewInit() {
     const stateId = UtilitiesService.getUrlParameterByName('state');
     const me = this;

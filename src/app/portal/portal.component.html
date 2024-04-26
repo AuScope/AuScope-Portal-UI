@@ -21,7 +21,7 @@
 <!-- END navbar -->
 
 <!-- BEGIN sidebar -->
-<nav id="sidebar" class="sidebar slimscroll sidebar-collapse show" style="overflow: auto;" >
+<nav id="sidebar" class="sidebar slimscroll sidebar-collapse show" [ngClass]="{'sidebar-show': isSidebarOpen, 'sidebar-close': !isSidebarOpen}"  style="overflow: auto;" >
     <!-- BEGIN Active Layers -->
     <h5 class="mb-1">
         <label style="font-size: larger;" id="activeLayersLink" for="activeLayersBtn" class="mb-0" title="Layers added to map">
@@ -49,7 +49,7 @@
 <!-- END sidebar -->
 
 <!-- BEGIN #map-area -->
-<div id="map-area" class="map-area">
+<div id="map-area" class="map-area" [ngClass]="{'sidebar-open': isSidebarOpen}">
     <!-- BEGIN map-area-csmap -->
     <div class="map-area-csmap">
         <app-cs-map class="h-100 w-100"></app-cs-map>

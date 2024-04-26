@@ -2,7 +2,9 @@
 <button class="cesium-button cesium-toolbar-button browse-menu-button" (click)="toggleBrowsePanel()">
     <em class="fa fa-bars" title="Browse featured layers"></em> Browse
 </button>
-
+<button class="sidebar-toggle cesium-button cesium-toolbar-button browse-menu-button" (click)="toggleSidebar()">
+    <em class="fa fa-sliders" title="Browse featured layers"></em> SideBar
+</button>
 <div *ngIf="bShowBrowsePanel" class="browse-menu">
 	<!-- Layer Groups column -->
 	<div class="container text-left browse-menu-col">

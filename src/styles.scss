@@ -869,3 +869,27 @@ fieldset.show-fieldset-borders-whitebg legend{
     }
 }
 /* End LegendModal dialog */
+.sidebar.sidebar-close {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    background-color: #fff;
+    z-index: 1050;
+    overflow-y: auto;
+    transition: width 0.3s ease;
+}
+
+.sidebar.sidebar-show {
+width: 320px; /* Adjust the width as needed */
+}
+
+.map-area {
+margin-left: 0;
+transition: margin-left 0.3s ease;
+}
+
+.map-area.sidebar-open {
+margin-left: 320px; /* Adjust the margin to match the sidebar width */
+}
