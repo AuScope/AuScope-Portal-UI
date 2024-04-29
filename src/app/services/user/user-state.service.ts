@@ -1,15 +1,16 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { Bookmark } from 'app/models/bookmark.model';
 import { PermanentLink } from 'app/models/permanentlink.model';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { catchError, map, take } from 'rxjs/operators';
 import { User } from '../../models/user.model';
 import { AuscopeApiService } from '../api/auscope-api.service';
-import { CsMapService, ManageStateService } from '@auscope/portal-core-ui';
+import { CsMapService, ManageStateService, Polygon, UtilitiesService } from '@auscope/portal-core-ui';
 import { v4 as uuidv4 } from 'uuid';
 import { HttpResponse } from '@angular/common/http';
 import { environment } from 'environments/environment';
 import { UILayerModelService } from '../ui/uilayer-model.service';
+import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
 
 
 @Injectable()
@@ -27,7 +28,11 @@ export class UserStateService {
   private _states: BehaviorSubject<PermanentLink[]> = new BehaviorSubject([]);
   public readonly states: Observable<PermanentLink[]> = this._states.asObservable();
 
-  constructor(private apiService: AuscopeApiService, private manageStateService: ManageStateService, private csMapService: CsMapService, private uiLayerModelService: UILayerModelService) {}
+  //ROI for User
+  public roiList:Polygon[] = [];
+  public roiKey = '';
+
+  constructor(private apiService: AuscopeApiService, private manageStateService: ManageStateService, private csMapService: CsMapService, @Inject(LOCAL_STORAGE) private storage: StorageService, private uiLayerModelService: UILayerModelService) {}
 
   /**
    * Get the currently logged in user (if one is logged in)
@@ -44,6 +49,8 @@ export class UserStateService {
       // Update user's bookmarks and map states
       this.updateBookmarks();
       this.updateUserStates();
+      // Update user's ROI
+      this.updateUserROI(user);
     }, () => {
       // Failure to retrieve User means no User logged in
       this.logoutUser();
@@ -208,5 +215,27 @@ export class UserStateService {
       }),
     );
   }
-  
+  /**
+   * Save the user's list of ROI
+   */
+  public saveROI() {
+    if (UtilitiesService.isEmpty(this.roiKey))
+      return;
+
+    let strROIs = JSON.stringify(this.roiList);
+    this.storage.set(this.roiKey, strROIs);
+  }
+
+  /**
+   * Retrieve a list of ROI associated with the user
+   * @param user
+   */
+  public updateUserROI(user:User){
+    let key = user.id + user.email + user.fullName;
+    this.roiKey = key.replace(' ','-');
+    if (this.storage.has(this.roiKey)){
+      let strROIs = this.storage.get(this.roiKey);
+      this.roiList = JSON.parse(strROIs);
+    }
+  }
 }

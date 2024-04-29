@@ -8,6 +8,7 @@
         </button>
         <mat-menu #loginMenu="matMenu" style="margin-top:12px;">
             <h5 *ngIf="userHasStates()" mat-menu-item (click)="manageStates()"><i class="ti-link"></i>&nbsp;&nbsp;Manage Permanent Links</h5>
+            <h5 *ngIf="userHasROI()" mat-menu-item (click)="manageROI()"><img src="extension/svg/polygon.svg" fill="#000000" width="24" height="24"  style="color:#edffff;">&nbsp;&nbsp;Manage Region Of Interest</h5>
             <h5 mat-menu-item (click)="logOut()"><i class="fa fa-power-off"></i>&nbsp;&nbsp;Log Out</h5>
         </mat-menu>
     </div>
