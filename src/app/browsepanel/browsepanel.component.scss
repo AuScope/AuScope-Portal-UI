@@ -5,10 +5,10 @@
     .browse-menu {
         display: flex;
         flex-direction: row;
-        position: fixed;
+        position: absolute;
         line-height: 1.2;
-        top: 130px;
-        left: 350px;
+        top: 85px;
+        left: 10px;
         z-index: 1000;
         padding: 6px;
         background-color:rgb(242, 242, 241); /* From AVRE App Store */
