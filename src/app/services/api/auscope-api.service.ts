@@ -253,4 +253,45 @@ export class AuscopeApiService {
     return this.apiRequest<string>('secure/deletePortalState.do', options);
   }
 
+  /**
+   * Get params for the currently logged in user
+   * @param key
+   * @returns string value
+   */
+    public getUserParams(key: string) {
+      const options = {
+        params: {
+            key: key
+        }
+      };
+      return this.apiRequest<string>('secure/getUserParams.do', options);
+    }
+  /**
+   * Delete a user params
+   * @param key
+   * @returns true response on success, false otherwise
+   */
+  public deleteUserParams(key: string) {
+    const options = {
+      params: {
+          key: key
+      }
+    };
+    return this.apiRequest<string>('secure/deleteUserParams.do', options);
+  }
+  /**
+   * Update user params
+   * @param key
+   * @param value
+   * @returns true response on success, false otherwise
+   */
+  public saveUserParams(key: string, value: string) {
+    const options = {
+      params: {
+        key: key,
+        value: value
+      }
+    };
+    return this.apiRequest<string>('secure/saveUserParams.do', options);
+  }
 }

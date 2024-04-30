@@ -216,14 +216,15 @@ export class UserStateService {
     );
   }
   /**
-   * Save the user's list of ROI
+   * Save the user's list of ROI 
    */
   public saveROI() {
     if (UtilitiesService.isEmpty(this.roiKey))
       return;
 
     let strROIs = JSON.stringify(this.roiList);
-    this.storage.set(this.roiKey, strROIs);
+    this.apiService.saveUserParams(this.roiKey,strROIs).subscribe(response => {
+    });
   }
 
   /**
@@ -231,11 +232,13 @@ export class UserStateService {
    * @param user
    */
   public updateUserROI(user:User){
-    let key = user.id + user.email + user.fullName;
+    let key = 'roiId.'+ user.email;
     this.roiKey = key.replace(' ','-');
-    if (this.storage.has(this.roiKey)){
-      let strROIs = this.storage.get(this.roiKey);
-      this.roiList = JSON.parse(strROIs);
-    }
+    this.apiService.getUserParams(key).subscribe(strROIs => {
+      if (strROIs) {
+        this.roiList = JSON.parse(JSON.parse(JSON.stringify(strROIs)).value);
+      }
+      return undefined;
+    });
   }
 }
