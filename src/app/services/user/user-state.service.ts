@@ -10,8 +10,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { HttpResponse } from '@angular/common/http';
 import { environment } from 'environments/environment';
 import { UILayerModelService } from '../ui/uilayer-model.service';
-import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
-
 
 @Injectable()
 export class UserStateService {
@@ -32,7 +30,7 @@ export class UserStateService {
   public roiList:Polygon[] = [];
   public roiKey = '';
 
-  constructor(private apiService: AuscopeApiService, private manageStateService: ManageStateService, private csMapService: CsMapService, @Inject(LOCAL_STORAGE) private storage: StorageService, private uiLayerModelService: UILayerModelService) {}
+  constructor(private apiService: AuscopeApiService, private manageStateService: ManageStateService, private csMapService: CsMapService, private uiLayerModelService: UILayerModelService) {}
 
   /**
    * Get the currently logged in user (if one is logged in)
