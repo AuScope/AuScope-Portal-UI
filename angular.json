@@ -53,7 +53,7 @@
               "src/styles.scss",
               "node_modules/rickshaw/rickshaw.min.css",
               "src/extension/css/extensions.css",
-              "node_modules/nouislider/distribute/nouislider.min.css",
+              "node_modules/nouislider/dist/nouislider.min.css",
               "src/extension/css/d3.css",
               "node_modules/@ng-select/ng-select/themes/default.theme.css",
               "./node_modules/cesium/Build/Cesium/Widgets/widgets.css"
