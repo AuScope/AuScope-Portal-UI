@@ -59,7 +59,8 @@ export class CsMapClipboardComponent implements OnInit {
     let strToday=new Date(); 
     let dt= new Date(strToday).toISOString();
     roiPolygon.name = 'ROI-' + dt.slice(0,dt.lastIndexOf('.'));
-    this.userStateService.roiList.push(roiPolygon);  
+    this.userStateService.roiList.push(roiPolygon);
+    this.userStateService.saveROI();
   }
   onKmlFileSave(event) {
     if (this.polygonBBox === null) return;
