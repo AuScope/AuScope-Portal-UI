@@ -27,9 +27,11 @@ declare var Cesium: any;
     <div #mapElement id="map" class="h-100 w-100" (mouseout)="mouseLongitude=undefined;mouseLatitude=undefined;">
       <ac-map>
           <rectangles-editor></rectangles-editor>
+          <app-browse-menu></app-browse-menu>
           <app-cs-map-zoom></app-cs-map-zoom>
           <app-cs-map-split (toggleEvent)="toggleShowMapSplit()"></app-cs-map-split>
           <app-cs-clipboard></app-cs-clipboard>
+          <app-permanent-link></app-permanent-link>
           <div #mapSlider id="mapSlider" *ngIf="getSplitMapShown()">
             <div class="slider-grabber">
               <div class="slider-grabber-inner"></div>

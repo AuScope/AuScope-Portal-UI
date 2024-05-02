@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { PermanentLinksModalComponent } from 'app/modalwindow/permanentlink/permenantlinks.modal.component';
+import { PermanentLinksModalComponent } from 'app/modalwindow/permanentlink/permanentlinks.modal.component';
 import { PermanentLink } from 'app/models/permanentlink.model';
 import { User } from 'app/models/user.model';
 import { AuthService } from 'app/services/auth/auth.service';

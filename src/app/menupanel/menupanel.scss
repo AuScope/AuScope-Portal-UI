@@ -231,9 +231,9 @@ input[type=checkbox] + label {
 }
 
 /* "Featured Layers" and "Custom Layers" search filter boxes */
-input + div.input-group-append  > button {
-	margin-right: 0px;
-}
+//input + div.input-group-append  > button {
+//	margin-right: 0px;
+//}
 
 /* Title for downloads and catalogue search */
 .standard-title h4 span {
@@ -288,25 +288,12 @@ input + div.input-group-append  > button {
 
 .select-layers-message {
     font-size: 0.9rem;
-    color: $auscope-grey;
+    color: $text-colour;
     margin-top: 5px;
 }
 
 .help-block {
-    color: $auscope-grey;
-}
-
-/* Featured Layers -> Filtered Layers box */
-.filtered-layers {
-    display: flex;
-    color: $auscope-grey;
-    align-items: baseline;
-    text-align: center;
-    font-size: small;
-    border: solid 1px $auscope-grey;
-    border-radius: 5px;
-    padding: 5px 5px 0 0;
-    margin: 5px 8px 5px 0;
+    color: $text-colour;
 }
 
 /* "info" button - positioned in line and to the right of "map layer" and "download" tabs */
@@ -320,8 +307,10 @@ input + div.input-group-append  > button {
 
 .opacity-label {
     width: 7em;
+    font-size: 0.8rem;
 }
 .opacity-slider {
+    width: 100%;
     //margin-right: 2em;
     // Material component styling
     --mdc-slider-handle-color: white;

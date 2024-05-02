@@ -1,4 +1,4 @@
-name: Azure Static Web Apps Dev CI/CD
+name: Deploy to Dev AuScope portal auportal-dev.geoanalytics.group
 
 on:
   push:
@@ -35,6 +35,7 @@ jobs:
           app_location: "/" # App source code path
           api_location: "" # Api source code path - optional
           output_location: "dist/" # Built app content directory - optional
+          app_build_command: "npm run build-dev"
           ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:

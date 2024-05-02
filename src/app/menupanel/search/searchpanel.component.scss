@@ -20,7 +20,7 @@
         position: absolute;
         top: 15%;
         bottom: 15%;
-        right: 132px;
+        right: 5px;
         line-height: 0;
         background: white;
         color: gray;
@@ -142,6 +142,22 @@
             }
             .layer-header:hover {
                 background-color: lightgray;
+            }
+
+            .csw-label {
+                border-radius: 5px;
+                background-color: #AED6F1;
+                font-size: smaller;
+                padding: 0px 4px;
+                margin-left: 2px;
+            }
+
+            .layer-label {
+                border-radius: 5px;
+                background-color: #A9DFBF;
+                font-size: smaller;
+                padding: 0px 4px;
+                margin-left: 2px;
             }
     
             // Overriding LayerPanel card styles to better fit this panel

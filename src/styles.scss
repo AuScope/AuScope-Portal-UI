@@ -43,7 +43,7 @@ button, a, a:link, a:visited { color: $text-colour;  }
 button:hover, button:active, a:active, a:hover {color: $text-highlight-colour; }
 
 label {
-    font-weight: 400;
+    font-weight: 800;
 }
 
 .small, small {
@@ -68,7 +68,7 @@ label {
 }
 
 .text-danger {
-	color: #e89f32!important;
+	color: #d35400 !important;
 }
 
 .alert-danger {
@@ -93,7 +93,7 @@ label {
 }
 
 .white {
-	 color: white;
+	 color: $text-colour;
 }
 
 /* END general colours */
@@ -104,7 +104,7 @@ label {
 .navbar {
     min-height: $navbar-height;
     height: $navbar-height;
-    background-color: $background-colour;
+    background-color: #282572;
     margin-bottom: 20px;
     width: 100%;
     position: fixed;
@@ -215,7 +215,6 @@ label {
     background-color: $background-colour;
     bottom: 0;
     overflow-x: hidden !important;
-    padding-bottom: 40px;
     transition: all .2s ease-in-out;
 
     .red {
@@ -387,7 +386,7 @@ label {
 /* END map area rules */
 
 .nav-tabs {
-    border-bottom-color: $text-highlight-colour;
+    // border-bottom-color: $text-highlight-colour;
     padding-bottom: 8px;
     margin-top: 10px;
 }
@@ -395,22 +394,20 @@ label {
 .nav-tabs > li > a {
     line-height: 0.428571;
 }
-
 .nav-tabs > li.active > a,
 .nav-tabs > li.active >a:focus,
 .nav-tabs> li.active > a:hover {
-    color: $text-highlight-colour;
+    color: white;
     cursor: default;
-    border: 1px solid $border-colour;
-    background-color: $background-colour;
-    border-bottom-color: $background-colour;
+    border-radius: 5px;
+    background-color: #4078F8;
+    // border-bottom-color: $text-highlight-colour;
 }
 
 .nav-tabs > li > a:hover, .nav-tabs > li > a:focus {
     color: $text-colour;
     /* background-color: $background-colour; */
     border-color: $background-colour;
-    border-bottom-color: $text-highlight-colour;
 }
 
 .nav-tabs > li > a:hover span {
@@ -418,7 +415,7 @@ label {
 }
 
 .nav-tabs > li.active > a span {
-    color: $text-highlight-colour;
+    color: white;
 }
 
 .card.card-info {
@@ -437,7 +434,7 @@ label {
     border-color: $border-colour;
     box-shadow: none;
     border: none;
-    color: #fff;
+    // color: #fff;
     background-color: $background-colour;
 }
 
@@ -445,7 +442,7 @@ label {
     font-size: 12px;
 }
 
-.card-info > .card-header {
+.card-info .card-header {
     color: #fff;
     background-color: $background-colour;
     border-color: $border-colour;
@@ -469,6 +466,10 @@ label {
 
 .card-sub .card .card-header {
 	height:43px;
+}
+
+.card-sub {
+    color: $text-colour;
 }
 
 .card.card-bordered a:hover {
@@ -553,11 +554,12 @@ fieldset.show-fieldset-borders {
 	border: 1px solid #c4c4c4;
     padding: 0 1.4em 1.4em 1.4em;
     margin: 0 1em 1em 1em;
+    color: $text-colour;
 }
 
 fieldset legend{
 	border-bottom:	0px;
-	color: #fff;
+	// color: #fff;
 	width: 70%;
 	padding-left:10px;
 }
@@ -867,3 +869,27 @@ fieldset.show-fieldset-borders-whitebg legend{
     }
 }
 /* End LegendModal dialog */
+.sidebar.sidebar-close {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    background-color: #fff;
+    z-index: 1050;
+    overflow-y: auto;
+    transition: width 0.3s ease;
+}
+
+.sidebar.sidebar-show {
+width: 320px; /* Adjust the width as needed */
+}
+
+.map-area {
+margin-left: 0;
+transition: margin-left 0.3s ease;
+}
+
+.map-area.sidebar-open {
+margin-left: 320px; /* Adjust the margin to match the sidebar width */
+}

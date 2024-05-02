@@ -1,10 +1,36 @@
-<p><b>Title: </b>{{cswRecord.name}}</p>
-<p><b>Abstract: </b>{{cswRecord.description}}</p>
+<!-- Title -->
+<p><b style="font-size:large;">{{cswRecord.name}}</b></p>
+
+<!-- Preview -->
+<div *ngIf="wmsUrl!==undefined">
+	<b>WMS Preview:</b>
+	<div style="position:relative; height:200px; margin:0.5rem 0;">
+		<!-- Place images one on top of the other -->
+		<div style="display:inline-block; position:absolute; top:0px; left:50px; opacity: 50%;">
+			<img appImgLoading src="{{outlineUrl}}" (error)="onImgError($event)" height="200" width="200"/>
+		</div>
+		<div style="display:inline-block; position:absolute; top:0px; left:50px; opacity:50%;">
+			<img appImgLoading src="{{wmsUrl}}" (error)="onImgError($event)" height="200" width="200"/>
+		</div>
+	</div>
+</div>
+
+<div style="display:inline-block; position:relative;">
+	<!-- Legend -->
+	<p *ngIf="legendUrl!==undefined">
+		<b>Legend: </b>
+		<img appImgLoading src="{{legendUrl}}" (error)="onImgError($event)" class="infopanel-legend"/>
+	</p>
+
+	<!-- Abstract -->
+	<p>{{cswRecord.description}}</p>
+
+<!-- Organisation etc. -->
 <p><b>Contact org: </b>{{cswRecord.contactOrg}}</p>
 <p *ngIf="cswRecord.funderOrg && cswRecord.funderOrg !== 'Unknown'"><b>Funder: </b>{{cswRecord.funderOrg}}</p>
 <p *ngIf='cleanConstraints(cswRecord.constraints).length > 0'><b>Constraints: </b>{{cleanConstraints(cswRecord.constraints)}}</p>
 <p *ngIf='selectConstraints(layer.capabilityRecords, cswRecord.accessConstraints).length > 0'><b>Access Constraints: </b>{{selectConstraints(layer.capabilityRecords, cswRecord.accessConstraints)}}</p>
-<p *ngIf="cswRecord.recordInfoUrl && cswRecord.recordInfoUrl.length > 0"><b>Info URL: </b><a target="_blank" href="{{cswRecord.recordInfoUrl}}">Link to Geonetwork Record</a></p>
+<p *ngIf="cswRecord.recordInfoUrl && cswRecord.recordInfoUrl.length > 0"><b>Info URL: </b><a style="color: blue; text-decoration: underline;" target="_blank" href="{{cswRecord.recordInfoUrl}}">Link to Geonetwork Record</a></p>
 <div *ngFor="let onlineResource of cswRecord.onlineResources">
 	<p *ngIf="onlineResource.type==='DOI'">
 		<span class="label label-default"><b>DOI Name: </b></span> {{onlineResource.name}}<br>
@@ -13,14 +39,10 @@
 	</p>
 	<p *ngIf="onlineResource.type!=='Unsupported' && onlineResource.type!=='DOI'">
 		<span *ngIf="isGetCapabilitiesType(onlineResource)" class="label label-default"><b>{{onlineResource.type}}: </b></span>
-		<a *ngIf="isGetCapabilitiesType(onlineResource)" target="_blank" href="{{ onlineResourceGetCapabilitiesUrl(onlineResource) }}">{{onlineResource.type}} GetCapabilities Info</a>
+		<a style="color: blue; text-decoration: underline;" *ngIf="isGetCapabilitiesType(onlineResource)" target="_blank" href="{{ onlineResourceGetCapabilitiesUrl(onlineResource) }}">{{onlineResource.type}} GetCapabilities Info</a>
 		<span *ngIf="!isGetCapabilitiesType(onlineResource) && onlineResource.url" class="label label-default"><b>{{onlineResource.name.split('_').join(' ')}}: </b></span>
-		<a *ngIf="!isGetCapabilitiesType(onlineResource)" target="_blank" href="{{ removeProxy(onlineResource.url) }}">{{ removeProxy(onlineResource.url) }}</a>
+		<a style="color: blue; text-decoration: underline;" *ngIf="!isGetCapabilitiesType(onlineResource)" target="_blank" href="{{ removeProxy(onlineResource.url) }}">{{ removeProxy(onlineResource.url) }}</a>
 	</p>
 </div>
-<p *ngIf="wmsUrl!==undefined">
-	<b>WMS Preview: </b><img appImgLoading src="{{wmsUrl}}" (error)="onImgError($event)" height="100" width="100"/>
-</p>
-<p *ngIf="legendUrl!==undefined">
-	<b>Legend: </b><img appImgLoading src="{{legendUrl}}" (error)="onImgError($event)" class="infopanel-legend"/>
-</p>
+
+</div>

@@ -124,12 +124,12 @@ export class FilterService {
     }
 
     /**
-     * Get layer times for a given layer
+     * Get layer times behaviour subject for a given layer
      *
      * @param layerId ID of th elayer
      * @returns LayerTimes as Observable
      */
-    public getLayerTimes(layerId: string): BehaviorSubject<LayerTimes> {
+    public getLayerTimesBS(layerId: string): BehaviorSubject<LayerTimes> {
         let layerTimesBS: BehaviorSubject<LayerTimes> = this.layerTimes.get(layerId);
         if (layerTimesBS) {
             return layerTimesBS;
@@ -147,7 +147,7 @@ export class FilterService {
      * @param layerTimes layer times
      */
     public setLayerTimes(layerId: string, layerTimes: LayerTimes) {
-        this.getLayerTimes(layerId).next(layerTimes);
+        this.getLayerTimesBS(layerId).next(layerTimes);
     }
 
     /**
@@ -194,20 +194,20 @@ export class FilterService {
         if (layerTimes.timeExtent.length === 0 && wmsEndpointUrl !== null && layerName !== null) {
             layerTimes.loadingTimeExtent = true;
             if (wmsEndpointUrl.indexOf('?') !== -1) {
-            wmsEndpointUrl = wmsEndpointUrl.substring(0, wmsEndpointUrl.indexOf('?'));
+                wmsEndpointUrl = wmsEndpointUrl.substring(0, wmsEndpointUrl.indexOf('?'));
             }
             this.getCapsService.getCaps(wmsEndpointUrl).subscribe(response => {
             if (response.data && response.data.capabilityRecords.length === 1 && response.data.capabilityRecords[0].layers.length > 0) {
                 const responseLayers = response.data.capabilityRecords[0].layers.filter(l => l.name === layerName);
                 if (responseLayers && responseLayers.length > 0 && responseLayers[0].timeExtent) {
-                // Sort by date (newest first)
-                layerTimes.timeExtent = responseLayers[0].timeExtent.sort((a, b) => {
-                    return <any>new Date(b) - <any>new Date(a);
-                });
-                // Time may have already been set from retrieving state
-                if (!layerTimes.currentTime) {
-                    layerTimes.currentTime = layerTimes.timeExtent[0];
-                }
+                    // Sort by date (newest first)
+                    layerTimes.timeExtent = responseLayers[0].timeExtent.sort((a, b) => {
+                        return <any>new Date(b) - <any>new Date(a);
+                    });
+                    // Time may have already been set from retrieving state
+                    if (!layerTimes.currentTime) {
+                        layerTimes.currentTime = layerTimes.timeExtent[0];
+                    }
                 }
             }
             layerTimes.loadingTimeExtent = false;

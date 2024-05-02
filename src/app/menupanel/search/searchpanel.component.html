@@ -2,7 +2,7 @@
     <!-- Search bar and buttons -->
     <div class="input-group">
         <div class="input-group-prepend">
-            <button tabindex="-1" class="btn btn-primary search-toggle-button" type="button" title="{{showingResultsPanel ? 'Hide results' : 'Show results'}}" (click)="toggleResultsPanel()">
+            <button tabindex="-1" class="btn btn-primary search-toggle-button" style="border-top-left-radius:0.25rem;border-bottom-left-radius:0.25rem;" type="button" title="{{showingResultsPanel ? 'Hide results' : 'Show results'}}" (click)="setShowingResultsPanel(!showingResultsPanel)">
                 <span *ngIf="!showingResultsPanel" class="fa-layers fa-fw">
                     <i class="fa fa-list"></i>
                     <i class="fa fa-caret-down caret-icon"></i>
@@ -15,7 +15,11 @@
         </div>
         <div ngbDropdown #suggesterDropdown="ngbDropdown" style="flex:1;">
             <!-- Search text field -->
-            <input type="text" class="form-control" #queryinput placeholder="Enter search term here..." [(ngModel)]="queryText" (keyup)="onKeyUp($event)" (keydown)="onKeyDown($event)" [disabled]="searching">
+            <div>
+                <input type="text" class="form-control" #queryinput placeholder="Enter search term here..." [(ngModel)]="queryText" (keyup)="onKeyUp($event)" (keydown)="onKeyDown($event)" [disabled]="searching">
+                <!-- Clear query text button -->
+                <button *ngIf="!searching && queryText && queryText !== ''" class="clear-query-button" type="button" title="Clear search" (click)="clearQueryText()">&times;</button>
+            </div>
             <!-- Suggester -->
 			<div ngbDropdownMenu>
                 <div *ngFor="let term of suggestedTerms; let i = index;">
@@ -23,30 +27,25 @@
                 </div>
             </div>
         </div>
-        <!-- Clear query text button -->
-        <button *ngIf="!searching && queryText && queryText !== ''" class="clear-query-button" type="button" title="Clear search" (click)="clearQueryText()">&times;</button>
         <div class="input-group-append">
             <!-- Search button -->
-            <button *ngIf="!searching" tabindex="-1" class="btn btn-primary search-button" type="button" title="Search layers" (click)="search()"><i class="fa fa-search"></i></button>
-            <!-- Search tips -->
-            <ng-template #searchTipsContent>
-                Searches will attempt to match <strong>full words</strong> in the search bar <strong>in any order</strong>.<br><br>
-                <strong>Wilcards</strong> may be used, but not at the beginning of a word. Use <strong>?</strong> for a single character wildcard search, or <strong>*</strong> for multi-character. E.g.<br><br>
-                <strong>anom?lies</strong><br>
-                <strong>anom*</strong><br><br>
-                To match <strong>phrases</strong> (case-insenitive), use <strong>double-quotes</strong>. E.g.<br><br>
-                <strong>"mineral analyses"</strong><br>
-            </ng-template>
-            <ng-template #searchTipsTitle><strong>Search Tips</strong></ng-template>
-            <button tabindex="-1" class="btn btn-info" type="button" title="Search Tips" [ngbPopover]="searchTipsContent" [popoverTitle]="searchTipsTitle" popover-trigger="outsideClick">
-                <i class="fa fa-lg fa-question-circle"></i>
-            </button>
+            <button *ngIf="!searching" tabindex="-1" class="btn btn-primary search-button" type="button" title="Search layers" (click)="search(true)"><i class="fa fa-search"></i></button>
+            <button *ngIf="searching" tabindex="-1" class="btn btn-primary search-button" type="button" title="Searching layers"><i class="fa fa-spin fa-spinner"></i></button>
             <!-- Advanced options selection -->
-            <button tabindex="-1" class="btn btn-primary" title="{{showingAdvancedOptions ? 'Hide advanced search options' : 'Show advanced search options'}}" (click)="showingAdvancedOptions = !showingAdvancedOptions">
+            <button tabindex="-1" class="btn btn-primary" style="border-top-right-radius:0.25rem;border-bottom-right-radius:0.25rem;" title="{{showingAdvancedOptions ? 'Hide advanced search options' : 'Show advanced search options'}}" (click)="showingAdvancedOptions=!showingAdvancedOptions">
                 <span class="fa-layers">
                     <i class="fa fa-sliders"></i>
                     <i *ngIf="!showingAdvancedOptions" class="fa fa-caret-down caret-icon"></i>
                     <i *ngIf="showingAdvancedOptions" class="fa fa-caret-up caret-icon"></i>
+                </span>
+            </button>
+            <!-- small gap -->
+            <!-- KML/OGC -->
+            <button tabindex="-1" class="btn btn-primary" style="margin-left:0.25rem;border-radius:0.25rem;" title="{{showingKmlOgcOptions ? 'Hide custom layer options' : 'Add custom layers'}}" (click)="setShowingKmlOgcOptions(!showingKmlOgcOptions)">
+                <span class="fa-layers">
+                    <span style="font-size:small;">Custom Layers</span>
+                    <i *ngIf="!showingKmlOgcOptions" class="fa fa-caret-down caret-icon"></i>
+                    <i *ngIf="showingKmlOgcOptions" class="fa fa-caret-up caret-icon"></i>
                 </span>
             </button>
         </div>
@@ -119,15 +118,19 @@
             <button style="margin-left:auto;margin-right:6px;" class="btn btn-sm btn-secondary" (click)="resetAdvancedSearch()"><i class="fa fa-ban"></i>&nbsp;Reset All</button>
         </div>
     </div>
+    <!-- KML/OGC options -->
+    <div class="options-panel" *ngIf="showingKmlOgcOptions" style="padding:1em 1em 0 1em;">
+        <ul class="card-sub" appCustomPanel style="display:contents;"></ul>
+    </div>
     <!-- Search results -->
     <div *ngIf="showingResultsPanel && !searching" class="results-panel">
-        <div *ngIf="searchResults.length === 0">
-            <strong>No results found, try refining your search or adding a wildcard (*).</strong>
+        <div *ngIf="!searchResults || searchResults.length === 0">
+            <strong>No results found, try refining your search.</strong>
         </div>
-        <div *ngIf="searchResults.length > 0">
+        <div *ngIf="searchResults?.length > 0">
             <div class="search-results-title">
                 <label><strong>{{ getSearchResultsTitle() }}</strong></label>
-                <button *ngIf="!showingAllLayers" title="Show all layers" class="btn btn-sm btn-danger clear-search-results-button" type="button" (click)="showAllLayers()"><i class="fa fa-ban"></i>&nbsp;Clear</button>
+                <button *ngIf="!showingAllLayers" title="Show all layers" class="btn btn-sm btn-danger clear-search-results-button" type="button" (click)="showFeaturedLayers()"><i class="fa fa-ban"></i>&nbsp;Clear</button>
             </div>
 
             <div class="results-list">
@@ -135,13 +138,18 @@
                 <div *ngFor="let searchResult of paginatedSearchResults();" [id]="searchResult.layer.id">
                     <button style="line-height:1.7em;height:2.2em;padding:2px 5px 0px 5px;margin-bottom:2px;" class="btn layer-header" (click)="scrollToLayer(searchResult.layer)">
                         <span class="layer-header-label" title="{{searchResult.layer.name}}">{{ searchResult.layer.name }}</span>
+                        <span class="csw-label" *ngIf="searchResult.layer.id.startsWith('registry-csw:')">CSW</span>
+                        <span class="layer-label" *ngIf="!searchResult.layer.id.startsWith('registry-csw:')">Featured</span>
                         <button *ngIf="!isLayerAdded(searchResult.layer.id)" [disabled]="!csMapService.isMapSupportedLayer(searchResult.layer)" style="float:right;width:6em;padding:2px;" class="btn btn-sm btn-success" type="button" title="Add layer" (click)="addLayer(searchResult.layer)"><i class="fa fa-plus-circle"></i>&nbsp;Add</button>
                         <button *ngIf="isLayerAdded(searchResult.layer.id)" style="float:right;width:8em;padding:2px;" class="btn btn-sm btn-danger" type="button" title="Remove layer" (click)="removeLayer($event, searchResult.layer)"><i class="fa fa-trash"></i>&nbsp;Remove</button>
                         <button style="float:right;width:6em;padding:2px;margin-left:8px;" class="btn btn-sm btn-info" type="button" title="Layer information" (click)="showLayerInformation($event, searchResult.layer)"><i class="fa fa-info-circle"></i>&nbsp;Info</button>
-                        <button style="float:right;width:6em;padding:2px;margin-left:8px;" class="btn btn-sm btn-primary" type="button" title="Add to download" ><input *ngIf="isCsvDownloadable(searchResult.layer)" type="checkbox" class="faChkSqr" [checked]="mapDownloadLayers.get(searchResult.layer.id)" (change)="OnChangeDownloadLayers(searchResult.layer)"></button>
+                        <button style="float:right;width:6em;padding:2px;margin-left:8px; min-height: 8px;" class="btn btn-sm btn-primary" type="button" title="Add to download" [style.visibility]="isCsvDownloadable(searchResult.layer) ? 'visible' : 'hidden'">
+                            <input type="checkbox" class="faChkSqr" [checked]="mapDownloadLayers.get(searchResult.layer.id)" (change)="OnChangeDownloadLayers(searchResult.layer)">
+                          </button>
                    </button>
                 </div>
             </div>
+
             <div class="pagination" *ngIf="searchResults.length > resultsPerPage">
                 <ngb-pagination [collectionSize]="searchResults.length" [(page)]="currentPage" [maxSize]="5" [pageSize]="resultsPerPage" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>
             </div>
@@ -164,6 +172,11 @@
                         <button style="float:right;padding:2px;margin-left:8px;" class="btn btn-sm btn-primary" type="button" title="Click to download" (click)="downloadAsCSV(downloadLayer.value.Layer)"><i class="fa fa-download"></i></button>
                    </button>
                 </div>
+            </div>
+
+            <!-- Pagination if more than one page of search results -->
+            <div class="pagination" *ngIf="searchResults.length > RESULTS_PER_PAGE">
+                <ngb-pagination [collectionSize]="searchResults.length" [(page)]="currentPage" [maxSize]="5" [pageSize]="RESULTS_PER_PAGE" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>
             </div>
         </div>
     </div>

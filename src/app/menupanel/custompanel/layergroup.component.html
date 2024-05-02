@@ -1,7 +1,6 @@
 <!-- Custom Layer Controls for WMS service -->
 <li class="active" *ngFor="let layerGroup of layerGroups | getKey">
   		<a href="javascript:;">
-           <i class="ti-angle-down float-right"></i>
              {{layerGroup.key}}
         </a>
 	<ul>
@@ -30,11 +29,15 @@
 				</div>
 			</a>
 			<div [hidden]="!layer.expanded" class="sidebar-card-menu-show">
-				 <div class="card card-info card-with-tabs layer-card animated slideInRight">
+				 <div class="card card-info card-with-tabs layer-card animated slideInRight" style="margin-left:2.6rem;">
 					<div class = "rh_info_wrap">
 						<div class="card-header">
 							<ul id="card-tab" class="nav nav-tabs float-right">
-								<li (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': getUILayerModel(layer.id).tabpanel.filterpanel.expanded}"><a data-toggle="tab"><span class="d-none d-sm-inline">Map Layer</span></a></li>
+								<li (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': getUILayerModel(layer.id).tabpanel.filterpanel.expanded}">
+									<a data-toggle="tab">
+										<span class="d-none d-sm-inline">Map Layer</span>
+									</a>
+								</li>
 							</ul>
 						</div>
 						<div class="rh_info">	

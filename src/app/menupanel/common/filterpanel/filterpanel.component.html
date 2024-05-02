@@ -1,4 +1,5 @@
 <div class="filter-form">
+	<!-- Mandatory filters, if supported -->
 	<div *ngIf="layerFilterCollection">
 		<div *ngFor="let mandatoryFilter of layerFilterCollection['mandatoryFilters']">
 			<div *ngIf="mandatoryFilter.type === 'MANDATORY.CHECKBOX'">
@@ -29,21 +30,25 @@
 		</div>
 	</div>
 
-	<div *ngIf="(!layerFilterCollection || layerFilterCollection.optionalFilters?.length === 0) && !layerHasAdvancedFilterComponent(layer.id)">
+	<!-- If there are no filters display a warning -->
+	<div style="font-size: small;" *ngIf="(!layerFilterCollection || layerFilterCollection.optionalFilters?.length === 0) && !layerHasAdvancedFilterComponent(layer.id)">
 		<div class="alert alert-warning fade show">
 			<i class="ti-bell float-left"></i>
 			<p>There are no filters associated with this layer</p>
 		</div>
 	</div>
 
+	<!-- Optional filters, if supported -->
 	<fieldset *ngIf="layerFilterCollection?.optionalFilters && layerFilterCollection.optionalFilters.length > 0" class="show-fieldset-borders">
 		<legend><h5>Optional Filters</h5></legend>
 		<div class="form-group form-group-sm">
 			<label style="display:flex;font-size:0.9rem;" *ngIf="optionalFilters.length > 0" title="Remove filter"> Select Filter:<i style="margin-left:auto;font-size:0.9rem;" class="hasEvent red" (click)="refreshFilter()">Clear All</i></label>
+			<!-- Render the filter selector -->
 			<select class="form-control form-control-sm" [ngModel]="selectedFilter" (ngModelChange)="addFilter($event)">
 				<option [ngValue]="filt" *ngFor="let filt of layerFilterCollection['optionalFilters']">{{filt.label}}</option>
 			</select>
 		</div>
+		<!-- Already selected optional filters are rendered here -->
 		<hr *ngIf="optionalFilters.length > 0" class="nav-divider filter-divider">
 		<div *ngFor="let optionalFilter of optionalFilters; let i = index;">
 			<div *ngIf="optionalFilter.type==='OPTIONAL.TEXT'">
@@ -64,8 +69,8 @@
 					<div *ngIf="optionalFilter.multiSelect; else singleSelect">
 						<!-- Can select multiple options -->
 						<mat-radio-group title="Select union or intersection of properties" aria-label="Select union or intersection of properties" [(ngModel)]="optionalFilter.boolOp">
-							<mat-radio-button value="OR">Union</mat-radio-button>
-							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<mat-radio-button value="AND">Intersect</mat-radio-button>
+							<mat-radio-button value="OR" ><span style="color: #7E7CAA">Union</span></mat-radio-button>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<mat-radio-button value="AND"><span style="color: #7E7CAA">Intersect</span></mat-radio-button>
 						</mat-radio-group>
 						<ng-select [(ngModel)]="optionalFilter.value" [multiple]="true" placeholder="Select...">
 							<ng-option *ngFor="let option of optionalFilter.options"  ng-if="option!=''" [value]="getValue(option)" >{{getKey(option)}}</ng-option>
@@ -104,7 +109,7 @@
 				</div>
 			</div>
 
-			<div  class="d-none d-md-block" *ngIf="optionalFilter.type==='OPTIONAL.POLYGONBBOX'">
+			<div class="d-none d-md-block" *ngIf="optionalFilter.type==='OPTIONAL.POLYGONBBOX'">
 				<div class="form-group form-group-sm">
 					<div class="checkbox" >
 						<input class="form-control-sm" id="{{ 'filter-OPTIONAL.POLYGONBBOX-0-' + layer.id }}" type="checkbox" [(ngModel)]="bApplyClipboardBBox"/>
@@ -112,7 +117,7 @@
 					</div>
 				</div>
 			</div>
-			<div  class="d-block d-md-none" *ngIf="optionalFilter.type==='OPTIONAL.POLYGONBBOX'">
+			<div class="d-block d-md-none" *ngIf="optionalFilter.type==='OPTIONAL.POLYGONBBOX'">
 				<div class="alert alert-warning fade show">
 					<i class="ti-bell float-left"></i>
 					<p>This filter is not supported on a small screen and would not return any results.</p>
@@ -126,10 +131,10 @@
 	<ng-template #advancedFilterComponents></ng-template>
 
 	<!-- WMS time periods (if time extents present in LayerModel.capabilityRecords or GetCapabilities) -->
-	<button *ngIf="layerTimes && layerTimes.loadingTimeExtent" type="button" class="btn btn-info btn-sm unclickable-btn" style="position:absolute;left:0;"><i class="fa fa-spinner fa-spin" style="cursor:default;"></i>&nbsp;&nbsp;Querying time</button>
+	<button *ngIf="layerTimes && layerTimes.loadingTimeExtent" type="button" class="btn btn-primary btn-sm unclickable-btn" style="position:absolute;left:0;"><i class="fa fa-spinner fa-spin" style="cursor:default;"></i>&nbsp;&nbsp;Querying time</button>
 	<div ngbDropdown id="timeDropdown" *ngIf="layerTimes && layerTimes.currentTime" dropdownClass="time-dropdown" style="position:absolute;left:0;" container="body">
-		<button *ngIf="!layerTimes.loadingTimeExtent && layerTimes.timeExtent.length === 1" type="button" class="btn btn-info btn-sm date-btn unclickable-btn" style="cursor:default;"><i class="fa fa-calendar"></i>&nbsp;&nbsp;{{ layerTimes.currentTime | date }}</button>
-		<button *ngIf="!layerTimes.loadingTimeExtent && layerTimes.timeExtent.length > 1" type="button" class="btn btn-info btn-sm date-btn" ngbDropdownToggle><i class="fa fa-calendar"></i>&nbsp;&nbsp;{{ layerTimes.currentTime | date }}</button>
+		<button *ngIf="!layerTimes.loadingTimeExtent && layerTimes.timeExtent.length === 1" type="button" class="btn btn-primary btn-sm date-btn unclickable-btn" style="cursor:default;"><i class="fa fa-calendar"></i>&nbsp;&nbsp;{{ layerTimes.currentTime | date }}</button>
+		<button *ngIf="!layerTimes.loadingTimeExtent && layerTimes.timeExtent.length > 1" type="button" class="btn btn-primary btn-sm date-btn" ngbDropdownToggle><i class="fa fa-calendar"></i>&nbsp;&nbsp;{{ layerTimes.currentTime | date }}</button>
 		<div class="dropdown-menu" title="Select time to display" *ngIf="!layerTimes.loadingTimeExtent && layerTimes.timeExtent && layerTimes.timeExtent.length > 1" ngbDropdownMenu>
 			<div *ngFor="let d of layerTimes.timeExtent">
 				<button ngbDropdownItem (click)="changeCurrentTime(d)">{{ d | date }}</button>
@@ -137,10 +142,15 @@
 		</div>
 	</div>
 
-	<p *ngIf='layerStatus.isLayerDown(layer.id)' class='small text-danger'><i class="fa fa-warning text-warning"></i> One or more of the services used by this layer are reported to be experiencing issues at the moment. Click on the info panel for more information.</p>
+	<!-- If layer services are unresponsive then display a warning message -->
+	<p *ngIf='layerStatus.isLayerDown(layer.id)' class='small text-danger'><i class="fa fa-warning text-warning"></i>One or more of the services used by this layer are reported to be experiencing issues at the moment. Click on the info panel for more information.</p>
+	
 	<div>
+		<!-- Optional layer analytics button -->
 		<button *ngIf="analyticMap[layer.id]" type="button" class="btn btn-warning btn-sm analytic-btn" title="Display analytics" (click)="processLayerAnalytic(layer)"><i class="fa fa-bar-chart" aria-hidden="true"></i>&nbsp;Analytic</button>
-		<button type="button" *ngIf="isMapSupportedLayer(layer)" class="btn btn-info btn-sm add-layer-btn float-right" (click)="addLayer(layer)"><i class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp;Add Layer</button>
+		<!-- Update layer button -->
+		<button type="button" *ngIf="isMapSupportedLayer(layer)" class="btn btn-primary btn-sm add-layer-btn float-right" (click)="addLayer(layer)"><i class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp;Update Layer</button>
+		<!-- Optional unsupported layer message & icon -->
 		<div class="unsupported-layer-message" *ngIf="!isMapSupportedLayer(layer)">
 			<em class="fa fa-exclamation-triangle warning-icon"></em>
 			{{ getUnsupportedLayerMessage() }}
