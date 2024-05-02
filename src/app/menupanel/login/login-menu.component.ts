@@ -6,7 +6,8 @@ import { PermanentLink } from 'app/models/permanentlink.model';
 import { User } from 'app/models/user.model';
 import { AuthService } from 'app/services/auth/auth.service';
 import { UserStateService } from '../../services/user/user-state.service';
-
+import { ROIModalComponent } from 'app/modalwindow/roi/roi.modal.component';
+import { CsClipboardService } from '@auscope/portal-core-ui';
 @Component({
     selector: '[app-login-menu]',
     templateUrl: './login-menu.component.html',
@@ -17,7 +18,7 @@ export class LoginMenuComponent {
   user: User;
   states: PermanentLink[];
 
-  constructor(private router: Router, private authService: AuthService, private userStateService: UserStateService, private modalService: NgbModal) {
+  constructor(private router: Router, private authService: AuthService, private userStateService: UserStateService, private csClipboardService: CsClipboardService, private modalService: NgbModal) {
     this.userStateService.user.subscribe(user => {
       this.user = user;
     });
@@ -38,6 +39,23 @@ export class LoginMenuComponent {
    */
   logOut() {
     this.authService.logout();
+  }
+  /**
+   * Manage user's ROI list
+   */  
+  manageROI() {
+    this.modalService.open(ROIModalComponent, {
+      size: 'sm',
+      backdrop: false
+    });
+  }
+  /**
+   * Test if user has ROI
+   *
+   * @returns true if user has saved ROI, false otherwise
+   */
+  public userHasROI(): boolean {
+    return this.userStateService.roiList.length > 0;
   }
 
   /**

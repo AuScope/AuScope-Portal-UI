@@ -24,6 +24,7 @@
 			<input type="file" accept=".kml" class="file-input" (change)="onKmlFileSelected($event)" #KmlFileLoader>
 			<button (click)="KmlFileLoader.click()" type="button" title="Load polygon from KML file" [ngStyle]="{'background-color': isDrawingPolygon ? '#282572' : '#303336'}" class="cesium-button cesium-toolbar-button editor-button"><i class="fa fa-lg fa-file" aria-hidden="true"></i>Load</button>
 			<button (click)="onKmlFileSave()" type="button" title="Save polygon to KML file" [ngStyle]="{'background-color': isDrawingPolygon ? '#282572' : '#303336'}" class="cesium-button cesium-toolbar-button editor-button"><i class="fa fa-lg fa-floppy-o" aria-hidden="true"></i>Save</button>
+			<button (click)="onRoiSave()" type="button" title="Save to ROI" [ngStyle]="{'background-color': isDrawingPolygon ? '#282572' : '#303336'}" class="cesium-button cesium-toolbar-button editor-button" ><img src="extension/svg/polygon.svg" fill="#000000" width="24" height="24" style="color:#edffff;">ROI </button>
 			<button (click)='toggleFilterLayers()' type="button" title="Toggle applicable layers" class="cesium-button cesium-toolbar-button editor-button">
 				<i *ngIf="!isFilterLayerShown" class="fa fa-lg fa-toggle-off" aria-hidden="true"></i>
 				<i *ngIf="isFilterLayerShown" class="fa fa-lg fa-toggle-on" aria-hidden="true"></i>

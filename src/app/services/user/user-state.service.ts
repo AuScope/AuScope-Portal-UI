@@ -1,16 +1,15 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { Bookmark } from 'app/models/bookmark.model';
 import { PermanentLink } from 'app/models/permanentlink.model';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { catchError, map, take } from 'rxjs/operators';
 import { User } from '../../models/user.model';
 import { AuscopeApiService } from '../api/auscope-api.service';
-import { CsMapService, ManageStateService } from '@auscope/portal-core-ui';
+import { CsMapService, ManageStateService, Polygon, UtilitiesService } from '@auscope/portal-core-ui';
 import { v4 as uuidv4 } from 'uuid';
 import { HttpResponse } from '@angular/common/http';
 import { environment } from 'environments/environment';
 import { UILayerModelService } from '../ui/uilayer-model.service';
-
 
 @Injectable()
 export class UserStateService {
@@ -26,6 +25,10 @@ export class UserStateService {
   // Portal map states for User
   private _states: BehaviorSubject<PermanentLink[]> = new BehaviorSubject([]);
   public readonly states: Observable<PermanentLink[]> = this._states.asObservable();
+
+  //ROI for User
+  public roiList:Polygon[] = [];
+  public roiKey = '';
 
   constructor(private apiService: AuscopeApiService, private manageStateService: ManageStateService, private csMapService: CsMapService, private uiLayerModelService: UILayerModelService) {}
 
@@ -44,6 +47,8 @@ export class UserStateService {
       // Update user's bookmarks and map states
       this.updateBookmarks();
       this.updateUserStates();
+      // Update user's ROI
+      this.updateUserROI(user);
     }, () => {
       // Failure to retrieve User means no User logged in
       this.logoutUser();
@@ -208,5 +213,30 @@ export class UserStateService {
       }),
     );
   }
-  
+  /**
+   * Save the user's list of ROI 
+   */
+  public saveROI() {
+    if (UtilitiesService.isEmpty(this.roiKey))
+      return;
+
+    let strROIs = JSON.stringify(this.roiList);
+    this.apiService.saveUserParams(this.roiKey,strROIs).subscribe(response => {
+    });
+  }
+
+  /**
+   * Retrieve a list of ROI associated with the user
+   * @param user
+   */
+  public updateUserROI(user:User){
+    let key = 'roiId.'+ user.email;
+    this.roiKey = key.replace(' ','-');
+    this.apiService.getUserParams(key).subscribe(strROIs => {
+      if (strROIs) {
+        this.roiList = JSON.parse(JSON.parse(JSON.stringify(strROIs)).value);
+      }
+      return undefined;
+    });
+  }
 }

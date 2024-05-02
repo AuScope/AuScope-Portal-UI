@@ -1,8 +1,9 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { CsClipboardService, DownloadWfsService, Polygon } from '@auscope/portal-core-ui';
 import { Component, OnInit } from '@angular/core';
-import { isNumber } from '@turf/helpers';
+import { isNumber, polygon } from '@turf/helpers';
 import { saveAs } from 'file-saver';
+import { UserStateService } from 'app/services/user/user-state.service';
 
 @Component({
   selector: 'app-cs-clipboard',
@@ -30,7 +31,7 @@ export class CsMapClipboardComponent implements OnInit {
   kmlFileName = '';
 
 
-  constructor(private csClipboardService: CsClipboardService, private downloadWfsService: DownloadWfsService) {
+  constructor(private csClipboardService: CsClipboardService, private userStateService: UserStateService, private downloadWfsService: DownloadWfsService) {
     this.polygonBBox = null;
     this.isFilterLayerShown = false;
     this.csClipboardService.filterLayersBS.subscribe(filterLayerStatus => {
@@ -52,7 +53,15 @@ export class CsMapClipboardComponent implements OnInit {
         this.polygonBBox = polygonBBox;
     });
   }
-
+  onRoiSave(event) {
+    if (this.polygonBBox === null) return;
+    let roiPolygon= this.polygonBBox;
+    let strToday=new Date(); 
+    let dt= new Date(strToday).toISOString();
+    roiPolygon.name = 'ROI-' + dt.slice(0,dt.lastIndexOf('.'));
+    this.userStateService.roiList.push(roiPolygon);
+    this.userStateService.saveROI();
+  }
   onKmlFileSave(event) {
     if (this.polygonBBox === null) return;
 

@@ -83,6 +83,8 @@ import { CreatePermanentLinkModalComponent } from './modalwindow/permanentlink/c
 import { AddRegistryModalComponent } from './modalwindow/registry/add-registry.modal.component';
 import { ConfirmModalComponent } from './modalwindow/confirm/confirm.modal.component';
 
+import { ROIModalComponent } from './modalwindow/roi/roi.modal.component';
+
 // Services
 import { AuscopeApiService } from './services/api/auscope-api.service';
 import { FilterService } from './services/filter/filter.service';
@@ -120,6 +122,7 @@ import { AuthService } from './services/auth/auth.service';
 import { LayerGroupComponent } from './menupanel/custompanel/layergroup.component';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthErrorHandlerInterceptor } from './interceptors/auth-error.interceptor';
+import { ROIModule } from './modalwindow/roi/roi.modal.modules';
 
 PlotlyModule.plotlyjs = PlotlyJS;
 
@@ -215,7 +218,8 @@ PlotlyModule.plotlyjs = PlotlyJS;
         FormsModule,
         ReactiveFormsModule,
         BrowserModule,
-        DragDropModule
+        DragDropModule,
+        ROIModule
     ],
     bootstrap: [
         AppComponent
