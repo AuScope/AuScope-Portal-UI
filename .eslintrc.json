@@ -1,11 +1,18 @@
 {
   "root": true,
-  "ignorePatterns": ["projects/**/*"],
+  "ignorePatterns": [
+    "projects/**/*"
+  ],
   "overrides": [
     {
-      "files": ["*.ts"],
+      "files": [
+        "*.ts"
+      ],
       "parserOptions": {
-        "project": ["tsconfig.json", "e2e/tsconfig.json"],
+        "project": [
+          "tsconfig.json",
+          "e2e/tsconfig.json"
+        ],
         "createDefaultProgram": true
       },
       "extends": [
@@ -20,7 +27,10 @@
           {
             "prefix": "app",
             "style": "kebab-case",
-            "type": ["element", "attribute"]
+            "type": [
+              "element",
+              "attribute"
+            ]
           }
         ],
         "@angular-eslint/directive-selector": [
@@ -31,7 +41,7 @@
             "type": "attribute"
           }
         ],
-        "@typescript-eslint/no-explicit-any": "off", //Too Many, needed to turn off
+        "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-empty-function": "warn",
         "@typescript-eslint/no-unused-vars": "warn",
         "prefer-const": "warn",
@@ -42,8 +52,12 @@
       }
     },
     {
-      "files": ["*.html"],
-      "extends": ["plugin:@angular-eslint/template/recommended"],
+      "files": [
+        "*.html"
+      ],
+      "extends": [
+        "plugin:@angular-eslint/template/recommended"
+      ],
       "rules": {}
     }
   ]
