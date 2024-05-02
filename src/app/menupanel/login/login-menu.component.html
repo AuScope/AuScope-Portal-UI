@@ -7,7 +7,9 @@
             </div>
         </button>
         <mat-menu #loginMenu="matMenu" style="margin-top:12px;">
-            <h5 *ngIf="userHasStates()" mat-menu-item (click)="manageStates()"><i class="ti-link"></i>&nbsp;&nbsp;Manage Permanent Links</h5>
+            <h5 *ngIf="userHasStates()" mat-menu-item (click)="manageStates()">
+                <span style="color:#7E7CAA"><i class="ti-link"></i>&nbsp;&nbsp;Manage Permanent Links</span>
+            </h5>
             <h5 mat-menu-item (click)="logOut()"><span style="color:#7E7CAA"><i class="fa fa-power-off"></i>&nbsp;&nbsp;Log Out</span></h5>
         </mat-menu>
     </div>
