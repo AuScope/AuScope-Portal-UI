@@ -15,10 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
-      - uses: jsdaniell/create-json@v1.2.2
+      - uses: jsdaniell/create-json@v1.2.3
         with:
           name: "context.json"
           json: '{"portalBaseUrl":"${{ vars.AZURE_PORTAL_API_URL_DEV }}","hostUrl":"${{ vars.AZURE_PORTAL_URL_DEV }}","authBaseUrl":"${{ vars.AZURE_PORTAL_URL_DEV }}/api/"}'

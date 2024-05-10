@@ -14,6 +14,9 @@
     "docs": "npm run typedoc -- --options typedoc.json --out ./src/app/portal-core-ui/docs --exclude '**/*.spec.ts' ./app/portal-core-ui",
     "typedoc": "typedoc"
   },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "private": true,
   "dependencies": {
     "@angular/animations": "^17.3.6",
