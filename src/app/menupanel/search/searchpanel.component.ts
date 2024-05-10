@@ -16,6 +16,8 @@ import { Download } from 'app/modalwindow/layeranalytic/nvcl/tsgdownload';
 import * as saveAs from 'file-saver';
 import { take } from 'rxjs/operators';
 
+import { SidebarService } from 'app/portal/sidebar.service';
+
 // Search fields
 const SEARCH_FIELDS = [{
   name: 'Name',
@@ -142,6 +144,7 @@ export class SearchPanelComponent implements OnInit {
   constructor(private searchService: SearchService, private csMapService: CsMapService,
               private layerHandlerService: LayerHandlerService, private layerManagerService: LayerManagerService,
               private uiLayerModelService: UILayerModelService, private renderStatusService: RenderStatusService,
+              private sidebarService: SidebarService,
               private manageStateService: ManageStateService, private modalService: NgbModal,
               private http: HttpClient, @Inject('env') private env) { }
 
@@ -149,7 +152,6 @@ export class SearchPanelComponent implements OnInit {
     // Populate search results with all layers by default
     this.showFeaturedLayers();
   }
-
   /**
    * Detect internal clicks so we can differntiate from external
    */
@@ -419,7 +421,8 @@ export class SearchPanelComponent implements OnInit {
     if (layer) {
       const modalRef = this.modalService.open(InfoPanelComponent, {
         size: 'lg',
-        backdrop: false
+        backdrop: false,
+        scrollable: true
       });
       modalRef.componentInstance.cswRecords = layer.cswRecords;
       modalRef.componentInstance.layer = layer;
@@ -459,6 +462,7 @@ export class SearchPanelComponent implements OnInit {
       this.uiLayerModelService.setUILayerModel(layer.id, uiLayerModel);
     }
     this.layerManagerService.addLayer(layer, [], layer.filterCollection, undefined);
+    this.sidebarService.setOpenState(true);
   }
 
   /**
@@ -490,6 +494,7 @@ export class SearchPanelComponent implements OnInit {
   public removeLayer(event: any, layer: LayerModel) {
     event.stopPropagation();
     this.layerManagerService.removeLayer(layer);
+    this.sidebarService.setOpenState(false);
   }
 
   /**
