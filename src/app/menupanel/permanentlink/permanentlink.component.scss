@@ -3,17 +3,13 @@
 /* Editor toggle map buton */
 .editor-toggle-button {
     display: block;
-    position: absolute;
-    right: 143px;
-    top: 5px;
-    z-index: 5;
     font-size: 21px;
 }
 /* Main editor panel */
 .editor-box {
-    position: fixed;
-    top: 100px;
-    right: 140px;
+    position: absolute;
+    bottom: 0;
+    left: -285px;
     width: 280px;
     z-index: 100;
     padding: 6px;

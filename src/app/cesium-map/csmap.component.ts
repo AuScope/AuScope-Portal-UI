@@ -18,6 +18,7 @@ import { UserStateService } from 'app/services/user/user-state.service';
 import { VMFQuerierHandler } from './custom-querier-handler/vmf-querier-handler.service';
 import { Observable, forkJoin } from 'rxjs';
 import { finalize, tap, timeout } from 'rxjs/operators';
+import { ToolbarComponent } from 'app/menupanel/toolbar/toolbar.component';
 
 declare var Cesium: any;
 
@@ -26,12 +27,8 @@ declare var Cesium: any;
   template: `
     <div #mapElement id="map" class="h-100 w-100" (mouseout)="mouseLongitude=undefined;mouseLatitude=undefined;">
       <ac-map>
-          <rectangles-editor></rectangles-editor>
           <app-browse-menu></app-browse-menu>
-          <app-cs-map-zoom></app-cs-map-zoom>
-          <app-cs-map-split (toggleEvent)="toggleShowMapSplit()"></app-cs-map-split>
-          <app-cs-clipboard></app-cs-clipboard>
-          <app-permanent-link></app-permanent-link>
+          <app-toolbar (splitToggleEvent)="toggleShowMapSplit()"></app-toolbar>
           <div #mapSlider id="mapSlider" *ngIf="getSplitMapShown()">
             <div class="slider-grabber">
               <div class="slider-grabber-inner"></div>
@@ -59,6 +56,8 @@ export class CsMapComponent implements AfterViewInit {
   @ViewChild('mapElement', { static: true }) mapElement: ElementRef;
 
   @ViewChild('mapSlider', { static: false }) mapSlider: ElementRef;
+
+  @ViewChild(ToolbarComponent) toolbar!: ToolbarComponent;
 
   // Advanced map components (legends etc.)
   @ViewChild('advancedmapcomponents', { static: true, read: ViewContainerRef }) advancedMapComponents: ViewContainerRef;
@@ -697,7 +696,6 @@ export class CsMapComponent implements AfterViewInit {
           this.sliderMoveActive = false;
         }, ScreenSpaceEventType.PINCH_END);
       }, 10);
-
     } else {
       for (const layer of this.csMapService.getLayerModelList()) {
         this.csMapService.setLayerSplitDirection(layer, SplitDirection.NONE);

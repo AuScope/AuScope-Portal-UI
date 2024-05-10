@@ -9,9 +9,6 @@
     </div>
     <!-- END navbar-header -->
 
-    <!-- search bar -->
-    <app-search-panel></app-search-panel>
-
     <!-- login dropdown menu -->
     <li class="dropdown" app-login-menu></li>
 
@@ -31,20 +28,6 @@
         <div appActiveLayers></div>
     </h5>
     <!-- END Active Layers -->
-
-    <!-- BEGIN Data Explorer -->
-    <!--
-    <input type="checkbox" class="menuBtn" id="dataBtn"/>
-    <h5 class="mb-1">
-        <label for="dataBtn" class="mb-0" title="Search CSW services for records">
-            <i class="ti-book"></i>
-            Data Search
-            <i class="fa fa-arrow-circle-down"></i>
-        </label>
-        <ul class="card-sub" appDataExplorer></ul>
-    </h5>
-    -->
-    <!-- END Data Explorer -->
 </nav>
 <!-- END sidebar -->
 
@@ -53,6 +36,7 @@
     <!-- BEGIN map-area-csmap -->
     <div class="map-area-csmap">
         <app-cs-map class="h-100 w-100"></app-cs-map>
+        <app-search-panel></app-search-panel>
     </div>
     <!-- END map-area-csmap -->
 </div>
