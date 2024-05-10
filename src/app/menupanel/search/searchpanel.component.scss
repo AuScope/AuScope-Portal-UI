@@ -1,15 +1,49 @@
-@import 'app/globals';
+@import 'app/auscope-styles';
 
 :host {
-    flex: 1;
-    width: 100%;
-    margin: 9px 50px 0px 50px;
+    position: absolute;
+    top: 5px;
+    left: 200px;
+    height: 32px; // match browse button
+    width: calc(100% - 400px);  // 100% of parent minus 2 x 200 for left/right margins
+}
+
+// Remove search panel if screen gets too small (< 835px)
+@media only screen and (max-width: 600px) {
+    .search-panel {
+        display: none;
+    }
+}
+
+// Widen search results, remove info-panel and add info-btn when screen width below 1000px
+@media only screen and (max-width: 1300px) {
+    .results-pane {
+        width: 100%;
+        min-width: 100%;
+    }
+    
+    .search-info-panel {
+        display: none;
+    }
+
+    .btn-info {
+        display: block;
+    }
+}
+
+// Remove info-btn when screen wider than 1000px
+@media only screen and (min-width: 1300px) {
+    .btn-info {
+        display: none;
+    }
 }
 
 .search-panel {
-    position: relative;
     z-index: 1;
-    width: 100%;
+
+    .search-dropdown {
+        flex: 1;
+    }
 
     .suggestion-button {
         width: 100%;
@@ -34,12 +68,28 @@
     }
 
     .search-toggle-button {
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
+        font-size: 20px;
+        border-top-left-radius: 0.25rem;
+        border-bottom-left-radius: 0.25rem;
     }
 
     .search-button {
-        border-bottom-right-radius: 0;
+        font-size: 20px;
+    }
+
+    .advanced-options-button {
+        font-size: 20px;
+        border-top-right-radius: 0.25rem !important;
+        border-bottom-right-radius: 0.25rem !important;
+    }
+
+    .custom-layers-button {
+        margin-left: 0.5rem;
+        border-radius: 0.25rem;
+
+        .custom-layers-label {
+            font-size: 20px;
+        }
     }
 
     .search-message {
@@ -78,9 +128,6 @@
             margin: 0px;
         }
 
-        .tips-button {
-            float: right;
-        }
     }
 
     .options-panel {
@@ -110,79 +157,54 @@
     }
     
     .results-panel {
-        position: absolute;
+        position: relative;
         width: 100%;
+        max-height: 420px;
+        overflow-y: clip;
+        padding: 8px 0 0px 8px;
         background-color: #fdfdfd;
-        padding: 8px;
 
-        .clear-search-results-button {
-            margin: 0px 0px 0px 20px;
-            padding: 0px 2px 0px 0px;
-            border-radius: 2px;
-        }
+        .results-table {
+            position: fixed;
+            display: contents;
 
-        .results-list {
-            overflow-y: auto;
-
-            .layer-header {
+            .results-row {
                 display: flex;
-                width: 100%;
-                text-align: start;
-                background-color: #f2f4f4;
-                border-radius: 4px;
 
-                .layer-header-label {
-                    width: 100%;
-                    color: black;
-                    display: block;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
+                .results-column {
+                    width: 60%;
+                    display: flex;
+                    flex-direction: column;
+                    height: 410px;
+
+                    .clear-search-results-button {
+                        margin: 0px 0px 0px 20px;
+                        padding: 0px 2px 0px 0px;
+                        border-radius: 2px;
+                    }
+
+                }
+
+                .search-info-panel {
+                    background-color: white;
+                    width: 40%;
+                    height: 410px;
+                    padding-left: 1rem;
+                    margin-left: 5px;
+                    overflow-y: auto;
+                    border-left: 1px solid #ccc;
                 }
             }
-            .layer-header:hover {
-                background-color: lightgray;
-            }
 
-            .csw-label {
-                border-radius: 5px;
-                background-color: #AED6F1;
-                font-size: smaller;
-                padding: 0px 4px;
-                margin-left: 2px;
-            }
-
-            .layer-label {
-                border-radius: 5px;
-                background-color: #A9DFBF;
-                font-size: smaller;
-                padding: 0px 4px;
-                margin-left: 2px;
-            }
-    
-            // Overriding LayerPanel card styles to better fit this panel
-            .card {
-                margin-bottom: 0px;
-
-                .nav-tabs {
-                    margin-top: 0px;
-                    padding-bottom: 0px;
-
-                    a {
-                        padding: 6px;
-                    }
-                }   
-            }
         }
 
         ::ng-deep .accordion-item {
             margin-bottom: 2px;
         }
-        
     }
-    
+
     .pagination {
-        padding-top: 5px;
+        overflow: hidden;
 
         button {
             margin: 0px 4px 0px 0px;
@@ -192,6 +214,100 @@
         ::ng-deep .visually-hidden {
             display: none;
         }
+    }
+
+    .results-list {
+        height:100%;
+        overflow-y: auto;
+
+        .layer-header, .selected-layer-header {
+            display: flex;
+            width: 100%;
+            height:2.2em;
+            line-height:1.7em;
+            margin-bottom:2px;cursor:pointer;
+            padding:2px 5px 0px 5px;
+            background-color: #f2f4f4;
+            border-radius: 4px;
+            text-align: start;
+
+            .layer-header-label {
+                width: 100%;
+                color: black;
+                display: block;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                // Prevent selection
+                -webkit-user-select: none; /* Safari */
+                -ms-user-select: none; /* IE 10 and IE 11 */
+                user-select: none; /* Standard syntax */
+            }
+
+        }
+
+        // Override bg-color for selected search result
+        .selected-layer-header {
+            background-color:  #f9e79f;
+        }
+
+        .layer-header:hover  {
+            background-color: lightgray;
+        }
+
+        .selected-layer-header:hover {
+            background-color:  #f9e79f;
+        }
+
+        .search-result-button {
+            height: 90%;
+            width: 8.5rem;  // consistency so Add/Remove don't push the CSW/Featured labels out and break alignment
+            text-align: center;
+            float: right;
+            padding: 2px;
+            margin-left: 8px;
+            min-height: 8px;
+        }
+
+        .csw-label {
+            border-radius: 5px;
+            background-color: #AED6F1;
+            font-size: smaller;
+            padding: 0px 4px;
+            margin-left: 2px;
+        }
+
+        .layer-label {
+            border-radius: 5px;
+            background-color: #A9DFBF;
+            font-size: smaller;
+            padding: 0px 4px;
+            margin-left: 2px;
+        }
+
+        // Overriding LayerPanel card styles to better fit this panel
+        .card {
+            margin-bottom: 0px;
+
+            .nav-tabs {
+                margin-top: 0px;
+                padding-bottom: 0px;
+
+                a {
+                    padding: 6px;
+                }
+            }   
+        }
+    }
+
+    .downloads-list {
+        background-color: white;
+        padding: 0.5rem;
+    }
+
+    .break-border {
+        border-bottom: 2px solid #ccc;
+        margin-bottom: 0.5rem;
     }
 
 }

@@ -15,7 +15,7 @@ export class CsMapZoomComponent {
 
   constructor(
     private cameraService: CameraService,
-    private cesiumService: CesiumService,
+    cesiumService: CesiumService,
     private zoomToRectangleService: ZoomToRectangleService,
   ) {
     this.zoomToRectangleService.init(cesiumService, cameraService);

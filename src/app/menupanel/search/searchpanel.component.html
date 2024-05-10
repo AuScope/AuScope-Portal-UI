@@ -2,7 +2,7 @@
     <!-- Search bar and buttons -->
     <div class="input-group">
         <div class="input-group-prepend">
-            <button tabindex="-1" class="btn btn-primary search-toggle-button" style="border-top-left-radius:0.25rem;border-bottom-left-radius:0.25rem;" type="button" title="{{showingResultsPanel ? 'Hide results' : 'Show results'}}" (click)="setShowingResultsPanel(!showingResultsPanel)">
+            <button tabindex="-1" class="btn btn-auscope-primary search-toggle-button" type="button" title="{{showingResultsPanel ? 'Hide results' : 'Show results'}}" (click)="setShowingResultsPanel(!showingResultsPanel)">
                 <span *ngIf="!showingResultsPanel" class="fa-layers fa-fw">
                     <i class="fa fa-list"></i>
                     <i class="fa fa-caret-down caret-icon"></i>
@@ -13,7 +13,7 @@
                 </span>
             </button>
         </div>
-        <div ngbDropdown #suggesterDropdown="ngbDropdown" style="flex:1;">
+        <div class="search-dropdown" ngbDropdown #suggesterDropdown="ngbDropdown">
             <!-- Search text field -->
             <div>
                 <input type="text" class="form-control" #queryinput placeholder="Enter search term here..." [(ngModel)]="queryText" (keyup)="onKeyUp($event)" (keydown)="onKeyDown($event)" [disabled]="searching">
@@ -29,10 +29,10 @@
         </div>
         <div class="input-group-append">
             <!-- Search button -->
-            <button *ngIf="!searching" tabindex="-1" class="btn btn-primary search-button" type="button" title="Search layers" (click)="search(true)"><i class="fa fa-search"></i></button>
-            <button *ngIf="searching" tabindex="-1" class="btn btn-primary search-button" type="button" title="Searching layers"><i class="fa fa-spin fa-spinner"></i></button>
+            <button *ngIf="!searching" tabindex="-1" class="btn btn-auscope-primary search-button" type="button" title="Search layers" (click)="search(true)"><i class="fa fa-search"></i></button>
+            <button *ngIf="searching" tabindex="-1" class="btn btn-auscope-primary search-button" type="button" title="Searching layers"><i class="fa fa-spin fa-spinner"></i></button>
             <!-- Advanced options selection -->
-            <button tabindex="-1" class="btn btn-primary" style="border-top-right-radius:0.25rem;border-bottom-right-radius:0.25rem;" title="{{showingAdvancedOptions ? 'Hide advanced search options' : 'Show advanced search options'}}" (click)="showingAdvancedOptions=!showingAdvancedOptions">
+            <button tabindex="-1" class="btn btn-auscope-primary advanced-options-button" title="{{showingAdvancedOptions ? 'Hide advanced search options' : 'Show advanced search options'}}" (click)="showingAdvancedOptions=!showingAdvancedOptions">
                 <span class="fa-layers">
                     <i class="fa fa-sliders"></i>
                     <i *ngIf="!showingAdvancedOptions" class="fa fa-caret-down caret-icon"></i>
@@ -41,9 +41,9 @@
             </button>
             <!-- small gap -->
             <!-- KML/OGC -->
-            <button tabindex="-1" class="btn btn-primary" style="margin-left:0.25rem;border-radius:0.25rem;" title="{{showingKmlOgcOptions ? 'Hide custom layer options' : 'Add custom layers'}}" (click)="setShowingKmlOgcOptions(!showingKmlOgcOptions)">
+            <button tabindex="-1" class="btn btn-auscope-primary custom-layers-button" title="{{showingKmlOgcOptions ? 'Hide custom layer options' : 'Add custom layers'}}" (click)="setShowingKmlOgcOptions(!showingKmlOgcOptions)">
                 <span class="fa-layers">
-                    <span style="font-size:small;">Custom Layers</span>
+                    <span class="custom-layers-label">Custom Layers</span>
                     <i *ngIf="!showingKmlOgcOptions" class="fa fa-caret-down caret-icon"></i>
                     <i *ngIf="showingKmlOgcOptions" class="fa fa-caret-up caret-icon"></i>
                 </span>
@@ -127,57 +127,74 @@
         <div *ngIf="!searchResults || searchResults.length === 0">
             <strong>No results found, try refining your search.</strong>
         </div>
-        <div *ngIf="searchResults?.length > 0">
-            <div class="search-results-title">
-                <label><strong>{{ getSearchResultsTitle() }}</strong></label>
-                <button *ngIf="!showingAllLayers" title="Show all layers" class="btn btn-sm btn-danger clear-search-results-button" type="button" (click)="showFeaturedLayers()"><i class="fa fa-ban"></i>&nbsp;Clear</button>
-            </div>
+        <table *ngIf="searchResults?.length > 0" class="results-table">
+            <tr class = "results-row">
+                <td class="results-column">
+                    <div class="search-results-title">
+                        <label><strong>{{ getSearchResultsTitle() }}</strong></label>
+                        <button *ngIf="!showingAllLayers" title="Show all layers" class="btn btn-sm btn-danger clear-search-results-button" type="button" (click)="showFeaturedLayers()"><i class="fa fa-ban"></i>&nbsp;Clear</button>
+                    </div>
 
-            <div class="results-list">
-                <!-- Accordion layout with filter/download/info options -->
-                <div *ngFor="let searchResult of paginatedSearchResults();" [id]="searchResult.layer.id">
-                    <button style="line-height:1.7em;height:2.2em;padding:2px 5px 0px 5px;margin-bottom:2px;" class="btn layer-header" (click)="scrollToLayer(searchResult.layer)">
-                        <span class="layer-header-label" title="{{searchResult.layer.name}}">{{ searchResult.layer.name }}</span>
-                        <span class="csw-label" *ngIf="searchResult.layer.id.startsWith('registry-csw:')">CSW</span>
-                        <span class="layer-label" *ngIf="!searchResult.layer.id.startsWith('registry-csw:')">Featured</span>
-                        <button *ngIf="!isLayerAdded(searchResult.layer.id)" [disabled]="!csMapService.isMapSupportedLayer(searchResult.layer)" style="float:right;width:6em;padding:2px;" class="btn btn-sm btn-success" type="button" title="Add layer" (click)="addLayer(searchResult.layer)"><i class="fa fa-plus-circle"></i>&nbsp;Add</button>
-                        <button *ngIf="isLayerAdded(searchResult.layer.id)" style="float:right;width:8em;padding:2px;" class="btn btn-sm btn-danger" type="button" title="Remove layer" (click)="removeLayer($event, searchResult.layer)"><i class="fa fa-trash"></i>&nbsp;Remove</button>
-                        <button style="float:right;width:6em;padding:2px;margin-left:8px;" class="btn btn-sm btn-info" type="button" title="Layer information" (click)="showLayerInformation($event, searchResult.layer)"><i class="fa fa-info-circle"></i>&nbsp;Info</button>
-                        <button style="float:right;width:6em;padding:2px;margin-left:8px; min-height: 8px;" class="btn btn-sm btn-primary" type="button" title="Add to download" [style.visibility]="isCsvDownloadable(searchResult.layer) ? 'visible' : 'hidden'">
-                            <input type="checkbox" class="faChkSqr" [checked]="mapDownloadLayers.get(searchResult.layer.id)" (change)="OnChangeDownloadLayers(searchResult.layer)">
-                          </button>
-                   </button>
-                </div>
-            </div>
+                    <div class="results-list">
+                        <!-- Accordion layout with filter/download/info options -->
+                        <div *ngFor="let searchResult of paginatedSearchResults();" [id]="searchResult.layer.id">
+                            <span [ngClass]="searchResult  === selectedSearchResult ? 'selected-layer-header' : 'layer-header'" (click)="selectSearchResult(searchResult)">
+                                <span class="layer-header-label" title="{{searchResult.layer.name}}">{{ searchResult.layer.name }}</span>
+                                <span class="csw-label search-result-button" *ngIf="searchResult.layer.id.startsWith('registry-csw:')">CSW</span>
+                                <span class="layer-label search-result-button" *ngIf="!searchResult.layer.id.startsWith('registry-csw:')">Featured</span>
+                                <button *ngIf="!isLayerAdded(searchResult.layer.id)" [disabled]="!csMapService.isMapSupportedLayer(searchResult.layer)" class="btn btn-sm btn-success search-result-button" type="button" title="Add layer" (click)="addLayer(searchResult.layer)"><i class="fa fa-plus-circle"></i>&nbsp;Add</button>
+                                <button *ngIf="isLayerAdded(searchResult.layer.id)" class="btn btn-sm btn-danger search-result-button" type="button" title="Remove layer" (click)="removeLayer($event, searchResult.layer)"><i class="fa fa-trash"></i>&nbsp;Remove</button>
+                                <button class="btn btn-sm btn-info" type="button" title="Layer information" (click)="showLayerInformation($event, searchResult.layer)"><i class="fa fa-info-circle"></i>&nbsp;Info</button>
+                                <button class="btn btn-sm btn-primary search-result-button" type="button" title="Add to download" [style.visibility]="isCsvDownloadable(searchResult.layer) ? 'visible' : 'hidden'">
+                                    <input type="checkbox" class="faChkSqr" style="vertical-align: middle;" [checked]="mapDownloadLayers.get(searchResult.layer.id)" (change)="OnChangeDownloadLayers(searchResult.layer)">
+                                </button>
+                            </span>
+                        </div>
+                    </div>
 
-            <div class="pagination" *ngIf="searchResults.length > resultsPerPage">
-                <ngb-pagination [collectionSize]="searchResults.length" [(page)]="currentPage" [maxSize]="5" [pageSize]="resultsPerPage" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>
-            </div>
-            <div *ngIf="mapDownloadLayers.size > 0" class="results-list">
-                <hr/>
-                <div class="search-results-title">
-                    <label ><strong>Selected Layers To Download:</strong></label>
-                    <button title="Clear all layers" class="btn btn-sm btn-danger clear-search-results-button" type="button" (click)="clearDownloadLayers()"><i class="fa fa-ban"></i>&nbsp;Clear</button>
-                    <span class="layer-header-label">Layers:{{total0}}:{{completed0}}</span>
-                    <span class="layer-header-label">Files:{{total}}:{{completed}}</span>
-                    <button title="Download all layers" style="float:right;padding:2px;margin:2px;" class="btn btn-sm btn-success clear-search-results-button" type="button" (click)="downloadAll()"><i class="fa fa-download"></i>All</button>
-                </div>
-                <!-- DownloadLayers list -->
-                <div *ngFor="let downloadLayer of mapDownloadLayers | keyvalue">
-                    <button style="line-height:1.7em;height:2.2em;padding:2px 5px 0px 5px;margin-bottom:2px;" class="btn layer-header" >
-                        <button style="float:right;padding:2px;margin-left:8px;" class="btn btn-sm btn-primary" type="button" title="Click to remove" (click)="removeDownloadLayer(downloadLayer.value.Layer)"><i class="fa fa-close" style="color:red"></i></button>
-                        <span class="layer-header-label" title="{{downloadLayer.value.Layer.name}}">{{ downloadLayer.value.Layer.name }}</span>
-						<!--mat-progress-bar *ngIf= "downloadLayer.value.Ob | async as download" [mode]="download.state === 'PENDING' ? 'buffer' : 'determinate'" [value]="download.progress"></mat-progress-bar-->
-                        <mat-progress-bar *ngIf= "downloadLayer.value.Ob" style="height: 10px;" [mode]="determinate" [value]="downloadLayer.value.Ob.progress" ></mat-progress-bar>
-                        <button style="float:right;padding:2px;margin-left:8px;" class="btn btn-sm btn-primary" type="button" title="Click to download" (click)="downloadAsCSV(downloadLayer.value.Layer)"><i class="fa fa-download"></i></button>
-                   </button>
-                </div>
-            </div>
+                    <div class="pagination" *ngIf="searchResults.length > resultsPerPage">
+                        <ngb-pagination [collectionSize]="searchResults.length" [(page)]="currentPage" [maxSize]="5" [pageSize]="resultsPerPage" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>
+                    </div>
 
-            <!-- Pagination if more than one page of search results -->
-            <div class="pagination" *ngIf="searchResults.length > RESULTS_PER_PAGE">
-                <ngb-pagination [collectionSize]="searchResults.length" [(page)]="currentPage" [maxSize]="5" [pageSize]="RESULTS_PER_PAGE" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>
-            </div>
+                    <!-- Pagination if more than one page of search results -->
+                    <div class="pagination" *ngIf="searchResults.length > RESULTS_PER_PAGE">
+                        <ngb-pagination [collectionSize]="searchResults.length" [(page)]="currentPage" [maxSize]="5" [pageSize]="RESULTS_PER_PAGE" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>
+                    </div>
+
+                </td>
+
+                <!-- Search Info Panel -->
+                <td class="search-info-panel" *ngIf="selectedSearchResult && showingInfoPanel && !searching">
+                    <a style="font-weight: bolder;">Information</a>
+                    <div *ngFor="let cswRecord of selectedSearchResult.layer.cswRecords; index as i">
+                        <info-sub-panel *ngIf="selectedSearchResult" [cswRecord]="cswRecord" [layer]="selectedSearchResult.layer" [expanded]=1></info-sub-panel>
+                        <div *ngIf="i !== selectedSearchResult.layer.cswRecords.length - 1" class="break-border"></div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Downloads -->
+    <div *ngIf="mapDownloadLayers.size > 0 && showingResultsPanel && !searching" class="results-list downloads-list">
+        <div class="break-border"></div>
+        <div class="search-results-title">
+            <label><strong>Selected Layers To Download:&nbsp;</strong></label>
+            <span class="layer-header-label">Layers:&nbsp;{{total0}}:{{completed0}}</span>
+            <span class="layer-header-label">&nbsp;&nbsp;Files:&nbsp;{{total}}:{{completed}}</span>
+            <button title="Clear all layers" class="btn btn-sm btn-danger clear-search-results-button" type="button" (click)="clearDownloadLayers()"><i class="fa fa-ban"></i>&nbsp;Clear&nbsp;</button>
+            <button title="Download all layers" style="float:right;" class="btn btn-sm btn-success clear-search-results-button" type="button" (click)="downloadAll()"><i class="fa fa-download"></i>&nbsp;All</button>
+        </div>
+        <!-- DownloadLayers list -->
+        <div *ngFor="let downloadLayer of mapDownloadLayers | keyvalue">
+            <button style="line-height:1.7em;height:2.2em;padding:2px 5px 0px 5px;margin-bottom:2px;" class="btn layer-header" style="align-items: baseline;">
+                <button style="float:right;padding:2px 2px 2px 0;margin-left:0px;margin-right:8px;line-height:100%;" class="btn btn-sm btn-warning" type="button" title="Click to remove" (click)="removeDownloadLayer(downloadLayer.value.Layer)"><i class="fa fa-close" style="color:red"></i></button>
+                <span class="layer-header-label" title="{{downloadLayer.value.Layer.name}}">{{ downloadLayer.value.Layer.name }}</span>
+                <!--mat-progress-bar *ngIf= "downloadLayer.value.Ob | async as download" [mode]="download.state === 'PENDING' ? 'buffer' : 'determinate'" [value]="download.progress"></mat-progress-bar-->
+                <mat-progress-bar *ngIf= "downloadLayer.value.Ob" style="height: 10px;" [mode]="determinate" [value]="downloadLayer.value.Ob.progress" ></mat-progress-bar>
+                <button style="float:right;padding:2px;margin-left:8px;line-height:100%;" class="btn btn-sm btn-primary" type="button" title="Click to download" (click)="downloadAsCSV(downloadLayer.value.Layer)"><i class="fa fa-download"></i></button>
+            </button>
         </div>
     </div>
+
 </div>

@@ -1,0 +1,11 @@
+@import '../../../app/globals';
+
+.portal-toolbar {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 48px;
+  right: 5px;
+  z-index: 1;
+  gap: 0.4rem;
+}

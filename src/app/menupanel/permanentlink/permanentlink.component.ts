@@ -21,6 +21,7 @@ export class PermanentLinkComponent {
       this.user = user;
     });
   }
+  
   public togglePermanentLinkPanel(){
     this.bShowDialog = !this.bShowDialog;
     if (this.bShowDialog){
@@ -28,6 +29,7 @@ export class PermanentLinkComponent {
     }
     return;
   }
+
   /**
    * Generate the permanent link
    */
@@ -38,7 +40,7 @@ export class PermanentLinkComponent {
       const link = environment.hostUrl + '?state=' + response;
       this.permanentlink = link;
       this.shorteningMode = false;
-    }, err => {
+    }, () => {
       this.permanentlink = "Error on retrieving permanentLink!"
       this.shorteningMode = false;
     });

@@ -15,7 +15,7 @@
 	</div>
 </div>
 
-<div style="display:inline-block; position:relative;">
+<div class="link-wrap" style="display:inline-block; position:relative;">
 	<!-- Legend -->
 	<p *ngIf="legendUrl!==undefined">
 		<b>Legend: </b>
@@ -25,24 +25,24 @@
 	<!-- Abstract -->
 	<p>{{cswRecord.description}}</p>
 
-<!-- Organisation etc. -->
-<p><b>Contact org: </b>{{cswRecord.contactOrg}}</p>
-<p *ngIf="cswRecord.funderOrg && cswRecord.funderOrg !== 'Unknown'"><b>Funder: </b>{{cswRecord.funderOrg}}</p>
-<p *ngIf='cleanConstraints(cswRecord.constraints).length > 0'><b>Constraints: </b>{{cleanConstraints(cswRecord.constraints)}}</p>
-<p *ngIf='selectConstraints(layer.capabilityRecords, cswRecord.accessConstraints).length > 0'><b>Access Constraints: </b>{{selectConstraints(layer.capabilityRecords, cswRecord.accessConstraints)}}</p>
-<p *ngIf="cswRecord.recordInfoUrl && cswRecord.recordInfoUrl.length > 0"><b>Info URL: </b><a style="color: blue; text-decoration: underline;" target="_blank" href="{{cswRecord.recordInfoUrl}}">Link to Geonetwork Record</a></p>
-<div *ngFor="let onlineResource of cswRecord.onlineResources">
-	<p *ngIf="onlineResource.type==='DOI'">
-		<span class="label label-default"><b>DOI Name: </b></span> {{onlineResource.name}}<br>
-		<span class="label label-default"><b>Description: </b></span> {{onlineResource.description}}<br>
-		<span class="label label-default"><b>URL: </b></span><a target="_blank" href="{{onlineResource.url}}">{{onlineResource.url}}</a><br>
-	</p>
-	<p *ngIf="onlineResource.type!=='Unsupported' && onlineResource.type!=='DOI'">
-		<span *ngIf="isGetCapabilitiesType(onlineResource)" class="label label-default"><b>{{onlineResource.type}}: </b></span>
-		<a style="color: blue; text-decoration: underline;" *ngIf="isGetCapabilitiesType(onlineResource)" target="_blank" href="{{ onlineResourceGetCapabilitiesUrl(onlineResource) }}">{{onlineResource.type}} GetCapabilities Info</a>
-		<span *ngIf="!isGetCapabilitiesType(onlineResource) && onlineResource.url" class="label label-default"><b>{{onlineResource.name.split('_').join(' ')}}: </b></span>
-		<a style="color: blue; text-decoration: underline;" *ngIf="!isGetCapabilitiesType(onlineResource)" target="_blank" href="{{ removeProxy(onlineResource.url) }}">{{ removeProxy(onlineResource.url) }}</a>
-	</p>
-</div>
+	<!-- Organisation etc. -->
+	<p><b>Contact org: </b>{{cswRecord.contactOrg}}</p>
+	<p *ngIf="cswRecord.funderOrg && cswRecord.funderOrg !== 'Unknown'"><b>Funder: </b>{{cswRecord.funderOrg}}</p>
+	<p *ngIf='cleanConstraints(cswRecord.constraints).length > 0'><b>Constraints: </b>{{cleanConstraints(cswRecord.constraints)}}</p>
+	<p *ngIf='selectConstraints(layer.capabilityRecords, cswRecord.accessConstraints).length > 0'><b>Access Constraints: </b>{{selectConstraints(layer.capabilityRecords, cswRecord.accessConstraints)}}</p>
+	<p *ngIf="cswRecord.recordInfoUrl && cswRecord.recordInfoUrl.length > 0"><b>Info URL: </b><a style="color: blue; text-decoration: underline;" target="_blank" href="{{cswRecord.recordInfoUrl}}">Link to Geonetwork Record</a></p>
+	<div *ngFor="let onlineResource of cswRecord.onlineResources">
+		<p *ngIf="onlineResource.type==='DOI'">
+			<span class="label label-default"><b>DOI Name: </b></span> {{onlineResource.name}}<br>
+			<span class="label label-default"><b>Description: </b></span> {{onlineResource.description}}<br>
+			<span class="label label-default"><b>URL: </b></span><a target="_blank" href="{{onlineResource.url}}">{{onlineResource.url}}</a><br>
+		</p>
+		<p *ngIf="onlineResource.type!=='Unsupported' && onlineResource.type!=='DOI'">
+			<span *ngIf="isGetCapabilitiesType(onlineResource)" class="label label-default"><b>{{onlineResource.type}}: </b></span>
+			<a style="color: blue; text-decoration: underline;white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -pre-wrap;white-space: -o-pre-wrap;word-wrap: break-word;" *ngIf="isGetCapabilitiesType(onlineResource)" target="_blank" href="{{ onlineResourceGetCapabilitiesUrl(onlineResource) }}">{{onlineResource.type}} GetCapabilities Info</a>
+			<span *ngIf="!isGetCapabilitiesType(onlineResource) && onlineResource.url" class="label label-default"><b>{{onlineResource.name.split('_').join(' ')}}: </b></span>
+			<a style="color: blue; text-decoration: underline;white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -pre-wrap;white-space: -o-pre-wrap;word-wrap: break-word;" *ngIf="!isGetCapabilitiesType(onlineResource)" target="_blank" href="{{ removeProxy(onlineResource.url) }}">{{ removeProxy(onlineResource.url) }}</a>
+		</p>
+	</div>
 
 </div>

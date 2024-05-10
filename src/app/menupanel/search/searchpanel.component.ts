@@ -95,10 +95,12 @@ export class SearchPanelComponent implements OnInit {
   showingResultsPanel = false;        // True when results panel is being shown
   showingAdvancedOptions = false;     // True when advanced options are being displayed
   showingKmlOgcOptions = false;       // True when KML/OGC panel is displayed
+  showingInfoPanel = false;
   queryText = '';                     // User entered query text
   searching = false;                  // True if search in progress
   searchResults: SearchResult[] = []; // Search results
   showingAllLayers = false;           // True if all layers being shown (no search)
+  selectedSearchResult;               // Currently selected search result
 
   // Options
   allSearchField: SearchField = new SearchField('All', [], true);
@@ -122,7 +124,7 @@ export class SearchPanelComponent implements OnInit {
   private drawBoundsStarted = false;
 
   // DownloadLayers to CSV files.
-  private mapDownloadLayers = new Map<string, any>();
+  public mapDownloadLayers = new Map<string, any>();
   public total0: number=0;
   public completed0:number=0;
   public total:number=0;
@@ -196,15 +198,24 @@ export class SearchPanelComponent implements OnInit {
       this.totalSearchHits = totalLayerCount;
       // Sort alphabetically
       layers.sort((a, b) => a.layer.name.localeCompare(b.layer.name));
-      this.showingAllLayers = true;
+
       this.searchResults = layers;
+
+      // Select first result
+      if (this.searchResults.length > 0) {
+        this.selectSearchResult(this.searchResults[0]);
+      }
+
+      this.showingAllLayers = true;
     });
-    
   }
 
-  public setShowingResultsPanel(showingOptions: boolean) {
-    this.showingResultsPanel = showingOptions;
-    if (showingOptions && this.showingKmlOgcOptions) {
+  public setShowingResultsPanel(showingResults: boolean) {
+    this.showingResultsPanel = showingResults;
+    if (this.selectedSearchResult) {
+      this.showingInfoPanel = showingResults;
+    }
+    if (showingResults && this.showingKmlOgcOptions) {
       this.showingKmlOgcOptions = false;
     }
   }
@@ -213,6 +224,7 @@ export class SearchPanelComponent implements OnInit {
     this.showingKmlOgcOptions = showingOptions;
     if (showingOptions && this.showingResultsPanel) {
       this.showingResultsPanel = false;
+      this.showingInfoPanel = false;
     }
   }
 
@@ -277,6 +289,17 @@ export class SearchPanelComponent implements OnInit {
     const startPos = (this.currentPage - 1) * this.RESULTS_PER_PAGE;
     const endPos = startPos + this.RESULTS_PER_PAGE;
     return this.searchResults.slice(startPos, endPos);
+  }
+
+  /**
+   * Set the current search result as clicked by user in search results
+   * @param searchResult the currently selected SearchResult
+   */
+  public selectSearchResult(searchResult: SearchResult) {
+    this.selectedSearchResult = searchResult;
+    if (this.showingResultsPanel) {
+      this.showingInfoPanel = true;
+    }
   }
 
   /**
@@ -440,7 +463,8 @@ export class SearchPanelComponent implements OnInit {
 
   /**
    * Scroll to the specified layer in sidebar (Featured Layers)
-   *
+   * Note: Unused, was originally for scrolling to layer in Featured Layers when that was part
+   * of the side-bar. Kept in case we ever want to highlight the browse menu (or similar)
    * @param layer the layer
    */
   public scrollToLayer(layer: LayerModel) {
@@ -645,6 +669,7 @@ export class SearchPanelComponent implements OnInit {
    */
   public search(newSearch: boolean) {
 
+    this.selectedSearchResult = null;
     this.showingAllLayers = false;
 
     // Validate parameters before continuing
@@ -708,10 +733,15 @@ export class SearchPanelComponent implements OnInit {
         }
         this.searching = false;
         this.showingAllLayers = false;
+
+        // Select first result
+        if (this.searchResults.length > 0) {
+          this.selectSearchResult(this.searchResults[0]);
+        }
+
         if (!this.showingResultsPanel) {
           this.setShowingResultsPanel(true);
         }
-
       });
     }, error => {
       this.alertMessage = error.error;

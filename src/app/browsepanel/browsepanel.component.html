@@ -1,9 +1,11 @@
 <!-- Menu toggle button -->
-<button class="cesium-button cesium-toolbar-button browse-menu-button" (click)="toggleBrowsePanel()">
-    <em class="fa fa-bars" title="Browse featured layers"></em> Browse
+<!--<button class="cesium-button cesium-toolbar-button browse-menu-button" (click)="toggleBrowsePanel()">-->
+<button class="btn browse-menu-button btn-auscope-primary" (click)="toggleBrowsePanel()">
+    <em class="fa fa-bars" title="Browse featured layers"></em>&nbsp;Browse
 </button>
-<button class="sidebar-toggle cesium-button cesium-toolbar-button browse-menu-button" (click)="toggleSidebar()">
-    <em class="fa fa-sliders" title="Browse featured layers"></em> SideBar
+<!--<button class="sidebar-toggle cesium-button cesium-toolbar-button browse-menu-button" (click)="toggleSidebar()">-->
+<button class="sidebar-toggle btn browse-menu-button btn-auscope-primary" (click)="toggleSidebar()">
+    <em class="fa fa-sliders" title="Browse featured layers"></em>&nbsp;SideBar
 </button>
 <div *ngIf="bShowBrowsePanel" class="browse-menu">
 	<!-- Layer Groups column -->

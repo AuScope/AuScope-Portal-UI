@@ -123,6 +123,7 @@ import { LayerGroupComponent } from './menupanel/custompanel/layergroup.componen
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthErrorHandlerInterceptor } from './interceptors/auth-error.interceptor';
 import { ROIModule } from './modalwindow/roi/roi.modal.modules';
+import { ToolbarComponent } from './menupanel/toolbar/toolbar.component';
 
 PlotlyModule.plotlyjs = PlotlyJS;
 
@@ -175,7 +176,8 @@ PlotlyModule.plotlyjs = PlotlyJS;
         PermanentLinksModalComponent,
         CreatePermanentLinkModalComponent,
         AddRegistryModalComponent,
-        ConfirmModalComponent
+        ConfirmModalComponent,
+        ToolbarComponent
     ],
     providers: [ AuscopeApiService, FilterService, RectanglesEditorService, AdvancedComponentService, SearchService,
                  NVCLService, MSCLService, BoundsService, GraceService, { provide: SAVER, useFactory: getSaver },

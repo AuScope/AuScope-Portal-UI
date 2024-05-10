@@ -1,4 +1,7 @@
 @import '../../globals';
+:host {
+    margin-left: auto;
+}
 
 .user-menu {
     color: $text-colour;
