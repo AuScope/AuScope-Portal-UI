@@ -51,6 +51,8 @@ export class DownloadPanelComponent implements OnInit {
 
   irisDownloadListOption: any;
   isIRISDownloadSupported: boolean;
+  irisAllStationsMaxDate: any;
+  irisAllStationsMinDate: any;
 
   // Default values for selectors
   public SELECT_DEFAULT_DOWNLOAD_FMT = "Choose a download format";
@@ -334,11 +336,13 @@ export class DownloadPanelComponent implements OnInit {
         selectedChannels: [],
         selectedStations: [],
         displayBbox: true,
-        minDate: response['data'][0].mintDate,
+        minDate: response['data'][0].minDate,
         maxDate: response['data'][0].maxDate,
-        dateFrom: response['data'][0].mintDate,
+        dateFrom: response['data'][0].minDate,
         dateTo: response['data'][0].maxDate,
-      }
+      };
+      this.irisAllStationsMinDate = response['data'][0].minDate;
+      this.irisAllStationsMaxDate = response['data'][0].maxDate;
     })
   }
 
@@ -562,20 +566,15 @@ export class DownloadPanelComponent implements OnInit {
 
     const kmlPlaceMarkBHTemplate = '<Placemark><name>${GMLID}</name><styleUrl>#icon-1899-0288D1</styleUrl><ExtendedData>${METADATA}</ExtendedData><Point><coordinates>${GSMLPSHAPE}</coordinates></Point></Placemark>';
     const bhMetaDataTemplate = '<Data name="${NAME}"><value>${VALUE}</value></Data>';
-    let kml = "";
     let kmlPlaceMarkBHarray=[];
     let gmlid = "";
     let gsmlpshape = "";
-    let gsmlpidentifier = "";
     let metaData = "";
-    let name = "";
-    let value = "";
     //csv data process
     let csvArray = csv.split(/\r?\n/g);    
     let csvHeader = csvArray[0].split(",");
     let indexGsmlpShape = csvHeader.indexOf("gsmlp:shape");
     let indexGmlId = csvHeader.indexOf("gml:id");
-    let indexGsmlpIdentifier = csvHeader.indexOf("gsmlp:identifier")
 
     if (indexGsmlpShape < 0 || indexGmlId < 0) {
       console.log("saveKML:error to find gsmlp:shape");
@@ -760,11 +759,30 @@ export class DownloadPanelComponent implements OnInit {
   public onStationChange() {
     this.irisDownloadListOption.channelLst.length = 0;
     if (this.irisDownloadListOption.selectedStations.includes(this.SELECT_ALL_CODE)) {
+      // Update the channel list
       this.irisDownloadListOption.channelLst = this.getAvilChannel(this.irisDownloadListOption.stationLst);
+      // Update the to/from and start/end dates for all stations in the network
+      this.irisDownloadListOption.minDate = this.irisAllStationsMinDate;
+      this.irisDownloadListOption.maxDate = this.irisAllStationsMaxDate;
+      this.irisDownloadListOption.dateFrom = this.irisAllStationsMinDate;
+      this.irisDownloadListOption.dateTo = this.irisAllStationsMaxDate;
     } else {
       const stations = this.irisDownloadListOption.stationLst.filter(station => this.irisDownloadListOption.selectedStations.includes(station.code));
+      // Update the channel list
       this.irisDownloadListOption.channelLst = this.getAvilChannel(stations);
+      // Update the to/from and start/end dates according to the channels selected
+      let newStartDate = stations[0].startDate;
+      let newEndDate = stations[0].endDate;
+      for (let station of stations) {
+        newStartDate = station.startDate < newStartDate ? station.startDate : newStartDate;
+        newEndDate = station.endDate > newEndDate ? station.endDate : newEndDate;
+      }
+      this.irisDownloadListOption.minDate = newStartDate;
+      this.irisDownloadListOption.maxDate = newEndDate;
+      this.irisDownloadListOption.dateFrom = newStartDate;
+      this.irisDownloadListOption.dateTo = newEndDate;
     }
+
   }
 
 }
