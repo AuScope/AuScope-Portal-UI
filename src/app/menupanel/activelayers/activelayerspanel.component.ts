@@ -375,7 +375,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
 
     isDatasetURLSupportedLayer = config.datasetUrlSupportedLayer[layer.id] !== undefined;
 
-    if (config.datasetUrlAussPassLayer && config.datasetUrlAussPassLayer[layer.group.toLowerCase()] !== undefined &&
+    if (config.datasetUrlAussPassLayer && layer.group && config.datasetUrlAussPassLayer[layer.group.toLowerCase()] !== undefined &&
       UtilitiesService.layerContainsResourceType(layer, ResourceType.IRIS)) {
       isIRISDownloadSupported = true;
     }
