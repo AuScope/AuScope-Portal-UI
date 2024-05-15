@@ -8,6 +8,7 @@
         flex-direction: row;
         position: absolute;
         line-height: 1.2;
+        max-height: calc(100vh - 150px);
         top: 85px;
         left: 10px;
         z-index: 1000;
@@ -16,9 +17,11 @@
         opacity: 0.9;
         border: 1px solid #444444;
         border-radius: .8rem!important;
+        overflow-y: auto;
 
         .browse-menu-col {
             flex: fit-content;
+            overflow-y: auto;
         }
     }
 
@@ -84,7 +87,6 @@
     .info-col {
         max-width: 420px;
         min-width: 420px;
-        height: 700px;
         overflow-x: hidden;
         overflow-y: auto;
     }
