@@ -119,7 +119,7 @@
         </div>
     </div>
     <!-- KML/OGC options -->
-    <div class="options-panel" *ngIf="showingKmlOgcOptions" style="padding:1em 1em 0 1em;">
+    <div class="options-panel kml-options-panel" [style.visibility]="showingKmlOgcOptions ? 'visible' : 'hidden'">
         <ul class="card-sub" appCustomPanel style="display:contents;"></ul>
     </div>
     <!-- Search results -->

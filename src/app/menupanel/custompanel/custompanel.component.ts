@@ -87,7 +87,7 @@ export class CustomPanelComponent {
     this.statusMsg = '';
 
     // Clear the results from the previous search, start the loading spinner
-    //this.urlLayerGroups = { 'Results': [] }; // don't clear the results
+    this.urlLayerGroups = { 'Results': [] };
     this.loading = true;
 
     // Check for empty URL
@@ -279,6 +279,16 @@ export class CustomPanelComponent {
   }
 
   /**
+   * Catch ENTER key event in KML input to trigger search
+   * @param event KeyEvent
+   */
+  public onKeyUp(event: KeyboardEvent) {
+    if (event.key == 'Enter') {
+      this.search();
+    }
+  }
+
+  /**
    * Open the modal that displays the status of the render
    * 
    * @param uiLayerModel ui layer model object whose status will be displayed
@@ -364,7 +374,6 @@ export class CustomPanelComponent {
    * @param sourceType URL or File
    */
   public setupLayer(me: this, name: string, kmzData: any, proxyUrl: string, docType: ResourceType, sourceType: string) {
-
     let layerRec: LayerModel= null;
     // Make a layer model object
     if (docType == ResourceType.KMZ) {

@@ -1,4 +1,4 @@
-@import '../globals';
+@import 'app/auscope-styles';
 
 .submenu-open-block {
 	display: block !important;
@@ -41,6 +41,7 @@ a {
 p a {
     color: #000;
 }
+
 .infopanel-legend {
 	max-width: 500px;
 }
