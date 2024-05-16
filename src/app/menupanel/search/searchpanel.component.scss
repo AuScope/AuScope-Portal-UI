@@ -155,6 +155,12 @@
             }
         }
     }
+
+    .kml-options-panel {
+        max-height: calc(100vh - 100px);
+        overflow-y: auto;
+        padding: 1em 1em 0 1em;
+    }
     
     .results-panel {
         position: relative;

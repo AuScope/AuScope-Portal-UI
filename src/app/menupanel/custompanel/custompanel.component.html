@@ -2,9 +2,9 @@
 <div class="form-group">
 	<label class="control-label" for="inputSuccess1"><span class="white">KML/KMZ URL or OGC WMS Service URL</span></label>
 	<div class="input-group" style="margin-left:1em;right:1em;">
-		<input type="text" class="form-control" [(ngModel)] = "searchUrl" >
+		<input type="text" class="form-control" [(ngModel)] = "searchUrl" (keyup)="onKeyUp($event)">
 		<div class="input-group-append" title="Add KML, KMZ or OGC WMS service URL layer to map" (click)="search()">
-			<button class="btn btn-light" type="button" [disabled]="!searchUrl || searchUrl.trim() === ''">
+			<button class="btn btn-auscope-primary" type="button" [disabled]="!searchUrl || searchUrl.trim() === ''">
 				<i *ngIf="!loading" class="fa fa-search"></i>
 				<i *ngIf="loading" class="fa fa-spinner fa-spin fa-fw"></i>
 			</button>
@@ -15,7 +15,6 @@
 </div>
 <!-- Once a URL has been selected and processed, its available layers are shown here -->
 <layer-group *ngIf="urlLayerGroups.Results.length > 0" layerGroup [layerGroups]="urlLayerGroups" style="left:-5.2em;"></layer-group>
-
 
 <!-- Custom Layer KML File Input -->
 <div class="form-group">
