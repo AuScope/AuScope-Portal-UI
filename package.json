@@ -32,7 +32,7 @@
     "@angular/platform-server": "^17.3.6",
     "@angular/router": "^17.3.6",
     "@auscope/angular-cesium": "^17.0.0",
-    "@auscope/portal-core-ui": "^6.5.10",
+    "@auscope/portal-core-ui": "^6.5.11",
     "@csiro-geoanalytics/ng": "^2.5.0",
     "@csiro-geoanalytics/utils-rxjs": "^2.0.1",
     "@ng-bootstrap/ng-bootstrap": "^16.0.0",
