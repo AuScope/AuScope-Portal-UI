@@ -118,10 +118,6 @@
             <button style="margin-left:auto;margin-right:6px;" class="btn btn-sm btn-secondary" (click)="resetAdvancedSearch()"><i class="fa fa-ban"></i>&nbsp;Reset All</button>
         </div>
     </div>
-    <!-- KML/OGC options -->
-    <div class="options-panel kml-options-panel" [style.visibility]="showingKmlOgcOptions ? 'visible' : 'hidden'">
-        <ul class="card-sub" appCustomPanel style="display:contents;"></ul>
-    </div>
     <!-- Search results -->
     <div *ngIf="showingResultsPanel && !searching" class="results-panel">
         <div *ngIf="!searchResults || searchResults.length === 0">
@@ -197,6 +193,11 @@
                 </button>
             </div>
         </div>
+    </div>
+
+    <!-- KML/OGC options -->
+    <div class="options-panel kml-options-panel" [style.visibility]="showingKmlOgcOptions ? 'visible' : 'hidden'">
+        <ul class="card-sub" appCustomPanel style="display:contents;"></ul>
     </div>
 
 </div>
