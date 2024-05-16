@@ -12,7 +12,7 @@
 		<div class="row align-items-start" *ngFor="let layerGroup of layerGroupColumn | keyvalue">
 			<div class="col" (click)="selectGroup(layerGroup)">
 				<a>
-					<span class="truncate-grp" [ngClass]="{'enbolden': isGroupSelected(layerGroup)}">{{layerGroup.key}}</span>
+					<span class="truncate-grp" [ngClass]="{'enbolden': isGroupSelected(layerGroup)}" title="{{layerGroup.key}}">{{layerGroup.key}}</span>
 				</a>
 			</div>
 		</div>
@@ -25,7 +25,7 @@
 		<div class="row align-items-start" *ngFor="let layer of layerColumn">
 			<div class="col" (click)="selectLayer(layer)">
 				<a>
-					<span class="truncate-layer" [ngClass]="{'enbolden': isLayerSelected(layer)}">{{layer.name}}</span>
+					<span class="truncate-layer" [ngClass]="{'enbolden': isLayerSelected(layer)}" title="{{layer.name}}">{{layer.name}}</span>
 				</a>
 				<button *ngIf="isLayerSelected(layer)" style="float:right; width:6em; padding:2px" class="btn btn-sm btn-success" type="button" title="Add layer" (click)="addLayer(layer)">
 					<i class="fa fa-plus-circle"></i>
