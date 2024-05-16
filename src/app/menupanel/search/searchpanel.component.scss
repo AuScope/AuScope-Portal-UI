@@ -303,6 +303,11 @@
     .downloads-list {
         background-color: white;
         padding: 0.5rem;
+
+        .download-layers-list {
+            max-height: calc(100vh - 580px);
+            overflow-y: auto;
+        }
     }
 
     .break-border {

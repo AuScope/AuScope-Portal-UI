@@ -17,10 +17,10 @@
 
 <div class="link-wrap" style="display:inline-block; position:relative;">
 	<!-- Legend -->
-	<p *ngIf="legendUrl!==undefined">
-		<b>Legend: </b>
+	<div *ngIf="legendUrl!==undefined">
+		<div class="preview-legend-title">Legend:</div>
 		<img appImgLoading src="{{legendUrl}}" (error)="onImgError($event)" class="infopanel-legend"/>
-	</p>
+	</div>
 
 	<!-- Abstract -->
 	<p>{{cswRecord.description}}</p>
