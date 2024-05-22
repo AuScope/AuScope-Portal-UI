@@ -7,7 +7,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
     selector: 'info-panel',
     templateUrl: './infopanel.component.html',
     providers: [LayerStatusService],
-    styleUrls: ['../../menupanel.scss']
+    styleUrls: ['../../menupanel.scss', './infopanel.component.scss']
 })
 
 export class InfoPanelComponent {
