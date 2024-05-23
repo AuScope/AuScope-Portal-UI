@@ -38,6 +38,8 @@
 				<button *ngIf="editingState !== i" class="btn btn-sm btn-primary state-form-button pull-right" (click)="editState(i)"><i class="fa fa-pencil"></i>&nbsp;Edit</button>
 				<button *ngIf="editingState === i" class="btn btn-sm btn-primary state-form-button pull-right" (click)="saveState(i)"><i class="fa fa-disk"></i>&nbsp;Save Changes</button>
 			</div>
-			<button class="btn btn-primary" (click)="close()">Close</button>
 		</form>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-primary" (click)="close()">Close</button>
 	</div>

@@ -73,7 +73,8 @@ export class LoginMenuComponent {
   manageStates() {
     this.modalService.open(PermanentLinksModalComponent, {
       size: 'lg',
-      backdrop: false
+      backdrop: false,
+      scrollable: true
     });
   }
 
