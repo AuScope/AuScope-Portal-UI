@@ -1,8 +1,8 @@
-<button class="cesium-button cesium-toolbar-button editor-toggle-button" (click)="togglePermanentLinkPanel()">
-    <em class="fa fa-link" title="Create Permanent Link"></em>
+<!-- Main button to trigger anonymous or user dialog -->
+<button class="cesium-button cesium-toolbar-button editor-toggle-button" (click)="permanentLinkClick()">
+	<em class="fa fa-link" title="Create Permanent Link"></em>
 </button>
-<!--div *ngIf="bShowDialog" @fadeSlideInOut class="container-fluid editor-box " role="group"-->
-
+<!-- Anonymous user dialog -->
 <div *ngIf="!user && bShowDialog" class="editor-box hasEvent">
 	<a id="PermanentLinkAnonymous" class="popup" (click)="generateAnonymousPermanentLink()"><i class="ti-link"></i><span title="Create a link preserving current map layers">Permanent Link</span>
 		<div class="popuptext container-fluid" [ngClass]="{'show':bShowDialog}" style="z-index: 10;">
@@ -22,10 +22,5 @@
 				<div *ngIf="shorteningMode" class="small">URL shortening in progress ...</div>
 			</div>
 		</div>
-	</a>
-</div>
-<div *ngIf="user && bShowDialog" class="editor-box hasEvent">
-	<a id="PermanentLinkUser" (click)="showPermanentLinkDialog()">
-		<i class="ti-link"></i><span title="Create a link preserving current map layers">Permanent Link</span>
 	</a>
 </div>

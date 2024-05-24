@@ -22,7 +22,21 @@ export class PermanentLinkComponent {
     });
   }
   
-  public togglePermanentLinkPanel(){
+  /**
+   * User has clicked permanent link button, show dialog based on whether they're logged in
+   */
+  public permanentLinkClick() {
+    if (this.user) {
+      this.showUserPermanentLinkDialog();
+    } else {
+      this.togglePermanentLinkPanel();
+    }
+  }
+
+  /**
+   * Toggle anonymous user permanent link panel
+   */
+  public togglePermanentLinkPanel() {
     this.bShowDialog = !this.bShowDialog;
     if (this.bShowDialog){
       this.generateAnonymousPermanentLink();
@@ -50,10 +64,11 @@ export class PermanentLinkComponent {
   /**
    * Show the create permanent link dialog for a logged in user
    */
-  public showPermanentLinkDialog() {
+  public showUserPermanentLinkDialog() {
     this.modalService.open(CreatePermanentLinkModalComponent, {
       size: 'lg',
-      backdrop: false
+      backdrop: false,
+      scrollable: true
     });
   }
 
