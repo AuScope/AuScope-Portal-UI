@@ -367,6 +367,20 @@ export class CustomPanelComponent {
     return xmlStr;
   }
 
+  /**
+   * Check if a list of file or URL records already contain a record denoted by its name and URL
+   *
+   * @param recordsList the list of records (file or url)
+   * @param name the name of the layer
+   * @param url the URL of the layer
+   * @returns true if the layer is found within recordsList, false otherwise
+   */
+  private recordsListContainsRecord(recordsList: any, name: string, url: string): boolean {
+    if (recordsList['Results'].findIndex(x => x.cswRecords[0].name === name && x.cswRecords[0].onlineResources[0].url === url) != -1) {
+      return true;
+    }
+    return false;
+  }
 
   /**
    * This gets called after a file has been selected for upload
@@ -385,13 +399,12 @@ export class CustomPanelComponent {
     const uiLayerModel = new UILayerModel(layerRec.id, me.renderStatusService.getStatusBSubject(layerRec));
     me.uiLayerModelService.setUILayerModel(layerRec.id, uiLayerModel);
     // Make the layer group listing visible in the UI
-    if (sourceType == "URL") {
+    if (sourceType == "URL" && !this.recordsListContainsRecord(me.urlLayerGroups, name, proxyUrl)) {
       me.urlLayerGroups['Results'].unshift(layerRec);
-    } else {
+    } else if (!this.recordsListContainsRecord(me.fileLayerGroups, name, proxyUrl)) {
       me.fileLayerGroups['Results'].unshift(layerRec);
     }
   }
-
 
   /**
    * This gets called after a file has been selected for upload
