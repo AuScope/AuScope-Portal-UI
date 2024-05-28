@@ -14,13 +14,17 @@
 						</u>
 					</span>
 					-->
-					<div>
-						<i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-times red" (click) = "removeLayer(layer);$event.stopPropagation();"></i>
-						{{layer.name}}
-						<i *ngIf="layer.expanded && !getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-arrow-circle-down"></i>
-						<i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted() && !getUILayerModel(layer.id).statusMap.getRenderComplete()" class="float-right light-blue fa fa-spin fa-spinner"></i>
-						<i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted() && getUILayerModel(layer.id).statusMap.getContainsError()" class="fa fa-warning text-warning"></i>
-					</div>
+					<div style="display: flex; justify-content: space-between">
+                        
+                        <div>
+                            {{layer.name}}
+                        <i *ngIf="!layer.expanded" class="fa fa-arrow-circle-down"></i>
+                        <i *ngIf="layer.expanded" class="fa fa-arrow-circle-up"></i>
+                        <i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted() && !getUILayerModel(layer.id).statusMap.getRenderComplete()" class="float-right light-blue fa fa-spin fa-spinner"></i>
+                        <i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted() && getUILayerModel(layer.id).statusMap.getContainsError()" class="fa fa-warning text-warning"></i>
+                        </div>
+                        <i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-trash red" (click) = "removeLayer(layer);$event.stopPropagation();"></i>
+                    </div>
 					<!--
 					<div *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="progress progress-xs" style="height: 5px">
 						<div class="progress-bar bg-gradient-blue-purple" [style.width]="getUILayerModel(layer.id).statusMap.getCompletePercentage()" role="progressbar"></div>

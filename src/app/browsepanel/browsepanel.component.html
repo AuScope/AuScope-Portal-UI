@@ -2,9 +2,10 @@
 <button class="btn browse-menu-button btn-auscope-primary" (click)="toggleBrowsePanel()">
     <em class="fa fa-bars" title="Browse featured layers"></em>&nbsp;Browse
 </button>
-<button class="sidebar-toggle btn browse-menu-button btn-auscope-primary" (click)="toggleSidebar()">
-    <em class="fa fa-sliders" title="Browse featured layers"></em>&nbsp;SideBar
-</button>
+<span class="sidebar-toggle" (click)="toggleSidebar()">
+    <i class="fa fa-angle-left fa-5x" *ngIf="isSidebarOpen" title="Open active layers"></i>
+    <i class="fa fa-angle-right fa-5x" *ngIf="!isSidebarOpen" title="Open active layers"></i>
+</span>
 <div *ngIf="bShowBrowsePanel" class="browse-menu">
 	<!-- Layer Groups column -->
 	<div class="container text-left browse-menu-col">

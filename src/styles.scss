@@ -893,3 +893,27 @@ transition: margin-left 0.3s ease;
 .map-area.sidebar-open {
 margin-left: 320px; /* Adjust the margin to match the sidebar width */
 }
+.close-sidebar-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #f00;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.vertical-text-btn {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: rotate(-90deg) translateY(-50%);
+    transform-origin: left center;
+    background-color: #00f;
+    color: #fff;
+    border: none;
+    padding: 10px 5px;
+    cursor: pointer;
+    z-index: 1000;    
+}  

@@ -32,10 +32,10 @@
 
 	<!-- If there are no filters display a warning -->
 	<div style="font-size: small;" *ngIf="(!layerFilterCollection || layerFilterCollection.optionalFilters?.length === 0) && !layerHasAdvancedFilterComponent(layer.id)">
-		<div class="alert alert-warning fade show">
+		<!-- <div class="alert alert-warning fade show">
 			<i class="ti-bell float-left"></i>
 			<p>There are no filters associated with this layer</p>
-		</div>
+		</div> -->
 	</div>
 
 	<!-- Optional filters, if supported -->
@@ -149,7 +149,7 @@
 		<!-- Optional layer analytics button -->
 		<button *ngIf="analyticMap[layer.id]" type="button" class="btn btn-warning btn-sm analytic-btn" title="Display analytics" (click)="processLayerAnalytic(layer)"><i class="fa fa-bar-chart" aria-hidden="true"></i>&nbsp;Analytic</button>
 		<!-- Update layer button -->
-		<button type="button" *ngIf="isMapSupportedLayer(layer)" class="btn btn-primary btn-sm add-layer-btn float-right" (click)="addLayer(layer)"><i class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp;Update Layer</button>
+		<button type="button" *ngIf="isMapSupportedLayer(layer)" class="btn btn-primary btn-sm add-layer-btn float-right" (click)="addLayer(layer)"><i class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp;Add Layer</button>
 		<!-- Optional unsupported layer message & icon -->
 		<div class="unsupported-layer-message" *ngIf="!isMapSupportedLayer(layer)">
 			<em class="fa fa-exclamation-triangle warning-icon"></em>

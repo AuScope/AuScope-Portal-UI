@@ -44,7 +44,7 @@ export class PortalComponent implements OnInit, OnDestroy  {
     }, 10);
   }
   toggleSidebar() {
-    this.isSidebarOpen = !this.isSidebarOpen;
+    this.sidebarService.toggleSidebar();
   }
   /**
    * Check is a user is logged in.
