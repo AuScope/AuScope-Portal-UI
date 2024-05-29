@@ -27,6 +27,9 @@
         </label>
         <div appActiveLayers></div>
     </h5>
+    <button *ngIf="isSidebarOpen" (click)="toggleSidebar()" class="close-sidebar-btn">
+        <i class="fa fa-times" aria-hidden="true"></i>
+    </button>
     <!-- END Active Layers -->
 </nav>
 <!-- END sidebar -->

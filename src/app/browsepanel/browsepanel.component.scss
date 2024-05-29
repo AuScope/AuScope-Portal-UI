@@ -9,7 +9,7 @@
         line-height: 1.2;
         max-height: calc(100vh - 150px);
         top: 85px;
-        left: 10px;
+        left: 40px;
         z-index: 1000;
         padding: 6px;
         background-color:rgb(242, 242, 241); /* From AVRE App Store */
@@ -28,7 +28,7 @@
     .browse-menu-button {
         display: block;
         position: absolute;
-        left: 5px;
+        left: 30px;
         top: 5px;
         height: 32px;
         width: 160px;
@@ -95,11 +95,15 @@
         display: block;
         position: absolute;
         left: 5px;
-        top: 40px;
+        top: 50%; /* Center vertically */
         height: 32px;
         width: 160px;
         z-index: 5;
-        font-size: 20px;
+        font-size: 15px;
+        color: grey;
+        cursor: pointer;
     }
-
+    .sidebar-toggle:hover {
+        color: whitesmoke; /* From AuScope style guide */
+    }
 }

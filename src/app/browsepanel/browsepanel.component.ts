@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, type OnDestroy } from '@angular/core';
 import { LayerHandlerService, RenderStatusService } from '@auscope/portal-core-ui';
 import { UILayerModel } from '../menupanel/common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
@@ -6,6 +6,7 @@ import { LayerModel } from '@auscope/portal-core-ui'
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
 import { FilterService } from 'app/services/filter/filter.service';
 import { SidebarService } from 'app/portal/sidebar.service';
+import { Subscription } from 'rxjs';
 
 
 @Component({
@@ -13,7 +14,7 @@ import { SidebarService } from 'app/portal/sidebar.service';
     templateUrl: './browsepanel.component.html',
     styleUrls: ['./browsepanel.component.scss']
 })
-export class BrowsePanelComponent implements OnInit {
+export class BrowsePanelComponent implements OnInit, OnDestroy{
 
   public layerGroupColumn: {}; /* Holds the data structures for all layers and groups */
   public layerColumn: []; /* List of layers for a certain group */
@@ -21,13 +22,15 @@ export class BrowsePanelComponent implements OnInit {
   public selectedLayer; /* Selected layer, assigned a layer object */
   public panelStayOpen = false; /* Checkbox state for user to keep panel open after adding a layer */
   public bShowBrowsePanel = false; /* If true menu panel is open */
+  public isSidebarOpen = false; /* If true sidebar is open */
+  public sidebarSubscription: Subscription;
 
   constructor(private layerHandlerService: LayerHandlerService,
       private layerManagerService: LayerManagerService,
       private renderStatusService: RenderStatusService,
       private uiLayerModelService: UILayerModelService,
       private filterService: FilterService,
-      private sidebarService: SidebarService
+      private sidebarService: SidebarService,
       ) {
   }
   toggleSidebar() {
@@ -38,7 +41,11 @@ export class BrowsePanelComponent implements OnInit {
    */
     public ngOnInit() {
       const me = this;
-  
+      this.sidebarSubscription = this.sidebarService.isSidebarOpen$.subscribe(
+        isOpen => {
+          this.isSidebarOpen = isOpen;
+        }
+      );
       // Initialise layers and groups in sidebar
       this.layerHandlerService.getLayerRecord().subscribe(
         response => {
@@ -61,7 +68,11 @@ export class BrowsePanelComponent implements OnInit {
           });
       });
     }
-
+    ngOnDestroy(): void {
+        if (this.sidebarSubscription) {
+          this.sidebarSubscription.unsubscribe();
+        }
+      }
   /**
    * Select a group
    * 
