@@ -1,4 +1,4 @@
-import { Component, OnInit, type OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { LayerHandlerService, RenderStatusService } from '@auscope/portal-core-ui';
 import { UILayerModel } from '../menupanel/common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
@@ -7,6 +7,8 @@ import { LayerManagerService } from 'app/services/ui/layer-manager.service';
 import { FilterService } from 'app/services/filter/filter.service';
 import { SidebarService } from 'app/portal/sidebar.service';
 import { Subscription } from 'rxjs';
+import { UserStateService } from 'app/services/user/user-state.service';
+import { AuthService } from 'app/services/auth/auth.service';
 
 
 @Component({
@@ -14,7 +16,7 @@ import { Subscription } from 'rxjs';
     templateUrl: './browsepanel.component.html',
     styleUrls: ['./browsepanel.component.scss']
 })
-export class BrowsePanelComponent implements OnInit, OnDestroy{
+export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public layerGroupColumn: {}; /* Holds the data structures for all layers and groups */
   public layerColumn: []; /* List of layers for a certain group */
@@ -24,6 +26,8 @@ export class BrowsePanelComponent implements OnInit, OnDestroy{
   public bShowBrowsePanel = false; /* If true menu panel is open */
   public isSidebarOpen = false; /* If true sidebar is open */
   public sidebarSubscription: Subscription;
+  public layerBookmarked = {}; /* Object stores which layers are bookmarked. key is layer id, value is boolean */
+  public showOnlyBookmarked = false; /* When true only bookmarked layers are shown in the browse menu */
 
   constructor(private layerHandlerService: LayerHandlerService,
       private layerManagerService: LayerManagerService,
@@ -31,48 +35,100 @@ export class BrowsePanelComponent implements OnInit, OnDestroy{
       private uiLayerModelService: UILayerModelService,
       private filterService: FilterService,
       private sidebarService: SidebarService,
+      private userStateService: UserStateService,
+      private authService: AuthService
       ) {
   }
-  toggleSidebar() {
+
+  /**
+   * Toggle sidebar
+   */
+  public toggleSidebar() {
     this.sidebarService.toggleSidebar();
   }
+
   /**
    * Initialise Component
    */
-    public ngOnInit() {
-      const me = this;
-      this.sidebarSubscription = this.sidebarService.isSidebarOpen$.subscribe(
-        isOpen => {
-          this.isSidebarOpen = isOpen;
-        }
-      );
-      // Initialise layers and groups in sidebar
-      this.layerHandlerService.getLayerRecord().subscribe(
-        response => {
-          me.layerGroupColumn = response;
-          // Loop over each group of layers
-          for (const group in me.layerGroupColumn) {
-            // Loop over each layer in a group
-            for (let layer_idx = 0; layer_idx < me.layerGroupColumn[group].length; layer_idx++) {
-  
-              // Initialise a list of cesium layers
-              me.layerGroupColumn[group][layer_idx].csLayers = [];
-              // Initialise UILayerModel
-              const uiLayerModel = new UILayerModel(me.layerGroupColumn[group][layer_idx].id, me.renderStatusService.getStatusBSubject(me.layerGroupColumn[group][layer_idx]));
-              me.uiLayerModelService.setUILayerModel(me.layerGroupColumn[group][layer_idx].id, uiLayerModel);
-  
-            }
+  public ngOnInit() {
+    const me = this;
+    this.sidebarSubscription = this.sidebarService.isSidebarOpen$.subscribe(
+      isOpen => {
+        this.isSidebarOpen = isOpen;
+      }
+    );
+    // Initialise layers and groups in sidebar
+    this.layerHandlerService.getLayerRecord().subscribe(
+      response => {
+        me.layerGroupColumn = response;
+        // Loop over each group of layers
+        for (const group in me.layerGroupColumn) {
+          // Loop over each layer in a group
+          for (let layer_idx = 0; layer_idx < me.layerGroupColumn[group].length; layer_idx++) {
+
+            // Initialise a list of cesium layers
+            me.layerGroupColumn[group][layer_idx].csLayers = [];
+            // Initialise UILayerModel
+            const uiLayerModel = new UILayerModel(me.layerGroupColumn[group][layer_idx].id, me.renderStatusService.getStatusBSubject(me.layerGroupColumn[group][layer_idx]));
+            me.uiLayerModelService.setUILayerModel(me.layerGroupColumn[group][layer_idx].id, uiLayerModel);
           }
-          Object.keys(me.layerGroupColumn).forEach(group => {
-            me.layerGroupColumn[group].sort((a, b) => a.name.localeCompare(b.name));
-          });
-      });
-    }
-    ngOnDestroy(): void {
-        if (this.sidebarSubscription) {
-          this.sidebarSubscription.unsubscribe();
+        }
+        // Sort alphabetically by group name
+        Object.keys(me.layerGroupColumn).forEach(group => {
+          me.layerGroupColumn[group].sort((a, b) => a.name.localeCompare(b.name));
+        });
+      }
+    );
+  }
+
+  /**
+   * Called after Angular has initialised the view
+   */
+  public ngAfterViewInit() {
+    const me = this;
+    this.userStateService.getBookmarks().subscribe(bookMarkList => {
+      me.layerBookmarked = {}
+      for (const bookMark of bookMarkList) {
+        me.layerBookmarked[bookMark.fileIdentifier] = true;
+      }
+    });
+  }
+
+  /**
+   * Check is user is currently logged in
+   *
+   * @returns true if user is logged in, false otherwise
+   */
+  public isUserLoggedIn(): boolean {
+    return this.authService.isLoggedIn;
+  }
+
+  /**
+   * See whether a layer group contains a layer that has been bookmarked by the user
+   *
+   * @param layerGroupKey the key (string) of the layer group
+   * @returns true iff the layer group contains a layer that has been bookmarked, false otherwise
+   */
+  public layerGroupHasBookmarkedLayer(layerGroupKey: string): boolean {
+    if (this.layerGroupColumn.hasOwnProperty(layerGroupKey)) {;
+      for (const layer of this.layerGroupColumn[layerGroupKey]) {
+        if (this.layerBookmarked?.hasOwnProperty(layer.id) && this.layerBookmarked[layer.id]) {
+          return true;
         }
       }
+    }
+    return false;
+  }
+
+  /**
+   * Called when component destroyed
+   */
+  ngOnDestroy(): void {
+    if (this.sidebarSubscription) {
+        this.sidebarSubscription.unsubscribe();
+    }
+  }
+
   /**
    * Select a group
    * 
@@ -138,11 +194,22 @@ export class BrowsePanelComponent implements OnInit, OnDestroy{
 
   /**
    * Is this group selected?
-   * 
+   *
    * @param layerGroup group
    * @returns true if this group is selected
    */
   public isGroupSelected(layerGroup: any) {
     return this.layerColumn === layerGroup.value;
+  }
+
+  /**
+   * Checks if a layer has been bookmarked
+   *
+   * @param layerId layer id
+   * @returns boolean, true iff layer has been bookmarked
+   */
+
+  public checkLayerBookmarked(layerId: string) {
+    return this.layerBookmarked?.hasOwnProperty(layerId) && this.layerBookmarked[layerId];
   }
 }

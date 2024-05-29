@@ -1,19 +1,34 @@
 <!-- Menu toggle button -->
 <button class="btn browse-menu-button btn-auscope-primary" (click)="toggleBrowsePanel()">
     <em class="fa fa-bars" title="Browse featured layers"></em>&nbsp;Browse
+	  <em *ngIf="bShowBrowsePanel" class="fa fa-caret-up caret-icon"></em>
+	  <em *ngIf="!bShowBrowsePanel" class="fa fa-caret-down caret-icon"></em>
 </button>
 <span class="sidebar-toggle" (click)="toggleSidebar()">
-    <i class="fa fa-angle-left fa-5x" *ngIf="isSidebarOpen" title="Open active layers"></i>
+    <i class="fa fa-angle-left fa-5x" *ngIf="isSidebarOpen" title="Close active layers"></i>
     <i class="fa fa-angle-right fa-5x" *ngIf="!isSidebarOpen" title="Open active layers"></i>
 </span>
 <div *ngIf="bShowBrowsePanel" class="browse-menu">
 	<!-- Layer Groups column -->
 	<div class="container text-left browse-menu-col">
-		<a style="font-weight: bold">Featured Layer Groups</a>
+		<div style="font-weight: bold">Featured Layer Groups
+			<!-- 'Bookmarked only' check box -->
+			<div *ngIf="isUserLoggedIn()" style="display: inline-block" class="form-check">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<input class="form-check-input" type="checkbox" value="" [(ngModel)]="showOnlyBookmarked" id="showBkMarkedDefault">
+				<label class="form-check-label" for="showBkMarkedDefault">
+					Bookmarked
+				</label>
+			</div>
+		</div>
+		<!-- Layer groups -->
 		<div class="row align-items-start" *ngFor="let layerGroup of layerGroupColumn | keyvalue">
-			<div class="col" (click)="selectGroup(layerGroup)">
+			<div *ngIf="!showOnlyBookmarked || layerGroupHasBookmarkedLayer(layerGroup.key)" class="col" (click)="selectGroup(layerGroup)">
 				<a>
-					<span class="truncate-grp" [ngClass]="{'enbolden': isGroupSelected(layerGroup)}" title="{{layerGroup.key}}">{{layerGroup.key}}</span>
+					<span class="truncate-grp" [ngClass]="{'enbolden': isGroupSelected(layerGroup)}" title="{{layerGroup.key}}">
+						<i *ngIf="layerGroupHasBookmarkedLayer(layerGroup.key)" class="ti-bookmark-alt bookmark-icon" title="This layer is bookmarked"></i>
+						{{layerGroup.key}}
+					</span>
 				</a>
 			</div>
 		</div>
@@ -24,10 +39,15 @@
 		<a *ngIf="!layerColumnHeader" style="font-weight: bold">Layers</a>
 		<a *ngIf="layerColumnHeader"><span style="font-weight: bold;" class="truncate-layer">{{layerColumnHeader}} Layers</span></a>
 		<div class="row align-items-start" *ngFor="let layer of layerColumn">
-			<div class="col" (click)="selectLayer(layer)">
+			<!-- Layers -->
+			<div *ngIf="!showOnlyBookmarked || checkLayerBookmarked(layer.id)" class="col" (click)="selectLayer(layer)">
 				<a>
-					<span class="truncate-layer" [ngClass]="{'enbolden': isLayerSelected(layer)}" title="{{layer.name}}">{{layer.name}}</span>
+					<span class="truncate-layer" [ngClass]="{'enbolden': isLayerSelected(layer)}" title="{{layer.name}}">
+						<i *ngIf="checkLayerBookmarked(layer.id)" class="ti-bookmark-alt bookmark-icon" title="This layer is bookmarked"></i>
+						{{layer.name}}
+					</span>
 				</a>
+				<!-- Add layer button -->
 				<button *ngIf="isLayerSelected(layer)" style="float:right; width:6em; padding:2px" class="btn btn-sm btn-success" type="button" title="Add layer" (click)="addLayer(layer)">
 					<i class="fa fa-plus-circle"></i>
 					&nbsp;Add

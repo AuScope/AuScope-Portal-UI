@@ -45,7 +45,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
   areLayersPolygonFiltered: boolean;
 
   // User bookmarks (if logged in and stored)
-  bookmarks: Bookmark[];
+  bookmarks: Bookmark[] = [];
   showingOnlyBookmarkedLayers = false;
   isSidebarOpen = false;
 
@@ -59,17 +59,31 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
         this.areLayersPolygonFiltered = filterLayers;
       });
     }
-  toggleSidebar() {
+
+  /**
+   * Open or close sidebar
+   */
+  public toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
-    console.log(this.isSidebarOpen);
   }
-  openSidebar() {
+
+  /**
+   * Open sidebar
+   */
+  public openSidebar() {
     this.isSidebarOpen = true;
   }
 
-  closeSidebar() {
+  /**
+   * Close sidebar
+   */
+  public closeSidebar() {
     this.isSidebarOpen = false;
   }
+
+  /**
+   * Called after view is initialised
+   */
   public ngAfterViewInit() {
     const stateId = UtilitiesService.getUrlParameterByName('state');
     const me = this;
@@ -93,6 +107,16 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
       // Load state layers in corresponding FilterPanels
       this.loadFilterPanelLayersFromState(layerStateObj);
     });
+
+    // Look for bookmarks, if there are any
+    this.userStateService.getBookmarks().subscribe({
+      next: (bookMarkList: Bookmark[]) => {
+        me.bookmarks = [];
+        for (const bookMark of bookMarkList) {
+            me.bookmarks.push(bookMark);
+        }
+      }
+  });
   }
 
   /**
@@ -150,6 +174,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
 
   /**
    * Retrieve UILayerModel from the UILayerModelService
+   *
    * @param layerId ID of layer
    */
   public getUILayerModel(layerId: string): UILayerModel {
@@ -173,7 +198,8 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
   }
 
   /**
-   * Determine if a layer hsould have an opacity slider
+   * Determine if a layer should have an opacity slider
+   *
    * @param layer the layer
    * @returns true if a layer should have an opacity slider, false otherwise
    */
@@ -183,6 +209,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
 
   /**
    * Layer opacity slider change event
+   *
    * @param value slider change event
    * @param layer the layer object
    */
@@ -192,6 +219,9 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
 
   /**
    * Split buttons will only be displayed if the split map is shown and the layer has started (or completed) rendering.
+   *
+   * @param layer the layer to show buttons on
+   * @returns boolean
    */
   public getShowSplitMapButtons(layer: LayerModel): boolean {
     return this.csMapService.getSplitMapShown() &&
@@ -225,7 +255,8 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
   }
 
   /**
-   * Get the ImagerySplitrDirection of a layer as a string (template can't access SplitDirection)
+   * Get the ImagerySplitDirection of a layer as a string (template can't access SplitDirection)
+   *
    * @param layerId the ID of the layer
    */
   public getLayerSplitDirection(layerId: string): string {
@@ -253,7 +284,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
   }
 
   /**
-   * open the modal that display the status of the render
+   * Open the modal that display the status of the render
    */
    public openStatusReport(uiLayerModel: UILayerModel) {
     this.bsModalRef = this.modalService.show(NgbdModalStatusReportComponent, {class: 'modal-lg'});
@@ -299,7 +330,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
   }
 
   /**
-   * Check whether a legend is already being displayed for alyer
+   * Check whether a legend is already being displayed for layer
    *
    * @param layerId the ID of the layer
    * @returns true if a legend is being displayed for the supplied layer, false otherwise
@@ -310,6 +341,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
 
   /**
    * Event fired when a LayerModel has been been dropped after being dragged
+   *
    * @param event the CdkDragDrop event
    */
   public layerDropped(event: CdkDragDrop<LayerModel[]>) {
@@ -350,6 +382,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
 
   /**
    * Check to see if a layer is supported to be added to the map
+   *
    * @param layer layer to check
    * @returns true if supported layer, false otherwise
    */
@@ -358,7 +391,8 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
    }
 
   /**
-  * Check to see if a layer is support downloading
+  * Check to see if a layer supports downloading
+  *
   * @param layer layer to check
   * @returns true if supported layer, false otherwise
   */
@@ -402,7 +436,8 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
 
   /**
    * Returns true if any layer in a layer group is active
-   * "layerGroup" - an instance of this.layerGroups[key].value
+   * 
+   * @param layerGroupValue - an instance of this.layerGroups[key].value
    */
   public isLayerGroupActive(layerGroupValue): boolean {
     for (const layer of layerGroupValue) {
@@ -424,7 +459,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
  /**
    * Display the record information dialog
    *
-   * @param cswRecord CSW record for information
+   * @param layer layer for information
    */
   public displayRecordInformation(layer: any) {
     if (layer) {
@@ -438,6 +473,12 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
     }
   }
 
+  /**
+   * Returns true iff info panel is visible
+   *
+   * @param layerId layer id
+   * @returns true iff info panel is visible
+   */
   public isInfoPanelExpanded(layerId: string): boolean {
     if (this.getUILayerModel(layerId)) {
       return this.getUILayerModel(layerId).tabpanel.infopanel.expanded;
@@ -445,6 +486,12 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
     return false;
   }
 
+  /**
+   * Returns true iff filter panel is visible
+   * 
+   * @param layerId layer id
+   * @returns true iff filter panel is visible
+   */
   public isFilterPanelExpanded(layerId: string): boolean {
     if (this.getUILayerModel(layerId)) {
       return this.getUILayerModel(layerId).tabpanel.filterpanel.expanded;
@@ -452,6 +499,12 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
     return false;
   }
 
+  /**
+   * Returns true iff download panel is visible
+   * 
+   * @param layerId layer id
+   * @returns true iff download panel is visible
+   */
   public isDownloadPanelExpanded(layerId: string): boolean {
     if (this.getUILayerModel(layerId)) {
       return this.getUILayerModel(layerId).tabpanel.downloadpanel.expanded;
@@ -459,9 +512,9 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
     return false;
   }
 
-   /** Check is user is currently logged in
+  /** Check if user is currently logged in
    *
-   * @returns true if user is logge din, false otherwise
+   * @returns true if user is logged in, false otherwise
    */
   public isUserLoggedIn(): boolean {
     return this.authService.isLoggedIn;
@@ -499,29 +552,17 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
   }
 
   /**
-   * See whether a layer group contains a layer that has been bookmarked by the user
-   *
-   * @param layerGroupKey the key (string) of the layer group
-   * @returns true if the layer group ocntains a layer that has been bookmarked, false otherwise
-   */
-  public layerGroupHasBookmarkedLayer(layerGroupKey: string): boolean {
-    /*if (this.layerGroups[layerGroupKey]) {
-      for (const layer of this.layerGroups[layerGroupKey]) {
-        if (this.bookmarks?.find(b => b.fileIdentifier === layer.id)) {
-          return true;
-        }
-      }
-    }*/
-    return false;
-  }
-
-  /**
    * Add a layer bookmark
    *
    * @param layerId layer ID
    */
   public addLayerBookmark(layerId: string) {
+    if (this.bookmarks?.find(b => b.fileIdentifier === layerId)) {
+      return;
+    }
     this.userStateService.addBookmark(layerId);
+    const bookmark: Bookmark = { 'fileIdentifier': layerId, serviceId: ''};
+    this.bookmarks.push(bookmark);
   }
 
   /**
@@ -531,6 +572,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
    */
   public removeLayerBookmark(layerId: string) {
     this.userStateService.removeBookmark(layerId);
+    this.bookmarks = this.bookmarks?.filter(b => b.fileIdentifier !== layerId);
   }
 
 }
