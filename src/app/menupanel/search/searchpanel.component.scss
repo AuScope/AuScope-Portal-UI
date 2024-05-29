@@ -6,6 +6,7 @@
     left: 200px;
     height: 32px; // match browse button
     width: calc(100% - 400px);  // 100% of parent minus 2 x 200 for left/right margins
+    z-index: 1000;  // matches browse panel so will open over it
 }
 
 // Remove search panel if screen gets too small (< 835px)
@@ -39,7 +40,6 @@
 }
 
 .search-panel {
-    z-index: 1;
 
     .search-dropdown {
         flex: 1;
