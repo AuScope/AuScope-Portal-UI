@@ -165,8 +165,12 @@ export class SearchPanelComponent implements OnInit {
    */
   @HostListener('document:click')
   externalClick() {
-    if (!this.searchClick && this.showingResultsPanel && !this.infoDialogOpen) {
-      this.setShowingResultsPanel(false);
+    if (!this.searchClick && !this.infoDialogOpen) {
+      if (this.showingResultsPanel) {
+        this.setShowingResultsPanel(false);
+      } else if (this.showingKmlOgcOptions) {
+        this.setShowingKmlOgcOptions(false);
+      }
     }
     this.searchClick = false;
   }
