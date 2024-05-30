@@ -17,7 +17,6 @@ export class NVCLService {
    * returns the observable of "isAnalytic" variable
    */
   getAnalytic(): Observable<boolean> {
-    //console.log("[nvclservice]getAnalytic().this.isAnalytic="+this.isAnalytic.asObservable()._isScalar);
     return this.isAnalytic.asObservable();
   }
 
@@ -25,15 +24,33 @@ export class NVCLService {
    * sets the state of "isAnalytic" variable
    */
   setAnalytic(state:boolean): void {
-    //console.log("[nvclservice]setAnalytic("+state+")");
     this.isAnalytic.next(state);
   }
 
+  public isInitialScalarLoad: BehaviorSubject<boolean>; // observable used in querier to control loading of rickshaw chart
+
+  /**
+   * returns the observable of "isInitialScalarLoad" variable
+   */
+  getInitialScalarLoad(): Observable<boolean> {
+    return this.isInitialScalarLoad.asObservable();
+  }
+
+  /**
+   * sets the state of "isInitialScalarLoad" variable
+   */
+  setInitialScalarLoad(state:boolean): void {
+    this.isInitialScalarLoad.next(state);
+  }
+
+
   constructor(private http: HttpClient , @Inject(LOCAL_STORAGE) private storage: StorageService, private downloadWfsService: DownloadWfsService) {
     this.isAnalytic = new BehaviorSubject<boolean>(false);
+    this.isInitialScalarLoad = new BehaviorSubject<boolean>(false);
   }
 
   public getNVCLDatasets(serviceUrl: string, holeIdentifier: string): Observable<any> {
+
     let httpParams = new HttpParams();
     const nvclUrl = this.getNVCLDataServiceUrl(serviceUrl);
 
@@ -55,6 +72,7 @@ export class NVCLService {
   }
 
    public getNVCL2_0_Images(serviceUrl: string, datasetId: string): Observable<any> {
+    
     let httpParams = new HttpParams();
     const nvclUrl = this.getNVCLDataServiceUrl(serviceUrl);
     httpParams = httpParams.append('serviceUrl', nvclUrl);

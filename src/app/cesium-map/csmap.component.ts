@@ -507,7 +507,7 @@ export class CsMapComponent implements AfterViewInit {
    */
   private displayModal(clickCoord: { x: number, y: number, z: number } | null) {
     if (!this.modalDisplayed) {
-      this.bsModalRef = this.modalService.show(QuerierModalComponent, { class: 'modal-lg' });
+      this.bsModalRef = this.modalService.show(QuerierModalComponent, { class: 'modal-dialog-scrollable modal-dialog-centered' });
       this.modalDisplayed = true;
       this.bsModalRef.content.downloading = true;
       this.bsModalRef.content.showZoomMsg = false;
