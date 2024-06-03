@@ -1,8 +1,8 @@
-import { Inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Bookmark } from 'app/models/bookmark.model';
 import { PermanentLink } from 'app/models/permanentlink.model';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { catchError, map, take } from 'rxjs/operators';
+import { catchError, map, take, tap } from 'rxjs/operators';
 import { User } from '../../models/user.model';
 import { AuscopeApiService } from '../api/auscope-api.service';
 import { CsMapService, ManageStateService, Polygon, UtilitiesService } from '@auscope/portal-core-ui';
@@ -80,7 +80,9 @@ export class UserStateService {
    * @param layerId layer ID
    */
   public addBookmark(layerId: string) {
+    // Add bookmark to db via API
     this.apiService.addBookmark(layerId).subscribe(newBookmarkId => {
+      // Update local bookmark list
       this.bookmarks.pipe(take(1)).subscribe(currentBookmarks => {
         if (!currentBookmarks.find(b => b.fileIdentifier === layerId)) {
           const newBookmark: Bookmark = {
@@ -89,6 +91,7 @@ export class UserStateService {
             serviceId: ''
           }
           currentBookmarks.push(newBookmark);
+          this._bookmarks.next(currentBookmarks);
         }
       });
     });
@@ -103,12 +106,23 @@ export class UserStateService {
     this.bookmarks.pipe(take(1)).subscribe(currentBookmarks => {
       const bm = currentBookmarks.find(b => b.fileIdentifier === layerId);
       if (bm) {
+        // Remove bookmark from db via API
         this.apiService.removeBookmark(bm.id).subscribe(() => {
+          // Update local bookmarks list
           const newBookmarks = currentBookmarks.filter(b => b.id !== bm.id);
           this._bookmarks.next(newBookmarks);
         });
       }
     });
+  }
+
+  /**
+   * Gets bookmarks
+   *
+   * @returns observable of bookmark list
+   */
+  public getBookmarks(): Observable<Bookmark[]> {
+    return this.bookmarks;
   }
 
   /**
