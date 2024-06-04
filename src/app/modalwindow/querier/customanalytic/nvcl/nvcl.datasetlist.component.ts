@@ -92,6 +92,13 @@ export class NVCLDatasetListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if(!(this.featureId)) {
+      return;
+    };
+    if(!(this.onlineResource.url)) {
+      return;
+    }
+
     this.nvclService.getNVCLDatasets(this.onlineResource.url, this.featureId).subscribe(result => {
       for (const nvclDataset of result) {
         nvclDataset.image = true;
@@ -104,7 +111,6 @@ export class NVCLDatasetListComponent implements OnInit {
         this._getNVCLImage(this.onlineResource.url, nvclDataset.datasetId, null);
         this._getNVCLScalar(this.onlineResource.url, nvclDataset.datasetId);
         this.isCachedTSGFileAvailable(nvclDataset);
-
         this.nvclDatasets.push(nvclDataset);
       }
       if (result.length === 0) {
