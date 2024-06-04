@@ -30,7 +30,7 @@ export class NVCLService {
   public isInitialScalarLoad: BehaviorSubject<boolean>; // observable used in querier to control loading of rickshaw chart
 
   /**
-   * returns the observable of "isInitialScalarLoad" variable
+   * returns the observable of the "isInitialScalarLoad" variable
    */
   getInitialScalarLoad(): Observable<boolean> {
     return this.isInitialScalarLoad.asObservable();

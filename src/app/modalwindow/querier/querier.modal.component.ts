@@ -204,7 +204,6 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
      */
     this.nvclService.getAnalytic().subscribe((result) => {
       this.flagNVCLAnalytic = result;
-      console.log("[getAnalytic]flagNVCLAnalytic"+this.flagNVCLAnalytic);
       // Calling this to update the UI
       this.onDataChange();
     });
@@ -1009,8 +1008,11 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     }
     this.selectedLayer = this.getAbbr(doc.layer.name, " ");
     this.buttonEnabled = "disabled";
+
     // should we check flagNVCLAnalytic ?
-    if (this.selectedLayer == "NVCLV-2.0") { console.log("[updateDropDownButtonText]flagNVCLAnalytic"+this.flagNVCLAnalytic); this.buttonEnabled = "enabled"; }
+    if (this.selectedLayer == "NVCLV-2.0") { 
+      this.buttonEnabled = "enabled";
+    }
 
     this.selectedToolTip = doc.layer.name + ":" + this.selectedFeature;
 

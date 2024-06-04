@@ -150,7 +150,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
         InfoPanelSubComponent,
         CsMapSplitComponent,
         CsMapZoomComponent,
-        QuerierModalComponent,
+        QuerierModalComponent, 
         DynamicAnalyticComponent,
         NVCLDatasetListComponent,
         NVCLDatasetListDialogComponent,

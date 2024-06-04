@@ -36,8 +36,7 @@
 						<!-- Add definition -->
 						<div style="width:500px;height:10px;overflow-wrap:break-word;">{{tipScalarDefinition}}</div>
 						<button class="float-right btn btn-lg btn-primary" mat-stroked-button
-							(click)="openLegend(nvclDataset.datasetId)" [disabled]="selectedScalar===null">Show
-							Legend</button>
+							(click)="openLegend(nvclDataset.datasetId)" [disabled]="selectedScalar===null">Show Legend</button>
 						<ng-select *ngIf="nvclDataset.datasetId" style="z-index:10000;"
 							[items]="datasetScalars[nvclDataset.datasetId]" [multiple]="false" bindLabel="logName"
 							bindValue="logId" placeholder="Select Scalar"
