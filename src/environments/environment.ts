@@ -14,7 +14,6 @@ export const environment = {
   production: false,
   getCSWRecordEndP: 'getKnownLayers.do',
   portalBaseUrl: 'http://localhost:8080/api/',
-  //portalBaseUrl: 'https://portal.auscope.org.au/api/',
   portalProxyUrl: '/api/',
   authBaseUrl: 'http://localhost:8080/api/',
   hostUrl: 'http://localhost:4200',
