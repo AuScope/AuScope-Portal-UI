@@ -190,7 +190,8 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     this.renderer.setStyle(parentElement, 'overflow', 'auto');
     //this.renderer.setStyle(parentElement, 'top', '10px');
     this.renderer.setStyle(parentElement, 'width', '900px');
-    //this.renderer.setStyle(parentElement, 'min-height', '400px');
+    this.renderer.setStyle(parentElement, 'min-height', '600px');
+    //this.renderer.setStyle(parentElement, 'height', '600px');
     //this.renderer.setStyle(parentElement, 'left', (left - 900) / 2 + 'px');
     //this.renderer.setStyle(parentElement, 'left', '100px');
     // this.renderer.setStyle(parentElement, 'height', height*0.8  + 'px');
