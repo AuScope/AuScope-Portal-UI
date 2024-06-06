@@ -100,6 +100,11 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
    * @returns true if user is logged in, false otherwise
    */
   public isUserLoggedIn(): boolean {
+    // If the user logs out showOnlyBookmarked doesn't get reset.
+    // TODO: Whether to show bookmarks should probably be in a service, but this will work for the short term
+    if (!this.authService.isLoggedIn) {
+      this.showOnlyBookmarked = false;
+    }
     return this.authService.isLoggedIn;
   }
 
