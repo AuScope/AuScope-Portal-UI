@@ -1,5 +1,6 @@
 <!-- Modal for querier-->
 <style>
+
 	.modal-header {
 		border-width: 0;
 		/* height: 50px; */
@@ -7,20 +8,19 @@
 		display: block;
 	}
 
+	/*
 	.modal-footer {
 		height: 10vh;
 		display: none;
-		/*
 		position: absolute;
 		bottom: 0;
 		width: 100%;
 		z-index: 99;
-		*/
 	}
-
+		*/
 	.modal-body {
-		height: 60vh; 
-		overflow-y: auto
+		height: 60vh;
+		overflow-y: auto;
 	}
 
 	.right-modal {
@@ -129,93 +129,102 @@
 		position: absolute;
 		top: 0;
 	}
+
+	.alertHeading {
+		padding: 10px;
+		margin-bottom: 10px;
+		border: 1px solid transparent;
+		border-radius: 4px;
+	}
 </style>
 
 <div id="featureInfo" cdkDrag cdkDragRootElement=".modal-content" #childElement cdkDragBoundary="body"
-	bsModalRef="bsModalRef">
-	<div class="modal-header" cdkDragHandle>
-		<div style="display:flex">
-			<div id="startContainer" class="alert alert-success" role="alert">
-				<h4 class="alert-heading">Feature Information</h4>
+	bsModalRef="bsModalRef" >
+</div>
+<div class="modal-header" cdkDragHandle [hidden]="!modalVisible">
+	<div style="display:flex">
+		<div id="startContainer" class="alertHeading alert-success">
+			<h4 class="alert-heading">Feature Information</h4>
+		</div>
+		<div id="middleContainer">
+			<p class="tip-info">Tip: Drag the "Feature Information" header to move this window. Resize by
+				dragging
+				the
+				bottom right corner.
+			</p>
+		</div>
+		<div id="endContainer">
+			<button type="button" class="close" (click)="bsModalRef.hide()" title="Close" aria-label="Close">
+				<span aria-hidden="true" class="closeBtn">&times;</span>
+			</button>
+		</div>
+	</div>
+	<div class="toolbar-header">
+		<div class="rowFeature">
+			<div class="btn-group">
+				<button type="button" class="btn btn-primary" title="{{selectedToolTip}}"
+					data-data-toggle-second="tooltip" *ngIf="selectedLayer" (click)="wfs();">
+					<span>{{selectedLayer}}</span><br />
+					<span>{{selectedFeature}}</span>
+				</button>
+				<button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+					data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<span class="sr-only">Toggle Dropdown</span>
+				</button>
+				<ul class="dropdown-menu">
+					<li active *ngFor="let doc of docs; let i = index;">
+						<a class="dropdown-item"
+							(click)="wfs();updateDropDownButtonText(doc);currentIndex=index;currentDoc=doc;currentDoc.analytic=false;currentDoc.home=true;transformToHtml(currentDoc,i);getNVCL();"
+							*ngIf="doc.node_name !== null" data-toggle="collapse">
+							<div *ngIf="doc.node_name">
+								{{doc.layer.name}}{{doc.node_name ? ': ' + doc.node_name : ''}}
+							</div>
+							<div *ngIf="!doc.node_name && doc.key">
+								{{doc.layer.name}}{{doc.key ? ': ' + doc.key : ''}}
+							</div>
+						</a>
+					</li>
+				</ul>
 			</div>
-			<div id="middleContainer">
-				<p class="tip-info">Tip: Drag the "Feature Information" header to move this window. Resize by
-					dragging
-					the
-					bottom right corner.
-				</p>
+			<div>
+				<button class="btn btnFeature btn-primary {{buttonEnabled}}"
+					(click)="currentDoc.home=false;currentDoc.analytic=true;image();">
+					<span class="btnSpan">Image</span>
+				</button>
 			</div>
-			<div id="endContainer">
-				<button type="button" class="close" (click)="bsModalRef.hide()" title="Close" aria-label="Close">
-					<span aria-hidden="true" class="closeBtn">&times;</span>
+			<div>
+				<button class="btn btnFeature btn-primary {{buttonEnabled}}"
+					(click)="currentDoc.home=false;currentDoc.analytic=true;onDataChange();scalar();onDataChange();">
+					<span class="btnSpan">Scalar</span>
+				</button>
+			</div>
+			<div>
+				<button class="btn btnFeature btn-primary {{buttonEnabled}}"
+					(click)="currentDoc.home=false;currentDoc.analytic=true;onDataChange();getNVCL();download();onDataChange();">
+					<span class="btnSpan">Download</span>
 				</button>
 			</div>
 		</div>
-		<div class="toolbar-header">
-			<div class="rowFeature">
-				<div class="btn-group">
-					<button type="button" class="btn btn-primary" title="{{selectedToolTip}}"
-						data-data-toggle-second="tooltip" *ngIf="selectedLayer" (click)="wfs();">
-						<span>{{selectedLayer}}</span><br />
-						<span>{{selectedFeature}}</span>
-					</button>
-					<button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
-						data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						<span class="sr-only">Toggle Dropdown</span>
-					</button>
-					<ul class="dropdown-menu">
-						<li active *ngFor="let doc of docs; let i = index;">
-							<a class="dropdown-item"
-								(click)="wfs();updateDropDownButtonText(doc);currentIndex=index;currentDoc=doc;currentDoc.analytic=false;currentDoc.home=true;transformToHtml(currentDoc,i);getNVCL();"
-								*ngIf="doc.node_name !== null" data-toggle="collapse">
-								<div *ngIf="doc.node_name">
-									{{doc.layer.name}}{{doc.node_name ? ': ' + doc.node_name : ''}}
-								</div>
-								<div *ngIf="!doc.node_name && doc.key">
-									{{doc.layer.name}}{{doc.key ? ': ' + doc.key : ''}}
-								</div>
-							</a>
-						</li>
-					</ul>
-				</div>
-				<div>
-					<button class="btn btnFeature btn-primary {{buttonEnabled}}"
-						(click)="currentDoc.home=false;currentDoc.analytic=true;image();">
-						<span class="btnSpan">Image</span>
-					</button>
-				</div>
-				<div>
-					<button class="btn btnFeature btn-primary {{buttonEnabled}}"
-						(click)="currentDoc.home=false;currentDoc.analytic=true;onDataChange();scalar();onDataChange();">
-						<span class="btnSpan">Scalar</span>
-					</button>
-				</div>
-				<div>
-					<button class="btn btnFeature btn-primary {{buttonEnabled}}"
-						(click)="currentDoc.home=false;currentDoc.analytic=true;onDataChange();getNVCL();download();onDataChange();">
-						<span class="btnSpan">Download</span>
-					</button>
-				</div>
-			</div>
-			<script>
-				$('[data-toggle-second="tooltip"]').tooltip();
+		<script>
+			$('[data-toggle-second="tooltip"]').tooltip();
 
-				$("#legendModal").on("hidden.bs.modal", function () {
-					openLegend(nvclDatasetId)
-				});
-				/*
-				$(".modal").on('show.bs.modal', function (event) {
-					$('html').addClass('no-scroll');
-				})
-				$(".modal").on('hide.bs.modal', function (event) {
-					$('html').removeClass('no-scroll');
-				})
-				*/
-			</script>
+			$("#legendModal").on("hidden.bs.modal", function () {
+				openLegend(nvclDatasetId)
+			});
+			/*
+			$(".modal").on('show.bs.modal', function (event) {
+				$('html').addClass('no-scroll');
+			})
+			$(".modal").on('hide.bs.modal', function (event) {
+				$('html').removeClass('no-scroll');
+			})
+			*/
+		</script>
 
-		</div>
 	</div>
+</div>
 
+<div style="display:flex">
 	<div id="wfs_tab" [hidden]="!wfs_tab">
 		<div *ngIf="wfs_tab">
 			<div *ngIf="list">
@@ -618,9 +627,9 @@
 			</div>
 		</div>
 	</div>
-
+	<!--
 	<div class="modal-footer">
 		<button type="button" class="btn btn-primary" (click)="bsModalRef.hide()">Close</button>
 	</div>
-
+	-->
 </div>

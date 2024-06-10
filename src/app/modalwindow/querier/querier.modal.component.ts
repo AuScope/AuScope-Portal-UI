@@ -35,22 +35,7 @@ interface FlatNode {
   selector: 'app-querier-modal-window',
   templateUrl: './querier.modal.component.html',
   providers: [RickshawService, NVCLBoreholeAnalyticService],
-  styleUrls: ['../modalwindow.scss'],
-  animations: [
-    trigger('slideInOut', [
-      transition(':enter', [
-        style({ transform: 'translateX(-100%)' }),
-        animate('5000ms ease-in', style({ transform: 'translateX(0%)' }))
-      ]),
-      transition(':leave', [
-        animate('5000ms ease-in', style({ transform: 'translateX(-100%)' }))
-      ])
-      /*
-      transition(':enter', [style({ width: 0 }), animate(500)]),
-      transition(':leave', [animate(500, style({ width: 0 }))])
-      */
-    ])
-  ]
+  styleUrls: ['../modalwindow.scss']
 })
 
 export class QuerierModalComponent implements OnInit, AfterViewInit {
@@ -165,6 +150,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   private screenWidth: number;
   listingdata: any;
   public initialScalarLoad = true;
+  public modalVisible = true;
 
   constructor(public nvclService: NVCLService, public bsModalRef: BsModalRef, public csClipboardService: CsClipboardService,
     private manageStateService: ManageStateService, private gmlParserService: GMLParserService,
@@ -180,7 +166,8 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   }
   
   ngAfterViewInit(): void {
-    const parentElement = this.childElement.nativeElement.parentElement.parentElement;
+    //const parentElement = this.childElement.nativeElement.parentElement.parentElement;
+    const parentElement = this.childElement.nativeElement.parentElement;
 
     //const left = this.screenWidth
 
@@ -191,6 +178,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     //this.renderer.setStyle(parentElement, 'top', '10px');
     this.renderer.setStyle(parentElement, 'width', '900px');
     this.renderer.setStyle(parentElement, 'min-height', '600px');
+    //this.renderer.setStyle(parentElement, 'display', 'none');
     //this.renderer.setStyle(parentElement, 'height', '600px');
     //this.renderer.setStyle(parentElement, 'left', (left - 900) / 2 + 'px');
     //this.renderer.setStyle(parentElement, 'left', '100px');
@@ -216,8 +204,19 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
       this.onDataChange();
     });
 
-
     this.nvclService.getNVCL2_0_Images
+
+    /*
+    the following are needed to prevent an "artifact" showing when the active layers panel is showing
+    and then slides out of the way - i.e. the header of the modal for Feature Informatio displays at
+    the bottom of the layers panel
+    */
+    this.modalService.onHide.subscribe(reason => {
+      this.modalVisible = false;
+    })
+    this.modalService.onShow.subscribe(reason => {
+      this.modalVisible = true;
+    })
   }
   /*
     @HostListener('window:resize', ['$event']) onResize(event) {
@@ -1065,10 +1064,6 @@ export class QuerierDialogComponent {
   scalarClasses: any;
 
   constructor(public BsModalRef: BsModalRef) { }
-  close() {
-    document.getElementsByClassName("animate__animated")[0].classList.remove("animate__slideInLeft")
-    document.getElementsByClassName("animate__animated")[0].classList.add("animate__slideOutRight");
-  }
 
 }
 
