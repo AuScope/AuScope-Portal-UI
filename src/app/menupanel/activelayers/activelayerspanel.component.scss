@@ -1,4 +1,4 @@
-@import '../../globals';
+@import 'app/globals';
 
 :host {
   .filter-text {
@@ -150,8 +150,10 @@
 }
 
 .cdk-drag-preview {
-  background-color: #6764ce;
-  //color: #d8d9d7;
+  background-color: $auscope-shoots-green;
+  height: 100px !important;
+  display: flex;
+  flex-direction: column;
   box-sizing: border-box;
   border: 1px solid white;
   border-radius: 4px;
@@ -176,7 +178,7 @@
     display: block;
     position: relative;
     font-size: larger;
-    top: 3rem;
+    top: 20px;
   }
 
 }
