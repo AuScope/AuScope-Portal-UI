@@ -7,20 +7,19 @@
 		display: block;
 	}
 
+	/*
 	.modal-footer {
 		height: 10vh;
 		display: none;
-		/*
 		position: absolute;
 		bottom: 0;
 		width: 100%;
 		z-index: 99;
-		*/
 	}
-
+		*/
 	.modal-body {
-		height: 60vh; 
-		overflow-y: auto
+		height: 60vh;
+		overflow-y: auto;
 	}
 
 	.right-modal {
@@ -129,13 +128,20 @@
 		position: absolute;
 		top: 0;
 	}
+
+	.alertHeading {
+		padding: 10px;
+		margin-bottom: 10px;
+		border: 1px solid transparent;
+		border-radius: 4px;
+	}
 </style>
 
 <div id="featureInfo" cdkDrag cdkDragRootElement=".modal-content" #childElement cdkDragBoundary="body"
 	bsModalRef="bsModalRef">
-	<div class="modal-header" cdkDragHandle>
+	<div class="modal-header" cdkDragHandle [hidden]="!modalVisible">
 		<div style="display:flex">
-			<div id="startContainer" class="alert alert-success" role="alert">
+			<div id="startContainer" class="alertHeading alert-success">
 				<h4 class="alert-heading">Feature Information</h4>
 			</div>
 			<div id="middleContainer">
@@ -618,9 +624,9 @@
 			</div>
 		</div>
 	</div>
-
+	<!--
 	<div class="modal-footer">
 		<button type="button" class="btn btn-primary" (click)="bsModalRef.hide()">Close</button>
 	</div>
-
+	-->
 </div>
