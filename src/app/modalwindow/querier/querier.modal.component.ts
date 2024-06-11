@@ -167,7 +167,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   
   ngAfterViewInit(): void {
     const parentElement = this.childElement.nativeElement.parentElement.parentElement;
-    //const parentElement = this.childElement.nativeElement.parentElement;
+    //const parentElement2 = this.childElement.nativeElement.parentElement;
 
     //const left = this.screenWidth
 
