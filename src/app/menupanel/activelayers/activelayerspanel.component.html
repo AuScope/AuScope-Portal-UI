@@ -12,7 +12,7 @@
                     <i style="margin-left: 0;" class="ti-exchange-vertical" title="Drag to reorder"></i>
                 </div>
                 <!-- Title, loader spinner and delete button -->
-                <div class="activeLayerTitle">{{ layer.name }}</div>
+                <div class="activeLayerTitle" title="{{ layer.name }}">{{ layer.name }}</div>
                 <span style="margin-left: auto;" *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="project-percentage hasEvent light-blue">
                     <i *ngIf="!getUILayerModel(layer.id).statusMap.getRenderComplete()" class="fa fa-spin fa-spinner"></i>
                     <i *ngIf="getUILayerModel(layer.id).statusMap.getContainsError()" class="fa fa-warning text-warning"></i>

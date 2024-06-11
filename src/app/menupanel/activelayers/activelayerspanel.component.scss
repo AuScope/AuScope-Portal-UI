@@ -103,6 +103,8 @@
     .activeLayerTitle {
       font-size: 1.1rem;
       margin-right: 2px;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
   }
 
