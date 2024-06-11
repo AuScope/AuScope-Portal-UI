@@ -1,4 +1,4 @@
-@import '../../globals';
+@import 'app/globals';
 :host {
     margin-left: auto;
 }
@@ -26,6 +26,10 @@
 
 .user-menu:hover {
     color: $text-highlight-colour;
+}
+
+.svg-purple-colour {
+    filter: invert(56%) sepia(17%) saturate(758%) hue-rotate(204deg) brightness(87%) contrast(86%);
 }
 
 ::ng-deep {
