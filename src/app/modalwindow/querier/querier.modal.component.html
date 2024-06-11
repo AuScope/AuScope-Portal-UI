@@ -163,7 +163,13 @@
 					<button type="button" class="btn btn-primary" title="{{selectedToolTip}}"
 						data-data-toggle-second="tooltip" *ngIf="selectedLayer" (click)="wfs();">
 						<span>{{selectedLayer}}</span><br />
-						<span>{{selectedFeature}}</span>
+						<span style="
+                            display: inline-block;
+                            max-width: 200px;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        ">{{selectedFeature}}</span>
 					</button>
 					<button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
 						data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -243,7 +249,7 @@
 								</div>
 							</div>
 						</div>
-						<mat-tree *ngIf="flatTreeDataSource[currentDoc.key]"
+						<mat-tree style="margin-top: 20px;" *ngIf="flatTreeDataSource[currentDoc.key]"
 							[dataSource]="flatTreeDataSource[currentDoc.key]"
 							[treeControl]="flatTreeControl[currentDoc.key]">
 							<dl>
