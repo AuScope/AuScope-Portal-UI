@@ -5,10 +5,10 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { MSCLAnalyticComponent } from '../../../layeranalytic/mscl/mscl.analytic.component';
 
 @Component({
-  selector: 'app-mscl',
-  templateUrl: './mscl.component.html',
-  styleUrls: ['./mscl.component.scss'],
-  providers: [MSCLService]
+    selector: 'app-mscl',
+    templateUrl: './mscl.component.html',
+    styleUrls: ['./mscl.component.scss'],
+    providers: [MSCLService]
 })
 export class MSCLComponent implements OnInit {
 
@@ -18,10 +18,10 @@ export class MSCLComponent implements OnInit {
     @Input() doc: QuerierInfoModel;
 
     public msclform: { startDepth: number, endDepth: number, bMetric: {}, bGroup: {} }; // Used to store form data
-                       // startDepth = start depth
-                       // endDepth = end depth
-                       // bMetric = metric tickbox, dict: key is printable name, val is boolean
-                       // bGroup = group metric tickbox, dict: key is printable name, val is boolean
+    // startDepth = start depth
+    // endDepth = end depth
+    // bMetric = metric tickbox, dict: key is printable name, val is boolean
+    // bGroup = group metric tickbox, dict: key is printable name, val is boolean
 
     public metricPNameList: string[];  // Printable list of all selectable metrics
     public metricGroupList: string[]; // List of selectable group names
@@ -56,7 +56,7 @@ export class MSCLComponent implements OnInit {
         } else {
             const searchResult = /<gsmlp:datasetProperties>[a-z_,]*<\/gsmlp:datasetProperties>/.exec(this.doc.raw);
             if (searchResult) {
-                const metricsStr = searchResult.toString(); 
+                const metricsStr = searchResult.toString();
                 // Remove tags at ends and convert to a list
                 metricList = metricsStr.substring(25, metricsStr.length - 26).split(",");
             }
@@ -127,10 +127,13 @@ export class MSCLComponent implements OnInit {
                     'featureId': this.featureId,
                     'closeGraphModal': this.closeGraphModal.bind(this),
                     'serviceUrl': this.onlineResource.url,
-                    'usesGMLObs': this.usesGMLObs
+                    'usesGMLObs': this.usesGMLObs,
                 }
             });
             this.modalDisplayed = true;
+            this.bsModalRef.onHide.subscribe(reason => {
+                console.log("[mscl.component.ngOnInit]bsModalRef.onHide().reason:", reason);
+            })
         }
         this.changeDetectorRef.detectChanges();
     }

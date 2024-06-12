@@ -34,6 +34,14 @@ export class DynamicAnalyticComponent {
     }
   }
 
+
+ngOnChanges() {
+  // Show Value from Parent
+  if (this._load) {
+    this.loadComponent();
+  }
+}
+
   loadComponent() {
 
     const viewContainerRef = this.dynamicAnalyticHost
@@ -60,6 +68,7 @@ export class DynamicAnalyticComponent {
     (<MSCLComponent>componentRef.instance).onlineResource = this.onlineResource;
     (<MSCLComponent>componentRef.instance).featureId = this.featureId;
     (<MSCLComponent>componentRef.instance).doc = this.doc;
+
 
     this.changeDetectorRef.detectChanges();
 
