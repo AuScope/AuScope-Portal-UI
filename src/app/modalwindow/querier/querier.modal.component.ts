@@ -108,6 +108,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   public image_tab: boolean = false;
   public scalar_tab: boolean = false;
   public download_tab: boolean = false;
+  public analytic_tab: boolean = false;
 
   // Show a message to zoom in
   public showZoomMsg = false;
@@ -164,7 +165,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     this.initialScalarLoad = true;
     this.screenWidth = window.innerWidth;
   }
-  
+
   ngAfterViewInit(): void {
     const parentElement = this.childElement.nativeElement.parentElement.parentElement;
     //const parentElement2 = this.childElement.nativeElement.parentElement;
@@ -203,20 +204,23 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
       // Calling this to update the UI
       this.onDataChange();
     });
-
-    this.nvclService.getNVCL2_0_Images
-
     /*
     the following are needed to prevent an "artifact" showing when the active layers panel is showing
     and then slides out of the way - i.e. the header of the modal for Feature Informatio displays at
     the bottom of the layers panel
     */
     this.modalService.onHide.subscribe(reason => {
-      this.modalVisible = false;
+      /* modal close event has cascaded down; most liekly from the MSCL popup modal */
+      if (!reason.initialState) {
+        this.modalVisible = false;
+      }
     })
     this.modalService.onShow.subscribe(reason => {
       this.modalVisible = true;
     })
+
+    this.nvclService.getNVCL2_0_Images
+
   }
   /*
     @HostListener('window:resize', ['$event']) onResize(event) {
@@ -298,7 +302,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
         } else {
           this.nvclService.setAnalytic(true);
         }
-      }  else {
+      } else {
         console.error("[getNVCLDatasets] subscribe iterable error: result", result);
       }
     },
@@ -923,6 +927,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     this.image_tab = false;
     this.scalar_tab = false;
     this.download_tab = false;
+    this.analytic_tab = false;
   }
 
 
@@ -953,6 +958,16 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     this.download_tab = true;
   }
 
+  public analytic() {
+    //if (this.buttonEnabled != "enabled") { return }
+    this.wfs_tab = false;
+    this.image_tab = false;
+    this.scalar_tab = false;
+    this.download_tab = false;
+    this.analytic_tab = true;
+
+    this.changeDetectorRef.detectChanges();
+  }
 
   public setScalarLoaded(state: boolean) {
     this.scalarLoaded = state;
@@ -1010,7 +1025,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     this.buttonEnabled = "disabled";
 
     // should we check flagNVCLAnalytic ?
-    if (this.selectedLayer == "NVCLV-2.0") { 
+    if (this.selectedLayer == "NVCLV-2.0") {
       this.buttonEnabled = "enabled";
     }
 
