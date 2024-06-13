@@ -244,7 +244,6 @@ export const config = {
     'tima-shrimp-geosample',
     'mscl-borehole',
     'mscl-gssa-borehole',
-    'pressuredb-borehole',
     'sf0-borehole-nvcl'
   ],
   clipboard: {

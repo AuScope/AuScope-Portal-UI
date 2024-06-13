@@ -223,6 +223,13 @@
 						<span class="btnSpan">Download</span>
 					</button>
 				</div>
+				<div>
+					<!-- {{hasMsclAnalytics}} -->
+					<button class="btn btnFeature btn-primary"
+						(click)="analytic();currentDoc.home=false;currentDoc.analytic=true;">
+						<span class="btnSpan">Analytic</span>
+					</button>
+				</div>
 			</div>
 			<script>
 				$('[data-toggle-second="tooltip"]').tooltip();
@@ -302,6 +309,24 @@
 							</dl>
 						</mat-tree>
 					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div id="analytic_tab" [hidden]="!analytic_tab">
+		<div *ngIf="analytic_tab">
+			<div *ngIf="currentDoc">
+				<div class="modal-body">
+					<!-- Content of Analytics Tab -->
+					<div *ngIf="analyticMap[currentDoc.layer.id] || hasMsclAnalytics" class="tab-pane fade"
+						[ngClass]="{'active show':true}" id="{{currentDoc.key}}-analytic-tab">
+						<app-custom-analytic [layer]="currentDoc.layer" [load]="currentDoc.loadSubComponent"
+							[onlineResource]="currentDoc.onlineResource" [featureId]="currentDoc.key"
+							[doc]="currentDoc"></app-custom-analytic>
+					</div>
+
 				</div>
 			</div>
 		</div>
