@@ -408,11 +408,24 @@ export class DownloadPanelComponent implements OnInit {
   }
 
   /**
+   * Use the rules present in the button options to determine if download button should be enabled
+   */
+  downloadButtonEnabled(): boolean {
+    if (this.bbox || (this.bbox && this.irisDownloadListOption) ||
+        (this.polygonFilter && this.isPolygonSupportedLayer) ||
+        ((this.bbox || this.polygonFilter) && this.isWCSDownloadSupported) ||
+        this.isTsgDownloadAvailable) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
    * Download the layer
    */
   public download(): void {
     if (this.downloadStarted) {
-      alert('Download in progress, please wait for it to completed');
+      alert('Download in progress, please wait for it to complete');
       return;
     }
     let observableResponse = null;
@@ -421,24 +434,24 @@ export class DownloadPanelComponent implements OnInit {
     // WCS download
     if (this.isWCSDownloadSupported) {
       if (!this.bbox || UtilitiesService.isEmpty(this.wcsDownloadForm)) {
-        alert('Required information missing. Make sure you have selected an area, crs and format for download');
+        alert('Required information missing. Make sure you have selected an area, crs and format for download.');
         return;
       }
       // Check that input values were selected
       if (this.wcsDownloadForm.inputCrs === this.SELECT_DEFAULT_REF_SYSTEM) {
-        alert('Cannot download. A reference system value has not been selected');
+        alert('Cannot download. A reference system value has not been selected.');
         return;
       }
       if (this.wcsDownloadForm.downloadFormat === this.SELECT_DEFAULT_DOWNLOAD_FMT) {
-        alert('Cannot download. A download format has not been selected');
+        alert('Cannot download. A download format has not been selected.');
         return;
       }
       if (this.wcsDownloadForm.outputCrs === this.SELECT_DEFAULT_OUTPUT_CRS) {
-        alert('Cannot download. An output CRS has not been selected');
+        alert('Cannot download. An output CRS has not been selected.');
         return;
       }
       if (this.wcsDownloadListOption.timePositionList.length > 0 && this.wcsDownloadForm.timePosition === this.SELECT_DEFAULT_TIME_POS) {
-        alert('Cannot download. A time position value has not been selected');
+        alert('Cannot download. A time position value has not been selected.');
         return;
       }
 
@@ -457,6 +470,11 @@ export class DownloadPanelComponent implements OnInit {
 
     // Download IRIS datasets by constructing a data download URL. User can select the either Dataselect or Station
     } else if (this.irisDownloadListOption) {
+      // IRIS requires a bbox be present
+      if (!this.bbox) {
+        alert('Cannot download. Make sure you select a bounding box.');
+        return;
+      }
       this.downloadStarted = true;
 
       let start = (this.irisDownloadListOption.dateFrom !== null && this.irisDownloadListOption.dateFrom !== '') ? new Date(new Date(this.irisDownloadListOption.dateFrom)).toISOString() : null;

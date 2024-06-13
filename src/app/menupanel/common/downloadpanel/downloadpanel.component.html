@@ -89,14 +89,15 @@
 		</div>
 
 		<!-- Download options for bounds, polygon or all (if irisDownloadListOption) -->
-		<div *ngIf="bbox || polygonFilter || irisDownloadListOption" class="d-inline-block" ngbDropdown>
-			<button type="button" class="btn btn-primary btn-xs" [disabled]="drawPolygonStarted || drawBoundsStarted || downloadStarted || download4pStarted || download4PolygonKMLStarted" title="Download data" ngbDropdownToggle>
+		<div *ngIf="downloadButtonEnabled()" class="d-inline-block" ngbDropdown>
+			<button type="button" class="btn btn-primary btn-xs" [disabled]="drawBoundsStarted || downloadStarted || download4pStarted || download4PolygonKMLStarted" title="Download data" ngbDropdownToggle>
 				<i *ngIf="downloadStarted || download4pStarted || download4PolygonKMLStarted" class="fa fa-spinner fa-spin fa-fw"></i>
 				<i *ngIf="!downloadStarted && !download4pStarted && !download4PolygonKML" class="fa fa-cloud-download"></i>&nbsp;Download
 			</button>
 			<div ngbDropdownMenu>
+				<!-- Note: If you add or modify conditions here, be sure to update the downloadButtonEnabled() method -->
 				<button *ngIf="bbox || irisDownloadListOption" title="Download data" (click)="download()" ngbDropdownItem>Download Data</button>
-				<button *ngIf="polygonFilter" title="Download data" (click)="download4Polygon()" ngbDropdownItem>Download Data</button>
+				<button *ngIf="polygonFilter && isPolygonSupportedLayer" title="Download data" (click)="download4Polygon()" ngbDropdownItem>Download Data</button>
 				<button *ngIf="(bbox || polygonFilter) && isWCSDownloadSupported" title="Download as KML. GoogleMap's maximum KML size is 5M!" (click)="download4PolygonKML()" ngbDropdownItem>Download KML</button>
 				<button *ngIf="isTsgDownloadAvailable" title="Download TSG files" (click)="popupTSGDownload()" ngbDropdownItem>Download TSG Files</button>
 			</div>
