@@ -2,8 +2,8 @@
 <style>
 	.modal-header {
 		border-width: 0;
-		/* height: 50px; */
 		height: 15vh;
+		overflow-y: visible;
 		display: block;
 	}
 
@@ -123,10 +123,12 @@
 
 	.closeBtn {
 		font-weight: 900;
+		font-size: 30px;
 		color: red;
 		display: block;
 		position: absolute;
 		top: 0;
+		right: 5px;
 	}
 
 	.alertHeading {
@@ -138,7 +140,7 @@
 </style>
 
 <div id="featureInfo" cdkDrag cdkDragRootElement=".modal-content" #childElement cdkDragBoundary="body"
-	bsModalRef="bsModalRef">
+	bsModalRef="bsModalRef" style="overflow-x: clip;">
 	<div class="modal-header" cdkDragHandle [hidden]="!modalVisible">
 		<div style="display:flex">
 			<div id="startContainer" class="alertHeading alert-success">
@@ -159,6 +161,8 @@
 		</div>
 		<div class="toolbar-header">
 			<div class="rowFeature">
+
+				<!-- Feature tab button -->
 				<div class="btn-group">
 					<button type="button" class="btn btn-primary" title="{{selectedToolTip}}"
 						data-data-toggle-second="tooltip" *ngIf="selectedLayer" (click)="wfs();">
@@ -176,10 +180,11 @@
 						<span class="sr-only">Toggle Dropdown</span>
 					</button>
 					<ul class="dropdown-menu">
+						<!-- For layers that are derived from XML feature data -->
 						<li active *ngFor="let doc of docs; let i = index;">
 							<a class="dropdown-item"
-								(click)="wfs();updateDropDownButtonText(doc);currentIndex=index;currentDoc=doc;currentDoc.analytic=false;currentDoc.home=true;transformToHtml(currentDoc,i);getNVCL();"
-								*ngIf="doc.node_name !== null" data-toggle="collapse">
+								(click)="setWFS(doc, i);"
+								*ngIf="i < 10 && doc.node_name !== null" data-toggle="collapse">
 								<div *ngIf="doc.node_name">
 									{{doc.layer.name}}{{doc.node_name ? ': ' + doc.node_name : ''}}
 								</div>
@@ -188,22 +193,32 @@
 								</div>
 							</a>
 						</li>
+						<!-- For layers that display as HTML derived from KML, CSW records etc. -->
+						<li *ngFor="let html of htmls; let i = index;">
+							<a *ngIf="i < 10" class="dropdown-item" (click)="setHTML(html.key)">{{html.key}}</a>
+						</li>
 					</ul>
 				</div>
-				<div>
-					<button class="btn btnFeature btn-primary {{buttonEnabled}}"
+
+				<!-- Image tab button -->
+				<div *ngIf="imScDoButtonsEnabled">
+					<button class="btn btnFeature btn-primary"
 						(click)="currentDoc.home=false;currentDoc.analytic=true;image();">
 						<span class="btnSpan">Image</span>
 					</button>
 				</div>
-				<div>
-					<button class="btn btnFeature btn-primary {{buttonEnabled}}"
+
+				<!-- Scalar tab button -->
+				<div *ngIf="imScDoButtonsEnabled">
+					<button class="btn btnFeature btn-primary"
 						(click)="currentDoc.home=false;currentDoc.analytic=true;onDataChange();scalar();onDataChange();">
 						<span class="btnSpan">Scalar</span>
 					</button>
 				</div>
-				<div>
-					<button class="btn btnFeature btn-primary {{buttonEnabled}}"
+
+				<!-- Download tab button -->
+				<div *ngIf="imScDoButtonsEnabled">
+					<button class="btn btnFeature btn-primary"
 						(click)="currentDoc.home=false;currentDoc.analytic=true;onDataChange();getNVCL();download();onDataChange();">
 						<span class="btnSpan">Download</span>
 					</button>
@@ -234,6 +249,9 @@
 
 		</div>
 	</div>
+
+	<!-- HTML is displayed here -->
+	<div style="padding: 10px;" [innerHTML] = "currentHTML"></div>
 
 	<div id="wfs_tab" [hidden]="!wfs_tab">
 		<div *ngIf="wfs_tab">

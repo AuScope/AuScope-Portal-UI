@@ -15,7 +15,6 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { MSCLService } from '../layeranalytic/mscl/mscl.service';
 import { NVCLBoreholeAnalyticService } from '../layeranalytic/nvcl/nvcl.boreholeanalytic.service';
 import { saveAs } from 'file-saver';
-import { animate, style, transition, trigger } from '@angular/animations';
 import { MatDialog } from '@angular/material/dialog';
 
 export class FileNode {
@@ -45,6 +44,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   public transformingToHtml: Map<string, boolean> = new Map<string, boolean>();
   public docs: QuerierInfoModel[] = [];
   public htmls: QuerierInfoModel[] = [];
+  public currentHTML = ''; // HTML displayed in popup window for those layers that use it
   public uniqueLayerNames: string[] = [];
   public selectLayerNameFilter = 'ALL';
   public analyticMap;
@@ -60,7 +60,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   public currentFeature = 'Feature';
   public selectedLayer = 'Layer';
   public selectedToolTip = '';
-  public buttonEnabled = "disabled";
+  public imScDoButtonsEnabled = false; // Image-Scalar-Download buttons used by NVCL boreholes layer
   public nvclDatasets: any[] = [];
   public datasetImages: any[] = [];
   public imagesLoaded: string[] = [];
@@ -148,8 +148,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
    * If this was not done the two components would not see the same state of the service variable "isAnalytic"
   */
   public flagNVCLAnalytic: boolean;
-  private screenWidth: number;
-  listingdata: any;
+  public listingdata: any;
   public initialScalarLoad = true;
   public modalVisible = true;
 
@@ -669,7 +668,47 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // Look for changes and update UI after brief delay
+  /**
+   * Set HTML to be displayed in popup window
+   * 
+   * @param key key used to select HTML to display
+   */
+  public setHTML(key) {
+    // Clear the WFS XML display
+    this.currentDoc = null;
+    // Search for our HTML to display
+    for (const html of this.htmls) {
+      if (html.key == key) {
+        this.currentHTML = html.value;
+        return;
+      }
+    }
+  }
+
+  /**
+   * Set WFS feature data to be displayed in popup window
+   * 
+   * @param doc XML document
+   * @param i index of this XML docment in list of XML documents
+   */
+  public setWFS(doc, i) {
+    // Clear the HTML display  
+    this.currentHTML = "";
+    // Set up, convert the XML and display in popup 
+    this.wfs();
+    this.updateDropDownButtonText(doc);
+    this.currentIndex=i;
+    this.currentDoc=doc;
+    this.currentDoc.analytic=false;
+    this.currentDoc.home=true;
+    this.transformToHtml(this.currentDoc, i);
+    this.getNVCL();
+  }
+
+
+  /**
+   * Look for changes and update UI after brief delay
+   */
   public onDataChange(): void {
     const htmldata = []
     const Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
@@ -932,7 +971,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
 
 
   public image() {
-    if (this.buttonEnabled != "enabled") { return }
+    if (!this.imScDoButtonsEnabled) { return };
     this.wfs_tab = false;
     this.image_tab = true;
     this.scalar_tab = false;
@@ -940,7 +979,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   }
 
   public scalar() {
-    if (this.buttonEnabled != "enabled") { return }
+    if (!this.imScDoButtonsEnabled) { return };
     this.wfs_tab = false;
     this.image_tab = false;
     this.scalar_tab = true;
@@ -951,7 +990,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   }
 
   public download() {
-    if (this.buttonEnabled != "enabled") { return }
+    if (!this.imScDoButtonsEnabled) { return };
     this.wfs_tab = false;
     this.image_tab = false;
     this.scalar_tab = false;
@@ -959,7 +998,6 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   }
 
   public analytic() {
-    //if (this.buttonEnabled != "enabled") { return }
     this.wfs_tab = false;
     this.image_tab = false;
     this.scalar_tab = false;
@@ -1013,7 +1051,6 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   }
 
   public updateDropDownButtonText(doc) {
-
     const d = document.getElementById("dropdownMenuFeature");
     this.selectedFeature = '';
     if (doc.node_name) {
@@ -1022,11 +1059,11 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
       this.selectedFeature = doc.key;
     }
     this.selectedLayer = this.getAbbr(doc.layer.name, " ");
-    this.buttonEnabled = "disabled";
+    this.imScDoButtonsEnabled = false;
 
     // should we check flagNVCLAnalytic ?
-    if (this.selectedLayer == "NVCLV-2.0") {
-      this.buttonEnabled = "enabled";
+    if (this.selectedLayer == "NVCLV-2.0") { 
+      this.imScDoButtonsEnabled = true;
     }
 
     this.selectedToolTip = doc.layer.name + ":" + this.selectedFeature;
