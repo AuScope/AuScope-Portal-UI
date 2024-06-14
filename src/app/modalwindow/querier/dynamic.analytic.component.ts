@@ -70,7 +70,7 @@ ngOnChanges() {
     (<MSCLComponent>componentRef.instance).doc = this.doc;
 
 
-    this.changeDetectorRef.detectChanges();
+    //this.changeDetectorRef.detectChanges();
 
   }
 

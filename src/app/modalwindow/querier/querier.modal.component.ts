@@ -61,6 +61,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   public selectedLayer = 'Layer';
   public selectedToolTip = '';
   public imScDoButtonsEnabled = false; // Image-Scalar-Download buttons used by NVCL boreholes layer
+  public analyticEnabled = false;
   public nvclDatasets: any[] = [];
   public datasetImages: any[] = [];
   public imagesLoaded: string[] = [];
@@ -193,6 +194,21 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
      */
     this.nvclService.getAnalytic().subscribe((result) => {
       this.flagNVCLAnalytic = result;
+
+      /*
+      this.analyticEnabled = false;
+      console.log("[getAnalytic].flagNVCLAnalytic = ", this.flagNVCLAnalytic);
+      if (this.flagNVCLAnalytic) {
+        if (this.getSelectedLayer() == "NVCLV-2.0") {
+          this.analyticEnabled = false;
+        } else {
+          this.analyticEnabled = true;
+        }
+      }
+
+      console.log("[getAnalytic].analyticEnabled = ", this.analyticEnabled);
+      */
+
       // Calling this to update the UI
       this.onDataChange();
     });
@@ -209,9 +225,12 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     the bottom of the layers panel
     */
     this.modalService.onHide.subscribe(reason => {
-      /* modal close event has cascaded down; most liekly from the MSCL popup modal */
-      if (!reason.initialState) {
-        this.modalVisible = false;
+      /* modal close event has cascaded down; most lieley from the MSCL popup modal or the legend */
+
+      if (!(reason == "backdrop-click")) {  // check - image > scalar > legend
+        if (!reason.initialState) { // check - scl chart
+          this.modalVisible = false;
+        }
       }
     })
     this.modalService.onShow.subscribe(reason => {
@@ -228,6 +247,12 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
       this.renderer.setStyle(parentElement, 'left', (event.target.innerWidth - 900) / 2 + 'px');
     }
   */
+
+  public getSelectedLayer(): string {
+    let layerName: string = "";
+    layerName = this.selectedLayer;
+    return layerName;
+  }
 
   /**
    * Returns true iff layer is NVCL layer
@@ -270,6 +295,9 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   }
 
   public getNVCL() {
+
+    if (!this.imScDoButtonsEnabled) { return; }
+    
     // check if have already loaded   
     if (this.loadedDataset.includes(this.currentDoc.key)) {
       this.nvclIndex = this.loadedDataset.indexOf(this.currentDoc.key);
@@ -302,7 +330,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
           this.nvclService.setAnalytic(true);
         }
       } else {
-        console.error("[getNVCLDatasets] subscribe iterable error: result", result);
+        this.nvclService.setAnalytic(false);
       }
     },
       error => {
@@ -697,10 +725,10 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     // Set up, convert the XML and display in popup 
     this.wfs();
     this.updateDropDownButtonText(doc);
-    this.currentIndex=i;
-    this.currentDoc=doc;
-    this.currentDoc.analytic=false;
-    this.currentDoc.home=true;
+    this.currentIndex = i;
+    this.currentDoc = doc;
+    this.currentDoc.analytic = false;
+    this.currentDoc.home = true;
     this.transformToHtml(this.currentDoc, i);
     this.getNVCL();
   }
@@ -757,6 +785,14 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     this.currentIndex = index;
     if (this.msclService.usesGMLObs(document.raw)) {
       this.hasMsclAnalytics = true;
+    }
+
+    if (!this.imScDoButtonsEnabled) {
+      if (this.analyticMap[document.layer.id]) { // turn on analytic button, if in "ref.analytic" and not NVCL2
+        this.analyticEnabled = true;
+      } else {
+        this.analyticEnabled = false;
+      }
     }
 
     if (!document.expanded) {
@@ -1060,9 +1096,10 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     }
     this.selectedLayer = this.getAbbr(doc.layer.name, " ");
     this.imScDoButtonsEnabled = false;
+    this.analyticEnabled = false;
 
     // should we check flagNVCLAnalytic ?
-    if (this.selectedLayer == "NVCLV-2.0") { 
+    if (this.selectedLayer == "NVCLV-2.0") {
       this.imScDoButtonsEnabled = true;
     }
 
@@ -1077,6 +1114,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
       this.selectedScalar = null;
       this.legendOpen = false;
       this.drawGraphMode = false;
+      this.analyticEnabled = false;
     }
     this.currentFeature = this.selectedFeature;
   }
