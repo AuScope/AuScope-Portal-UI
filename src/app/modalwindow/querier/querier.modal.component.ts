@@ -295,6 +295,9 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   }
 
   public getNVCL() {
+
+    if (!this.imScDoButtonsEnabled) { return; }
+    
     // check if have already loaded   
     if (this.loadedDataset.includes(this.currentDoc.key)) {
       this.nvclIndex = this.loadedDataset.indexOf(this.currentDoc.key);
