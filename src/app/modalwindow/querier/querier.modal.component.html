@@ -75,7 +75,7 @@
 	}
 
 	.btnSpan {
-		min-height: 42px;
+		min-height: 46px;
 		display: inline-flex;
 		align-items: center;
 	}
@@ -182,9 +182,8 @@
 					<ul class="dropdown-menu">
 						<!-- For layers that are derived from XML feature data -->
 						<li active *ngFor="let doc of docs; let i = index;">
-							<a class="dropdown-item"
-								(click)="setWFS(doc, i);"
-								*ngIf="i < 10 && doc.node_name !== null" data-toggle="collapse">
+							<a class="dropdown-item" (click)="setWFS(doc, i);" *ngIf="i < 10 && doc.node_name !== null"
+								data-toggle="collapse">
 								<div *ngIf="doc.node_name">
 									{{doc.layer.name}}{{doc.node_name ? ': ' + doc.node_name : ''}}
 								</div>
@@ -223,44 +222,46 @@
 						<span class="btnSpan">Download</span>
 					</button>
 				</div>
-				<div>
-					<!-- {{hasMsclAnalytics}} -->
+				<!-- {{analyticEnabled}} -->
+				<div *ngIf="analyticEnabled">
 					<button class="btn btnFeature btn-primary"
 						(click)="analytic();currentDoc.home=false;currentDoc.analytic=true;">
 						<span class="btnSpan">Analytic</span>
 					</button>
 				</div>
 			</div>
-			<script>
-				$('[data-toggle-second="tooltip"]').tooltip();
-
-				$("#legendModal").on("hidden.bs.modal", function () {
-					openLegend(nvclDatasetId)
-				});
-				/*
-				$(".modal").on('show.bs.modal', function (event) {
-					$('html').addClass('no-scroll');
-				})
-				$(".modal").on('hide.bs.modal', function (event) {
-					$('html').removeClass('no-scroll');
-				})
-				*/
-			</script>
-
 		</div>
+		<script>
+			$('[data-toggle-second="tooltip"]').tooltip();
+
+			$("#legendModal").on("hidden.bs.modal", function () {
+				openLegend(nvclDatasetId)
+			});
+			/*
+			$(".modal").on('show.bs.modal', function (event) {
+				$('html').addClass('no-scroll');
+			})
+			$(".modal").on('hide.bs.modal', function (event) {
+				$('html').removeClass('no-scroll');
+			})
+			*/
+		</script>
+
 	</div>
 
 	<!-- HTML is displayed here -->
-	<div style="padding: 10px;" [innerHTML] = "currentHTML"></div>
+	<div style="padding: 10px;" [innerHTML]="currentHTML"></div>
 
 	<div id="wfs_tab" [hidden]="!wfs_tab">
 		<div *ngIf="wfs_tab">
 			<div *ngIf="list">
 				<div *ngIf="currentDoc">
 					<div class="modal-body row" style="margin-left:50px;">
-						<div *ngIf="bToClipboard || supportOpenInNewWindow(currentDoc)" style="position: inherit;padding-top: unset;margin-bottom: 20px;">
+						<div *ngIf="bToClipboard || supportOpenInNewWindow(currentDoc)"
+							style="position: inherit;padding-top: unset;margin-bottom: 20px;">
 							<div class="float-left d-none d-md-inline mt-0 w-100">
-								<div *ngIf="bToClipboard" data-toggle="tooltip" title="Copy to Clipboard" (click)="CopyToClipboard(currentDoc)" class="btn btn-primary btn-sm">
+								<div *ngIf="bToClipboard" data-toggle="tooltip" title="Copy to Clipboard"
+									(click)="CopyToClipboard(currentDoc)" class="btn btn-primary btn-sm">
 									<span><i class="ti-clip"></i>Copy to Clipboard</span>
 								</div>
 							</div>
@@ -320,7 +321,7 @@
 			<div *ngIf="currentDoc">
 				<div class="modal-body">
 					<!-- Content of Analytics Tab -->
-					<div *ngIf="analyticMap[currentDoc.layer.id] || hasMsclAnalytics" class="tab-pane fade"
+					<div *ngIf="analyticEnabled" class="tab-pane fade"
 						[ngClass]="{'active show':true}" id="{{currentDoc.key}}-analytic-tab">
 						<app-custom-analytic [layer]="currentDoc.layer" [load]="currentDoc.loadSubComponent"
 							[onlineResource]="currentDoc.onlineResource" [featureId]="currentDoc.key"

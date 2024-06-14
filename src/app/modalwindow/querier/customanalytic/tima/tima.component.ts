@@ -33,6 +33,7 @@ export class TIMAComponent implements AfterViewInit {
 
 
   ngAfterViewInit(): void {
+    if (this.doc.value) {
     const docValue = this.doc.value;
     this.imageUrl = docValue.getElementsByTagName('tima:image_url')[0].textContent;
     const mineralInfo = JSON.parse(docValue.getElementsByTagName('tima:mineral_information_json')[0].textContent);
@@ -44,7 +45,7 @@ export class TIMAComponent implements AfterViewInit {
     this.ngxdata.sort((a, b) => {
       return a.name.localeCompare(b.name);
     });
-
+    }
   }
 
 }
