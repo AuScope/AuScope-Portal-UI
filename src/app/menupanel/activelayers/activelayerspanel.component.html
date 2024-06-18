@@ -53,9 +53,9 @@
                         <div class="card-header">
                             <ul id="card-tab" class="nav nav-tabs">
                                 <!-- Layer Styling tab -->
-                                <li (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': getUILayerModel(layer.id)?.tabpanel.filterpanel.expanded}">
+                                <li (click)="selectTabPanel(layer.id,'filterpanel')" class="tab-item">
                                     <a data-toggle="tab">
-                                        <span class="d-none d-sm-inline">Layer Styling</span>
+                                        <span class="d-none tab-link d-sm-inline mr-2">Layer Styling</span>
                                     </a>
                                 </li>
                                 <!-- Layer Download tab -->
@@ -70,9 +70,12 @@
                             <!-- Add bookmark button -->
                             <button *ngIf="isUserLoggedIn() && !isLayerBookmarked(layer.id)" (click)="addLayerBookmark(layer.id)" type="button" class="btn btn-sm btn-info top-layer-btn" title="Bookmark Layer"><i class="fa fa-sm fa-bookmark-o"></i></button>
                             <!-- Remove bookmark button -->
-                            <button *ngIf="isUserLoggedIn() && isLayerBookmarked(layer.id)" (click)="removeLayerBookmark(layer.id)" type="button" class="btn btn-sm btn-info top-layer-btn" title="Remove Layer Bookmark"><i class="fa fa-sm fa-bookmark"></i></button>
+                            <button *ngIf="isUserLoggedIn() && isLayerBookmarked(layer.id)" (click)="removeLayerBookmark(layer.id)" class="btn-info" title="Remove Layer Bookmark"><i class="fa fa-sm fa-bookmark"></i></button>
                             <!-- Info button  -->
-                            <button (click)="displayRecordInformation(layer)" type="button" class="btn btn-sm btn-info top-layer-btn" title="Information" [ngClass]="{'active': getUILayerModel(layer.id)?.tabpanel.infopanel.expanded}">Info</button>
+                            <!-- <button (click)="displayRecordInformation(layer)" type="button" class="btn-info" title="Information" [ngClass]="{'active': getUILayerModel(layer.id)?.tabpanel.filterpanel.expanded}">Info</button> -->
+                            <div class="rh_info">	
+                                <button (click)="displayRecordInformation(layer)" class="btn-info" title="Information" [ngClass]="{'active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.infopanel.expanded}">Info</button>
+                            </div>
                         </div>
                     </div>
                     <div id="card-tab-content" class="tab-content">

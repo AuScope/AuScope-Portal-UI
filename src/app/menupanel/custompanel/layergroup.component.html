@@ -37,15 +37,15 @@
 					<div class = "rh_info_wrap">
 						<div class="card-header">
 							<ul id="card-tab" class="nav nav-tabs float-right">
-								<li (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': getUILayerModel(layer.id).tabpanel.filterpanel.expanded}">
-									<a data-toggle="tab">
-										<span class="d-none d-sm-inline">Map Layer</span>
-									</a>
-								</li>
-							</ul>
+                                <li class="tab-item" (click)="selectTabPanel(layer.id,'filterpanel')">
+                                    <a data-toggle="tab">
+                                        <span class="d-none d-sm-inline tab-link">Map Layer</span>
+                                    </a>
+                                </li>
+                            </ul>
 						</div>
 						<div class="rh_info">	
-							<button (click)="displayRecordInformation(layer)" class="btn-info" title="Information" [ngClass]="{'active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.filterpanel.expanded}">info</button>
+							<button (click)="displayRecordInformation(layer)" class="btn-info" title="Information" [ngClass]="{'active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.filterpanel.expanded}">Info</button>
 						</div>
 					</div>
 					<div id="card-tab-content" class="tab-content">
