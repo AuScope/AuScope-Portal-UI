@@ -477,8 +477,8 @@ export class DownloadPanelComponent implements OnInit {
       }
       this.downloadStarted = true;
 
-      let start = (this.irisDownloadListOption.dateFrom !== null && this.irisDownloadListOption.dateFrom !== '') ? new Date(new Date(this.irisDownloadListOption.dateFrom)).toISOString() : null;
-      let end = (this.irisDownloadListOption.dateToTo !== null && this.irisDownloadListOption.dateTo !== '') ? new Date(new Date(this.irisDownloadListOption.dateTo)).toISOString() : null;
+      let start = (this.irisDownloadListOption.dateFrom !== null && this.irisDownloadListOption.dateFrom !== '') ? new Date(new Date(this.irisDownloadListOption.dateFrom)).toISOString().substring(0, 10) : null;
+      let end = (this.irisDownloadListOption.dateToTo !== null && this.irisDownloadListOption.dateTo !== '') ? new Date(new Date(this.irisDownloadListOption.dateTo)).toISOString().substring(0, 10) : null;
 
       let station = this.SELECT_ALL_CODE;
       station = !this.irisDownloadListOption.selectedStations.includes(this.SELECT_ALL_CODE) ? this.irisDownloadListOption.selectedStations.join(",") : this.SELECT_ALL_CODE;
