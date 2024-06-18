@@ -632,11 +632,11 @@
 							href="https://research.csiro.au/thespectralgeologist/tsg/pricing/purchase-tsg/">free
 							TSG
 							Base.</a></p>
-					<a *ngIf="nvclDatasets[nvclIndex].TSGCacheDownloadurl" class="float-right btn btn-info btn-xs"
+					<a *ngIf="nvclDatasets[nvclIndex]?.TSGCacheDownloadurl" class="float-right btn btn-info btn-xs"
 						href="{{nvclDatasets[nvclIndex].TSGCacheDownloadurl}}"
 						title="Download TSG file from cache">Download
 						Immediately from the NVCL File Cache</a>
-					<div *ngIf="!nvclDatasets[nvclIndex].TSGCacheDownloadurl">
+					<div *ngIf="!nvclDatasets[nvclIndex]?.TSGCacheDownloadurl">
 						<div>***[download - TSGCacheDownloadurl]***</div>
 						<p>Unfortunately, this dataset is not available in the NVCL cache. You can
 							request

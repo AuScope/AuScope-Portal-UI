@@ -323,6 +323,8 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
           this.nvclDatasetId = nvclDataset.datasetId;
           this.nvclDatasets.push(nvclDataset);
           this.nvclIndex = this.nvclDatasets.length - 1;
+          this.changeDetectorRef.detectChanges();
+
         }
         if (result.length === 0) {
           this.nvclService.setAnalytic(false);
