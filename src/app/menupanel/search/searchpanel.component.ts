@@ -228,6 +228,7 @@ export class SearchPanelComponent implements OnInit {
 
   public setShowingKmlOgcOptions(showingOptions: boolean) {
     this.showingKmlOgcOptions = showingOptions;
+    this.searching = !this.searching
     if (showingOptions && this.showingResultsPanel) {
       this.showingResultsPanel = false;
       this.showingInfoPanel = false;
