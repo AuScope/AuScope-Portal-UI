@@ -30,7 +30,7 @@
         <div class="input-group-append">
             <!-- Search button -->
             <button *ngIf="!searching" tabindex="-1" class="btn btn-auscope-primary search-button" type="button" title="Search layers" (click)="search(true)"><i class="fa fa-search"></i></button>
-            <button *ngIf="searching" tabindex="-1" class="btn btn-auscope-primary search-button" type="button" title="Searching layers"><i class="fa fa-spin fa-spinner"></i></button>
+            <button *ngIf="searching" tabindex="-1" class="btn btn-auscope-primary search-button" type="button" title="Searching layers"><i class="fa fa-spin fa-spinner" *ngIf="!showingKmlOgcOptions"></i></button>
             <!-- Advanced options selection -->
             <button tabindex="-1" class="btn btn-auscope-primary advanced-options-button" title="{{showingAdvancedOptions ? 'Hide advanced search options' : 'Show advanced search options'}}" (click)="showingAdvancedOptions=!showingAdvancedOptions">
                 <span class="fa-layers">
