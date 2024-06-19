@@ -192,3 +192,39 @@
 u {
   text-decoration: none;
 }
+
+.tab-item {
+    display: inline-block;
+    // margin-right: 10px;
+    cursor: pointer;
+    padding-bottom: 8px;
+}
+
+.tab-link {
+    display: inline-block;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: #605E7B; /* Primary color */
+    background-color: #f8f9fa; /* Light background */
+    border: 1px solid #dee2e6; /* Border color */
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.tab-link:hover,
+.tab-link:focus {
+    background-color: #e2e6ea; /* Light hover color */
+    color: #605E7B; /* Darker text color on hover */
+}
+
+.tab-link.active {
+    background-color: #605E7B; /* Active background color */
+    color: #ffffff; /* Active text color */
+    border-color: #605E7B;
+}
+
+.rh_info .btn-info {
+    margin-bottom: 24px; 
+    background-color: #117a8b; 
+    border-color:#10707f;
+}
