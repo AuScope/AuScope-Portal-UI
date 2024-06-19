@@ -74,7 +74,7 @@
                             <!-- Info button  -->
                             <!-- <button (click)="displayRecordInformation(layer)" type="button" class="btn-info" title="Information" [ngClass]="{'active': getUILayerModel(layer.id)?.tabpanel.filterpanel.expanded}">Info</button> -->
                             <div class="rh_info">	
-                                <button (click)="displayRecordInformation(layer)" class="btn-info" title="Information" [ngClass]="{'active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.infopanel.expanded}">Info</button>
+                                <button (click)="displayRecordInformation(layer)" type="button" class="btn-info" title="Information" [ngClass]="{'active': getUILayerModel(layer.id)?.tabpanel.infopanel.expanded}">Info</button>
                             </div>
                         </div>
                     </div>
