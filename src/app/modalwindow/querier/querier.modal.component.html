@@ -1,144 +1,4 @@
 <!-- Modal for querier-->
-<style>
-	.modal-header {
-		border-width: 0;
-		height: 15vh;
-		overflow-y: visible;
-		display: block;
-	}
-
-	/*
-	.modal-footer {
-		height: 10vh;
-		display: none;
-		position: absolute;
-		bottom: 0;
-		width: 100%;
-		z-index: 99;
-	}
-		*/
-	.modal-body {
-		height: 60vh;
-		overflow-y: auto;
-	}
-
-	.right-modal {
-		margin-left: auto;
-		order: 2;
-	}
-
-	.toobar-header {
-		display: block;
-	}
-
-	.rowFeature {
-		display: flex;
-		padding: 0px 0px 0px 0px;
-		text-align: center;
-		border-width: 10px;
-	}
-
-	.rowScalarChartClose {
-		display: flex;
-		padding: 10px 10px;
-		text-align: center;
-		border-width: 0;
-	}
-
-	.rowFeature:first-child {
-		padding: 0px 00px;
-	}
-
-	.rowFeature div {
-		width: 25%;
-	}
-
-	.btnFeature {
-		padding: 5px;
-		width: 120px;
-	}
-
-	.btn:focus,
-	.btn:active {
-		outline: none !important;
-		box-shadow: none;
-	}
-
-	.dropdown-menu:focus,
-	.dropdown-menu:active {
-		outline: none !important;
-		box-shadow: none;
-	}
-
-	.datasetName {
-		padding: 5px;
-	}
-
-	.btnSpan {
-		min-height: 46px;
-		display: inline-flex;
-		align-items: center;
-	}
-
-	.rowScalar {
-		display: inline-flex;
-		padding-left: 10px;
-	}
-
-	.no-scroll {
-		overflow: hidden;
-	}
-
-
-
-	#endContainer {
-		display: flex;
-		justify-content: flex-end;
-	}
-
-	#middleContainer {
-		width: 100%;
-		display: flex;
-		justify-content: flex-end;
-	}
-
-	#startContainer {
-		width: 320px;
-		display: flex;
-		justify-content: flex-start;
-	}
-
-	#startContainer div {
-		height: 10px;
-	}
-
-	#middleContainer div {
-		height: 10px;
-	}
-
-	#endContainer div {
-		vertical-align: top;
-		height: 10px;
-	}
-
-	.closeBtn {
-		font-weight: 900;
-		font-size: 30px;
-		color: red;
-		display: block;
-		position: absolute;
-		top: 0;
-		right: 5px;
-	}
-
-	.alertHeading {
-		padding: 10px;
-		margin-bottom: 10px;
-		border: 1px solid transparent;
-		border-radius: 4px;
-	}
-</style>
-
 <div id="featureInfo" cdkDrag cdkDragRootElement=".modal-content" #childElement cdkDragBoundary="body"
 	bsModalRef="bsModalRef" style="overflow-x: clip;">
 	<div class="modal-header" cdkDragHandle [hidden]="!modalVisible">
@@ -160,7 +20,7 @@
 			</div>
 		</div>
 		<div class="toolbar-header">
-			<div class="rowFeature">
+			<div *ngIf="!downloading && (docs.length > 0 || htmls.length > 0)" class="rowFeature">
 
 				<!-- Feature tab button -->
 				<div class="btn-group">
@@ -175,7 +35,7 @@
                             text-overflow: ellipsis;
                         ">{{selectedFeature}}</span>
 					</button>
-					<button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+					<button *ngIf="docs.length > 1 || htmls.length > 1" type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
 						data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 						<span class="sr-only">Toggle Dropdown</span>
 					</button>
@@ -250,13 +110,29 @@
 	</div>
 
 	<!-- HTML is displayed here -->
-	<div style="padding: 10px;" [innerHTML]="currentHTML"></div>
+	<div *ngIf="htmls.length > 0" style="padding: 10px;" [innerHTML]="currentHTML"></div>
+
+	<!-- Message if downloading -->
+	<div *ngIf="downloading" class="message-tab">
+		Downloading feature information...<br>
+		<i class="fa fa-spin fa-spinner"></i>
+	</div>
+
+	<!-- Message if no features found -->
+	<div *ngIf="!downloading && docs?.length === 0 && htmls.length === 0" class="message-tab">
+		It looks like there aren't any results where you have clicked.<br>Try zooming in for greater accuracy.
+	</div>
+
+	<!-- Message if more than 1 result and no document has been selected -->
+	<div *ngIf="!downloading && (docs?.length > 1 || htmls?.length > 1) && currentDoc === undefined" class="message-tab">
+		Please select a feature from the Layer Feature list above.
+	</div>
 
 	<div id="wfs_tab" [hidden]="!wfs_tab">
 		<div *ngIf="wfs_tab">
 			<div *ngIf="list">
 				<div *ngIf="currentDoc">
-					<div class="modal-body row" style="margin-left:50px;">
+					<div class="modal-body row">
 						<div *ngIf="bToClipboard || supportOpenInNewWindow(currentDoc)"
 							style="position: inherit;padding-top: unset;margin-bottom: 20px;">
 							<div class="float-left d-none d-md-inline mt-0 w-100">
@@ -638,16 +514,10 @@
 						Immediately from the NVCL File Cache</a>
 					<div *ngIf="!nvclDatasets[nvclIndex]?.TSGCacheDownloadurl">
 						<div>***[download - TSGCacheDownloadurl]***</div>
-						<p>Unfortunately, this dataset is not available in the NVCL cache. You can
-							request
-							it
-							from
-							the
-							State/Territory servers via the form below, but it might take some time to
-							prepare.
-							Alternatively, you can check other datasets as over 99% are available via
-							the
-							cache.
+						<p>Unfortunately, this dataset is not available in the NVCL cache. You can 
+							request it from the State/Territory servers via the form below, but it might 
+							take some time to prepare. Alternatively, you can check other datasets as 
+							over 99% are available via the cache.
 						</p>
 						<form>
 							<div class="form-group  form-group-sm">

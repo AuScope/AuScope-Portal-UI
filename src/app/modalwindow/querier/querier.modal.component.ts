@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/member-ordering */
-import { ApplicationRef, ChangeDetectorRef, Component, Inject, OnInit, ElementRef, ViewChild, AfterViewInit, Renderer2, HostListener } from '@angular/core';
+import { ApplicationRef, ChangeDetectorRef, Component, Inject, OnInit, ElementRef, ViewChild, AfterViewInit, Renderer2 } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { config } from '../../../environments/config';
 import { ref } from '../../../environments/ref';
@@ -34,7 +34,7 @@ interface FlatNode {
   selector: 'app-querier-modal-window',
   templateUrl: './querier.modal.component.html',
   providers: [RickshawService, NVCLBoreholeAnalyticService],
-  styleUrls: ['../modalwindow.scss']
+  styleUrls: ['../modalwindow.scss', './querier.modal.component.scss']
 })
 
 export class QuerierModalComponent implements OnInit, AfterViewInit {
@@ -110,9 +110,6 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   public scalar_tab: boolean = false;
   public download_tab: boolean = false;
   public analytic_tab: boolean = false;
-
-  // Show a message to zoom in
-  public showZoomMsg = false;
 
   /* Transforms FileNode into displayable node */
   private _transformer = (node: FileNode, level: number) => {
@@ -772,9 +769,24 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
       }
       this.docs[i]['node_name'] = htmldata[i]
     }
+
     setTimeout(() => {
       this.changeDetectorRef.detectChanges();
     }, 50);
+  }
+
+  /**
+   * When all layers are loaded call onDatachange and automatically set the first feature
+   * if it is the only one in the list
+   */
+  allLayersLoaded() {
+    this.onDataChange();
+    this.downloading = false;
+    if (this.docs.length === 1 && this.htmls.length === 0) {
+      this.setWFS(this.docs[0], 0);
+    } else if(this.htmls.length === 1 && this.docs.length === 0) {
+      this.setHTML(this.htmls[0].key);
+    }
   }
 
   /**
