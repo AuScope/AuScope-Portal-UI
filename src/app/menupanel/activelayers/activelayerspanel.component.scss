@@ -202,12 +202,12 @@ u {
 
 .tab-link {
     display: inline-block;
-    padding: 10px 15px;
+    padding: 10px 10px;
     text-decoration: none;
     color: #605E7B; /* Primary color */
     background-color: #f8f9fa; /* Light background */
     border: 1px solid #dee2e6; /* Border color */
-    border-radius: 4px;
+    // border-radius: 4px;
     transition: background-color 0.2s, color 0.2s;
 }
 
@@ -215,16 +215,21 @@ u {
 .tab-link:focus {
     background-color: #e2e6ea; /* Light hover color */
     color: #605E7B; /* Darker text color on hover */
+    cursor: pointer;
 }
 
-.tab-link.active {
-    background-color: #605E7B; /* Active background color */
-    color: #ffffff; /* Active text color */
-    border-color: #605E7B;
+#card-tab .active span{
+    background-color: #e2e6ea; /* Light hover color */
+    color: #605E7B; /* Active text color */
+    border-color: #e2e6ea; /* Active border color */
 }
 
 .rh_info .btn-info {
-    margin-bottom: 24px; 
+    margin-bottom: 40px; 
     background-color: #117a8b; 
     border-color:#10707f;
+}
+#card-tab {
+    padding: 11px;
+    display: flex;
 }

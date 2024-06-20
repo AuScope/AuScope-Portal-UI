@@ -51,17 +51,17 @@
                 <div style="position: inherit;" class="card card-info card-with-tabs layer-card">
                     <div class="rh_info_wrap">
                         <div class="card-header">
-                            <ul id="card-tab" class="nav nav-tabs">
+                            <ul id="card-tab">
                                 <!-- Layer Styling tab -->
                                 <li (click)="selectTabPanel(layer.id,'filterpanel')" class="tab-item">
-                                    <a data-toggle="tab">
-                                        <span class="d-none tab-link d-sm-inline mr-2">Layer Styling</span>
+                                    <a>
+                                        <span class="d-none tab-link d-sm-inline">Layer Styling</span>
                                     </a>
                                 </li>
                                 <!-- Layer Download tab -->
-                                <li *ngIf="isMapSupportedLayer(layer) && isDownloadSupportedLayer(layer)" (click)="selectTabPanel(layer.id,'downloadpanel')" [ngClass]="{'active': getUILayerModel(layer.id)?.tabpanel.downloadpanel.expanded}" class="d-none d-md-block">
-                                    <a data-toggle="tab">
-                                        <span>Download</span>
+                                <li *ngIf="isMapSupportedLayer(layer) && isDownloadSupportedLayer(layer)" (click)="selectTabPanel(layer.id,'downloadpanel')" [ngClass]="{'active': getUILayerModel(layer.id)?.tabpanel.downloadpanel.expanded}" class="tab-item">
+                                    <a>
+                                        <span class="d-none tab-link d-sm-inline ml-2" >Download</span>
                                     </a>
                                 </li>
                             </ul>
