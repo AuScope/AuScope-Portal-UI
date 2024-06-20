@@ -468,12 +468,11 @@ export class CsMapComponent implements AfterViewInit {
       forkJoin(getFeatureInfoRequests).pipe(
         finalize(() => {
           this.bsModalRef.content.downloading = false;
-          if (numberOfFeatures === 0) {
-              this.bsModalRef.content.showZoomMsg = true;
-          }
-          this.bsModalRef.content.onDataChange();
+          this.bsModalRef.content.allLayersLoaded();
         })
       ).subscribe();
+    } else {
+      this.bsModalRef.content.allLayersLoaded();
     }
 
   }
@@ -510,7 +509,6 @@ export class CsMapComponent implements AfterViewInit {
       this.bsModalRef = this.modalService.show(QuerierModalComponent, { class : 'modal-lg modal-dialog-scrollable modal-dialog-centered' });
       this.modalDisplayed = true;
       this.bsModalRef.content.downloading = true;
-      this.bsModalRef.content.showZoomMsg = false;
       /*
       if (clickCoord) {
         const vector = this.csMapService.drawDot(clickCoord);
@@ -609,10 +607,7 @@ export class CsMapComponent implements AfterViewInit {
       }
       featureCount++;
       if (featureCount >= 10) {
-        this.setModalHTML('<p>One or more layers returned too many features to list, use map zoom to get a more precise location</p>',
-          '...', feature, this.bsModalRef);
         break;
-
       }
       treeCollection.raw = result;
       this.bsModalRef.content.docs.push(treeCollection);
@@ -622,7 +617,6 @@ export class CsMapComponent implements AfterViewInit {
     }
 
     if (featureCount > 0) {
-      this.bsModalRef.content.downloading = false;
       this.bsModalRef.content.onDataChange();
     }
     return featureCount;
@@ -645,7 +639,6 @@ export class CsMapComponent implements AfterViewInit {
     if (bsModalRef.content.uniqueLayerNames.indexOf(layer.name) === -1) {
       bsModalRef.content.uniqueLayerNames.push(layer.name)
     }
-    this.bsModalRef.content.downloading = false;
     this.bsModalRef.content.onDataChange();
   }
 
