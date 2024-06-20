@@ -294,7 +294,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   public getNVCL() {
 
     if (!this.imScDoButtonsEnabled) { return; }
-    
+
     // check if have already loaded   
     if (this.loadedDataset.includes(this.currentDoc.key)) {
       this.nvclIndex = this.loadedDataset.indexOf(this.currentDoc.key);
@@ -402,15 +402,20 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     const logs = this.datasetScalars[datasetId];
     const logIds = [];
 
-    for (const log of logs) {
-      if (log.value) {
-        logIds.push(log.logId);
+
+    if (this.isIterable(logs)) {
+      for (const log of logs) {
+        if (log.value) {
+          logIds.push(log.logId);
+        }
       }
     }
 
     if (logIds.length <= 0) {
       alert('No logs selected');
+      return;
     }
+    
     this.nvclService.getNVCL2_0_CSVDownload(this.currentDoc.onlineResource.url, logIds).
       subscribe(response => {
         const blob = new Blob([response], { type: 'application/csv' });
