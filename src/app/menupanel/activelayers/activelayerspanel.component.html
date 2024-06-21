@@ -53,7 +53,7 @@
                         <div class="card-header">
                             <ul id="card-tab">
                                 <!-- Layer Styling tab -->
-                                <li *ngIf="hasFilters(layer.id)"  (click)="selectTabPanel(layer.id,'filterpanel')" class="tab-item">
+                                <li *ngIf="hasFilters(layer.id)" (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': !getUILayerModel(layer.id)?.tabpanel.downloadpanel.expanded}" class="tab-item">
                                     <a>
                                         <span class="d-none tab-link d-sm-inline">Layer Styling</span>
                                     </a>
