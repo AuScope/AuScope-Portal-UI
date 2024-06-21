@@ -1,4 +1,4 @@
-import { Component, Input, ViewChildren, QueryList, AfterViewInit } from '@angular/core';
+import { Component, Input, ViewChildren, QueryList, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { CsMapService, LayerModel, ResourceType, UtilitiesService } from '@auscope/portal-core-ui';
 import { ManageStateService, LayerHandlerService, CsClipboardService } from '@auscope/portal-core-ui';
 import { SplitDirection } from 'cesium';
@@ -54,11 +54,13 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
     private legendUiService: LegendUiService, private modalService: BsModalService,
     private layerHandlerService: LayerHandlerService, private csClipboardService: CsClipboardService,
     private userStateService: UserStateService, private manageStateService: ManageStateService,
-    private authService: AuthService, private activeModalService: NgbModal) { 
-      this.csClipboardService.filterLayersBS.subscribe(filterLayers => {
-        this.areLayersPolygonFiltered = filterLayers;
-      });
-    }
+    private authService: AuthService, private activeModalService: NgbModal, private ref: ChangeDetectorRef) {
+    this.csClipboardService.filterLayersBS.subscribe(filterLayers => {
+      this.areLayersPolygonFiltered = filterLayers;
+    });
+  }
+
+  public isDownloadExpanded: boolean = false;
 
   /**
    * Open or close sidebar
@@ -113,10 +115,35 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
       next: (bookMarkList: Bookmark[]) => {
         me.bookmarks = [];
         for (const bookMark of bookMarkList) {
-            me.bookmarks.push(bookMark);
+          me.bookmarks.push(bookMark);
         }
       }
-  });
+    });
+
+  }
+
+  /**
+   * check if a layer has filters - used to hide the tab "Layer Styling"
+   * 
+   * @param layerId
+   * @returns boolean
+   */
+  public hasFilters(layerId: string): boolean {
+
+    let filterState = this.layerManagerService.getFilters(layerId);
+    /*
+    // if the layer has no filters then set it to display the download tab
+    if (this.getUILayerModel(layerId)) {
+      this.selectTabPanel(layerId,'filterpanel');
+      //this.getUILayerModel(layerId).tabpanel.downloadpanel.expanded = false;
+      if (!filterState) {
+        this.selectTabPanel(layerId,'downloadpanel');
+        //this.getUILayerModel(layerId).tabpanel.downloadpanel.expanded = true;
+      }
+    }
+    */
+
+    return filterState;
   }
 
   /**
@@ -144,10 +171,10 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
       this.layerHandlerService.getLayerModelsForIds([layerId]).subscribe(layers => {
         for (const layerModel of layers) {
           // This adds layer to the map
-          me.layerManagerService.addLayer(layerModel, 
-                                          layerStateObj[layerId].optionalFilters,
-                                          layerStateObj[layerId].filterCollection,
-                                          layerStateObj[layerId].time);
+          me.layerManagerService.addLayer(layerModel,
+            layerStateObj[layerId].optionalFilters,
+            layerStateObj[layerId].filterCollection,
+            layerStateObj[layerId].time);
           setTimeout(() => {
             const layerFilterPanel: FilterPanelComponent = me.filterComponents.find(fc => fc.layer.id === layerId);
             if (layerFilterPanel) {
@@ -225,7 +252,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
    */
   public getShowSplitMapButtons(layer: LayerModel): boolean {
     return this.csMapService.getSplitMapShown() &&
-           (this.getUILayerModel(layer.id).statusMap.getRenderStarted() || this.getUILayerModel(layer.id).statusMap.getRenderComplete());
+      (this.getUILayerModel(layer.id).statusMap.getRenderStarted() || this.getUILayerModel(layer.id).statusMap.getRenderComplete());
   }
 
   /**
@@ -262,7 +289,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
   public getLayerSplitDirection(layerId: string): string {
     let splitDir = "none";
     if (this.csMapService.getLayerModel(layerId) !== undefined) {
-      switch(this.csMapService.getLayerModel(layerId).splitDirection) {
+      switch (this.csMapService.getLayerModel(layerId).splitDirection) {
         case SplitDirection.LEFT:
           splitDir = "left";
           break;
@@ -286,8 +313,8 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
   /**
    * Open the modal that display the status of the render
    */
-   public openStatusReport(uiLayerModel: UILayerModel) {
-    this.bsModalRef = this.modalService.show(NgbdModalStatusReportComponent, {class: 'modal-lg'});
+  public openStatusReport(uiLayerModel: UILayerModel) {
+    this.bsModalRef = this.modalService.show(NgbdModalStatusReportComponent, { class: 'modal-lg' });
     uiLayerModel.statusMap.getStatusBSubject().subscribe((value) => {
       this.bsModalRef.content.resourceMap = value.resourceMap;
     });
@@ -361,6 +388,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
    */
   public selectTabPanel(layerId: string, panelType: string) {
     this.getUILayerModel(layerId).tabpanel.setPanelOpen(panelType);
+    this.isDownloadExpanded = this.getUILayerModel(layerId).tabpanel.downloadpanel.expanded;
   }
 
   /**
@@ -386,9 +414,9 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
    * @param layer layer to check
    * @returns true if supported layer, false otherwise
    */
-   public isMapSupportedLayer(layer: LayerModel): boolean {
-     return this.csMapService.isMapSupportedLayer(layer);
-   }
+  public isMapSupportedLayer(layer: LayerModel): boolean {
+    return this.csMapService.isMapSupportedLayer(layer);
+  }
 
   /**
   * Check to see if a layer supports downloading
@@ -456,11 +484,11 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
     this.csClipboardService.toggleFilterLayers(false);
   }
 
- /**
-   * Display the record information dialog
-   *
-   * @param layer layer for information
-   */
+  /**
+    * Display the record information dialog
+    *
+    * @param layer layer for information
+    */
   public displayRecordInformation(layer: any) {
     if (layer) {
       const modelRef = this.activeModalService.open(InfoPanelComponent, {
@@ -561,7 +589,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
       return;
     }
     this.userStateService.addBookmark(layerId);
-    const bookmark: Bookmark = { 'fileIdentifier': layerId, serviceId: ''};
+    const bookmark: Bookmark = { 'fileIdentifier': layerId, serviceId: '' };
     this.bookmarks.push(bookmark);
   }
 
