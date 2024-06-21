@@ -32,6 +32,8 @@
                     <button class="btn btn-primary btn-sm legend" [disabled]="isLegendShown(layer.id)" (click)="showLegend(layer)">Legend</button>
                     <!-- Display status button -->
                     <button class="btn btn-primary btn-sm status" (click)="openStatusReport(getUILayerModel(layer.id)); $event.stopPropagation();">Status</button>
+                    <!-- Display info button -->
+                    <button (click)="displayRecordInformation(layer)" type="button" class="btn btn-primary btn-sm info" title="Information" [ngClass]="{'active': getUILayerModel(layer.id)?.tabpanel.infopanel.expanded}">Info</button>
                 </div>
             </div>
             <!-- Map split controls -->
@@ -73,9 +75,11 @@
                             <button *ngIf="isUserLoggedIn() && isLayerBookmarked(layer.id)" (click)="removeLayerBookmark(layer.id)" class="btn-info" title="Remove Layer Bookmark"><i class="fa fa-sm fa-bookmark"></i></button>
                             <!-- Info button  -->
                             <!-- <button (click)="displayRecordInformation(layer)" type="button" class="btn-info" title="Information" [ngClass]="{'active': getUILayerModel(layer.id)?.tabpanel.filterpanel.expanded}">Info</button> -->
+                            <!--
                             <div class="rh_info">	
                                 <button (click)="displayRecordInformation(layer)" type="button" class="btn-info" title="Information" [ngClass]="{'active': getUILayerModel(layer.id)?.tabpanel.infopanel.expanded}">Info</button>
                             </div>
+                        -->
                         </div>
                     </div>
                     <div id="card-tab-content" class="tab-content">
