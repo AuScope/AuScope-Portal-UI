@@ -65,6 +65,14 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
       });
     }
 
+    // set a filter flag for the layer
+    this.layerManagerService.setFilters(this.layer.id, false);
+    if (this.layerFilterCollection) {
+      if (this.layerFilterCollection.optionalFilters) {
+        this.layerManagerService.setFilters(this.layer.id, true);
+      }
+    }
+
     // XXX Sidebar only..?
     if (this.layer.filterCollection && this.layer.filterCollection['mandatoryFilters']) {
       const mandatoryFilters = this.layer.filterCollection['mandatoryFilters'];
@@ -106,6 +114,15 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
   public ngAfterViewInit() {
         // Update the time extent button/selector
         this.setLayerTimeExtent();
+  }
+
+  /**
+   * Check if a layer has filters - filterList array
+   */
+  public hasFilters(layerId : string): boolean {
+    let filterState: boolean = false;
+    filterState = this.layerManagerService.getFilters(layerId);
+    return filterState;
   }
 
   /**

@@ -149,7 +149,7 @@
 		<!-- Optional layer analytics button -->
 		<button *ngIf="analyticMap[layer.id]" type="button" class="btn btn-warning btn-sm analytic-btn" title="Display analytics" (click)="processLayerAnalytic(layer)"><i class="fa fa-bar-chart" aria-hidden="true"></i>&nbsp;Analytic</button>
 		<!-- Update layer button -->
-		<button type="button" *ngIf="isMapSupportedLayer(layer)" class="btn btn-primary btn-sm add-layer-btn float-right" (click)="addLayer(layer)"><i class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp;Add Layer</button>
+		<button type="button" *ngIf="isMapSupportedLayer(layer) && hasFilters(layer.id)" class="btn btn-primary btn-sm add-layer-btn float-right" (click)="addLayer(layer)"><i class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp;Add Layer</button>
 		<!-- Optional unsupported layer message & icon -->
 		<div class="unsupported-layer-message" *ngIf="!isMapSupportedLayer(layer)">
 			<em class="fa fa-exclamation-triangle warning-icon"></em>

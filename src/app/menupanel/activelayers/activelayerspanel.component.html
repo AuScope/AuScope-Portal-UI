@@ -53,7 +53,7 @@
                         <div class="card-header">
                             <ul id="card-tab">
                                 <!-- Layer Styling tab -->
-                                <li (click)="selectTabPanel(layer.id,'filterpanel')" class="tab-item">
+                                <li *ngIf="hasFilters(layer.id)"  (click)="selectTabPanel(layer.id,'filterpanel')" class="tab-item">
                                     <a>
                                         <span class="d-none tab-link d-sm-inline">Layer Styling</span>
                                     </a>
@@ -84,8 +84,8 @@
                             <app-filter-panel *ngIf="getUILayerModel(layer.id)?.tabpanel.filterpanel.expanded" [layer]=layer></app-filter-panel>
                         </div>
                         <!-- Panel for layer download -->
-                        <div class="tab-pane fade" [ngClass]="{'show active': getUILayerModel(layer.id)?.tabpanel.downloadpanel.expanded}">
-                            <app-download-panel *ngIf="getUILayerModel(layer.id)?.tabpanel.downloadpanel.expanded" [layer]=layer></app-download-panel>
+                        <div class="tab-pane fade" [ngClass]="{'show active': !hasFilters(layer.id) || getUILayerModel(layer.id)?.tabpanel.downloadpanel.expanded}">
+                            <app-download-panel *ngIf="!hasFilters(layer.id) || getUILayerModel(layer.id)?.tabpanel.downloadpanel.expanded" [layer]=layer></app-download-panel>
                         </div>
                     </div>
                 </div>
