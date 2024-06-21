@@ -129,8 +129,8 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
    * @returns boolean
    */
   public hasFilters(layerId: string): boolean {
-    let filterState = this.layerManagerService.getFilters(layerId);
 
+    let filterState = this.layerManagerService.getFilters(layerId);
     /*
     // if the layer has no filters then set it to display the download tab
     if (this.getUILayerModel(layerId)) {
