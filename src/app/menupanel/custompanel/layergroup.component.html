@@ -1,7 +1,6 @@
 <!-- Custom Layer Controls for WMS service -->
 <li class="active" *ngFor="let layerGroup of layerGroups | getKey">
   		<a href="javascript:;">
-           <i class="ti-angle-down float-right"></i>
              {{layerGroup.key}}
         </a>
 	<ul>
@@ -15,13 +14,17 @@
 						</u>
 					</span>
 					-->
-					<div>
-						<i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-times red" (click) = "removeLayer(layer);$event.stopPropagation();"></i>
-						{{layer.name}}
-						<i *ngIf="layer.expanded && !getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-arrow-circle-down"></i>
-						<i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted() && !getUILayerModel(layer.id).statusMap.getRenderComplete()" class="float-right light-blue fa fa-spin fa-spinner"></i>
-						<i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted() && getUILayerModel(layer.id).statusMap.getContainsError()" class="fa fa-warning text-warning"></i>
-					</div>
+					<div style="display: flex; justify-content: space-between">
+                        
+                        <div>
+                            {{layer.name}}
+                        <i *ngIf="!layer.expanded" class="fa fa-arrow-circle-down"></i>
+                        <i *ngIf="layer.expanded" class="fa fa-arrow-circle-up"></i>
+                        <i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted() && !getUILayerModel(layer.id).statusMap.getRenderComplete()" class="float-right light-blue fa fa-spin fa-spinner"></i>
+                        <i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted() && getUILayerModel(layer.id).statusMap.getContainsError()" class="fa fa-warning text-warning"></i>
+                        </div>
+                        <i *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-trash red" (click) = "removeLayer(layer);$event.stopPropagation();"></i>
+                    </div>
 					<!--
 					<div *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="progress progress-xs" style="height: 5px">
 						<div class="progress-bar bg-gradient-blue-purple" [style.width]="getUILayerModel(layer.id).statusMap.getCompletePercentage()" role="progressbar"></div>
@@ -30,15 +33,19 @@
 				</div>
 			</a>
 			<div [hidden]="!layer.expanded" class="sidebar-card-menu-show">
-				 <div class="card card-info card-with-tabs layer-card animated slideInRight">
+				 <div class="card card-info card-with-tabs layer-card animated slideInRight" style="margin-left:2.6rem;">
 					<div class = "rh_info_wrap">
 						<div class="card-header">
 							<ul id="card-tab" class="nav nav-tabs float-right">
-								<li (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': getUILayerModel(layer.id).tabpanel.filterpanel.expanded}"><a data-toggle="tab"><span class="d-none d-sm-inline">Map Layer</span></a></li>
-							</ul>
+                                <li class="tab-item" (click)="selectTabPanel(layer.id,'filterpanel')">
+                                    <a data-toggle="tab">
+                                        <span class="d-none d-sm-inline tab-link">Map Layer</span>
+                                    </a>
+                                </li>
+                            </ul>
 						</div>
 						<div class="rh_info">	
-							<button (click)="displayRecordInformation(layer)" class="btn-info" title="Information" [ngClass]="{'active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.filterpanel.expanded}">info</button>
+							<button (click)="displayRecordInformation(layer)" class="btn-info" title="Information" [ngClass]="{'active': getUILayerModel(layer.id) && getUILayerModel(layer.id).tabpanel.filterpanel.expanded}">Info</button>
 						</div>
 					</div>
 					<div id="card-tab-content" class="tab-content">

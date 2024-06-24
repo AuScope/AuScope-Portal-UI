@@ -1,6 +1,7 @@
 import { CsClipboardService, CsMapService, CsWMSService, FilterPanelService, GeometryType, LayerHandlerService,
-         LayerModel, LayerStatusService, Polygon, UtilitiesService } from '@auscope/portal-core-ui';
-import { ApplicationRef, Component, Input, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+         LayerModel, LayerStatusService, Polygon, UtilitiesService, ResourceType, 
+         CsCSWService} from '@auscope/portal-core-ui';
+import { ApplicationRef, Component, Inject, Input, OnInit, AfterViewInit, ViewChild, ViewContainerRef } from '@angular/core';
 import * as _ from 'lodash';
 import { config } from '../../../../environments/config';
 import { ref } from '../../../../environments/ref';
@@ -10,17 +11,16 @@ import { AdvancedComponentService } from 'app/services/ui/advanced-component.ser
 import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
 
-declare let gtag: Function;
 
 @Component({
   selector: 'app-filter-panel',
   templateUrl: './filterpanel.component.html',
   styleUrls: ['./filterpanel.component.scss', '../../menupanel.scss']
 })
-export class FilterPanelComponent implements OnInit {
+export class FilterPanelComponent implements OnInit, AfterViewInit {
   @Input() layer: LayerModel;
   private providers: Array<Object>;
-  public optionalFilters: Array<Object>;
+  public optionalFilters: Array<Object>; // Optional filters currently rendered by this component
   public selectedFilter;
   public advancedParam = [];
   public analyticMap;
@@ -28,7 +28,7 @@ export class FilterPanelComponent implements OnInit {
   public showAdvancedFilter = true;
   public bApplyClipboardBBox = true;
   public layerTimes: LayerTimes;
-  public layerFilterCollection: any;
+  public layerFilterCollection: any; // List of all filters that maybe rendered by this component
 
   // Layer toolbar
   @ViewChild('advancedFilterComponents', { static: true, read: ViewContainerRef }) advancedFilterComponents: ViewContainerRef;
@@ -42,16 +42,18 @@ export class FilterPanelComponent implements OnInit {
     private modalService: BsModalService,
     private csClipboardService: CsClipboardService,
     private csWMSService: CsWMSService,
+    private csCSWService: CsCSWService,
     public layerStatus: LayerStatusService,
     private appRef: ApplicationRef,
-    private advancedComponentService: AdvancedComponentService) {
+    private advancedComponentService: AdvancedComponentService,
+    @Inject('conf') private conf) {
     this.providers = [];
     this.optionalFilters = [];
     this.analyticMap = ref.layeranalytic;
     this.advancedFilterMap = ref.advancedFilter;
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     // Register filters with service
     if (this.layer.filterCollection) {
       this.filterService.registerLayerFilterCollection(this.layer.id, this.layer.filterCollection).subscribe(filterCollection => {
@@ -61,6 +63,14 @@ export class FilterPanelComponent implements OnInit {
           this.selectedFilter = {};
         }
       });
+    }
+
+    // set a filter flag for the layer
+    this.layerManagerService.setFilters(this.layer.id, false);
+    if (this.layerFilterCollection) {
+      if (this.layerFilterCollection.optionalFilters) {
+        this.layerManagerService.setFilters(this.layer.id, true);
+      }
     }
 
     // XXX Sidebar only..?
@@ -78,8 +88,8 @@ export class FilterPanelComponent implements OnInit {
       this.providers = layerProviders;
     });
 
-    // Layer times
-    this.filterService.getLayerTimes(this.layer.id).subscribe(times => {
+    // Subscribe to receiving the layer's time extent, if it has one
+    this.filterService.getLayerTimesBS(this.layer.id).subscribe(times => {
       this.layerTimes = times;
     });
 
@@ -96,7 +106,23 @@ export class FilterPanelComponent implements OnInit {
         });
       }
     }
+  }
 
+  /**
+   * Called once the panel has been drawn
+   */
+  public ngAfterViewInit() {
+        // Update the time extent button/selector
+        this.setLayerTimeExtent();
+  }
+
+  /**
+   * Check if a layer has filters - filterList array
+   */
+  public hasFilters(layerId : string): boolean {
+    let filterState: boolean = false;
+    filterState = this.layerManagerService.getFilters(layerId);
+    return filterState;
   }
 
   /**
@@ -104,6 +130,7 @@ export class FilterPanelComponent implements OnInit {
    * @param layerState layer state is JSON
    */
   public addLayerFromState(layerState: any) {
+
     // Populate layer times if necessary
     if (config.queryGetCapabilitiesTimes.indexOf(this.layer.id) > -1) {
       this.filterService.updateLayerTimes(this.layer, this.layerTimes);
@@ -116,18 +143,26 @@ export class FilterPanelComponent implements OnInit {
     if (layerState.advancedFilter) {
       this.advancedComponentService.getAdvancedFilterComponentForLayer(this.layer.id).setAdvancedParams(layerState.advancedFilter);
     }
-    this.optionalFilters = this.optionalFilters.concat(layerState.optionalFilters);
-    let me = this;
+    // Merge state filters with optional filters
+    this.optionalFilters = this.optionalFilters.map( optFilt => {
+        const filt = layerState.optionalFilters.find((filt) => filt.label === optFilt['label']);
+        if (filt) {
+          return filt;
+        }
+        return optFilt;
+    });
+
+    const me = this;
     setTimeout(() => {
       for (const optFilter of me.optionalFilters) {
         if (optFilter['value'] && optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
           const geometry = optFilter['value'];
-          const swapedGeometry = this.csClipboardService.swapGeometry(geometry);
+          const swappedGeometry = this.csClipboardService.swapGeometry(geometry);
           const newPolygon:Polygon = {
             name: 'Polygon created',
             srs: 'EPSG:4326',
             geometryType: GeometryType.POLYGON,
-            coordinates: swapedGeometry
+            coordinates: swappedGeometry
           };
           this.csClipboardService.clearClipboard();
           this.csClipboardService.addPolygon(newPolygon);
@@ -136,6 +171,13 @@ export class FilterPanelComponent implements OnInit {
         }
       }
       me.layerManagerService.addLayer(me.layer, me.optionalFilters, me.layerFilterCollection, me.layerTimes.currentTime);
+
+      // Set opacity of the layer on the map
+      if (UtilitiesService.layerContainsResourceType(me.layer, ResourceType.WMS)) {
+        me.csWMSService.setOpacity(this.layer, layerState.opacity / 100.0 );
+      } else if (this.conf.cswrenderer && this.conf.cswrenderer.includes(me.layer.id)) {
+        me.csCSWService.setOpacity(this.layer, layerState.opacity / 100.0 );
+      }
     }, 500);
   }
 
@@ -174,8 +216,7 @@ export class FilterPanelComponent implements OnInit {
    * containing a supported OnlineResource type.
    */
   public getUnsupportedLayerMessage(): string {
-    return 'This layer cannot be displayed. For Featured Layers, please wait for the layer cache to rebuild itself. ' +
-      'For Custom Layers please note that only the following online resource types can be added to the map: ' +
+    return 'This layer cannot be displayed. Only the following online resource types can be added to the map: ' +
       this.csMapService.getSupportedOnlineResourceTypes();
   }
 
@@ -260,6 +301,12 @@ export class FilterPanelComponent implements OnInit {
     this.advancedParam = $event;
   }
 
+  /**
+   * Update the filter service with a new filter or remove one
+   * 
+   * @param filter filter 
+   * @param filterAdded boolean, if 'true' will add, if 'false' remove
+   */
   private updateFilter(filter: any, filterAdded: boolean) {
     filter.added = filterAdded;
     const i = this.layerFilterCollection.optionalFilters.indexOf(this.layerFilterCollection.optionalFilters.find(f => f.label === filter.label));
@@ -350,7 +397,7 @@ export class FilterPanelComponent implements OnInit {
   /**
    * Set layer time extent
    */
-  setLayerTimeExtent() {
+  public setLayerTimeExtent() {
     if (this.layerTimes.timeExtent.length === 0 && config.queryGetCapabilitiesTimes.indexOf(this.layer.id) > -1) {
       this.filterService.updateLayerTimes(this.layer, this.layerTimes);
     }

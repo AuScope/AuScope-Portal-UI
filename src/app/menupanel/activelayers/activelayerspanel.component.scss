@@ -1,52 +1,236 @@
+@import 'app/globals';
+
+:host {
+  .filter-text {
+    width: 100%;
+  }
+  .filter-btn {
+    margin-left: auto;
+  }
+ 
+  ::ng-deep {
+    fieldset.show-fieldset-borders {
+        margin: 0 0 1em 0;
+        padding: 0 1.4em 0.5em 1.4em;
+    }
+
+    fieldset legend {
+        width: 50%;
+    }
+
+    .tab-content {
+        padding: 0 15px 0 15px;
+    }
+
+    .mat-ripple {
+        display: none !important;
+    }
+
+    .mdc-slider {
+        height: 24px;
+        margin: 0 0.5rem;
+        min-width: 92px;
+    }
+
+    .mdc-slider .mdc-slider__thumb {
+        left: -12px;
+        height: 24px;
+        width: 24px;
+    }
+  }
+
+  .top-layer-btn-panel {
+      display:flex;
+      position:relative;
+      margin-left:auto;
+      right:16px;
+
+      .top-layer-btn {
+          position: relative;
+          top: 16px;
+          height: fit-content;
+          margin-left: 5px;
+      }
+  }
+
+  .show-bookmark-btn {
+      position: relative;
+      top: 5px;
+  }
+
+  .bookmark-icon {
+      color: $auscope-teal;
+      margin-right: 4px;
+      vertical-align: middle;
+  }
+
+  .layer-card {
+      left: -50px;
+      width: 310px;
+  }
+}
+
 .activeLayerItem {
+  padding: 0.8rem 0.8rem 0 0.8rem;
   display: flex;
   position: relative;
   right: 5px;
   width: 100%;
   align-items: center;
-  font-size: .85rem;
+  font-size: 1rem;
   color: #d8d9d7;
   margin: 0 5px 0 0;
-  padding: 0.5em 0;
   border-bottom: 1px solid rgba(255 ,255, 255, 0.15);
 
-  // Disbale text selection
+  // Disable text selection
   -webkit-user-select: none;  /* Safari */
   -ms-user-select: none;      /* IE 10 and IE 11 */
   user-select: none;          /* Standard syntax */
 
-  .activeLayerGrabber {
-    cursor: grab;
-    margin-right: 0.5em;
-    border: 1px solid white;
-    border-radius: 0.5em;
-    padding: 0.2em 0.4em;
+  .activeLayerTitleBar {
+    display:flex;
+    flex-direction:row;
+    width:100%;
+    align-items: center;
+
+    .activeLayerGrabber {
+      align-self:center;
+      cursor: grab;
+      margin-right: 0.5em;
+      margin-left: 0;
+    }
+
+    .activeLayerTitle {
+      font-size: 1.1rem;
+      margin-right: 2px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+  }
+
+  .activeLayerOpacityLegendStatusBar {
+    display:flex;
+    flex-direction:row;
+    width:100%;
+    margin-bottom: 0.3rem;
+    align-items: center;
+
+    .legend, .status, .info {
+      font-size: 0.8rem;
+      padding: 0 2px;
+      margin-left: 12px;
+      margin-top:6px;
+    }
+    .sidebar {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 0;
+      background-color: #fff;
+      z-index: 1050;
+      overflow-y: auto;
+      transition: width 0.3s ease;
+    }
   }
 
   .activeLayerContent {
     width:100%;
+    color: $text-colour;  // XXX Needs to be darker but may be fixed at a higher level
   }
 
+  .activeLayerDragMessagePanel {
+    display: none;
+  }
+  
   // Slider min-width is 112px by default which can push components to right off the panel 
   ::ng-deep {
     mat-slider {
       min-width: 80px;
     }
   }
-
 }
 
 .cdk-drag-preview {
-  background-color: #6764ce;
-  color: #d8d9d7;
+  background-color: $auscope-shoots-green;
+  height: 100px !important;
+  display: flex;
+  flex-direction: column;
   box-sizing: border-box;
   border: 1px solid white;
   border-radius: 4px;
   box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
               0 8px 10px 1px rgba(0, 0, 0, 0.14),
               0 3px 14px 2px rgba(0, 0, 0, 0.12);
+
+  .activeLayerFilterPanel {
+    display: none;
+  }
+
+  .activeLayerOpacityLegendStatusBar {
+    display: none;
+  }
+
+  .split-panel {
+    display: none;
+  }
+
+  .activeLayerDragMessagePanel {
+    text-align: center;
+    display: block;
+    position: relative;
+    font-size: larger;
+    top: 20px;
+  }
+
 }
 
 .cdk-drop-list-dragging {
   cursor: grabbing;
+}
+
+u {
+  text-decoration: none;
+}
+
+.tab-item {
+    display: inline-block;
+    // margin-right: 10px;
+    cursor: pointer;
+    padding-bottom: 8px;
+}
+
+.tab-link {
+    display: inline-block;
+    padding: 10px 10px;
+    text-decoration: none;
+    color: #605E7B; /* Primary color */
+    background-color: #f8f9fa; /* Light background */
+    border: 1px solid #dee2e6; /* Border color */
+    // border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.tab-link:hover,
+.tab-link:focus {
+    background-color: #e2e6ea; /* Light hover color */
+    color: #605E7B; /* Darker text color on hover */
+    cursor: pointer;
+}
+
+#card-tab .active span{
+    background-color: #e2e6ea; /* Light hover color */
+    color: #605E7B; /* Active text color */
+    border-color: #e2e6ea; /* Active border color */
+}
+
+.rh_info .btn-info {
+    margin-bottom: 40px; 
+    background-color: #117a8b; 
+    border-color:#10707f;
+}
+#card-tab {
+    padding: 11px;
+    display: flex;
 }

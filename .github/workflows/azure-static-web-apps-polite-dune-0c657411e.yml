@@ -1,4 +1,4 @@
-name: Azure Static Web Apps Dev CI/CD
+name: Deploy to Dev AuScope portal auportal-dev.geoanalytics.group
 
 on:
   push:
@@ -15,10 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
-      - uses: jsdaniell/create-json@v1.2.2
+      - uses: jsdaniell/create-json@v1.2.3
         with:
           name: "context.json"
           json: '{"portalBaseUrl":"${{ vars.AZURE_PORTAL_API_URL_DEV }}","hostUrl":"${{ vars.AZURE_PORTAL_URL_DEV }}","authBaseUrl":"${{ vars.AZURE_PORTAL_URL_DEV }}/api/"}'
@@ -35,7 +35,10 @@ jobs:
           app_location: "/" # App source code path
           api_location: "" # Api source code path - optional
           output_location: "dist/" # Built app content directory - optional
+          app_build_command: "npm run build-dev"
           ###### End of Repository/Build Configurations ######
+        env:
+          SKIP_DEPLOY_ON_MISSING_SECRETS: true
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
@@ -48,3 +51,5 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_POLITE_DUNE_0C657411E }}
           action: "close"
+        env:
+          SKIP_DEPLOY_ON_MISSING_SECRETS: true

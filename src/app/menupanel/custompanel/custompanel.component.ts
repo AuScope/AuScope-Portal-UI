@@ -55,6 +55,12 @@ export class CustomPanelComponent {
     this.statusMsg = 'Enter your OGC WMS service endpoint</br>e.g. "https://server.gov.au/service/wms"</br>or KML/KMZ URL and hit <i class="fa fa-search"></i>.';
   }
 
+  /**
+   * Makes a filter or download tab panel visible
+   * 
+   * @param layerId layer id string
+   * @param panelType panel type string, either 'filterpanel' or 'downloadpanel'
+   */
   public selectTabPanel(layerId: string, panelType: string) {
     this.uiLayerModelService.getUILayerModel(layerId).tabpanel.setPanelOpen(panelType);
   }
@@ -81,7 +87,7 @@ export class CustomPanelComponent {
     this.statusMsg = '';
 
     // Clear the results from the previous search, start the loading spinner
-    //this.urlLayerGroups = { 'Results': [] }; // don't clear the results
+    this.urlLayerGroups = { 'Results': [] };
     this.loading = true;
 
     // Check for empty URL
@@ -273,6 +279,16 @@ export class CustomPanelComponent {
   }
 
   /**
+   * Catch ENTER key event in KML input to trigger search
+   * @param event KeyEvent
+   */
+  public onKeyUp(event: KeyboardEvent) {
+    if (event.key == 'Enter') {
+      this.search();
+    }
+  }
+
+  /**
    * Open the modal that displays the status of the render
    * 
    * @param uiLayerModel ui layer model object whose status will be displayed
@@ -351,6 +367,20 @@ export class CustomPanelComponent {
     return xmlStr;
   }
 
+  /**
+   * Check if a list of file or URL records already contain a record denoted by its name and URL
+   *
+   * @param recordsList the list of records (file or url)
+   * @param name the name of the layer
+   * @param url the URL of the layer
+   * @returns true if the layer is found within recordsList, false otherwise
+   */
+  private recordsListContainsRecord(recordsList: any, name: string, url: string): boolean {
+    if (recordsList['Results'].findIndex(x => x.cswRecords[0].name === name && x.cswRecords[0].onlineResources[0].url === url) != -1) {
+      return true;
+    }
+    return false;
+  }
 
   /**
    * This gets called after a file has been selected for upload
@@ -358,7 +388,6 @@ export class CustomPanelComponent {
    * @param sourceType URL or File
    */
   public setupLayer(me: this, name: string, kmzData: any, proxyUrl: string, docType: ResourceType, sourceType: string) {
-
     let layerRec: LayerModel= null;
     // Make a layer model object
     if (docType == ResourceType.KMZ) {
@@ -370,13 +399,12 @@ export class CustomPanelComponent {
     const uiLayerModel = new UILayerModel(layerRec.id, me.renderStatusService.getStatusBSubject(layerRec));
     me.uiLayerModelService.setUILayerModel(layerRec.id, uiLayerModel);
     // Make the layer group listing visible in the UI
-    if (sourceType == "URL") {
+    if (sourceType == "URL" && !this.recordsListContainsRecord(me.urlLayerGroups, name, proxyUrl)) {
       me.urlLayerGroups['Results'].unshift(layerRec);
-    } else {
+    } else if (!this.recordsListContainsRecord(me.fileLayerGroups, name, proxyUrl)) {
       me.fileLayerGroups['Results'].unshift(layerRec);
     }
   }
-
 
   /**
    * This gets called after a file has been selected for upload

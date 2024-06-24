@@ -18,6 +18,7 @@ import { UserStateService } from 'app/services/user/user-state.service';
 import { VMFQuerierHandler } from './custom-querier-handler/vmf-querier-handler.service';
 import { Observable, forkJoin } from 'rxjs';
 import { finalize, tap, timeout } from 'rxjs/operators';
+import { ToolbarComponent } from 'app/menupanel/toolbar/toolbar.component';
 
 declare var Cesium: any;
 
@@ -26,10 +27,8 @@ declare var Cesium: any;
   template: `
     <div #mapElement id="map" class="h-100 w-100" (mouseout)="mouseLongitude=undefined;mouseLatitude=undefined;">
       <ac-map>
-          <rectangles-editor></rectangles-editor>
-          <app-cs-map-zoom></app-cs-map-zoom>
-          <app-cs-map-split (toggleEvent)="toggleShowMapSplit()"></app-cs-map-split>
-          <app-cs-clipboard></app-cs-clipboard>
+          <app-browse-menu></app-browse-menu>
+          <app-toolbar (splitToggleEvent)="toggleShowMapSplit()"></app-toolbar>
           <div #mapSlider id="mapSlider" *ngIf="getSplitMapShown()">
             <div class="slider-grabber">
               <div class="slider-grabber-inner"></div>
@@ -38,7 +37,7 @@ declare var Cesium: any;
           <div class="mouse-coordinates" *ngIf="mouseLongitude !== undefined && mouseLatitude !== undefined">
               Longitude:&nbsp;{{ mouseLongitude }},&nbsp;Latitude:&nbsp;{{ mouseLatitude }}
           </div>
-          <div class="advancedmapcomponent" style="position:absolute;right:0;z-index:1;">
+          <div class="advancedmapcomponent">
               <ng-template #advancedmapcomponents></ng-template>
           </div>
       </ac-map>
@@ -57,6 +56,8 @@ export class CsMapComponent implements AfterViewInit {
   @ViewChild('mapElement', { static: true }) mapElement: ElementRef;
 
   @ViewChild('mapSlider', { static: false }) mapSlider: ElementRef;
+
+  @ViewChild(ToolbarComponent) toolbar!: ToolbarComponent;
 
   // Advanced map components (legends etc.)
   @ViewChild('advancedmapcomponents', { static: true, read: ViewContainerRef }) advancedMapComponents: ViewContainerRef;
@@ -467,12 +468,11 @@ export class CsMapComponent implements AfterViewInit {
       forkJoin(getFeatureInfoRequests).pipe(
         finalize(() => {
           this.bsModalRef.content.downloading = false;
-          if (numberOfFeatures === 0) {
-              this.bsModalRef.content.showZoomMsg = true;
-          }
-          this.bsModalRef.content.onDataChange();
+          this.bsModalRef.content.allLayersLoaded();
         })
       ).subscribe();
+    } else {
+      this.bsModalRef.content.allLayersLoaded();
     }
 
   }
@@ -506,10 +506,9 @@ export class CsMapComponent implements AfterViewInit {
    */
   private displayModal(clickCoord: { x: number, y: number, z: number } | null) {
     if (!this.modalDisplayed) {
-      this.bsModalRef = this.modalService.show(QuerierModalComponent, { class: 'modal-lg' });
+      this.bsModalRef = this.modalService.show(QuerierModalComponent, { class : 'modal-lg modal-dialog-scrollable modal-dialog-centered' });
       this.modalDisplayed = true;
       this.bsModalRef.content.downloading = true;
-      this.bsModalRef.content.showZoomMsg = false;
       /*
       if (clickCoord) {
         const vector = this.csMapService.drawDot(clickCoord);
@@ -608,10 +607,7 @@ export class CsMapComponent implements AfterViewInit {
       }
       featureCount++;
       if (featureCount >= 10) {
-        this.setModalHTML('<p>One or more layers returned too many features to list, use map zoom to get a more precise location</p>',
-          '...', feature, this.bsModalRef);
         break;
-
       }
       treeCollection.raw = result;
       this.bsModalRef.content.docs.push(treeCollection);
@@ -621,7 +617,6 @@ export class CsMapComponent implements AfterViewInit {
     }
 
     if (featureCount > 0) {
-      this.bsModalRef.content.downloading = false;
       this.bsModalRef.content.onDataChange();
     }
     return featureCount;
@@ -644,7 +639,6 @@ export class CsMapComponent implements AfterViewInit {
     if (bsModalRef.content.uniqueLayerNames.indexOf(layer.name) === -1) {
       bsModalRef.content.uniqueLayerNames.push(layer.name)
     }
-    this.bsModalRef.content.downloading = false;
     this.bsModalRef.content.onDataChange();
   }
 
@@ -695,7 +689,6 @@ export class CsMapComponent implements AfterViewInit {
           this.sliderMoveActive = false;
         }, ScreenSpaceEventType.PINCH_END);
       }, 10);
-
     } else {
       for (const layer of this.csMapService.getLayerModelList()) {
         this.csMapService.setLayerSplitDirection(layer, SplitDirection.NONE);

@@ -51,6 +51,8 @@ export class DownloadPanelComponent implements OnInit {
 
   irisDownloadListOption: any;
   isIRISDownloadSupported: boolean;
+  irisAllStationsMaxDate: any;
+  irisAllStationsMinDate: any;
 
   // Default values for selectors
   public SELECT_DEFAULT_DOWNLOAD_FMT = "Choose a download format";
@@ -334,11 +336,13 @@ export class DownloadPanelComponent implements OnInit {
         selectedChannels: [],
         selectedStations: [],
         displayBbox: true,
-        minDate: response['data'][0].mintDate,
+        minDate: response['data'][0].minDate,
         maxDate: response['data'][0].maxDate,
-        dateFrom: response['data'][0].mintDate,
+        dateFrom: response['data'][0].minDate,
         dateTo: response['data'][0].maxDate,
-      }
+      };
+      this.irisAllStationsMinDate = response['data'][0].minDate;
+      this.irisAllStationsMaxDate = response['data'][0].maxDate;
     })
   }
 
@@ -404,11 +408,24 @@ export class DownloadPanelComponent implements OnInit {
   }
 
   /**
+   * Use the rules present in the button options to determine if download button should be enabled
+   */
+  downloadButtonEnabled(): boolean {
+    if (this.bbox || (this.bbox && this.irisDownloadListOption) ||
+        (this.polygonFilter && this.isPolygonSupportedLayer) ||
+        ((this.bbox || this.polygonFilter) && this.isWCSDownloadSupported) ||
+        this.isTsgDownloadAvailable) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
    * Download the layer
    */
   public download(): void {
     if (this.downloadStarted) {
-      alert('Download in progress, please wait for it to completed');
+      alert('Download in progress, please wait for it to complete');
       return;
     }
     let observableResponse = null;
@@ -417,24 +434,24 @@ export class DownloadPanelComponent implements OnInit {
     // WCS download
     if (this.isWCSDownloadSupported) {
       if (!this.bbox || UtilitiesService.isEmpty(this.wcsDownloadForm)) {
-        alert('Required information missing. Make sure you have selected an area, crs and format for download');
+        alert('Required information missing. Make sure you have selected an area, crs and format for download.');
         return;
       }
       // Check that input values were selected
       if (this.wcsDownloadForm.inputCrs === this.SELECT_DEFAULT_REF_SYSTEM) {
-        alert('Cannot download. A reference system value has not been selected');
+        alert('Cannot download. A reference system value has not been selected.');
         return;
       }
       if (this.wcsDownloadForm.downloadFormat === this.SELECT_DEFAULT_DOWNLOAD_FMT) {
-        alert('Cannot download. A download format has not been selected');
+        alert('Cannot download. A download format has not been selected.');
         return;
       }
       if (this.wcsDownloadForm.outputCrs === this.SELECT_DEFAULT_OUTPUT_CRS) {
-        alert('Cannot download. An output CRS has not been selected');
+        alert('Cannot download. An output CRS has not been selected.');
         return;
       }
       if (this.wcsDownloadListOption.timePositionList.length > 0 && this.wcsDownloadForm.timePosition === this.SELECT_DEFAULT_TIME_POS) {
-        alert('Cannot download. A time position value has not been selected');
+        alert('Cannot download. A time position value has not been selected.');
         return;
       }
 
@@ -453,10 +470,15 @@ export class DownloadPanelComponent implements OnInit {
 
     // Download IRIS datasets by constructing a data download URL. User can select the either Dataselect or Station
     } else if (this.irisDownloadListOption) {
+      // IRIS requires a bbox be present
+      if (!this.bbox) {
+        alert('Cannot download. Make sure you select a bounding box.');
+        return;
+      }
       this.downloadStarted = true;
 
-      let start = (this.irisDownloadListOption.dateFrom !== null && this.irisDownloadListOption.dateFrom !== '') ? new Date(new Date(this.irisDownloadListOption.dateFrom)).toISOString() : null;
-      let end = (this.irisDownloadListOption.dateToTo !== null && this.irisDownloadListOption.dateTo !== '') ? new Date(new Date(this.irisDownloadListOption.dateTo)).toISOString() : null;
+      let start = (this.irisDownloadListOption.dateFrom !== null && this.irisDownloadListOption.dateFrom !== '') ? new Date(new Date(this.irisDownloadListOption.dateFrom)).toISOString().substring(0, 10) : null;
+      let end = (this.irisDownloadListOption.dateToTo !== null && this.irisDownloadListOption.dateTo !== '') ? new Date(new Date(this.irisDownloadListOption.dateTo)).toISOString().substring(0, 10) : null;
 
       let station = this.SELECT_ALL_CODE;
       station = !this.irisDownloadListOption.selectedStations.includes(this.SELECT_ALL_CODE) ? this.irisDownloadListOption.selectedStations.join(",") : this.SELECT_ALL_CODE;
@@ -562,20 +584,15 @@ export class DownloadPanelComponent implements OnInit {
 
     const kmlPlaceMarkBHTemplate = '<Placemark><name>${GMLID}</name><styleUrl>#icon-1899-0288D1</styleUrl><ExtendedData>${METADATA}</ExtendedData><Point><coordinates>${GSMLPSHAPE}</coordinates></Point></Placemark>';
     const bhMetaDataTemplate = '<Data name="${NAME}"><value>${VALUE}</value></Data>';
-    let kml = "";
     let kmlPlaceMarkBHarray=[];
     let gmlid = "";
     let gsmlpshape = "";
-    let gsmlpidentifier = "";
     let metaData = "";
-    let name = "";
-    let value = "";
     //csv data process
     let csvArray = csv.split(/\r?\n/g);    
     let csvHeader = csvArray[0].split(",");
     let indexGsmlpShape = csvHeader.indexOf("gsmlp:shape");
     let indexGmlId = csvHeader.indexOf("gml:id");
-    let indexGsmlpIdentifier = csvHeader.indexOf("gsmlp:identifier")
 
     if (indexGsmlpShape < 0 || indexGmlId < 0) {
       console.log("saveKML:error to find gsmlp:shape");
@@ -760,11 +777,30 @@ export class DownloadPanelComponent implements OnInit {
   public onStationChange() {
     this.irisDownloadListOption.channelLst.length = 0;
     if (this.irisDownloadListOption.selectedStations.includes(this.SELECT_ALL_CODE)) {
+      // Update the channel list
       this.irisDownloadListOption.channelLst = this.getAvilChannel(this.irisDownloadListOption.stationLst);
+      // Update the to/from and start/end dates for all stations in the network
+      this.irisDownloadListOption.minDate = this.irisAllStationsMinDate;
+      this.irisDownloadListOption.maxDate = this.irisAllStationsMaxDate;
+      this.irisDownloadListOption.dateFrom = this.irisAllStationsMinDate;
+      this.irisDownloadListOption.dateTo = this.irisAllStationsMaxDate;
     } else {
       const stations = this.irisDownloadListOption.stationLst.filter(station => this.irisDownloadListOption.selectedStations.includes(station.code));
+      // Update the channel list
       this.irisDownloadListOption.channelLst = this.getAvilChannel(stations);
+      // Update the to/from and start/end dates according to the channels selected
+      let newStartDate = stations[0].startDate;
+      let newEndDate = stations[0].endDate;
+      for (let station of stations) {
+        newStartDate = station.startDate < newStartDate ? station.startDate : newStartDate;
+        newEndDate = station.endDate > newEndDate ? station.endDate : newEndDate;
+      }
+      this.irisDownloadListOption.minDate = newStartDate;
+      this.irisDownloadListOption.maxDate = newEndDate;
+      this.irisDownloadListOption.dateFrom = newStartDate;
+      this.irisDownloadListOption.dateTo = newEndDate;
     }
+
   }
 
 }

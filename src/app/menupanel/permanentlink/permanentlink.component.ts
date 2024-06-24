@@ -6,15 +6,14 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CreatePermanentLinkModalComponent } from 'app/modalwindow/permanentlink/create-permanentlink.modal.component';
 
 @Component({
-  selector: '[appPermanentLink]',
+  selector: 'app-permanent-link',
   templateUrl: './permanentlink.component.html',
-  styleUrls: ['../menupanel.scss']
+  styleUrls: ['./permanentlink.component.scss']
 })
 export class PermanentLinkComponent {
-
+  public bShowDialog = false;
   public user: User;
   public permanentlink = "";
-  public showPermanentLink = false;
   public shorteningMode = false;
 
   constructor(private userStateService: UserStateService, private modalService: NgbModal) {
@@ -22,28 +21,54 @@ export class PermanentLinkComponent {
       this.user = user;
     });
   }
+  
+  /**
+   * User has clicked permanent link button, show dialog based on whether they're logged in
+   */
+  public permanentLinkClick() {
+    if (this.user) {
+      this.showUserPermanentLinkDialog();
+    } else {
+      this.togglePermanentLinkPanel();
+    }
+  }
+
+  /**
+   * Toggle anonymous user permanent link panel
+   */
+  public togglePermanentLinkPanel() {
+    this.bShowDialog = !this.bShowDialog;
+    if (this.bShowDialog){
+      this.generateAnonymousPermanentLink();
+    }
+    return;
+  }
 
   /**
    * Generate the permanent link
    */
   public generateAnonymousPermanentLink() {
-    if (this.showPermanentLink) {
-      this.shorteningMode = true;
-      this.userStateService.addState(null, null, true, true).subscribe(response => {
-        const link = environment.hostUrl + '?state=' + response;
-        this.permanentlink = link;
-        this.shorteningMode = false;
-      });
-    }
+    this.shorteningMode = true;
+
+    this.userStateService.addState(null, null, true, true).subscribe(response => {
+      const link = environment.hostUrl + '?state=' + response;
+      this.permanentlink = link;
+      this.shorteningMode = false;
+    }, () => {
+      this.permanentlink = "Error on retrieving permanentLink!"
+      this.shorteningMode = false;
+    });
+
   }
 
   /**
    * Show the create permanent link dialog for a logged in user
    */
-  public showPermanentLinkDialog() {
+  public showUserPermanentLinkDialog() {
     this.modalService.open(CreatePermanentLinkModalComponent, {
       size: 'lg',
-      backdrop: false
+      backdrop: false,
+      scrollable: true
     });
   }
 

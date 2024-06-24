@@ -9,7 +9,7 @@ import { TIMAComponent } from './customanalytic/tima/tima.component';
 import { MSCLComponent } from './customanalytic/mscl/mscl.component';
 
 @Component({
-  selector: 'app-custom-analytic',
+   selector: 'app-custom-analytic',
    template: `<div #dynamicContentAnalyticPlaceholder></div>`
 })
 
@@ -33,6 +33,14 @@ export class DynamicAnalyticComponent {
       this.loadComponent();
     }
   }
+
+
+ngOnChanges() {
+  // Show Value from Parent
+  if (this._load) {
+    this.loadComponent();
+  }
+}
 
   loadComponent() {
 
@@ -61,8 +69,8 @@ export class DynamicAnalyticComponent {
     (<MSCLComponent>componentRef.instance).featureId = this.featureId;
     (<MSCLComponent>componentRef.instance).doc = this.doc;
 
-    this.changeDetectorRef.detectChanges();
 
+    //this.changeDetectorRef.detectChanges();
 
   }
 

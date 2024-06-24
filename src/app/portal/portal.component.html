@@ -4,13 +4,10 @@
     <div class="navbar-header">
         <span class="navbar-brand">
             <img id="org-logo" src="extension/img/auscope_single-colour-1.png">
-            <span><b>Au</b>Scope Discovery Portal</span>
+            <span style="margin-left:0.5rem;"><b>Au</b>Scope Discovery Portal</span>
         </span>
     </div>
     <!-- END navbar-header -->
-
-    <!-- search bar -->
-    <app-search-panel></app-search-panel>
 
     <!-- login dropdown menu -->
     <li class="dropdown" app-login-menu></li>
@@ -21,72 +18,28 @@
 <!-- END navbar -->
 
 <!-- BEGIN sidebar -->
-<nav id="sidebar" class="sidebar slimscroll sidebar-collapse show" style="overflow: auto;" >
-    <li class="hasEvent" appPermanentLink></li>
-
+<nav id="sidebar" class="sidebar slimscroll sidebar-collapse show" [ngClass]="{'sidebar-show': isSidebarOpen, 'sidebar-close': !isSidebarOpen}"  style="overflow: auto;" >
     <!-- BEGIN Active Layers -->
-    <input type="checkbox" checked class="menuBtn" id="activeLayersBtn"/>
     <h5 class="mb-1">
-        <label id="activeLayersLink" for="activeLayersBtn" class="mb-0" title="Layers added to map">
-            <i class="ti-filter"></i>
+        <label style="font-size: larger;" id="activeLayersLink" for="activeLayersBtn" class="mb-4" title="Layers added to map">
+            <i class="ti-layers-alt"></i>
             Active Layers
-            <i class="fa fa-arrow-circle-down"></i>
         </label>
-        <ul class="card-sub" appActiveLayers></ul>
+        <div appActiveLayers></div>
     </h5>
+    <button *ngIf="isSidebarOpen" (click)="toggleSidebar()" class="close-sidebar-btn">
+        <i class="fa fa-times" aria-hidden="true"></i>
+    </button>
     <!-- END Active Layers -->
-
-    <!-- BEGIN Featured Layers -->
-    <input type="checkbox" class="menuBtn" id="featuredLayersBtn" [(ngModel)]="featuredLayersCheckbox"/>
-    <h5 class="mb-1">
-        <label id="featuredLayersLink" for="featuredLayersBtn" class="mb-0" title="Select predefined layers">
-            <i class="ti-layers"></i>
-            Featured Layers
-            <i class="fa fa-arrow-circle-down"></i>
-        </label>
-        <ul class="card-sub" appLayerPanel></ul>
-    </h5>
-    <!-- END Featured Layers -->
-
-    <!-- BEGIN Custom Layers -->
-    <input type="checkbox" class="menuBtn" id="customLayersBtn"/>
-    <h5 class="mb-1">
-        <label for="customLayersBtn" class="mb-0" title="Enter a custom WMS endpoint">
-            <i class="ti-pencil-alt"></i>
-            Custom Layer
-            <i class="fa fa-arrow-circle-down"></i>
-        </label>
-        <ul class="card-sub" appCustomPanel></ul>
-    </h5>
-    <!-- END Custom Layers -->
-
-    <!-- BEGIN Data Explorer -->
-    <input type="checkbox" class="menuBtn" id="dataBtn"/>
-    <h5 class="mb-1">
-        <label for="dataBtn" class="mb-0" title="Search CSW services for records">
-            <i class="ti-book"></i>
-            Data Search
-            <i class="fa fa-arrow-circle-down"></i>
-        </label>
-        <ul class="card-sub" appDataExplorer></ul>
-    </h5>
-    <!-- END Data Explorer -->
-    
-    <hr/>
-    <li appPortalDetailsPanel></li>
 </nav>
 <!-- END sidebar -->
 
 <!-- BEGIN #map-area -->
-<div id="map-area" class="map-area">
+<div id="map-area" class="map-area" [ngClass]="{'sidebar-open': isSidebarOpen}">
     <!-- BEGIN map-area-csmap -->
     <div class="map-area-csmap">
         <app-cs-map class="h-100 w-100"></app-cs-map>
+        <app-search-panel></app-search-panel>
     </div>
     <!-- END map-area-csmap -->
 </div>
-
-<!-- Modal window used as a popup when map querying -->
-<app-querier-modal-window></app-querier-modal-window>
-<app-layer-modal-window></app-layer-modal-window>
-<app-disclaimer-modal-window></app-disclaimer-modal-window>

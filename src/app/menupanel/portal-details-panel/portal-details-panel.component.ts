@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { DisclaimerModalComponent } from '../../modalwindow/disclaimer/disclaimer.modal.component';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: '[appPortalDetailsPanel]',
@@ -8,6 +9,8 @@ import { DisclaimerModalComponent } from '../../modalwindow/disclaimer/disclaime
   styleUrls: ['./portal-details-panel.component.scss']
 })
 export class PortalDetailsPanelComponent {
+  currentVersion : string = environment.appVersion;
+  devSuffix: string = (environment.production!=true)? " Development version" : "";
 
   constructor(private modalService: BsModalService) { }
 

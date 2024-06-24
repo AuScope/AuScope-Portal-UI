@@ -34,7 +34,7 @@
 			</div>
 
 
-			<div class="card card-default card-with-tabs">
+			<div class="card card-default card-with-tabs" cdkDrag cdkDragRootElement=".modal-content" #childElement cdkDragBoundary="body">
 				<!-- BEGIN card-header -->
 				<div class="card-header">
 					<ul class="nav nav-tabs float-right">
@@ -50,17 +50,15 @@
 					<div class="tab-pane fade" [ngClass]="{'active show': UItabpanel.algorithm}" id="nvcl-boreholeanalytic-tabpanel-algorithm">
 						<div class="alert alert-secondary">
 			                Please select a classification algorithm to filter boreholes against.
-			            </div>
-
-						<div class="form-group form-group-md">
-							<div class="checkbox">
-								<input id="nvcl-boreholeanalytic-existing-algor" type="checkbox" [(ngModel)]="isExistingAlgorithm" name="isExistingAlgorithm" />
-								<label for="nvcl-boreholeanalytic-existing-algor">Existing Algorithm </label>
+							<div class="form-group form-group-md">
+								<div id="nvcl-boreholeanalytic-algor-radio">
+									<input type="radio" name="ExistingAlgorithm" id="ExistingAlgorithm" [value]="true" [(ngModel)]="isExistingAlgorithm" style="margin-left: 5px"> <label  for = "existA" >Existing Algorithm  </label>
+									<input type="radio" name="NewAlgorithm" id="NewAlgorithm" [value]="false" [(ngModel)]="isExistingAlgorithm" style="margin-left: 5px"> <label  for = "newA">New Alogrithm</label>
+								</div>
 							</div>
-						</div>
-
+			            </div>
 						<fieldset *ngIf="!isExistingAlgorithm" class="show-fieldset-borders-whitebg mb-3">
-				        	<legend><h6>TSG Algorithm</h6></legend>
+						<legend><h6>New Algorithm</h6></legend>
 				        	<div class="form">
 				        		<div class="form-group form-group-md row">
 								    <label class="col-md-3">Name:</label>
@@ -84,7 +82,7 @@
 
 
 						<fieldset *ngIf="isExistingAlgorithm" class="show-fieldset-borders-whitebg mb-3">
-				        	<legend><h6>Algorithm</h6></legend>
+						<legend><h6>Existing Algorithm</h6></legend>
 			        		<div class="form-group form-group-md row">
 							    <label class="col-md-3">Algorithm Output</label>
 							    <div class="col-md-8">
@@ -187,7 +185,7 @@
 							<div class="form-row">
 								<div class="checkbox col-md-6">
 									<input id="apply-nvcl-filter" type="checkbox" [(ngModel)]="bApplyNvclFilter" name="bApplyNvclFilter" />
-									<label for="apply-nvcl-filter"> Apply Nvcl filters </label>
+									<label for="apply-nvcl-filter"  title="Tick it, if you want to limit the searching boreholes with the filter of Update Layer Button. Untick it, if you want to search all NVCL boreholes."> Apply Nvcl filters </label>
 								</div>
 							</div>
 					    </fieldset>
@@ -222,9 +220,9 @@
 										<td>{{status.timeStamp}}</td>
 										<td>{{status.status}}</td>
 										<td *ngIf="status.status==='Success'" class="btn-col" style="white-space: nowrap">
-											<a class="btn btn-purple btn-xs" (click) = "viewOnMap(status.jobid)"><i class="ti-map-alt"></i></a>
-											<a class="btn btn-light btn-xs" (click)="nvclDownload(status.jobid)"><i class="ti-download"></i></a>
-											<a class="btn btn-light btn-xs" (click)="nvclDownloadData(status.jobid)"><i class="ti-zip"></i></a>
+											<a class="btn btn-purple btn-xs" title="View this job on the map." (click) = "viewOnMap(status.jobid)"><i class="ti-map-alt"></i></a>
+											<a class="btn btn-light btn-xs" title="Download this job result." (click)="nvclDownload(status.jobid)"><i class="ti-download"></i></a>
+											<a class="btn btn-light btn-xs" title="Download the TSGMod data for this job. It is only for non-existing scalars, otherwise, the zip file will be empty." (click)="nvclDownloadData(status.jobid)"><i class="ti-zip"></i></a>
 										</td>
 									</tr>
 								</tbody>

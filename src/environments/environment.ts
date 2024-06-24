@@ -8,6 +8,8 @@
 // Note: environment files replace the default, they don't override.  So, any change in this file
 // will almost always need an equivalent change in all the other environment files.
 
+import packagejson from '../../package.json';
+
 export const environment = {
   production: false,
   getCSWRecordEndP: 'getKnownLayers.do',
@@ -22,9 +24,9 @@ export const environment = {
     { value: 'World_Imagery', viewValue: 'ESRI World Imagery', tooltip: 'ESRI World Imagery', layerType: 'ESRI' },
     { value: 'NatGeo_World_Map', viewValue: 'ESRI National Geographic Map', tooltip: 'ESRI National Geographic Map', layerType: 'ESRI' },
     { value: 'World_Street_Map', viewValue: 'ESRI Street Map', tooltip: 'ESRI Street Map', layerType: 'ESRI' },
-    { value: 'OSM', viewValue: 'OpenStreetMap',
-      tooltip: 'OpenStreetMap (OSM) is a collaborative project to create a free editable\n' +
-               'map of the world.\nhttp://www.openstreetmap.org', layerType: 'OSM' },
+    // { value: 'OSM', viewValue: 'OpenStreetMap',
+    //  tooltip: 'OpenStreetMap (OSM) is a collaborative project to create a free editable\n' +
+    //           'map of the world.\nhttp://www.openstreetmap.org', layerType: 'OSM' },
     // Bing maps will only be available if the bingMapsKey property is set
     { value: 'Road', viewValue: 'Bing Roads', tooltip: 'Bing Maps Road', layerType: 'Bing' },
     { value: 'Aerial', viewValue: 'Bing Aerial', tooltip: 'Bing Maps Aerial', layerType: 'Bing' },
@@ -37,5 +39,7 @@ export const environment = {
                 'https://geossdi.dmp.wa.gov.au',
                 'https://geology.data.vic.gov.au',
                 'http://geology.data.vic.gov.au',
-                'http://geoserver.octopusdata.org']
+                'http://geoserver.octopusdata.org'],
+  appVersion: packagejson.version
+
 }

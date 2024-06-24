@@ -1,15 +1,14 @@
-name: Azure Static Web Apps Production CI/CD
+name: Deploy to Production AuScope portal portal.auscope.org.au 
 
 on:
   push:
     branches:
-      # this will be prod so set filters here to control when a release is pushed to the prod static web app
-      - Release-6.4.0
+      - Release
+      # changes committed to the Release branch will be deployed to production AuScope portal.
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
-      # and here
-      - Release-6.4.0
+      - Release
 
 jobs:
   build_and_deploy_job:
@@ -17,10 +16,10 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
-      - uses: jsdaniell/create-json@v1.2.2
+      - uses: jsdaniell/create-json@v1.2.3
         with:
           name: "context.json"
           json: '{"portalBaseUrl":"${{ vars.AZURE_PORTAL_API_URL_PROD }}","hostUrl":"${{ vars.AZURE_PORTAL_URL_PROD }}","authBaseUrl":"${{ vars.AZURE_PORTAL_URL_PROD }}/api/", "googleAnalyticsKey": "${{ secrets.PROD_GOOGLE_ANALYTICS_KEY }}" }'
@@ -37,6 +36,7 @@ jobs:
           app_location: "/" # App source code path
           api_location: "" # Api source code path - optional
           output_location: "dist/" # Built app content directory - optional
+          app_build_command: "npm run build-prod"
           ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:

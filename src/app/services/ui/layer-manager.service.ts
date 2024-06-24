@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { CsMapService, LayerModel, ManageStateService, ResourceType, UtilitiesService } from '@auscope/portal-core-ui';
+import { CsMapService, LayerModel, ManageStateService } from '@auscope/portal-core-ui';
 import { AdvancedComponentService } from './advanced-component.service';
 import { LegendUiService } from '../legend/legend-ui.service';
 import { UILayerModelService } from './uilayer-model.service';
 import { environment } from 'environments/environment';
 import * as _ from 'lodash';
 import * as $ from 'jquery';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 declare let gtag: Function;
 
@@ -15,16 +16,69 @@ declare let gtag: Function;
 @Injectable()
 export class LayerManagerService {
 
-  constructor(private csMapService: CsMapService, private manageStateService: ManageStateService, private uiLayerModelService: UILayerModelService,
-              private advancedComponentService: AdvancedComponentService, private legendUiService: LegendUiService) {}
+  filterList = []; // an array of all active layers - object = {layer, filterState }
+  /**
+   * returns a boolean for whether a layer has filters; from the array filerList
+   */
+  getFilters(layerId: string): boolean {
+
+    let filterState: boolean = false;
+
+    for (let i = 0; i < this.filterList.length; i++) {
+      var c: string;
+      c = this.filterList[i];
+      if (layerId.startsWith(c['layer'])) {
+        filterState = c['hasFilters'];
+      }
+    }
+
+    return filterState;
+  }
 
   /**
-   * Add a layer
+   * sets the state of "hasFilters" variable for the given layer in the array filterList
+   */
+  setFilters(layerId: string, filterState: boolean): void {
+
+    let objIndex = this.filterList.findIndex(obj => obj.layer == layerId);
+    if (objIndex >= 0) { 
+      this.filterList[objIndex].hasFilters = filterState; 
+    } else {
+      this.filterList.push({ layer: layerId, hasFilters: filterState });
+    }
+
+    //this.hasFilters.next(filterState);
+  }
+
+  /**
+   * 
+   * removes a once "Active layer" from the filterList array
+   */
+  removeFilters(layerId: string) {
+
+    this.filterList.forEach((item, index) => {
+      if (item['layer'] === layerId) this.filterList.splice(index, 1);
+    });
+  }
+
+  constructor(private csMapService: CsMapService, private manageStateService: ManageStateService,
+              private uiLayerModelService: UILayerModelService,
+              private advancedComponentService: AdvancedComponentService,
+              private legendUiService: LegendUiService) {
+  }
+
+  /**
+   * Add a layer - this is the generic function to add a layer to the map
+   *  - adds the layer to the Cesium map
+   *  - updates the map state service
+   *  - sets up the optional and mandatory filters
+   * 
    *
-   * @param layer
-   * @param optionalFilters
-   * @param layerFilterCollection
-   * @param layerTime
+   * @param layer LayerModel object
+   * @param optionalFilters layer's optional filters that have been selected already
+   * @param layerFilterCollection the layer's filter collection, 
+   *         i.e. mandatory filters and optional filters that can be selected
+   * @param layerTime time range to display
    *
    * TODO: FilterPanel is only place bounding box filter can currently be set, better to shift flag to FilterService
    * and apply here when it's needed to adding from SearchPanel etc. will apply filter as well
@@ -53,7 +107,7 @@ export class LayerManagerService {
       Object.assign(param, advancedFilter.getCallParams());
     }
 
-    // Remove filters without values
+    // Remove filters without values from parameter list
     param.optionalFilters = param.optionalFilters.filter(f => this.filterHasValue(f));
     for (const optFilter of param.optionalFilters) {
       if (optFilter['options']) {
@@ -64,10 +118,25 @@ export class LayerManagerService {
     // Remove any existing legends in case map re-added with new style
     this.legendUiService.removeLegend(layer.id);
 
-    // Add layer to map in Cesium
+    // Transfer mandatory filters from the 'layerFilterCollection' input to the 'layer' object
+    if (layer?.filterCollection?.mandatoryFilters && 
+        layerFilterCollection?.mandatoryFilters) {
+      for (const layerFilt of layer.filterCollection.mandatoryFilters) {
+        for (const mandFilt of layerFilterCollection.mandatoryFilters) {
+          if (layerFilt.label === mandFilt.label) {
+            // Set value of filter
+            layerFilt.value = mandFilt.value;
+          }
+        }
+      }
+    }
 
+    // Add layer to map in Cesium
     this.csMapService.addLayer(layer, param);
-    
+
+    // Update the optional filter display
+    this.csMapService.updateFilterDisplay(layer.id, optionalFilters);
+
     // Add a new layer in the layer state service
     this.manageStateService.addLayer(
       layer.id,

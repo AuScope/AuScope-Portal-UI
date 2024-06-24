@@ -1,0 +1,19 @@
+<div class="modal-header">
+    <h4>Region Of Interest</h4><button class="btn btn-sm btn-outline pull-right" aria-label="Close" (click)="activeModal.close()"><i class="fa fa-times"></i></button>
+</div>
+<div class="modal-body">
+    <table>
+        <tbody>
+          <tr *ngFor = "let roi of userStateService.roiList">
+            <td>{{roi.name}}</td>
+            <td  class="btn-col" style="white-space: nowrap">
+              <a class="btn btn-purple btn-xs" title="add to map" (click) = "onAddToPolyFilter(roi)"><i class="ti-map-alt"></i></a>
+              <a class="btn btn-light btn-xs" title="delete" (click)="onDelete(roi)"><i class="ti-trash"></i></a>
+            </td>
+          </tr>
+        </tbody>
+    </table>    
+    <form class="text-left">
+        <button type="button" class="btn btn-primary" (click)="close()">Close</button>
+    </form>
+</div>

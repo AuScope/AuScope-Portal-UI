@@ -1,4 +1,4 @@
-<div class="modal-header" style="background: #EEE">
+<div cdkDrag cdkDragRootElement=".modal-content" #childElement cdkDragBoundary="body" class="modal-header" style="background: #EEE;">
     <h5 class="modal-title" id="exampleModalLongTitle">Record Information</h5>
     <button type="button" class="close" (click)="activeModal.close()" aria-label="Close">
         <span aria-hidden="true">&times;</span>
@@ -28,8 +28,8 @@
                         <div class="card-header">
                                 <h4 class="card-title">
                                     <a class="accordion-link" data-toggle="collapse" href="#info-link{{i}}" (click)="cswRecord.expanded = !cswRecord.expanded" >
-                                    <i *ngIf='layerStatus.showInfoWarning(layer.id, cswRecord)' class="fa fa-warning text-warning"> </i>{{cswRecord.contactOrg !=='' && cswRecord.contactOrg !== null ? cswRecord.contactOrg : 'More Information'}}
-                                </a>
+                                        <i *ngIf='layerStatus.showInfoWarning(layer.id, cswRecord)' class="fa fa-warning text-warning"> </i>{{cswRecord.contactOrg !=='' && cswRecord.contactOrg !== null ? cswRecord.contactOrg : 'More Information'}}
+                                    </a>
                                 </h4>
                         </div>
                         <div id="info-link{{i}}" class="card-body card-collapse collapse">

@@ -17,7 +17,7 @@ import { LoginComponent } from './menupanel/login/login.component';
 import { LoggedInComponent } from './menupanel/login/logged-in.component';
 import { CsMapComponent } from './cesium-map/csmap.component';
 import { CesiumMapPreviewComponent } from './menupanel/common/infopanel/cesiummappreview/cesium.preview.component';
-import { LayerPanelComponent } from './menupanel/layerpanel/layerpanel.component';
+import { BrowsePanelComponent } from './browsepanel/browsepanel.component';
 import { CustomPanelComponent } from './menupanel/custompanel/custompanel.component';
 import { ActiveLayersPanelComponent } from './menupanel/activelayers/activelayerspanel.component';
 import { FilterPanelComponent } from './menupanel/common/filterpanel/filterpanel.component';
@@ -41,7 +41,7 @@ import { CsMapClipboardComponent } from './cesium-map/csmap.clipboard.component'
 
 import { AngularCesiumModule, AngularCesiumWidgetsModule } from '@auscope/angular-cesium';
 
-import { QuerierModalComponent } from './modalwindow/querier/querier.modal.component';
+import { QuerierDialogComponent, QuerierModalComponent } from './modalwindow/querier/querier.modal.component';
 import { ClipboardModule } from 'ngx-clipboard';
 
 import { PortalCoreModule } from '@auscope/portal-core-ui';
@@ -77,11 +77,13 @@ import { GraceAdvancedFilterComponent } from './menupanel/common/filterpanel/adv
 
 import { LegendModalComponent } from './modalwindow/legend/legend.modal.component';
 
-import { PermanentLinksModalComponent } from './modalwindow/permanentlink/permenantlinks.modal.component';
+import { PermanentLinksModalComponent } from './modalwindow/permanentlink/permanentlinks.modal.component';
 import { CreatePermanentLinkModalComponent } from './modalwindow/permanentlink/create-permanentlink.modal.component';
 
 import { AddRegistryModalComponent } from './modalwindow/registry/add-registry.modal.component';
 import { ConfirmModalComponent } from './modalwindow/confirm/confirm.modal.component';
+
+import { ROIModalComponent } from './modalwindow/roi/roi.modal.component';
 
 // Services
 import { AuscopeApiService } from './services/api/auscope-api.service';
@@ -120,6 +122,8 @@ import { AuthService } from './services/auth/auth.service';
 import { LayerGroupComponent } from './menupanel/custompanel/layergroup.component';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthErrorHandlerInterceptor } from './interceptors/auth-error.interceptor';
+import { ROIModule } from './modalwindow/roi/roi.modal.modules';
+import { ToolbarComponent } from './menupanel/toolbar/toolbar.component';
 
 PlotlyModule.plotlyjs = PlotlyJS;
 
@@ -133,7 +137,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
         LoginMenuComponent,
         CsMapComponent,
         CesiumMapPreviewComponent,
-        LayerPanelComponent,
+        BrowsePanelComponent,
         CustomPanelComponent,
         LayerGroupComponent,
         ActiveLayersPanelComponent,
@@ -146,10 +150,11 @@ PlotlyModule.plotlyjs = PlotlyJS;
         InfoPanelSubComponent,
         CsMapSplitComponent,
         CsMapZoomComponent,
-        QuerierModalComponent,
+        QuerierModalComponent, 
         DynamicAnalyticComponent,
         NVCLDatasetListComponent,
         NVCLDatasetListDialogComponent,
+        QuerierDialogComponent,
         TIMAComponent,
         RemanentAnomaliesComponent,
         LayerAnalyticModalComponent,
@@ -172,7 +177,8 @@ PlotlyModule.plotlyjs = PlotlyJS;
         PermanentLinksModalComponent,
         CreatePermanentLinkModalComponent,
         AddRegistryModalComponent,
-        ConfirmModalComponent
+        ConfirmModalComponent,
+        ToolbarComponent
     ],
     providers: [ AuscopeApiService, FilterService, RectanglesEditorService, AdvancedComponentService, SearchService,
                  NVCLService, MSCLService, BoundsService, GraceService, { provide: SAVER, useFactory: getSaver },
@@ -215,7 +221,8 @@ PlotlyModule.plotlyjs = PlotlyJS;
         FormsModule,
         ReactiveFormsModule,
         BrowserModule,
-        DragDropModule
+        DragDropModule,
+        ROIModule
     ],
     bootstrap: [
         AppComponent

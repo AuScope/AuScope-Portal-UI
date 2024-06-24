@@ -1,4 +1,4 @@
-import { Component, Inject, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Inject, Input, OnInit } from '@angular/core';
 import { CSWRecordModel, LayerModel, OnlineResourceModel, UtilitiesService } from '@auscope/portal-core-ui';
 
 
@@ -7,14 +7,15 @@ import { CSWRecordModel, LayerModel, OnlineResourceModel, UtilitiesService } fro
     templateUrl: './subpanel.component.html',
     styleUrls: ['../../../menupanel.scss']
 })
-export class InfoPanelSubComponent implements OnChanges {
+export class InfoPanelSubComponent implements OnInit {
     @Input() cswRecord: CSWRecordModel;
     @Input() layer: LayerModel;
     @Input() expanded: boolean;
 
-    // These store the URL of the WMS preview and legend
-    wmsUrl: any;
-    legendUrl: any;
+    // These store the URL of the WMS preview, outline of Australia and legend
+    wmsUrl: string;
+    outlineUrl: string;
+    legendUrl: string;
 
     constructor(@Inject('env') private env) {}
 
@@ -26,22 +27,24 @@ export class InfoPanelSubComponent implements OnChanges {
     public selectConstraints(capabilityRecords, cswConstraints: string[]) {
         if (capabilityRecords && capabilityRecords.length > 0 && capabilityRecords[0].accessConstraints && capabilityRecords[0].accessConstraints.length > 0) {
             return this.cleanConstraints(capabilityRecords[0].accessConstraints);
-        } else {
+        } else if (cswConstraints) {
             return this.cleanConstraints(cswConstraints);
         }
     }
 
     /**
      * Remove unwanted and empty strings from metadata constraints fields
-     * @param constraints string array of contraints
+     * @param constraints string array of constraints
      * @return string constraints in string format
      */
     public cleanConstraints(constraints: string[]) {
         let outStr = '';
-        for (const conStr of constraints) {
-            if (conStr.indexOf('no conditions apply') < 0 &&
-                conStr.indexOf('#MD_RestrictionCode') < 0 && conStr.trim() !== "") {
-                outStr += conStr.trim() + ', ';
+        if (constraints) {
+            for (const conStr of constraints) {
+                if (conStr.indexOf('no conditions apply') < 0 &&
+                    conStr.indexOf('#MD_RestrictionCode') < 0 && conStr.trim() !== "") {
+                    outStr += conStr.trim() + ', ';
+                }
             }
         }
         // Remove trailing comma
@@ -97,53 +100,50 @@ export class InfoPanelSubComponent implements OnChanges {
         return path;
     }
 
-    /**
-     * Gets called by Angular framework upon any changes
-     * @param changes object which holds the changes
-     */
-    ngOnChanges(changes: SimpleChanges) {
-        // If this subpanel becomes expanded, then load up the legend and preview map
-        if (changes.expanded.currentValue === true && !changes.expanded.previousValue) {
-            const me = this;
-            const wmsOnlineResource = this.cswRecord.onlineResources.find(r => r.type.toLowerCase() === 'wms');
-            if (wmsOnlineResource) {
-                const params = 'SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png&HEIGHT=25&BGCOLOR=0xFFFFFF'
-                    + '&LAYER=' + wmsOnlineResource.name + '&LAYERS=' + wmsOnlineResource.name + '&WIDTH=188&SCALE=1000000'
-                    + '&LEGEND_OPTIONS=forceLabels:on;minSymbolSize:16';
-                this.legendUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(wmsOnlineResource.url), params);
-            } else if (this.layer.legendImg && this.layer.legendImg !== '') {
-                this.legendUrl = this.env.portalBaseUrl + 'legend/' + this.layer.legendImg;
-            }
-            // Gather up BBOX coordinates to calculate the centre and envelope
-            const bbox = this.cswRecord.geographicElements[0];
-            // Make sure that the view is only of Australia
-            // On most maps if we use world-wide bounds it will make the Australian features too small
-            if (bbox.westBoundLongitude < 100) {
-                bbox.westBoundLongitude = 100;
-            }
-            if (bbox.eastBoundLongitude > 160) {
-                bbox.eastBoundLongitude = 160;
-            }
-            if (bbox.southBoundLatitude < -50) {
-                bbox.southBoundLatitude = -50;
-            }
-            if (bbox.northBoundLatitude > -5) {
-                bbox.northBoundLatitude = -5;
-            }
+    ngOnInit(): void {
+        const me = this;
+        const wmsOnlineResource = this.cswRecord.onlineResources.find(r => r.type.toLowerCase() === 'wms');
+        if (wmsOnlineResource) {
+            const params = 'SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png&HEIGHT=25&BGCOLOR=0xFFFFFF'
+                + '&LAYER=' + wmsOnlineResource.name + '&LAYERS=' + wmsOnlineResource.name + '&WIDTH=188&SCALE=1000000'
+                + '&LEGEND_OPTIONS=forceLabels:on;minSymbolSize:16';
+            this.legendUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(wmsOnlineResource.url), params);
+        } else if (this.layer.legendImg && this.layer.legendImg !== '') {
+            this.legendUrl = this.env.portalBaseUrl + 'legend/' + this.layer.legendImg;
+        }
+        // Gather up BBOX coordinates to calculate the centre and envelope
+        const bbox = this.cswRecord.geographicElements[0];
+        // Make sure that the view is only of Australia
+        // On most maps if we use world-wide bounds it will make the Australian features too small
+        if (bbox.westBoundLongitude < 100) {
+            bbox.westBoundLongitude = 100;
+        }
+        if (bbox.eastBoundLongitude > 160) {
+            bbox.eastBoundLongitude = 160;
+        }
+        if (bbox.southBoundLatitude < -50) {
+            bbox.southBoundLatitude = -50;
+        }
+        if (bbox.northBoundLatitude > -5) {
+            bbox.northBoundLatitude = -5;
+        }
 
-            // Gather up lists of information URLs
-            if (wmsOnlineResource) {
-                let params = 'SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&STYLES=&FORMAT=image/png&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&LAYERS='
-                    + encodeURIComponent(wmsOnlineResource.name) + '&SRS=EPSG:4326&BBOX=' + bbox.westBoundLongitude + ',' + bbox.southBoundLatitude
-                    + ',' + bbox.eastBoundLongitude + ',' + bbox.northBoundLatitude
-                    + '&WIDTH=400&HEIGHT=400';
-                if (this.layer.group == 'ASTER Maps') {
-                    params += '&TIME=' + this.layer['capabilityRecords'][0]['layers'][0]['timeExtent'][0];
-                }
-                this.wmsUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(wmsOnlineResource.url), params);
+        // Gather up lists of information URLs
+        if (wmsOnlineResource) {
+            let params = 'SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&STYLES=&FORMAT=image/png&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&LAYERS='
+                + encodeURIComponent(wmsOnlineResource.name) + '&SRS=EPSG:4326&BBOX=' + bbox.westBoundLongitude + ',' + bbox.southBoundLatitude
+                + ',' + bbox.eastBoundLongitude + ',' + bbox.northBoundLatitude
+                + '&WIDTH=400&HEIGHT=400';
+            if (this.layer.group == 'ASTER Maps') {
+                params += '&TIME=' + this.layer['capabilityRecords'][0]['layers'][0]['timeExtent'][0];
             }
+            this.wmsUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(wmsOnlineResource.url), params);
+            this.outlineUrl = "https://research-community.geoanalytics.csiro.au/geoserver/auscope/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&LAYERS=auscope%3AStates%20and%20Territories%20-%202021&TRANSPARENT=TRUE&SRS=EPSG:4326&FORMAT=image%2Fpng&BBOX="+ 
+                              + bbox.westBoundLongitude + ',' + bbox.southBoundLatitude
+                              + ',' + bbox.eastBoundLongitude + ',' + bbox.northBoundLatitude + "&WIDTH=400&HEIGHT=400";
         }
     }
+
     public onImgError(event: Event) {
         // (event.target as HTMLImageElement).style.display = 'none';
         (event.target as HTMLImageElement).parentElement.style.display = 'none';
