@@ -3,7 +3,7 @@
 </div>
 
 <div class="activeLayersBoundary" cdkDropList (cdkDropListDropped)="layerDropped($event)">
-    <div class="activeLayerItem" *ngFor="let layer of getActiveLayers()" cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".activeLayersBoundary" [cdkDragDisabled]="getActiveLayers().length <= 1">
+    <div class="activeLayerItem" *ngFor="let layer of getActiveLayers(); let j = index" cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".activeLayersBoundary" [cdkDragDisabled]="getActiveLayers().length <= 1">
         <!-- Active layer info column -->
         <div class="activeLayerContent">
             <div class="activeLayerTitleBar" cdkDragHandle>
@@ -50,9 +50,9 @@
             </div>
             <!-- Filter panel -->
             <div class="activeLayerFilterPanel"> <!--  this div seems unnecessary, but remove it and drag breaks (more) -->
-                <div style="position: inherit;" class="card card-info card-with-tabs layer-card">
+                <div style="position: inherit;" class="card  card-with-tabs layer-card">
                     <div class="rh_info_wrap">
-                        <div class="card-header">
+                        <div class="active-header">
                             <ul id="card-tab">
                                 <!-- Layer Styling tab -->
                                 <li *ngIf="hasFilters(layer.id)" (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': !getUILayerModel(layer.id)?.tabpanel.downloadpanel.expanded}" class="tab-item">
@@ -61,7 +61,7 @@
                                     </a>
                                 </li>
                                 <!-- Layer Download tab -->
-                                <li *ngIf="isMapSupportedLayer(layer) && isDownloadSupportedLayer(layer)" (click)="selectTabPanel(layer.id,'downloadpanel')" [ngClass]="{'active': getUILayerModel(layer.id)?.tabpanel.downloadpanel.expanded}" class="tab-item">
+                                <li *ngIf="isMapSupportedLayer(layer) && isDownloadSupportedLayer(layer)" (click)="selectTabPanel(layer.id,'downloadpanel')" [ngClass]="{'active': !hasFilters(layer.id) || getUILayerModel(layer.id)?.tabpanel.downloadpanel.expanded}" class="tab-item">
                                     <a>
                                         <span class="d-none tab-link d-sm-inline ml-2" >Download</span>
                                     </a>
@@ -97,6 +97,7 @@
             <div class="activeLayerDragMessagePanel">
                 Drag layer to change layer order.
             </div>
+            <hr *ngIf="j < getActiveLayers().length - 1" class="nav-divider active-divider">
         </div>
     </div>
 </div>
