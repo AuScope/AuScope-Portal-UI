@@ -1,6 +1,6 @@
 import { Component, Inject, Input, OnInit } from '@angular/core';
 import { CSWRecordModel, LayerModel, OnlineResourceModel, UtilitiesService } from '@auscope/portal-core-ui';
-
+import { environment } from 'environments/environment';
 
 @Component({
     selector: 'info-sub-panel',
@@ -101,7 +101,6 @@ export class InfoPanelSubComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        const me = this;
         const wmsOnlineResource = this.cswRecord.onlineResources.find(r => r.type.toLowerCase() === 'wms');
         if (wmsOnlineResource) {
             const params = 'SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png&HEIGHT=25&BGCOLOR=0xFFFFFF'
@@ -137,6 +136,7 @@ export class InfoPanelSubComponent implements OnInit {
             if (this.layer.group == 'ASTER Maps') {
                 params += '&TIME=' + this.layer['capabilityRecords'][0]['layers'][0]['timeExtent'][0];
             }
+
             this.wmsUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(wmsOnlineResource.url), params);
             this.outlineUrl = "https://research-community.geoanalytics.csiro.au/geoserver/auscope/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&LAYERS=auscope%3AStates-and-Territories&TRANSPARENT=TRUE&SRS=EPSG:4326&FORMAT=image%2Fpng&BBOX="+ 
                               + bbox.westBoundLongitude + ',' + bbox.southBoundLatitude
@@ -144,9 +144,34 @@ export class InfoPanelSubComponent implements OnInit {
         }
     }
 
-    public onImgError(event: Event) {
-        // (event.target as HTMLImageElement).style.display = 'none';
-        (event.target as HTMLImageElement).parentElement.style.display = 'none';
+    /**
+     * On first preview image error update the URL to use the proxy.
+     * If the proxy also fails, remove the preview image element.
+     *
+     * @param event the error event
+     */
+    public onPreviewImgError(event: Event) {
+        if (this.wmsUrl && this.wmsUrl.indexOf('getViaProxy.do') == -1) {
+            this.wmsUrl = environment.portalBaseUrl + 'getViaProxy.do?usewhitelist=false&usepostafterproxy=true&url=' + this.wmsUrl;
+            (event.target as HTMLImageElement).src = this.wmsUrl;
+        } else {
+            (event.target as HTMLImageElement).parentElement.style.display = 'none';
+        }
+    }
+
+    /**
+     * On first legend image error update the URL to use the proxy.
+     * If the proxy also fails, remove the legend image element.
+     *
+     * @param event the error event
+     */
+    public onLegendImgError(event: Event) {
+        if (this.legendUrl && this.legendUrl.indexOf('getViaProxy.do') == -1) {
+            this.legendUrl = environment.portalBaseUrl + 'getViaProxy.do?usewhitelist=false&usepostafterproxy=true&url=' + this.legendUrl;
+            (event.target as HTMLImageElement).src = this.legendUrl;
+        } else {
+            (event.target as HTMLImageElement).parentElement.style.display = 'none';
+        }
     }
 
 }
