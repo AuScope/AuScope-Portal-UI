@@ -126,7 +126,7 @@ export class FilterService {
     /**
      * Get layer times behaviour subject for a given layer
      *
-     * @param layerId ID of th elayer
+     * @param layerId ID of the layer
      * @returns LayerTimes as Observable
      */
     public getLayerTimesBS(layerId: string): BehaviorSubject<LayerTimes> {
@@ -157,7 +157,14 @@ export class FilterService {
      * @param layerTimes the layer times
      */
     public updateLayerTimes(layer: LayerModel, layerTimes: LayerTimes) {
-        const layerTimesBS: BehaviorSubject<LayerTimes> = this.layerTimes.get(layer.id);
+        let layerTimesBS: BehaviorSubject<LayerTimes> = this.layerTimes.get(layer.id);
+
+        if (!layerTimesBS) {
+            const layerTimes: LayerTimes = new LayerTimes();
+            layerTimesBS = new BehaviorSubject(layerTimes);
+            this.layerTimes.set(layer.id, layerTimesBS);
+        }
+
 
         let wmsEndpointUrl = null;
         let layerName = null;

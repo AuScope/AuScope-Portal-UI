@@ -462,7 +462,6 @@ export class SearchPanelComponent implements OnInit {
    */
   public addLayer(layer: LayerModel) {
     if (!this.uiLayerModelService.getUILayerModel(layer.id)) {
-      console.log('Adding UI Layer Model: XXX ALSO DATA SEARCH PANEL< FILTER PANEL ETC (and probably state load)');
       const uiLayerModel = new UILayerModel(layer.id, this.renderStatusService.getStatusBSubject(layer));
       this.uiLayerModelService.setUILayerModel(layer.id, uiLayerModel);
     }

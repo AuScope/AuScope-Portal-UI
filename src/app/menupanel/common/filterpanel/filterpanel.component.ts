@@ -112,8 +112,8 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
    * Called once the panel has been drawn
    */
   public ngAfterViewInit() {
-        // Update the time extent button/selector
-        this.setLayerTimeExtent();
+    // Update the time extent button/selector
+    this.setLayerTimeExtent();
   }
 
   /**

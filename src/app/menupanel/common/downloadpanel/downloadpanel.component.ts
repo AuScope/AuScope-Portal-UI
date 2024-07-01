@@ -116,7 +116,7 @@ export class DownloadPanelComponent implements OnInit {
         }
       }
       // If it is an IRIS layer get the station information
-      if (config.datasetUrlAussPassLayer[this.layer.group.toLowerCase()] !== undefined &&
+      if (config.datasetUrlAussPassLayer[this.layer.group?.toLowerCase()] !== undefined &&
           UtilitiesService.layerContainsResourceType(this.layer, ResourceType.IRIS)) {
         this.isIRISDownloadSupported = true;
         this.getIRISStationInfo();
