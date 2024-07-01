@@ -593,6 +593,11 @@ export class CsMapComponent implements AfterViewInit {
    */
   private setModal(layerId: string, result: string, feature: any, clickCoord: { x: number, y: number, z: number } | null, gmlid?: string) {
     let treeCollections = [];
+    // AUS-4207 Filter out "Serious Error"
+    if (result.indexOf('Server Error') >= 0) {
+      console.log('FeatureInfo:Server Error:' + result);
+      return 0;
+    }
     // Some layers return JSON
     if (config.wmsGetFeatureJSON.indexOf(layerId) !== -1) {
       treeCollections = this.parseJSONResponse(result, feature);
