@@ -7,10 +7,13 @@
 	<div style="position:relative; height:200px; margin:0.5rem 0;">
 		<!-- Place images one on top of the other -->
 		<div style="display:inline-block; position:absolute; top:0px; left:50px; opacity: 50%;">
-			<img appImgLoading [src]="outlineUrl" (error)="onPreviewImgError($event)" height="200" width="200"/>
+			<img id="outlineImg" [src]="outlineUrl" (error)="onPreviewImgError($event)" height="200" width="200"/>
 		</div>
 		<div style="display:inline-block; position:absolute; top:0px; left:50px; opacity:50%;">
-			<img appImgLoading [src]="wmsUrl" (error)="onPreviewImgError($event)" height="200" width="200"/>
+			<img id="wmsImg" [src]="wmsUrl" (error)="onPreviewImgError($event)" (load)="imageLoad($event)" height="200" width="200"/>
+			<div *ngIf="!wmsLoaded">
+				<i class="fa fa-lg fa-spin fa-spinner preview-spinner"></i>
+			</div>
 		</div>
 	</div>
 </div>
@@ -19,7 +22,8 @@
 	<!-- Legend -->
 	<div *ngIf="legendUrl!==undefined">
 		<div class="preview-legend-title">Legend:</div>
-		<img appImgLoading [src]="legendUrl" (error)="onLegendImgError($event)" class="infopanel-legend"/>
+		<img id="legendImg" [src]="legendUrl" (error)="onLegendImgError($event)" (load)="imageLoad($event)" class="infopanel-legend"/>
+		<div *ngIf="!legendLoaded"><i class="fa fa-lg fa-spin fa-spinner preview-spinner"></i></div>
 	</div>
 
 	<!-- Abstract -->

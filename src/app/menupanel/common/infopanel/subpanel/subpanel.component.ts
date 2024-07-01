@@ -1,11 +1,13 @@
 import { Component, Inject, Input, OnInit } from '@angular/core';
 import { CSWRecordModel, LayerModel, OnlineResourceModel, UtilitiesService } from '@auscope/portal-core-ui';
+import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
 import { environment } from 'environments/environment';
+import { config } from 'environments/config';
 
 @Component({
     selector: 'info-sub-panel',
     templateUrl: './subpanel.component.html',
-    styleUrls: ['../../../menupanel.scss']
+    styleUrls: ['../../../menupanel.scss', './subpanel.component.scss']
 })
 export class InfoPanelSubComponent implements OnInit {
     @Input() cswRecord: CSWRecordModel;
@@ -16,8 +18,11 @@ export class InfoPanelSubComponent implements OnInit {
     wmsUrl: string;
     outlineUrl: string;
     legendUrl: string;
+    // Have preview/legend loaded
+    wmsLoaded = false;
+    legendLoaded = false;
 
-    constructor(@Inject('env') private env) {}
+    constructor(@Inject('env') private env, private filterService: FilterService) {}
 
     /**
      * Remove unwanted strings from metadata constraints fields
@@ -101,46 +106,69 @@ export class InfoPanelSubComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        const wmsOnlineResource = this.cswRecord.onlineResources.find(r => r.type.toLowerCase() === 'wms');
-        if (wmsOnlineResource) {
-            const params = 'SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png&HEIGHT=25&BGCOLOR=0xFFFFFF'
-                + '&LAYER=' + wmsOnlineResource.name + '&LAYERS=' + wmsOnlineResource.name + '&WIDTH=188&SCALE=1000000'
-                + '&LEGEND_OPTIONS=forceLabels:on;minSymbolSize:16';
-            this.legendUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(wmsOnlineResource.url), params);
-        } else if (this.layer.legendImg && this.layer.legendImg !== '') {
-            this.legendUrl = this.env.portalBaseUrl + 'legend/' + this.layer.legendImg;
-        }
-        // Gather up BBOX coordinates to calculate the centre and envelope
-        const bbox = this.cswRecord.geographicElements[0];
-        // Make sure that the view is only of Australia
-        // On most maps if we use world-wide bounds it will make the Australian features too small
-        if (bbox.westBoundLongitude < 100) {
-            bbox.westBoundLongitude = 100;
-        }
-        if (bbox.eastBoundLongitude > 160) {
-            bbox.eastBoundLongitude = 160;
-        }
-        if (bbox.southBoundLatitude < -50) {
-            bbox.southBoundLatitude = -50;
-        }
-        if (bbox.northBoundLatitude > -5) {
-            bbox.northBoundLatitude = -5;
+        // Update layer times for this layer if required
+        if (config.queryGetCapabilitiesTimes.indexOf(this.layer.id) > -1) {
+            this.filterService.updateLayerTimes(this.layer, new LayerTimes());
         }
 
-        // Gather up lists of information URLs
-        if (wmsOnlineResource) {
-            let params = 'SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&STYLES=&FORMAT=image/png&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&LAYERS='
-                + encodeURIComponent(wmsOnlineResource.name) + '&SRS=EPSG:4326&BBOX=' + bbox.westBoundLongitude + ',' + bbox.southBoundLatitude
-                + ',' + bbox.eastBoundLongitude + ',' + bbox.northBoundLatitude
-                + '&WIDTH=400&HEIGHT=400';
-            if (this.layer.group == 'ASTER Maps') {
-                params += '&TIME=' + this.layer['capabilityRecords'][0]['layers'][0]['timeExtent'][0];
+        // We subscribe to the layer times even though it may not be required, but if it is we'll update
+        // the WMS urls after the times have been loaded
+        this.filterService.getLayerTimesBS(this.layer.id).subscribe(layerTimes => {
+            const wmsOnlineResource = this.cswRecord.onlineResources.find(r => r.type.toLowerCase() === 'wms');
+            if (wmsOnlineResource) {
+                const params = 'SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png&HEIGHT=25&BGCOLOR=0xFFFFFF'
+                    + '&LAYER=' + wmsOnlineResource.name + '&LAYERS=' + wmsOnlineResource.name + '&WIDTH=188&SCALE=1000000'
+                    + '&LEGEND_OPTIONS=forceLabels:on;minSymbolSize:16';
+                this.legendUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(wmsOnlineResource.url), params);
+            } else if (this.layer.legendImg && this.layer.legendImg !== '') {
+                this.legendUrl = this.env.portalBaseUrl + 'legend/' + this.layer.legendImg;
+            }
+            // Gather up BBOX coordinates to calculate the centre and envelope
+            const bbox = this.cswRecord.geographicElements[0];
+            // Make sure that the view is only of Australia
+            // On most maps if we use world-wide bounds it will make the Australian features too small
+            if (bbox.westBoundLongitude < 100) {
+                bbox.westBoundLongitude = 100;
+            }
+            if (bbox.eastBoundLongitude > 160) {
+                bbox.eastBoundLongitude = 160;
+            }
+            if (bbox.southBoundLatitude < -50) {
+                bbox.southBoundLatitude = -50;
+            }
+            if (bbox.northBoundLatitude > -5) {
+                bbox.northBoundLatitude = -5;
             }
 
-            this.wmsUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(wmsOnlineResource.url), params);
-            this.outlineUrl = "https://research-community.geoanalytics.csiro.au/geoserver/auscope/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&LAYERS=auscope%3AStates-and-Territories&TRANSPARENT=TRUE&SRS=EPSG:4326&FORMAT=image%2Fpng&BBOX="+ 
-                              + bbox.westBoundLongitude + ',' + bbox.southBoundLatitude
-                              + ',' + bbox.eastBoundLongitude + ',' + bbox.northBoundLatitude + "&WIDTH=400&HEIGHT=400";
+            // Gather up lists of information URLs
+            if (wmsOnlineResource) {
+                let params = 'SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&STYLES=&FORMAT=image/png&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&LAYERS='
+                    + encodeURIComponent(wmsOnlineResource.name) + '&SRS=EPSG:4326&BBOX=' + bbox.westBoundLongitude + ',' + bbox.southBoundLatitude
+                    + ',' + bbox.eastBoundLongitude + ',' + bbox.northBoundLatitude
+                    + '&WIDTH=400&HEIGHT=400';
+
+                // Add default time if present
+                if (layerTimes?.currentTime) {
+                    params += '&TIME=' + layerTimes.currentTime;
+                }
+
+                this.wmsUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(wmsOnlineResource.url), params);
+                this.outlineUrl = "https://research-community.geoanalytics.csiro.au/geoserver/auscope/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&LAYERS=auscope%3AStates-and-Territories&TRANSPARENT=TRUE&SRS=EPSG:4326&FORMAT=image%2Fpng&BBOX="+ 
+                                + bbox.westBoundLongitude + ',' + bbox.southBoundLatitude
+                                + ',' + bbox.eastBoundLongitude + ',' + bbox.northBoundLatitude + "&WIDTH=400&HEIGHT=400";
+            }            
+        });
+    }
+
+    /**
+     * WMS or Legend image has finished loading
+     * @param event the image load event
+     */
+    public imageLoad(event: Event) {
+        if ((event.target as HTMLImageElement).id === 'wmsImg' && !this.wmsLoaded) {
+            this.wmsLoaded = true;
+        } else if ((event.target as HTMLImageElement).id === 'legendImg' && !this.legendLoaded) {
+            this.legendLoaded = true;
         }
     }
 
