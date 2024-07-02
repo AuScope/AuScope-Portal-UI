@@ -593,12 +593,14 @@ export class CsMapComponent implements AfterViewInit {
    */
   private setModal(layerId: string, result: string, feature: any, clickCoord: { x: number, y: number, z: number } | null, gmlid?: string) {
     let treeCollections = [];
+
     // Some layers return JSON
     if (config.wmsGetFeatureJSON.indexOf(layerId) !== -1) {
       treeCollections = this.parseJSONResponse(result, feature);
     } else {
       treeCollections = SimpleXMLService.parseTreeCollection(this.gmlParserService.getRootNode(result), feature);
     }
+
     let featureCount = 0;
     for (const treeCollection of treeCollections) {
       this.displayModal(clickCoord);
@@ -610,6 +612,12 @@ export class CsMapComponent implements AfterViewInit {
         break;
       }
       treeCollection.raw = result;
+      // AUS-4207 Filter out "Serious Error"
+      if (treeCollection.key.indexOf('Server Error') >= 0) {
+        console.log('FeatureInfo:Server Error:' + treeCollection.key);
+        continue;
+      }
+
       this.bsModalRef.content.docs.push(treeCollection);
       if (this.bsModalRef.content.uniqueLayerNames.indexOf(feature.layer.name) === -1) {
         this.bsModalRef.content.uniqueLayerNames.push(feature.layer.name);
