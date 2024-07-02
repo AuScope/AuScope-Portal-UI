@@ -1,6 +1,6 @@
 {
   "name": "auscope-portal",
-  "version": "6.6.0",
+  "version": "6.5.2",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
