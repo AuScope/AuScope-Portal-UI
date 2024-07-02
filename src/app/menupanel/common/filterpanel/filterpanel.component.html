@@ -152,7 +152,7 @@
 			class="btn btn-primary btn-sm unclickable-btn" style="position:absolute;left:0;"><i
 				class="fa fa-spinner fa-spin" style="cursor:default;"></i>&nbsp;&nbsp;Querying time</button>
 		<div ngbDropdown id="timeDropdown" *ngIf="layerTimes && layerTimes.currentTime" dropdownClass="time-dropdown"
-			style="left:0;" container="body">
+			style="position:absolute;" container="body">
 			<button *ngIf="!layerTimes.loadingTimeExtent && layerTimes.timeExtent.length === 1" type="button"
 				class="btn btn-primary btn-sm date-btn unclickable-btn" style="cursor:default;"><i
 					class="fa fa-calendar"></i>&nbsp;&nbsp;{{ layerTimes.currentTime | date }}</button>
