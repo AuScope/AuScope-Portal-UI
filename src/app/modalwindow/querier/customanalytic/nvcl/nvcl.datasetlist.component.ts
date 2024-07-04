@@ -19,7 +19,7 @@ export interface DialogData {
   selector: 'app-nvcl-datasetlist-component',
   templateUrl: './nvcl.datasetlist.component.html',
   providers: [RickshawService, NVCLBoreholeAnalyticService],
-  styleUrls: ['../../../../../../node_modules/@auscope/portal-core-ui/src/lib/widget/chart/rickshaw/rickshaw.service.scss', '../../../modalwindow.scss']
+  styleUrls: ['../../../../../../node_modules/@auscope/portal-core-ui/src/lib/widget/chart/rickshaw/rickshaw.service.scss', '../../../modalwindow.scss', './nvcl.datasetlist.component.scss']
 })
 export class NVCLDatasetListComponent implements OnInit {
 
