@@ -131,9 +131,6 @@ export class MSCLComponent implements OnInit {
                 }
             });
             this.modalDisplayed = true;
-            this.bsModalRef.onHide.subscribe(reason => {
-                console.log("[mscl.component.ngOnInit]bsModalRef.onHide().reason:", reason);
-            })
         }
         this.changeDetectorRef.detectChanges();
     }

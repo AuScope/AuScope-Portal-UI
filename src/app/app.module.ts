@@ -41,7 +41,7 @@ import { CsMapClipboardComponent } from './cesium-map/csmap.clipboard.component'
 
 import { AngularCesiumModule, AngularCesiumWidgetsModule } from '@auscope/angular-cesium';
 
-import { QuerierDialogComponent, QuerierModalComponent } from './modalwindow/querier/querier.modal.component';
+import { QuerierModalComponent } from './modalwindow/querier/querier.modal.component';
 import { ClipboardModule } from 'ngx-clipboard';
 
 import { PortalCoreModule } from '@auscope/portal-core-ui';
@@ -154,7 +154,6 @@ PlotlyModule.plotlyjs = PlotlyJS;
         DynamicAnalyticComponent,
         NVCLDatasetListComponent,
         NVCLDatasetListDialogComponent,
-        QuerierDialogComponent,
         TIMAComponent,
         RemanentAnomaliesComponent,
         LayerAnalyticModalComponent,
