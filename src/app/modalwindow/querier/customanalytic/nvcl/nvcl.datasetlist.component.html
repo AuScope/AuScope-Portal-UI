@@ -81,183 +81,193 @@
 					</div>
 				</div>
 			</div>
-			<div class="modal-card-size">
-				<div class="container-fluid">
-					<div *ngIf="drawGraphMode===false;" style="width: 100%; height: 100%;"> <!-- overflow: auto;  -->
-						<div>
-							<!-- BEGIN toolbar -->
-							<div class="container-fluid">
-								<div class="row justify-content-between d-none d-md-flex">
-									<div class="col-3">
-										<div *ngIf="jobList[featureId] && jobList[featureId].length > 0"
-											data-toggle="tooltip" title="Job View" (click)="jobView=true;"
-											class="btn btn-light btn-sm" [ngClass]="{'lightgray-bg':jobView}">
-											<span><i class="ti-flag-alt"></i>Job</span>
-										</div>
-										<div data-toggle="tooltip" title="Scalar View" (click)="jobView=false;"
-											class="btn btn-light btn-sm" [ngClass]="{'lightgray-bg':!jobView}">
-											<span><i class="ti-panel"></i> Scalar</span>
-										</div>
-									</div>
-									<div class="col-5">
-										<div *ngIf="!jobView" data-toggle="tooltip" title="Download csv"
-											(click)="downloadCSV(nvclDataset.datasetId)" class="btn btn-light btn-sm">
-											<i class="ti-download"></i>
-										</div>
-										<div data-toggle="tooltip" title="Plot Analytic Graph"
-											(click)="changeDrawGraphMode(true, nvclDataset.datasetId)"
-											class="btn btn-light btn-sm">
-											<i class="ti-bar-chart-alt"></i>
-										</div>
-										<div data-toggle="tooltip" title="Reset Selection"
-											(click)="clearCheckBox(nvclDataset.datasetId)" class="btn btn-light btn-sm">
-											<i class="ti-loop"></i>
-										</div>
-									</div>
-								</div>
-							</div>
-							<!-- END toolbar -->
 
-							<!-- BEGIN jobView==false -->
-							<div *ngIf="jobView===false">
-								<!-- BEGIN container -->
-								<!-- BEGIN row -->
-
-								<table class="table"
-									*ngFor="let datasetScalar of datasetScalars[nvclDataset.datasetId]">
-									<tbody>
-										<tr>
-											<td>
-												<input type="checkbox" class="btnSpan" value="10"
-													id="log-checkbox-{{nvclDataset.datasetName}}-{{datasetScalar.logName}}"
-													[(ngModel)]="datasetScalar.value" />
-												<label
-													for="log-checkbox-{{nvclDataset.datasetName}}-{{datasetScalar.logName}}"></label>
-											</td>
-											<td>
-												<div>{{datasetScalar.logName}}</div>
-												<div *ngIf="datasetScalarDefinition[datasetScalar.logName]">
-													{{datasetScalarDefinition[datasetScalar.logName].definition}}
-												</div>
-											</td>
-											<td>
-												<button class="btn btn-info float-right"
-													(click)="getDefinition(datasetScalar.logName)">
-													<span>Definition</span>
-												</button>
-											</td>
-										</tr>
-									</tbody>
-								</table>
-								<!-- END row -->
-							</div>
-							<!-- END container -->
+			<!-- BEGIN toolbar -->
+			<div *ngIf="!drawGraphMode" class="container-fluid">
+				<div class="row justify-content-between d-none d-md-flex">
+					<div class="col-3">
+						<div *ngIf="jobList[featureId] && jobList[featureId].length > 0" data-toggle="tooltip"
+							title="Job View" (click)="jobView=true;" class="btn btn-light btn-sm"
+							[ngClass]="{'lightgray-bg':jobView}">
+							<span><i class="ti-flag-alt"></i>Job</span>
 						</div>
-						<!-- END jobView==false -->
-
-						<!-- BEGIN jobView==true -->
-						<div *ngIf="jobView===true">
-							<!-- BEGIN container -->
-							<div class="container-fluid">
-								<!-- BEGIN row -->
-								<div class="row rowScalar" *ngFor="let job of jobList[featureId]">
-									<div class="col-sm-1 checkbox">
-										<input type="checkbox" value="10"
-											id="job-checkbox-{{nvclDataset.datasetName}}-{{job.jobName}}"
-											[(ngModel)]="job.value" />
-										<label for="job-checkbox-{{nvclDataset.datasetName}}-{{job.jobName}}"></label>
-									</div>
-									<div class="col-sm-11">
-										<div>
-											{{job.jobName}}
-										</div>
-										<div>Job ID: {{job.jobId}}</div>
-									</div>
-								</div>
-								<!-- END row -->
-							</div>
-							<!-- END container -->
+						<div data-toggle="tooltip" title="Scalar View" (click)="jobView=false;"
+							class="btn btn-light btn-sm" [ngClass]="{'lightgray-bg':!jobView}">
+							<span><i class="ti-panel"></i> Scalar</span>
 						</div>
-						<!-- END jobView==true -->
 					</div>
+					<div class="col-5">
+						<div *ngIf="!jobView" data-toggle="tooltip" title="Download csv"
+							(click)="downloadCSV(nvclDataset.datasetId)" class="btn btn-light btn-sm">
+							<i class="ti-download"></i>
+						</div>
+						<div data-toggle="tooltip" title="Plot Analytic Graph"
+							(click)="changeDrawGraphMode(true, nvclDataset.datasetId)" class="btn btn-light btn-sm">
+							<i class="ti-bar-chart-alt"></i>
+						</div>
+						<div data-toggle="tooltip" title="Reset Selection"
+							(click)="clearCheckBox(nvclDataset.datasetId)" class="btn btn-light btn-sm">
+							<i class="ti-loop"></i>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- END toolbar -->
 
-					<div *ngIf="drawGraphMode===true;" class="modal-card-size">
-						<div style="width: 100%; height: 100%;">
-							<div id="rickshawChart_outer">
-								<div
-									*ngFor="let selectedLogName of selectedLogNames[nvclDataset.datasetId]; let j = index">
-									<div id="content_{{j}}" style="width: 900px; display: inline-flex;"
-										[ngClass]="{'loading-iframe': processingGraph}">
-										<form
-											style="width: 220px; padding: 0px 0px 0px 0px; position: absolute; font-family:  Tahoma, Arial, Helvetica, sans-serif; font-size: 10pt;"
-											id="left_side_panel_{{j}}">
-											<h1 style="font-family: 'Open Sans', sans-serif !important;">
-												{{selectedLogName}}</h1>
-											<section style="border-width: 0;">
-												<div style="background: #FFFFFF; color: #000000;" id="legend_{{j}}"
-													class="rickshaw_legend">
-												</div>
-											</section>
-											<section style="border-width: 0;">
-												<div id="renderer_form_{{j}}" class="toggler">
-													<input type="radio" name="renderer" id="area_{{j}}" value="area">
-													<label for="area_{{j}}">area</label>
-													<input type="radio" name="renderer" id="bar_{{j}}" value="bar"
-														checked>
-													<label for="bar_{{j}}">bar</label>
-													<input type="radio" name="renderer" id="line_{{j}}" value="line">
-													<label for="line_{{j}}">line</label>
-													<input type="radio" name="renderer" id="scatter_{{j}}"
-														value="scatterplot">
-													<label for="scatter_{{j}}">scatter</label>
-												</div>
-											</section>
-											<section style="border-width: 0;">
-												<div id="offset_form_{{j}}" class="toggler">
-													<input type="radio" name="offset" id="stack_{{j}}" value="zero"
-														checked><label for="stack_{{j}}">stack</label>
-													<input type="radio" name="offset" id="value_{{j}}"
-														value="value"><label for="value_{{j}}">value</label>
-													<input type="radio" name="offset" id="expand_{{j}}"
-														value="expand"><label style="width: 45px;"
-														for="expand_{{j}}">expand</label>
-												</div>
-												<div id="interpolation_form_{{j}}" style="display: none;">
-													<label for="cardinal_{{j}}"> <input type="radio"
-															name="interpolation" id="cardinal-{{j}}" value="cardinal"
-															checked="">
-														<span>cardinal</span>
-													</label> <label for="linear_{{j}}">
-														<input type="radio" name="interpolation" id="linear_{{j}}"
-															value="linear">
-														<span>linear</span>
-													</label> <label for="step_{{j}}"> <input type="radio"
-															name="interpolation" id="step_{{j}}" value="step-after">
-														<span>step</span>
-													</label>
-												</div>
-											</section>
-											<section style="border-width: 0;">
-												<h6 style="font-size: 10pt; font-weight: 400;">
-													Smoothing
-												</h6>
-												<div id="smoother_{{j}}"></div>
-											</section>
-										</form>
-										<div id="chartcontainer_{{j}}"
-											style="position: relative; left: 200px; width: 74%;font-family:  Tahoma, Arial, Helvetica, sans-serif; font-size: 10pt;">
-											<div style="position: relative; font-family:  Tahoma, Arial, Helvetica, sans-serif; font-size: 10pt; opacity: 0.7; z-index: 1;height: 300px; width: 100px; display: inline-block; top: 5px;"
-												id="y_axis_{{j}}"></div> <!-- top: -232px; -->
-											<div style="display: inline-block;" id="chart_{{j}}">
+			<div class="modal-body">
+				<div class="modal-card-size">
+					<div class="container-fluid">
+						<div *ngIf="drawGraphMode===false;" style="width: 100%; height: 100%;">
+							<!-- overflow: auto;  -->
+							<div>
+
+								<!-- BEGIN jobView==false -->
+								<div *ngIf="jobView===false">
+									<!-- BEGIN container -->
+									<!-- BEGIN row -->
+
+									<table class="table"
+										*ngFor="let datasetScalar of datasetScalars[nvclDataset.datasetId]">
+										<tbody>
+											<tr>
+												<td>
+													<input type="checkbox" class="btnSpan" value="10"
+														id="log-checkbox-{{nvclDataset.datasetName}}-{{datasetScalar.logName}}"
+														[(ngModel)]="datasetScalar.value" />
+													<label
+														for="log-checkbox-{{nvclDataset.datasetName}}-{{datasetScalar.logName}}"></label>
+												</td>
+												<td>
+													<div>{{datasetScalar.logName}}</div>
+													<div *ngIf="datasetScalarDefinition[datasetScalar.logName]">
+														{{datasetScalarDefinition[datasetScalar.logName].definition}}
+													</div>
+												</td>
+												<td>
+													<button class="btn btn-info float-right"
+														(click)="getDefinition(datasetScalar.logName)">
+														<span>Definition</span>
+													</button>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+									<!-- END row -->
+								</div>
+								<!-- END container -->
+							</div>
+							<!-- END jobView==false -->
+
+							<!-- BEGIN jobView==true -->
+							<div *ngIf="jobView===true">
+								<!-- BEGIN container -->
+								<div class="container-fluid">
+									<!-- BEGIN row -->
+									<div class="row rowScalar" *ngFor="let job of jobList[featureId]">
+										<div class="col-sm-1 checkbox">
+											<input type="checkbox" value="10"
+												id="job-checkbox-{{nvclDataset.datasetName}}-{{job.jobName}}"
+												[(ngModel)]="job.value" />
+											<label
+												for="job-checkbox-{{nvclDataset.datasetName}}-{{job.jobName}}"></label>
+										</div>
+										<div class="col-sm-11">
+											<div>
+												{{job.jobName}}
 											</div>
-											<div style="position: relative; font-family:  Tahoma, Arial, Helvetica, sans-serif; font-size: 10pt; opacity: 0.7; width:520px; left: 100px; top: -6px;"
-												id="x_axis_{{j}}"></div> <!-- top: -132px; -->
-											<div style="position: relative; width:520px; left: 94px; top: -15px;"
-												id="preview_last_{{j}}"></div> <!--  top: -122px; -->
+											<div>Job ID: {{job.jobId}}</div>
 										</div>
 									</div>
-									<hr *ngIf="j < selectedLogNames[nvclDataset.datasetId].length - 1"
-										style="margin-top: 180px; margin-bottom: 2rem;">
+									<!-- END row -->
+								</div>
+								<!-- END container -->
+							</div>
+							<!-- END jobView==true -->
+						</div>
+
+						<div *ngIf="drawGraphMode===true;" class="modal-card-size">
+							<div style="width: 100%; height: 100%;">
+								<div id="rickshawChart_outer">
+									<!-- Loading gif overlay if charts aren't done loading -->
+									<div *ngIf="processingGraph" class="loading-chart"></div>
+									<div
+										*ngFor="let selectedLogName of selectedLogNames[nvclDataset.datasetId]; let j = index">
+										<div id="content_{{j}}" style="width: 900px; display: inline-flex;"
+											[ngClass]="{'loading-iframe': processingGraph}">
+
+											<form
+												style="width: 220px; padding: 0px 0px 0px 0px; position: absolute; font-family:  Tahoma, Arial, Helvetica, sans-serif; font-size: 10pt;"
+												id="left_side_panel_{{j}}">
+												<h1 style="font-family: 'Open Sans', sans-serif !important;">
+													{{selectedLogName}}</h1>
+												<section style="border-width: 0;">
+													<div style="background: #FFFFFF; color: #000000;" id="legend_{{j}}"
+														class="rickshaw_legend">
+													</div>
+												</section>
+												<section style="border-width: 0;">
+													<div id="renderer_form_{{j}}" class="toggler">
+														<input type="radio" name="renderer" id="area_{{j}}"
+															value="area">
+														<label for="area_{{j}}">area</label>
+														<input type="radio" name="renderer" id="bar_{{j}}" value="bar"
+															checked>
+														<label for="bar_{{j}}">bar</label>
+														<input type="radio" name="renderer" id="line_{{j}}"
+															value="line">
+														<label for="line_{{j}}">line</label>
+														<input type="radio" name="renderer" id="scatter_{{j}}"
+															value="scatterplot">
+														<label for="scatter_{{j}}">scatter</label>
+													</div>
+												</section>
+												<section style="border-width: 0;">
+													<div id="offset_form_{{j}}" class="toggler">
+														<input type="radio" name="offset" id="stack_{{j}}" value="zero"
+															checked><label for="stack_{{j}}">stack</label>
+														<input type="radio" name="offset" id="value_{{j}}"
+															value="value"><label for="value_{{j}}">value</label>
+														<input type="radio" name="offset" id="expand_{{j}}"
+															value="expand"><label style="width: 45px;"
+															for="expand_{{j}}">expand</label>
+													</div>
+													<div id="interpolation_form_{{j}}" style="display: none;">
+														<label for="cardinal_{{j}}"> <input type="radio"
+																name="interpolation" id="cardinal-{{j}}"
+																value="cardinal" checked="">
+															<span>cardinal</span>
+														</label> <label for="linear_{{j}}">
+															<input type="radio" name="interpolation" id="linear_{{j}}"
+																value="linear">
+															<span>linear</span>
+														</label> <label for="step_{{j}}"> <input type="radio"
+																name="interpolation" id="step_{{j}}" value="step-after">
+															<span>step</span>
+														</label>
+													</div>
+												</section>
+												<section style="border-width: 0;">
+													<h6 style="font-size: 10pt; font-weight: 400;">
+														Smoothing
+													</h6>
+													<div id="smoother_{{j}}"></div>
+												</section>
+											</form>
+											<div id="chartcontainer_{{j}}"
+												style="position: relative; left: 200px; width: 74%;font-family:  Tahoma, Arial, Helvetica, sans-serif; font-size: 10pt;">
+												<div style="position: relative; font-family:  Tahoma, Arial, Helvetica, sans-serif; font-size: 10pt; opacity: 0.7; z-index: 1;height: 300px; width: 100px; display: inline-block; top: 5px;"
+													id="y_axis_{{j}}"></div> <!-- top: -232px; -->
+												<div style="display: inline-block;" id="chart_{{j}}">
+												</div>
+												<div style="position: relative; font-family:  Tahoma, Arial, Helvetica, sans-serif; font-size: 10pt; opacity: 0.7; width:520px; left: 100px; top: -6px;"
+													id="x_axis_{{j}}"></div> <!-- top: -132px; -->
+												<div style="position: relative; width:520px; left: 94px; top: -15px;"
+													id="preview_last_{{j}}"></div> <!--  top: -122px; -->
+											</div>
+										</div>
+										<hr *ngIf="j < selectedLogNames[nvclDataset.datasetId].length - 1"
+											style="margin-top: 180px; margin-bottom: 2rem;">
+									</div>
 								</div>
 							</div>
 						</div>
