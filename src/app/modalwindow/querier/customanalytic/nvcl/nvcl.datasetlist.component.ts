@@ -151,11 +151,13 @@ export class NVCLDatasetListComponent implements OnInit {
 
   public drawGraph(logIds: Array<string>, logNames: Array<string>) {
     this.processingGraph = true;
+    this.appRef.tick();
     this.nvclService.getNVCL2_0_JSONDataBinned(this.onlineResource.url, logIds).
       subscribe(response => {
         if (response.success) {
           this.rickshawService.drawNVCLDataGraph(response.data, logIds, logNames);
           this.processingGraph = false;
+          this.appRef.tick();
         } else {
           alert('Failed to load resources');
           this.processingGraph = false;
