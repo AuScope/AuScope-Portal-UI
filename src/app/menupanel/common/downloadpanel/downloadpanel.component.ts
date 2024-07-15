@@ -98,7 +98,7 @@ export class DownloadPanelComponent implements OnInit {
           } else {
             this.isTsgDownloadAvailable = false;
           }
-        }, err => {
+        }, () => {
           this.isTsgDownloadAvailable = false;
         });
       }
@@ -408,13 +408,16 @@ export class DownloadPanelComponent implements OnInit {
   }
 
   /**
-   * Use the rules present in the button options to determine if download button should be enabled
+   * Use the rules present in the button options to determine if download button should be enabled.
+   * Reduction of the multiple if statements that were in the HTML:
+   * - (this.bbox || this.irisDownloadListOption)
+   * - (this.polygonFilter && this.isPolygonSupportedLayer)
+   * - ((this.bbox || this.polygonFilter) && this.isWCSDownloadSupported)
+   * - this.isTsgDownloadAvailable
    */
   downloadButtonEnabled(): boolean {
-    if (this.bbox || (this.bbox && this.irisDownloadListOption) ||
-        (this.polygonFilter && this.isPolygonSupportedLayer) ||
-        ((this.bbox || this.polygonFilter) && this.isWCSDownloadSupported) ||
-        this.isTsgDownloadAvailable) {
+    if (this.bbox || this.isTsgDownloadAvailable ||
+        (this.polygonFilter && (this.isPolygonSupportedLayer || this.isWCSDownloadSupported))) {
       return true;
     }
     return false;
