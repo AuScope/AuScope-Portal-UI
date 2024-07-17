@@ -17,5 +17,15 @@ export class UILayerModelService {
   public setUILayerModel(layerId: string, uiLayerModel: UILayerModel) {
     this.uiLayerModels.set(layerId, uiLayerModel);
   }
+
+  /**
+   * Check whether layer has been added to the map
+   *
+   * @param layerId ID of the layer
+   * @returns true if layer has been added to the map, false otherwise
+   */
+  isLayerAdded(layerId: string) {
+    return this.getUILayerModel(layerId) && this.getUILayerModel(layerId).statusMap.getRenderStarted();
+  }
   
 }
