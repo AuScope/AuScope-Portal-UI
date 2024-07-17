@@ -1,27 +1,24 @@
 import { Component, Output, Inject, EventEmitter } from '@angular/core';
 import { LayerHandlerService, LayerModel, RenderStatusService, KMLDocService, ResourceType,
-         Constants } from '@auscope/portal-core-ui';
-import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
-import { BsModalService } from 'ngx-bootstrap/modal';
-import { BsModalRef } from 'ngx-bootstrap/modal';
+         Constants, CsMapService} from '@auscope/portal-core-ui';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import * as JSZip from 'jszip';
 import { HttpClient } from '@angular/common/http';
 import { throwError as observableThrowError, Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { HttpResponse } from '@angular/common/http';
+import { LayerManagerService } from 'app/services/ui/layer-manager.service';
+import { SidebarService } from 'app/portal/sidebar.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
 
-type LayerGroups = { 'Results': LayerModel[] };
 
 @Component({
   selector: '[appCustomPanel]',
   templateUrl: './custompanel.component.html',
-  styleUrls: ['../menupanel.scss']
+  styleUrls: ['../menupanel.scss', './custompanel.component.scss']
 })
-
-
 export class CustomPanelComponent {
 
   // URL that the user types in
@@ -34,21 +31,22 @@ export class CustomPanelComponent {
   statusMsg: string;
 
   // Displays custom layers for URLs in sidebar
-  urlLayerGroups: LayerGroups = { 'Results': [] };
+  urlLayers: LayerModel[] = [];
 
   // Displays custom layers for KML file in sidebar
-  fileLayerGroups: LayerGroups = { 'Results': [] };
+  fileLayers: LayerModel[] = [];
 
-  bsModalRef: BsModalRef;
   @Output() expanded: EventEmitter<any> = new EventEmitter();
 
   constructor(private http: HttpClient,
               private layerHandlerService: LayerHandlerService,
+              private layerManagerService: LayerManagerService,
               private renderStatusService: RenderStatusService,
-              private modalService: BsModalService,
               private uiLayerModelService: UILayerModelService,
-              public activeModalService: NgbModal,
               private kmlService: KMLDocService,
+              private sidebarService: SidebarService,
+              private csMapService: CsMapService,
+              public activeModalService: NgbModal,
               @Inject('env') private env
   ) {
     this.loading = false;
@@ -56,13 +54,12 @@ export class CustomPanelComponent {
   }
 
   /**
-   * Makes a filter or download tab panel visible
-   * 
-   * @param layerId layer id string
-   * @param panelType panel type string, either 'filterpanel' or 'downloadpanel'
+   * Get the UILayerModel for the layer
+   * @param layerId ID of layer
+   * @returns UILayerModel for layer
    */
-  public selectTabPanel(layerId: string, panelType: string) {
-    this.uiLayerModelService.getUILayerModel(layerId).tabpanel.setPanelOpen(panelType);
+  public getUILayerModel(layerId: string): UILayerModel {
+    return this.uiLayerModelService.getUILayerModel(layerId);
   }
 
   /**
@@ -87,7 +84,7 @@ export class CustomPanelComponent {
     this.statusMsg = '';
 
     // Clear the results from the previous search, start the loading spinner
-    this.urlLayerGroups = { 'Results': [] };
+    this.urlLayers = [];
     this.loading = true;
 
     // Check for empty URL
@@ -118,16 +115,16 @@ export class CustomPanelComponent {
       const proxyUrl = this.env.portalBaseUrl + Constants.PROXY_API + "?usewhitelist=false&url=" + searchUrl;
 
       this.getGoogleMapDoc(proxyUrl).subscribe(response => {
-        let kml = response;
+        const kml = response;
 
         const reader = new FileReader();
 
         // This fires after the blob has been read/loaded.
         reader.addEventListener('loadend', (e) => {
-          var kmlTxt = e.target.result;
+          const kmlTxt = e.target.result;
 
           // Remove unwanted characters and inject proxy for embedded URLs
-          let kmlStr = this.kmlService.cleanKML(kmlTxt.toString());
+          const kmlStr = this.kmlService.cleanKML(kmlTxt.toString());
 
           const parser = new DOMParser();
           let kmlDoc = parser.parseFromString(kmlStr, "text/xml");
@@ -140,9 +137,7 @@ export class CustomPanelComponent {
 
         // Start reading the blob as text.
         reader.readAsText(kml);
-
       });
-
 
     } else {
       // If KMZ URL ...
@@ -173,16 +168,16 @@ export class CustomPanelComponent {
 
           // This fires after the blob has been read/loaded.
           reader.addEventListener('loadend', (e) => {
-            var kmzTxt = e.target.result;
+            const kmzTxt = e.target.result;
 
             let getDom = xml => (new DOMParser()).parseFromString(xml, "text/xml")
 
             const getExtension = fileName => fileName.split(".").pop().toLowerCase();
 
             // unzip the kmz and iterate through the files
-            var zipKMZ = new JSZip(); // reassemble the kmz (files) in this object
+            const zipKMZ = new JSZip(); // reassemble the kmz (files) in this object
             let getKmzDom = (kmzDoc) => {
-              var zip = new JSZip()
+              const zip = new JSZip()
               return zip.loadAsync(kmzDoc)
                 .then(zip => {
                   let kmlDom = null
@@ -192,7 +187,7 @@ export class CustomPanelComponent {
                       kmlDom = file.async("string").then(x => {
 
                         // Remove unwanted characters and inject proxy for embedded URLs
-                        let kmlStr = this.kmlService.cleanKMZ(x);
+                        const kmlStr = this.kmlService.cleanKMZ(x);
 
                         const parser = new DOMParser();
                         let kmlDoc = parser.parseFromString(kmlStr, "text/xml");
@@ -208,24 +203,20 @@ export class CustomPanelComponent {
                         //zipKMZ.file(relPath, kmlStr);
                         zipKMZ.file(relPath, xmlStr);
                       })
-
                     } else {
                       // add the file (non kml) into the zip
                       file.async("blob").then(x => {
                         zipKMZ.file(relPath, x);
                       });
                     }
-                    //})
                   })
-
                   return kmlDom || Promise.reject("No kmz file found")
-
                 }).catch(function (err) {
                   return console.log("ERROR [unzipping kmz]: " + err.msg + JSON.stringify(err));
                 })
             };
 
-            getKmzDom(kmzTxt).then(kmzDom => {
+            getKmzDom(kmzTxt).then(() => {
 
               let me = this;
 
@@ -264,7 +255,7 @@ export class CustomPanelComponent {
               // Evaluate the layers and if found set up loadable map layers
               for (const layerRec of layerRecs) {
                 // Make the layer group listing visible in the UI
-                this.urlLayerGroups['Results'].unshift(layerRec);
+                this.urlLayers.unshift(layerRec);
                 // Configure layers so they can be added to map
                 const uiLayerModel = new UILayerModel(layerRec.id, this.renderStatusService.getStatusBSubject(layerRec));
                 this.uiLayerModelService.setUILayerModel(layerRec.id, uiLayerModel);
@@ -293,12 +284,14 @@ export class CustomPanelComponent {
    * 
    * @param uiLayerModel ui layer model object whose status will be displayed
    */
+  /*
   public openStatusReport(uiLayerModel: UILayerModel) {
     this.bsModalRef = this.modalService.show(NgbdModalStatusReportComponent, { class: 'modal-lg' });
     uiLayerModel.statusMap.getStatusBSubject().subscribe((value) => {
       this.bsModalRef.content.resourceMap = value.resourceMap;
     });
   }
+  */
 
   /**
    * adds support so that kmlFeatureDatasupport will display a features attributes when they 
@@ -376,7 +369,7 @@ export class CustomPanelComponent {
    * @returns true if the layer is found within recordsList, false otherwise
    */
   private recordsListContainsRecord(recordsList: any, name: string, url: string): boolean {
-    if (recordsList['Results'].findIndex(x => x.cswRecords[0].name === name && x.cswRecords[0].onlineResources[0].url === url) != -1) {
+    if (recordsList.findIndex(x => x.cswRecords[0].name === name && x.cswRecords[0].onlineResources[0].url === url) != -1) {
       return true;
     }
     return false;
@@ -392,17 +385,19 @@ export class CustomPanelComponent {
     // Make a layer model object
     if (docType == ResourceType.KMZ) {
       layerRec  = me.layerHandlerService.makeCustomKMZLayerRecord(name, proxyUrl, kmzData);
+      layerRec.group = 'kmz-layer';
     } else {
       layerRec = me.layerHandlerService.makeCustomKMLLayerRecord(name, proxyUrl, kmzData);
+      layerRec.group = 'kml-layer';
     }
     // Configure layers so it can be added to map
     const uiLayerModel = new UILayerModel(layerRec.id, me.renderStatusService.getStatusBSubject(layerRec));
     me.uiLayerModelService.setUILayerModel(layerRec.id, uiLayerModel);
     // Make the layer group listing visible in the UI
-    if (sourceType == "URL" && !this.recordsListContainsRecord(me.urlLayerGroups, name, proxyUrl)) {
-      me.urlLayerGroups['Results'].unshift(layerRec);
-    } else if (!this.recordsListContainsRecord(me.fileLayerGroups, name, proxyUrl)) {
-      me.fileLayerGroups['Results'].unshift(layerRec);
+    if (sourceType == "URL" && !this.recordsListContainsRecord(me.urlLayers, name, proxyUrl)) {
+      me.urlLayers.unshift(layerRec);
+    } else if (!this.recordsListContainsRecord(me.fileLayers, name, proxyUrl)) {
+      me.fileLayers.unshift(layerRec);
     }
   }
 
@@ -492,4 +487,43 @@ export class CustomPanelComponent {
       }
     }
   }
+
+  /**
+   * Add a KML layer to the map
+   *
+   * @param layer the KML LayerModel
+   */
+  public addLayer(layer: LayerModel) {
+    this.layerManagerService.addLayer(layer, [], null, null);
+    this.sidebarService.setOpenState(true);
+  }
+
+  /**
+   * Remove a KML layer from the map.
+   *
+   * @param layer the KML LayerModel
+   */
+  public removeLayer(layer: LayerModel) {
+    this.layerManagerService.removeLayer(layer);
+    if (this.csMapService.getLayerModelList()?.length === 0) {
+      this.sidebarService.setOpenState(false);
+    }
+  }
+
+  /**
+   * Display layer information in modal
+   *
+   * @param layer the LayerModel
+   */
+  public displayRecordInfo(layer: LayerModel) {
+    if (layer) {
+      const modelRef = this.activeModalService.open(InfoPanelComponent, {
+        size: "lg",
+        backdrop: false
+      });
+      modelRef.componentInstance.cswRecords = layer.cswRecords;
+      modelRef.componentInstance.layer = layer;
+    }
+  }
+  
 }

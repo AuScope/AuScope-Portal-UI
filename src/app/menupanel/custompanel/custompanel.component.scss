@@ -1,0 +1,19 @@
+.custom-table {
+  table-layout: fixed;
+  margin-bottom: 5px;
+  width: 100%;
+
+  .custom-result-row {
+    vertical-align: baseline;
+
+    .text-truncate {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .custom-btn {
+      line-height: 0.8em;
+    }
+  }
+}

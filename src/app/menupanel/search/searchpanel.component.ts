@@ -217,22 +217,23 @@ export class SearchPanelComponent implements OnInit {
   }
 
   public setShowingResultsPanel(showingResults: boolean) {
+    if (showingResults && this.showingKmlOgcOptions) {
+      this.showingKmlOgcOptions = false;
+    }
     this.showingResultsPanel = showingResults;
     if (this.selectedSearchResult) {
       this.showingInfoPanel = showingResults;
     }
-    if (showingResults && this.showingKmlOgcOptions) {
-      this.showingKmlOgcOptions = false;
-    }
   }
 
   public setShowingKmlOgcOptions(showingOptions: boolean) {
-    this.showingKmlOgcOptions = showingOptions;
-    this.searching = !this.searching
     if (showingOptions && this.showingResultsPanel) {
       this.showingResultsPanel = false;
       this.showingInfoPanel = false;
+
+      this.searching = !this.searching
     }
+    this.showingKmlOgcOptions = showingOptions;
   }
 
   /**
