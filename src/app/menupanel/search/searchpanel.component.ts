@@ -230,8 +230,8 @@ export class SearchPanelComponent implements OnInit {
     if (showingOptions && this.showingResultsPanel) {
       this.showingResultsPanel = false;
       this.showingInfoPanel = false;
-
-      this.searching = !this.searching
+      // TODO: Kill searching if in the middle of one
+      //this.searching = !this.searching
     }
     this.showingKmlOgcOptions = showingOptions;
   }
