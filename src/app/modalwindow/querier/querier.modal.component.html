@@ -24,8 +24,8 @@
 
 				<!-- Feature tab button -->
 				<div class="btn-group">
-					<button type="button" class="btn btn-primary" title="{{selectedToolTip}}"
-						data-data-toggle-second="tooltip" *ngIf="selectedLayer" (click)="openTab(event, 'wfs');">
+					<button type="button" class="btn btn-primary tablinks" title="{{selectedToolTip}}"
+						data-data-toggle-second="tooltip" *ngIf="selectedLayer" (click)="openTab($event, 'wfs');">
 						<span>{{selectedLayer}}</span><br />
 						<span style="
                             display: inline-block;
@@ -43,7 +43,7 @@
 					<ul class="dropdown-menu">
 						<!-- For layers that are derived from XML feature data -->
 						<li active *ngFor="let doc of docs; let i = index;">
-							<a class="dropdown-item" (click)="setWFS(doc, i);openTab(event, 'wfs');" *ngIf="i < 10 && doc.node_name !== null"
+							<a class="dropdown-item" (click)="setWFS(doc, i);openTab($event, 'wfs');" *ngIf="i < 10 && doc.node_name !== null"
 								data-toggle="collapse">
 								<div *ngIf="doc.node_name">
 									{{doc.layer.name}}{{doc.node_name ? ': ' + doc.node_name : ''}}
@@ -61,22 +61,22 @@
 				</div>
 
 				<div *ngIf="imScDoButtonsEnabled">
-					<button class="btn btnFeature btn-primary" (click)="openTab(event, 'image')">
+					<button class="btn btnFeature btn-primary tablinks" (click)="openTab($event, 'image')">
 						<span class="btnSpan">Image</span>
 					</button>
 				</div>
 				<div *ngIf="imScDoButtonsEnabled">
-					<button class="btn btnFeature btn-primary" (click)="openTab(event, 'scalar');">
-						<span class="btnSpan">Scalar</span>
+					<button class="btn btnFeature btn-primary tablinks"  [disabled]="!isScalarLoaded" (click)="analytic_tab = true; openTab($event, 'scalar');">
+						<span class="btnSpan"><i *ngIf="!isScalarLoaded" class="fa fa-spinner fa-spin fa-fw"></i>Scalar</span>
 					</button>
 				</div>
 				<div *ngIf="imScDoButtonsEnabled">
-					<button class="btn btnFeature btn-primary" (click)="openTab(event, 'download')">
+					<button class="btn btnFeature btn-primary tablinks" (click)="openTab($event, 'download')">
 						<span class="btnSpan">Download</span>
 					</button>
 				</div>
 				<div *ngIf="analyticEnabled">
-					<button class="btn btnFeature btn-primary" (click)="openTab(event, 'analytic_tab')">
+					<button class="btn btnFeature btn-primary tablinks" (click)="openTab($event, 'analytic_tab')">
 						<span class="btnSpan">Analytic</span>
 					</button>
 				</div>
@@ -89,7 +89,7 @@
 	</div>
 
 	<!-- HTML is displayed here -->
-	<div *ngIf="htmls.length > 0" style="padding: 10px;" [innerHTML]="currentHTML"></div>
+	<div *ngIf="htmls.length > 0" style="padding: 10px;" [innerHTML]="currentHTML">***[innerHTML]</div>
 
 	<!-- Message if downloading -->
 	<div *ngIf="downloading" class="message-tab">
