@@ -315,7 +315,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     this.transformToHtml(this.currentDoc, i);
 
     if (this.analyticEnabled) {
-        this.analytic_tab = true;
+        //this.analytic_tab = true;
         this.changeDetectorRef.detectChanges();
     }
   }
@@ -629,12 +629,6 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
       }
     }
     return terms.join(' ');
-  }
-
-  public analytic() {
-    this.analytic_tab = true;
-  
-    this.changeDetectorRef.detectChanges();
   }
 
   public formatXML(doc) {

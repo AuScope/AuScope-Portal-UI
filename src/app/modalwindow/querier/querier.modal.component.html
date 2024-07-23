@@ -25,7 +25,7 @@
 				<!-- Feature tab button -->
 				<div class="btn-group">
 					<button type="button" class="btn btn-primary tablinks" title="{{selectedToolTip}}"
-						data-data-toggle-second="tooltip" *ngIf="selectedLayer" (click)="openTab($event, 'wfs');">
+						data-data-toggle-second="tooltip" *ngIf="selectedLayer" (click)="analytic_tab = false; openTab($event, 'wfs');">
 						<span>{{selectedLayer}}</span><br />
 						<span style="
                             display: inline-block;
@@ -43,7 +43,7 @@
 					<ul class="dropdown-menu">
 						<!-- For layers that are derived from XML feature data -->
 						<li active *ngFor="let doc of docs; let i = index;">
-							<a class="dropdown-item" (click)="setWFS(doc, i);openTab($event, 'wfs');" *ngIf="i < 10 && doc.node_name !== null"
+							<a class="dropdown-item" (click)="analytic_tab = false; setWFS(doc, i);openTab($event, 'wfs');" *ngIf="i < 10 && doc.node_name !== null"
 								data-toggle="collapse">
 								<div *ngIf="doc.node_name">
 									{{doc.layer.name}}{{doc.node_name ? ': ' + doc.node_name : ''}}
@@ -76,7 +76,7 @@
 					</button>
 				</div>
 				<div *ngIf="analyticEnabled">
-					<button class="btn btnFeature btn-primary tablinks" (click)="openTab($event, 'analytic_tab')">
+					<button class="btn btnFeature btn-primary tablinks" (click)="analytic_tab = true; openTab($event, 'analytic_tab')">
 						<span class="btnSpan">Analytic</span>
 					</button>
 				</div>
@@ -89,7 +89,7 @@
 	</div>
 
 	<!-- HTML is displayed here -->
-	<div *ngIf="htmls.length > 0" style="padding: 10px;" [innerHTML]="currentHTML">***[innerHTML]</div>
+	<div *ngIf="htmls.length > 0" style="padding: 10px;" [innerHTML]="currentHTML"></div>
 
 	<!-- Message if downloading -->
 	<div *ngIf="downloading" class="message-tab">
