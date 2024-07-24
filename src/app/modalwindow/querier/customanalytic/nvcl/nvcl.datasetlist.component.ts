@@ -114,7 +114,7 @@ export class NVCLDatasetListComponent implements OnInit {
         this._getNVCLImage(this.onlineResource.url, nvclDataset.datasetId, null);
         this._getNVCLScalar(this.onlineResource.url, nvclDataset.datasetId);
         this.isCachedTSGFileAvailable(nvclDataset);
-        this.nvclDatasets.push(nvclDataset);
+        this.nvclDatasets.push(nvclDataset); 
       }
       if (result.length === 0) {
         this.nvclService.setAnalytic(false);
