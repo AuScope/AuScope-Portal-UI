@@ -9,6 +9,7 @@ import { saveAs } from 'file-saver';
 import { NVCLBoreholeAnalyticService } from '../../../layeranalytic/nvcl/nvcl.boreholeanalytic.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { UtilitiesService } from '@auscope/portal-core-ui';
+import { trace } from 'console';
 
 export interface DialogData {
   scalarClasses: any[];
@@ -102,6 +103,7 @@ export class NVCLDatasetListComponent implements OnInit {
 
     this.nvclService.getNVCLDatasets(this.onlineResource.url, this.featureId).subscribe(result => {
       for (const nvclDataset of result) {
+        this.nvclService.setScalarLoaded(false);
         nvclDataset.image = true;
         nvclDataset.scalar = false;
         nvclDataset.download = false;
@@ -112,7 +114,7 @@ export class NVCLDatasetListComponent implements OnInit {
         this._getNVCLImage(this.onlineResource.url, nvclDataset.datasetId, null);
         this._getNVCLScalar(this.onlineResource.url, nvclDataset.datasetId);
         this.isCachedTSGFileAvailable(nvclDataset);
-        this.nvclDatasets.push(nvclDataset);
+        this.nvclDatasets.push(nvclDataset); 
       }
       if (result.length === 0) {
         this.nvclService.setAnalytic(false);
@@ -245,6 +247,7 @@ export class NVCLDatasetListComponent implements OnInit {
         if (twoindex === -1 && oneindex === -1) { return (one.logName > two.logName) ? 1 : -1 }
         if (twoindex < 0) { return -1; } else if (oneindex < 0) { return 1; } else { return oneindex - twoindex; }
       });
+      this.nvclService.setScalarLoaded(true);
     });
   }
 

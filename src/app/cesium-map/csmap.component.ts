@@ -16,8 +16,8 @@ import { KMLQuerierHandler } from './custom-querier-handler/kml-querier-handler.
 import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
 import { UserStateService } from 'app/services/user/user-state.service';
 import { VMFQuerierHandler } from './custom-querier-handler/vmf-querier-handler.service';
-import { Observable, forkJoin } from 'rxjs';
-import { finalize, tap, timeout } from 'rxjs/operators';
+import { Observable, forkJoin, throwError } from 'rxjs';
+import { catchError, finalize, tap, timeout } from 'rxjs/operators';
 import { ToolbarComponent } from 'app/menupanel/toolbar/toolbar.component';
 
 declare var Cesium: any;
@@ -455,6 +455,8 @@ export class CsMapComponent implements AfterViewInit {
                     if (numberOfLayerFeatures > 0) {
                       numberOfFeatures += numberOfLayerFeatures;
                     }
+                  }), catchError((error) => {
+                    return throwError(error);
                   })
                 )
             );

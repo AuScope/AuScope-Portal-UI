@@ -62,27 +62,6 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   public selectedToolTip = '';
   public imScDoButtonsEnabled = false; // Image-Scalar-Download buttons used by NVCL boreholes layer
   public analyticEnabled = false;
-  public nvclDatasets: any[] = [];
-  public datasetImages: any[] = [];
-  public imagesLoaded: string[] = [];
-  public nvclDatasetId: any;
-  public datasetScalars: any[] = [];
-  public datasetScalarDefinition = {};
-  public drawGraphMode = false;
-  public jobList: any[] = [];
-  public jobView = false;
-  public loadedDataset = [];
-  public nvclIndex = -1;
-  public downloadEmail = '';
-  public downloadResponse = '';
-  public tipScalarDefinition = null;
-  public legendData: any = {};
-  public selectedLogNames = [];
-  public processingGraph = false;
-  public scalarLoaded: boolean = false;
-  public scalarPageSelected: boolean = false;
-  public scalarToolbar: boolean = true;
-  public selectedScalar = null;
 
   public scalarPriorityOrder: string[] = ['Grp1 dTSAS+', 'Grp2 dTSAS+', 'Grp3 dTSAS+', 'Grp1 uTSAS+', 'Grp2 uTSAS+', 'Grp3 uTSAS+', 'Grp1 sTSAS+', 'Grp2 sTSAS+',
     'Grp3 sTSAS+', 'Grp1 dTSAS', 'Grp2 dTSAS', 'Grp3 dTSAS', 'Grp1 uTSAS', 'Grp2 uTSAS', 'Grp3 uTSAS', 'Grp1 SWIR-CLS', 'Grp2 SWIR-CLS', 'Grp3 SWIR-CLS', 'Grp1 sTSAS',
@@ -103,13 +82,6 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     'Wt3 sjCLST', 'Wt3 dTSAT', 'Wt3 uTSAT', 'Wt3 TIR-CLS', 'Wt4 djCLST', 'Wt4 ujCLST', 'Wt4 sjCLST', 'Wt4 dTSAT', 'Wt4 uTSAT', 'Wt4 TIR-CLS', 'Wt5 djCLST',
     'Wt5 ujCLST', 'Wt5 sjCLST', 'Wt5 dTSAT', 'Wt5 uTSAT', 'Wt5 TIR-CLS', 'Wt6 djCLST', 'Wt6 ujCLST', 'Wt6 sjCLST', 'Wt6 dTSAT', 'Wt6 uTSAT', 'Wt6 TIR-CLS',
     'Wt7 djCLST', 'Wt7 ujCLST', 'Wt7 sjCLST', 'Wt7 dTSAT', 'Wt7 uTSAT', 'Wt7 TIR-CLS'];
-
-  public wfs_tab: boolean = true;
-  public image_tab: boolean = false;
-  public scalar_tab: boolean = false;
-  public download_tab: boolean = false;
-  public analytic_tab: boolean = false;
-  public wfs_analytic: boolean = false;
 
   /* Transforms FileNode into displayable node */
   private _transformer = (node: FileNode, level: number) => {
@@ -147,7 +119,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   */
   public flagNVCLAnalytic: boolean;
   public listingdata: any;
-  public initialScalarLoad = true;
+  public isScalarLoaded = false;
   public modalVisible = true;
 
   constructor(public nvclService: NVCLService, public bsModalRef: BsModalRef, public csClipboardService: CsClipboardService,
@@ -196,12 +168,17 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
       this.onDataChange();
     });
 
-    this.nvclService.getInitialScalarLoad().subscribe((result) => {
-      this.initialScalarLoad = result;
+    /**
+     * Checks the state of "isScalarLoaded" variable in the nvclService - observable
+     * and updates the local variable "isScalarLoaded" - which updates the scalar button in the html
+     */
+    this.nvclService.getScalarLoaded().subscribe((result) => {
+      this.isScalarLoaded = result;
 
       // Calling this to update the UI
       this.onDataChange();
     });
+
     /*
     the following are needed to prevent an "artifact" showing when the active layers panel is showing
     and then slides out of the way - i.e. the header of the modal for Feature Informatio displays at
@@ -330,24 +307,30 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     // Clear the HTML display  
     this.currentHTML = "";
     // Set up, convert the XML and display in popup 
-    this.wfs();
     this.updateDropDownButtonText(doc);
     this.currentIndex = i;
     this.currentDoc = doc;
     this.currentDoc.analytic = false;
     this.currentDoc.home = true;
     this.transformToHtml(this.currentDoc, i);
-    //this.getNVCL();
 
     if (this.analyticEnabled) {
-      this.analytic();
+        //this.analytic_tab = true;
+        this.changeDetectorRef.detectChanges();
     }
   }
 
-
+/**
+ * sets the button/tab active in the dynamic component nvcl.modal.component.html
+ * 
+ * @param evt 
+ * @param tabName 
+ */
   public openTab(evt, tabName) {
-    if (this.imScDoButtonsEnabled) { this.analytic_tab = true; }
     var i, tabcontent, tablinks;
+    if (this.imScDoButtonsEnabled) { this.analytic_tab = true; }
+
+    // set all the "tabs" to display:none - ie hidden
     tabcontent = document.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
       tabcontent[i].style.display = "none";
@@ -360,9 +343,9 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     if (document.getElementById(tabName)) {
       document.getElementById(tabName).style.display = "block";
       if (evt) {
-        if (evt.currentTarget) {
-          if (evt.currentTarget.className) {
-            evt.currentTarget.className += " active";
+        if (evt.target) {
+          if (evt.target.className) {
+            evt.target.className += " activeBtn";
           }
         }
       }
@@ -420,6 +403,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     this.downloading = false;
     if (this.docs.length === 1 && this.htmls.length === 0) {
       this.setWFS(this.docs[0], 0);
+      this.openTab(event, 'wfs')
     } else if (this.htmls.length === 1 && this.docs.length === 0) {
       this.setHTML(this.htmls[0].key);
     }
@@ -647,64 +631,6 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     return terms.join(' ');
   }
 
-  public wfs() {
-    this.wfs_tab = true;
-    this.image_tab = false;
-    this.scalar_tab = false;
-    this.download_tab = false;
-  }
-
-  public image() {
-    if (!this.imScDoButtonsEnabled) { return };
-    this.wfs_tab = false;
-    this.image_tab = true;
-    this.scalar_tab = false;
-    this.download_tab = false;
-  }
-
-  public scalar() {
-    if (!this.imScDoButtonsEnabled) { return };
-    this.wfs_tab = false;
-    this.image_tab = false;
-    this.scalar_tab = true;
-    this.download_tab = false;
-    this.scalarPageSelected = true;
-    if (this.initialScalarLoad == true) { this.initialScalarLoad = false; }
-    if (this.drawGraphMode) { this.changeDrawGraphMode(true, this.nvclDatasets[this.nvclIndex].datasetId) }
-  }
-
-  public download() {
-    if (!this.imScDoButtonsEnabled) { return };
-    this.wfs_tab = false;
-    this.image_tab = false;
-    this.scalar_tab = false;
-    this.download_tab = true;
-  }
-
-  public analytic() {
-    this.wfs_tab = true;
-    this.image_tab = false;
-    this.scalar_tab = false;
-    this.download_tab = false;
-    this.analytic_tab = true;
-
-    this.changeDetectorRef.detectChanges();
-  }
-
-  public setScalarLoaded(state: boolean) {
-    this.scalarLoaded = state;
-  }
-
-
-  public setScalarPageSelected(state: boolean) {
-    this.scalarPageSelected = state;
-  }
-
-
-  public setInitialScalarLoaded(state: boolean) {
-    this.nvclService.setInitialScalarLoad(state);
-  }
-
   public formatXML(doc) {
     if (!doc) { return }
 
@@ -755,11 +681,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
 
     if (this.selectedFeature != this.currentFeature) {
       // if changed feature selection then reset
-      this.processingGraph = false;
-      this.scalarLoaded = false;
-      this.scalarPageSelected = false;
-      this.scalarToolbar = true;
-      this.selectedScalar = null;
+      this.isScalarLoaded = false;
       this.drawGraphMode = false;
       this.analyticEnabled = false;
     }
@@ -790,19 +712,3 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     return regex.test(str);
   }
 }
-
-/*
-@Component({
-  selector: 'app-querier-component-dialog',
-  templateUrl: '/querier.dialog.component.html',
-})
-export class QuerierDialogComponent {
-
-  scalarClasses: any;
-
-  constructor(public BsModalRef: BsModalRef) { }
-
-}
-*/
-
-
