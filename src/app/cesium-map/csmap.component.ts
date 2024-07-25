@@ -456,7 +456,6 @@ export class CsMapComponent implements AfterViewInit {
                       numberOfFeatures += numberOfLayerFeatures;
                     }
                   }), catchError((error) => {
-                    console.log('*** getFeatureInfo.error = ',error,' ***');
                     return throwError(error);
                   })
                 )
