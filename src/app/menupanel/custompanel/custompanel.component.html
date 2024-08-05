@@ -16,23 +16,20 @@
 <!-- Once a URL has been selected and processed, its available layers are shown here -->
 <table class="custom-table">
 	<tr *ngFor="let layer of urlLayers" class="custom-result-row">
-		<td>
-			<div>
-				<div class="text-truncate">{{layer.name}}</div>
+		<td class="text-truncate">
+					{{layer.name}}
+					<div *ngIf="layer.capabilityRecords[0]?.layers[0]?.minScaleDenominator || layer.capabilityRecords[0]?.layers[0]?.maxScaleDenominator" class="scale-text">
+						This layer has scale constraints and may not display at certain zoom levels.<br>
+						Adjust zoom level if the data does not display.
 				<i *ngIf="getUILayerModel(layer.id)?.statusMap.getRenderStarted() && !getUILayerModel(layer.id)?.statusMap.getRenderComplete()" class="float-right light-blue fa fa-spin fa-spinner"></i>
 				<i *ngIf="getUILayerModel(layer.id)?.statusMap.getRenderStarted() && getUILayerModel(layer.id)?.statusMap.getContainsError()" class="fa fa-warning text-warning"></i>
 			</div>
 		</td>
-		<td>
+		<td style="vertical-align: middle;">
 			<button *ngIf="!uiLayerModelService.isLayerAdded(layer.id)" class="btn-sm btn-success custom-btn" (click)="addLayer(layer)">Add&nbsp;<i class="fa fa-plus"></i></button>
 			<button *ngIf="uiLayerModelService.isLayerAdded(layer.id)" class="btn-sm btn-danger custom-btn" (click)="removeLayer(layer)">Remove&nbsp;<i class="fa fa-trash"></i></button>
 			<button *ngIf="layer.group !== 'kml-layer' && layer.group !== 'kmz-layer'" class="btn-sm btn-info custom-btn" (click)="displayRecordInfo(layer)">Info&nbsp;<i class="fa fa-info-circle"></i></button>
 		</td>
-		<!--
-		<div *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="progress progress-xs" style="height: 5px">
-			<div class="progress-bar bg-gradient-blue-purple" [style.width]="getUILayerModel(layer.id).statusMap.getCompletePercentage()" role="progressbar"></div>
-		</div>
-		-->
 	</tr>
 </table>
 

@@ -192,12 +192,10 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
           this.modalVisible = false;
         }
       }
-    })
+    });
     this.modalService.onShow.subscribe(reason => {
       this.modalVisible = true;
-    })
-
-    this.nvclService.getNVCL2_0_Images
+    });
 
   }
 
