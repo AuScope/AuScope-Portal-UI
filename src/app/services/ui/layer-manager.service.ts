@@ -6,7 +6,6 @@ import { UILayerModelService } from './uilayer-model.service';
 import { environment } from 'environments/environment';
 import * as _ from 'lodash';
 import * as $ from 'jquery';
-import { BehaviorSubject, Observable } from 'rxjs';
 
 declare let gtag: Function;
 

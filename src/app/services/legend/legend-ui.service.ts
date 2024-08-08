@@ -78,6 +78,9 @@ export class LegendUiService {
       };
       const dialogRef = this.dialog.open(LegendModalComponent, dialogConfig);
       this.displayedLegends.set(layerId, dialogRef);
+      dialogRef.afterClosed().subscribe(() => {
+        this.removeLegend(layerId);
+      });
   }
 
   /**
@@ -100,9 +103,9 @@ export class LegendUiService {
           .append('LEGEND_OPTIONS', 'forceLabels:on;minSymbolSize:16')
           .append('url', url)
           .append('usewhitelist', 'false');
-          if (sldBody) {
-            httpParams = httpParams.append('SLD_BODY', sldBody);
-          }
+    if (sldBody) {
+      httpParams = httpParams.append('SLD_BODY', sldBody);
+    }
 
     // Add mandatory filters, discard optional
     for (const p in collatedParam) {
@@ -222,8 +225,8 @@ export class LegendUiService {
 
         // Create a POST request with proxy, with the proxy this enables us to use HTTP services
         // Assemble params, including 'GetLegend' params
-        let httpParams = this.getLegendHttpParams(this.trimUrl(wmsOnlineResource.url), wmsOnlineResource.name, collatedParam);
-        let proxyUrl = this.env.portalBaseUrl + Constants.PROXY_API;
+        const httpParams = this.getLegendHttpParams(this.trimUrl(wmsOnlineResource.url), wmsOnlineResource.name, collatedParam);
+        const proxyUrl = this.env.portalBaseUrl + Constants.PROXY_API;
         const postRequest = this.http.post(proxyUrl, httpParams, { responseType: 'blob' }).pipe(
           catchError(() => {
             return of(undefined);
