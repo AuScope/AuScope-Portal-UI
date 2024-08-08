@@ -88,13 +88,12 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
    */
   public ngAfterViewInit() {
     const stateId = UtilitiesService.getUrlParameterByName('state');
-    const me = this;
 
     // Attempt to fetch state from permanent link database
     this.userStateService.getPortalState(stateId).subscribe((layerStateObj: any) => {
       // If permanent link state is defined, then re-orient the camera
       if (!UtilitiesService.isEmpty(layerStateObj)) {
-        me.manageStateService.resumeMapState(layerStateObj.map);
+        this.manageStateService.resumeMapState(layerStateObj.map);
       } else if (stateId !== undefined) {
         alert('The specified state could not be found, it may have been deleted or made private.');
       }
@@ -113,9 +112,9 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
     // Look for bookmarks, if there are any
     this.userStateService.getBookmarks().subscribe({
       next: (bookMarkList: Bookmark[]) => {
-        me.bookmarks = [];
+        this.bookmarks = [];
         for (const bookMark of bookMarkList) {
-          me.bookmarks.push(bookMark);
+          this.bookmarks.push(bookMark);
         }
       }
     });
@@ -167,16 +166,15 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
 
     // Add ordered layers to map
     for (const layerId of orderedLayerKeys) {
-      const me = this;
       this.layerHandlerService.getLayerModelsForIds([layerId]).subscribe(layers => {
         for (const layerModel of layers) {
           // This adds layer to the map
-          me.layerManagerService.addLayer(layerModel,
+          this.layerManagerService.addLayer(layerModel,
             layerStateObj[layerId].optionalFilters,
             layerStateObj[layerId].filterCollection,
             layerStateObj[layerId].time);
           setTimeout(() => {
-            const layerFilterPanel: FilterPanelComponent = me.filterComponents.find(fc => fc.layer.id === layerId);
+            const layerFilterPanel: FilterPanelComponent = this.filterComponents.find(fc => fc.layer.id === layerId);
             if (layerFilterPanel) {
               // Update filter values, times and map opacity 
               layerFilterPanel.addLayerFromState(layerStateObj[layerId]);
