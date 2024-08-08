@@ -271,7 +271,9 @@ input[type=checkbox] + label {
 }
 
 .split-panel {
-    margin-bottom: 4px;
+    margin-top: 15px; 
+    margin-bottom: 15px;
+    font-size: small; 
     .split-button-panel {
         display: contents;
     }
