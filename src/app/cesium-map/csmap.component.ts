@@ -112,6 +112,12 @@ export class CsMapComponent implements AfterViewInit {
         this.csMapObject.processClick(movement);
       }, Cesium.ScreenSpaceEventType.LEFT_UP);
 
+      // Speed up map loading by disabling the loading of ancestor tiles
+      viewer.scene.globe.preloadAncestors = false;
+
+      // Increase size of tile cache to speed up zoom performance
+      viewer.scene.globe.tileCacheSize = 100000;
+
       // Keep track of lat/lon at mouse
       handler.setInputAction((movement) => {
         const ellipsoid = this.viewer.scene.globe.ellipsoid;
