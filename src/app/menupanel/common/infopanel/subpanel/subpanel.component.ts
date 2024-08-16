@@ -111,8 +111,10 @@ export class InfoPanelSubComponent implements OnInit {
         } else if (this.layer.legendImg && this.layer.legendImg !== '') {
             this.legendUrl = this.env.portalBaseUrl + 'legend/' + this.layer.legendImg;
         }
-        // Gather up BBOX coordinates to calculate the centre and envelope
-        const bbox = this.cswRecord.geographicElements[0];
+
+        // Gather up BBOX coordinates to calculate the centre and envelope. Use a copy of coords so they don't stay modified for the main map
+        const bbox = { ...this.cswRecord.geographicElements[0] };
+
         // Make sure that the view is only of Australia
         // On most maps if we use world-wide bounds it will make the Australian features too small
         if (bbox.westBoundLongitude < 100) {
