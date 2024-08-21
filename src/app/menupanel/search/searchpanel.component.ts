@@ -450,7 +450,6 @@ export class SearchPanelComponent implements OnInit {
    * @param layer LayerModel of layer
    */
   public layerWarningMessage(layer: LayerModel): string {
-    console.log("[searchpanel.component.ts]layerWarningMessage()");
     return 'This layer cannot be displayed. For Featured Layers, please wait for the layer cache to rebuild itself. ' +
       'For Custom Layers please note that only the following online resource types can be added to the map: ' +
       this.csMapService.getSupportedOnlineResourceTypes();
@@ -719,10 +718,21 @@ export class SearchPanelComponent implements OnInit {
       }
     }
 
+    let westBounds = undefined;
+    let eastBounds = undefined;
+    let northBounds = undefined;
+    let southBounds = undefined;
+    if (this.restrictBounds && this.bbox) {
+      westBounds = this.bbox.westBoundLongitude;
+      eastBounds = this.bbox.eastBoundLongitude;
+      northBounds = this.bbox.northBoundLatitude;
+      southBounds = this.bbox.southBoundLatitude;
+    }
+
     // Search CSW records
     this.searchService.searchCSWRecords(this.queryText, selectedSearchFields, null, null, selectedServices,
-        this.boundsRelationship.toLowerCase(), this.bbox?.westBoundLongitude, this.bbox?.eastBoundLongitude,
-        this.bbox?.southBoundLatitude, this.bbox?.northBoundLatitude).subscribe(searchResponse => {
+        this.boundsRelationship.toLowerCase(), westBounds, eastBounds,
+        southBounds, northBounds).subscribe(searchResponse => {
 
       this.searchResults = [];
       this.totalSearchHits = searchResponse.totalCSWRecordHits;
