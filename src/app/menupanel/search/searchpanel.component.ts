@@ -463,7 +463,6 @@ export class SearchPanelComponent implements OnInit {
    */
   public addLayer(layer: LayerModel) {
     if (!this.uiLayerModelService.getUILayerModel(layer.id)) {
-      console.log('Adding UI Layer Model: XXX ALSO DATA SEARCH PANEL< FILTER PANEL ETC (and probably state load)');
       const uiLayerModel = new UILayerModel(layer.id, this.renderStatusService.getStatusBSubject(layer));
       this.uiLayerModelService.setUILayerModel(layer.id, uiLayerModel);
     }
@@ -667,6 +666,7 @@ export class SearchPanelComponent implements OnInit {
     const layer = new LayerModel();
     // Identify CSW layers
     layer.id = 'registry-csw:' + record.id;
+    layer.group = 'registry-csw';
     layer.name = record.name;
     layer.description = record.description;
     layer.useDefaultProxy = false,    // Use the default proxy (getViaProxy.do) if true (custom layers)

@@ -9,6 +9,7 @@ import { SidebarService } from 'app/portal/sidebar.service';
 import { Subscription } from 'rxjs';
 import { UserStateService } from 'app/services/user/user-state.service';
 import { AuthService } from 'app/services/auth/auth.service';
+import { take } from 'rxjs/operators';
 
 
 @Component({
@@ -161,8 +162,8 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
    * @param layer the layer to add to map
    */
   public addLayer(layer: LayerModel): void {
-    // Fetch layer times and add layer
-    this.filterService.getLayerTimesBS(layer.id).subscribe(layerTimes => {
+    // Fetch layer times and add layer (only take 1 or addLayer will fire every time layer times change)
+    this.filterService.getLayerTimesBS(layer.id).pipe(take(1)).subscribe(layerTimes => {
       this.layerManagerService.addLayer(layer, [], null, layerTimes.currentTime);
     });
 

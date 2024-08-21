@@ -16,8 +16,8 @@ import { KMLQuerierHandler } from './custom-querier-handler/kml-querier-handler.
 import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
 import { UserStateService } from 'app/services/user/user-state.service';
 import { VMFQuerierHandler } from './custom-querier-handler/vmf-querier-handler.service';
-import { Observable, forkJoin } from 'rxjs';
-import { finalize, tap, timeout } from 'rxjs/operators';
+import { Observable, forkJoin, throwError } from 'rxjs';
+import { catchError, finalize, tap, timeout } from 'rxjs/operators';
 import { ToolbarComponent } from 'app/menupanel/toolbar/toolbar.component';
 
 declare var Cesium: any;
@@ -111,6 +111,12 @@ export class CsMapComponent implements AfterViewInit {
       handler.setInputAction((movement) => {
         this.csMapObject.processClick(movement);
       }, Cesium.ScreenSpaceEventType.LEFT_UP);
+
+      // Speed up map loading by disabling the loading of ancestor tiles
+      viewer.scene.globe.preloadAncestors = false;
+
+      // Increase size of tile cache to speed up zoom performance
+      viewer.scene.globe.tileCacheSize = 100000;
 
       // Keep track of lat/lon at mouse
       handler.setInputAction((movement) => {
@@ -455,6 +461,8 @@ export class CsMapComponent implements AfterViewInit {
                     if (numberOfLayerFeatures > 0) {
                       numberOfFeatures += numberOfLayerFeatures;
                     }
+                  }), catchError((error) => {
+                    return throwError(error);
                   })
                 )
             );

@@ -196,7 +196,7 @@
     </div>
 
     <!-- KML/OGC options -->
-    <div class="options-panel kml-options-panel" *ngIf="showingKmlOgcOptions">
+    <div class="options-panel kml-options-panel" [style.display]="showingKmlOgcOptions ? 'block' : 'none'">
         <ul class="card-sub" appCustomPanel style="display:contents;"></ul>
     </div>
 

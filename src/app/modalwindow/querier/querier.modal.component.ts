@@ -62,28 +62,6 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   public selectedToolTip = '';
   public imScDoButtonsEnabled = false; // Image-Scalar-Download buttons used by NVCL boreholes layer
   public analyticEnabled = false;
-  public nvclDatasets: any[] = [];
-  public datasetImages: any[] = [];
-  public imagesLoaded: string[] = [];
-  public nvclDatasetId: any;
-  public datasetScalars: any[] = [];
-  public datasetScalarDefinition = {};
-  public drawGraphMode = false;
-  public jobList: any[] = [];
-  public jobView = false;
-  public loadedDataset = [];
-  public nvclIndex = -1;
-  public downloadEmail = '';
-  public downloadResponse = '';
-  public tipScalarDefinition = null;
-  public legendData: any = {};
-  public selectedLogNames = [];
-  public processingGraph = false;
-  public scalarLoaded: boolean = false;
-  public scalarPageSelected: boolean = false;
-  public scalarToolbar: boolean = true;
-  public selectedScalar = null;
-  public legendOpen = false;
 
   public scalarPriorityOrder: string[] = ['Grp1 dTSAS+', 'Grp2 dTSAS+', 'Grp3 dTSAS+', 'Grp1 uTSAS+', 'Grp2 uTSAS+', 'Grp3 uTSAS+', 'Grp1 sTSAS+', 'Grp2 sTSAS+',
     'Grp3 sTSAS+', 'Grp1 dTSAS', 'Grp2 dTSAS', 'Grp3 dTSAS', 'Grp1 uTSAS', 'Grp2 uTSAS', 'Grp3 uTSAS', 'Grp1 SWIR-CLS', 'Grp2 SWIR-CLS', 'Grp3 SWIR-CLS', 'Grp1 sTSAS',
@@ -104,12 +82,6 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     'Wt3 sjCLST', 'Wt3 dTSAT', 'Wt3 uTSAT', 'Wt3 TIR-CLS', 'Wt4 djCLST', 'Wt4 ujCLST', 'Wt4 sjCLST', 'Wt4 dTSAT', 'Wt4 uTSAT', 'Wt4 TIR-CLS', 'Wt5 djCLST',
     'Wt5 ujCLST', 'Wt5 sjCLST', 'Wt5 dTSAT', 'Wt5 uTSAT', 'Wt5 TIR-CLS', 'Wt6 djCLST', 'Wt6 ujCLST', 'Wt6 sjCLST', 'Wt6 dTSAT', 'Wt6 uTSAT', 'Wt6 TIR-CLS',
     'Wt7 djCLST', 'Wt7 ujCLST', 'Wt7 sjCLST', 'Wt7 dTSAT', 'Wt7 uTSAT', 'Wt7 TIR-CLS'];
-
-  public wfs_tab: boolean = true;
-  public image_tab: boolean = false;
-  public scalar_tab: boolean = false;
-  public download_tab: boolean = false;
-  public analytic_tab: boolean = false;
 
   /* Transforms FileNode into displayable node */
   private _transformer = (node: FileNode, level: number) => {
@@ -147,7 +119,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   */
   public flagNVCLAnalytic: boolean;
   public listingdata: any;
-  public initialScalarLoad = true;
+  public isScalarLoaded = false;
   public modalVisible = true;
 
   constructor(public nvclService: NVCLService, public bsModalRef: BsModalRef, public csClipboardService: CsClipboardService,
@@ -192,30 +164,21 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     this.nvclService.getAnalytic().subscribe((result) => {
       this.flagNVCLAnalytic = result;
 
-      /*
-      this.analyticEnabled = false;
-      console.log("[getAnalytic].flagNVCLAnalytic = ", this.flagNVCLAnalytic);
-      if (this.flagNVCLAnalytic) {
-        if (this.getSelectedLayer() == "NVCLV-2.0") {
-          this.analyticEnabled = false;
-        } else {
-          this.analyticEnabled = true;
-        }
-      }
+      // Calling this to update the UI
+      this.onDataChange();
+    });
 
-      console.log("[getAnalytic].analyticEnabled = ", this.analyticEnabled);
-      */
+    /**
+     * Checks the state of "isScalarLoaded" variable in the nvclService - observable
+     * and updates the local variable "isScalarLoaded" - which updates the scalar button in the html
+     */
+    this.nvclService.getScalarLoaded().subscribe((result) => {
+      this.isScalarLoaded = result;
 
       // Calling this to update the UI
       this.onDataChange();
     });
 
-    this.nvclService.getInitialScalarLoad().subscribe((result) => {
-      this.initialScalarLoad = result;
-
-      // Calling this to update the UI
-      this.onDataChange();
-    });
     /*
     the following are needed to prevent an "artifact" showing when the active layers panel is showing
     and then slides out of the way - i.e. the header of the modal for Feature Informatio displays at
@@ -229,26 +192,11 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
           this.modalVisible = false;
         }
       }
-    })
+    });
     this.modalService.onShow.subscribe(reason => {
       this.modalVisible = true;
-    })
+    });
 
-    this.nvclService.getNVCL2_0_Images
-
-  }
-  /*
-    @HostListener('window:resize', ['$event']) onResize(event) {
-      console.log(event.target.innerWidth);
-      const parentElement = this.childElement.nativeElement.parentElement.parentElement;
-      this.renderer.setStyle(parentElement, 'left', (event.target.innerWidth - 900) / 2 + 'px');
-    }
-  */
-
-  public getSelectedLayer(): string {
-    let layerName: string = "";
-    layerName = this.selectedLayer;
-    return layerName;
   }
 
   /**
@@ -261,29 +209,6 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     return this.nvclService.isNVCL(layer);
   }
 
-
-  /**
-   * Sets a dataset's images as having completed loading
-   *
-   * @param event the event that triggered this method
-   * @param nvclDatasetId the ID of the dataset for which images have been loaded
-   */
-  setImagesLoaded(event: any, nvclDatasetId: string) {
-    // Chrome will fire this event when added to DOM, ignore that
-    if (event.target.src !== '') {
-      this.imagesLoaded.push(nvclDatasetId);
-    }
-  }
-  /**
-    * Check if images for a dataset have finished loading
-    *
-    * @param nvclDatasetId the ID of the dataset to check
-    * @returns true if images have been loaded, false if not
-    */
-  haveImagesLoaded2(nvclDatasetId: string): boolean {
-    return (this.imagesLoaded.indexOf(nvclDatasetId) !== -1);
-  }
-
   private isIterable(obj) {
     if (obj == null) {
       return false;
@@ -291,353 +216,6 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     return typeof obj[Symbol.iterator] === 'function';
   }
 
-  public getNVCL() {
-
-    if (!this.imScDoButtonsEnabled) { return; }
-
-    // check if have already loaded   
-    if (this.loadedDataset.includes(this.currentDoc.key)) {
-      this.nvclIndex = this.loadedDataset.indexOf(this.currentDoc.key);
-      return;
-    }
-
-    this.nvclService.getNVCLDatasets(this.currentDoc.onlineResource.url, this.currentDoc.key).subscribe(result => {
-      this.loadedDataset.push(this.currentDoc.key);
-
-      if (this.isIterable(result)) {
-        for (const nvclDataset of result) {
-          nvclDataset.image = true;
-          nvclDataset.scalar = false;
-          nvclDataset.download = false;
-          nvclDataset.TSGCacheDownloadurl = "";
-          if (this.nvclBoreholeAnalyticService.hasSavedEmail()) {
-            this.downloadEmail = this.nvclBoreholeAnalyticService.getUserEmail();
-          }
-          this._getNVCLImage(this.currentDoc.onlineResource.url, nvclDataset.datasetId, null);
-          this._getNVCLScalar(this.currentDoc.onlineResource.url, nvclDataset.datasetId);
-          this.isCachedTSGFileAvailable(nvclDataset);
-
-          this.nvclDatasetId = nvclDataset.datasetId;
-          this.nvclDatasets.push(nvclDataset);
-          this.nvclIndex = this.nvclDatasets.length - 1;
-          this.changeDetectorRef.detectChanges();
-
-        }
-        if (result.length === 0) {
-          this.nvclService.setAnalytic(false);
-        } else {
-          this.nvclService.setAnalytic(true);
-        }
-      } else {
-        this.nvclService.setAnalytic(false);
-      }
-    },
-      error => {
-        this.errors = error;
-        console.log("[getNVCLDatasets].error", this.errors);
-      });
-  }
-
-  public changeDrawGraphMode(mode: boolean, datasetId: string) {
-    this.drawGraphMode = mode;
-    this.scalarToolbar = !mode;
-    //this.nvclService.setInitialScalarLoad(initialState);
-    if (mode) {
-      if (this.jobView) {
-        const jobIds = [];
-        const jobNames = [];
-
-        for (const ijob of this.jobList[this.featureId]) {
-          if (ijob.value) {
-            jobIds.push(ijob.jobId);
-            jobNames.push(ijob.jobName)
-          }
-        }
-        if (jobIds.length <= 0) {
-          alert('No logs selected');
-          return;
-        }
-
-        this.selectedLogNames[datasetId] = jobNames;
-        this.drawGraphJob(jobIds);
-
-      } else {
-        const logs = this.datasetScalars[datasetId];
-        const logIds = [];
-        const logNames = [];
-
-        for (const log of logs) {
-          if (log.value) {
-            logIds.push(log.logId);
-            logNames.push(log.logName);
-          }
-        }
-        this.selectedLogNames[datasetId] = logNames;
-        if (logIds.length <= 0) {
-          alert('No logs selected');
-        }
-
-        setTimeout(() => {
-          this.processingGraph = true;
-          this.drawGraph(logIds, logNames);
-        }, 0);
-      }
-
-    } else {
-      this.selectedLogNames = [];
-    }
-  }
-
-  public isCachedTSGFileAvailable(dataset: any) {
-    this.nvclService.getTSGCachedDownloadUrl(this.currentDoc.onlineResource.url, dataset.datasetName).
-      subscribe(url => {
-        dataset.TSGCacheDownloadurl = url;
-      },
-        () => {
-          // swallow error.  the file just isnt cached.
-        });
-  }
-
-  public downloadCSV(datasetId: string) {
-    const logs = this.datasetScalars[datasetId];
-    const logIds = [];
-
-
-    if (this.isIterable(logs)) {
-      for (const log of logs) {
-        if (log.value) {
-          logIds.push(log.logId);
-        }
-      }
-    }
-
-    if (logIds.length <= 0) {
-      alert('No logs selected');
-      return;
-    }
-    
-    this.nvclService.getNVCL2_0_CSVDownload(this.currentDoc.onlineResource.url, logIds).
-      subscribe(response => {
-        const blob = new Blob([response], { type: 'application/csv' });
-        saveAs(blob, datasetId + '.csv');
-      });
-  }
-
-  public downloadTSG(datasetId: string) {
-    if (this.downloadEmail.length === 0 || this.downloadEmail.indexOf('@') < 0) {
-      alert('Please enter a valid email address');
-      return;
-    }
-    this.downloadingTSG = true;
-    this.nvclService.getNVCLTSGDownload(this.currentDoc.onlineResource.url, datasetId, this.downloadEmail).
-      subscribe(response => {
-        this.downloadResponse = response;
-        this.downloadingTSG = false;
-        this.nvclBoreholeAnalyticService.setUserEmail(this.downloadEmail);
-      }, () => {
-        this.downloadingTSG = false;
-      });
-  }
-
-  public checkStatus() {
-    if (this.downloadEmail.length === 0 || this.downloadEmail.indexOf('@') < 0) {
-      alert('Please enter a valid email address');
-      return;
-    }
-    this.checkingTSG = true;
-    this.nvclService.getNVCLTSGDownloadStatus(this.currentDoc.onlineResource.url, this.downloadEmail).
-      subscribe(response => {
-        this.downloadResponse = response;
-        this.checkingTSG = false;
-        this.nvclBoreholeAnalyticService.setUserEmail(this.downloadEmail);
-      }, () => {
-        this.checkingTSG = false;
-      });
-  }
-
-  public clearCheckBox(datasetId: string) {
-    const logs = this.datasetScalars[datasetId];
-    for (const log of logs) {
-      if (log.value) {
-        log.value = false;
-      }
-    }
-  }
-
-  public _colourConvert(BGRColorNumber) {
-    return '#' + UtilitiesService.leftPad((BGRColorNumber & 255).toString(16), 2, '0') +
-      UtilitiesService.leftPad(((BGRColorNumber & 65280) >> 8).toString(16), 2, '0') +
-      UtilitiesService.leftPad((BGRColorNumber >> 16).toString(16), 2, '0');
-  }
-
-  public openLegend(datasetId: string) {
-    if ((Object.entries(this.legendData).length > 0) && (this.legendOpen == false)) {
-      this.legendData = {};
-      //return;
-    }
-    if (this.selectedScalar === null)
-      return;
-
-    this.nvclService.getNVCL2_0_JSONDataBinned(this.currentDoc.onlineResource.url, [this.selectedScalar]).
-      subscribe(response => {
-        if ('success' in response && response.success === true && response.data.length > 0) {
-          const this_ptr = this;
-          const metricColours: any = {};
-          let minval = 999999999;
-          let maxval = -999999999;
-          let hasData = false;
-          const jsonObj = JSON.parse(response.data);
-          for (let i = 0; i < jsonObj.length; i++) {
-            const bv = jsonObj[i];
-            ['stringValues', 'numericValues'].forEach(dataType => {
-              if (bv.hasOwnProperty(dataType) && bv[dataType].length > 0) {
-                // Find the log name for our log id, this will be our 'metric_name'
-                const metric_name = this_ptr.datasetScalars[datasetId].filter(x => x.logId === bv.logId)[0].logName;
-                if (metric_name.length > 0) {
-                  bv[dataType].forEach(function (val) {
-
-                    // "stringValues" ==> units are called "Sample Count" and "numericValues" ==> "Meter Average"
-                    if (dataType === 'stringValues') {
-                      const key = val.classText;
-                      // Use the supplied colour for each metric
-                      if (!(key in metricColours)) {
-                        metricColours[key] = this_ptr._colourConvert(val.colour);
-                      }
-                      hasData = true;
-                    } else if (dataType === 'numericValues') {
-                      if (val.averageValue < minval) {
-                        minval = parseFloat(val.averageValue);
-                      }
-                      if (val.averageValue > maxval) {
-                        maxval = parseFloat(val.averageValue);
-                      }
-                      hasData = true;
-                    } // if
-                  }); // for each
-                  if (dataType === 'numericValues') {
-                    for (let j = 0; j < 9; j++) {
-                      metricColours[(minval + (maxval - minval) * (j / 8)).toLocaleString()] = this_ptr._colourConvert(this_ptr.linPal[256 * (8 - j) / 8]);
-                    }
-                    metricColours.sort();
-                  }
-                } // if
-              } // if
-            }); // for each
-          } // for
-
-          if (hasData) {
-            //this.modalRef = this.modalService.show(NVCLDatasetListDialogComponent, {class: 'modal-sm modal-dialog-centered'});
-            this.bsModalLegend = this.modalService.show(QuerierDialogComponent, { animated: true, class: 'modal-sm' });
-            this.bsModalLegend.content.scalarClasses = metricColours;
-            this.legendData = metricColours;
-            this.legendOpen = true;
-            this.bsModalLegend.onHidden.subscribe(() => {
-              this.legendOpen = false;
-            });
-          }
-        } else {
-          alert('Failed to render legend');
-        }
-      });
-  }
-
-  private _getNVCLScalar(url: string, datasetId: string) {
-    if (this.datasetScalars[datasetId]) {
-      return;
-    }
-    const scalarPriorityOrder = this.scalarPriorityOrder;
-    this.nvclService.getNVCLScalars(url, datasetId).subscribe(scalars => {
-      this.datasetScalars[datasetId] = scalars.sort(function (one, two) {
-        const oneindex = scalarPriorityOrder.findIndex((element) => (element === one.logName));
-        const twoindex = scalarPriorityOrder.findIndex((element) => (element === two.logName));
-        if (twoindex === -1 && oneindex === -1) { return (one.logName > two.logName) ? 1 : -1 }
-        if (twoindex < 0) { return -1; } else if (oneindex < 0) { return 1; } else { return oneindex - twoindex; }
-      });
-    });
-  }
-
-
-  private _getNVCLImage(url: string, datasetId: string, scalarid: string) {
-    this.nvclService.getNVCL2_0_Images(url, datasetId).subscribe(trayImages => {
-      for (const trayImage of trayImages) {
-        if (trayImage.logName === 'Tray Thumbnail Images') {
-          this.datasetImages[datasetId] = []
-          let httpParams = new HttpParams();
-          // httpParams = httpParams.append('serviceUrl', this.nvclService.getNVCLDataServiceUrl(this.onlineResource.url));
-          // httpParams = httpParams.append('logId', trayImage.logId);
-          httpParams = httpParams.append('datasetid', datasetId);
-          // httpParams = httpParams.append('width', '3');
-          if (scalarid != null) {
-            httpParams = httpParams.append('scalarids', scalarid);
-          }
-          this.datasetImages[datasetId].push(this.nvclService.getNVCLDataServiceUrl(this.currentDoc.onlineResource.url) + 'mosaic.html?' + httpParams.toString());
-        }
-      }
-    });
-  }
-
-  public drawGraph(logIds: Array<string>, logNames: Array<string>) {
-    this.processingGraph = true;
-    this.nvclService.getNVCL2_0_JSONDataBinned(this.currentDoc.onlineResource.url, logIds).
-      subscribe(response => {
-        if (response.success) {
-          this.rickshawService.drawNVCLDataGraph(response.data, logIds, logNames);
-          this.processingGraph = false;
-        } else {
-          alert('Failed to load resources');
-          this.processingGraph = false;
-          this.drawGraphMode = false;
-        }
-      });
-  }
-
-  public changeScalarSelection(datasetid) {
-    this._getNVCLImage(this.currentDoc.onlineResource.url, datasetid, this.selectedScalar);
-  }
-
-  public drawGraphJob(jobIds: Array<string>) {
-    this.processingGraph = true;
-    this.nvclService.getNVCL2_0_JobsScalarBinned(this.featureId, jobIds).
-      subscribe(response => {
-        if (response.success) {
-          this.rickshawService.drawNVCLJobsGraph(response, {}, jobIds, jobIds);
-          this.processingGraph = false;
-        } else {
-          alert('Failed to load resources');
-          this.processingGraph = false;
-          this.drawGraphMode = false;
-        }
-      });
-  }
-
-  public onMouseoverScalarDefinition(logName: string): void {
-    if (this.datasetScalarDefinition[logName] !== undefined) {
-      this.tipScalarDefinition = logName + ': ' + this.datasetScalarDefinition[logName].definition;
-    } else {
-      this.tipScalarDefinition = null;
-    }
-  }
-
-  public onMouseoutScalarDefinition(): void {
-    this.tipScalarDefinition = null;
-  }
-
-  public getDefinition(logName: string): void {
-    this.datasetScalarDefinition[logName] = {
-      definition: 'Loading ...'
-    }
-    this.nvclService.getLogDefinition(logName).subscribe(result => {
-      if (result['definition']) {
-        this.datasetScalarDefinition[logName] = result;
-      } else {
-        this.datasetScalarDefinition[logName] = {
-          definition: 'Error retrieving definition',
-          label: 'Error unknown',
-          scopeNote: 'Error unknown'
-        }
-      }
-    })
-  }
   /**
    * Returns true if this supports open in new window
    *
@@ -727,16 +305,50 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     // Clear the HTML display  
     this.currentHTML = "";
     // Set up, convert the XML and display in popup 
-    this.wfs();
     this.updateDropDownButtonText(doc);
     this.currentIndex = i;
     this.currentDoc = doc;
     this.currentDoc.analytic = false;
     this.currentDoc.home = true;
     this.transformToHtml(this.currentDoc, i);
-    this.getNVCL();
+
+    if (this.analyticEnabled) {
+        //this.analytic_tab = true;
+        this.changeDetectorRef.detectChanges();
+    }
   }
 
+/**
+ * sets the button/tab active in the dynamic component nvcl.modal.component.html
+ * 
+ * @param evt 
+ * @param tabName 
+ */
+  public openTab(evt, tabName) {
+    var i, tabcontent, tablinks;
+    if (this.imScDoButtonsEnabled) { this.analytic_tab = true; }
+
+    // set all the "tabs" to display:none - ie hidden
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+      tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+
+    if (document.getElementById(tabName)) {
+      document.getElementById(tabName).style.display = "block";
+      if (evt) {
+        if (evt.target) {
+          if (evt.target.className) {
+            evt.target.className += " activeBtn";
+          }
+        }
+      }
+    }
+  }
 
   /**
    * Look for changes and update UI after brief delay
@@ -789,7 +401,8 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     this.downloading = false;
     if (this.docs.length === 1 && this.htmls.length === 0) {
       this.setWFS(this.docs[0], 0);
-    } else if(this.htmls.length === 1 && this.docs.length === 0) {
+      this.openTab(event, 'wfs')
+    } else if (this.htmls.length === 1 && this.docs.length === 0) {
       this.setHTML(this.htmls[0].key);
     }
   }
@@ -1016,66 +629,6 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     return terms.join(' ');
   }
 
-  public wfs() {
-    this.wfs_tab = true;
-    this.image_tab = false;
-    this.scalar_tab = false;
-    this.download_tab = false;
-    this.analytic_tab = false;
-  }
-
-
-  public image() {
-    if (!this.imScDoButtonsEnabled) { return };
-    this.wfs_tab = false;
-    this.image_tab = true;
-    this.scalar_tab = false;
-    this.download_tab = false;
-  }
-
-  public scalar() {
-    if (!this.imScDoButtonsEnabled) { return };
-    this.wfs_tab = false;
-    this.image_tab = false;
-    this.scalar_tab = true;
-    this.download_tab = false;
-    this.scalarPageSelected = true;
-    if (this.initialScalarLoad == true) { this.initialScalarLoad = false; }
-    if (this.drawGraphMode) { this.changeDrawGraphMode(true, this.nvclDatasets[this.nvclIndex].datasetId) }
-  }
-
-  public download() {
-    if (!this.imScDoButtonsEnabled) { return };
-    this.wfs_tab = false;
-    this.image_tab = false;
-    this.scalar_tab = false;
-    this.download_tab = true;
-  }
-
-  public analytic() {
-    this.wfs_tab = false;
-    this.image_tab = false;
-    this.scalar_tab = false;
-    this.download_tab = false;
-    this.analytic_tab = true;
-
-    this.changeDetectorRef.detectChanges();
-  }
-
-  public setScalarLoaded(state: boolean) {
-    this.scalarLoaded = state;
-  }
-
-
-  public setScalarPageSelected(state: boolean) {
-    this.scalarPageSelected = state;
-  }
-
-
-  public setInitialScalarLoaded(state: boolean) {
-    this.nvclService.setInitialScalarLoad(state);
-  }
-
   public formatXML(doc) {
     if (!doc) { return }
 
@@ -1126,12 +679,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
 
     if (this.selectedFeature != this.currentFeature) {
       // if changed feature selection then reset
-      this.processingGraph = false;
-      this.scalarLoaded = false;
-      this.scalarPageSelected = false;
-      this.scalarToolbar = true;
-      this.selectedScalar = null;
-      this.legendOpen = false;
+      this.isScalarLoaded = false;
       this.drawGraphMode = false;
       this.analyticEnabled = false;
     }
@@ -1162,18 +710,3 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     return regex.test(str);
   }
 }
-
-
-@Component({
-  selector: 'app-querier-component-dialog',
-  templateUrl: '/querier.dialog.component.html',
-})
-export class QuerierDialogComponent {
-
-  scalarClasses: any;
-
-  constructor(public BsModalRef: BsModalRef) { }
-
-}
-
-
