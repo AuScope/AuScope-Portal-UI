@@ -416,7 +416,7 @@ export class DownloadPanelComponent implements OnInit {
    * - this.isTsgDownloadAvailable
    */
   downloadButtonEnabled(): boolean {
-    if (this.bbox || this.isTsgDownloadAvailable ||
+    if (this.bbox || this.isTsgDownloadAvailable || this.irisDownloadListOption ||
         (this.polygonFilter && (this.isPolygonSupportedLayer || this.isWCSDownloadSupported))) {
       return true;
     }
@@ -473,21 +473,13 @@ export class DownloadPanelComponent implements OnInit {
 
     // Download IRIS datasets by constructing a data download URL. User can select the either Dataselect or Station
     } else if (this.irisDownloadListOption) {
-      // IRIS requires a bbox be present
-      if (!this.bbox) {
-        alert('Cannot download. Make sure you select a bounding box.');
-        return;
-      }
       this.downloadStarted = true;
 
-      let start = (this.irisDownloadListOption.dateFrom !== null && this.irisDownloadListOption.dateFrom !== '') ? new Date(new Date(this.irisDownloadListOption.dateFrom)).toISOString().substring(0, 10) : null;
-      let end = (this.irisDownloadListOption.dateToTo !== null && this.irisDownloadListOption.dateTo !== '') ? new Date(new Date(this.irisDownloadListOption.dateTo)).toISOString().substring(0, 10) : null;
+      const start = (this.irisDownloadListOption.dateFrom !== null && this.irisDownloadListOption.dateFrom !== '') ? new Date(new Date(this.irisDownloadListOption.dateFrom)).toISOString().substring(0, 10) : null;
+      const end = (this.irisDownloadListOption.dateToTo !== null && this.irisDownloadListOption.dateTo !== '') ? new Date(new Date(this.irisDownloadListOption.dateTo)).toISOString().substring(0, 10) : null;
 
-      let station = this.SELECT_ALL_CODE;
-      station = !this.irisDownloadListOption.selectedStations.includes(this.SELECT_ALL_CODE) ? this.irisDownloadListOption.selectedStations.join(",") : this.SELECT_ALL_CODE;
-
-      let channel = this.SELECT_ALL_CODE;
-      channel = !this.irisDownloadListOption.selectedChannels.includes(this.SELECT_ALL_CHANNEL) ? this.irisDownloadListOption.selectedChannels.join(",") : this.SELECT_ALL_CODE;
+      const station = !this.irisDownloadListOption.selectedStations.includes(this.SELECT_ALL_CODE) ? this.irisDownloadListOption.selectedStations.join(",") : this.SELECT_ALL_CODE;
+      const channel = !this.irisDownloadListOption.selectedChannels.includes(this.SELECT_ALL_CHANNEL) ? this.irisDownloadListOption.selectedChannels.join(",") : this.SELECT_ALL_CODE;
 
       if (this.irisDownloadListOption.selectedserviceType === 'Station') {
         observableResponse = this.downloadIrisService.downloadIRISStation(this.layer, this.bbox, station, channel, start, end);
@@ -516,17 +508,15 @@ export class DownloadPanelComponent implements OnInit {
       this.downloadStarted = false;
       if (UtilitiesService.isEmpty(err.message)) {
         alert('An error has occurred whilst attempting to download. Please contact cg-admin@csiro.au');
+      } else if (err.status === 413 && this.irisDownloadListOption) {
+        alert('An error has occurred whilst attempting to download. (Request entity is too large, please reduce the size by limiting the stations, channels, or time period.) Please contact cg-admin@csiro.au');
       } else {
-        if (err.status === 413 && this.irisDownloadListOption) {
-          alert('An error has occurred whilst attempting to download. (Request entity is too large, please reduce the size by limiting the stations, channels, or time period.) Please contact cg-admin@csiro.au');
-        } else {
             alert('There is an error, when downloading (' + this.layer.name + ') layer at location (' +
             'eLongitude:' + Math.floor(this.bbox.eastBoundLongitude)
             + ' nLatitude: ' + Math.floor(this.bbox.northBoundLatitude)
             + ' sLatitude:' + Math.floor(this.bbox.southBoundLatitude)
             + ' wLongitude:' + Math.floor(this.bbox.westBoundLongitude)
             + '). Detail of the error: (' + err.message + ')');
-        }
       }
     });
   }
@@ -794,7 +784,7 @@ export class DownloadPanelComponent implements OnInit {
       // Update the to/from and start/end dates according to the channels selected
       let newStartDate = stations[0].startDate;
       let newEndDate = stations[0].endDate;
-      for (let station of stations) {
+      for (const station of stations) {
         newStartDate = station.startDate < newStartDate ? station.startDate : newStartDate;
         newEndDate = station.endDate > newEndDate ? station.endDate : newEndDate;
       }
