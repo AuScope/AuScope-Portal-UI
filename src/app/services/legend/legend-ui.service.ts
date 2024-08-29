@@ -141,7 +141,7 @@ export class LegendUiService {
   private createLegendUrl(wmsUrl: string, layerName: string, sldBody?: string): string {
     wmsUrl = this.trimUrl(wmsUrl);
     let requestUrl = wmsUrl + '?SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png&BGCOLOR=0xFFFFFF' +
-                     '&WIDTH=40&HEIGHT=40' +
+                    //  '&WIDTH=40&HEIGHT=40' +
                      '&LAYER=' + layerName + '&LAYERS=' + layerName + '&SCALE=1000000' + '&forceLabels=on&minSymbolSize=16';
     if (sldBody) {
       requestUrl += '&SLD_BODY=' + encodeURI(sldBody);
