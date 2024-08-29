@@ -10,8 +10,8 @@ import { isNumber } from '@turf/helpers';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { BoundsService } from 'app/services/bounds/bounds.service';
 import { NVCLService } from '../../../modalwindow/querier/customanalytic/nvcl/nvcl.service';
-import { catchError, shareReplay } from 'rxjs/operators';
-import { Subject, throwError } from 'rxjs';
+import { shareReplay } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 declare var gtag: Function;
 
@@ -484,14 +484,7 @@ export class DownloadPanelComponent implements OnInit {
       if (this.irisDownloadListOption.selectedserviceType === 'Station') {
         observableResponse = this.downloadIrisService.downloadIRISStation(this.layer, this.bbox, station, channel, start, end);
       } else {
-        observableResponse = this.downloadIrisService.downloadIRISDataselect(this.layer, station, channel, start, end)
-        .pipe(
-          catchError(err => {
-            // Handle the error or log it
-            alert('Please narrow down the date range, as the request data is too large.')
-            return throwError(err);
-          })
-        );
+        observableResponse = this.downloadIrisService.downloadIRISDataselect(this.layer, station, channel, start, end);
       }
     // Standard WFS feature download as a CSV
     } else {
@@ -502,23 +495,42 @@ export class DownloadPanelComponent implements OnInit {
     // Kick off the download process and save zip file in browser
     observableResponse.subscribe(value => {
       this.downloadStarted = false;
-      const blob = new Blob([value], { type: 'application/zip' });
+      // Catch No Content (204) response
+      if (value.status === 204) {
+        alert('No content could be found for the specified area. Please adjust the download bounds.');
+        return;
+      }
+      const blob = new Blob([value.body], { type: 'application/zip' });
       saveAs(blob, 'download.zip');
     }, err => {
       this.downloadStarted = false;
+      // No error message
       if (UtilitiesService.isEmpty(err.message)) {
         alert('An error has occurred whilst attempting to download. Please contact cg-admin@csiro.au');
-      } else if (err.status === 413 && this.irisDownloadListOption) {
-        alert('An error has occurred whilst attempting to download. (Request entity is too large, please reduce the size by limiting the stations, channels, or time period.) Please contact cg-admin@csiro.au');
-      } else {
-            alert('There is an error, when downloading (' + this.layer.name + ') layer at location (' +
+      } 
+      // Content Too Large (413)
+      else if (err.status === 413) {
+        if (this.irisDownloadListOption) {
+          alert('An error has occurred whilst attempting to download. Request entity is too large, please reduce the size by limiting the stations, channels, or time period.');
+        } else {
+          alert('An error has occurred whilst attempting to download. Request entity is too large, please reduce the size by limiting download bounds or features.');
+        }
+      }
+      // Catch-all
+      else {
+        let alertMessage = 'There is an error, when downloading (' + this.layer.name + ') layer';
+        if (this.bbox) {
+          alertMessage += ' at location (' +
             'eLongitude:' + Math.floor(this.bbox.eastBoundLongitude)
             + ' nLatitude: ' + Math.floor(this.bbox.northBoundLatitude)
             + ' sLatitude:' + Math.floor(this.bbox.southBoundLatitude)
             + ' wLongitude:' + Math.floor(this.bbox.westBoundLongitude)
-            + '). Detail of the error: (' + err.message + ')');
+            + '). Detail of the error: (' + err.message + ')';
+        }
+        alert(alertMessage);
       }
     });
+
   }
 
   /**
