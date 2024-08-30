@@ -500,7 +500,7 @@ export class DownloadPanelComponent implements OnInit {
         alert('No content could be found for the specified area. Please adjust the download bounds.');
         return;
       }
-      const blob = new Blob([value.body], { type: 'application/zip' });
+      const blob = new Blob([value.body ? value.body : value], { type: 'application/zip' });
       saveAs(blob, 'download.zip');
     }, err => {
       this.downloadStarted = false;
