@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { ApplicationRef, ChangeDetectorRef, Component, Inject, OnInit, ElementRef, ViewChild, AfterViewInit, Renderer2 } from '@angular/core';
-import { environment } from '../../../environments/environment';
 import { config } from '../../../environments/config';
 import { ref } from '../../../environments/ref';
-import { CsClipboardService, GMLParserService, ManageStateService, Polygon, QuerierInfoModel, RickshawService, UtilitiesService } from '@auscope/portal-core-ui';
+import { CsClipboardService, GMLParserService, Polygon, QuerierInfoModel } from '@auscope/portal-core-ui';
 import { NVCLService } from './customanalytic/nvcl/nvcl.service';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { FlatTreeControl } from '@angular/cdk/tree';
@@ -14,7 +13,6 @@ import * as X2JS from 'x2js';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MSCLService } from '../layeranalytic/mscl/mscl.service';
 import { NVCLBoreholeAnalyticService } from '../layeranalytic/nvcl/nvcl.boreholeanalytic.service';
-import { saveAs } from 'file-saver';
 import { MatDialog } from '@angular/material/dialog';
 
 export class FileNode {
@@ -33,10 +31,9 @@ interface FlatNode {
 @Component({
   selector: 'app-querier-modal-window',
   templateUrl: './querier.modal.component.html',
-  providers: [RickshawService, NVCLBoreholeAnalyticService],
+  providers: [NVCLBoreholeAnalyticService],
   styleUrls: ['../modalwindow.scss', './querier.modal.component.scss']
 })
-
 export class QuerierModalComponent implements OnInit, AfterViewInit {
   [x: string]: any;
   @ViewChild('childElement', { static: false }) childElement: ElementRef;
@@ -123,12 +120,12 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   public modalVisible = true;
 
   constructor(public nvclService: NVCLService, public bsModalRef: BsModalRef, public csClipboardService: CsClipboardService,
-    private manageStateService: ManageStateService, private gmlParserService: GMLParserService,
+    private gmlParserService: GMLParserService,
     private http: HttpClient, @Inject('env') private env, private sanitizer: DomSanitizer,
     public nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService,
     private changeDetectorRef: ChangeDetectorRef, private appRef: ApplicationRef,
-    private msclService: MSCLService, private renderer: Renderer2, private elementRef: ElementRef,
-    private modalService: BsModalService, public dialog: MatDialog, private rickshawService: RickshawService) {
+    private msclService: MSCLService, private renderer: Renderer2,
+    private modalService: BsModalService, public dialog: MatDialog) {
     this.analyticMap = ref.analytic;
     this.flagNVCLAnalytic = false;
     this.initialScalarLoad = true;
@@ -226,34 +223,11 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     return config.supportOpenInNewWindow.includes(doc.layer.id);
   }
 
-  public newWindow(doc: QuerierInfoModel) {
-    const state = _.cloneDeep(this.manageStateService.getState());
-    const layerid = doc.layer.id;
-    for (const key in state) {
-      if (key !== layerid && key !== 'map') {
-        delete state[key];
-      }
-      if (key === layerid) {
-        state[key].raw = doc.raw;
-        state[key].onlineResource = doc.onlineResource; // TODO: currentDoc. ???
-        state[key].gmlid = doc.key;
-      }
-    }
-
-    // Store state object in DB & open up window
-    const uncompStateStr = JSON.stringify(state);
-    this.manageStateService.saveStateToDB(uncompStateStr).subscribe((response: any) => {
-      if (response.success === true) {
-        window.open(environment.hostUrl + '?state=' + response.id);
-      }
-    });
-  }
-
   /**
    * Copy drawn polygon to clipboard
    * @param document polygon as document
    */
-  public CopyToClipboard(document) {
+  public copyToClipboard(document) {
     const name = document.key;
     const doc = document.value;
     let polygon: Polygon;

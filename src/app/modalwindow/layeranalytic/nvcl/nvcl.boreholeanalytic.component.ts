@@ -1,7 +1,6 @@
 import { environment } from '../../../../environments/environment';
 import { saveAs } from 'file-saver';
 import { LayerModel } from '@auscope/portal-core-ui';
-import { ManageStateService } from '@auscope/portal-core-ui';
 import { NVCLBoreholeAnalyticService } from './nvcl.boreholeanalytic.service';
 import {
   Component,
@@ -12,6 +11,7 @@ import {
 } from '@angular/core';
 import { LayerAnalyticInterface } from '../layer.analytic.interface';
 import { NgForm } from '@angular/forms';
+import { UserStateService } from 'app/services/user/user-state.service';
 
 
 @Component({
@@ -52,7 +52,7 @@ export class NVCLBoreholeAnalyticComponent
 
   constructor(
     public nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService,
-    private manageStateService: ManageStateService
+    private userStateService: UserStateService
   ) {
     this.nvclform = {};
   }
@@ -135,10 +135,10 @@ export class NVCLBoreholeAnalyticComponent
       .getNVCLClassifications(algorithmOutputIds)
       .subscribe(classifications => {
         classifications = classifications.sort((a,b)=> {
-          var a1 = a.classText.toLowerCase();
-          var b1 = b.classText.toLowerCase();
-          return a1<b1 ?-1:a1> b1? 1 :0;
-          })
+          const a1 = a.classText.toLowerCase();
+          const b1 = b.classText.toLowerCase();
+          return a1 < b1 ? -1 : a1 > b1 ? 1 : 0;
+        })
         this.classifications = classifications;
       });
   }
@@ -161,8 +161,7 @@ export class NVCLBoreholeAnalyticComponent
         alert('Job has been successfully submitted. The results will be sent to your email.');
         this.nvclBoreholeAnalyticService.setUserEmail(this.nvclform.email);
       }
-      },
-      err => {
+      }, () => {
         alert('Failed on the job submission. Please contact cg-admin@csiro.au for help!');
       }
     );
@@ -185,7 +184,8 @@ export class NVCLBoreholeAnalyticComponent
         }
       });
   }
-  public ChangePublish(status: any) {
+
+  public changePublish(status: any) {
     const jobid = status.jobid;
     const published = status.published;
     status.published = !published;
