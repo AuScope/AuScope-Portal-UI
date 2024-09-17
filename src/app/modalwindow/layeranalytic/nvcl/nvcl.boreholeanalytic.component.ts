@@ -214,22 +214,4 @@ export class NVCLBoreholeAnalyticComponent
       });
   }
 
-  public viewOnMap(jobid: string) {
-    if (window.confirm('This action will link you to an external URL. Please ensure you have grant access to allow pop up from this domain.')) {
-      this.layer.filterCollection.mandatoryFilters[0].value = jobid;
-      // Make a state object
-      const state = this.manageStateService.generateOneOffState(
-        this.layer.id,
-        this.layer.filterCollection,
-        []
-      );
-      // Store state object in DB & open up window
-      const uncompStateStr = JSON.stringify(state);
-      this.manageStateService.saveStateToDB(uncompStateStr).subscribe((response: any) => {
-        if (response.success === true) {
-          window.open(environment.hostUrl + '?state=' + response.id);
-        }
-      });
-    }
-  }
 }
