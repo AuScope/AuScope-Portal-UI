@@ -9,7 +9,6 @@ import { Observable, Subject, Subscription } from 'rxjs';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
-import { UILayerModel } from '../common/model/ui/uilayer.model';
 
 import { HttpClient, HttpHeaders, HttpParams, HttpUrlEncodingCodec } from '@angular/common/http';
 import { Download } from 'app/modalwindow/layeranalytic/nvcl/tsgdownload';
@@ -17,6 +16,7 @@ import * as saveAs from 'file-saver';
 import { take } from 'rxjs/operators';
 
 import { SidebarService } from 'app/portal/sidebar.service';
+import { UILayerModel } from '../common/model/ui/uilayer.model';
 
 // Search fields
 const SEARCH_FIELDS = [{
@@ -452,7 +452,16 @@ export class SearchPanelComponent implements OnInit {
   public layerWarningMessage(layer: LayerModel): string {
     return 'This layer cannot be displayed. For Featured Layers, please wait for the layer cache to rebuild itself. ' +
       'For Custom Layers please note that only the following online resource types can be added to the map: ' +
-      this.csMapService.getSupportedOnlineResourceTypes();
+      UtilitiesService.getSupportedOnlineResourceTypes();
+  }
+
+  /**
+   * Check if map layer is supported and addable to map
+   *
+   * @param layer the LayerModel
+   */
+  isMapSupportedLayer(layer: LayerModel): boolean {
+    return UtilitiesService.isMapSupportedLayer(layer);
   }
 
   /**
@@ -461,10 +470,12 @@ export class SearchPanelComponent implements OnInit {
    * @param layer LayerModel
    */
   public addLayer(layer: LayerModel) {
+    
     if (!this.uiLayerModelService.getUILayerModel(layer.id)) {
-      const uiLayerModel = new UILayerModel(layer.id, this.renderStatusService.getStatusBSubject(layer));
+      const uiLayerModel = new UILayerModel(layer.id, 100, this.renderStatusService.getStatusBSubject(layer));
       this.uiLayerModelService.setUILayerModel(layer.id, uiLayerModel);
     }
+    
     this.layerManagerService.addLayer(layer, [], layer.filterCollection, undefined);
     this.sidebarService.setOpenState(true);
   }

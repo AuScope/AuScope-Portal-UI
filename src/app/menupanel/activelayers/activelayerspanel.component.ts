@@ -413,7 +413,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
    * @returns true if supported layer, false otherwise
    */
   public isMapSupportedLayer(layer: LayerModel): boolean {
-    return this.csMapService.isMapSupportedLayer(layer);
+    return UtilitiesService.isMapSupportedLayer(layer);
   }
 
   /**

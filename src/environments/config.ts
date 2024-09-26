@@ -186,39 +186,6 @@ export const config = {
     'bulkdensitypoint_4326',
     'waroxi_wa_4326_bed'
   ],
-  // Layers that use CSW records to display a simple rectangle on map
-  cswrenderer: [
-    'pmd-crc-project-a1-presentations',
-    'pmd-crc-project-c1-final-report',
-    'pmd-crc-project-c2-final-report',
-    'pmd-crc-project-c6-final-report',
-    'pmd-crc-project-c7-final-report',
-    'pmd-crc-project-i1-appendix1',
-    'pmd-crc-project-i1-appendix5',
-    'pmd-crc-project-i2-presentations',
-    'pmd-crc-project-i5-final-report',
-    'pmd-crc-project-i6-final-report',
-    'pmd-crc-project-i9-final-report',
-    'pmd-crc-project-t1-final-report',
-    'pmd-crc-project-t3-final-report',
-    'pmd-crc-project-t67-final-report',
-    'pmd-crc-project-t11-final-report',
-    'pmd-crc-project-y2-appendix',
-    'pmd-crc-project-y4-final-report',
-    'leme-crc-maps',
-    'portal-geo-models',
-    'l180-mt-isa-deep-crus-seis-surv-qld-2006-stac-and-migr-data-and-imag-for-line-06ga-to-06ga',
-    'are-ther-any-sand-uran-syst-in-the-erom-basi',
-    'l164-curn-seis-surv-sa-2003-2004-stac-and-migr-seis-data-and-imag-for-line-03ga',
-    'lawn-hill-plat-and-leic-rive-faul-trou-meas-stra-sect-onli-gis',
-    'pred-mine-disc-in-the-east-yilg-crat-an-exam-of-dist-targ-of-an-orog-gold-mine-syst',
-    'fina-repo-3d-geol-mode-of-the-east-yilg-crat-proj-pmd-y2-sept-2001-dece-2004',
-    'cate-3-expl-lice-poly-of-tasm-min-reso-tasm',
-    'auscope-mt-collection-1',
-    'auscope-mt-collection-2',
-    'auscope-mt-collection-3',
-    'auscope-mt-collection-4'
-  ],
   // Layers that require a JSON response for WMS GetFeature requests
   wmsGetFeatureJSON: [
     // ASTER is served by GSKY which only returns JSON
