@@ -11,10 +11,10 @@ export class UILayerModel {
   statusMap: StatusMapModel;
   opacity: number;
 
-  constructor(public id: string, public loadingSubject: BehaviorSubject<StatusMapModel>) {
+  constructor(id: string, opacity: number, loadingSubject: BehaviorSubject<StatusMapModel>) {
     this.tabpanel = new UITabPanel();
     this.expanded = false;
-    this.opacity = 100;
+    this.opacity = opacity;
     loadingSubject.subscribe((value) => {
       this.statusMap = value;
     });

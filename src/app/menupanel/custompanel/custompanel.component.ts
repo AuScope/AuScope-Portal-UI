@@ -256,8 +256,9 @@ export class CustomPanelComponent {
               for (const layerRec of layerRecs) {
                 // Make the layer group listing visible in the UI
                 this.urlLayers.unshift(layerRec);
+
                 // Configure layers so they can be added to map
-                const uiLayerModel = new UILayerModel(layerRec.id, this.renderStatusService.getStatusBSubject(layerRec));
+                const uiLayerModel = new UILayerModel(layerRec.id, 100, this.renderStatusService.getStatusBSubject(layerRec));
                 this.uiLayerModelService.setUILayerModel(layerRec.id, uiLayerModel);
               }
             }
@@ -391,8 +392,8 @@ export class CustomPanelComponent {
       layerRec.group = 'kml-layer';
     }
     // Configure layers so it can be added to map
-    const uiLayerModel = new UILayerModel(layerRec.id, me.renderStatusService.getStatusBSubject(layerRec));
-    me.uiLayerModelService.setUILayerModel(layerRec.id, uiLayerModel);
+    const uiLayerModel = new UILayerModel(layerRec.id, 100, me.renderStatusService.getStatusBSubject(layerRec));
+    this.uiLayerModelService.setUILayerModel(layerRec.id, uiLayerModel);
     // Make the layer group listing visible in the UI
     if (sourceType == "URL" && !this.recordsListContainsRecord(me.urlLayers, name, proxyUrl)) {
       me.urlLayers.unshift(layerRec);

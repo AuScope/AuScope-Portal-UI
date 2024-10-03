@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { CsMapService, LayerModel, ManageStateService } from '@auscope/portal-core-ui';
+import { CsMapService, LayerModel, ManageStateService, RenderStatusService } from '@auscope/portal-core-ui';
 import { AdvancedComponentService } from './advanced-component.service';
 import { LegendUiService } from '../legend/legend-ui.service';
 import { UILayerModelService } from './uilayer-model.service';
 import { environment } from 'environments/environment';
 import * as _ from 'lodash';
 import * as $ from 'jquery';
+import { UILayerModel } from 'app/menupanel/common/model/ui/uilayer.model';
 
 declare let gtag: Function;
 
@@ -16,16 +17,22 @@ declare let gtag: Function;
 export class LayerManagerService {
 
   filterList = []; // an array of all active layers - object = {layer, filterState }
+
+  constructor(private csMapService: CsMapService, private manageStateService: ManageStateService,
+    private uiLayerModelService: UILayerModelService,
+    private renderStatusService: RenderStatusService,
+    private advancedComponentService: AdvancedComponentService,
+    private legendUiService: LegendUiService) {
+  }
+
   /**
    * returns a boolean for whether a layer has filters; from the array filerList
    */
   getFilters(layerId: string): boolean {
-
     let filterState: boolean = false;
 
     for (let i = 0; i < this.filterList.length; i++) {
-      var c: string;
-      c = this.filterList[i];
+      const c = this.filterList[i];
       if (layerId.startsWith(c['layer'])) {
         filterState = c['hasFilters'];
       }
@@ -38,14 +45,12 @@ export class LayerManagerService {
    * sets the state of "hasFilters" variable for the given layer in the array filterList
    */
   setFilters(layerId: string, filterState: boolean): void {
-
-    let objIndex = this.filterList.findIndex(obj => obj.layer == layerId);
+    const objIndex = this.filterList.findIndex(obj => obj.layer == layerId);
     if (objIndex >= 0) { 
       this.filterList[objIndex].hasFilters = filterState; 
     } else {
       this.filterList.push({ layer: layerId, hasFilters: filterState });
     }
-
     //this.hasFilters.next(filterState);
   }
 
@@ -58,12 +63,6 @@ export class LayerManagerService {
     this.filterList.forEach((item, index) => {
       if (item['layer'] === layerId) this.filterList.splice(index, 1);
     });
-  }
-
-  constructor(private csMapService: CsMapService, private manageStateService: ManageStateService,
-              private uiLayerModelService: UILayerModelService,
-              private advancedComponentService: AdvancedComponentService,
-              private legendUiService: LegendUiService) {
   }
 
   /**
@@ -159,14 +158,9 @@ export class LayerManagerService {
    * @param layer the layer to remove
    */
   public removeLayer(layer: LayerModel) {
-    // Reset opacity to 100, mainly so UI resets and matches layer if re-added later
-    // TODO: we should keep as is and use it when re-added
-    const uiLayerModel = this.uiLayerModelService.getUILayerModel(layer.id);
-    if (uiLayerModel) {
-      uiLayerModel.opacity = 100;
-      this.uiLayerModelService.setUILayerModel(layer.id, uiLayerModel);
-    }
-    //
+    // Remove UILayerModel
+    this.uiLayerModelService.removeUILayerModel(layer.id);
+    // Remove layer
     this.csMapService.removeLayer(layer);
     // Remove any layer specific map components
     this.advancedComponentService.removeAdvancedMapComponents(layer.id);

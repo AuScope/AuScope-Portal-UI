@@ -154,7 +154,7 @@ export class PermanentLinksModalComponent implements OnInit {
       } else {
 
         if (this.editingState !== -1) {
-          // TODO: Prompt unsaved changes (if any) XXX
+          // TODO: Prompt unsaved changes (if any)
           this.enableStateFormControls(this.editingState, false);
         }
         this.editingState = stateNo;

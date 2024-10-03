@@ -75,7 +75,7 @@ export class DataExplorerService {
    * @param type
    * @param comparison
    */
-  // XXX GET RID OF THIS AND REPLACE WITH NEXT METHOD
+  // TODO: GET RID OF THIS AND REPLACE WITH NEXT METHOD
   public getFacetedSearch(serviceId: string, start: number, limit: number,
     field: string[], value: string[], type: string[], comparison: string[]): Observable<any> {
 
