@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
-import { CsMapService, LayerModel, ManageStateService, RenderStatusService } from '@auscope/portal-core-ui';
+import { CsMapService, LayerModel, ManageStateService } from '@auscope/portal-core-ui';
 import { AdvancedComponentService } from './advanced-component.service';
 import { LegendUiService } from '../legend/legend-ui.service';
 import { UILayerModelService } from './uilayer-model.service';
 import { environment } from 'environments/environment';
 import * as _ from 'lodash';
 import * as $ from 'jquery';
-import { UILayerModel } from 'app/menupanel/common/model/ui/uilayer.model';
 
 declare let gtag: Function;
 
@@ -20,7 +19,6 @@ export class LayerManagerService {
 
   constructor(private csMapService: CsMapService, private manageStateService: ManageStateService,
     private uiLayerModelService: UILayerModelService,
-    private renderStatusService: RenderStatusService,
     private advancedComponentService: AdvancedComponentService,
     private legendUiService: LegendUiService) {
   }
