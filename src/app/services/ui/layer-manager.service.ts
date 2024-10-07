@@ -158,8 +158,12 @@ export class LayerManagerService {
    * @param layer the layer to remove
    */
   public removeLayer(layer: LayerModel) {
-    // Remove UILayerModel
-    this.uiLayerModelService.removeUILayerModel(layer.id);
+    // Reset UI opacity in case added later
+    const uiLayerModel = this.uiLayerModelService.getUILayerModel(layer.id);
+    if (uiLayerModel) {
+      uiLayerModel.opacity = 100;
+      this.uiLayerModelService.setUILayerModel(layer.id, uiLayerModel);
+    }
     // Remove layer
     this.csMapService.removeLayer(layer);
     // Remove any layer specific map components
