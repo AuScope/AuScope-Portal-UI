@@ -54,7 +54,7 @@ export class PermanentLinkComponent {
       this.permanentlink = link;
       this.shorteningMode = false;
     }, () => {
-      this.permanentlink = "Error retrieving permanentLink."
+      this.permanentlink = "Error retrieving permanent link."
       this.shorteningMode = false;
     });
 
