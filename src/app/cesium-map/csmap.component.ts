@@ -381,6 +381,23 @@ export class CsMapComponent implements AfterViewInit {
     // Total number of features returned from GetFeatureInfo requests
     let numberOfFeatures = 0;
 
+    // get the list of optional filter - providers
+    // we will use this to filter calls to the backend i.e. wmsMarkerPopup.do
+    let optProviderList = [];
+    for (const maplayer of mapClickInfo.clickedLayerList) {
+      for (const optFil of maplayer.filterCollection.optionalFilters) {
+        if (optFil.value !== null) {
+          if (optFil.type === 'OPTIONAL.PROVIDER') {
+            for (const [key, value] of Object.entries(optFil.value)) {
+              if (value === true) {
+                optProviderList.push(key); // key is the Provider e.g. sarigdata.pir.sa.gov.au
+              }
+            }
+          }
+        }
+      }
+    }
+
     // Process list of layers clicked
     for (const maplayer of mapClickInfo.clickedLayerList) {
       for (const i of maplayer.clickCSWRecordsIndex) {
@@ -394,76 +411,91 @@ export class CsMapComponent implements AfterViewInit {
         }
 
         if (onlineResource) {
-
-          if (!UtilitiesService.getLayerHasSupportedOnlineResourceType(maplayer) && UtilitiesService.layerContainsBboxGeographicElement(maplayer)) {
-            // Display CSW record info
-            this.displayModal(mapClickInfo.clickCoord);
-            this.setModalHTML(this.parseCSWtoHTML(cswRecord), cswRecord.name, maplayer, this.bsModalRef);
+          // iterate through optional Filters to see if the provider "matches" the onlineResource.url
+          let optProviderFound = false;
+          for (const optPro of optProviderList) {
+            if (onlineResource.url.includes(optPro) ) {
+              optProviderFound = true;
+            }
+          }
+          
+          // this is the case of no provider set, i.e. all Australia
+          if (optProviderList.length === 0) {
+            optProviderFound = true; 
           }
 
-          // Display WMS layer info
-          const params = this.getParams(maplayer.clickPixel[0], maplayer.clickPixel[1]);
-          if (!params) {
-            continue;
-          }
-          let sldBody = maplayer.sldBody;
-          let postMethod = false;
-          let infoFormat: string;
-          if (sldBody) {
-            sldBody = SimpleXMLService.extractIntersectsFiltersFromSld(sldBody);
-            postMethod = true;
-          } else {
-            sldBody = '';
-          }
+          if (optProviderFound) {
 
-          // WMS 1.3.0 GetFeatureInfo requests will have had their lat,lng coords swapped to lng,lat
-          if (maplayer.sldBody130) {
-            sldBody = maplayer.sldBody130;
-          }
+            if (!UtilitiesService.getLayerHasSupportedOnlineResourceType(maplayer) && UtilitiesService.layerContainsBboxGeographicElement(maplayer)) {
+              // Display CSW record info
+              this.displayModal(mapClickInfo.clickCoord);
+              this.setModalHTML(this.parseCSWtoHTML(cswRecord), cswRecord.name, maplayer, this.bsModalRef);
+            }
 
-          // Layer specific SLD_BODY, INFO_FORMAT and postMethod
-          if (onlineResource.name.indexOf('ProvinceFullExtent') >= 0) {
-            infoFormat = 'application/vnd.ogc.gml';
-          } else {
-            infoFormat = 'application/vnd.ogc.gml/3.1.1';
-          }
+            // Display WMS layer info
+            const params = this.getParams(maplayer.clickPixel[0], maplayer.clickPixel[1]);
+            if (!params) {
+              continue;
+            }
+            let sldBody = maplayer.sldBody;
+            let postMethod = false;
+            let infoFormat: string;
+            if (sldBody) {
+              sldBody = SimpleXMLService.extractIntersectsFiltersFromSld(sldBody);
+              postMethod = true;
+            } else {
+              sldBody = '';
+            }
 
-          if (UtilitiesService.resourceIsArcGIS(onlineResource)) {
-            infoFormat = 'text/xml';
-            sldBody = '';
-            postMethod = false;
-          }
+            // WMS 1.3.0 GetFeatureInfo requests will have had their lat,lng coords swapped to lng,lat
+            if (maplayer.sldBody130) {
+              sldBody = maplayer.sldBody130;
+            }
 
-          // GSKY and some Loop3D layers require JSON response
-          if (config.wmsGetFeatureJSON.indexOf(maplayer.id) !== -1) {
-            infoFormat = 'application/json';
-          }
+            // Layer specific SLD_BODY, INFO_FORMAT and postMethod
+            if (onlineResource.name.indexOf('ProvinceFullExtent') >= 0) {
+              infoFormat = 'application/vnd.ogc.gml';
+            } else {
+              infoFormat = 'application/vnd.ogc.gml/3.1.1';
+            }
 
-          if (onlineResource.description.indexOf('EMAG2 - Total Magnetic Intensity') >= 0) {
-            infoFormat = 'text/xml';
-          }
+            if (UtilitiesService.resourceIsArcGIS(onlineResource)) {
+              infoFormat = 'text/xml';
+              sldBody = '';
+              postMethod = false;
+            }
 
-          if (onlineResource.description.indexOf('Onshore Seismic Surveys') >= 0) {
-            infoFormat = 'text/xml';
-          }
+            // GSKY and some Loop3D layers require JSON response
+            if (config.wmsGetFeatureJSON.indexOf(maplayer.id) !== -1) {
+              infoFormat = 'application/json';
+            }
 
-          // Build GetFeatureInfo requests
-          getFeatureInfoRequests.push(
-            this.queryWMSService.getFeatureInfo(onlineResource, sldBody, infoFormat, postMethod, maplayer.clickCoord[0],
-              maplayer.clickCoord[1], params.x, params.y, params.width, params.height, params.bbox).pipe(
-                timeout(5000),
-                tap(result => {
-                  // Update the modal features as each request completes
-                  const feature = { onlineResource: onlineResource, layer: maplayer };
-                  const numberOfLayerFeatures = this.setModal(maplayer.id, result, feature, mapClickInfo.clickCoord);
-                  if (numberOfLayerFeatures > 0) {
-                    numberOfFeatures += numberOfLayerFeatures;
-                  }
-                }), catchError((error) => {
-                  return throwError(error);
-                })
-              )
-          );
+            if (onlineResource.description.indexOf('EMAG2 - Total Magnetic Intensity') >= 0) {
+              infoFormat = 'text/xml';
+            }
+
+            if (onlineResource.description.indexOf('Onshore Seismic Surveys') >= 0) {
+              infoFormat = 'text/xml';
+            }
+
+            // Build GetFeatureInfo requests
+            getFeatureInfoRequests.push(
+              this.queryWMSService.getFeatureInfo(onlineResource, sldBody, infoFormat, postMethod, maplayer.clickCoord[0],
+                maplayer.clickCoord[1], params.x, params.y, params.width, params.height, params.bbox).pipe(
+                  timeout(5000),
+                  tap(result => {
+                    // Update the modal features as each request completes
+                    const feature = { onlineResource: onlineResource, layer: maplayer };
+                    const numberOfLayerFeatures = this.setModal(maplayer.id, result, feature, mapClickInfo.clickCoord);
+                    if (numberOfLayerFeatures > 0) {
+                      numberOfFeatures += numberOfLayerFeatures;
+                    }
+                  }), catchError((error) => {
+                    return throwError(error);
+                  })
+                )
+            );
+          }
         }
       }
     }
