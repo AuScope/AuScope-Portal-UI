@@ -481,16 +481,6 @@ export class SearchPanelComponent implements OnInit {
   }
 
   /**
-   * Scroll to the specified layer in sidebar (Featured Layers)
-   * Note: Unused, was originally for scrolling to layer in Featured Layers when that was part
-   * of the side-bar. Kept in case we ever want to highlight the browse menu (or similar)
-   * @param layer the layer
-   */
-  public scrollToLayer(layer: LayerModel) {
-    this.manageStateService.setLayerToExpand(layer.id);
-  }
-
-  /**
    * Check whether layer has been added to the map
    *
    * @param layerId ID of the layer

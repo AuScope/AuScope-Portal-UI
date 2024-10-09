@@ -41,7 +41,6 @@ export class PermanentLinkComponent {
     if (this.bShowDialog){
       this.generateAnonymousPermanentLink();
     }
-    return;
   }
 
   /**
@@ -55,7 +54,7 @@ export class PermanentLinkComponent {
       this.permanentlink = link;
       this.shorteningMode = false;
     }, () => {
-      this.permanentlink = "Error on retrieving permanentLink!"
+      this.permanentlink = "Error retrieving permanent link."
       this.shorteningMode = false;
     });
 
