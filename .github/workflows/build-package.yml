@@ -41,7 +41,7 @@ jobs:
         run: zip release.zip ./dist/* -r
       - name: file bundle artifact
         if: contains(github.ref, 'master')
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: portal UI dev bundle
           path: release.zip
