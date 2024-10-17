@@ -385,12 +385,14 @@ export class CsMapComponent implements AfterViewInit {
     // we will use this to filter calls to the backend i.e. wmsMarkerPopup.do
     let optProviderList = [];
     for (const maplayer of mapClickInfo.clickedLayerList) {
-      for (const optFil of maplayer.filterCollection.optionalFilters) {
-        if (optFil.value !== null) {
-          if (optFil.type === 'OPTIONAL.PROVIDER') {
-            for (const [key, value] of Object.entries(optFil.value)) {
-              if (value === true) {
-                optProviderList.push(key); // key is the Provider e.g. sarigdata.pir.sa.gov.au
+      if (maplayer?.filterCollection?.optionalFilters) {
+        for (const optFil of maplayer.filterCollection.optionalFilters) {
+          if (optFil.value !== null) {
+            if (optFil.type === 'OPTIONAL.PROVIDER') {
+              for (const [key, value] of Object.entries(optFil.value)) {
+                if (value === true) {
+                  optProviderList.push(key); // key is the Provider e.g. sarigdata.pir.sa.gov.au
+                }
               }
             }
           }
