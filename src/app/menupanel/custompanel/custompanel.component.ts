@@ -265,6 +265,11 @@ export class CustomPanelComponent {
           } else {
             this.statusMsg = '<div class="text-danger">No viable OGC WMS found on the service endpoint. Kindly check your URL again.</div>';
           }
+        },
+        (error: any) => {
+          //console.log("[custompanel.componen].error:", error);
+          this.statusMsg = '<div class="text-danger">No viable OGC WMS found on the service endpoint. Kindly check your URL again.</div>';
+          this.loading = false;
         });
       }
     }
