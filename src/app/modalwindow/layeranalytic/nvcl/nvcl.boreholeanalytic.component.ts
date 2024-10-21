@@ -1,4 +1,3 @@
-import { environment } from '../../../../environments/environment';
 import { saveAs } from 'file-saver';
 import { LayerModel } from '@auscope/portal-core-ui';
 import { NVCLBoreholeAnalyticService } from './nvcl.boreholeanalytic.service';
@@ -11,7 +10,6 @@ import {
 } from '@angular/core';
 import { LayerAnalyticInterface } from '../layer.analytic.interface';
 import { NgForm } from '@angular/forms';
-import { UserStateService } from 'app/services/user/user-state.service';
 
 
 @Component({
@@ -51,8 +49,7 @@ export class NVCLBoreholeAnalyticComponent
   };
 
   constructor(
-    public nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService,
-    private userStateService: UserStateService
+    public nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService
   ) {
     this.nvclform = {};
   }
@@ -195,6 +192,7 @@ export class NVCLBoreholeAnalyticComponent
         // console.log('jobid=' + jobid + ' publishStatus=' + response);
       });
   }
+
   public nvclDownload(jobid: string) {
     this.nvclBoreholeAnalyticService
       .downloadNVCLJobResult(jobid)
