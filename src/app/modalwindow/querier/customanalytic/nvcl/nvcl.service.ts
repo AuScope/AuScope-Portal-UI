@@ -5,7 +5,7 @@ import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
 import {catchError, delay, map, mergeMap } from 'rxjs/operators';
 import { UtilitiesService,DownloadWfsService } from '@auscope/portal-core-ui';
 import { Injectable, Inject} from '@angular/core';
-import {HttpClient, HttpParams, HttpHeaders, HttpResponse} from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
 declare let gtag: Function;
 @Injectable()
