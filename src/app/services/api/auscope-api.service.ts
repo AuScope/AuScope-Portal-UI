@@ -54,10 +54,24 @@ export class AuscopeApiService {
     return this.http.post<ApiResponse<T>>(url, body, opts).pipe(switchMap(apiData));
   }
 
+  private apiPostJson<T>(endpoint: string, params = {}, options = {}): Observable<T> {
+    const url = environment.portalProxyUrl + endpoint;
+    const body = params;
+    const opts: { observe: 'body' } = { ...options, observe: 'body' };
+
+    return this.http.post<ApiResponse<T>>(url, body, opts).pipe(switchMap(apiData));
+  }
+
   private apiGet<T>(endpoint: string, params = {}, options?): Observable<T> {
     const url = environment.portalProxyUrl + endpoint;
     const opts: { observe: 'body' } = { ...options, observe: 'body', params: params };
     return this.http.get<ApiResponse<T>>(url, opts).pipe(switchMap(apiData));
+  }
+
+  private apiDelete<T>(endpoint: string, params = {}, options?): Observable<T> {
+    const url = environment.portalProxyUrl + endpoint;
+    const opts: { observe: 'body' } = { ...options, observe: 'body', params: params };
+    return this.http.delete<ApiResponse<T>>(url, opts).pipe(switchMap(apiData));
   }
 
   public getWmsCapabilities(serviceUrl: string, version: string): Observable<any> {
@@ -90,28 +104,24 @@ export class AuscopeApiService {
 
   // Add bookmark to database
   public addBookmark(layerId: string): Observable<number> {
-    const options = {
-        params: {
+    const params = {
             fileIdentifier: layerId,
             serviceId: ''
         }
-    };
-    return this.apiRequest('secure/addBookMark.do', options);
+    return this.apiPostJson('bookmarks', params);
   }
 
   // Remove bookmark information from database
   public removeBookmark(bookmarkId: number) {
-    const options = {
-        params: {
+    const params = {
             id: bookmarkId.toString()
         }
-    };
-    return this.apiRequest('secure/deleteBookMark.do', options);
+    return this.apiDelete('bookmarks', params);
   }
 
   // Get list of bookmarks for a user
   public getBookmarks(): Observable<Bookmark[]> {
-      return this.apiRequest('secure/getBookMarks.do');
+      return this.apiRequest('bookmarks');
   }
 
   /**
