@@ -37,10 +37,10 @@
 <div class="form-group">
 	<label class="control-label" for="inputSuccess2"><span class="white">Upload KML/KMZ file</span></label>
 	<div class="input-group">
-		<input type="file" accept=".kml, .kmz" style="display:none" class="file-input" (change)="onKmlFileSelected($event)" #CustomKmlFileLoader>
-		<button (click)="CustomKmlFileLoader.click()" type="button" title="Load KML/KMZ file"  class="btn-primary btn-sm">
+		<input type="file" accept=".kml, .kmz, .geojson" style="display:none" class="file-input" (change)="onKmlFileSelected($event)" #CustomKmlFileLoader>
+		<button (click)="CustomKmlFileLoader.click()" type="button" title="Load KML/KMZ/GEOJSON file"  class="btn-primary btn-sm">
 			<i class="fa fa-lg fa-file" aria-hidden="true"></i>
-			&nbsp;Load KML/KMZ
+			&nbsp;Load KML/KMZ/GEOJSON
 			<i *ngIf="!loading" class="fa"></i>
 			<i *ngIf="loading" class="fa fa-spinner fa-spin fa-fw"></i>
 		</button>

@@ -16,6 +16,7 @@ import { KMLQuerierHandler } from './custom-querier-handler/kml-querier-handler.
 import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
 import { UserStateService } from 'app/services/user/user-state.service';
 import { VMFQuerierHandler } from './custom-querier-handler/vmf-querier-handler.service';
+import { GeoJsonQuerierHandler } from './custom-querier-handler/geojson-querier-handler.service'
 import { Observable, forkJoin, throwError } from 'rxjs';
 import { catchError, finalize, tap, timeout } from 'rxjs/operators';
 import { ToolbarComponent } from 'app/menupanel/toolbar/toolbar.component';
@@ -174,6 +175,7 @@ export class CsMapComponent implements AfterViewInit {
     return this.viewer;
   }
 
+
   ngAfterViewInit() {
     this.csMapService.init();
 
@@ -331,6 +333,10 @@ export class CsMapComponent implements AfterViewInit {
         } else if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.VMF))) {
           this.displayModal(mapClickInfo.clickCoord);
           const handler = new VMFQuerierHandler(entity);
+          this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.bsModalRef);
+        } else if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.GEOJSON))) {
+          this.displayModal(mapClickInfo.clickCoord);
+          const handler = new GeoJsonQuerierHandler(entity);
           this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.bsModalRef);
         }
       }

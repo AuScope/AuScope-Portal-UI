@@ -383,7 +383,10 @@ export class CustomPanelComponent {
   public setupLayer(me: this, name: string, kmzData: any, proxyUrl: string, docType: ResourceType, sourceType: string) {
     let layerRec: LayerModel= null;
     // Make a layer model object
-    if (docType == ResourceType.KMZ) {
+    if (docType == ResourceType.GEOJSON) {
+      layerRec  = me.layerHandlerService.makeCustomGEOJSONLayerRecord(name, proxyUrl, kmzData);
+      layerRec.group = 'geojson-layer';
+    } else if (docType == ResourceType.KMZ) {
       layerRec  = me.layerHandlerService.makeCustomKMZLayerRecord(name, proxyUrl, kmzData);
       layerRec.group = 'kmz-layer';
     } else {
@@ -411,7 +414,17 @@ export class CustomPanelComponent {
     const me = this;
     const file: File = event.target.files[0];
     if (file) {
-      if (getExtension(file.name) === "kmz") {
+      if (getExtension(file.name) === "geojson") {
+        const reader = new FileReader();
+        // When file has been read this function is called
+        reader.onload = () => {
+
+          let jsonStr = reader.result.toString();
+          this.setupLayer(this, file.name, jsonStr, "", ResourceType.GEOJSON, "FILE");
+        };
+        // Initiate reading the GEOJSON file
+        reader.readAsText(file);
+      } else if (getExtension(file.name) === "kmz") {
         this.loading = true; // start spinner
         let getDom = xml => (new DOMParser()).parseFromString(xml, "text/xml")
 
