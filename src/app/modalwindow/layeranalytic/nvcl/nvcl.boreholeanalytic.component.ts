@@ -1,15 +1,11 @@
 import { saveAs } from 'file-saver';
 import { LayerModel } from '@auscope/portal-core-ui';
 import { NVCLBoreholeAnalyticService } from './nvcl.boreholeanalytic.service';
-import {
-  Component,
-  Input,
-  AfterViewInit,
-  OnInit,
-  ViewChild
-} from '@angular/core';
+import { Component, Input, AfterViewInit, OnInit, ViewChild} from '@angular/core';
+import { UserStateService } from 'app/services/user/user-state.service';
 import { LayerAnalyticInterface } from '../layer.analytic.interface';
 import { NgForm } from '@angular/forms';
+import { environment } from 'environments/environment';
 
 
 @Component({
@@ -48,9 +44,7 @@ export class NVCLBoreholeAnalyticComponent
     checkprocess: false
   };
 
-  constructor(
-    public nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService
-  ) {
+  constructor( public nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService, private userStateService: UserStateService ) {
     this.nvclform = {};
   }
 
@@ -192,13 +186,19 @@ export class NVCLBoreholeAnalyticComponent
         // console.log('jobid=' + jobid + ' publishStatus=' + response);
       });
   }
-
+  public viewOnMap(jobid: string) {
+    const me = this;
+    this.nvclBoreholeAnalyticService.getNVCLGeoJson(jobid).subscribe(results => {
+      const jsonData = results;
+      me.nvclBoreholeAnalyticService.addGeoJsonLayer(jobid,jsonData);
+    });
+  }
   public nvclDownload(jobid: string) {
     this.nvclBoreholeAnalyticService
       .downloadNVCLJobResult(jobid)
       .subscribe(response => {
-        const blob = new Blob([response], { type: 'application/zip' });
-        saveAs(blob, 'nvclAnalytical-jobresult-' + jobid + '.zip');
+        const blob = new Blob([response], { type: 'text/csv' });
+        saveAs(blob, 'nvclAnalytical-jobresult-' + jobid + '.csv');
         this.nvclBoreholeAnalyticService.setUserEmail(this.nvclform.email);
       });
   }

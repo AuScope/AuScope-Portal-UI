@@ -2,7 +2,7 @@
 import {throwError as observableThrowError,  Observable } from 'rxjs';
 
 import {catchError, map} from 'rxjs/operators';
-import { LayerModel } from '@auscope/portal-core-ui';
+import { LayerModel, RenderStatusService } from '@auscope/portal-core-ui';
 import { LayerHandlerService } from '@auscope/portal-core-ui';
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
@@ -10,14 +10,54 @@ import { environment } from '../../../../environments/environment';
 import {config} from '../../../../environments/config';
 
 import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
+import { LayerManagerService } from 'app/services/ui/layer-manager.service';
+import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
+import { UILayerModel } from 'app/menupanel/common/model/ui/uilayer.model';
 
 @Injectable()
 export class NVCLBoreholeAnalyticService {
 
 
-  constructor(private http: HttpClient, private layerHandlerService: LayerHandlerService, @Inject(LOCAL_STORAGE) private storage: StorageService) {
+  constructor(private http: HttpClient,
+    private layerHandlerService: LayerHandlerService,
+    private layerManagerService: LayerManagerService,
+    private renderStatusService: RenderStatusService,
+    private uiLayerModelService: UILayerModelService,
+    @Inject(LOCAL_STORAGE) private storage: StorageService) {
 
   }
+  public addGeoJsonLayer(name: string, jsonData: any) {
+    const me = this;
+    const proxyUrl = "";
+    let layerRec: LayerModel= null;
+    // Make a layer model object
+    layerRec  = me.layerHandlerService.makeCustomGEOJSONLayerRecord(name, proxyUrl, jsonData);
+    layerRec.group = 'geojson-layer';
+    // Configure layers so it can be added to map
+    const uiLayerModel = new UILayerModel(layerRec.id, 100, me.renderStatusService.getStatusBSubject(layerRec));
+    me.uiLayerModelService.setUILayerModel(layerRec.id, uiLayerModel);
+    me.layerManagerService.addLayer(layerRec, [], null, null);
+  }
+
+  public getNVCLGeoJson(jobId:string): Observable<any> {
+    let httpParams = new HttpParams();
+    httpParams = httpParams.append('jobid', jobId);
+    httpParams = httpParams.append('format', 'json');
+    return this.http.get(environment.nVCLAnalyticalUrl + 'downloadNVCLJobResult.do', {
+      params: httpParams
+    }).pipe(map(response => {
+      if (response) {
+        return JSON.stringify(response);
+      } else {
+        return observableThrowError('error');
+      }
+    }), catchError(
+      (error: HttpResponse<any>) => {
+        return observableThrowError(error);
+      }
+      ), );
+  }
+
 
   public getNVCLAlgorithms(): Observable<any> {
     let httpParams = new HttpParams();
