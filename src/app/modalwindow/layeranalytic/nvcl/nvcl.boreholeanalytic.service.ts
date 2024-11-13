@@ -24,9 +24,13 @@ export class NVCLBoreholeAnalyticService {
     private renderStatusService: RenderStatusService,
     private uiLayerModelService: UILayerModelService,
     @Inject(LOCAL_STORAGE) private storage: StorageService) {
-
   }
   public addGeoJsonLayer(name: string, jsonData: any) {
+    let layerId = 'GEOJSON_' + name;
+    if (this.uiLayerModelService.isLayerAdded(layerId)){
+      alert("This NVCLAnalytical-Job-Result has been added already!");
+      return;
+    }
     const me = this;
     const proxyUrl = "";
     let layerRec: LayerModel= null;
