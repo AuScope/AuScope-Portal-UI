@@ -8,6 +8,7 @@ module.exports = {
       zlib: false
     },
   },
+  cache: false,
   module: {
     unknownContextCritical: false
   }
