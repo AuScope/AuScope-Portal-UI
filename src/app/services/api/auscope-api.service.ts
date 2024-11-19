@@ -17,7 +17,6 @@ interface ApiResponse<T> {
 function apiData<T>(response: ApiResponse<T>): Observable<T> {
   // Convert a VGL error into an Observable error
   if (!response.success) {
-    console.log('API response error: ' + JSON.stringify(response));
     return throwError(response.msg);
   }
 
@@ -113,10 +112,7 @@ export class AuscopeApiService {
 
   // Remove bookmark information from database
   public removeBookmark(bookmarkId: number) {
-    const params = {
-            id: bookmarkId.toString()
-        }
-    return this.apiDelete('bookmarks', params);
+    return this.apiDelete('bookmarks/'+bookmarkId.toString());
   }
 
   // Get list of bookmarks for a user
