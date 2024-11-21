@@ -203,6 +203,7 @@
 										<th>Published</th>
 										<th>Submitted</th>
 										<th>Status</th>
+										<th>Type</th>
 										<th style="width:1%">ACTIONS</th>
 									</tr>
 								</thead>
@@ -215,12 +216,13 @@
 												<span class="custom-control-indicator"></span>
 											</label>
 										</td>
-										<td>{{status.timeStamp}}</td>
+										<td>{{status.jmstimestamp}}</td>
 										<td>{{status.status}}</td>
+										<td>{{status.requestType}}</td>
 										<td *ngIf="status.status==='Success'" class="btn-col" style="white-space: nowrap">
 											<a class="btn btn-purple btn-xs" title="View this job on the map." (click) = "viewOnMap(status.jobid)"><i class="ti-map-alt"></i></a>
 											<a class="btn btn-light btn-xs" title="Download this job result." (click)="nvclDownload(status.jobid)"><i class="ti-download"></i></a>
-											<a class="btn btn-light btn-xs" title="Download the TSGMod data for this job. It is only for non-existing scalars, otherwise, the zip file will be empty." (click)="nvclDownloadData(status.jobid)"><i class="ti-zip"></i></a>
+											<a class="btn btn-light btn-xs" title="Download the TSGMod data." (click)="nvclDownloadData(status.jobid)" [style.visibility]="status.requestType !=='ANALYTICAL' ? 'visible' : 'hidden'"><i class="ti-zip"></i></a>
 										</td>
 									</tr>
 								</tbody>
