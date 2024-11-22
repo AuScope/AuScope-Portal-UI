@@ -71,9 +71,9 @@ export class NVCLBoreholeAnalyticComponent
     this.nvclform.startDepth = 0;
     this.nvclform.endDepth = 9999;
     this.nvclform.operator = 'gt';
-    this.nvclform.value = 5;
+    this.nvclform.value = 0;
     this.nvclform.units = 'count';
-    this.nvclform.span = 1;
+    this.nvclform.span = 9999;
     this.nvclform.ogcFilter = '';
   }
 
