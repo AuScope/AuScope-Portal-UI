@@ -490,7 +490,7 @@ export class CsMapComponent implements AfterViewInit {
             getFeatureInfoRequests.push(
               this.queryWMSService.getFeatureInfo(onlineResource, sldBody, infoFormat, postMethod, maplayer.clickCoord[0],
                 maplayer.clickCoord[1], params.x, params.y, params.width, params.height, params.bbox).pipe(
-                  timeout(5000),
+                  timeout(15000),
                   tap(result => {
                     // Update the modal features as each request completes
                     const feature = { onlineResource: onlineResource, layer: maplayer };
