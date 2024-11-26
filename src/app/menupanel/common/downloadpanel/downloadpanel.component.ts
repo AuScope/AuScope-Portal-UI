@@ -463,8 +463,9 @@ export class DownloadPanelComponent implements OnInit {
       if (this.wcsDownloadForm.timePosition) {
         timePositions = [this.wcsDownloadForm.timePosition];
       }
+      const maxImageSize = config.wcsSupportedLayer[this.layer.id].maxImageSize;
       observableResponse = this.downloadWcsService.download(this.layer, this.bbox, this.wcsDownloadForm.inputCrs,
-        this.wcsDownloadForm.downloadFormat, this.wcsDownloadForm.outputCrs, timePositions);
+        this.wcsDownloadForm.downloadFormat, this.wcsDownloadForm.outputCrs, timePositions, maxImageSize);
 
     // Download datasets using a URL in the WFS GetFeature response
     } else if (this.isDatasetURLSupportedLayer) {
