@@ -23,7 +23,7 @@
             <div class="activeLayerOpacityLegendStatusBar">
                 <div style="font-size: small;">Opacity {{ getUILayerModel(layer.id).opacity }}%&nbsp;</div>
                 <!-- Opacity slider -->
-                <mat-slider class="opacity-slider" min="0" max="100" (input)="layerOpacityChangeValue($event, layer)">
+                <mat-slider [disabled] = "!showOpacitySlider(layer)" class="opacity-slider" min="0" max="100" (input)="layerOpacityChangeValue($event, layer)">
                     <input matSliderThumb
                         [(ngModel)]="getUILayerModel(layer.id).opacity">
                 </mat-slider>
