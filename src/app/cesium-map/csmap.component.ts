@@ -413,34 +413,34 @@ export class CsMapComponent implements AfterViewInit {
 
         // Get the WMS OnlineResource, if that fails use the first in the list
         let onlineResource = cswRecord.onlineResources?.find(or => or.type === ResourceType.WMS);
-
         if (!onlineResource && cswRecord.onlineResources?.length > 0) {
           onlineResource = cswRecord.onlineResources[0];
         }
 
+        let optProviderFound = false;
         if (onlineResource) {
-          // iterate through optional Filters to see if the provider "matches" the onlineResource.url
-          let optProviderFound = false;
+          // iterate through optional Filters to see if the provider "matches" the onlineResource.url  
           for (const optPro of optProviderList) {
             if (onlineResource.url.includes(optPro) ) {
               optProviderFound = true;
             }
           }
+        }
           
-          // this is the case of no provider set, i.e. all Australia
-          if (optProviderList.length === 0) {
-            optProviderFound = true; 
+        // this is the case of no provider set, i.e. all Australia
+        if (optProviderList.length === 0) {
+          optProviderFound = true; 
+        }
+        if (optProviderFound) {
+          if (!UtilitiesService.getLayerHasSupportedOnlineResourceType(maplayer) && UtilitiesService.layerContainsBboxGeographicElement(maplayer)) {
+            // Display CSW record info
+            this.displayModal(mapClickInfo.clickCoord);
+            this.setModalHTML(this.parseCSWtoHTML(cswRecord), cswRecord.name, maplayer, this.bsModalRef);
+            continue;
           }
 
-          if (optProviderFound) {
-
-            if (!UtilitiesService.getLayerHasSupportedOnlineResourceType(maplayer) && UtilitiesService.layerContainsBboxGeographicElement(maplayer)) {
-              // Display CSW record info
-              this.displayModal(mapClickInfo.clickCoord);
-              this.setModalHTML(this.parseCSWtoHTML(cswRecord), cswRecord.name, maplayer, this.bsModalRef);
-            }
-
-            // Display WMS layer info
+          // Display WMS layer info
+          if (onlineResource) {
             const params = this.getParams(maplayer.clickPixel[0], maplayer.clickPixel[1]);
             if (!params) {
               continue;
@@ -540,7 +540,6 @@ export class CsMapComponent implements AfterViewInit {
       html += '<p><a style="color: #000000" target="_blank" href="' + onlineResource.url + '">' + (onlineResource.name ? onlineResource.name : 'Web resource link') + '</a></p>';
     }
     html += '</div></div>';
-
     return html;
   }
 
