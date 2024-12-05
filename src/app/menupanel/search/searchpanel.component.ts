@@ -1,7 +1,7 @@
 import { Component, ElementRef, HostListener, Inject, OnInit, ViewChild } from '@angular/core';
 import { RectangleEditorObservable } from '@auscope/angular-cesium';
 
-import { Bbox, CSWRecordModel, CsMapService, LayerHandlerService, LayerModel, ManageStateService, RenderStatusService, UtilitiesService, Constants } from '@auscope/portal-core-ui';
+import { Bbox, CSWRecordModel, CsMapService, LayerHandlerService, LayerModel, RenderStatusService, UtilitiesService, Constants } from '@auscope/portal-core-ui';
 import { NgbDropdown, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SearchService } from 'app/services/search/search.service';
 import { Observable, Subject, Subscription } from 'rxjs';
@@ -61,11 +61,11 @@ const OGC_SERVICES = [
     checked: true
   }, {
     name: 'IRIS',
-    fields: ['OGC:IRIS'],
+    fields: ['iris'],
     checked: true
   }, {
     name: "KML",
-    fields: ['OGC:KML'],
+    fields: ['kml'],
     checked: true
   }, {
     name: 'WFS',
@@ -77,7 +77,7 @@ const OGC_SERVICES = [
     checked: true
   }, {
     name: 'WWW',
-    fields: ['OGC:WWW'],
+    fields: ['OGC:WWW', 'WWW:LINK-1.0-http--link'],
     checked: true
   }]
 
@@ -144,8 +144,7 @@ export class SearchPanelComponent implements OnInit {
   constructor(private searchService: SearchService, private csMapService: CsMapService,
               private layerHandlerService: LayerHandlerService, private layerManagerService: LayerManagerService,
               private uiLayerModelService: UILayerModelService, private renderStatusService: RenderStatusService,
-              private sidebarService: SidebarService,
-              private manageStateService: ManageStateService, private modalService: NgbModal,
+              private sidebarService: SidebarService, private modalService: NgbModal,
               private http: HttpClient, @Inject('env') private env) { }
 
   ngOnInit() {
@@ -712,10 +711,12 @@ export class SearchPanelComponent implements OnInit {
 
     // OGC services if selected
     const selectedServices: string[] = [];
-    const checkedServices = this.ogcServices.filter(s => s.checked === true);
-    if (checkedServices.length < OGC_SERVICES.length) {
+    if (!this.allOGCServices.checked) {
+      const checkedServices = this.ogcServices.filter(s => s.checked === true);
       for (const service of checkedServices) {
-        selectedServices.push(service.fields[0]);
+        for (const serviceField of service.fields) {
+          selectedServices.push(serviceField);
+        }
       }
     }
 

@@ -220,7 +220,7 @@ export class NVCLDatasetListComponent implements OnInit {
     this.nvclService.getNVCL2_0_Images(url, datasetId).subscribe(trayImages => {
       for (const trayImage of trayImages) {
         if (trayImage.logName === 'Tray Thumbnail Images') {
-          this.datasetImages[datasetId] = []
+          this.datasetImages[datasetId] = [];
           let httpParams = new HttpParams();
           // httpParams = httpParams.append('serviceUrl', this.nvclService.getNVCLDataServiceUrl(this.onlineResource.url));
           // httpParams = httpParams.append('logId', trayImage.logId);
