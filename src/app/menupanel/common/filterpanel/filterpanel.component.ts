@@ -95,16 +95,6 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
     // Add any layer specific advanced filter components
     this.advancedComponentService.addAdvancedFilterComponents(this.layer, this.advancedFilterComponents);
 
-    // LJ: nvclAnalyticalJob external link
-    const nvclanid = UtilitiesService.getUrlParameterByName('nvclanid');
-    if (nvclanid) {
-      if (this.layer.id === 'nvcl-v2-borehole') {
-        this.layer.filterCollection['mandatoryFilters'][0].value = nvclanid;
-        setTimeout(() => {
-          this.addLayer(this.layer);
-        });
-      }
-    }
   }
 
   /**

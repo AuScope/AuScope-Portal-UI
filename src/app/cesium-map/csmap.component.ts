@@ -184,17 +184,14 @@ export class CsMapComponent implements AfterViewInit {
     const nvclanid = UtilitiesService.getUrlParameterByName('nvclanid');
     if (nvclanid) {
       const me = this;
-
-        this.nvclBoreholeAnalyticService.getNVCLGeoJson(nvclanid).subscribe(results => {
-          if (typeof results === 'object') {
-            window.alert('This analytical job could not be found!\n the nvclanid = ' + nvclanid);
-            return;
-          }
+      this.nvclBoreholeAnalyticService.getNVCLGeoJson(nvclanid).subscribe(results => {
+        if (typeof results === 'object') {
+          window.alert('This analytical job could not be found!\n the nvclanid = ' + nvclanid);
+        } else {
           const jsonData = results;
           me.nvclBoreholeAnalyticService.addGeoJsonLayer(nvclanid,jsonData);
-        });
-
-      return;
+        }
+      });
     }
 
     // This code is used to display the map state stored in a permanent link
