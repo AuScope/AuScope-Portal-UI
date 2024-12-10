@@ -20,6 +20,7 @@ import { GeoJsonQuerierHandler } from './custom-querier-handler/geojson-querier-
 import { Observable, forkJoin, throwError } from 'rxjs';
 import { catchError, finalize, tap, timeout } from 'rxjs/operators';
 import { ToolbarComponent } from 'app/menupanel/toolbar/toolbar.component';
+import { NVCLBoreholeAnalyticService } from 'app/modalwindow/layeranalytic/nvcl/nvcl.boreholeanalytic.service';
 
 declare var Cesium: any;
 
@@ -44,7 +45,7 @@ declare var Cesium: any;
       </ac-map>
     </div>
     `,
-  providers: [ViewerConfiguration], // Don't forget to Provide it
+  providers: [ViewerConfiguration,NVCLBoreholeAnalyticService], // Don't forget to Provide it
   styleUrls: ['./csmap.component.scss']
   // The "#" (template reference variable) matters to access the map element with the ViewChild decorator!
 })
@@ -78,7 +79,8 @@ export class CsMapComponent implements AfterViewInit {
   constructor(private csMapObject: CsMapObject, private csMapService: CsMapService, private modalService: BsModalService,
     private queryWMSService: QueryWMSService, private gmlParserService: GMLParserService,
     private manageStateService: ManageStateService, private advancedMapComponentService: AdvancedComponentService,
-    private userStateService: UserStateService, private viewerConf: ViewerConfiguration, private ngZone: NgZone) {
+    private userStateService: UserStateService,  private nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService,
+    private viewerConf: ViewerConfiguration, private ngZone: NgZone) {
     this.csMapService.getClickedLayerListBS().subscribe((mapClickInfo) => {
       this.handleLayerClick(mapClickInfo);
     });
@@ -178,6 +180,16 @@ export class CsMapComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     this.csMapService.init();
+    // This code is used to display the map for nvclanid job's urlLink
+    const nvclanid = UtilitiesService.getUrlParameterByName('nvclanid');
+    if (nvclanid) {
+      const me = this;
+      this.nvclBoreholeAnalyticService.getNVCLGeoJson(nvclanid).subscribe(results => {
+        const jsonData = results;
+        me.nvclBoreholeAnalyticService.addGeoJsonLayer(nvclanid,jsonData);
+      });
+      return;
+    }
 
     // This code is used to display the map state stored in a permanent link
     const stateId = UtilitiesService.getUrlParameterByName('state');
