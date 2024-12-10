@@ -184,10 +184,16 @@ export class CsMapComponent implements AfterViewInit {
     const nvclanid = UtilitiesService.getUrlParameterByName('nvclanid');
     if (nvclanid) {
       const me = this;
-      this.nvclBoreholeAnalyticService.getNVCLGeoJson(nvclanid).subscribe(results => {
-        const jsonData = results;
-        me.nvclBoreholeAnalyticService.addGeoJsonLayer(nvclanid,jsonData);
-      });
+
+        this.nvclBoreholeAnalyticService.getNVCLGeoJson(nvclanid).subscribe(results => {
+          if (typeof results === 'object') {
+            window.alert('This analytical job could not be found!\n the nvclanid = ' + nvclanid);
+            return;
+          }
+          const jsonData = results;
+          me.nvclBoreholeAnalyticService.addGeoJsonLayer(nvclanid,jsonData);
+        });
+
       return;
     }
 
