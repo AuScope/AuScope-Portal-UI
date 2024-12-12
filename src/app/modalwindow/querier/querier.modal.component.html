@@ -35,7 +35,7 @@
                             text-overflow: ellipsis;
                         ">{{selectedFeature}}</span>
 					</button>
-					<button *ngIf="docs.length > 1 || htmls.length > 1" type="button"
+					<button *ngIf="docs.length + htmls.length > 1" type="button"
 						class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"
 						aria-haspopup="true" aria-expanded="false">
 						<span class="sr-only">Toggle Dropdown</span>
