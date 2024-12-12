@@ -29,6 +29,8 @@ export class CsMapClipboardComponent implements OnInit {
   public isFilterLayerShown: boolean;
   public isDrawingPolygon: boolean;
   kmlFileName = '';
+  roiNameList = [];
+
 
 
   constructor(private csClipboardService: CsClipboardService, private userStateService: UserStateService, private downloadWfsService: DownloadWfsService) {
@@ -56,9 +58,11 @@ export class CsMapClipboardComponent implements OnInit {
   onRoiSave(event) {
     if (this.polygonBBox === null) return;
     let roiPolygon= this.polygonBBox;
-    let strToday=new Date(); 
-    let dt= new Date(strToday).toISOString();
-    roiPolygon.name = 'ROI-' + dt.slice(0,dt.lastIndexOf('.'));
+    if (this.roiNameList.includes(roiPolygon.name)) {
+      console.log('existed already:'+ roiPolygon.name);
+      return;
+    }
+    this.roiNameList.push(roiPolygon.name);
     this.userStateService.roiList.push(roiPolygon);
     this.userStateService.saveROI();
   }
