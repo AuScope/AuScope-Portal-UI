@@ -68,6 +68,12 @@
   box-shadow: none;
 }
 
+.dropdown-item {
+  max-width: 800px;
+  overflow: clip;
+  text-overflow: ellipsis;
+}
+
 .datasetName {
   padding: 5px;
 }
