@@ -21,7 +21,7 @@ export class UILayerModelService {
   public removeUILayerModel(layerId: string) {
     this.uiLayerModels.delete(layerId);
   }
-
+  
   /**
    * Check whether layer has been added to the map
    *

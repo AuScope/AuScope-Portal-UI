@@ -256,7 +256,6 @@ export class CustomPanelComponent {
               for (const layerRec of layerRecs) {
                 // Make the layer group listing visible in the UI
                 this.urlLayers.unshift(layerRec);
-
                 // Configure layers so they can be added to map
                 const uiLayerModel = new UILayerModel(layerRec.id, 100, this.renderStatusService.getStatusBSubject(layerRec));
                 this.uiLayerModelService.setUILayerModel(layerRec.id, uiLayerModel);
