@@ -1,17 +1,11 @@
-import { environment } from '../../../../environments/environment';
 import { saveAs } from 'file-saver';
 import { LayerModel } from '@auscope/portal-core-ui';
-import { ManageStateService } from '@auscope/portal-core-ui';
 import { NVCLBoreholeAnalyticService } from './nvcl.boreholeanalytic.service';
-import {
-  Component,
-  Input,
-  AfterViewInit,
-  OnInit,
-  ViewChild
-} from '@angular/core';
+import { Component, Input, AfterViewInit, OnInit, ViewChild} from '@angular/core';
+import { UserStateService } from 'app/services/user/user-state.service';
 import { LayerAnalyticInterface } from '../layer.analytic.interface';
 import { NgForm } from '@angular/forms';
+import { environment } from 'environments/environment';
 
 
 @Component({
@@ -50,10 +44,7 @@ export class NVCLBoreholeAnalyticComponent
     checkprocess: false
   };
 
-  constructor(
-    public nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService,
-    private manageStateService: ManageStateService
-  ) {
+  constructor( public nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService, private userStateService: UserStateService ) {
     this.nvclform = {};
   }
 
@@ -80,9 +71,9 @@ export class NVCLBoreholeAnalyticComponent
     this.nvclform.startDepth = 0;
     this.nvclform.endDepth = 9999;
     this.nvclform.operator = 'gt';
-    this.nvclform.value = 5;
+    this.nvclform.value = 0;
     this.nvclform.units = 'count';
-    this.nvclform.span = 1;
+    this.nvclform.span = 9999;
     this.nvclform.ogcFilter = '';
   }
 
@@ -135,10 +126,10 @@ export class NVCLBoreholeAnalyticComponent
       .getNVCLClassifications(algorithmOutputIds)
       .subscribe(classifications => {
         classifications = classifications.sort((a,b)=> {
-          var a1 = a.classText.toLowerCase();
-          var b1 = b.classText.toLowerCase();
-          return a1<b1 ?-1:a1> b1? 1 :0;
-          })
+          const a1 = a.classText.toLowerCase();
+          const b1 = b.classText.toLowerCase();
+          return a1 < b1 ? -1 : a1 > b1 ? 1 : 0;
+        })
         this.classifications = classifications;
       });
   }
@@ -161,8 +152,7 @@ export class NVCLBoreholeAnalyticComponent
         alert('Job has been successfully submitted. The results will be sent to your email.');
         this.nvclBoreholeAnalyticService.setUserEmail(this.nvclform.email);
       }
-      },
-      err => {
+      }, () => {
         alert('Failed on the job submission. Please contact cg-admin@csiro.au for help!');
       }
     );
@@ -185,7 +175,8 @@ export class NVCLBoreholeAnalyticComponent
         }
       });
   }
-  public ChangePublish(status: any) {
+
+  public changePublish(status: any) {
     const jobid = status.jobid;
     const published = status.published;
     status.published = !published;
@@ -195,12 +186,19 @@ export class NVCLBoreholeAnalyticComponent
         // console.log('jobid=' + jobid + ' publishStatus=' + response);
       });
   }
+  public viewOnMap(jobid: string) {
+    const me = this;
+    this.nvclBoreholeAnalyticService.getNVCLGeoJson(jobid).subscribe(results => {
+      const jsonData = results;
+      me.nvclBoreholeAnalyticService.addGeoJsonLayer(jobid,jsonData);
+    });
+  }
   public nvclDownload(jobid: string) {
     this.nvclBoreholeAnalyticService
       .downloadNVCLJobResult(jobid)
       .subscribe(response => {
-        const blob = new Blob([response], { type: 'application/zip' });
-        saveAs(blob, 'nvclAnalytical-jobresult-' + jobid + '.zip');
+        const blob = new Blob([response], { type: 'text/csv' });
+        saveAs(blob, 'nvclAnalytical-jobresult-' + jobid + '.csv');
         this.nvclBoreholeAnalyticService.setUserEmail(this.nvclform.email);
       });
   }
@@ -214,22 +212,4 @@ export class NVCLBoreholeAnalyticComponent
       });
   }
 
-  public viewOnMap(jobid: string) {
-    if (window.confirm('This action will link you to an external URL. Please ensure you have grant access to allow pop up from this domain.')) {
-      this.layer.filterCollection.mandatoryFilters[0].value = jobid;
-      // Make a state object
-      const state = this.manageStateService.generateOneOffState(
-        this.layer.id,
-        this.layer.filterCollection,
-        []
-      );
-      // Store state object in DB & open up window
-      const uncompStateStr = JSON.stringify(state);
-      this.manageStateService.saveStateToDB(uncompStateStr).subscribe((response: any) => {
-        if (response.success === true) {
-          window.open(environment.hostUrl + '?state=' + response.id);
-        }
-      });
-    }
-  }
 }

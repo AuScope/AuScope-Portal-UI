@@ -134,6 +134,14 @@ dt {
 }
 /* END WFS feature tree display rules */
 
+/* START NVCL core scalar chart display */
+.loading-chart {
+    background:url(../../extension/images/loader.gif) center center no-repeat;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+
 /* START NVCL core image display */
 .loading-image {
     background:url(../../extension/images/loader.gif) center center no-repeat;

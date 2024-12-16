@@ -11,12 +11,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js 20.x
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 20
       - name: Cache node modules
         id: cache-npm
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         env:
           cache-name: cache-node-modules
         with:
@@ -41,7 +41,7 @@ jobs:
         run: zip release.zip ./dist/* -r
       - name: file bundle artifact
         if: contains(github.ref, 'master')
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: portal UI dev bundle
           path: release.zip

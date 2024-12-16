@@ -117,18 +117,18 @@
         "serve": {
           "builder": "@angular-builders/custom-webpack:dev-server",
           "options": {
-            "browserTarget": "project:build",
+            "buildTarget": "project:build",
             "proxyConfig": "./proxy.conf.json"
           },
           "configurations": {
             "audev": {
-              "browserTarget": "project:build:audev"
+              "buildTarget": "project:build:audev"
             },
             "production": {
-              "browserTarget": "project:build:production"
+              "buildTarget": "project:build:production"
             },
             "development": {
-              "browserTarget": "project:build:development"
+              "buildTarget": "project:build:development"
             }
           },
           "defaultConfiguration": "development"

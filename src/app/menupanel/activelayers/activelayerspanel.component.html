@@ -23,7 +23,7 @@
             <div class="activeLayerOpacityLegendStatusBar">
                 <div style="font-size: small;">Opacity {{ getUILayerModel(layer.id).opacity }}%&nbsp;</div>
                 <!-- Opacity slider -->
-                <mat-slider class="opacity-slider" min="0" max="100" (input)="layerOpacityChangeValue($event, layer)">
+                <mat-slider [disabled] = "!showOpacitySlider(layer)" class="opacity-slider" min="0" max="100" (input)="layerOpacityChangeValue($event, layer)">
                     <input matSliderThumb
                         [(ngModel)]="getUILayerModel(layer.id).opacity">
                 </mat-slider>
@@ -37,7 +37,7 @@
                 </div>
             </div>
             <!-- Map split controls -->
-            <div class="split-panel" style="font-size: small;" *ngIf="getShowSplitMapButtons(layer)" (click)="$event.stopPropagation()">
+            <div class="split-panel" *ngIf="getShowSplitMapButtons(layer)" (click)="$event.stopPropagation()">
                 Split Direction&nbsp;
                 <div *ngIf="getApplicableSplitLayer(layer)" class="split-button-panel">
                     <button [className]="getLayerSplitDirection(layer.id) === 'left' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'left')">Left</button>
@@ -72,7 +72,7 @@
                             <!-- Add bookmark button -->
                             <button *ngIf="isUserLoggedIn() && !isLayerBookmarked(layer.id)" (click)="addLayerBookmark(layer.id)" type="button" class="btn btn-sm btn-info top-layer-btn" title="Bookmark Layer"><i class="fa fa-sm fa-bookmark-o"></i></button>
                             <!-- Remove bookmark button -->
-                            <button *ngIf="isUserLoggedIn() && isLayerBookmarked(layer.id)" (click)="removeLayerBookmark(layer.id)" class="btn-info" title="Remove Layer Bookmark"><i class="fa fa-sm fa-bookmark"></i></button>
+                            <button *ngIf="isUserLoggedIn() && isLayerBookmarked(layer.id)" (click)="removeLayerBookmark(layer.id)" class="btn btn-sm btn-info top-layer-btn" title="Remove Layer Bookmark"><i class="fa fa-sm fa-bookmark"></i></button>
                             <!-- Info button  -->
                             <!-- <button (click)="displayRecordInformation(layer)" type="button" class="btn-info" title="Information" [ngClass]="{'active': getUILayerModel(layer.id)?.tabpanel.filterpanel.expanded}">Info</button> -->
                             <!--

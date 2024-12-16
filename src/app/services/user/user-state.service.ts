@@ -234,9 +234,8 @@ export class UserStateService {
     if (UtilitiesService.isEmpty(this.roiKey))
       return;
 
-    let strROIs = JSON.stringify(this.roiList);
-    this.apiService.saveUserParams(this.roiKey,strROIs).subscribe(response => {
-    });
+    const strROIs = JSON.stringify(this.roiList);
+    this.apiService.saveUserParams(this.roiKey, strROIs).subscribe(() => {});
   }
 
   /**
@@ -244,7 +243,7 @@ export class UserStateService {
    * @param user
    */
   public updateUserROI(user:User){
-    let key = 'roiId.'+ user.email;
+    const key = 'roiId.'+ user.email;
     this.roiKey = key.replace(' ','-');
     this.apiService.getUserParams(key).subscribe(strROIs => {
       if (strROIs) {

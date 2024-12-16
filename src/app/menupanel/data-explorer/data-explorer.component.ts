@@ -260,7 +260,7 @@ export class DataExplorerComponent implements OnInit {
                 response["data"].searchErrors[registry.id];
             }
             for (const item of response["itemLayers"]) {
-              const uiLayerModel = new UILayerModel(item.id, this.renderStatusService.getStatusBSubject(item));
+              const uiLayerModel = new UILayerModel(item.id, 100, this.renderStatusService.getStatusBSubject(item));
               this.uiLayerModelService.setUILayerModel(item.id, uiLayerModel);                  
             }
             response["itemLayers"].useDefaultProxy = true;
@@ -364,9 +364,10 @@ export class DataExplorerComponent implements OnInit {
       registry.recordsMatched = response["data"].recordsMatched;
 
       for (const item of response["itemLayers"]) {
-        const uiLayerModel = new UILayerModel(item.id, this.renderStatusService.getStatusBSubject(item));
+        const uiLayerModel = new UILayerModel(item.id, 100, this.renderStatusService.getStatusBSubject(item));
         this.uiLayerModelService.setUILayerModel(item.id, uiLayerModel);                  
       }
+
       response["itemLayers"].useDefaultProxy = true;
       response["itemLayers"].useProxyWhitelist = false;
       if (response["data"].searchErrors && response["data"].searchErrors.length > 0) {

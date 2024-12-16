@@ -33,19 +33,23 @@ export class TIMAComponent implements AfterViewInit {
 
 
   ngAfterViewInit(): void {
-    if (this.doc.value) {
-    const docValue = this.doc.value;
-    this.imageUrl = docValue.getElementsByTagName('tima:image_url')[0].textContent;
-    const mineralInfo = JSON.parse(docValue.getElementsByTagName('tima:mineral_information_json')[0].textContent);
-    this.ngxdata = [];
-    for (const mineral_name in mineralInfo) {
-      const mineral_pixel_count = mineralInfo[mineral_name]['mineral_pixel_count'];
-      this.ngxdata.push({ name: mineral_name, value: mineral_pixel_count });
-    }
-    this.ngxdata.sort((a, b) => {
-      return a.name.localeCompare(b.name);
+    // the timeout fixes the - NG0100: ExpressionChangedAfterItHasBeenCheckedError error
+    // data fetching is asynchronous anyway, you can postpone it to be called in next 
+    // macrotask (after ngAfterViewInit is finished) with a help of setTimeout with 0 time delay
+    setTimeout(() => {
+      if (this.doc.value) {
+        const docValue = this.doc.value;
+        this.imageUrl = docValue.getElementsByTagName('tima:image_url')[0].textContent;
+        const mineralInfo = JSON.parse(docValue.getElementsByTagName('tima:mineral_information_json')[0].textContent);
+        this.ngxdata = [];
+        for (const mineral_name in mineralInfo) {
+          const mineral_pixel_count = mineralInfo[mineral_name]['mineral_pixel_count'];
+          this.ngxdata.push({ name: mineral_name, value: mineral_pixel_count });
+        }
+        this.ngxdata.sort((a, b) => {
+          return a.name.localeCompare(b.name);
+        });
+      }
     });
-    }
   }
-
 }

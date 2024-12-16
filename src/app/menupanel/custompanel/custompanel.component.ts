@@ -257,13 +257,18 @@ export class CustomPanelComponent {
                 // Make the layer group listing visible in the UI
                 this.urlLayers.unshift(layerRec);
                 // Configure layers so they can be added to map
-                const uiLayerModel = new UILayerModel(layerRec.id, this.renderStatusService.getStatusBSubject(layerRec));
+                const uiLayerModel = new UILayerModel(layerRec.id, 100, this.renderStatusService.getStatusBSubject(layerRec));
                 this.uiLayerModelService.setUILayerModel(layerRec.id, uiLayerModel);
               }
             }
           } else {
             this.statusMsg = '<div class="text-danger">No viable OGC WMS found on the service endpoint. Kindly check your URL again.</div>';
           }
+        },
+        (error: any) => {
+          //console.log("[custompanel.componen].error:", error);
+          this.statusMsg = '<div class="text-danger">No viable OGC WMS found on the service endpoint. Kindly check your URL again.</div>';
+          this.loading = false;
         });
       }
     }
@@ -383,7 +388,10 @@ export class CustomPanelComponent {
   public setupLayer(me: this, name: string, kmzData: any, proxyUrl: string, docType: ResourceType, sourceType: string) {
     let layerRec: LayerModel= null;
     // Make a layer model object
-    if (docType == ResourceType.KMZ) {
+    if (docType == ResourceType.GEOJSON) {
+      layerRec  = me.layerHandlerService.makeCustomGEOJSONLayerRecord(name, proxyUrl, kmzData);
+      layerRec.group = 'geojson-layer';
+    } else if (docType == ResourceType.KMZ) {
       layerRec  = me.layerHandlerService.makeCustomKMZLayerRecord(name, proxyUrl, kmzData);
       layerRec.group = 'kmz-layer';
     } else {
@@ -391,8 +399,8 @@ export class CustomPanelComponent {
       layerRec.group = 'kml-layer';
     }
     // Configure layers so it can be added to map
-    const uiLayerModel = new UILayerModel(layerRec.id, me.renderStatusService.getStatusBSubject(layerRec));
-    me.uiLayerModelService.setUILayerModel(layerRec.id, uiLayerModel);
+    const uiLayerModel = new UILayerModel(layerRec.id, 100, me.renderStatusService.getStatusBSubject(layerRec));
+    this.uiLayerModelService.setUILayerModel(layerRec.id, uiLayerModel);
     // Make the layer group listing visible in the UI
     if (sourceType == "URL" && !this.recordsListContainsRecord(me.urlLayers, name, proxyUrl)) {
       me.urlLayers.unshift(layerRec);
@@ -411,7 +419,17 @@ export class CustomPanelComponent {
     const me = this;
     const file: File = event.target.files[0];
     if (file) {
-      if (getExtension(file.name) === "kmz") {
+      if (getExtension(file.name) === "geojson") {
+        const reader = new FileReader();
+        // When file has been read this function is called
+        reader.onload = () => {
+
+          let jsonStr = reader.result.toString();
+          this.setupLayer(this, file.name, jsonStr, "", ResourceType.GEOJSON, "FILE");
+        };
+        // Initiate reading the GEOJSON file
+        reader.readAsText(file);
+      } else if (getExtension(file.name) === "kmz") {
         this.loading = true; // start spinner
         let getDom = xml => (new DOMParser()).parseFromString(xml, "text/xml")
 

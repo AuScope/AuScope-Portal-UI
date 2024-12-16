@@ -16,9 +16,11 @@ import { KMLQuerierHandler } from './custom-querier-handler/kml-querier-handler.
 import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
 import { UserStateService } from 'app/services/user/user-state.service';
 import { VMFQuerierHandler } from './custom-querier-handler/vmf-querier-handler.service';
-import { Observable, forkJoin } from 'rxjs';
-import { finalize, tap, timeout } from 'rxjs/operators';
+import { GeoJsonQuerierHandler } from './custom-querier-handler/geojson-querier-handler.service'
+import { Observable, forkJoin, throwError } from 'rxjs';
+import { catchError, finalize, tap, timeout } from 'rxjs/operators';
 import { ToolbarComponent } from 'app/menupanel/toolbar/toolbar.component';
+import { NVCLBoreholeAnalyticService } from 'app/modalwindow/layeranalytic/nvcl/nvcl.boreholeanalytic.service';
 
 declare var Cesium: any;
 
@@ -43,7 +45,7 @@ declare var Cesium: any;
       </ac-map>
     </div>
     `,
-  providers: [ViewerConfiguration], // Don't forget to Provide it
+  providers: [ViewerConfiguration,NVCLBoreholeAnalyticService], // Don't forget to Provide it
   styleUrls: ['./csmap.component.scss']
   // The "#" (template reference variable) matters to access the map element with the ViewChild decorator!
 })
@@ -77,7 +79,8 @@ export class CsMapComponent implements AfterViewInit {
   constructor(private csMapObject: CsMapObject, private csMapService: CsMapService, private modalService: BsModalService,
     private queryWMSService: QueryWMSService, private gmlParserService: GMLParserService,
     private manageStateService: ManageStateService, private advancedMapComponentService: AdvancedComponentService,
-    private userStateService: UserStateService, private viewerConf: ViewerConfiguration, private ngZone: NgZone) {
+    private userStateService: UserStateService,  private nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService,
+    private viewerConf: ViewerConfiguration, private ngZone: NgZone) {
     this.csMapService.getClickedLayerListBS().subscribe((mapClickInfo) => {
       this.handleLayerClick(mapClickInfo);
     });
@@ -111,6 +114,12 @@ export class CsMapComponent implements AfterViewInit {
       handler.setInputAction((movement) => {
         this.csMapObject.processClick(movement);
       }, Cesium.ScreenSpaceEventType.LEFT_UP);
+
+      // Speed up map loading by disabling the loading of ancestor tiles
+      viewer.scene.globe.preloadAncestors = false;
+
+      // Increase size of tile cache to speed up zoom performance
+      viewer.scene.globe.tileCacheSize = 100000;
 
       // Keep track of lat/lon at mouse
       handler.setInputAction((movement) => {
@@ -168,8 +177,22 @@ export class CsMapComponent implements AfterViewInit {
     return this.viewer;
   }
 
+
   ngAfterViewInit() {
     this.csMapService.init();
+    // This code is used to display the map for nvclanid job's urlLink
+    const nvclanid = UtilitiesService.getUrlParameterByName('nvclanid');
+    if (nvclanid) {
+      const me = this;
+      this.nvclBoreholeAnalyticService.getNVCLGeoJson(nvclanid).subscribe(results => {
+        if (typeof results === 'object') {
+          window.alert('This analytical job could not be found!\n the nvclanid = ' + nvclanid);
+        } else {
+          const jsonData = results;
+          me.nvclBoreholeAnalyticService.addGeoJsonLayer(nvclanid,jsonData);
+        }
+      });
+    }
 
     // This code is used to display the map state stored in a permanent link
     const stateId = UtilitiesService.getUrlParameterByName('state');
@@ -326,6 +349,10 @@ export class CsMapComponent implements AfterViewInit {
           this.displayModal(mapClickInfo.clickCoord);
           const handler = new VMFQuerierHandler(entity);
           this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.bsModalRef);
+        } else if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.GEOJSON))) {
+          this.displayModal(mapClickInfo.clickCoord);
+          const handler = new GeoJsonQuerierHandler(entity);
+          this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.bsModalRef);
         }
       }
       // TODO: Remove commented code, kept for yet to be re-implemented entity types
@@ -337,6 +364,7 @@ export class CsMapComponent implements AfterViewInit {
       this.displayModal(mapClickInfo.clickCoord);
 
       // VT: if it is a csw renderer layer, handling of the click is slightly different
+      // SW: Note that we no longer use cswrenderer, instead if layer has no WMS/KML etc we look at GeographicElement bbox
       if (config.cswrenderer.includes(entity.layer.id) || CsCSWService.cswDiscoveryRendered.includes(entity.layer.id)) {
         this.setModalHTML(this.parseCSWtoHTML(entity.cswRecord), entity.cswRecord.name, entity, this.bsModalRef);
       }
@@ -374,30 +402,60 @@ export class CsMapComponent implements AfterViewInit {
     // Total number of features returned from GetFeatureInfo requests
     let numberOfFeatures = 0;
 
+    // get the list of optional filter - providers
+    // we will use this to filter calls to the backend i.e. wmsMarkerPopup.do
+    let optProviderList = [];
+    for (const maplayer of mapClickInfo.clickedLayerList) {
+      if (maplayer?.filterCollection?.optionalFilters) {
+        for (const optFil of maplayer.filterCollection.optionalFilters) {
+          if (optFil.value !== null) {
+            if (optFil.type === 'OPTIONAL.PROVIDER') {
+              for (const [key, value] of Object.entries(optFil.value)) {
+                if (value === true) {
+                  optProviderList.push(key); // key is the Provider e.g. sarigdata.pir.sa.gov.au
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
     // Process list of layers clicked
     for (const maplayer of mapClickInfo.clickedLayerList) {
       for (const i of maplayer.clickCSWRecordsIndex) {
         const cswRecord = maplayer.cswRecords[i];
 
-        // Bail if no OnlineResources
-        if (!cswRecord.onlineResources || cswRecord.onlineResources.length === 0) {
-          continue;
-        }
-
         // Get the WMS OnlineResource, if that fails use the first in the list
-        let onlineResource = cswRecord.onlineResources.find(or => or.type === ResourceType.WMS);
-        if (!onlineResource && cswRecord.onlineResources[0]) {
+        let onlineResource = cswRecord.onlineResources?.find(or => or.type === ResourceType.WMS);
+        if (!onlineResource && cswRecord.onlineResources?.length > 0) {
           onlineResource = cswRecord.onlineResources[0];
         }
 
+        let optProviderFound = false;
         if (onlineResource) {
-          // Display CSW record info
-          if (config.cswrenderer.includes(maplayer.id)) {
+          // iterate through optional Filters to see if the provider "matches" the onlineResource.url  
+          for (const optPro of optProviderList) {
+            if (onlineResource.url.includes(optPro) ) {
+              optProviderFound = true;
+            }
+          }
+        }
+          
+        // this is the case of no provider set, i.e. all Australia
+        if (optProviderList.length === 0) {
+          optProviderFound = true; 
+        }
+        if (optProviderFound) {
+          if (!UtilitiesService.getLayerHasSupportedOnlineResourceType(maplayer) && UtilitiesService.layerContainsBboxGeographicElement(maplayer)) {
+            // Display CSW record info
             this.displayModal(mapClickInfo.clickCoord);
             this.setModalHTML(this.parseCSWtoHTML(cswRecord), cswRecord.name, maplayer, this.bsModalRef);
+            continue;
+          }
 
-            // Display WMS layer info
-          } else {
+          // Display WMS layer info
+          if (onlineResource) {
             const params = this.getParams(maplayer.clickPixel[0], maplayer.clickPixel[1]);
             if (!params) {
               continue;
@@ -447,7 +505,7 @@ export class CsMapComponent implements AfterViewInit {
             getFeatureInfoRequests.push(
               this.queryWMSService.getFeatureInfo(onlineResource, sldBody, infoFormat, postMethod, maplayer.clickCoord[0],
                 maplayer.clickCoord[1], params.x, params.y, params.width, params.height, params.bbox).pipe(
-                  timeout(5000),
+                  timeout(15000),
                   tap(result => {
                     // Update the modal features as each request completes
                     const feature = { onlineResource: onlineResource, layer: maplayer };
@@ -455,6 +513,8 @@ export class CsMapComponent implements AfterViewInit {
                     if (numberOfLayerFeatures > 0) {
                       numberOfFeatures += numberOfLayerFeatures;
                     }
+                  }), catchError((error) => {
+                    return throwError(error);
                   })
                 )
             );
@@ -495,7 +555,6 @@ export class CsMapComponent implements AfterViewInit {
       html += '<p><a style="color: #000000" target="_blank" href="' + onlineResource.url + '">' + (onlineResource.name ? onlineResource.name : 'Web resource link') + '</a></p>';
     }
     html += '</div></div>';
-
     return html;
   }
 

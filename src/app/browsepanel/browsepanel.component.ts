@@ -9,6 +9,7 @@ import { SidebarService } from 'app/portal/sidebar.service';
 import { Subscription } from 'rxjs';
 import { UserStateService } from 'app/services/user/user-state.service';
 import { AuthService } from 'app/services/auth/auth.service';
+import { take } from 'rxjs/operators';
 
 
 @Component({
@@ -51,7 +52,6 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
    * Initialise Component
    */
   public ngOnInit() {
-    const me = this;
     this.sidebarSubscription = this.sidebarService.isSidebarOpen$.subscribe(
       isOpen => {
         this.isSidebarOpen = isOpen;
@@ -60,22 +60,23 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
     // Initialise layers and groups in sidebar
     this.layerHandlerService.getLayerRecord().subscribe(
       response => {
-        me.layerGroupColumn = response;
+        this.layerGroupColumn = response;
         // Loop over each group of layers
-        for (const group in me.layerGroupColumn) {
+        for (const group in this.layerGroupColumn) {
           // Loop over each layer in a group
-          for (let layer_idx = 0; layer_idx < me.layerGroupColumn[group].length; layer_idx++) {
+          for (let layer_idx = 0; layer_idx < this.layerGroupColumn[group].length; layer_idx++) {
 
             // Initialise a list of cesium layers
-            me.layerGroupColumn[group][layer_idx].csLayers = [];
+            this.layerGroupColumn[group][layer_idx].csLayers = [];
+
             // Initialise UILayerModel
-            const uiLayerModel = new UILayerModel(me.layerGroupColumn[group][layer_idx].id, me.renderStatusService.getStatusBSubject(me.layerGroupColumn[group][layer_idx]));
-            me.uiLayerModelService.setUILayerModel(me.layerGroupColumn[group][layer_idx].id, uiLayerModel);
+            const uiLayerModel = new UILayerModel(this.layerGroupColumn[group][layer_idx].id, 100, this.renderStatusService.getStatusBSubject(this.layerGroupColumn[group][layer_idx]));
+            this.uiLayerModelService.setUILayerModel(this.layerGroupColumn[group][layer_idx].id, uiLayerModel);
           }
         }
         // Sort alphabetically by group name
-        Object.keys(me.layerGroupColumn).forEach(group => {
-          me.layerGroupColumn[group].sort((a, b) => a.name.localeCompare(b.name));
+        Object.keys(this.layerGroupColumn).forEach(group => {
+          this.layerGroupColumn[group].sort((a, b) => a.name.localeCompare(b.name));
         });
       }
     );
@@ -85,11 +86,10 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
    * Called after Angular has initialised the view
    */
   public ngAfterViewInit() {
-    const me = this;
     this.userStateService.getBookmarks().subscribe(bookMarkList => {
-      me.layerBookmarked = {}
+      this.layerBookmarked = {}
       for (const bookMark of bookMarkList) {
-        me.layerBookmarked[bookMark.fileIdentifier] = true;
+        this.layerBookmarked[bookMark.fileIdentifier] = true;
       }
     });
   }
@@ -161,8 +161,8 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
    * @param layer the layer to add to map
    */
   public addLayer(layer: LayerModel): void {
-    // Fetch layer times and add layer
-    this.filterService.getLayerTimesBS(layer.id).subscribe(layerTimes => {
+    // Fetch layer times and add layer (only take 1 or addLayer will fire every time layer times change)
+    this.filterService.getLayerTimesBS(layer.id).pipe(take(1)).subscribe(layerTimes => {
       this.layerManagerService.addLayer(layer, [], null, layerTimes.currentTime);
     });
 

@@ -1,7 +1,7 @@
 import { Component, ElementRef, HostListener, Inject, OnInit, ViewChild } from '@angular/core';
 import { RectangleEditorObservable } from '@auscope/angular-cesium';
 
-import { Bbox, CSWRecordModel, CsMapService, LayerHandlerService, LayerModel, ManageStateService, RenderStatusService, UtilitiesService, Constants } from '@auscope/portal-core-ui';
+import { Bbox, CSWRecordModel, CsMapService, LayerHandlerService, LayerModel, RenderStatusService, UtilitiesService, Constants } from '@auscope/portal-core-ui';
 import { NgbDropdown, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SearchService } from 'app/services/search/search.service';
 import { Observable, Subject, Subscription } from 'rxjs';
@@ -9,7 +9,6 @@ import { Observable, Subject, Subscription } from 'rxjs';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
-import { UILayerModel } from '../common/model/ui/uilayer.model';
 
 import { HttpClient, HttpHeaders, HttpParams, HttpUrlEncodingCodec } from '@angular/common/http';
 import { Download } from 'app/modalwindow/layeranalytic/nvcl/tsgdownload';
@@ -17,6 +16,7 @@ import * as saveAs from 'file-saver';
 import { take } from 'rxjs/operators';
 
 import { SidebarService } from 'app/portal/sidebar.service';
+import { UILayerModel } from '../common/model/ui/uilayer.model';
 
 // Search fields
 const SEARCH_FIELDS = [{
@@ -61,11 +61,11 @@ const OGC_SERVICES = [
     checked: true
   }, {
     name: 'IRIS',
-    fields: ['OGC:IRIS'],
+    fields: ['iris'],
     checked: true
   }, {
     name: "KML",
-    fields: ['OGC:KML'],
+    fields: ['kml'],
     checked: true
   }, {
     name: 'WFS',
@@ -77,7 +77,7 @@ const OGC_SERVICES = [
     checked: true
   }, {
     name: 'WWW',
-    fields: ['OGC:WWW'],
+    fields: ['OGC:WWW', 'WWW:LINK-1.0-http--link'],
     checked: true
   }]
 
@@ -144,8 +144,7 @@ export class SearchPanelComponent implements OnInit {
   constructor(private searchService: SearchService, private csMapService: CsMapService,
               private layerHandlerService: LayerHandlerService, private layerManagerService: LayerManagerService,
               private uiLayerModelService: UILayerModelService, private renderStatusService: RenderStatusService,
-              private sidebarService: SidebarService,
-              private manageStateService: ManageStateService, private modalService: NgbModal,
+              private sidebarService: SidebarService, private modalService: NgbModal,
               private http: HttpClient, @Inject('env') private env) { }
 
   ngOnInit() {
@@ -450,10 +449,18 @@ export class SearchPanelComponent implements OnInit {
    * @param layer LayerModel of layer
    */
   public layerWarningMessage(layer: LayerModel): string {
-    console.log("[searchpanel.component.ts]layerWarningMessage()");
     return 'This layer cannot be displayed. For Featured Layers, please wait for the layer cache to rebuild itself. ' +
       'For Custom Layers please note that only the following online resource types can be added to the map: ' +
-      this.csMapService.getSupportedOnlineResourceTypes();
+      UtilitiesService.getSupportedOnlineResourceTypes();
+  }
+
+  /**
+   * Check if map layer is supported and addable to map
+   *
+   * @param layer the LayerModel
+   */
+  isMapSupportedLayer(layer: LayerModel): boolean {
+    return UtilitiesService.isMapSupportedLayer(layer);
   }
 
   /**
@@ -462,23 +469,14 @@ export class SearchPanelComponent implements OnInit {
    * @param layer LayerModel
    */
   public addLayer(layer: LayerModel) {
+    
     if (!this.uiLayerModelService.getUILayerModel(layer.id)) {
-      console.log('Adding UI Layer Model: XXX ALSO DATA SEARCH PANEL< FILTER PANEL ETC (and probably state load)');
-      const uiLayerModel = new UILayerModel(layer.id, this.renderStatusService.getStatusBSubject(layer));
+      const uiLayerModel = new UILayerModel(layer.id, 100, this.renderStatusService.getStatusBSubject(layer));
       this.uiLayerModelService.setUILayerModel(layer.id, uiLayerModel);
     }
+    
     this.layerManagerService.addLayer(layer, [], layer.filterCollection, undefined);
     this.sidebarService.setOpenState(true);
-  }
-
-  /**
-   * Scroll to the specified layer in sidebar (Featured Layers)
-   * Note: Unused, was originally for scrolling to layer in Featured Layers when that was part
-   * of the side-bar. Kept in case we ever want to highlight the browse menu (or similar)
-   * @param layer the layer
-   */
-  public scrollToLayer(layer: LayerModel) {
-    this.manageStateService.setLayerToExpand(layer.id);
   }
 
   /**
@@ -667,6 +665,7 @@ export class SearchPanelComponent implements OnInit {
     const layer = new LayerModel();
     // Identify CSW layers
     layer.id = 'registry-csw:' + record.id;
+    layer.group = 'registry-csw';
     layer.name = record.name;
     layer.description = record.description;
     layer.useDefaultProxy = false,    // Use the default proxy (getViaProxy.do) if true (custom layers)
@@ -712,17 +711,30 @@ export class SearchPanelComponent implements OnInit {
 
     // OGC services if selected
     const selectedServices: string[] = [];
-    const checkedServices = this.ogcServices.filter(s => s.checked === true);
-    if (checkedServices.length < OGC_SERVICES.length) {
+    if (!this.allOGCServices.checked) {
+      const checkedServices = this.ogcServices.filter(s => s.checked === true);
       for (const service of checkedServices) {
-        selectedServices.push(service.fields[0]);
+        for (const serviceField of service.fields) {
+          selectedServices.push(serviceField);
+        }
       }
+    }
+
+    let westBounds = undefined;
+    let eastBounds = undefined;
+    let northBounds = undefined;
+    let southBounds = undefined;
+    if (this.restrictBounds && this.bbox) {
+      westBounds = this.bbox.westBoundLongitude;
+      eastBounds = this.bbox.eastBoundLongitude;
+      northBounds = this.bbox.northBoundLatitude;
+      southBounds = this.bbox.southBoundLatitude;
     }
 
     // Search CSW records
     this.searchService.searchCSWRecords(this.queryText, selectedSearchFields, null, null, selectedServices,
-        this.boundsRelationship.toLowerCase(), this.bbox?.westBoundLongitude, this.bbox?.eastBoundLongitude,
-        this.bbox?.southBoundLatitude, this.bbox?.northBoundLatitude).subscribe(searchResponse => {
+        this.boundsRelationship.toLowerCase(), westBounds, eastBounds,
+        southBounds, northBounds).subscribe(searchResponse => {
 
       this.searchResults = [];
       this.totalSearchHits = searchResponse.totalCSWRecordHits;

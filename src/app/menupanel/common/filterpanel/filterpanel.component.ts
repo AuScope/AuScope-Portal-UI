@@ -73,7 +73,6 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
       }
     }
 
-    // XXX Sidebar only..?
     if (this.layer.filterCollection && this.layer.filterCollection['mandatoryFilters']) {
       const mandatoryFilters = this.layer.filterCollection['mandatoryFilters'];
       for (const mandatoryFilter of mandatoryFilters) {
@@ -96,24 +95,14 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
     // Add any layer specific advanced filter components
     this.advancedComponentService.addAdvancedFilterComponents(this.layer, this.advancedFilterComponents);
 
-    // LJ: nvclAnalyticalJob external link
-    const nvclanid = UtilitiesService.getUrlParameterByName('nvclanid');
-    if (nvclanid) {
-      if (this.layer.id === 'nvcl-v2-borehole') {
-        this.layer.filterCollection['mandatoryFilters'][0].value = nvclanid;
-        setTimeout(() => {
-          this.addLayer(this.layer);
-        });
-      }
-    }
   }
 
   /**
    * Called once the panel has been drawn
    */
   public ngAfterViewInit() {
-        // Update the time extent button/selector
-        this.setLayerTimeExtent();
+    // Update the time extent button/selector
+    this.setLayerTimeExtent();
   }
 
   /**
@@ -152,14 +141,16 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
         return optFilt;
     });
 
-    const me = this;
     setTimeout(() => {
-      for (const optFilter of me.optionalFilters) {
+      for (const optFilter of this.optionalFilters) {
         if (optFilter['value'] && optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
           const geometry = optFilter['value'];
           const swappedGeometry = this.csClipboardService.swapGeometry(geometry);
+          let strToday=new Date(); 
+          let dt= new Date(strToday).toISOString();
+          const name = 'Polygon-' + dt.slice(0,dt.lastIndexOf('.'));
           const newPolygon:Polygon = {
-            name: 'Polygon created',
+            name: name,
             srs: 'EPSG:4326',
             geometryType: GeometryType.POLYGON,
             coordinates: swappedGeometry
@@ -170,13 +161,13 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
           this.appRef.tick();
         }
       }
-      me.layerManagerService.addLayer(me.layer, me.optionalFilters, me.layerFilterCollection, me.layerTimes.currentTime);
+      this.layerManagerService.addLayer(this.layer, this.optionalFilters, this.layerFilterCollection, this.layerTimes.currentTime);
 
       // Set opacity of the layer on the map
-      if (UtilitiesService.layerContainsResourceType(me.layer, ResourceType.WMS)) {
-        me.csWMSService.setOpacity(this.layer, layerState.opacity / 100.0 );
-      } else if (this.conf.cswrenderer && this.conf.cswrenderer.includes(me.layer.id)) {
-        me.csCSWService.setOpacity(this.layer, layerState.opacity / 100.0 );
+      if (UtilitiesService.layerContainsResourceType(this.layer, ResourceType.WMS)) {
+        this.csWMSService.setLayerOpacity(this.layer, layerState.opacity / 100.0 );
+      } else if (UtilitiesService.layerContainsBboxGeographicElement(this.layer)) {
+        this.csCSWService.setLayerOpacity(this.layer, layerState.opacity / 100.0 );
       }
     }, 500);
   }
@@ -208,7 +199,7 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
    * @returns true if supported layer, false otherwise
    */
   public isMapSupportedLayer(layer: LayerModel): boolean {
-    return this.csMapService.isMapSupportedLayer(layer);
+    return UtilitiesService.isMapSupportedLayer(layer);
   }
 
   /**
@@ -217,7 +208,7 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
    */
   public getUnsupportedLayerMessage(): string {
     return 'This layer cannot be displayed. Only the following online resource types can be added to the map: ' +
-      this.csMapService.getSupportedOnlineResourceTypes();
+      UtilitiesService.getSupportedOnlineResourceTypes();
   }
 
   /**

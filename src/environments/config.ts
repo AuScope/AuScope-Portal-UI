@@ -36,110 +36,153 @@ export const config = {
     'erl-mineraloccurrenceview',
     'erl-commodityresourceview'
   ],
-  // Layers that support downloading datasets via WCS
+  // Layers that support downloading datasets via WCS have limits
+  // 'downloadAreaMaxSize' is a limit (in metres squared) to the size of the bounding box drawn on the map
+  // 'maxImageSize' is a limit on the the lagrest side of the downloaded image/dataset
+  // For ESRI MapServers set 'maxImageSize' to 1024
+  // For GSKY set 'maxImageSize' to 4096
+  // 
   // (Set 'downloadAreaMaxSize' to Number.MAX_SAFE_INTEGER to disable area download limits)
   wcsSupportedLayer: {
+    'regolith-depth-layer': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 1024
+    },
     'aster-aloh': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'aster-ferrous': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'aster-opaque': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'aster-ferric-oxide-content': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'aster-feoh': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'aster-ferric-oxide-comp': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'aster-group-index': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'aster-quartz-index': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'aster-mgoh-content': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'aster-green-veg': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'aster-ferr-carb': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'aster-mgoh-group-comp': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'aster-aloh-group-content': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'aster-gypsum-content': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'aster-silica-content': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'ga-geophys-1': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'ga-geophys-2': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'ga-geophys-3': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'ga-geophys-4': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'ga-geophys-5': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'ga-geophys-6': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'ga-geophys-7': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'ga-geophys-8': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'ga-geophys-9': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'ga-geophys-10': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'ga-geophys-11': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'ga-geophys-12': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'ga-geophys-13': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'ga-geophys-14': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'ga-geophys-15': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'ga-geophys-16': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'ga-geophys-17': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'ga-geophys-18': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     },
     'ga-geophys-19': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     }
   },
   // Layers that require the proxy service to add layers
@@ -185,39 +228,6 @@ export const config = {
     '500k_geol_4326',
     'bulkdensitypoint_4326',
     'waroxi_wa_4326_bed'
-  ],
-  // Layers that use CSW records to display a simple rectangle on map
-  cswrenderer: [
-    'pmd-crc-project-a1-presentations',
-    'pmd-crc-project-c1-final-report',
-    'pmd-crc-project-c2-final-report',
-    'pmd-crc-project-c6-final-report',
-    'pmd-crc-project-c7-final-report',
-    'pmd-crc-project-i1-appendix1',
-    'pmd-crc-project-i1-appendix5',
-    'pmd-crc-project-i2-presentations',
-    'pmd-crc-project-i5-final-report',
-    'pmd-crc-project-i6-final-report',
-    'pmd-crc-project-i9-final-report',
-    'pmd-crc-project-t1-final-report',
-    'pmd-crc-project-t3-final-report',
-    'pmd-crc-project-t67-final-report',
-    'pmd-crc-project-t11-final-report',
-    'pmd-crc-project-y2-appendix',
-    'pmd-crc-project-y4-final-report',
-    'leme-crc-maps',
-    'portal-geo-models',
-    'l180-mt-isa-deep-crus-seis-surv-qld-2006-stac-and-migr-data-and-imag-for-line-06ga-to-06ga',
-    'are-ther-any-sand-uran-syst-in-the-erom-basi',
-    'l164-curn-seis-surv-sa-2003-2004-stac-and-migr-seis-data-and-imag-for-line-03ga',
-    'lawn-hill-plat-and-leic-rive-faul-trou-meas-stra-sect-onli-gis',
-    'pred-mine-disc-in-the-east-yilg-crat-an-exam-of-dist-targ-of-an-orog-gold-mine-syst',
-    'fina-repo-3d-geol-mode-of-the-east-yilg-crat-proj-pmd-y2-sept-2001-dece-2004',
-    'cate-3-expl-lice-poly-of-tasm-min-reso-tasm',
-    'auscope-mt-collection-1',
-    'auscope-mt-collection-2',
-    'auscope-mt-collection-3',
-    'auscope-mt-collection-4'
   ],
   // Layers that require a JSON response for WMS GetFeature requests
   wmsGetFeatureJSON: [

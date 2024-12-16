@@ -5,7 +5,7 @@ import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
 import {catchError, delay, map, mergeMap } from 'rxjs/operators';
 import { UtilitiesService,DownloadWfsService } from '@auscope/portal-core-ui';
 import { Injectable, Inject} from '@angular/core';
-import {HttpClient, HttpParams, HttpHeaders, HttpResponse} from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
 declare let gtag: Function;
 @Injectable()
@@ -27,26 +27,26 @@ export class NVCLService {
     this.isAnalytic.next(state);
   }
 
-  public isInitialScalarLoad: BehaviorSubject<boolean>; // observable used in querier to control loading of rickshaw chart
+  public isScalarLoaded: BehaviorSubject<boolean>; // observable used in querier to control loading of rickshaw chart
 
   /**
-   * returns the observable of the "isInitialScalarLoad" variable
+   * returns the observable of the "isScalarLoaded" variable
    */
-  getInitialScalarLoad(): Observable<boolean> {
-    return this.isInitialScalarLoad.asObservable();
+  getScalarLoaded(): Observable<boolean> {
+    return this.isScalarLoaded.asObservable();
   }
 
   /**
-   * sets the state of "isInitialScalarLoad" variable
+   * sets the state of the "isScalarLoaded" variable
    */
-  setInitialScalarLoad(state:boolean): void {
-    this.isInitialScalarLoad.next(state);
+  setScalarLoaded(state:boolean): void {
+    this.isScalarLoaded.next(state);
   }
 
 
   constructor(private http: HttpClient , @Inject(LOCAL_STORAGE) private storage: StorageService, private downloadWfsService: DownloadWfsService) {
     this.isAnalytic = new BehaviorSubject<boolean>(false);
-    this.isInitialScalarLoad = new BehaviorSubject<boolean>(false);
+    this.isScalarLoaded = new BehaviorSubject<boolean>(false);
   }
 
   public getNVCLDatasets(serviceUrl: string, holeIdentifier: string): Observable<any> {

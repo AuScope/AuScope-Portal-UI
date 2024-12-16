@@ -138,7 +138,7 @@
                                 <span class="layer-header-label" title="{{searchResult.layer.name}}">{{ searchResult.layer.name }}</span>
                                 <span class="csw-label search-result-button" *ngIf="searchResult.layer.id.startsWith('registry-csw:')">CSW</span>
                                 <span class="layer-label search-result-button" *ngIf="!searchResult.layer.id.startsWith('registry-csw:')">Featured</span>
-                                <button *ngIf="!isLayerAdded(searchResult.layer.id)" [disabled]="!csMapService.isMapSupportedLayer(searchResult.layer)" class="btn btn-sm btn-success search-result-button" type="button" title="Add layer" (click)="addLayer(searchResult.layer)"><i class="fa fa-plus-circle"></i>&nbsp;Add</button>
+                                <button *ngIf="!isLayerAdded(searchResult.layer.id)" [disabled]="!isMapSupportedLayer(searchResult.layer)" class="btn btn-sm btn-success search-result-button" type="button" title="Add layer" (click)="addLayer(searchResult.layer)"><i class="fa fa-plus-circle"></i>&nbsp;Add</button>
                                 <button *ngIf="isLayerAdded(searchResult.layer.id)" class="btn btn-sm btn-danger search-result-button" type="button" title="Remove layer" (click)="removeLayer($event, searchResult.layer)"><i class="fa fa-trash"></i>&nbsp;Remove</button>
                                 <button class="btn btn-sm btn-info" type="button" title="Layer information" (click)="showLayerInformation($event, searchResult.layer)"><i class="fa fa-info-circle"></i>&nbsp;Info</button>
                                 <button class="btn btn-sm btn-primary search-result-button" type="button" title="Add to download" [style.visibility]="isCsvDownloadable(searchResult.layer) ? 'visible' : 'hidden'">
@@ -196,7 +196,7 @@
     </div>
 
     <!-- KML/OGC options -->
-    <div class="options-panel kml-options-panel" *ngIf="showingKmlOgcOptions">
+    <div class="options-panel kml-options-panel" [style.display]="showingKmlOgcOptions ? 'block' : 'none'">
         <ul class="card-sub" appCustomPanel style="display:contents;"></ul>
     </div>
 
