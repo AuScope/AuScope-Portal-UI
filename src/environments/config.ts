@@ -279,5 +279,46 @@ export const config = {
     'ga-geophys-6', 'ga-geophys-7', 'ga-geophys-8', 'ga-geophys-9', 'ga-geophys-10',
     'ga-geophys-11', 'ga-geophys-12', 'ga-geophys-13', 'ga-geophys-14', 'ga-geophys-15',
     'ga-geophys-16', 'ga-geophys-17', 'ga-geophys-18', 'ga-geophys-19'
-  ]
+  ],
+  styleServices: {
+    'sf0-borehole-nvcl': {
+      serviceName: 'BoreholeStyleService',
+    },
+    'nvcl-v2-borehole': {
+      serviceName: 'NVCLBoreholeStyleService',
+    },
+    'mineral-tenements': {
+      serviceName: 'MineralTenementStyleService',
+    },
+    'erml-mine': {
+      serviceName: 'MineStyleService',
+    },
+    'erml-mineraloccurrence': {
+      serviceName: 'MineralOccurrenceStyleService',
+    },
+    'erml-miningactivity': {
+      serviceName: 'MiningActivityStyleService',
+    },
+    'erl-commodityresourceview': {
+      serviceName: 'ErlCommodityStyleService',
+    },
+    'erl-mineview': {
+      serviceName: 'ErlMineViewStyleService',
+    },
+    'erl-mineraloccurrenceview': {
+      serviceName: 'ErlMineralOccurrenceStyleService',
+    },
+    'geological-provinces': {
+      serviceName: 'GeologicalProvincesStyleService',
+    },
+    'remanent-anomalies': {
+      serviceName: 'RemanentAnomaliesStyleService',
+    },
+    'remanent-anomalies-autosearch': {
+      serviceName: 'RemanentAnomaliesAutoSearchStyleService',
+    },
+    'remanent-anomalies-EMAG': {
+        serviceName: 'RemanentAnomaliesStyleService'
+    }
+  }
 };
