@@ -319,6 +319,22 @@ export const config = {
     },
     'remanent-anomalies-EMAG': {
         serviceName: 'RemanentAnomaliesStyleService'
-    }
+    },
+    // Add generic style service for layers that previously used doGenericFilterStyle.do
+    'tima-geosample': {
+      serviceName: 'GenericStyleService',
+    },
+    'tima-shrimp-geosample': {
+      serviceName: 'GenericStyleService',
+    },
+    'igsn-sample': {
+      serviceName: 'GenericStyleService',
+    },
+    'igsn-ga-sample': {
+      serviceName: 'GenericStyleService',
+    },
+    'igsn-ardc-sample': {
+      serviceName: 'GenericStyleService',
+    },
   }
 };
