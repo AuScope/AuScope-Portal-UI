@@ -183,6 +183,58 @@ export const config = {
     'ga-geophys-19': {
       downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
       maxImageSize: 4096
+    },
+    'sa-gravity': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
+    },
+    'sa-gravity-1vd': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
+    },
+    'sa-gravity-uc1000-res': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
+    },
+    'sa-tmi': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
+    },
+    'sa-tmi-vrtp': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
+    },
+    'sa-tmi-vrtp-1vd': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
+    },
+    'sa-rad-rgb': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
+    },
+    'sa-rad-rgb-lns': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
+    },
+    'sa-rad-k': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
+    },
+    'sa-rad-th': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
+    },
+    'sa-rad-u': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
+    },
+    'sa-rad-u2th': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
+    },
+    'sa-rad-tc': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     }
   },
   // Layers that require the proxy service to add layers
@@ -227,7 +279,33 @@ export const config = {
     '500k_geol_28350',
     '500k_geol_4326',
     'bulkdensitypoint_4326',
-    'waroxi_wa_4326_bed'
+    'waroxi_wa_4326_bed',
+    'sa-geochronology',
+    'sa-field-observation-sites',
+    'sa-surface-geology-7m',
+    'sa-downhole-geochem-zinc',
+    'sa-downhole-geochem-uranium',
+    'sa-downhole-geochem-copper',
+    'sa-downhole-geochem-lithium',
+    'sa-downhole-geochem-gold',
+    'sa-downhole-geochem-silver',
+    'sa-downhole-geochem-cobalt',
+    'sa-downhole-geochem-lead',
+    'sa-downhole-geochem-iron',
+    'sa-downhole-geochem-nickel',
+    'sa-gravity',
+    'sa-gravity-1vd',
+    'sa-gravity-uc1000-res',
+    'sa-tmi',
+    'sa-tmi-vrtp',
+    'sa-tmi-vrtp-1vd',
+    'sa-rad-rgb',
+    'sa-rad-rgb-lns',
+    'sa-rad-k',
+    'sa-rad-th',
+    'sa-rad-u',
+    'sa-rad-u2th',
+    'sa-rad-tc'
   ],
   // Layers that require a JSON response for WMS GetFeature requests
   wmsGetFeatureJSON: [
