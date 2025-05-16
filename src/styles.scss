@@ -863,9 +863,9 @@ fieldset.show-fieldset-borders-whitebg legend{
 }
 
 ::ng-deep {
-    // Reduce LegendModal z-index from 1000 to 100 so feature click dialogs aren't obscured
+    // Reduce LegendModal z-index from 1000 to 99 so feature click dialogs and browse/search panels (z: 100) aren't obscured
     .cdk-overlay-container {
-        z-index: 100 !important;
+        z-index: 99 !important;
     }
 }
 /* End LegendModal dialog */
