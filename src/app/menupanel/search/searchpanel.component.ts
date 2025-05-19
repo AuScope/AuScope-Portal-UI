@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, Inject, NgZone, OnInit, ViewChild } from '@angular/core';
 import { RectangleEditorObservable } from '@auscope/angular-cesium';
 
 import { Bbox, CSWRecordModel, CsMapService, LayerHandlerService, LayerModel, RenderStatusService, UtilitiesService, Constants } from '@auscope/portal-core-ui';
@@ -146,7 +146,8 @@ export class SearchPanelComponent implements OnInit {
               private layerHandlerService: LayerHandlerService, private layerManagerService: LayerManagerService,
               private uiLayerModelService: UILayerModelService, private renderStatusService: RenderStatusService,
               private sidebarService: SidebarService, private modalService: NgbModal,
-              private http: HttpClient, @Inject('env') private env) { }
+              private http: HttpClient, @Inject('env') private env,
+              private ngZone: NgZone) { }
 
   ngOnInit() {
     // Populate search results with all layers by default
@@ -576,8 +577,8 @@ export class SearchPanelComponent implements OnInit {
           return;
         }
         if (vector.points.length < 2
-          || vector.points[0].getPosition().x === vector.points[1].getPosition().x
-          || vector.points[0].getPosition().y === vector.points[1].getPosition().y) {
+            || vector.points[0].getPosition().x === vector.points[1].getPosition().x
+            || vector.points[0].getPosition().y === vector.points[1].getPosition().y) {
           // drawing hasn't finished
           this.alertMessage = 'Click again to finish drawing bounds';
           return;
@@ -588,14 +589,15 @@ export class SearchPanelComponent implements OnInit {
         this.bbox = UtilitiesService.reprojectToWGS84(points);
 
         this.alertMessage = '';
-        this.setShowingResultsPanel(true);
         this.restrictBounds = true;
 
         // Re-open bounds dropdown
         setTimeout(() => {
-          this.spatialOptionsDropdown.open();
+          this.ngZone.run(() => {
+            this.spatialOptionsDropdown.open();
+          });
         });
-      });
+    });    
   }
 
   /**
