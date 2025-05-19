@@ -6,20 +6,21 @@ import { saveAs } from 'file-saver';
 import { UserStateService } from 'app/services/user/user-state.service';
 
 @Component({
-  selector: 'app-cs-clipboard',
-  animations: [
-    trigger('fadeSlideInOut', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(-50px)' }),
-        animate('150ms', style({ opacity: 1, transform: 'translateY(2px)' })),
-      ]),
-      transition(':leave', [
-        animate('150ms', style({ opacity: 0, transform: 'translateY(-50px)' })),
-      ]),
-    ]),
-  ],
-  templateUrl: './csmap.clipboard.component.html',
-  styleUrls: ['./csmap.clipboard.component.scss'],
+    selector: 'app-cs-clipboard',
+    animations: [
+        trigger('fadeSlideInOut', [
+            transition(':enter', [
+                style({ opacity: 0, transform: 'translateY(-50px)' }),
+                animate('150ms', style({ opacity: 1, transform: 'translateY(2px)' })),
+            ]),
+            transition(':leave', [
+                animate('150ms', style({ opacity: 0, transform: 'translateY(-50px)' })),
+            ]),
+        ]),
+    ],
+    templateUrl: './csmap.clipboard.component.html',
+    styleUrls: ['./csmap.clipboard.component.scss'],
+    standalone: false
 })
 
 export class CsMapClipboardComponent implements OnInit {

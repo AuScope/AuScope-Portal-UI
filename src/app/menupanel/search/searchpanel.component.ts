@@ -84,7 +84,8 @@ const OGC_SERVICES = [
 @Component({
     selector: 'app-search-panel',
     templateUrl: './searchpanel.component.html',
-    styleUrls: ['./searchpanel.component.scss']
+    styleUrls: ['./searchpanel.component.scss'],
+    standalone: false
 })
 export class SearchPanelComponent implements OnInit {
 

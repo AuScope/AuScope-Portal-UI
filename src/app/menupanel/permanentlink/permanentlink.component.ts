@@ -6,9 +6,10 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CreatePermanentLinkModalComponent } from 'app/modalwindow/permanentlink/create-permanentlink.modal.component';
 
 @Component({
-  selector: 'app-permanent-link',
-  templateUrl: './permanentlink.component.html',
-  styleUrls: ['./permanentlink.component.scss']
+    selector: 'app-permanent-link',
+    templateUrl: './permanentlink.component.html',
+    styleUrls: ['./permanentlink.component.scss'],
+    standalone: false
 })
 export class PermanentLinkComponent {
   public bShowDialog = false;

@@ -11,10 +11,11 @@ import { ConfirmModalComponent } from '../confirm/confirm.modal.component';
  * Modal component used to display a user's permanent links
  */
 @Component({
-  selector: 'app-state-form',
-  templateUrl: './permanentlinks.modal.component.html',
-  styleUrls: ['./permanentlinks.modal.component.scss'],
-  providers: [ DatePipe ]
+    selector: 'app-state-form',
+    templateUrl: './permanentlinks.modal.component.html',
+    styleUrls: ['./permanentlinks.modal.component.scss'],
+    providers: [DatePipe],
+    standalone: false
 })
 export class PermanentLinksModalComponent implements OnInit {
 

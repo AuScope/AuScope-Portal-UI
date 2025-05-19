@@ -3,9 +3,10 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth/auth.service';
 
 @Component({
-  selector: 'app-logged-in',
-  template: ``,
-  styles: []
+    selector: 'app-logged-in',
+    template: ``,
+    styles: [],
+    standalone: false
 })
 export class LoggedInComponent implements OnInit {
 

@@ -17,10 +17,11 @@ export interface DialogData {
 }
 
 @Component({
-  selector: 'app-nvcl-datasetlist-component',
-  templateUrl: './nvcl.datasetlist.component.html',
-  providers: [RickshawService, NVCLBoreholeAnalyticService],
-  styleUrls: ['../../../../../../node_modules/@auscope/portal-core-ui/src/lib/widget/chart/rickshaw/rickshaw.service.scss', '../../../modalwindow.scss', './nvcl.datasetlist.component.scss']
+    selector: 'app-nvcl-datasetlist-component',
+    templateUrl: './nvcl.datasetlist.component.html',
+    providers: [RickshawService, NVCLBoreholeAnalyticService],
+    styleUrls: ['../../../../../../node_modules/@auscope/portal-core-ui/src/lib/widget/chart/rickshaw/rickshaw.service.scss', '../../../modalwindow.scss', './nvcl.datasetlist.component.scss'],
+    standalone: false
 })
 export class NVCLDatasetListComponent implements OnInit {
 
@@ -440,8 +441,9 @@ export class NVCLDatasetListComponent implements OnInit {
 }
 
 @Component({
-  selector: 'app-nvcl-datasetlist-component-dialog',
-  templateUrl: 'nvcl.datasetlist.dialog.component.html',
+    selector: 'app-nvcl-datasetlist-component-dialog',
+    templateUrl: 'nvcl.datasetlist.dialog.component.html',
+    standalone: false
 })
 export class NVCLDatasetListDialogComponent {
 

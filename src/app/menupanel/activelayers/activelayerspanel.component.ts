@@ -27,9 +27,10 @@ enum FilterMode {
 }
 
 @Component({
-  selector: '[appActiveLayers]',
-  templateUrl: './activelayerspanel.component.html',
-  styleUrls: ['../menupanel.scss', './activelayerspanel.component.scss']
+    selector: '[appActiveLayers]',
+    templateUrl: './activelayerspanel.component.html',
+    styleUrls: ['../menupanel.scss', './activelayerspanel.component.scss'],
+    standalone: false
 })
 export class ActiveLayersPanelComponent implements AfterViewInit {
   bsModalRef: BsModalRef;

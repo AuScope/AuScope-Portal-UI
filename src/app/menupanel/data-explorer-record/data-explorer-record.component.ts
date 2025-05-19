@@ -7,9 +7,10 @@ import { LayerManagerService } from "app/services/ui/layer-manager.service";
 import { DataExplorerService } from "../data-explorer/data-explorer.service";
 
 @Component({
-  selector: "app-data-explorer-record",
-  templateUrl: "./data-explorer-record.component.html",
-  styleUrls: ["./data-explorer-record.component.scss"],
+    selector: "app-data-explorer-record",
+    templateUrl: "./data-explorer-record.component.html",
+    styleUrls: ["./data-explorer-record.component.scss"],
+    standalone: false
 })
 export class DataExplorerRecordComponent implements OnInit {
   recordButtons: ViewContainerRef;

@@ -25,8 +25,8 @@ import { NVCLBoreholeAnalyticService } from 'app/modalwindow/layeranalytic/nvcl/
 declare var Cesium: any;
 
 @Component({
-  selector: 'app-cs-map',
-  template: `
+    selector: 'app-cs-map',
+    template: `
     <div #mapElement id="map" class="h-100 w-100" (mouseout)="mouseLongitude=undefined;mouseLatitude=undefined;">
       <ac-map>
           <app-browse-menu></app-browse-menu>
@@ -45,9 +45,11 @@ declare var Cesium: any;
       </ac-map>
     </div>
     `,
-  providers: [ViewerConfiguration,NVCLBoreholeAnalyticService], // Don't forget to Provide it
-  styleUrls: ['./csmap.component.scss']
-  // The "#" (template reference variable) matters to access the map element with the ViewChild decorator!
+    providers: [ViewerConfiguration, NVCLBoreholeAnalyticService], // Don't forget to Provide it
+    styleUrls: ['./csmap.component.scss']
+    // The "#" (template reference variable) matters to access the map element with the ViewChild decorator!
+    ,
+    standalone: false
 })
 
 export class CsMapComponent implements AfterViewInit {

@@ -13,9 +13,10 @@ import { LayerManagerService } from 'app/services/ui/layer-manager.service';
 
 
 @Component({
-  selector: 'app-filter-panel',
-  templateUrl: './filterpanel.component.html',
-  styleUrls: ['./filterpanel.component.scss', '../../menupanel.scss']
+    selector: 'app-filter-panel',
+    templateUrl: './filterpanel.component.html',
+    styleUrls: ['./filterpanel.component.scss', '../../menupanel.scss'],
+    standalone: false
 })
 export class FilterPanelComponent implements OnInit, AfterViewInit {
   @Input() layer: LayerModel;

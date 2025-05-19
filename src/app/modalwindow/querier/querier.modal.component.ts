@@ -29,10 +29,11 @@ interface FlatNode {
 }
 
 @Component({
-  selector: 'app-querier-modal-window',
-  templateUrl: './querier.modal.component.html',
-  providers: [NVCLBoreholeAnalyticService],
-  styleUrls: ['../modalwindow.scss', './querier.modal.component.scss']
+    selector: 'app-querier-modal-window',
+    templateUrl: './querier.modal.component.html',
+    providers: [NVCLBoreholeAnalyticService],
+    styleUrls: ['../modalwindow.scss', './querier.modal.component.scss'],
+    standalone: false
 })
 export class QuerierModalComponent implements OnInit, AfterViewInit {
   [x: string]: any;

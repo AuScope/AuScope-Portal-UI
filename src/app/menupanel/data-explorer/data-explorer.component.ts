@@ -12,10 +12,11 @@ import { UILayerModel } from "../common/model/ui/uilayer.model";
 import { AddRegistryModalComponent } from "app/modalwindow/registry/add-registry.modal.component";
 
 @Component({
-  selector: "[appDataExplorer]",
-  templateUrl: "./data-explorer.component.html",
-  styleUrls: ["../menupanel.scss", "./data-explorer.component.scss" ],
-  providers: [DataExplorerService],
+    selector: "[appDataExplorer]",
+    templateUrl: "./data-explorer.component.html",
+    styleUrls: ["../menupanel.scss", "./data-explorer.component.scss"],
+    providers: [DataExplorerService],
+    standalone: false
 })
 export class DataExplorerComponent implements OnInit {
   bbox: Bbox;

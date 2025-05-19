@@ -15,9 +15,10 @@ import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
 
 
 @Component({
-  selector: '[appCustomPanel]',
-  templateUrl: './custompanel.component.html',
-  styleUrls: ['../menupanel.scss', './custompanel.component.scss']
+    selector: '[appCustomPanel]',
+    templateUrl: './custompanel.component.html',
+    styleUrls: ['../menupanel.scss', './custompanel.component.scss'],
+    standalone: false
 })
 export class CustomPanelComponent {
 

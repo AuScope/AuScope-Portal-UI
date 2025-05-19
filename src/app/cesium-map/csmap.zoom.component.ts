@@ -3,11 +3,13 @@ import { CameraService, CesiumService, ZoomToRectangleService } from '@auscope/a
 import { CsMapComponent } from './csmap.component';
 
 @Component({
-  selector: 'app-cs-map-zoom',
-  templateUrl: './csmap.zoom.component.html', 
-  styleUrls: ['./csmap.zoom.component.scss'],
-  encapsulation: ViewEncapsulation.None // NB: Styles are not encapsulated.
-                                        // This adds the style to global styles 
+    selector: 'app-cs-map-zoom',
+    templateUrl: './csmap.zoom.component.html',
+    styleUrls: ['./csmap.zoom.component.scss'],
+    encapsulation: ViewEncapsulation.None // NB: Styles are not encapsulated.
+    // This adds the style to global styles 
+    ,
+    standalone: false
 })
 export class CsMapZoomComponent {
   // amount to zoom in/out by. 10x the default camera zoom

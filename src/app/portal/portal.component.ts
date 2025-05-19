@@ -9,7 +9,8 @@ import { SidebarService } from './sidebar.service';
 @Component({
     selector: 'app-portal',
     templateUrl: './portal.component.html',
-    styleUrls: ['../../styles.scss']
+    styleUrls: ['../../styles.scss'],
+    standalone: false
 })
 export class PortalComponent implements OnInit, OnDestroy  {
   private sidebarSubscription: Subscription;

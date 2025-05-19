@@ -16,9 +16,10 @@ import { Subject } from 'rxjs';
 declare var gtag: Function;
 
 @Component({
-  selector: 'app-download-panel',
-  templateUrl: './downloadpanel.component.html',
-  styleUrls: ['../../menupanel.scss']
+    selector: 'app-download-panel',
+    templateUrl: './downloadpanel.component.html',
+    styleUrls: ['../../menupanel.scss'],
+    standalone: false
 })
 
 

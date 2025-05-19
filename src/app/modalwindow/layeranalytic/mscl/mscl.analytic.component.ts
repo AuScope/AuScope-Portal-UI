@@ -2,10 +2,11 @@ import { Component, OnInit, ViewChild, ElementRef, Renderer2, ChangeDetectorRef 
 import { MSCLService } from './mscl.service';
 
 @Component({
-  selector: 'app-mscl.analytic',
-  templateUrl: './mscl.analytic.component.html',
-  styleUrls: ['./mscl.analytic.component.scss'],
-  providers: [MSCLService]
+    selector: 'app-mscl.analytic',
+    templateUrl: './mscl.analytic.component.html',
+    styleUrls: ['./mscl.analytic.component.scss'],
+    providers: [MSCLService],
+    standalone: false
 })
 export class MSCLAnalyticComponent implements OnInit {
 

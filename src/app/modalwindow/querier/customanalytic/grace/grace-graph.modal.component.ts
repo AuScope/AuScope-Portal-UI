@@ -13,7 +13,8 @@ import * as Plotly from 'plotly.js-dist-min';
 @Component({
     selector: 'app-grace-graph-modal-content',
     templateUrl: './grace-graph.modal.component.html',
-    styleUrls: ['./grace-graph.modal.component.scss']
+    styleUrls: ['./grace-graph.modal.component.scss'],
+    standalone: false
 })
 export class GraceGraphModalComponent implements AfterViewInit {
 

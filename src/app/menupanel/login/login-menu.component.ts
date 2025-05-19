@@ -11,7 +11,8 @@ import { CsClipboardService } from '@auscope/portal-core-ui';
 @Component({
     selector: '[app-login-menu]',
     templateUrl: './login-menu.component.html',
-    styleUrls: ['./login-menu.component.scss']
+    styleUrls: ['./login-menu.component.scss'],
+    standalone: false
 })
 export class LoginMenuComponent {
 
