@@ -862,12 +862,6 @@ fieldset.show-fieldset-borders-whitebg legend{
   --mdc-dialog-container-color: rgba(255,255,255,0.8);
 }
 
-::ng-deep {
-    // Reduce LegendModal z-index from 1000 to 99 so feature click dialogs and browse/search panels (z: 100) aren't obscured
-    .cdk-overlay-container {
-        z-index: 99 !important;
-    }
-}
 /* End LegendModal dialog */
 .sidebar.sidebar-close {
     position: fixed;
