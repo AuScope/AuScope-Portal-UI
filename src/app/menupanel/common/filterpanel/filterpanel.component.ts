@@ -147,8 +147,8 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
         if (optFilter['value'] && optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
           const geometry = optFilter['value'];
           const swappedGeometry = this.csClipboardService.swapGeometry(geometry);
-          let strToday=new Date(); 
-          let dt= new Date(strToday).toISOString();
+          const strToday=new Date(); 
+          const dt= new Date(strToday).toISOString();
           const name = 'Polygon-' + dt.slice(0,dt.lastIndexOf('.'));
           const newPolygon:Polygon = {
             name: name,
