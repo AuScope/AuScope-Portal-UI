@@ -181,8 +181,10 @@
 				aria-hidden="true"></i>&nbsp;Analytic</button>
 		<!-- Update layer button -->
 		<button type="button" *ngIf="isMapSupportedLayer(layer) && (hasFilters(layer.id) || layerHasAdvancedFilterComponent(layer.id))"
-			class="btn btn-primary btn-sm add-layer-btn float-right" (click)="addLayer(layer)"><i
-				class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp;Add Layer</button>
+			class="btn btn-primary btn-sm add-layer-btn float-right" (click)="addLayer(layer)">
+            <i class="fa fa-plus-circle" aria-hidden="true"></i>
+            &nbsp;Apply Filter
+        </button>
 		<!-- Optional unsupported layer message & icon -->
 		<div class="unsupported-layer-message" *ngIf="!isMapSupportedLayer(layer)">
 			<em class="fa fa-exclamation-triangle warning-icon"></em>
