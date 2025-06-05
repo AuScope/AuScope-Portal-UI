@@ -28,19 +28,19 @@
 		<td style="vertical-align: middle;">
 			<button *ngIf="!uiLayerModelService.isLayerAdded(layer.id)" class="btn-sm btn-success custom-btn" (click)="addLayer(layer)">Add&nbsp;<i class="fa fa-plus"></i></button>
 			<button *ngIf="uiLayerModelService.isLayerAdded(layer.id)" class="btn-sm btn-danger custom-btn" (click)="removeLayer(layer)">Remove&nbsp;<i class="fa fa-trash"></i></button>
-			<button *ngIf="layer.group !== 'kml-layer' && layer.group !== 'kmz-layer'" class="btn-sm btn-info custom-btn" (click)="displayRecordInfo(layer)">Info&nbsp;<i class="fa fa-info-circle"></i></button>
+			<button *ngIf="!['kml-layer', 'kmz-layer', 'geojson-layer'].includes(layer.group)" class="btn-sm btn-info custom-btn" (click)="displayRecordInfo(layer)">Info&nbsp;<i class="fa fa-info-circle"></i></button>
 		</td>
 	</tr>
 </table>
 
 <!-- Custom Layer KML File Input -->
 <div class="form-group">
-	<label class="control-label" for="inputSuccess2"><span class="white">Upload KML/KMZ file</span></label>
+	<label class="control-label" for="inputSuccess2"><span class="white">Upload KML/KMZ/GeoJSON file</span></label>
 	<div class="input-group">
 		<input type="file" accept=".kml, .kmz, .geojson" style="display:none" class="file-input" (change)="onKmlFileSelected($event)" #CustomKmlFileLoader>
-		<button (click)="CustomKmlFileLoader.click()" type="button" title="Load KML/KMZ/GEOJSON file"  class="btn-primary btn-sm">
+		<button (click)="CustomKmlFileLoader.click()" type="button" title="Load KML/KMZ/GeoJSON file"  class="btn-primary btn-sm">
 			<i class="fa fa-lg fa-file" aria-hidden="true"></i>
-			&nbsp;Load KML/KMZ/GEOJSON
+			&nbsp;Load KML/KMZ/GeoJSON
 			<i *ngIf="!loading" class="fa"></i>
 			<i *ngIf="loading" class="fa fa-spinner fa-spin fa-fw"></i>
 		</button>
@@ -59,7 +59,7 @@
 		<td>
 			<button *ngIf="!uiLayerModelService.isLayerAdded(layer.id)" class="btn-sm btn-success custom-btn" (click)="addLayer(layer)">Add&nbsp;<i class="fa fa-plus"></i></button>
 			<button *ngIf="uiLayerModelService.isLayerAdded(layer.id)" class="btn-sm btn-danger custom-btn" (click)="removeLayer(layer)">Remove&nbsp;<i class="fa fa-trash"></i></button>
-			<button *ngIf="layer.group !== 'kml-layer' && layer.group !== 'kmz-layer'" class="btn-sm btn-info custom-btn" (click)="displayRecordInfo(layer)">Info&nbsp;<i class="fa fa-info-circle"></i></button>
+			<button *ngIf="!['kml-layer', 'kmz-layer', 'geojson-layer'].includes(layer.group)" class="btn-sm btn-info custom-btn" (click)="displayRecordInfo(layer)">Info&nbsp;<i class="fa fa-info-circle"></i></button>
 		</td>
 		<!--
 		<div *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="progress progress-xs" style="height: 5px">
