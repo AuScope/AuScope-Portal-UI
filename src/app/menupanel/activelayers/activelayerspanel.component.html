@@ -27,9 +27,9 @@
                     <input matSliderThumb
                         [(ngModel)]="getUILayerModel(layer.id).opacity">
                 </mat-slider>
-                <div style="display: flex;" *ngIf="hasLegend(layer)">
+                <div style="display: flex;">
                     <!-- Display legend button -->
-                    <button class="btn btn-primary btn-sm legend" [disabled]="isLegendShown(layer.id)" (click)="showLegend(layer)">Legend</button>
+                    <button class="btn btn-primary btn-sm legend" *ngIf="hasLegend(layer)" [disabled]="isLegendShown(layer.id)" (click)="showLegend(layer)">Legend</button>
                     <!-- Display status button -->
                     <button class="btn btn-primary btn-sm status" (click)="openStatusReport(getUILayerModel(layer.id)); $event.stopPropagation();">Status</button>
                     <!-- Display info button -->
