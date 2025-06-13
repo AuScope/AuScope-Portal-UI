@@ -597,7 +597,8 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
         }
         default: {
           // make sure each first letter is capitalised
-          terms[j] = term[0].toUpperCase() + term.slice(1);
+          if (term.trim()[0])
+            terms[j] = term[0].toUpperCase() + term.slice(1);
         }
       }
     }
