@@ -1,4 +1,4 @@
-@import 'app/globals';
+@use 'app/globals';
 
 :host {
   .filter-text {
@@ -59,7 +59,7 @@
   }
 
   .bookmark-icon {
-      color: $auscope-teal;
+      color: globals.$auscope-teal;
       margin-right: 4px;
       vertical-align: middle;
   }
@@ -137,7 +137,7 @@
 
   .activeLayerContent {
     width:100%;
-    color: $text-colour;
+    color: globals.$text-colour;
   }
 
   .activeLayerDragMessagePanel {
@@ -153,7 +153,7 @@
 }
 
 .cdk-drag-preview {
-  background-color: $auscope-shoots-green;
+  background-color: globals.$auscope-shoots-green;
   height: 100px !important;
   display: flex;
   flex-direction: column;

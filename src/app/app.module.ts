@@ -2,7 +2,6 @@ import { environment } from '../environments/environment';
 import { config } from '../environments/config';
 import { NgModule } from '@angular/core';
 import { ModalModule } from 'ngx-bootstrap/modal';
-import { NouisliderModule } from 'ng2-nouislider';
 import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 
@@ -83,8 +82,6 @@ import { CreatePermanentLinkModalComponent } from './modalwindow/permanentlink/c
 import { AddRegistryModalComponent } from './modalwindow/registry/add-registry.modal.component';
 import { ConfirmModalComponent } from './modalwindow/confirm/confirm.modal.component';
 
-import { ROIModalComponent } from './modalwindow/roi/roi.modal.component';
-
 // Services
 import { AuscopeApiService } from './services/api/auscope-api.service';
 import { FilterService } from './services/filter/filter.service';
@@ -96,7 +93,7 @@ import { GraceService } from './services/wcustom/grace/grace.service';
 import { LegendUiService } from './services/legend/legend-ui.service';
 import { LayerManagerService } from './services/ui/layer-manager.service';
 
-import * as PlotlyJS from 'plotly.js-dist-min/plotly.min.js';
+import * as PlotlyJS from 'plotly.js-dist-min';
 import { PlotlyModule } from 'angular-plotly.js';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -192,7 +189,6 @@ PlotlyModule.plotlyjs = PlotlyJS;
         PortalCorePipesModule,
         ClipboardModule,
         ModalModule.forRoot(),
-        NouisliderModule,
         NgSelectModule,
         CdkTableModule,
         MatTreeModule,

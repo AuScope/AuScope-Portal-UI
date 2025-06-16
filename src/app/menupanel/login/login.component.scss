@@ -1,4 +1,4 @@
-@import 'app/globals';
+@use 'app/globals';
 
 .login-page {
   position: absolute;
@@ -7,7 +7,7 @@
   right: 0;
   bottom: 0;
   overflow: auto;
-  background: $auscope-royal-blue;
+  background: globals.$auscope-royal-blue;
   text-align: center;
   color: #fff;
   padding: 3em;
