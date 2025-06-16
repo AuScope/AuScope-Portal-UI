@@ -161,7 +161,7 @@
               "src/styles.scss",
               "node_modules/rickshaw/rickshaw.min.css",
               "src/extension/css/extensions.css",
-              "node_modules/nouislider/distribute/nouislider.min.css",
+              "node_modules/nouislider/dist/nouislider.min.css",
               "src/extension/css/d3.css"
             ],
             "assets": [
@@ -176,20 +176,6 @@
           "builder": "@angular-eslint/builder:lint",
           "options": {
             "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
-          }
-        }
-      }
-    },
-    "project-e2e": {
-      "root": "",
-      "sourceRoot": "",
-      "projectType": "application",
-      "architect": {
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "./protractor.conf.js",
-            "devServerTarget": "project:serve"
           }
         }
       }

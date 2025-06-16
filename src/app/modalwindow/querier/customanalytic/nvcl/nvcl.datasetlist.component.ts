@@ -9,7 +9,6 @@ import { saveAs } from 'file-saver';
 import { NVCLBoreholeAnalyticService } from '../../../layeranalytic/nvcl/nvcl.boreholeanalytic.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { UtilitiesService } from '@auscope/portal-core-ui';
-import { trace } from 'console';
 
 export interface DialogData {
   scalarClasses: any[];
