@@ -1,12 +1,12 @@
-@import 'app/globals';
+@use 'app/globals';
 
 /* Primary, Secondary etc. buttons using AuScope colours */
 .btn-auscope-primary {
-  background-color: $auscope-sky-blue;
+  background-color: globals.$auscope-sky-blue;
   color: white;
   line-height: 50%;
 }
 
 .btn-auscope-primary:hover {
-  background-color: $auscope-royal-blue;
+  background-color: globals.$auscope-royal-blue;
 }
