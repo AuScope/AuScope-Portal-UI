@@ -1,24 +1,24 @@
-@import 'app/auscope-styles';
+@use 'app/globals';
 
 .submenu-open-block {
 	display: block !important;
-	color: $text-highlight-colour;
+	color: globals.$text-highlight-colour;
 }
 
 .submenu-open-inline {
     display: inline !important;
-	color: $text-highlight-colour;
+	color: globals.$text-highlight-colour;
 }
 
 .nav-tabs > li.active > a:focus,
 .nav-tabs > li.active > a:hover,
 .nav-tabs > li.active > a > i {
-	color: $text-highlight-colour;
+	color: globals.$text-highlight-colour;
 }
 
 .nav-tabs > li > a > i {
 	font-size: 1.2em;
-    color: $text-colour;
+    color: globals.$text-colour;
 }
 
 .nav > li > a {
@@ -244,7 +244,7 @@ input[type=checkbox] + label {
 
 /* For "Bounding Box" labels */
 .container {
-	width: $card-width;
+	width: globals.$card-width;
 	margin-left: -10px;
 }
 
@@ -291,12 +291,12 @@ input[type=checkbox] + label {
 
 .select-layers-message {
     font-size: 0.9rem;
-    color: $text-colour;
+    color: globals.$text-colour;
     margin-top: 5px;
 }
 
 .help-block {
-    color: $text-colour;
+    color: globals.$text-colour;
 }
 
 /* "info" button - positioned in line and to the right of "map layer" and "download" tabs */

@@ -8,7 +8,8 @@ import { UserStateService } from './services/user/user-state.service';
  */
 @Component({
     selector: 'app-component',
-    templateUrl: './app.component.html'
+    templateUrl: './app.component.html',
+    standalone: false
 })
 
 export class AppComponent {

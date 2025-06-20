@@ -7,7 +7,8 @@ import { config } from 'environments/config';
 @Component({
     selector: 'info-sub-panel',
     templateUrl: './subpanel.component.html',
-    styleUrls: ['../../../menupanel.scss', './subpanel.component.scss']
+    styleUrls: ['../../../menupanel.scss', './subpanel.component.scss'],
+    standalone: false
 })
 export class InfoPanelSubComponent implements OnInit {
     @Input() cswRecord: CSWRecordModel;

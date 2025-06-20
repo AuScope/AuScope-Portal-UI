@@ -1,10 +1,10 @@
-@import 'app/globals';
+@use 'app/globals';
 :host {
     margin-left: auto;
 }
 
 .user-menu {
-    color: $text-colour;
+    color: globals.$text-colour;
 
     .user-login-button {
         display: flex;
@@ -25,7 +25,7 @@
 }
 
 .user-menu:hover {
-    color: $text-highlight-colour;
+    color: globals.$text-highlight-colour;
 }
 
 .svg-purple-colour {
@@ -38,7 +38,7 @@
     }
 
     .mat-mdc-menu-content {
-        background-color: $background-colour;
+        background-color: globals.$background-colour;
     }
 
 }

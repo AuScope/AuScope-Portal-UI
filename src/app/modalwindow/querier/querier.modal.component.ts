@@ -29,10 +29,11 @@ interface FlatNode {
 }
 
 @Component({
-  selector: 'app-querier-modal-window',
-  templateUrl: './querier.modal.component.html',
-  providers: [NVCLBoreholeAnalyticService],
-  styleUrls: ['../modalwindow.scss', './querier.modal.component.scss']
+    selector: 'app-querier-modal-window',
+    templateUrl: './querier.modal.component.html',
+    providers: [NVCLBoreholeAnalyticService],
+    styleUrls: ['../modalwindow.scss', './querier.modal.component.scss'],
+    standalone: false
 })
 export class QuerierModalComponent implements OnInit, AfterViewInit {
   [x: string]: any;
@@ -596,7 +597,8 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
         }
         default: {
           // make sure each first letter is capitalised
-          terms[j] = term[0].toUpperCase() + term.slice(1);
+          if (term.trim()[0])
+            terms[j] = term[0].toUpperCase() + term.slice(1);
         }
       }
     }

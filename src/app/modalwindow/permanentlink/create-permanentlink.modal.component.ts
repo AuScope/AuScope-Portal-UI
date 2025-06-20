@@ -8,9 +8,10 @@ import { environment } from '../../../environments/environment';
  * Modal component for the creation of a permanent link (logged in user)
  */
 @Component({
-  selector: 'app-permanentlink-form',
-  templateUrl: './create-permanentlink.modal.component.html',
-  styleUrls: ['./create-permanentlink.modal.component.scss']
+    selector: 'app-permanentlink-form',
+    templateUrl: './create-permanentlink.modal.component.html',
+    styleUrls: ['./create-permanentlink.modal.component.scss'],
+    standalone: false
 })
 export class CreatePermanentLinkModalComponent implements OnInit {
 

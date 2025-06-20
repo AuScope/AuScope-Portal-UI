@@ -9,7 +9,8 @@ import { GraceStyleSettings } from '../../../modalwindow/querier/customanalytic/
 @Component({
     selector: 'app-grace-legend',
     templateUrl: './grace-legend.component.html',
-    styleUrls: ['./grace-legend.component.scss']
+    styleUrls: ['./grace-legend.component.scss'],
+    standalone: false
 })
 export class GraceLegendComponent extends AdvancedMapComponent implements OnInit {
 

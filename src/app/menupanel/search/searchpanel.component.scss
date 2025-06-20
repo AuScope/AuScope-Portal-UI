@@ -1,4 +1,4 @@
-@import 'app/auscope-styles';
+@use 'app/auscope-styles';
 
 :host {
     position: absolute;
@@ -106,6 +106,7 @@
 
         .search-alert-label {
             display: flex;
+            overflow: hidden;
 
             .search-alert-button {
                 margin-left: auto;

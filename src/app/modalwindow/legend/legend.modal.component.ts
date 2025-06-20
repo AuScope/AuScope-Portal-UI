@@ -1,14 +1,17 @@
-import { Component, Inject } from '@angular/core';
+import { Component, inject, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { LegendUiService } from 'app/services/legend/legend-ui.service';
 import { forkJoin, Observable } from 'rxjs';
 
 @Component({
-  selector: 'legend-modal',
-  templateUrl: './legend.modal.component.html',
-  styleUrls: ['./legend.modal.component.scss']
+    selector: 'legend-modal',
+    templateUrl: './legend.modal.component.html',
+    styleUrls: ['./legend.modal.component.scss'],
+    standalone: false
 })
 export class LegendModalComponent {
+
+  private legendUiService = inject(LegendUiService);
 
   // Supplied parameters
   layerId: string;      // ID of layer that legend belongs to
@@ -21,7 +24,7 @@ export class LegendModalComponent {
   requestLegendFailed = false;  // True if all legend requests failed
 
 
-  constructor(private legendUiService: LegendUiService, private dialogRef: MatDialogRef<LegendModalComponent>, @Inject(MAT_DIALOG_DATA) data) {
+  constructor(private dialogRef: MatDialogRef<LegendModalComponent>, @Inject(MAT_DIALOG_DATA) data) {
     this.layerId = data.layerId;
     this.legendTitle = data.legendTitle;
     this.legendRequestList = data.legendRequestList;

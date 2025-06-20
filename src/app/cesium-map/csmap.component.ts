@@ -25,8 +25,8 @@ import { NVCLBoreholeAnalyticService } from 'app/modalwindow/layeranalytic/nvcl/
 declare var Cesium: any;
 
 @Component({
-  selector: 'app-cs-map',
-  template: `
+    selector: 'app-cs-map',
+    template: `
     <div #mapElement id="map" class="h-100 w-100" (mouseout)="mouseLongitude=undefined;mouseLatitude=undefined;">
       <ac-map>
           <app-browse-menu></app-browse-menu>
@@ -45,9 +45,11 @@ declare var Cesium: any;
       </ac-map>
     </div>
     `,
-  providers: [ViewerConfiguration,NVCLBoreholeAnalyticService], // Don't forget to Provide it
-  styleUrls: ['./csmap.component.scss']
-  // The "#" (template reference variable) matters to access the map element with the ViewChild decorator!
+    providers: [ViewerConfiguration, NVCLBoreholeAnalyticService], // Don't forget to Provide it
+    styleUrls: ['./csmap.component.scss']
+    // The "#" (template reference variable) matters to access the map element with the ViewChild decorator!
+    ,
+    standalone: false
 })
 
 export class CsMapComponent implements AfterViewInit {
@@ -543,7 +545,7 @@ export class CsMapComponent implements AfterViewInit {
    * @returns HTML string
    */
   private parseCSWtoHTML(cswRecord: CSWRecordModel): string {
-    let html = '<div class="row"><div class="col-md-3">Source</div><div class="col-md-9"><a style="color: #000000" href="' + cswRecord.recordInfoUrl + '">Full Metadata and download</a></div></div><hr>';
+    let html = '<div class="row"><div class="col-md-3">Source</div><div class="col-md-9"><a style="color: #000000" href="' + cswRecord.recordInfoUrl + '" target="_blank">Full Metadata and Download</a></div></div><hr>';
     html += '<div class="row"><div class="col-md-3">Title</div><div class="col-md-9">' + cswRecord.name + '</div></div><hr>';
     html += '<div class="row"><div class="col-md-3">Abstract</div><div class="col-md-8"><div class="row" style="height: 100px;overflow-y: scroll;margin-left:0">' +
       cswRecord.description + '</div></div></div><hr>';

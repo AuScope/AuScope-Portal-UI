@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, Inject } from '@angular/core';
 import { saveAs } from 'file-saver';
 import { config } from '../../../../environments/config';
 import { environment } from '../../../../environments/environment'; //CVP
@@ -16,9 +16,10 @@ import { Subject } from 'rxjs';
 declare var gtag: Function;
 
 @Component({
-  selector: 'app-download-panel',
-  templateUrl: './downloadpanel.component.html',
-  styleUrls: ['../../menupanel.scss']
+    selector: 'app-download-panel',
+    templateUrl: './downloadpanel.component.html',
+    styleUrls: ['../../menupanel.scss'],
+    standalone: false
 })
 
 
@@ -72,7 +73,8 @@ export class DownloadPanelComponent implements OnInit {
       private downloadWfsService: DownloadWfsService, private downloadWcsService: DownloadWcsService,
       private downloadIrisService: DownloadIrisService, private csClipboardService: CsClipboardService,
       private boundsService: BoundsService, private csIrisService: CsIrisService,
-      public activeModalService: NgbModal, private nvclService: NVCLService) {
+      public activeModalService: NgbModal, private nvclService: NVCLService,
+      @Inject('conf') private conf) {
     this.isNvclLayer = false;
     this.isTsgDownloadAvailable = false;
     this.bbox = null;
@@ -253,7 +255,11 @@ export class DownloadPanelComponent implements OnInit {
     if (UtilitiesService.layerContainsResourceType(this.layer, ResourceType.WCS)) {
       const wcsResources = this.layerHandlerService.getWCSResource(this.layer);
       const me = this;
-      this.downloadWcsService.describeCoverage(wcsResources[0].url, wcsResources[0].name).subscribe(response => {
+      // Some services have CORS enabled so we must use the proxy
+      let useProxy = this.conf.forceAddLayerViaProxy.includes(this.layer.id);
+
+      // Send describe coverage request & parse the response
+      this.downloadWcsService.describeCoverage(wcsResources[0].url, wcsResources[0].name, useProxy).subscribe(response => {
 
         // Look for any time period constraints
         // NB: Limited to user selecting from the start and end times only
@@ -261,12 +267,12 @@ export class DownloadPanelComponent implements OnInit {
         if ('spatialDomain' in response && 'envelopes' in response.spatialDomain) {
           const envelopes = response.spatialDomain.envelopes;
           if (envelopes && envelopes.length > 0) {
-            if ('timePositionStart' in envelopes[0] && 'timePositionEnd' in envelopes[0]) {
-              timePositionList.push(envelopes[0].timePositionStart);
-              // Only insert the end time if it is different to the start time
-              if (envelopes[0].timePositionStart !== envelopes[0].timePositionEnd) {
-                timePositionList.push(envelopes[0].timePositionEnd);
-              }
+            if (envelopes[0]?.timePositionStart && envelopes[0]?.timePositionEnd) {
+                timePositionList.push(envelopes[0].timePositionStart);
+                // Only insert the end time if it is different to the start time
+                if (envelopes[0].timePositionStart !== envelopes[0].timePositionEnd) {
+                  timePositionList.push(envelopes[0].timePositionEnd);
+                }
             }
           }
         }
@@ -464,7 +470,10 @@ export class DownloadPanelComponent implements OnInit {
         timePositions = [this.wcsDownloadForm.timePosition];
       }
       const maxImageSize = config.wcsSupportedLayer[this.layer.id].maxImageSize;
-      observableResponse = this.downloadWcsService.download(this.layer, this.bbox, this.wcsDownloadForm.inputCrs,
+      // Convert BBox coords to the CRS of WCS layer 'inputCrs' parameter
+      let bbox  = UtilitiesService.coordConvBbox(this.bbox, this.wcsDownloadForm.inputCrs);
+      // Perform WCS download
+      observableResponse = this.downloadWcsService.download(this.layer, bbox, this.wcsDownloadForm.inputCrs,
         this.wcsDownloadForm.downloadFormat, this.wcsDownloadForm.outputCrs, timePositions, maxImageSize);
 
     // Download datasets using a URL in the WFS GetFeature response

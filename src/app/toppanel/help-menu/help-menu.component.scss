@@ -1,11 +1,11 @@
-@import '../../globals';
+@use '../../globals';
 
 .help-menu {
-    color: $text-colour;
+    color: globals.$text-colour;
 }
 
 .help-menu:hover {
-    color: $text-highlight-colour;
+    color: globals.$text-highlight-colour;
 }
 
 ::ng-deep {
@@ -14,6 +14,6 @@
     }
 
     .mat-mdc-menu-content {
-        background-color: $background-colour;
+        background-color: globals.$background-colour;
     }
 }

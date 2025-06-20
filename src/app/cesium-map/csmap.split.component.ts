@@ -5,9 +5,10 @@ import { CsMapService } from '@auscope/portal-core-ui';
  * Split map widget
  */
 @Component({
-  selector: 'app-cs-map-split',
-  templateUrl: './csmap.split.component.html', 
-  styleUrls: ['./csmap.split.component.scss'],
+    selector: 'app-cs-map-split',
+    templateUrl: './csmap.split.component.html',
+    styleUrls: ['./csmap.split.component.scss'],
+    standalone: false
 })
 export class CsMapSplitComponent {
 

@@ -8,7 +8,8 @@ import { MSCLAnalyticComponent } from '../../../layeranalytic/mscl/mscl.analytic
     selector: 'app-mscl',
     templateUrl: './mscl.component.html',
     styleUrls: ['./mscl.component.scss'],
-    providers: [MSCLService]
+    providers: [MSCLService],
+    standalone: false
 })
 export class MSCLComponent implements OnInit {
 

@@ -1,4 +1,4 @@
-@import 'app/globals';
+@use 'app/globals';
 
 [hidden] { display: none !important;}
 
@@ -39,8 +39,8 @@ ul > li {
 li { list-style-type: none; }
 
 a, a:link, a:active, a:visited, a:hover { text-decoration: none }
-button, a, a:link, a:visited { color: $text-colour;  }
-button:hover, button:active, a:active, a:hover {color: $text-highlight-colour; }
+button, a, a:link, a:visited { color: globals.$text-colour;  }
+button:hover, button:active, a:active, a:hover {color: globals.$text-highlight-colour; }
 
 label {
     font-weight: 800;
@@ -56,7 +56,7 @@ label {
 /* START general colours */
 
 .highlight {
-    color: $text-highlight-colour !important;
+    color: globals.$text-highlight-colour !important;
 }
 
 .text-primary {
@@ -93,7 +93,7 @@ label {
 }
 
 .white {
-	 color: $text-colour;
+	 color: globals.$text-colour;
 }
 
 /* END general colours */
@@ -102,8 +102,8 @@ label {
 
 /* START navbar rules */
 .navbar {
-    min-height: $navbar-height;
-    height: $navbar-height;
+    min-height: globals.$navbar-height;
+    height: globals.$navbar-height;
     background-color: #282572;
     margin-bottom: 20px;
     width: 100%;
@@ -122,8 +122,8 @@ label {
     }
 
     .navbar-header {
-    	height: $navbar-height;
-        width: $sidebar-width;
+    	height: globals.$navbar-height;
+        width: globals.$sidebar-width;
     }
 
     .navbar-notify {
@@ -139,12 +139,12 @@ label {
     }
 
     .nav > li >a:hover, .nav > li >a:focus {
-        background-color: $background-colour;
+        background-color: globals.$background-colour;
         text-decoration: none;
     }
 
     li.dropdown.show > a.dropdown-toggle > i {
-         color: $text-highlight-colour;
+         color: globals.$text-highlight-colour;
     }
 
     button:focus {
@@ -158,11 +158,11 @@ label {
     /* position the twitter feed dropdown */
     .navbar-nav > li > .dropdown-menu {
         padding: 10px;
-        background: $auscope-royal-blue;
+        background: globals.$auscope-royal-blue;
         position: absolute;
         right: 20px;
         left: auto;
-        top: $navbar-height + 8px;
+        top: globals.$navbar-height + 8px;
     }
 
     /* Organisation logo */
@@ -176,7 +176,7 @@ label {
     /* Sidebar menu toggle button */
     .navbar-toggler {
         .icon-bar {
-            background-color: $text-highlight-colour;
+            background-color: globals.$text-highlight-colour;
             display: block;
             width: 22px;
             height: 2px;
@@ -191,7 +191,7 @@ label {
               font-size: 24px;
               position: relative !important;
               left: -4px;
-              color: $text-highlight-colour;
+              color: globals.$text-highlight-colour;
           }
     }
 }
@@ -206,13 +206,13 @@ label {
     border-radius: 0;
     position: fixed;
     z-index: 11;
-    top: $navbar-height;
-    left: $sidebar-width;
-    width: $sidebar-width;
-    margin-left: calc(-1.0 * #{$sidebar-width});
+    top: globals.$navbar-height;
+    left: globals.$sidebar-width;
+    width: globals.$sidebar-width;
+    margin-left: calc(-1.0 * #{globals.$sidebar-width});
     border: none;
     overflow-y: auto;
-    background-color: $background-colour;
+    background-color: globals.$background-colour;
     bottom: 0;
     overflow-x: hidden !important;
     transition: all .2s ease-in-out;
@@ -222,7 +222,7 @@ label {
     }
 
     .sidebar-heading {
-        color: $auscope-teal !important;
+        color: globals.$auscope-teal !important;
         font-weight: 700;
         margin-left: 1.5rem;
         margin-top: 0.5rem;
@@ -236,15 +236,15 @@ label {
     }
 
     a {
-        color: $text-colour;
+        color: globals.$text-colour;
     }
 
     a > i {
-        color: $text-colour;
+        color: globals.$text-colour;
     }
 
     a:hover > i, a.active > i {
-        color: $text-highlight-colour;
+        color: globals.$text-highlight-colour;
     }
 
     .input-group {
@@ -263,12 +263,12 @@ label {
 
     ul > li {
         font-size: 0.85rem;
-        color: $text-colour;
+        color: globals.$text-colour;
         margin: 0;
     }
 
     ul > li:hover {
-        color: $text-highlight-colour;
+        color: globals.$text-highlight-colour;
     }
 
     h5 > a {
@@ -277,24 +277,24 @@ label {
 
     /* "about" & "contact us" highlight */
     h5 > a > span:hover {
-        color: $text-highlight-colour;
+        color: globals.$text-highlight-colour;
     }
 
     /* menu highlight */
     h5 > label:hover,
     .menuBtn:checked + h5 > label {
-        color: $text-highlight-colour;
+        color: globals.$text-highlight-colour;
     }
 
     i + span, h5 > label {
         font-size: 1rem;
-        color: $text-colour;
+        color: globals.$text-colour;
         margin-left: 4px;
     }
 
     /* "permanent link" & "polgon filter" highlight */
     a:hover > i + span {
-        color: $text-highlight-colour;
+        color: globals.$text-highlight-colour;
     }
 
     /* spacing between menu links */
@@ -345,11 +345,11 @@ label {
 /* START map area rules */
 .map-area {
     overflow: hidden;
-    margin-left: $sidebar-width;
+    margin-left: globals.$sidebar-width;
     padding: 25px;
     position: relative;
-    height: calc(100% - #{$navbar-height});
-    top: $navbar-height;
+    height: calc(100% - #{globals.$navbar-height});
+    top: globals.$navbar-height;
     border-top: 1px solid #999;
     border-left: 1px solid #999;
 
@@ -386,7 +386,7 @@ label {
 /* END map area rules */
 
 .nav-tabs {
-    // border-bottom-color: $text-highlight-colour;
+    // border-bottom-color: globals.$text-highlight-colour;
     padding-bottom: 8px;
     margin-top: 10px;
 }
@@ -401,17 +401,17 @@ label {
     cursor: default;
     border-radius: 5px;
     background-color: #4078F8;
-    // border-bottom-color: $text-highlight-colour;
+    // border-bottom-color: globals.$text-highlight-colour;
 }
 
 .nav-tabs > li > a:hover, .nav-tabs > li > a:focus {
-    color: $text-colour;
-    /* background-color: $background-colour; */
-    border-color: $background-colour;
+    color: globals.$text-colour;
+    /* background-color: globals.$background-colour; */
+    border-color: globals.$background-colour;
 }
 
 .nav-tabs > li > a:hover span {
-    color: $text-colour;
+    color: globals.$text-colour;
 }
 
 .nav-tabs > li.active > a span {
@@ -424,18 +424,18 @@ label {
 
 .layer-card {
     left: -100px;
-    width: $card-width;
+    width: globals.$card-width;
 }
 
 .card {
     position: relative;
     margin-bottom: 12px;
     border-radius: 0;
-    border-color: $border-colour;
+    border-color: globals.$border-colour;
     box-shadow: none;
     border: none;
     // color: #fff;
-    background-color: $background-colour;
+    background-color: globals.$background-colour;
 }
 
 .card-title {
@@ -444,8 +444,8 @@ label {
 
 .card-info .card-header {
     color: #fff;
-    background-color: $background-colour;
-    border-color: $border-colour;
+    background-color: globals.$background-colour;
+    border-color: globals.$border-colour;
 }
 
 .card.card-with-tabs .card-header {
@@ -461,7 +461,7 @@ label {
 }
 
 .card.card-bordered {
-    border: 1px solid $border-colour;
+    border: 1px solid globals.$border-colour;
 }
 
 .card-sub .card .card-header {
@@ -469,11 +469,11 @@ label {
 }
 
 .card-sub {
-    color: $text-colour;
+    color: globals.$text-colour;
 }
 
 .card.card-bordered a:hover {
-    color: $blue-hover-colour;
+    color: globals.$blue-hover-colour;
 }
 
 .infocard-legend {
@@ -481,7 +481,7 @@ label {
 }
 
 .table.table-inverse {
-    color: $text-highlight-colour;
+    color: globals.$text-highlight-colour;
 }
 
 .sidebar-card-menu-show {
@@ -517,7 +517,7 @@ label {
 }
 
 div.alert.alert-danger p > a:hover {
-	color: $blue-hover-colour;
+	color: globals.$blue-hover-colour;
 }
 
 div.alert.alert-danger p > a {
@@ -542,7 +542,7 @@ div.alert.alert-danger p > a {
 
 /* Disclaimer link */
 app-disclaimer-modal-window a:hover, app-disclaimer-modal-window a:hover > i + span {
-    color: $blue-hover-colour;
+    color: globals.$blue-hover-colour;
 }
 
 /* 'line-height-1-8' is used for displaying bounding box coords */
@@ -554,7 +554,7 @@ fieldset.show-fieldset-borders {
 	border: 1px solid #c4c4c4;
     padding: 0 1.4em 1.4em 1.4em;
     margin: 0 1em 1em 1em;
-    color: $text-colour;
+    color: globals.$text-colour;
 }
 
 fieldset legend{
@@ -674,10 +674,10 @@ fieldset.show-fieldset-borders-whitebg legend{
     }
 
     .sidebar {
-        left: $sidebar-width-folded;
-        width: $sidebar-width-folded;
-        margin-left: calc(-1.0 * #{$sidebar-width-folded});
-        top: $navbar-more-height;
+        left: globals.$sidebar-width-folded;
+        width: globals.$sidebar-width-folded;
+        margin-left: calc(-1.0 * #{globals.$sidebar-width-folded});
+        top: globals.$navbar-more-height;
     }
 
     button.nav.navbar-toggler .nav-index-btn {
@@ -703,7 +703,7 @@ fieldset.show-fieldset-borders-whitebg legend{
     }
 
     .navbar {
-        height: $navbar-more-height;
+        height: globals.$navbar-more-height;
     }
 
     .search-panel {
@@ -828,7 +828,7 @@ fieldset.show-fieldset-borders-whitebg legend{
     .nav-tabs > li > a:hover {
         background-color: transparent;
         border-color: #fff;
-        color: $text-colour;
+        color: globals.$text-colour;
     }
 }
 /* END modal dialog rules */
@@ -862,12 +862,6 @@ fieldset.show-fieldset-borders-whitebg legend{
   --mdc-dialog-container-color: rgba(255,255,255,0.8);
 }
 
-::ng-deep {
-    // Reduce LegendModal z-index from 1000 to 100 so feature click dialogs aren't obscured
-    .cdk-overlay-container {
-        z-index: 100 !important;
-    }
-}
 /* End LegendModal dialog */
 .sidebar.sidebar-close {
     position: fixed;
@@ -882,16 +876,16 @@ fieldset.show-fieldset-borders-whitebg legend{
 }
 
 .sidebar.sidebar-show {
-width: 320px; /* Adjust the width as needed */
+    width: 320px; /* Adjust the width as needed */
 }
 
 .map-area {
-margin-left: 0;
-transition: margin-left 0.3s ease;
+    margin-left: 0;
+    transition: margin-left 0.3s ease;
 }
 
 .map-area.sidebar-open {
-margin-left: 320px; /* Adjust the margin to match the sidebar width */
+    margin-left: 320px; /* Adjust the margin to match the sidebar width */
 }
 .close-sidebar-btn {
     position: absolute;

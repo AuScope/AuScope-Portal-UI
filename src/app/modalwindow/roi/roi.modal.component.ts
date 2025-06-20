@@ -13,8 +13,9 @@ import { User } from 'app/models/user.model';
  * Modal component used to display a user's ROI lists
  */
 @Component({
-  selector: 'app-roi-form',
-  templateUrl: './roi.modal.component.html'
+    selector: 'app-roi-form',
+    templateUrl: './roi.modal.component.html',
+    standalone: false
 })
 
 

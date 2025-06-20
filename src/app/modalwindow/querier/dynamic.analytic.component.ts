@@ -9,8 +9,9 @@ import { TIMAComponent } from './customanalytic/tima/tima.component';
 import { MSCLComponent } from './customanalytic/mscl/mscl.component';
 
 @Component({
-   selector: 'app-custom-analytic',
-   template: `<div #dynamicContentAnalyticPlaceholder></div>`
+    selector: 'app-custom-analytic',
+    template: `<div #dynamicContentAnalyticPlaceholder></div>`,
+    standalone: false
 })
 
 

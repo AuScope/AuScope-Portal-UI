@@ -3,8 +3,9 @@ import { CsClipboardService, CsMapService } from '@auscope/portal-core-ui';
 
 
 @Component({
-  selector: '[appFilterClipboard]',
-  templateUrl: './clipboard.component.html'
+    selector: '[appFilterClipboard]',
+    templateUrl: './clipboard.component.html',
+    standalone: false
 })
 
 export class ClipboardComponent {

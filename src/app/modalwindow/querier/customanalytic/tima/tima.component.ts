@@ -7,9 +7,10 @@ import { TIMAService } from './tima.service';
 
 
 @Component({
-  templateUrl: './tima.component.html',
-  providers: [TIMAService],
-  styleUrls: ['../../../modalwindow.scss']
+    templateUrl: './tima.component.html',
+    providers: [TIMAService],
+    styleUrls: ['../../../modalwindow.scss'],
+    standalone: false
 })
 export class TIMAComponent implements AfterViewInit {
 

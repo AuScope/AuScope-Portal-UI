@@ -1,4 +1,4 @@
-@import '../../globals';
+@use '../../globals';
 
     .card {
         font-size: small;
@@ -46,7 +46,7 @@
             }
 
             fieldset {
-                border: 1px solid $auscope-grey;
+                border: 1px solid globals.$auscope-grey;
                 margin-right:4px; 
                 margin-top: 6px; 
                 margin-bottom: 4px;
@@ -64,21 +64,21 @@
                 #searchResults{
                     position:relative;
                     border-style:solid;
-                    border-color:$auscope-grey;
+                    border-color:globals.$auscope-grey;
                     margin: 0px;
                     padding: 0px;
                 }
             }
 
             .no-search-notification {
-                border: solid 1px $text-colour;
+                border: solid 1px globals.$text-colour;
                 border-radius: 6px;
                 padding: 10px;
             }
 
             #no-result-container{
                 padding:2px;
-                border:solid 1px $auscope-grey;
+                border:solid 1px globals.$auscope-grey;
                 border-radius:2px;
                 width: 100%;
                 box-sizing: border-box;

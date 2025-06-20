@@ -9,18 +9,19 @@ import { environment } from 'environments/environment';
 
 
 @Component({
-  templateUrl: './nvcl.boreholeanalytic.component.html',
-  styles: [
-    'input:invalid + span:after { content: \'✖\'; color: #f00; padding-left: 15px; }',
-    'input:valid + span:after { content: \'✓\'; color: #26b72b; padding-left: 15px;}',
-    'select:invalid + span:after { content: \'✖\'; color: #f00; padding-left: 15px; }',
-    'select:valid + span:after { content: \'✓\'; color: #26b72b; padding-left: 15px;}'
-  ],
-  styleUrls: [
-    './nvcl.boreholeanalytic.component.css',
-    '../../modalwindow.scss'
-  ],
-  providers: [NVCLBoreholeAnalyticService]
+    templateUrl: './nvcl.boreholeanalytic.component.html',
+    styles: [
+        'input:invalid + span:after { content: \'✖\'; color: #f00; padding-left: 15px; }',
+        'input:valid + span:after { content: \'✓\'; color: #26b72b; padding-left: 15px;}',
+        'select:invalid + span:after { content: \'✖\'; color: #f00; padding-left: 15px; }',
+        'select:valid + span:after { content: \'✓\'; color: #26b72b; padding-left: 15px;}'
+    ],
+    styleUrls: [
+        './nvcl.boreholeanalytic.component.css',
+        '../../modalwindow.scss'
+    ],
+    providers: [NVCLBoreholeAnalyticService],
+    standalone: false
 })
 export class NVCLBoreholeAnalyticComponent
   implements AfterViewInit, OnInit, LayerAnalyticInterface {

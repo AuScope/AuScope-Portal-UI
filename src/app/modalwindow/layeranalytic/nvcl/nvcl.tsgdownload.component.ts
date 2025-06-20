@@ -11,18 +11,19 @@ import { Observable, Subject } from 'rxjs';
 import { shareReplay } from 'rxjs/operators';
 
 @Component({
-  selector: 'nvcl-tsgdownload-component',
-  templateUrl: './nvcl.tsgdownload.component.html',
-  styles: [
-    'input:invalid + span:after { content: \'✖\'; color: #f00; padding-left: 15px; }',
-    'input:valid + span:after { content: \'✓\'; color: #26b72b; padding-left: 15px;}',
-    'select:invalid + span:after { content: \'✖\'; color: #f00; padding-left: 15px; }',
-    'select:valid + span:after { content: \'✓\'; color: #26b72b; padding-left: 15px;}'
-  ],
-  styleUrls: [
-    '../../modalwindow.scss'
-  ],
-  providers: [NVCLBoreholeAnalyticService]
+    selector: 'nvcl-tsgdownload-component',
+    templateUrl: './nvcl.tsgdownload.component.html',
+    styles: [
+        'input:invalid + span:after { content: \'✖\'; color: #f00; padding-left: 15px; }',
+        'input:valid + span:after { content: \'✓\'; color: #26b72b; padding-left: 15px;}',
+        'select:invalid + span:after { content: \'✖\'; color: #f00; padding-left: 15px; }',
+        'select:valid + span:after { content: \'✓\'; color: #26b72b; padding-left: 15px;}'
+    ],
+    styleUrls: [
+        '../../modalwindow.scss'
+    ],
+    providers: [NVCLBoreholeAnalyticService],
+    standalone: false
 })
 export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewInit, OnInit, LayerAnalyticInterface {
   @Input() layer: LayerModel;

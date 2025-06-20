@@ -9,8 +9,9 @@ import { GraceStyleSettings } from 'app/modalwindow/querier/customanalytic/grace
 
 @Component({
     templateUrl: './grace-advanced-filter.component.html',
-    styleUrls: ['./grace-advanced-filter.component.scss']
-  })
+    styleUrls: ['./grace-advanced-filter.component.scss'],
+    standalone: false
+})
   export class GraceAdvancedFilterComponent extends AdvancedFilterDirective implements OnInit {
 
     timeSeriesGraphModalRef?: BsModalRef;

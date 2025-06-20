@@ -4,8 +4,9 @@ import {ref} from '../../../environments/ref';
 import { LayerAnalyticInterface } from './layer.analytic.interface';
 
 @Component({
-  selector: 'app-dynamic-layer-analytic',
-   template: `<div #dynamicLayerContentAnalyticPlaceholder></div>`
+    selector: 'app-dynamic-layer-analytic',
+    template: `<div #dynamicLayerContentAnalyticPlaceholder></div>`,
+    standalone: false
 })
 
 

@@ -15,7 +15,8 @@ import { take } from 'rxjs/operators';
 @Component({
     selector: 'app-browse-menu',
     templateUrl: './browsepanel.component.html',
-    styleUrls: ['./browsepanel.component.scss']
+    styleUrls: ['./browsepanel.component.scss'],
+    standalone: false
 })
 export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
 

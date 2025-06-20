@@ -3,13 +3,13 @@
 
 User Interface component for the [AuScope Discovery Portal](http://portal.auscope.org.au/) 
 
-This project was generated with the [Angular CLI](https://github.com/angular/angular-cli).  It is now on version 17 of Angular.  For best results compile with Angular 17, node 18.20 and npm 10.5
+This project was generated with the [Angular CLI](https://github.com/angular/angular-cli).  It is now on version 19 of Angular.  For best results compile with Angular 19, node 18.20 and npm 10.5
 
 ## Prerequisites
 
 Install node v18.20 https://nodejs.org/en/download/ 
 Install npm v10.5 `npm install -g npm@10` 
-install the Angular CLI v17 `npm install -g @angular/cli@17`
+install the Angular CLI v19 `npm install -g @angular/cli@19`
 
 ## Development server
 
@@ -26,11 +26,6 @@ Run `ng build` to build the project. The build artifacts will be stored in the `
 ## Running unit tests
 
 Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-Before running the tests make sure you are serving the app via `ng serve`.
 
 ## Further help
 

@@ -4,10 +4,11 @@ import { CSWRecordModel, LayerModel, LayerStatusService } from '@auscope/portal-
 import { CesiumMapPreviewComponent } from '../common/infopanel/cesiummappreview/cesium.preview.component';
 
 @Component({
-  selector: 'app-record-modal-content',
-  templateUrl: './record-modal.component.html',
-  providers: [LayerStatusService],
-  styleUrls: ['./record-modal.component.scss']
+    selector: 'app-record-modal-content',
+    templateUrl: './record-modal.component.html',
+    providers: [LayerStatusService],
+    styleUrls: ['./record-modal.component.scss'],
+    standalone: false
 })
 export class RecordModalComponent implements OnInit {
   @Input() cswRecords: CSWRecordModel[];

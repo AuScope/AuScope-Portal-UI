@@ -8,9 +8,10 @@ import { RemanentAnomaliesService } from './remanentanomalies.service';
 
 
 @Component({
-  templateUrl: './remanentanomalies.component.html',
-  providers: [RemanentAnomaliesService],
-  styleUrls: ['../../../modalwindow.scss']
+    templateUrl: './remanentanomalies.component.html',
+    providers: [RemanentAnomaliesService],
+    styleUrls: ['../../../modalwindow.scss'],
+    standalone: false
 })
 export class RemanentAnomaliesComponent implements AfterViewInit {
 

@@ -12,7 +12,8 @@ import { Cartesian3, Color, ColorMaterialProperty, MapMode2D, PolygonHierarchy, 
         <div id="previewMapElement" #previewMapElement></div>
     </ac-map>
     `,
-    providers: [ViewerConfiguration]
+    providers: [ViewerConfiguration],
+    standalone: false
 })
 export class CesiumMapPreviewComponent {
 

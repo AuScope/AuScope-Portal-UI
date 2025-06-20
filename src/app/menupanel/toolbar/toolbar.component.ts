@@ -7,9 +7,10 @@ import { Component, EventEmitter, Output } from '@angular/core';
  * Eventually this can be made callpsible, but will need to merge the 2 Cesium buttons outlined above.
  */
 @Component({
-  selector: 'app-toolbar',
-  templateUrl: './toolbar.component.html',
-  styleUrls: ['./toolbar.component.scss']
+    selector: 'app-toolbar',
+    templateUrl: './toolbar.component.html',
+    styleUrls: ['./toolbar.component.scss'],
+    standalone: false
 })
 export class ToolbarComponent {
   

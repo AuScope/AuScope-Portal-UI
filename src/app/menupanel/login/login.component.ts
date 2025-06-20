@@ -6,7 +6,8 @@ import { environment } from '../../../environments/environment';
     selector: 'app-login',
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.scss'],
-    animations: [routerTransition()]
+    animations: [routerTransition()],
+    standalone: false
 })
 export class LoginComponent {
   constructor() {}

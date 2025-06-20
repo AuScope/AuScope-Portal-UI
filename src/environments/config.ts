@@ -183,6 +183,58 @@ export const config = {
     'ga-geophys-19': {
       downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
       maxImageSize: 4096
+    },
+    'sa-gravity': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
+    },
+    'sa-gravity-1vd': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
+    },
+    'sa-gravity-uc1000-res': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
+    },
+    'sa-tmi': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
+    },
+    'sa-tmi-vrtp': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
+    },
+    'sa-tmi-vrtp-1vd': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
+    },
+    'sa-rad-rgb': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
+    },
+    'sa-rad-rgb-lns': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
+    },
+    'sa-rad-k': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
+    },
+    'sa-rad-th': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
+    },
+    'sa-rad-u': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
+    },
+    'sa-rad-u2th': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
+    },
+    'sa-rad-tc': {
+      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+      maxImageSize: 4096
     }
   },
   // Layers that require the proxy service to add layers
@@ -227,7 +279,33 @@ export const config = {
     '500k_geol_28350',
     '500k_geol_4326',
     'bulkdensitypoint_4326',
-    'waroxi_wa_4326_bed'
+    'waroxi_wa_4326_bed',
+    'sa-geochronology',
+    'sa-field-observation-sites',
+    'sa-surface-geology-7m',
+    'sa-downhole-geochem-zinc',
+    'sa-downhole-geochem-uranium',
+    'sa-downhole-geochem-copper',
+    'sa-downhole-geochem-lithium',
+    'sa-downhole-geochem-gold',
+    'sa-downhole-geochem-silver',
+    'sa-downhole-geochem-cobalt',
+    'sa-downhole-geochem-lead',
+    'sa-downhole-geochem-iron',
+    'sa-downhole-geochem-nickel',
+    'sa-gravity',
+    'sa-gravity-1vd',
+    'sa-gravity-uc1000-res',
+    'sa-tmi',
+    'sa-tmi-vrtp',
+    'sa-tmi-vrtp-1vd',
+    'sa-rad-rgb',
+    'sa-rad-rgb-lns',
+    'sa-rad-k',
+    'sa-rad-th',
+    'sa-rad-u',
+    'sa-rad-u2th',
+    'sa-rad-tc'
   ],
   // Layers that require a JSON response for WMS GetFeature requests
   wmsGetFeatureJSON: [
@@ -279,5 +357,62 @@ export const config = {
     'ga-geophys-6', 'ga-geophys-7', 'ga-geophys-8', 'ga-geophys-9', 'ga-geophys-10',
     'ga-geophys-11', 'ga-geophys-12', 'ga-geophys-13', 'ga-geophys-14', 'ga-geophys-15',
     'ga-geophys-16', 'ga-geophys-17', 'ga-geophys-18', 'ga-geophys-19'
-  ]
+  ],
+  styleServices: {
+    'sf0-borehole-nvcl': {
+      serviceName: 'BoreholeStyleService',
+    },
+    'nvcl-v2-borehole': {
+      serviceName: 'NVCLBoreholeStyleService',
+    },
+    'mineral-tenements': {
+      serviceName: 'MineralTenementStyleService',
+    },
+    'erml-mine': {
+      serviceName: 'MineStyleService',
+    },
+    'erml-mineraloccurrence': {
+      serviceName: 'MineralOccurrenceStyleService',
+    },
+    'erml-miningactivity': {
+      serviceName: 'MiningActivityStyleService',
+    },
+    'erl-commodityresourceview': {
+      serviceName: 'ErlCommodityStyleService',
+    },
+    'erl-mineview': {
+      serviceName: 'ErlMineViewStyleService',
+    },
+    'erl-mineraloccurrenceview': {
+      serviceName: 'ErlMineralOccurrenceStyleService',
+    },
+    'geological-provinces': {
+      serviceName: 'GeologicalProvincesStyleService',
+    },
+    'remanent-anomalies': {
+      serviceName: 'RemanentAnomaliesStyleService',
+    },
+    'remanent-anomalies-autosearch': {
+      serviceName: 'RemanentAnomaliesAutoSearchStyleService',
+    },
+    'remanent-anomalies-EMAG': {
+        serviceName: 'RemanentAnomaliesStyleService'
+    },
+    // Add generic style service for layers that previously used doGenericFilterStyle.do
+    'tima-geosample': {
+      serviceName: 'GenericStyleService',
+    },
+    'tima-shrimp-geosample': {
+      serviceName: 'GenericStyleService',
+    },
+    'igsn-sample': {
+      serviceName: 'GenericStyleService',
+    },
+    'igsn-ga-sample': {
+      serviceName: 'GenericStyleService',
+    },
+    'igsn-ardc-sample': {
+      serviceName: 'GenericStyleService',
+    },
+  }
 };
