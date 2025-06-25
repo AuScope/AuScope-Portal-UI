@@ -361,15 +361,24 @@ export class MSCLService {
                 yAxisName += axisNum.toString();
                 yTitle = '';
             }
-            layout[xAxisName] = { title: metric,
-                                  showline: true,
-                                  ticks: 'outside',
-                                  side: 'top',
-                                  autorange: false,
-                                  range: this.getRange(xLists[metric])
-                                };
-            layout[yAxisName] = { autorange: 'reversed', title: yTitle, showline: true,
-                                 ticks: 'outside' };
+            layout[xAxisName] = {
+                title: {
+                    text: metric
+                },
+                showline: true,
+                ticks: 'outside',
+                side: 'top',
+                autorange: false,
+                range: this.getRange(xLists[metric])
+            };
+            layout[yAxisName] = {
+                autorange: 'reversed',
+                title: {
+                    text: yTitle
+                },
+                showline: true,
+                ticks: 'outside'
+            };
             switch (metric) {
                 // Logarithmic x-axis for these
                 case Metric.magSuscPoint:
@@ -383,7 +392,6 @@ export class MSCLService {
         return layout;
     }
 
-
     /**
      * Find the max and min values of array of numbers
      * 
@@ -394,7 +402,6 @@ export class MSCLService {
         const xFiltered = xList.filter(val => isFinite(val));
         return [Math.min(...xFiltered), Math.max(...xFiltered)]
     }
-
 
     /**
      * Create plot data for plotly graphs
