@@ -51,12 +51,12 @@ export class GraceGraphModalComponent implements AfterViewInit {
         }],
         layout: {
             autosize: true,
-            title: 'Equivalent Water Height (EWH)',
+            title: { text: 'Equivalent Water Height (EWH)' },
             xaxis: {
-                title: 'Date'
+                title: { text: 'Date' }
             },
             yaxis: {
-                title: 'Equivalent Water Height (m)'
+                title: { text: 'Equivalent Water Height (m)' }
             }
         },
         config: {
@@ -175,12 +175,12 @@ export class GraceGraphModalComponent implements AfterViewInit {
 
         this.graph.layout = {
             autosize: true,
-            title: title,
+            title: { text: title },
             xaxis: {
-                title: 'Date'
+                title: { text: 'Date' }
             },
             yaxis: {
-                title: 'Equivalent Water Height (m)'
+                title: { text: 'Equivalent Water Height (m)' }
             }
         };
     }
