@@ -10,7 +10,13 @@
 			<img id="outlineImg" [src]="outlineUrl" (error)="onPreviewImgError($event)" height="200" width="200"/>
 		</div>
 		<div style="display:inline-block; position:absolute; top:0px; left:50px; opacity:50%;">
-			<img id="wmsImg" [src]="wmsUrl" (error)="onPreviewImgError($event)" (load)="imageLoad($event)" height="200" width="200"/>
+			<img id="wmsImg"
+                [src]="wmsUrl"
+                loading="lazy"
+                (error)="onPreviewImgError($event)"
+                (load)="onImgLoad($event)"
+                height="200"
+                width="200"/>
 			<div *ngIf="!wmsLoaded">
 				<i class="fa fa-lg fa-spin fa-spinner preview-spinner"></i>
 			</div>
@@ -18,13 +24,23 @@
 	</div>
 </div>
 
-<div class="link-wrap" style="display:inline-block; position:relative;">
-	<!-- Legend -->
-	<div *ngIf="legendUrl!==undefined">
-		<div class="preview-legend-title">Legend:</div>
-		<img id="legendImg" [src]="legendUrl" (error)="onLegendImgError($event)" (load)="imageLoad($event)" class="infopanel-legend"/>
-		<div *ngIf="!legendLoaded"><i class="fa fa-lg fa-spin fa-spinner preview-spinner"></i></div>
-	</div>
+<div class="link-wrap preview-details">
+    <!-- Legend -->
+    <div *ngIf="legendUrl !== undefined">
+        <div class="preview-legend-title">Legend:</div>
+        <div class="preview-legend-container">
+                <img id="legendImg"
+                    [src]="legendUrl"
+                    fetchpriority="high"
+                    (error)="onLegendImgError($event)"
+                    (load)="onImgLoad($event)"
+                    class="infopanel-legend"
+                    style="display: block;" />
+                <div *ngIf="!legendLoaded" class="preview-spinner-container">
+                    <i class="fa fa-lg fa-spin fa-spinner preview-spinner"></i>
+                </div>
+        </div>
+    </div>
 
 	<!-- Abstract -->
 	<p>{{cswRecord.description}}</p>

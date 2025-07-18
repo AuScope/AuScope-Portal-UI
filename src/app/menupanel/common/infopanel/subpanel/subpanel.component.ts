@@ -117,8 +117,8 @@ export class InfoPanelSubComponent implements OnInit {
         this.filterService.getLayerTimesBS(this.layer.id).subscribe(layerTimes => {
             const wmsOnlineResource = this.cswRecord.onlineResources.find(r => r.type.toLowerCase() === 'wms');
             if (wmsOnlineResource) {
-                const params = 'SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png&HEIGHT=25&BGCOLOR=0xFFFFFF'
-                    + '&LAYER=' + wmsOnlineResource.name + '&LAYERS=' + wmsOnlineResource.name + '&WIDTH=188&SCALE=1000000'
+               const params = 'SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png'
+                    + '&LAYER=' + wmsOnlineResource.name + '&LAYERS=' + wmsOnlineResource.name
                     + '&LEGEND_OPTIONS=forceLabels:on;minSymbolSize:16';
                 this.legendUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(wmsOnlineResource.url), params);
             } else if (this.layer.legendImg && this.layer.legendImg !== '') {
@@ -167,7 +167,7 @@ export class InfoPanelSubComponent implements OnInit {
      * WMS or Legend image has finished loading
      * @param event the image load event
      */
-    public imageLoad(event: Event) {
+    public onImgLoad(event: Event) {
         if ((event.target as HTMLImageElement).id === 'wmsImg' && !this.wmsLoaded) {
             this.wmsLoaded = true;
         } else if ((event.target as HTMLImageElement).id === 'legendImg' && !this.legendLoaded) {
@@ -201,7 +201,7 @@ export class InfoPanelSubComponent implements OnInit {
             this.legendUrl = environment.portalBaseUrl + 'getViaProxy.do?usewhitelist=false&usepostafterproxy=true&url=' + this.legendUrl;
             (event.target as HTMLImageElement).src = this.legendUrl;
         } else {
-            (event.target as HTMLImageElement).parentElement.style.display = 'none';
+            (event.target as HTMLImageElement).parentElement.parentElement.style.display = 'none';
         }
     }
 
