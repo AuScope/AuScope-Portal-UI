@@ -14,14 +14,14 @@ export class LegendModalComponent {
   private legendUiService = inject(LegendUiService);
 
   // Supplied parameters
-  layerId: string;      // ID of layer that legend belongs to
-  legendTitle: string;  // Title of legend
+  layerId: string; // ID of layer that legend belongs to
+  legendTitle: string; // Title of legend
   legendRequestList: Observable<any>[]; // Array of Requests to try for legend
 
   // Local
-  legendImage: any;             // Legend image will be constructed from the supplied Blob (from legendRequestList)
-  legendLoading = true;         // True if legend is loading
-  requestLegendFailed = false;  // True if all legend requests failed
+  legendImage: any; // Legend image will be constructed from the supplied Blob (from legendRequestList)
+  legendLoading = true; // True if legend is loading
+  requestLegendFailed = false; // True if all legend requests failed
 
 
   constructor(private dialogRef: MatDialogRef<LegendModalComponent>, @Inject(MAT_DIALOG_DATA) data) {

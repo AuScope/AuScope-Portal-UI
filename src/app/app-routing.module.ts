@@ -15,7 +15,7 @@ const baseUrl = environment.portalBaseUrl.replace(/^\/|\/$/g, '');
  */
 const routes: Routes = [
   { path: '', pathMatch: 'full', component: PortalComponent },
-  { path: 'index.htm', pathMatch: 'full', component: PortalComponent },  // redirect legacy states from index.htm
+  { path: 'index.htm', pathMatch: 'full', component: PortalComponent }, // redirect legacy states from index.htm
   { path: 'index.html', pathMatch: 'full', component: PortalComponent }, // redirect legacy states from index.html
   { path: 'login', component: LoginComponent },
   { path: 'login/loggedIn', component: LoggedInComponent },

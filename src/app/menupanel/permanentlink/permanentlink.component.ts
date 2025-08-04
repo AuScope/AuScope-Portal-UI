@@ -22,7 +22,7 @@ export class PermanentLinkComponent {
       this.user = user;
     });
   }
-  
+
   /**
    * User has clicked permanent link button, show dialog based on whether they're logged in
    */

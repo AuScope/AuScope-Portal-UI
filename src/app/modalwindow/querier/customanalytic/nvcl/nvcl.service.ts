@@ -1,10 +1,10 @@
 
-import {throwError as observableThrowError, Observable, BehaviorSubject, of, ReplaySubject, timer } from 'rxjs';
+import { throwError as observableThrowError, Observable, BehaviorSubject } from 'rxjs';
 
 import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
-import {catchError, delay, map, mergeMap } from 'rxjs/operators';
+import { catchError, map, mergeMap } from 'rxjs/operators';
 import { UtilitiesService,DownloadWfsService } from '@auscope/portal-core-ui';
-import { Injectable, Inject} from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
 declare let gtag: Function;
@@ -55,7 +55,7 @@ export class NVCLService {
     const nvclUrl = this.getNVCLDataServiceUrl(serviceUrl);
 
     httpParams = httpParams.append('serviceUrl', nvclUrl);
-    httpParams = httpParams.append('holeIdentifier',  holeIdentifier.replace('gsml.borehole.', ''));
+    httpParams = httpParams.append('holeIdentifier', holeIdentifier.replace('gsml.borehole.', ''));
     return this.http.get(environment.portalBaseUrl + 'getNVCLDatasets.do', {
       params: httpParams
     }).pipe(map(response => {
@@ -68,16 +68,16 @@ export class NVCLService {
       (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
-      ), );
+      ),);
   }
 
    public getNVCL2_0_Images(serviceUrl: string, datasetId: string): Observable<any> {
-    
+
     let httpParams = new HttpParams();
     const nvclUrl = this.getNVCLDataServiceUrl(serviceUrl);
     httpParams = httpParams.append('serviceUrl', nvclUrl);
-    httpParams = httpParams.append('datasetId',  datasetId);
-    httpParams = httpParams.append('mosaicService',  'true');
+    httpParams = httpParams.append('datasetId', datasetId);
+    httpParams = httpParams.append('mosaicService', 'true');
     return this.http.get(environment.portalBaseUrl + 'getNVCL2_0_Logs.do', {
       params: httpParams
     }).pipe(map(response => {
@@ -90,14 +90,14 @@ export class NVCLService {
       (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
-      ), );
+      ),);
   }
 
   public getNVCLScalars(serviceUrl: string, datasetId: string): Observable<any> {
     let httpParams = new HttpParams();
     const nvclUrl = this.getNVCLDataServiceUrl(serviceUrl);
     httpParams = httpParams.append('serviceUrl', nvclUrl);
-    httpParams = httpParams.append('datasetId',  datasetId);
+    httpParams = httpParams.append('datasetId', datasetId);
     return this.http.get(environment.portalBaseUrl + 'getNVCLLogs.do', {
       params: httpParams
     }).pipe(map(response => {
@@ -110,7 +110,7 @@ export class NVCLService {
       (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
-      ), );
+      ),);
   }
 
 
@@ -129,7 +129,7 @@ export class NVCLService {
       (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
-      ), );
+      ),);
   }
 
    public getNVCL2_0_JobsScalarBinned(boreholeId: string, jobIds: string[]): Observable<any> {
@@ -146,7 +146,7 @@ export class NVCLService {
       (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
-      ), );
+      ),);
   }
 
   public getNVCL2_0_CSVDownload(serviceUrl: string, logIds: string[]): Observable<any> {
@@ -165,14 +165,14 @@ export class NVCLService {
       (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
-      ), );
+      ),);
   }
 
 
   public getLogDefinition(logName): Observable<any> {
     let httpParams = new HttpParams();
     httpParams = httpParams.append('repository', 'nvcl-scalars');
-    httpParams = httpParams.append('label',  logName);
+    httpParams = httpParams.append('label', logName);
     return this.http.get(environment.portalBaseUrl + 'getScalar.do', {
       params: httpParams
     }).pipe(map(response => {
@@ -185,18 +185,18 @@ export class NVCLService {
       (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
-      ), );
+      ),);
   }
 
 
   public getTSGCachedDownloadUrl(serviceUrl: string, datasetName: string,) {
     return this.downloadWfsService.checkTsgDownloadAvailable().pipe(map(response => {
       if (response['success'] === true) {
-        let urlArrays: string[] = response['data'].split(",");
+        const urlArrays: string[] = response['data'].split(",");
         let baseurl: string = "";
         let endpoint: string = "";
         let cacheUrl: string = "";
-        let mp = new Map();
+        const mp = new Map();
         let start = 0;
         if (urlArrays[0].indexOf("DEFAULT") >= 0) {
           baseurl = urlArrays[1].trim();
@@ -212,7 +212,7 @@ export class NVCLService {
         }
 
         let url: string = "";
-        for (let [key, value] of mp) {
+        for (const [key, value] of mp) {
           if (serviceUrl.startsWith(key)) {
             url = value + datasetName + ".zip";
           }
@@ -246,7 +246,7 @@ export class NVCLService {
        * console.log("getNVCLTSGDownload() serviceUrl:"+serviceUrl+",downloadEmail:"+downloadEmail+",datasetId:"+datasetId);
        * gtag('event', 'NVCLDownload',  {'event_category': 'NVCLDownload', 'event_action': serviceUrl, 'event_label': downloadEmail, 'value': datasetId});
       */
-      gtag('event', 'NVCLDownload',  {'event_category': 'NVCLDownload', 'event_action': serviceUrl, 'value': datasetId});
+      gtag('event', 'NVCLDownload', { 'event_category': 'NVCLDownload', 'event_action': serviceUrl, 'value': datasetId });
     }
     return this.http.post(environment.portalBaseUrl + 'getNVCLTSGDownload.do', httpParams.toString(), {
       headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
@@ -257,7 +257,7 @@ export class NVCLService {
       (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
-      ), );
+      ),);
   }
 
   public getNVCLTSGDownloadStatus(serviceUrl: string, downloadEmail: string) {
@@ -274,7 +274,7 @@ export class NVCLService {
         (error: HttpResponse<any>) => {
           return observableThrowError(error);
         }
-        ), );
+        ),);
   }
 
   public getNVCL2_0_TsgJobsByBoreholeId(boreholeId: string): Observable<any> {
@@ -297,7 +297,7 @@ export class NVCLService {
       (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
-      ), );
+      ),);
   }
 
 

@@ -1,6 +1,6 @@
 import { CsClipboardService, CsMapService, CsWMSService, FilterPanelService, GeometryType, LayerHandlerService,
-         LayerModel, LayerStatusService, Polygon, UtilitiesService, ResourceType, 
-         CsCSWService} from '@auscope/portal-core-ui';
+         LayerModel, LayerStatusService, Polygon, UtilitiesService, ResourceType,
+         CsCSWService } from '@auscope/portal-core-ui';
 import { ApplicationRef, Component, Inject, Input, OnInit, AfterViewInit, ViewChild, ViewContainerRef } from '@angular/core';
 import * as _ from 'lodash';
 import { config } from '../../../../environments/config';
@@ -134,7 +134,7 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
       this.advancedComponentService.getAdvancedFilterComponentForLayer(this.layer.id).setAdvancedParams(layerState.advancedFilter);
     }
     // Merge state filters with optional filters
-    this.optionalFilters = this.optionalFilters.map( optFilt => {
+    this.optionalFilters = this.optionalFilters.map(optFilt => {
         const filt = layerState.optionalFilters.find((filt) => filt.label === optFilt['label']);
         if (filt) {
           return filt;
@@ -147,7 +147,7 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
         if (optFilter['value'] && optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
           const geometry = optFilter['value'];
           const swappedGeometry = this.csClipboardService.swapGeometry(geometry);
-          const strToday=new Date(); 
+          const strToday=new Date();
           const dt= new Date(strToday).toISOString();
           const name = 'Polygon-' + dt.slice(0,dt.lastIndexOf('.'));
           const newPolygon:Polygon = {
@@ -166,9 +166,9 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
 
       // Set opacity of the layer on the map
       if (UtilitiesService.layerContainsResourceType(this.layer, ResourceType.WMS)) {
-        this.csWMSService.setLayerOpacity(this.layer, layerState.opacity / 100.0 );
+        this.csWMSService.setLayerOpacity(this.layer, layerState.opacity / 100.0);
       } else if (UtilitiesService.layerContainsBboxGeographicElement(this.layer)) {
-        this.csCSWService.setLayerOpacity(this.layer, layerState.opacity / 100.0 );
+        this.csCSWService.setLayerOpacity(this.layer, layerState.opacity / 100.0);
       }
     }, 500);
   }
@@ -295,8 +295,8 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
 
   /**
    * Update the filter service with a new filter or remove one
-   * 
-   * @param filter filter 
+   *
+   * @param filter filter
    * @param filterAdded boolean, if 'true' will add, if 'false' remove
    */
   private updateFilter(filter: any, filterAdded: boolean) {

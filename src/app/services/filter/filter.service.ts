@@ -44,7 +44,7 @@ export class FilterService {
      * @param layerId the ID of the layer
      * @param filterCollection the updated filter collection
      */
-    public updateLayerFilterCollection(layerId: string, filterCollection: any) {
+    public updateLayerFilterCollection(layerId: string, filterCollection: any): void {
         const existingFilterCollection = this.layerFilterCollections.get(layerId);
         if (existingFilterCollection) {
             this.layerFilterCollections.get(layerId).next(filterCollection);
@@ -234,7 +234,7 @@ export class FilterService {
  * Class for layer time information
  */
 export class LayerTimes {
-    timeExtent: Date[] = [];    // Array of dates representing time extent
-    currentTime: Date;          // Current date within timeExtent
-    loadingTimeExtent = false;  // Are the times being loaded
+    timeExtent: Date[] = []; // Array of dates representing time extent
+    currentTime: Date; // Current date within timeExtent
+    loadingTimeExtent = false; // Are the times being loaded
 }

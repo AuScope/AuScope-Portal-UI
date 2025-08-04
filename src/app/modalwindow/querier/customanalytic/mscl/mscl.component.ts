@@ -24,7 +24,7 @@ export class MSCLComponent implements OnInit {
     // bMetric = metric tickbox, dict: key is printable name, val is boolean
     // bGroup = group metric tickbox, dict: key is printable name, val is boolean
 
-    public metricPNameList: string[];  // Printable list of all selectable metrics
+    public metricPNameList: string[]; // Printable list of all selectable metrics
     public metricGroupList: string[]; // List of selectable group names
     public modalDisplayed = false; // Is modal dialogue displayed?
     public allTicked = false; // Are all tickboxes ticked?
@@ -92,7 +92,7 @@ export class MSCLComponent implements OnInit {
 
     /**
      * Set all metric tickboxes within a group
-     * 
+     *
      * @param group group name
      */
     public toggle_grp_chkbox(group: string) {

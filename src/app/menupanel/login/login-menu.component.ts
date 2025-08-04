@@ -43,7 +43,7 @@ export class LoginMenuComponent {
   }
   /**
    * Manage user's ROI list
-   */  
+   */
   manageROI() {
     this.modalService.open(ROIModalComponent, {
       size: 'sm',

@@ -1,4 +1,4 @@
-import {InjectionToken} from '@angular/core'
+import { InjectionToken } from '@angular/core'
 import { saveAs } from 'file-saver';
 
 export type Saver = (blob: Blob, filename?: string) => void

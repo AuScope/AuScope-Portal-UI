@@ -7,7 +7,7 @@ import { CsMapComponent } from './csmap.component';
     templateUrl: './csmap.zoom.component.html',
     styleUrls: ['./csmap.zoom.component.scss'],
     encapsulation: ViewEncapsulation.None // NB: Styles are not encapsulated.
-    // This adds the style to global styles 
+    // This adds the style to global styles
     ,
     standalone: false
 })
@@ -34,7 +34,7 @@ export class CsMapZoomComponent {
    * Tell the camera to go back to original map position.
    */
   public goHome() {
-    this.cameraService.cameraFlyTo({destination: CsMapComponent.AUSTRALIA});
+    this.cameraService.cameraFlyTo({ destination: CsMapComponent.AUSTRALIA });
   }
 
   /**

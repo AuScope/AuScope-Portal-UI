@@ -11,6 +11,7 @@ import { GraceStyleSettings } from 'app/modalwindow/querier/customanalytic/grace
     templateUrl: './grace-advanced-filter.component.html',
     styleUrls: ['./grace-advanced-filter.component.scss'],
     standalone: false
+
 })
   export class GraceAdvancedFilterComponent extends AdvancedFilterDirective implements OnInit {
 
@@ -29,11 +30,11 @@ import { GraceStyleSettings } from 'app/modalwindow/querier/customanalytic/grace
         // Construct form current GRACE style
         this.styleGroup = this.formBuilder.group({
             minColor: this.graceService.currentGraceStyleSettings.minColor,
-            minValue: [this.graceService.currentGraceStyleSettings.minValue, [Validators.required, Validators.pattern(this.DECIMAL_REGEX)]],
+            minValue: [this.graceService.currentGraceStyleSettings.minValue, [Validators.required.bind(Validators), Validators.pattern(this.DECIMAL_REGEX)]],
             neutralColor: this.graceService.currentGraceStyleSettings.neutralColor,
-            neutralValue: [this.graceService.currentGraceStyleSettings.neutralValue, [Validators.required, Validators.pattern(this.DECIMAL_REGEX)]],
+            neutralValue: [this.graceService.currentGraceStyleSettings.neutralValue, [Validators.required.bind(Validators), Validators.pattern(this.DECIMAL_REGEX)]],
             maxColor: this.graceService.currentGraceStyleSettings.maxColor,
-            maxValue: [this.graceService.currentGraceStyleSettings.maxValue, [Validators.required, Validators.pattern(this.DECIMAL_REGEX)]],
+            maxValue: [this.graceService.currentGraceStyleSettings.maxValue, [Validators.required.bind(Validators), Validators.pattern(this.DECIMAL_REGEX)]],
             transparentNeutralColor: this.graceService.currentGraceStyleSettings.transparentNeutralColor
         });
     }
@@ -57,7 +58,7 @@ import { GraceStyleSettings } from 'app/modalwindow/querier/customanalytic/grace
     public selectGraceDataPoint() {
         this.csMapObject.getPointFromClick().subscribe(point => {
             if (point) {
-                this.timeSeriesGraphModalRef = this.modalService.show(GraceGraphModalComponent, {class: 'modal-lg'});
+                this.timeSeriesGraphModalRef = this.modalService.show(GraceGraphModalComponent, { class: 'modal-lg' });
                 this.timeSeriesGraphModalRef.content.x = point.longitude;
                 this.timeSeriesGraphModalRef.content.y = point.latitude;
             }
@@ -77,7 +78,7 @@ import { GraceStyleSettings } from 'app/modalwindow/querier/customanalytic/grace
                 const singleCoord = c.split(',');
                 coordList.push([parseFloat(singleCoord[1]), parseFloat(singleCoord[0])]);
             }
-            this.timeSeriesGraphModalRef = this.modalService.show(GraceGraphModalComponent, {class: 'modal-lg'});
+            this.timeSeriesGraphModalRef = this.modalService.show(GraceGraphModalComponent, { class: 'modal-lg' });
             this.timeSeriesGraphModalRef.content.coords = coordList;
             this.timeSeriesGraphModalRef.content.centroid = '(-45.0,144.0)';
             setTimeout(() => {

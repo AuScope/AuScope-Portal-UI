@@ -44,8 +44,8 @@ export class LayerManagerService {
    */
   setFilters(layerId: string, filterState: boolean): void {
     const objIndex = this.filterList.findIndex(obj => obj.layer == layerId);
-    if (objIndex >= 0) { 
-      this.filterList[objIndex].hasFilters = filterState; 
+    if (objIndex >= 0) {
+      this.filterList[objIndex].hasFilters = filterState;
     } else {
       this.filterList.push({ layer: layerId, hasFilters: filterState });
     }
@@ -53,7 +53,7 @@ export class LayerManagerService {
   }
 
   /**
-   * 
+   *
    * removes a once "Active layer" from the filterList array
    */
   removeFilters(layerId: string) {
@@ -68,11 +68,11 @@ export class LayerManagerService {
    *  - adds the layer to the Cesium map
    *  - updates the map state service
    *  - sets up the optional and mandatory filters
-   * 
+   *
    *
    * @param layer LayerModel object
    * @param optionalFilters layer's optional filters that have been selected already
-   * @param layerFilterCollection the layer's filter collection, 
+   * @param layerFilterCollection the layer's filter collection,
    *         i.e. mandatory filters and optional filters that can be selected
    * @param layerTime time range to display
    *
@@ -115,7 +115,7 @@ export class LayerManagerService {
     this.legendUiService.removeLegend(layer.id);
 
     // Transfer mandatory filters from the 'layerFilterCollection' input to the 'layer' object
-    if (layer?.filterCollection?.mandatoryFilters && 
+    if (layer?.filterCollection?.mandatoryFilters &&
         layerFilterCollection?.mandatoryFilters) {
       for (const layerFilt of layer.filterCollection.mandatoryFilters) {
         for (const mandFilt of layerFilterCollection.mandatoryFilters) {

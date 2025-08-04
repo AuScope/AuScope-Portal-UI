@@ -13,11 +13,9 @@ import { Component, EventEmitter, Output } from '@angular/core';
     standalone: false
 })
 export class ToolbarComponent {
-  
+
   @Output() splitToggleEvent = new EventEmitter();
 
-  constructor() {}
-  
   public toggleToolbar() {
     this.splitToggleEvent.emit(true);
   }

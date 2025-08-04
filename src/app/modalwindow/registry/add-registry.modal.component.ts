@@ -21,9 +21,9 @@ export class AddRegistryModalComponent implements OnInit, AfterViewInit {
 
   // Service form
   registryForm: FormGroup = new FormGroup({
-    name: new FormControl('', [ Validators.required ]),
-    serviceUrl: new FormControl('', [ Validators.required ]),
-    recordUrl: new FormControl({value: '', disabled: true}, [ Validators.required ]),
+    name: new FormControl('', [ Validators.required.bind(Validators) ]),
+    serviceUrl: new FormControl('', [ Validators.required.bind(Validators) ]),
+    recordUrl: new FormControl({ value: '', disabled: true }, [ Validators.required.bind(Validators) ]),
     overrideRecordUrl: new FormControl(false)
   });
 
@@ -37,7 +37,7 @@ export class AddRegistryModalComponent implements OnInit, AfterViewInit {
     this.registryForm.get('serviceUrl').valueChanges.subscribe(url => {
       if (this.registryForm.get('overrideRecordUrl').value === false) {
         url = this.constructRecordInfoUrl(url);
-        this.registryForm.patchValue({recordUrl: url});
+        this.registryForm.patchValue({ recordUrl: url });
       }
     });
     // Enable/disable record URL, attempt to build record URL if disabled
@@ -88,7 +88,7 @@ export class AddRegistryModalComponent implements OnInit, AfterViewInit {
    */
   saveRegistry() {
     if (environment.googleAnalyticsKey && typeof gtag === 'function') {
-      gtag('event', 'AddCustomRegistry',  {
+      gtag('event', 'AddCustomRegistry', {
         event_category: 'AddCustomRegistry',
         event_action: 'AddCustomRegistry:' + this.registryForm.get('serviceUrl').value
       });
