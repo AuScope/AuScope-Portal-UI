@@ -41,7 +41,7 @@ export const config = {
   // 'maxImageSize' is a limit on the the lagrest side of the downloaded image/dataset
   // For ESRI MapServers set 'maxImageSize' to 1024
   // For GSKY set 'maxImageSize' to 4096
-  // 
+  //
   // (Set 'downloadAreaMaxSize' to Number.MAX_SAFE_INTEGER to disable area download limits)
   wcsSupportedLayer: {
     'regolith-depth-layer': {

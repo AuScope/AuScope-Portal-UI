@@ -1,4 +1,4 @@
-import { throwError as observableThrowError,  Observable, BehaviorSubject } from 'rxjs';
+import { throwError as observableThrowError, Observable, BehaviorSubject } from 'rxjs';
 
 import { map, catchError } from 'rxjs/operators';
 
@@ -54,7 +54,7 @@ export class DataExplorerService {
       }
     }), catchError((error: HttpResponse<any>) => {
       return observableThrowError(error);
-    }), );
+    }),);
   }
 
   /**

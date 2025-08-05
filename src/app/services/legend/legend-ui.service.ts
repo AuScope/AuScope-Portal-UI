@@ -122,7 +122,7 @@ export class LegendUiService {
    * @param wmsUrl the WMS URL to trim
    * @returns a trimmed URL string
    */
-  private trimUrl(wmsUrl: string ) {
+  private trimUrl(wmsUrl: string) {
     let url: string = wmsUrl;
     if (url.indexOf('?') !== -1) {
       url = url.substring(0, url.indexOf('?'));
@@ -154,7 +154,7 @@ export class LegendUiService {
    *
    * @param layer the layer
    */
-  public showLegend(layer: LayerModel) {
+  public showLegend(layer: LayerModel): void {
     // If a static image has been provided, use that
     if (layer.legendImg && layer.legendImg !== '') {
       const requestUrl = environment.portalBaseUrl + 'legend/' + layer.legendImg;
@@ -199,9 +199,9 @@ export class LegendUiService {
             // requests, so create lists of GET URLs and POST requests to throw everything at the wall and see what sticks.
 
             // Assemble params, including 'GetLegend' params
-            let httpParams = this.getLegendHttpParams(this.trimUrl(resource.url), wmsOnlineResource.name, collatedParam, sldBody);
+            const httpParams = this.getLegendHttpParams(this.trimUrl(resource.url), wmsOnlineResource.name, collatedParam, sldBody);
             // Make a POST request with proxy
-            let proxyUrl = this.env.portalBaseUrl + Constants.PROXY_API;
+            const proxyUrl = this.env.portalBaseUrl + Constants.PROXY_API;
             const postRequest = this.http.post(proxyUrl, httpParams, { responseType: 'blob' }).pipe(
               catchError(() => {
                 return of(undefined);
@@ -250,7 +250,7 @@ export class LegendUiService {
    *
    * @param layerId ID of relevant layer
    */
-  public removeLegend(layerId: string) {
+  public removeLegend(layerId: string): void {
     if (this.displayedLegends.has(layerId)) {
       this.displayedLegends.get(layerId).close();
       this.displayedLegends.delete(layerId);
@@ -263,7 +263,7 @@ export class LegendUiService {
    * @param layerId the ID of the layer
    * @returns true if legend is displayed for layer, false otherwise
    */
-  public isLegendDisplayed(layerId): boolean {
+  public isLegendDisplayed(layerId: string): boolean {
     return this.displayedLegends.has(layerId);
   }
 

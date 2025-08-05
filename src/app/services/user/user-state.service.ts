@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Bookmark } from 'app/models/bookmark.model';
 import { PermanentLink } from 'app/models/permanentlink.model';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { catchError, map, take, tap } from 'rxjs/operators';
+import { catchError, map, take } from 'rxjs/operators';
 import { User } from '../../models/user.model';
 import { AuscopeApiService } from '../api/auscope-api.service';
 import { CsMapService, ManageStateService, Polygon, UtilitiesService } from '@auscope/portal-core-ui';
@@ -173,7 +173,7 @@ export class UserStateService {
       (error: HttpResponse<any>) => {
         return throwError(error);
       }
-    ), );
+    ),);
   }
 
   /**
@@ -222,13 +222,13 @@ export class UserStateService {
       }
       return undefined;
     }), catchError(
-      (error: HttpResponse<any>) => {
+      () => {
         return of(undefined);
       }),
     );
   }
   /**
-   * Save the user's list of ROI 
+   * Save the user's list of ROI
    */
   public saveROI() {
     if (UtilitiesService.isEmpty(this.roiKey))

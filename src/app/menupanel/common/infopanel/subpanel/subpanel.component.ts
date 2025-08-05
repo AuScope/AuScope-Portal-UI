@@ -68,10 +68,10 @@ export class InfoPanelSubComponent implements OnInit {
     }
 
     /** Removes proxy from URL for display purposes
-     * 
+     *
      * e.g. "http://localhost:8080/getViaProxy.do?url=https://raw.githubusercontent.com/CesiumGS/cesium/main/Apps/SampleData/kml/bikeRide.kml"
      * get converted to "https://raw.githubusercontent.com/CesiumGS/cesium/main/Apps/SampleData/kml/bikeRide.kml"
-     * 
+     *
      * @param url URL which may be prepended with a reference to the proxy
      * @returns URL without the proxy part
      */
@@ -124,7 +124,7 @@ export class InfoPanelSubComponent implements OnInit {
             } else if (this.layer.legendImg && this.layer.legendImg !== '') {
                 this.legendUrl = this.env.portalBaseUrl + 'legend/' + this.layer.legendImg;
             }
-            
+
             // Gather up BBOX coordinates to calculate the centre and envelope. Use a copy of coords so they don't stay modified for the main map
             const bbox = { ...this.cswRecord.geographicElements[0] };
 
@@ -156,10 +156,10 @@ export class InfoPanelSubComponent implements OnInit {
                 }
 
                 this.wmsUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(wmsOnlineResource.url), params);
-                this.outlineUrl = "https://research-community.geoanalytics.csiro.au/geoserver/auscope/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&LAYERS=auscope%3AStates-and-Territories&TRANSPARENT=TRUE&SRS=EPSG:4326&FORMAT=image%2Fpng&BBOX="+ 
+                this.outlineUrl = "https://research-community.geoanalytics.csiro.au/geoserver/auscope/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&LAYERS=auscope%3AStates-and-Territories&TRANSPARENT=TRUE&SRS=EPSG:4326&FORMAT=image%2Fpng&BBOX="+
                                 + bbox.westBoundLongitude + ',' + bbox.southBoundLatitude
                                 + ',' + bbox.eastBoundLongitude + ',' + bbox.northBoundLatitude + "&WIDTH=400&HEIGHT=400";
-            }            
+            }
         });
     }
 

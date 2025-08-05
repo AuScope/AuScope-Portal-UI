@@ -137,7 +137,7 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
 
   /**
    * Select a group
-   * 
+   *
    * @param layerGroup group
    */
   public selectGroup(layerGroup): void {
@@ -148,9 +148,9 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * Select a layer 
-   * 
-   * @param layer layer 
+   * Select a layer
+   *
+   * @param layer layer
    */
   public selectLayer(layer) {
     this.selectedLayer = layer;
@@ -158,7 +158,7 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
 
   /**
    * Add layer to map
-   * 
+   *
    * @param layer the layer to add to map
    */
   public addLayer(layer: LayerModel): void {
@@ -176,8 +176,8 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
 
   /**
    * Opens and closes browse panel
-   * 
-   * @param open if true will open panel if false will close panel if missing will toggle 
+   *
+   * @param open if true will open panel if false will close panel if missing will toggle
    */
   public toggleBrowsePanel(open?: boolean) {
     if (open !== undefined) {
@@ -185,12 +185,12 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       this.bShowBrowsePanel = !this.bShowBrowsePanel;
     }
-  } 
-  
+  }
+
 
   /**
    * Is this layer selected?
-   * 
+   *
    * @param layer LayerModel for layer
    * @returns t@returns true if this layer is selected
    */

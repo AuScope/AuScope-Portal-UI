@@ -22,7 +22,7 @@ import { catchError, finalize, tap, timeout } from 'rxjs/operators';
 import { ToolbarComponent } from 'app/menupanel/toolbar/toolbar.component';
 import { NVCLBoreholeAnalyticService } from 'app/modalwindow/layeranalytic/nvcl/nvcl.boreholeanalytic.service';
 
-declare var Cesium: any;
+declare let Cesium: any;
 
 @Component({
     selector: 'app-cs-map',
@@ -81,7 +81,7 @@ export class CsMapComponent implements AfterViewInit {
   constructor(private csMapObject: CsMapObject, private csMapService: CsMapService, private modalService: BsModalService,
     private queryWMSService: QueryWMSService, private gmlParserService: GMLParserService,
     private manageStateService: ManageStateService, private advancedMapComponentService: AdvancedComponentService,
-    private userStateService: UserStateService,  private nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService,
+    private userStateService: UserStateService, private nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService,
     private viewerConf: ViewerConfiguration, private ngZone: NgZone) {
     this.csMapService.getClickedLayerListBS().subscribe((mapClickInfo) => {
       this.handleLayerClick(mapClickInfo);
@@ -185,13 +185,12 @@ export class CsMapComponent implements AfterViewInit {
     // This code is used to display the map for nvclanid job's urlLink
     const nvclanid = UtilitiesService.getUrlParameterByName('nvclanid');
     if (nvclanid) {
-      const me = this;
       this.nvclBoreholeAnalyticService.getNVCLGeoJson(nvclanid).subscribe(results => {
         if (typeof results === 'object') {
           window.alert('This analytical job could not be found!\n the nvclanid = ' + nvclanid);
         } else {
           const jsonData = results;
-          me.nvclBoreholeAnalyticService.addGeoJsonLayer(nvclanid,jsonData);
+          this.nvclBoreholeAnalyticService.addGeoJsonLayer(nvclanid,jsonData);
         }
       });
     }
@@ -336,22 +335,22 @@ export class CsMapComponent implements AfterViewInit {
       const layer: LayerModel = this.csMapService.getLayerForEntity(entity);
       if (layer !== null) {
         // IRIS layers
-        if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.IRIS))) {
+        if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type as ResourceType === ResourceType.IRIS))) {
           this.displayModal(mapClickInfo.clickCoord);
           const handler = new IrisQuerierHandler(layer, entity);
           this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.bsModalRef);
           // KML/KMZ layers
-        } else if ((layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.KML))) ||
-          (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.KMZ)))) {
+        } else if ((layer.cswRecords.find(c => c.onlineResources.find(o => o.type as ResourceType === ResourceType.KML))) ||
+          (layer.cswRecords.find(c => c.onlineResources.find(o => o.type as ResourceType === ResourceType.KMZ)))) {
           this.displayModal(mapClickInfo.clickCoord);
           const handler = new KMLQuerierHandler(entity);
           this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.bsModalRef);
           // KML/KMZ layers
-        } else if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.VMF))) {
+        } else if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type as ResourceType === ResourceType.VMF))) {
           this.displayModal(mapClickInfo.clickCoord);
           const handler = new VMFQuerierHandler(entity);
           this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.bsModalRef);
-        } else if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.GEOJSON))) {
+        } else if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type as ResourceType === ResourceType.GEOJSON))) {
           this.displayModal(mapClickInfo.clickCoord);
           const handler = new GeoJsonQuerierHandler(entity);
           this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.bsModalRef);
@@ -406,7 +405,7 @@ export class CsMapComponent implements AfterViewInit {
 
     // get the list of optional filter - providers
     // we will use this to filter calls to the backend i.e. wmsMarkerPopup.do
-    let optProviderList = [];
+    const optProviderList = [];
     for (const maplayer of mapClickInfo.clickedLayerList) {
       if (maplayer?.filterCollection?.optionalFilters) {
         for (const optFil of maplayer.filterCollection.optionalFilters) {
@@ -436,17 +435,17 @@ export class CsMapComponent implements AfterViewInit {
 
         let optProviderFound = false;
         if (onlineResource) {
-          // iterate through optional Filters to see if the provider "matches" the onlineResource.url  
+          // iterate through optional Filters to see if the provider "matches" the onlineResource.url
           for (const optPro of optProviderList) {
-            if (onlineResource.url.includes(optPro) ) {
+            if (onlineResource.url.includes(optPro)) {
               optProviderFound = true;
             }
           }
         }
-          
+
         // this is the case of no provider set, i.e. all Australia
         if (optProviderList.length === 0) {
-          optProviderFound = true; 
+          optProviderFound = true;
         }
         if (optProviderFound) {
           if (!UtilitiesService.getLayerHasSupportedOnlineResourceType(maplayer) && UtilitiesService.layerContainsBboxGeographicElement(maplayer)) {

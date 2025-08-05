@@ -124,13 +124,13 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
 
   /**
    * check if a layer has filters - used to hide the tab "Layer Styling"
-   * 
+   *
    * @param layerId
    * @returns boolean
    */
   public hasFilters(layerId: string): boolean {
 
-    let filterState = this.layerManagerService.getFilters(layerId);
+    const filterState = this.layerManagerService.getFilters(layerId);
     /*
     // if the layer has no filters then set it to display the download tab
     if (this.getUILayerModel(layerId)) {
@@ -177,7 +177,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
           setTimeout(() => {
             const layerFilterPanel: FilterPanelComponent = this.filterComponents.find(fc => fc.layer.id === layerId);
             if (layerFilterPanel) {
-              // Update filter values, times and map opacity 
+              // Update filter values, times and map opacity
               layerFilterPanel.addLayerFromState(layerStateObj[layerId]);
               // Set opacity slider to correct position
               const uiLayerModel = this.uiLayerModelService.getUILayerModel(layerId);
@@ -381,7 +381,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
 
   /**
    * Makes a filter or download tab panel visible
-   * 
+   *
    * @param layerId layer id string
    * @param panelType panel type string, either 'filterpanel' or 'downloadpanel'
    */
@@ -463,7 +463,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
 
   /**
    * Returns true if any layer in a layer group is active
-   * 
+   *
    * @param layerGroupValue - an instance of this.layerGroups[key].value
    */
   public isLayerGroupActive(layerGroupValue): boolean {
@@ -515,7 +515,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
 
   /**
    * Returns true iff filter panel is visible
-   * 
+   *
    * @param layerId layer id
    * @returns true iff filter panel is visible
    */
@@ -528,7 +528,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
 
   /**
    * Returns true iff download panel is visible
-   * 
+   *
    * @param layerId layer id
    * @returns true iff download panel is visible
    */

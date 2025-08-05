@@ -11,7 +11,7 @@ export class SidebarService {
   public setOpenState(isOpen: boolean): void {
     this.isSidebarOpenSubject.next(isOpen);
   }
-  
+
   toggleSidebar() {
     const currentState = this.isSidebarOpenSubject.getValue();
     this.isSidebarOpenSubject.next(!currentState);

@@ -1,19 +1,21 @@
 
-import {throwError as observableThrowError,  Observable } from 'rxjs';
+import { throwError as observableThrowError, Observable } from 'rxjs';
 
-import {catchError, map} from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { LayerModel, RenderStatusService } from '@auscope/portal-core-ui';
 import { LayerHandlerService } from '@auscope/portal-core-ui';
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
-import {config} from '../../../../environments/config';
+import { config } from '../../../../environments/config';
 
 import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { UILayerModel } from 'app/menupanel/common/model/ui/uilayer.model';
-declare var Cesium;
+
+declare let Cesium;
+
 @Injectable()
 export class NVCLBoreholeAnalyticService {
 
@@ -49,9 +51,10 @@ export class NVCLBoreholeAnalyticService {
       scaleByDistance: new Cesium.NearFarScalar(1.5e2, 0.35, 1.5e7, 0.35),
     });
   }
-  public addGeoJsonLayer(name: string, jsonData: any) {
-    let layerId = 'GEOJSON_' + name;
-    if (this.uiLayerModelService.isLayerAdded(layerId)){
+
+  public addGeoJsonLayer(name: string, jsonData: any): void {
+    const layerId = 'GEOJSON_' + name;
+    if (this.uiLayerModelService.isLayerAdded(layerId)) {
       alert("This NVCLAnalytical-Job-Result has been added already!");
       return;
     }
@@ -59,9 +62,9 @@ export class NVCLBoreholeAnalyticService {
     const proxyUrl = "";
     let layerRec: LayerModel= null;
     // Make a layer model object
-    layerRec  = me.layerHandlerService.makeCustomGEOJSONLayerRecord(name, proxyUrl, jsonData);
+    layerRec = me.layerHandlerService.makeCustomGEOJSONLayerRecord(name, proxyUrl, jsonData);
     layerRec.group = 'geojson-layer';
-    layerRec.stylefn = this.styleNVCLAnalyticalGeoJsonEntity;
+    layerRec.stylefn = this.styleNVCLAnalyticalGeoJsonEntity.bind(this);
     // Configure layers so it can be added to map
     const uiLayerModel = new UILayerModel(layerRec.id, 100, me.renderStatusService.getStatusBSubject(layerRec));
     me.uiLayerModelService.setUILayerModel(layerRec.id, uiLayerModel);
@@ -84,7 +87,7 @@ export class NVCLBoreholeAnalyticService {
       (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
-      ), );
+      ),);
   }
 
 
@@ -105,7 +108,7 @@ export class NVCLBoreholeAnalyticService {
       (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
-      ), );
+      ),);
   }
 
   public getNVCLClassifications(algorithmOutputIds: string[]): Observable<any> {
@@ -132,7 +135,7 @@ export class NVCLBoreholeAnalyticService {
       (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
-      ), );
+      ),);
   }
 
   public getTSGAlgorithmList(): Observable<any> {
@@ -146,7 +149,7 @@ export class NVCLBoreholeAnalyticService {
       (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
-      ), );
+      ),);
   }
 
 
@@ -163,7 +166,7 @@ export class NVCLBoreholeAnalyticService {
       (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
-      ), );
+      ),);
   }
 
   public submitNVCLAnalyticalJob(parameters: any, layer: LayerModel): Observable<any> {
@@ -204,7 +207,7 @@ export class NVCLBoreholeAnalyticService {
       (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
-      ), );
+      ),);
   }
 
   public submitNVCLTSGModJob(parameters: any, layer: LayerModel): Observable<any> {
@@ -233,12 +236,12 @@ export class NVCLBoreholeAnalyticService {
         return true;
       } else {
         return observableThrowError(response['msg']);
-      }      
+      }
     }), catchError(
       (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
-      ), );
+      ),);
   }
 
   public checkNVCLAnalyticalJobStatus(email: string): Observable<any> {
@@ -259,7 +262,7 @@ export class NVCLBoreholeAnalyticService {
       (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
-      ), );
+      ),);
   }
 
   public getNVCLJobPublishStatus(jobId: string): Observable<any> {
@@ -274,7 +277,7 @@ export class NVCLBoreholeAnalyticService {
       (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
-      ), );
+      ),);
   }
 
   public publishNvclJob(jobId: string, bPublished: boolean): Observable<any> {
@@ -290,7 +293,7 @@ export class NVCLBoreholeAnalyticService {
       (error: HttpResponse<any>) => {
         return observableThrowError(error);
       }
-      ), );
+      ),);
   }
 // download TsgJob json result file
   public downloadNVCLJobResult(jobId: string): Observable<any> {
@@ -304,7 +307,7 @@ export class NVCLBoreholeAnalyticService {
       return response;
     }), catchError((error: HttpResponse<any>) => {
       return observableThrowError(error);
-    }), )
+    }),)
   }
   public downloadTsgJobData(jobId: string): Observable<any> {
     let httpParams = new HttpParams();
@@ -317,7 +320,7 @@ export class NVCLBoreholeAnalyticService {
       return response;
     }), catchError((error: HttpResponse<any>) => {
       return observableThrowError(error);
-    }), )
+    }),)
   }
 
   public hasSavedEmail(): boolean {

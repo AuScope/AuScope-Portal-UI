@@ -13,7 +13,7 @@ import { NVCLService } from '../../../modalwindow/querier/customanalytic/nvcl/nv
 import { shareReplay } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 
-declare var gtag: Function;
+declare let gtag: Function;
 
 @Component({
     selector: 'app-download-panel',
@@ -36,7 +36,7 @@ export class DownloadPanelComponent implements OnInit {
   download4pStarted: boolean;
   download4PolygonKMLStarted: boolean;
   isPolygonSupportedLayer: boolean;
-  isCsvSupportedLayer: boolean;  // Supports CSV downloads of WFS Features
+  isCsvSupportedLayer: boolean; // Supports CSV downloads of WFS Features
   isDatasetURLSupportedLayer: boolean; // Supports dataset downloads using a URL in the WFS GetFeature response
   omitGslmpShapeProperty: boolean;
   datasetUrl: string;
@@ -173,9 +173,9 @@ export class DownloadPanelComponent implements OnInit {
       //subscribe
       this.downloadWfsService.tsgDownloadStartBS.subscribe(
         (message) => {
-          const progressData =  message.split(',');
+          const progressData = message.split(',');
           if ('start'.match(progressData[0])) {
-            this.tsgDownloadEmail =  progressData[1];
+            this.tsgDownloadEmail = progressData[1];
             this.download4TsgFiles();
           }
         });
@@ -254,9 +254,8 @@ export class DownloadPanelComponent implements OnInit {
   public describeCoverage() {
     if (UtilitiesService.layerContainsResourceType(this.layer, ResourceType.WCS)) {
       const wcsResources = this.layerHandlerService.getWCSResource(this.layer);
-      const me = this;
       // Some services have CORS enabled so we must use the proxy
-      let useProxy = this.conf.forceAddLayerViaProxy.includes(this.layer.id);
+      const useProxy = this.conf.forceAddLayerViaProxy.includes(this.layer.id);
 
       // Send describe coverage request & parse the response
       this.downloadWcsService.describeCoverage(wcsResources[0].url, wcsResources[0].name, useProxy).subscribe(response => {
@@ -276,7 +275,7 @@ export class DownloadPanelComponent implements OnInit {
             }
           }
         }
-        me.wcsDownloadListOption = {
+        this.wcsDownloadListOption = {
           inputCrsList: response.supportedRequestCRSs,
           outputCrsList: response.supportedResponseCRSs,
           downloadFormatList: response.supportedFormats,
@@ -284,37 +283,37 @@ export class DownloadPanelComponent implements OnInit {
         }
 
         // If there is only one input CRS option, then that is selected
-        if (me.wcsDownloadListOption.inputCrsList.length === 1) {
-          me.wcsDownloadForm.inputCrs = me.wcsDownloadListOption.inputCrsList[0];
+        if (this.wcsDownloadListOption.inputCrsList.length === 1) {
+          this.wcsDownloadForm.inputCrs = this.wcsDownloadListOption.inputCrsList[0];
         } else {
-          me.wcsDownloadForm.inputCrs = this.SELECT_DEFAULT_REF_SYSTEM;
+          this.wcsDownloadForm.inputCrs = this.SELECT_DEFAULT_REF_SYSTEM;
         }
 
         // If there is only one download format option, then that is selected
-        if (me.wcsDownloadListOption.downloadFormatList.length === 1) {
-          me.wcsDownloadForm.downloadFormat = me.wcsDownloadListOption.downloadFormatList[0];
+        if (this.wcsDownloadListOption.downloadFormatList.length === 1) {
+          this.wcsDownloadForm.downloadFormat = this.wcsDownloadListOption.downloadFormatList[0];
         } else {
-          me.wcsDownloadForm.downloadFormat = this.SELECT_DEFAULT_DOWNLOAD_FMT;
+          this.wcsDownloadForm.downloadFormat = this.SELECT_DEFAULT_DOWNLOAD_FMT;
         }
 
         // If there is only one download format option, then that is selected
-        if (me.wcsDownloadListOption.outputCrsList.length === 1) {
-          me.wcsDownloadForm.outputCrs = me.wcsDownloadListOption.outputCrsList[0];
+        if (this.wcsDownloadListOption.outputCrsList.length === 1) {
+          this.wcsDownloadForm.outputCrs = this.wcsDownloadListOption.outputCrsList[0];
         } else {
-          me.wcsDownloadForm.outputCrs = this.SELECT_DEFAULT_OUTPUT_CRS;
+          this.wcsDownloadForm.outputCrs = this.SELECT_DEFAULT_OUTPUT_CRS;
         }
 
         // If there is only one time position, then that is selected
-        if (me.wcsDownloadListOption.timePositionList.length === 1) {
-          me.wcsDownloadForm.timePosition = me.wcsDownloadListOption.timePositionList[0];
-        } else if (me.wcsDownloadListOption.timePositionList.length === 0) {
-          me.wcsDownloadForm.timePosition = null;
+        if (this.wcsDownloadListOption.timePositionList.length === 1) {
+          this.wcsDownloadForm.timePosition = this.wcsDownloadListOption.timePositionList[0];
+        } else if (this.wcsDownloadListOption.timePositionList.length === 0) {
+          this.wcsDownloadForm.timePosition = null;
         } else {
-          me.wcsDownloadForm.timePosition = this.SELECT_DEFAULT_TIME_POS;
+          this.wcsDownloadForm.timePosition = this.SELECT_DEFAULT_TIME_POS;
         }
 
         // somehow needs this to refresh the form with above
-        me.cdRef.detectChanges();
+        this.cdRef.detectChanges();
       });
     } else {
       alert('No coverage found. Please contact cg-admin@csiro.au');
@@ -471,7 +470,7 @@ export class DownloadPanelComponent implements OnInit {
       }
       const maxImageSize = config.wcsSupportedLayer[this.layer.id].maxImageSize;
       // Convert BBox coords to the CRS of WCS layer 'inputCrs' parameter
-      let bbox  = UtilitiesService.coordConvBbox(this.bbox, this.wcsDownloadForm.inputCrs);
+      const bbox = UtilitiesService.coordConvBbox(this.bbox, this.wcsDownloadForm.inputCrs);
       // Perform WCS download
       observableResponse = this.downloadWcsService.download(this.layer, bbox, this.wcsDownloadForm.inputCrs,
         this.wcsDownloadForm.downloadFormat, this.wcsDownloadForm.outputCrs, timePositions, maxImageSize);
@@ -517,7 +516,7 @@ export class DownloadPanelComponent implements OnInit {
       // No error message
       if (UtilitiesService.isEmpty(err.message)) {
         alert('An error has occurred whilst attempting to download. Please contact cg-admin@csiro.au');
-      } 
+      }
       // Content Too Large (413)
       else if (err.status === 413) {
         if (this.irisDownloadListOption) {
@@ -590,7 +589,7 @@ export class DownloadPanelComponent implements OnInit {
     const kmlHeader = '<?xml version=\"1.0\" encoding=\"UTF-8\"?>' +
                       '<kml xmlns=\"http://www.opengis.net/kml/2.2\">' +
                       '<Document><name>AuScope-Portal-KML</name><description>Content</description>' +
-                      '<Style id=\"markerstyle\"><IconStyle><Icon><href>http://maps.google.com/intl/en_us/mapfiles/ms/micons/red-dot.png</href></Icon></IconStyle></Style>' ;                      
+                      '<Style id=\"markerstyle\"><IconStyle><Icon><href>http://maps.google.com/intl/en_us/mapfiles/ms/micons/red-dot.png</href></Icon></IconStyle></Style>' ;
     const kmlTail = '</Document></kml>';
     const kmlPlaceMarkPolygon = '<Placemark><name>Polygon</name><description>AuScope-Portal Export</description><styleUrl>#Path</styleUrl>' +
                                 '<Polygon><tessellate>1</tessellate><altitudeMode>clampToGround</altitudeMode><outerBoundaryIs><LinearRing><coordinates>' +
@@ -599,15 +598,15 @@ export class DownloadPanelComponent implements OnInit {
 
     const kmlPlaceMarkBHTemplate = '<Placemark><name>${GMLID}</name><styleUrl>#icon-1899-0288D1</styleUrl><ExtendedData>${METADATA}</ExtendedData><Point><coordinates>${GSMLPSHAPE}</coordinates></Point></Placemark>';
     const bhMetaDataTemplate = '<Data name="${NAME}"><value>${VALUE}</value></Data>';
-    let kmlPlaceMarkBHarray=[];
+    const kmlPlaceMarkBHarray=[];
     let gmlid = "";
     let gsmlpshape = "";
     let metaData = "";
     //csv data process
-    let csvArray = csv.split(/\r?\n/g);    
-    let csvHeader = csvArray[0].split(",");
-    let indexGsmlpShape = csvHeader.indexOf("gsmlp:shape");
-    let indexGmlId = csvHeader.indexOf("gml:id");
+    const csvArray = csv.split(/\r?\n/g);
+    const csvHeader = csvArray[0].split(",");
+    const indexGsmlpShape = csvHeader.indexOf("gsmlp:shape");
+    const indexGmlId = csvHeader.indexOf("gml:id");
 
     if (indexGsmlpShape < 0 || indexGmlId < 0) {
       console.log("saveKML:error to find gsmlp:shape");
@@ -637,7 +636,7 @@ export class DownloadPanelComponent implements OnInit {
     }
     kmlPlaceMarkBHarray.push(kmlTail);
 
-    const blob = new Blob([kmlPlaceMarkBHarray.join('\n')], {type: "text/plain;charset=utf-8"});
+    const blob = new Blob([kmlPlaceMarkBHarray.join('\n')], { type: "text/plain;charset=utf-8" });
     saveAs(blob, "AuScope-Portal-BHPolygon.kml");
   }
 
@@ -701,7 +700,6 @@ export class DownloadPanelComponent implements OnInit {
       console.log('called:downloadTsgFileUrls');
       observableResponse = this.downloadWfsService.downloadTsgFileUrls(this.layer, this.bbox, this.tsgDownloadEmail, null).pipe(shareReplay(1));
     }
-    let me = this;
     // Kick off the download process and save zip file in browser
     observableResponse.subscribe(urls => {
       let total = 0;
@@ -714,11 +712,11 @@ export class DownloadPanelComponent implements OnInit {
       }
       if (!urls || total < 1) {
         alert('TSGFilesDownload: No TSGFiles was found in the area. Please draw another boundary or polygon to search.');
-        me.downloadWfsService.tsgDownloadBS.next('completed,completed');
+        this.downloadWfsService.tsgDownloadBS.next('completed,completed');
         return;
       }
-      me.bsModalRef.componentInstance.urlsArray = urlsArray;
-      me.bsModalRef.componentInstance.BulkDownloadTsgFiles();
+      this.bsModalRef.componentInstance.urlsArray = urlsArray;
+      this.bsModalRef.componentInstance.BulkDownloadTsgFiles();
       /**
        * do not "log" the "email" to "Google Analytics" - as this is an ethics issue
        *

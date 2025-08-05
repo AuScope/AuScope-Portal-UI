@@ -136,11 +136,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     const parentElement = this.childElement.nativeElement.parentElement.parentElement;
     //const parentElement2 = this.childElement.nativeElement.parentElement;
-
     //const left = this.screenWidth
-
-    const left = window.innerWidth;
-    const height = window.innerHeight
     this.renderer.setStyle(parentElement, 'resize', 'both');
     this.renderer.setStyle(parentElement, 'overflow', 'auto');
     //this.renderer.setStyle(parentElement, 'top', '10px');
@@ -185,13 +181,13 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     this.modalService.onHide.subscribe(reason => {
       /* modal close event has cascaded down; most lieley from the MSCL popup modal or the legend */
 
-      if (!(reason == "backdrop-click")) {  // check - image > scalar > legend
+      if (!(reason == "backdrop-click")) { // check - image > scalar > legend
         if (!reason.initialState) { // check - scl chart
           this.modalVisible = false;
         }
       }
     });
-    this.modalService.onShow.subscribe(reason => {
+    this.modalService.onShow.subscribe(() => {
       this.modalVisible = true;
     });
 
@@ -255,7 +251,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
 
   /**
    * Set HTML to be displayed in popup window
-   * 
+   *
    * @param key key used to select HTML to display
    */
   public setHTML(key) {
@@ -272,14 +268,14 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
 
   /**
    * Set WFS feature data to be displayed in popup window
-   * 
+   *
    * @param doc XML document
    * @param i index of this XML docment in list of XML documents
    */
   public setWFS(doc, i) {
-    // Clear the HTML display  
+    // Clear the HTML display
     this.currentHTML = "";
-    // Set up, convert the XML and display in popup 
+    // Set up, convert the XML and display in popup
     this.updateDropDownButtonText(doc);
     this.currentIndex = i;
     this.currentDoc = doc;
@@ -295,12 +291,12 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
 
 /**
  * sets the button/tab active in the dynamic component nvcl.modal.component.html
- * 
- * @param evt 
- * @param tabName 
+ *
+ * @param evt
+ * @param tabName
  */
   public openTab(evt, tabName) {
-    var i, tabcontent, tablinks;
+    let i, tabcontent, tablinks;
     if (this.imScDoButtonsEnabled) { this.analytic_tab = true; }
 
     // set all the "tabs" to display:none - ie hidden
@@ -620,8 +616,8 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
 
       Object.keys(result.BoreholeView).forEach((key) => {
         const value = result.BoreholeView[key];
-        var listKey = key.toString();
-        var listValue = value.toString();
+        const listKey = key.toString();
+        const listValue = value.toString();
         this.list.push({ [listKey]: listValue });
       })
 
@@ -663,17 +659,17 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   }
 
   private getAbbr(layerName: string, splitChar: string): string {
-    var abbr = "";
+    let abbr = "";
 
-    var s = layerName.split(splitChar);
+    const s = layerName.split(splitChar);
 
-    for (let i = 0; i < s.length; i++) {
-      var c: string;
+    for (const i of s) {
+      let c: string;
 
-      if (this.isAlpha(s[i])) {
-        c = Array.from(s[i])[0];
+      if (this.isAlpha(i)) {
+        c = Array.from(i)[0];
       } else {
-        c = s[i];
+        c = i;
       }
       abbr = abbr + c;
     }
@@ -682,7 +678,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   }
 
   private isAlpha(str) {
-    let regex = /^[a-zA-Z]+$/;
+    const regex = /^[a-zA-Z]+$/;
     return regex.test(str);
   }
 }

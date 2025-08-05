@@ -114,7 +114,7 @@ export class NVCLDatasetListComponent implements OnInit {
         this._getNVCLImage(this.onlineResource.url, nvclDataset.datasetId, null);
         this._getNVCLScalar(this.onlineResource.url, nvclDataset.datasetId);
         this.isCachedTSGFileAvailable(nvclDataset);
-        this.nvclDatasets.push(nvclDataset); 
+        this.nvclDatasets.push(nvclDataset);
       }
       if (result.length === 0) {
         this.nvclService.setAnalytic(false);
@@ -134,7 +134,7 @@ export class NVCLDatasetListComponent implements OnInit {
    * @param event the event that triggered this method
    * @param nvclDatasetId the ID of the dataset for which images have been loaded
    */
-  setImagesLoaded(event: any, nvclDatasetId: string) {
+  setImagesLoaded(event: any, nvclDatasetId: string): void {
     // Chrome will fire this event when added to DOM, ignore that
     if (event.target.src !== '') {
       this.imagesLoaded.push(nvclDatasetId);
@@ -168,7 +168,7 @@ export class NVCLDatasetListComponent implements OnInit {
       });
   }
 
-  public changeScalarSelection(datasetid) {
+  public changeScalarSelection(datasetid: string) {
     this._getNVCLImage(this.onlineResource.url, datasetid, this.selectedScalar);
   }
 
@@ -428,7 +428,7 @@ export class NVCLDatasetListComponent implements OnInit {
 
           if (hasData) {
             //this.modalRef = this.modalService.show(NVCLDatasetListDialogComponent, {class: 'modal-sm modal-dialog-centered'});
-            this.modalRef = this.modalService.show(NVCLDatasetListDialogComponent, {class: 'modal-sm'}); 
+            this.modalRef = this.modalService.show(NVCLDatasetListDialogComponent, { class: 'modal-sm' });
             this.modalRef.content.scalarClasses = metricColours;
             this.appRef.tick(); // required to make legend modal display the scalarClasses; otherwise required a click to trigger
           }

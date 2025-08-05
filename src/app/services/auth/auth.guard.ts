@@ -11,7 +11,7 @@ import { UserStateService } from '../user/user-state.service';
  * "canActivate [AuthGuard]" to the route deinfintion).
  */
 @Injectable()
-export class AuthGuard  {
+export class AuthGuard {
 
   constructor(private router: Router,
               private authService: AuthService,
@@ -25,8 +25,8 @@ export class AuthGuard  {
   checkLogin(url: string): Observable<boolean> | boolean {
     if (this.authService.isLoggedIn) {
         return this.userStateService.user.pipe(map(
-          // Later we can use 'user' to check T&C's etc. if necessary
-          user => {
+          // Later we can use returned user to check T&C's etc. if necessary
+          () => {
             return true;
           }
         ));

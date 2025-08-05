@@ -1,6 +1,6 @@
 import { AuthService } from 'app/services/auth/auth.service';
-import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { BsModalService } from 'ngx-bootstrap/modal';
+import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { SidebarService } from './sidebar.service';
 /**
@@ -12,12 +12,12 @@ import { SidebarService } from './sidebar.service';
     styleUrls: ['../../styles.scss'],
     standalone: false
 })
-export class PortalComponent implements OnInit, OnDestroy  {
+export class PortalComponent implements OnInit, OnDestroy, AfterViewInit {
   private sidebarSubscription: Subscription;
 
   featuredLayersCheckbox: boolean = true;
   isSidebarOpen = false;
-  
+
   constructor(private authService: AuthService, private modalService: BsModalService, private sidebarService: SidebarService
 
   ) {}
@@ -27,24 +27,26 @@ export class PortalComponent implements OnInit, OnDestroy  {
    * the panel checkbox to a variable we can set it immediately after display to ensure the
    * panel is always expanded after a page refresh
    */
-  ngOnInit() {
+  ngOnInit(): void {
     this.sidebarSubscription = this.sidebarService.isSidebarOpen$.subscribe(isOpen => {
       this.isSidebarOpen = isOpen;
     });
-    
+
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     if (this.sidebarSubscription) {
       this.sidebarSubscription.unsubscribe();
     }
   }
-  ngAfterViewInit() {
+
+  ngAfterViewInit(): void {
     setTimeout(() => {
       this.featuredLayersCheckbox = true;
     }, 10);
   }
-  toggleSidebar() {
+
+  toggleSidebar(): void {
     this.sidebarService.toggleSidebar();
   }
   /**

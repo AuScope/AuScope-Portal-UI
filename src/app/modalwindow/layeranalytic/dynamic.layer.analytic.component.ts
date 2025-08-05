@@ -1,6 +1,6 @@
 import { LayerModel } from '@auscope/portal-core-ui';
 import { Component, Input, ViewChild, ComponentFactoryResolver, ViewContainerRef, ChangeDetectorRef } from '@angular/core';
-import {ref} from '../../../environments/ref';
+import { ref } from '../../../environments/ref';
 import { LayerAnalyticInterface } from './layer.analytic.interface';
 
 @Component({
@@ -16,7 +16,7 @@ export class DynamicLayerAnalyticComponent {
   dynamicAnalyticHost: ViewContainerRef;
 
 
-  constructor(private componentFactoryResolver: ComponentFactoryResolver, private changeDetectorRef: ChangeDetectorRef ) { }
+  constructor(private componentFactoryResolver: ComponentFactoryResolver, private changeDetectorRef: ChangeDetectorRef) { }
 
 
   @Input()

@@ -1,6 +1,12 @@
 {
   "root": true,
   "ignorePatterns": [
+    "**/*.js",
+    "**.*.spec.ts",
+    "coverage/**/*",
+    "dist/**/*",
+    "docs/**/*",
+    "node_modules/**/*",
     "projects/**/*"
   ],
   "overrides": [
@@ -16,9 +22,11 @@
         "createDefaultProgram": true
       },
       "extends": [
-        "plugin:@typescript-eslint/recommended",
         "plugin:@angular-eslint/recommended",
-        "plugin:@angular-eslint/template/process-inline-templates"
+        "plugin:@angular-eslint/template/process-inline-templates",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@typescript-eslint/recommended-requiring-type-checking",
+        "prettier"
       ],
       "rules": {
         "@angular-eslint/component-selector": [
@@ -40,24 +48,58 @@
             "type": "attribute"
           }
         ],
-        "@typescript-eslint/no-explicit-any": "off",
+        // ESLint
+        "@typescript-eslint/no-floating-promises": "warn",
+        "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
+        "@typescript-eslint/consistent-type-definitions": ["warn", "interface"],
         "@typescript-eslint/no-empty-function": "warn",
-        "@typescript-eslint/no-unused-vars": "warn",
-        "prefer-const": "warn",
         "@typescript-eslint/ban-types": "warn",
-        "no-var": "warn",
         "@typescript-eslint/no-this-alias": "warn",
-        "@typescript-eslint/no-inferrable-types": "off"
+        // Unfortunately this flags every single void method not marked as void
+        "@typescript-eslint/explicit-module-boundary-types": "off",
+        // This one causes almost every file to error due to "standalone: false: which isn't recommended in Angular 19
+        // Fixing it should be on the cards, but it's a nightmare to unravel
+        "@angular-eslint/prefer-standalone": "off",
+        // Formatting
+        "no-trailing-spaces": "error",
+        "no-multi-spaces": "error",
+        "eol-last": ["error", "always"],
+        "space-in-parens": ["error", "never"],
+        "object-curly-spacing": ["error", "always"],
+        "complexity": ["warn", 20],
+        "max-lines": ["warn", 1000],
+        "max-params": ["warn", 8],
+        "no-var": "warn",
+        "no-console": "off",    // Allow console output
+        "prefer-const": "warn",
+        // Downgrade errors to warnings
+        "@typescript-eslint/restrict-plus-operands": "warn",
+        // Too many warnings on these next ones, perhaps we may want to revisit later
+        "@typescript-eslint/no-explicit-any": "off", // Unsafe return of an `any` typed value
+        "@typescript-eslint/no-unsafe-member-access": "off", // Unsafe member access .loaded on an `any` value
+        "@typescript-eslint/no-unsafe-return": "off", // Unsafe return of an `any` typed value
+        "@typescript-eslint/no-unsafe-assignment": "off", // Unsafe assignment of an `any` value
+        "@typescript-eslint/no-unsafe-call": "off", // Unsafe call of an `any` (or `error`) typed value
+        "@typescript-eslint/member-ordering": "off", // public before private (vars and methods)
+        "@typescript-eslint/no-unsafe-argument": "off" // E.g. Unsafe argument of type `any` assigned to a parameter of type `string`
       }
     },
     {
       "files": [
         "*.html"
       ],
+      "plugins": [
+        "@angular-eslint/eslint-plugin-template"
+      ],
+      "parser": "@angular-eslint/template-parser",
       "extends": [
         "plugin:@angular-eslint/template/recommended"
       ],
-      "rules": {}
+      "rules": {
+        "@angular-eslint/template/banana-in-box": "error",
+        "@angular-eslint/template/no-negated-async": "warn",
+        "eqeqeq": "error"
+      }
     }
   ]
 }

@@ -6,8 +6,4 @@ import { Component } from '@angular/core';
     styleUrls: ['./help-menu.component.scss'],
     standalone: false
 })
-export class HelpMenuComponent {
-
-  constructor() { }
-
-}
+export class HelpMenuComponent {}

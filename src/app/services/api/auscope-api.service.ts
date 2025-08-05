@@ -31,7 +31,7 @@ export class AuscopeApiService {
 
   private apiRequest<T>(endpoint: string, options: any = {}): Observable<T> {
     const params = options.params || {};
-    const opts = {...options};
+    const opts = { ...options };
     delete opts.params;
     return this.apiGet<T>(endpoint, params, opts);
   }
@@ -292,7 +292,7 @@ export class AuscopeApiService {
    * @param eastBoundLongitude East bounds
    * @param southBoundLatitude South bounds
    * @param northBoundLatitude North bounds
-   * @returns 
+   * @returns
    */
   public searchCSWRecords(queryText: string, searchFields: string[], page: number, pageSize: number, ogcServices: string[], spatialRelation: string, westBoundLongitude: number,
       eastBoundLongitude: number, southBoundLatitude: number, northBoundLatitude: number): Observable<SearchResponse> {

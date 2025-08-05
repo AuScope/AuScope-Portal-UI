@@ -35,7 +35,7 @@ export class TIMAComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     // the timeout fixes the - NG0100: ExpressionChangedAfterItHasBeenCheckedError error
-    // data fetching is asynchronous anyway, you can postpone it to be called in next 
+    // data fetching is asynchronous anyway, you can postpone it to be called in next
     // macrotask (after ngAfterViewInit is finished) with a help of setTimeout with 0 time delay
     setTimeout(() => {
       if (this.doc.value) {

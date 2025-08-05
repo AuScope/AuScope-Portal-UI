@@ -1,6 +1,6 @@
 import { Component, Output, Inject, EventEmitter } from '@angular/core';
 import { LayerHandlerService, LayerModel, RenderStatusService, KMLDocService, ResourceType,
-         Constants, CsMapService} from '@auscope/portal-core-ui';
+         Constants, CsMapService } from '@auscope/portal-core-ui';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import * as JSZip from 'jszip';
@@ -64,7 +64,7 @@ export class CustomPanelComponent {
   }
 
   /**
-   * From a given URL get the google document - KML or KMZ 
+   * From a given URL get the google document - KML or KMZ
    */
   private getGoogleMapDoc(url: string): Observable<any> {
     return this.http.get(url, { responseType: 'blob' }).pipe(map((docBlob) => {
@@ -78,7 +78,7 @@ export class CustomPanelComponent {
   }
 
   /**
-   * Search list of available WMS layers given an OGC WMS URL, or try to load a KML/KMZ URL 
+   * Search list of available WMS layers given an OGC WMS URL, or try to load a KML/KMZ URL
    */
   public search() {
     // Clear the status message
@@ -125,7 +125,7 @@ export class CustomPanelComponent {
           const kmlTxt = e.target.result;
 
           // Remove unwanted characters and inject proxy for embedded URLs
-          const kmlStr = this.kmlService.cleanKML(kmlTxt.toString());
+          const kmlStr = this.kmlService.cleanKML(String(kmlTxt));
 
           const parser = new DOMParser();
           let kmlDoc = parser.parseFromString(kmlStr, "text/xml");
@@ -163,7 +163,7 @@ export class CustomPanelComponent {
         // Add KMZ to map
         this.getGoogleMapDoc(proxyUrl).subscribe(response => {
 
-          let kmz = response;
+          const kmz = response;
 
           const reader = new FileReader();
 
@@ -171,13 +171,13 @@ export class CustomPanelComponent {
           reader.addEventListener('loadend', (e) => {
             const kmzTxt = e.target.result;
 
-            let getDom = xml => (new DOMParser()).parseFromString(xml, "text/xml")
+            const getDom = xml => (new DOMParser()).parseFromString(xml, "text/xml")
 
             const getExtension = fileName => fileName.split(".").pop().toLowerCase();
 
             // unzip the kmz and iterate through the files
             const zipKMZ = new JSZip(); // reassemble the kmz (files) in this object
-            let getKmzDom = (kmzDoc) => {
+            const getKmzDom = (kmzDoc) => {
               const zip = new JSZip()
               return zip.loadAsync(kmzDoc)
                 .then(zip => {
@@ -218,19 +218,13 @@ export class CustomPanelComponent {
             };
 
             getKmzDom(kmzTxt).then(() => {
-
-              let me = this;
-
               // add the re-zipped and processed (proxy, metadata) kmz blob
               zipKMZ.generateAsync({ type: "blob" }).then(function (kmzBlob) {
                 // uncomment the following to save the kmz as a file
                 //saveAs(kmzBlob, "zipKMZ.kmz");
-
-                me.setupLayer(me, layerName, kmzBlob, proxyUrl, ResourceType.KMZ, "URL");
-
-                me.loading = false;
+                this.setupLayer(this, layerName, kmzBlob, proxyUrl, ResourceType.KMZ, "URL");
+                this.loading = false;
               });
-
             })
 
           });
@@ -266,8 +260,7 @@ export class CustomPanelComponent {
           } else {
             this.statusMsg = '<div class="text-danger">No viable OGC WMS found on the service endpoint. Kindly check your URL again.</div>';
           }
-        },
-        (error: any) => {
+        }, () => {
           //console.log("[custompanel.componen].error:", error);
           this.statusMsg = '<div class="text-danger">No viable OGC WMS found on the service endpoint. Kindly check your URL again.</div>';
           this.loading = false;
@@ -288,7 +281,7 @@ export class CustomPanelComponent {
 
   /**
    * Open the modal that displays the status of the render
-   * 
+   *
    * @param uiLayerModel ui layer model object whose status will be displayed
    */
   /*
@@ -301,32 +294,32 @@ export class CustomPanelComponent {
   */
 
   /**
-   * adds support so that kmlFeatureDatasupport will display a features attributes when they 
+   * adds support so that kmlFeatureDatasupport will display a features attributes when they
    * are encoded as ExtendedData.SchemaData.SimpleData
-   * 
+   *
    * converts kmlDoc from this format to ExtendedData.Data
-   * 
+   *
    * @param Document kml document
    */
   public parseExtendedData(kmlDoc: Document) {
-    let placemarks = kmlDoc.querySelectorAll("Placemark");
+    const placemarks = kmlDoc.querySelectorAll("Placemark");
     if (placemarks) {
       placemarks.forEach(placemark => {
 
-        let extendedData = placemark.querySelector("ExtendedData");
+        const extendedData = placemark.querySelector("ExtendedData");
         if (extendedData) {
-          let schemaData = extendedData.querySelector("SchemaData");
+          const schemaData = extendedData.querySelector("SchemaData");
           if (schemaData) {
 
             extendedData.removeChild(schemaData);
-            let simpleData = schemaData.querySelectorAll("SimpleData");
+            const simpleData = schemaData.querySelectorAll("SimpleData");
             simpleData.forEach(data => {
-              let att = data.getAttribute('name');
-              let value = data.textContent;
+              const att = data.getAttribute('name');
+              const value = data.textContent;
 
-              var newData = kmlDoc.createElement("Data");
+              const newData = kmlDoc.createElement("Data");
               newData.setAttribute("name", att);
-              var newValue = kmlDoc.createElement("value");
+              const newValue = kmlDoc.createElement("value");
               newValue.textContent = value;
               newData.appendChild(newValue);
               extendedData.appendChild(newData);
@@ -342,18 +335,18 @@ export class CustomPanelComponent {
   /**
    * updates the kml string in terms of injecting proxy and
    * setting up metadata (if required) for cesium
-   * 
+   *
    * @param kmlTxt kml string
    */
   public updateKML(kmlTxt: any): string {
 
     let kmlDom = null;
 
-    let getDom = xml => (new DOMParser()).parseFromString(xml, "text/xml")
+    const getDom = xml => (new DOMParser()).parseFromString(xml, "text/xml")
 
 
     // Remove unwanted characters and inject proxy for embedded URLs
-    let kmlStr = this.kmlService.cleanKMZ(kmlTxt);
+    const kmlStr = this.kmlService.cleanKMZ(kmlTxt);
 
     kmlDom = getDom(kmlStr);
 
@@ -384,17 +377,17 @@ export class CustomPanelComponent {
 
   /**
    * This gets called after a file has been selected for upload
-   * 
+   *
    * @param sourceType URL or File
    */
   public setupLayer(me: this, name: string, kmzData: any, proxyUrl: string, docType: ResourceType, sourceType: string) {
     let layerRec: LayerModel= null;
     // Make a layer model object
     if (docType == ResourceType.GEOJSON) {
-      layerRec  = me.layerHandlerService.makeCustomGEOJSONLayerRecord(name, proxyUrl, kmzData);
+      layerRec = me.layerHandlerService.makeCustomGEOJSONLayerRecord(name, proxyUrl, kmzData);
       layerRec.group = 'geojson-layer';
     } else if (docType == ResourceType.KMZ) {
-      layerRec  = me.layerHandlerService.makeCustomKMZLayerRecord(name, proxyUrl, kmzData);
+      layerRec = me.layerHandlerService.makeCustomKMZLayerRecord(name, proxyUrl, kmzData);
       layerRec.group = 'kmz-layer';
     } else {
       layerRec = me.layerHandlerService.makeCustomKMLLayerRecord(name, proxyUrl, kmzData);
@@ -413,7 +406,7 @@ export class CustomPanelComponent {
 
   /**
    * This gets called after a file has been selected for upload
-   * 
+   *
    * @param event Javascript file selection event object
    */
   public onKmlFileSelected(event) {
@@ -425,41 +418,34 @@ export class CustomPanelComponent {
         const reader = new FileReader();
         // When file has been read this function is called
         reader.onload = () => {
-
-          let jsonStr = reader.result.toString();
+          const jsonStr = String(reader.result);
           this.setupLayer(this, file.name, jsonStr, "", ResourceType.GEOJSON, "FILE");
         };
         // Initiate reading the GEOJSON file
         reader.readAsText(file);
       } else if (getExtension(file.name) === "kmz") {
         this.loading = true; // start spinner
-        let getDom = xml => (new DOMParser()).parseFromString(xml, "text/xml")
 
         // unzip the kmz and iterate through the files
-        var zipKMZ = new JSZip(); // reassemble the kmz (files) in this object
-        let getKmlDom = (kmzFile) => {
-          var zip = new JSZip()
+        const zipKMZ = new JSZip(); // reassemble the kmz (files) in this object
+        const getKmlDom = (kmzFile) => {
+          const zip = new JSZip()
           return zip.loadAsync(kmzFile)
             .then(zip => {
-
               let kmlDom = null
               zip.forEach((relPath, file) => {
 
                 if (getExtension(relPath) === "kml") {
                   kmlDom = file.async("string").then(kmlTxt => {
-
                     const xmlStr = this.updateKML(kmlTxt);
-
                     zipKMZ.file(relPath, xmlStr);
-                  })
-
+                  });
                 } else {
                   // add the file (non kml) into the zip
                   file.async("blob").then(x => {
                     zipKMZ.file(relPath, x);
                   });
                 }
-                //})
               })
 
               return kmlDom || Promise.reject("No kmz file found")
@@ -475,15 +461,11 @@ export class CustomPanelComponent {
           //var blob5 = new Blob([kmlStr2], { type: 'text/xml' })
           //saveAs(blob5, "kmlStr2.kml");
 
-          let me = this;
-
           // add the re-zipped and processed (proxy, metadata) kmz blob
           zipKMZ.generateAsync({ type: "blob" }).then(function (kmzBlob) {
             //saveAs(kmzBlob, "zipKMZ.kmz");
-
-            me.setupLayer(me, file.name, kmzBlob, "", ResourceType.KMZ, "FILE");
-
-            me.loading = false;
+            this.setupLayer(me, file.name, kmzBlob, "", ResourceType.KMZ, "FILE");
+            this.loading = false;
           });
 
         })
@@ -492,7 +474,7 @@ export class CustomPanelComponent {
         // When file has been read this function is called
         reader.onload = () => {
 
-          let kmlStr = reader.result.toString();
+          let kmlStr = String(reader.result);
 
           // Remove unwanted characters and inject proxy for embedded URLs
           kmlStr = this.kmlService.cleanKML(kmlStr);
@@ -545,5 +527,5 @@ export class CustomPanelComponent {
       modelRef.componentInstance.layer = layer;
     }
   }
-  
+
 }
