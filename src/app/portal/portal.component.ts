@@ -1,26 +1,23 @@
 import { AuthService } from 'app/services/auth/auth.service';
-import { BsModalService } from 'ngx-bootstrap/modal';
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, inject } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { SidebarService } from './sidebar.service';
+
 /**
  * Defines the overall app layout
  */
 @Component({
     selector: 'app-portal',
     templateUrl: './portal.component.html',
-    styleUrls: ['../../styles.scss'],
+    styleUrls: ['./portal.component.scss'],
     standalone: false
 })
 export class PortalComponent implements OnInit, OnDestroy, AfterViewInit {
+  private authService = inject(AuthService);
+  private sidebarService = inject(SidebarService);
   private sidebarSubscription: Subscription;
-
   featuredLayersCheckbox: boolean = true;
   isSidebarOpen = false;
-
-  constructor(private authService: AuthService, private modalService: BsModalService, private sidebarService: SidebarService
-
-  ) {}
 
   /**
    * Featured layers would not display after logging in due to a strange UI bug, so by binding
@@ -49,6 +46,11 @@ export class PortalComponent implements OnInit, OnDestroy, AfterViewInit {
   toggleSidebar(): void {
     this.sidebarService.toggleSidebar();
   }
+
+  openAppStore(): void {
+    window.open('https://avre.auscope.org.au');
+  }
+
   /**
    * Check is a user is logged in.
    *

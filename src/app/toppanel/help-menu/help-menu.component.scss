@@ -1,11 +1,31 @@
 @use '../../globals';
 
-.help-menu {
-    color: globals.$text-colour;
+.menu-link {
+    color: globals.$auscope-royal-blue;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
 }
 
-.help-menu:hover {
-    color: globals.$text-highlight-colour;
+.menu-link:hover {
+    color: globals.$blue-hover-colour;
+}
+
+.menu-icon {
+    margin-right: 8px;
+    font-size: 1.2rem;
+}
+
+.menu-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.menu-subtext {
+    color: globals.$text-colour;
+    margin-top: -0.5rem;
+    font-size: x-small;
+    line-height: 1.5rem;
 }
 
 ::ng-deep {
