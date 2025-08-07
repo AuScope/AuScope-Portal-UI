@@ -1,0 +1,11 @@
+@use "../globals";
+@use "../../styles.scss";
+
+.auscope-tools-btn {
+    color: white;
+    transition: color 0.2s;
+}
+
+.auscope-tools-btn:hover, .auscope-tools-btn:active, .auscope-tools-btn:focus {
+    color: white;
+}

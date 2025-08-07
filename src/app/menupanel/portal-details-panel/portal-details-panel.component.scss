@@ -1,3 +1,9 @@
+@use "../../globals";
+
+.portal-version {
+    cursor: default;
+}
+
 a {
     font-size: 12px;
     display: inline;
@@ -6,7 +12,7 @@ a {
 div {
     text-align: center;
     padding-top: 10px;
-    color: #ccc;
+    color: globals.$auscope-royal-blue;
 }
 
 .disclaimer-link {
