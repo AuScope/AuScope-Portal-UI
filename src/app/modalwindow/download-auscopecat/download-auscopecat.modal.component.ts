@@ -164,7 +164,8 @@ export class DownloadAuScopeCatModalComponent implements OnInit {
         // Fallback to Australia‐wide bounds
         const defaultBounds = { north: -10.689, east: 153.637, south: -43.644, west: 113.155 };
         const header = [
-            '# No bbox or polygon supplied – defaulting to Australia wide:',
+            '# No bbox or polygon supplied, defaulting to Australia wide.',
+            '# Note this may result in long load times and large datasets. Adding bounds is highly recommended.',
             'bbox = {',
             `    "north": ${defaultBounds.north},`,
             `    "east":  ${defaultBounds.east},`,
