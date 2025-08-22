@@ -120,6 +120,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthErrorHandlerInterceptor } from './interceptors/auth-error.interceptor';
 import { ROIModule } from './modalwindow/roi/roi.modal.modules';
 import { ToolbarComponent } from './menupanel/toolbar/toolbar.component';
+import { DownloadAuScopeCatModalComponent } from './modalwindow/download-auscopecat/download-auscopecat.modal.component';
 
 PlotlyModule.plotlyjs = PlotlyJS;
 
@@ -215,7 +216,8 @@ PlotlyModule.plotlyjs = PlotlyJS;
         ReactiveFormsModule,
         BrowserModule,
         DragDropModule,
-        ROIModule
+        ROIModule,
+        DownloadAuScopeCatModalComponent
     ],
     bootstrap: [
         AppComponent
