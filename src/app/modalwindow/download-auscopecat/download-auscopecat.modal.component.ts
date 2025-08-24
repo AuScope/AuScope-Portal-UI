@@ -105,13 +105,14 @@ export class DownloadAuScopeCatModalComponent implements OnInit {
      * @returns a string representing the download api call
      */
     private buildDownloadCall(resource: OnlineResourceModel, index: number): string {
+        const bboxOrPolygon = this.bbox ? 'bbox=bbox' : 'polygon=polygon';
         return [
             'download_resource = SimpleNamespace(',
             `  url = "${resource.url}",`,
             '  type = ServiceType.WFS,',
             `  name = "${resource.name}"`,
             ')',
-            `download(download_resource, bbox=bbox, download_type=DownloadType.CSV, file_name="download_${index}.csv")`,
+            `download(download_resource, ${bboxOrPolygon}, download_type=DownloadType.CSV, file_name="download_${index}.csv")`,
             ''
         ].join('\n');
     }
