@@ -17,6 +17,7 @@ import { take } from 'rxjs/operators';
 
 import { SidebarService } from 'app/portal/sidebar.service';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
+import { DownloadAuScopeCatModalComponent } from 'app/modalwindow/download-auscopecat/download-auscopecat.modal.component';
 
 // Search fields
 const SEARCH_FIELDS = [{
@@ -869,6 +870,16 @@ export class SearchPanelComponent implements OnInit {
     } else {
       this.search(false);
     }
+  }
+
+  downloadWithAuScopeCat(layer: LayerModel): void {
+    const bsModalRef = this.modalService.open(DownloadAuScopeCatModalComponent, {
+      size: 'lg',
+      backdrop: false
+    });
+    bsModalRef.componentInstance.layer = layer;
+    bsModalRef.componentInstance.bbox = this.bbox;
+    //bsModalRef.componentInstance.polygon = this.polygonFilter;
   }
 
 }

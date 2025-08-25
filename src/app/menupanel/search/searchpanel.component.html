@@ -189,7 +189,8 @@
                     <span class="layer-header-label" title="{{downloadLayer.value.Layer.name}}">{{ downloadLayer.value.Layer.name }}</span>
                     <!--mat-progress-bar *ngIf= "downloadLayer.value.Ob | async as download" [mode]="download.state === 'PENDING' ? 'buffer' : 'determinate'" [value]="download.progress"></mat-progress-bar-->
                     <mat-progress-bar *ngIf= "downloadLayer.value.Ob" style="height: 10px;" [mode]="determinate" [value]="downloadLayer.value.Ob.progress" ></mat-progress-bar>
-                    <button style="float:right;padding:2px;margin-left:8px;line-height:100%;" class="btn btn-sm btn-primary" type="button" title="Click to download" (click)="downloadAsCSV(downloadLayer.value.Layer)"><i class="fa fa-download"></i></button>
+                    <button class="btn btn-sm btn-primary download-button" type="button" title="Click to download" (click)="downloadAsCSV(downloadLayer.value.Layer)"><i class="fa fa-download"></i></button>
+                    <button class="btn btn-sm btn-primary download-button" type="button" title="Download with AuScope-Cat" (click)="downloadWithAuScopeCat(downloadLayer.value.Layer)"><i class="fa fa-plug"></i></button>
                 </button>
             </div>
         </div>

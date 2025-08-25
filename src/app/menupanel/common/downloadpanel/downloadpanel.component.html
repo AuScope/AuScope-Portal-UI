@@ -102,6 +102,10 @@
 				<button *ngIf="polygonFilter && isPolygonSupportedLayer" title="Download data" (click)="download4Polygon()" ngbDropdownItem>Download Data</button>
 				<button *ngIf="(bbox || polygonFilter) && isWCSDownloadSupported" title="Download as KML. GoogleMap's maximum KML size is 5M!" (click)="download4PolygonKML()" ngbDropdownItem>Download KML</button>
 				<button *ngIf="isTsgDownloadAvailable" title="Download TSG files" (click)="popupTSGDownload()" ngbDropdownItem>Download TSG Files</button>
+                @if (bbox || (polygonFilter && isPolygonSupportedLayer)) {
+                    <hr class="menu-hr">
+                    <button (click)="downloadWithAuScopeCat()" ngbDropdownItem>Download with AuScope-Cat&nbsp;<i class="fa fa-plug menu-icon"></i></button>
+                }
 			</div>
 		</div>
 
@@ -110,7 +114,6 @@
 			{{layer.cswRecords[0].onlineResources[1].name}}
 			URL: <a class="text-danger" target="_blank" href="{{layer.cswRecords[0].onlineResources[1].url}}">{{layer.cswRecords[0].onlineResources[1].url}}</a>
 		</p>
-
 	</div>
 
 	<div [hidden]='!isWCSDownloadSupported' class="form-group">

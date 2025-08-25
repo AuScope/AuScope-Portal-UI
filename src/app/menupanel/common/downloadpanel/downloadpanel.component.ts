@@ -12,17 +12,16 @@ import { BoundsService } from 'app/services/bounds/bounds.service';
 import { NVCLService } from '../../../modalwindow/querier/customanalytic/nvcl/nvcl.service';
 import { shareReplay } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { DownloadAuScopeCatModalComponent } from 'app/modalwindow/download-auscopecat/download-auscopecat.modal.component';
 
 declare let gtag: Function;
 
 @Component({
     selector: 'app-download-panel',
     templateUrl: './downloadpanel.component.html',
-    styleUrls: ['../../menupanel.scss'],
+    styleUrls: ['../../menupanel.scss', './downloadpanel.component.scss'],
     standalone: false
 })
-
-
 export class DownloadPanelComponent implements OnInit {
   [x: string]: any;
   @Input() layer: LayerModel;
@@ -687,7 +686,7 @@ export class DownloadPanelComponent implements OnInit {
     this.bsModalRef.componentInstance.tsgDownloadServiceMsg = this.tsgDownloadServiceMsg;
   }
 
-   /**
+  /**
    * Download the TSG files filtering with a bbox or polyon filter
    */
   public download4TsgFiles() {
@@ -722,7 +721,7 @@ export class DownloadPanelComponent implements OnInit {
        *
        * console.log("environment.googleAnalyticsKey: "+environment.googleAnalyticsKey);
        */
-        if (environment.googleAnalyticsKey && typeof gtag === "function") {
+      if (environment.googleAnalyticsKey && typeof gtag === "function") {
         gtag('event', 'TSGDownload', {
           event_category: 'TSGBulkDownload',
           event_action: '[' + total + ' of ' + urlsArray.length + ']' + urls
@@ -813,7 +812,18 @@ export class DownloadPanelComponent implements OnInit {
       this.irisDownloadListOption.dateFrom = newStartDate;
       this.irisDownloadListOption.dateTo = newEndDate;
     }
+  }
 
+  public downloadWithAuScopeCat(): void {
+    this.bsModalRef = this.activeModalService.open(DownloadAuScopeCatModalComponent, {
+        size: 'lg',
+        backdrop: false
+      });
+    this.bsModalRef.componentInstance.layer = this.layer;
+    this.bsModalRef.componentInstance.bbox = this.bbox;
+    this.bsModalRef.componentInstance.polygon = this.polygonFilter;
+    // If we want to download TSG data later
+    // this.bsModalRef.componentInstance.isTsgLayer = this.isTsgDownloadAvailable;
   }
 
 }
