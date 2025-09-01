@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
-import { CsMapService, LayerModel, ManageStateService } from '@auscope/portal-core-ui';
+import { CsMapService } from '../../lib/portal-core-ui/service/cesium-map/cs-map.service';
+import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
+import { ManageStateService } from '../../lib/portal-core-ui/service/permanentlink/manage-state.service';
 import { AdvancedComponentService } from './advanced-component.service';
 import { LegendUiService } from '../legend/legend-ui.service';
 import { UILayerModelService } from './uilayer-model.service';

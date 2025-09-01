@@ -1,5 +1,5 @@
 import { saveAs } from 'file-saver';
-import { LayerModel } from '@auscope/portal-core-ui';
+import { LayerModel } from '../../../lib/portal-core-ui/model/data/layer.model';
 import { NVCLBoreholeAnalyticService } from './nvcl.boreholeanalytic.service';
 import { Component, Input, AfterViewInit, OnInit, ViewChild } from '@angular/core';
 import { UserStateService } from 'app/services/user/user-state.service';

@@ -1,5 +1,7 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { CsClipboardService, DownloadWfsService, Polygon } from '@auscope/portal-core-ui';
+import { CsClipboardService } from '../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
+import { DownloadWfsService } from '../lib/portal-core-ui/service/wfs/download/download-wfs.service';
+import { Polygon } from '../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
 import { Component, OnInit } from '@angular/core';
 import { isNumber } from '@turf/helpers';
 import { saveAs } from 'file-saver';

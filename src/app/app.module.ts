@@ -43,8 +43,8 @@ import { AngularCesiumModule, AngularCesiumWidgetsModule } from '@auscope/angula
 import { QuerierModalComponent } from './modalwindow/querier/querier.modal.component';
 import { ClipboardModule } from 'ngx-clipboard';
 
-import { PortalCoreModule } from '@auscope/portal-core-ui';
-import { PortalCorePipesModule } from '@auscope/portal-core-ui';
+
+
 
 import { NgSelectModule } from '@ng-select/ng-select';
 
@@ -60,6 +60,10 @@ import { CdkTableModule } from '@angular/cdk/table';
 
 import { DisclaimerModalComponent } from './modalwindow/disclaimer/disclaimer.modal.component';
 import { PortalDetailsPanelComponent } from './menupanel/portal-details-panel/portal-details-panel.component';
+
+// Portal Core UI Library
+import { PortalCoreModule } from './lib/portal-core-ui/portal-core.module';
+import { PortalCorePipesModule } from './lib/portal-core-ui/uiutilities/portal-core.pipes.module';
 
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';

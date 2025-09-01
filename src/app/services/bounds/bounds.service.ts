@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { RectangleEditorObservable } from '@auscope/angular-cesium';
-import { Bbox, CsMapService, UtilitiesService } from '@auscope/portal-core-ui';
+import { CsMapService } from '../../lib/portal-core-ui/service/cesium-map/cs-map.service';
+import { Bbox } from '../../lib/portal-core-ui/model/data/bbox.model';
+import { UtilitiesService } from '../../lib/portal-core-ui/utility/utilities.service';
 import { config } from '../../../environments/config';
 
 /**

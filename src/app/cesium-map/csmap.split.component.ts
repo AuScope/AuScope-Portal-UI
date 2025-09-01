@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { CsMapService } from '@auscope/portal-core-ui';
+import { CsMapService } from '../lib/portal-core-ui/service/cesium-map/cs-map.service';
 
 /**
  * Split map widget

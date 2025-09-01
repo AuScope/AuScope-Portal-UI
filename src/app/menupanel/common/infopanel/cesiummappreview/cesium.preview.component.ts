@@ -1,4 +1,5 @@
-import { CsMapService, CSWRecordModel } from '@auscope/portal-core-ui';
+import { CsMapService } from '../../../../lib/portal-core-ui/service/cesium-map/cs-map.service';
+import { CSWRecordModel } from '../../../../lib/portal-core-ui/model/data/cswrecord.model';
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ViewerConfiguration } from '@auscope/angular-cesium';
 import { CsMapComponent } from 'app/cesium-map/csmap.component';

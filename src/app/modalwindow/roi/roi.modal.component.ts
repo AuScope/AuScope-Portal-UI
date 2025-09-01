@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { UntypedFormArray, UntypedFormBuilder } from '@angular/forms';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmModalComponent } from '../confirm/confirm.modal.component';
-import { CsClipboardService } from '@auscope/portal-core-ui';
+import { CsClipboardService } from '../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
 import { UserStateService } from 'app/services/user/user-state.service';
 import { User } from 'app/models/user.model';
 

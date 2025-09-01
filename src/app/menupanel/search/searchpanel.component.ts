@@ -1,7 +1,14 @@
 import { Component, ElementRef, HostListener, Inject, NgZone, OnInit, ViewChild } from '@angular/core';
 import { RectangleEditorObservable } from '@auscope/angular-cesium';
 
-import { Bbox, CSWRecordModel, CsMapService, LayerHandlerService, LayerModel, RenderStatusService, UtilitiesService, Constants } from '@auscope/portal-core-ui';
+import { CSWRecordModel } from '../../lib/portal-core-ui/model/data/cswrecord.model';
+import { Bbox } from '../../lib/portal-core-ui/model/data/bbox.model';
+import { CsMapService } from '../../lib/portal-core-ui/service/cesium-map/cs-map.service';
+import { LayerHandlerService } from '../../lib/portal-core-ui/service/cswrecords/layer-handler.service';
+import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
+import { RenderStatusService } from '../../lib/portal-core-ui/service/cesium-map/renderstatus/render-status.service';
+import { UtilitiesService } from '../../lib/portal-core-ui/utility/utilities.service';
+import { Constants } from '../../lib/portal-core-ui/utility/constants.service';
 import { NgbDropdown, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SearchService } from 'app/services/search/search.service';
 import { Observable, Subject, Subscription } from 'rxjs';

@@ -1,6 +1,11 @@
 import { Component, Input, ViewChildren, QueryList, AfterViewInit, ChangeDetectorRef } from '@angular/core';
-import { CsMapService, LayerModel, ResourceType, UtilitiesService } from '@auscope/portal-core-ui';
-import { ManageStateService, LayerHandlerService, CsClipboardService } from '@auscope/portal-core-ui';
+import { CsMapService } from '../../lib/portal-core-ui/service/cesium-map/cs-map.service';
+import { ResourceType, GeometryType } from '../../lib/portal-core-ui/utility/constants.service';
+import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
+import { UtilitiesService } from '../../lib/portal-core-ui/utility/utilities.service';
+import { ManageStateService } from '../../lib/portal-core-ui/service/permanentlink/manage-state.service';
+import { LayerHandlerService } from '../../lib/portal-core-ui/service/cswrecords/layer-handler.service';
+import { CsClipboardService } from '../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
 import { SplitDirection } from 'cesium';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';

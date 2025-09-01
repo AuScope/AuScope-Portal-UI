@@ -1,6 +1,14 @@
-import { CsClipboardService, CsMapService, CsWMSService, FilterPanelService, GeometryType, LayerHandlerService,
-         LayerModel, LayerStatusService, Polygon, UtilitiesService, ResourceType,
-         CsCSWService } from '@auscope/portal-core-ui';
+import { CsClipboardService } from '../../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
+import { ResourceType, GeometryType } from '../../../lib/portal-core-ui/utility/constants.service';
+import { CsMapService } from '../../../lib/portal-core-ui/service/cesium-map/cs-map.service';
+import { CsWMSService } from '../../../lib/portal-core-ui/service/wms/cs-wms.service';
+import { FilterPanelService } from '../../../lib/portal-core-ui/service/filterpanel/filterpanel-service';
+import { LayerHandlerService } from '../../../lib/portal-core-ui/service/cswrecords/layer-handler.service';
+import { LayerModel } from '../../../lib/portal-core-ui/model/data/layer.model';
+import { LayerStatusService } from '../../../lib/portal-core-ui/utility/layerstatus.service';
+import { Polygon } from '../../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
+import { UtilitiesService } from '../../../lib/portal-core-ui/utility/utilities.service';
+import { CsCSWService } from '../../../lib/portal-core-ui/service/wcsw/cs-csw.service';
 import { ApplicationRef, Component, Inject, Input, OnInit, AfterViewInit, ViewChild, ViewContainerRef } from '@angular/core';
 import * as _ from 'lodash';
 import { config } from '../../../../environments/config';

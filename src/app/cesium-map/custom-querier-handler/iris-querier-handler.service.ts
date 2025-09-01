@@ -1,4 +1,4 @@
-import { LayerModel } from "@auscope/portal-core-ui";
+import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 import { KmlFeatureData } from "cesium";
 
 

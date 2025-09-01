@@ -1,9 +1,9 @@
-import { LayerModel } from '@auscope/portal-core-ui';
-import { OnlineResourceModel } from '@auscope/portal-core-ui';
+import { LayerModel } from '../../../../lib/portal-core-ui/model/data/layer.model';
+import { OnlineResourceModel } from '../../../../lib/portal-core-ui/model/data/onlineresource.model';
 import { Component, Input, AfterViewInit } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { QuerierInfoModel } from '@auscope/portal-core-ui';
-import { UtilitiesService } from '@auscope/portal-core-ui';
+import { QuerierInfoModel } from '../../../../lib/portal-core-ui/model/data/querierinfo.model';
+import { UtilitiesService } from '../../../../lib/portal-core-ui/utility/utilities.service';
 import { RemanentAnomaliesService } from './remanentanomalies.service';
 
 

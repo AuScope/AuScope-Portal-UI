@@ -3,7 +3,7 @@ import { throwError as observableThrowError, Observable, BehaviorSubject } from 
 import { map, catchError } from 'rxjs/operators';
 
 import { environment } from '../../../environments/environment';
-import { LayerModel } from '@auscope/portal-core-ui';
+import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Registry } from './data-model';

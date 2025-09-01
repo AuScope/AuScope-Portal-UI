@@ -1,4 +1,4 @@
-import { CSWRecordModel } from "@auscope/portal-core-ui";
+import { CSWRecordModel } from '../lib/portal-core-ui/model/data/cswrecord.model';
 
 export interface SearchResponse {
   totalCSWRecordHits: number;

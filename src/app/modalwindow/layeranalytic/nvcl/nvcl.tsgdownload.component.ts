@@ -1,8 +1,8 @@
-import { LayerModel } from '@auscope/portal-core-ui';
-import { ManageStateService } from '@auscope/portal-core-ui';
+import { LayerModel } from '../../../lib/portal-core-ui/model/data/layer.model';
+import { ManageStateService } from '../../../lib/portal-core-ui/service/permanentlink/manage-state.service';
 import { Component, Input, AfterViewInit, OnInit, AfterContentChecked } from '@angular/core';
 import { LayerAnalyticInterface } from '../layer.analytic.interface';
-import { DownloadWfsService } from '@auscope/portal-core-ui';
+import { DownloadWfsService } from '../../../lib/portal-core-ui/service/wfs/download/download-wfs.service';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { NVCLBoreholeAnalyticService } from './nvcl.boreholeanalytic.service';
 import { TSGDownloadService } from './tsgdownload.service';

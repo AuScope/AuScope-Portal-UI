@@ -3,7 +3,7 @@
   "version": "6.8.0",
   "license": "MIT",
   "scripts": {
-    "ng": "ng",
+    "ng": "node --max_old_space_size=8000 ./node_modules/@angular/cli/bin/ng",
     "start": "node --max_old_space_size=8000 ./node_modules/@angular/cli/bin/ng serve",
     "build": "node --max_old_space_size=8000 ./node_modules/@angular/cli/bin/ng build",
     "build-prod": "node --max_old_space_size=8000 ./node_modules/@angular/cli/bin/ng build --configuration=production",
@@ -33,7 +33,6 @@
     "@angular/router": "^20.1.6",
     "@auscope/angular-cesium": "^20.0.0",
     "@auscope/angular2parse": "^20.0.2",
-    "@auscope/portal-core-ui": "^6.5.51",
     "@csiro-geoanalytics/ng": "^2.5.0",
     "@csiro-geoanalytics/utils-rxjs": "^2.0.1",
     "@ng-bootstrap/ng-bootstrap": "^19.0.0",

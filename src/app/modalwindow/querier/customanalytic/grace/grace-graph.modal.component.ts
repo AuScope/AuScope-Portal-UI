@@ -1,5 +1,5 @@
 import { Component, AfterViewInit, ChangeDetectorRef } from '@angular/core';
-import { CsMapObject } from '@auscope/portal-core-ui';
+import { CsMapObject } from '../../../../lib/portal-core-ui/service/cesium-map/cs-map-object';
 import { Subscription } from 'rxjs';
 import { GraceService } from '../../../../services/wcustom/grace/grace.service';
 import { saveAs } from 'file-saver';

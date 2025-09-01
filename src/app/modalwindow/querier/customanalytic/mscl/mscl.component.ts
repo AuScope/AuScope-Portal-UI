@@ -1,5 +1,7 @@
 import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
-import { LayerModel, OnlineResourceModel, QuerierInfoModel } from '@auscope/portal-core-ui';
+import { LayerModel } from '../../../../lib/portal-core-ui/model/data/layer.model';
+import { OnlineResourceModel } from '../../../../lib/portal-core-ui/model/data/onlineresource.model';
+import { QuerierInfoModel } from '../../../../lib/portal-core-ui/model/data/querierinfo.model';
 import { MSCLService } from '../../../layeranalytic/mscl/mscl.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { MSCLAnalyticComponent } from '../../../layeranalytic/mscl/mscl.analytic.component';

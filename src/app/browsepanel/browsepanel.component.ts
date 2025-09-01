@@ -1,8 +1,9 @@
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
-import { LayerHandlerService, RenderStatusService } from '@auscope/portal-core-ui';
+import { LayerHandlerService } from '../lib/portal-core-ui/service/cswrecords/layer-handler.service';
+import { RenderStatusService } from '../lib/portal-core-ui/service/cesium-map/renderstatus/render-status.service';
 import { UILayerModel } from '../menupanel/common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
-import { LayerModel } from '@auscope/portal-core-ui'
+import { LayerModel } from '../lib/portal-core-ui/model/data/layer.model';
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
 import { FilterService } from 'app/services/filter/filter.service';
 import { SidebarService } from 'app/portal/sidebar.service';
