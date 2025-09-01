@@ -1,4 +1,5 @@
-import { UtilitiesService, LayerModel } from "@auscope/portal-core-ui";
+import { UtilitiesService } from '../../lib/portal-core-ui/utility/utilities.service';
+import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 
 export class GeoJsonQuerierHandler {
 

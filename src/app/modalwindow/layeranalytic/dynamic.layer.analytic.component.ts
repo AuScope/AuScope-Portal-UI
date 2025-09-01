@@ -1,4 +1,4 @@
-import { LayerModel } from '@auscope/portal-core-ui';
+import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 import { Component, Input, ViewChild, ComponentFactoryResolver, ViewContainerRef, ChangeDetectorRef } from '@angular/core';
 import { ref } from '../../../environments/ref';
 import { LayerAnalyticInterface } from './layer.analytic.interface';

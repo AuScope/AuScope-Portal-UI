@@ -1,8 +1,8 @@
-import { LayerModel } from '@auscope/portal-core-ui';
-import { OnlineResourceModel } from '@auscope/portal-core-ui';
+import { LayerModel } from '../../../../lib/portal-core-ui/model/data/layer.model';
+import { OnlineResourceModel } from '../../../../lib/portal-core-ui/model/data/onlineresource.model';
 import { Component, Input, AfterViewInit } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { QuerierInfoModel } from '@auscope/portal-core-ui';
+import { QuerierInfoModel } from '../../../../lib/portal-core-ui/model/data/querierinfo.model';
 import { TIMAService } from './tima.service';
 
 

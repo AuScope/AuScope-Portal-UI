@@ -1,7 +1,13 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, Inject } from '@angular/core';
 import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
-import { Constants, LayerModel, LayerStatusService, ManageStateService, OnlineResourceModel, SldService, UtilitiesService } from '@auscope/portal-core-ui';
+import { Constants } from '../../lib/portal-core-ui/utility/constants.service';
+import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
+import { LayerStatusService } from '../../lib/portal-core-ui/utility/layerstatus.service';
+import { ManageStateService } from '../../lib/portal-core-ui/service/permanentlink/manage-state.service';
+import { OnlineResourceModel } from '../../lib/portal-core-ui/model/data/onlineresource.model';
+import { SldService } from '../../lib/portal-core-ui/service/style/wms/sld.service';
+import { UtilitiesService } from '../../lib/portal-core-ui/utility/utilities.service';
 import { LegendModalComponent } from 'app/modalwindow/legend/legend.modal.component';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';

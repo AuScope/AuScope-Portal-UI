@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { GetCapsService, LayerHandlerService, LayerModel, UtilitiesService } from '@auscope/portal-core-ui';
+import { LayerHandlerService } from '../../lib/portal-core-ui/service/cswrecords/layer-handler.service';
+import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
+import { UtilitiesService } from '../../lib/portal-core-ui/utility/utilities.service';
+import { GetCapsService } from '../../lib/portal-core-ui/service/wms/get-caps.service';
 
 
 /**

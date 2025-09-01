@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { Layout, Data } from 'plotly.js-dist-min';
-import { SimpleXMLService } from '@auscope/portal-core-ui';
+import { SimpleXMLService } from '../../../lib/portal-core-ui/utility/simplexml.service';
 
 // Elements detectable via XRF
 const XRFElem = ['Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn', 'As', 'Se', 'Rb', 'Sr', 'Y', 'Zr', 'Nb', 'Mo',

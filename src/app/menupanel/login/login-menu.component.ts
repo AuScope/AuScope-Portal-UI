@@ -7,7 +7,7 @@ import { User } from 'app/models/user.model';
 import { AuthService } from 'app/services/auth/auth.service';
 import { UserStateService } from '../../services/user/user-state.service';
 import { ROIModalComponent } from 'app/modalwindow/roi/roi.modal.component';
-import { CsClipboardService } from '@auscope/portal-core-ui';
+import { CsClipboardService } from '../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
 @Component({
     selector: '[app-login-menu]',
     templateUrl: './login-menu.component.html',

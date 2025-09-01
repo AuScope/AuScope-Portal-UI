@@ -1,5 +1,5 @@
 import { ComponentFactoryResolver, ComponentRef, Injectable, ViewContainerRef } from '@angular/core';
-import { LayerModel } from '@auscope/portal-core-ui';
+import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 import { AdvancedMapComponent } from 'app/cesium-map/advanced/advanced-map.component';
 import { AdvancedFilterDirective } from 'app/menupanel/common/filterpanel/advance/advanced-filter.directive';
 import { ref } from '../../../environments/ref';

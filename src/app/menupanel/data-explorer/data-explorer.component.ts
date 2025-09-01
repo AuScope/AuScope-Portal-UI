@@ -2,14 +2,17 @@ import { DataExplorerService } from "./data-explorer.service";
 import { Observable, Subject, merge } from "rxjs";
 import { Component, OnInit, ViewChild, ElementRef } from "@angular/core";
 import { filter, debounceTime, distinctUntilChanged, map } from "rxjs/operators";
-import { Bbox, CsMapService, LayerModel, UtilitiesService } from "@auscope/portal-core-ui";
+import { CsMapService } from '../../lib/portal-core-ui/service/cesium-map/cs-map.service';
+import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
+import { UtilitiesService } from '../../lib/portal-core-ui/utility/utilities.service';
 import { NgbModal, NgbTypeahead } from "@ng-bootstrap/ng-bootstrap";
 import { UILayerModelService } from "app/services/ui/uilayer-model.service";
-import { RenderStatusService } from "@auscope/portal-core-ui";
+import { RenderStatusService } from '../../lib/portal-core-ui/service/cesium-map/renderstatus/render-status.service';
 import { Registry } from "./data-model";
 import { RectangleEditorObservable } from "@auscope/angular-cesium";
 import { UILayerModel } from "../common/model/ui/uilayer.model";
 import { AddRegistryModalComponent } from "app/modalwindow/registry/add-registry.modal.component";
+import { Bbox } from '../../lib/portal-core-ui/model/data/bbox.model';
 
 @Component({
     selector: "[app-data-explorer]",

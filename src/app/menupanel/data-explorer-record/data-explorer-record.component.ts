@@ -1,5 +1,8 @@
 import { Component, Input, ViewContainerRef, OnInit } from "@angular/core";
-import { CSWRecordModel, CsMapService, UtilitiesService, LayerModel } from "@auscope/portal-core-ui";
+import { CSWRecordModel } from '../../lib/portal-core-ui/model/data/cswrecord.model';
+import { CsMapService } from '../../lib/portal-core-ui/service/cesium-map/cs-map.service';
+import { UtilitiesService } from '../../lib/portal-core-ui/utility/utilities.service';
+import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { UserStateService } from "app/services/user/user-state.service";
 import { RecordModalComponent } from "../record-modal/record-modal.component";

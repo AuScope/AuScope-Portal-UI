@@ -1,7 +1,8 @@
 import { Clipboard } from '@angular/cdk/clipboard';
 import { CommonModule } from '@angular/common';
 import { Component, inject, Input, OnInit } from '@angular/core';
-import { LayerModel, OnlineResourceModel } from '@auscope/portal-core-ui';
+import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
+import { OnlineResourceModel } from '../../lib/portal-core-ui/model/data/onlineresource.model';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import bboxPolygon from '@turf/bbox-polygon';
 import { Feature } from '@turf/helpers';

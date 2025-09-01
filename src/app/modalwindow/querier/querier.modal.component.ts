@@ -2,7 +2,10 @@
 import { ApplicationRef, ChangeDetectorRef, Component, Inject, OnInit, ElementRef, ViewChild, AfterViewInit, Renderer2 } from '@angular/core';
 import { config } from '../../../environments/config';
 import { ref } from '../../../environments/ref';
-import { CsClipboardService, GMLParserService, Polygon, QuerierInfoModel } from '@auscope/portal-core-ui';
+import { CsClipboardService } from '../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
+import { GMLParserService } from '../../lib/portal-core-ui/utility/gmlparser.service';
+import { Polygon } from '../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
+import { QuerierInfoModel } from '../../lib/portal-core-ui/model/data/querierinfo.model';
 import { NVCLService } from './customanalytic/nvcl/nvcl.service';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { FlatTreeControl } from '@angular/cdk/tree';

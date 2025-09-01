@@ -3,10 +3,16 @@ import { QuerierModalComponent } from '../modalwindow/querier/querier.modal.comp
 import { AfterViewInit, Component, ElementRef, NgZone, ViewChild, ViewContainerRef } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ViewerConfiguration } from '@auscope/angular-cesium';
-import {
-  CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService,
-  QueryWMSService, SimpleXMLService, UtilitiesService, CsMapObject, ResourceType
-} from '@auscope/portal-core-ui';
+import { CsMapService } from '../lib/portal-core-ui/service/cesium-map/cs-map.service';
+import { CSWRecordModel } from '../lib/portal-core-ui/model/data/cswrecord.model';
+import { GMLParserService } from '../lib/portal-core-ui/utility/gmlparser.service';
+import { LayerModel } from '../lib/portal-core-ui/model/data/layer.model';
+import { ManageStateService } from '../lib/portal-core-ui/service/permanentlink/manage-state.service';
+import { QueryWMSService } from '../lib/portal-core-ui/service/wms/query-wms.service';
+import { SimpleXMLService } from '../lib/portal-core-ui/utility/simplexml.service';
+import { UtilitiesService } from '../lib/portal-core-ui/utility/utilities.service';
+import { CsMapObject } from '../lib/portal-core-ui/service/cesium-map/cs-map-object';
+import { ResourceType, GeometryType } from '../lib/portal-core-ui/utility/constants.service';
 import {
   Cartesian3, MapMode2D, Math, ScreenSpaceEventHandler, SceneMode, ScreenSpaceEventType, Rectangle, SplitDirection,
   Cartesian2, WebMapServiceImageryProvider, WebMercatorProjection, Cartographic, GeographicProjection

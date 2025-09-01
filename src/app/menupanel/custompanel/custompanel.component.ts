@@ -1,6 +1,11 @@
 import { Component, Output, Inject, EventEmitter } from '@angular/core';
-import { LayerHandlerService, LayerModel, RenderStatusService, KMLDocService, ResourceType,
-         Constants, CsMapService } from '@auscope/portal-core-ui';
+import { LayerHandlerService } from '../../lib/portal-core-ui/service/cswrecords/layer-handler.service';
+import { ResourceType, GeometryType } from '../../lib/portal-core-ui/utility/constants.service';
+import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
+import { RenderStatusService } from '../../lib/portal-core-ui/service/cesium-map/renderstatus/render-status.service';
+import { KMLDocService } from '../../lib/portal-core-ui/service/kml/kml.service';
+import { Constants } from '../../lib/portal-core-ui/utility/constants.service';
+import { CsMapService } from '../../lib/portal-core-ui/service/cesium-map/cs-map.service';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import * as JSZip from 'jszip';

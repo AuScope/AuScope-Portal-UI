@@ -1,5 +1,8 @@
 import { Component, Inject, Input, OnInit } from '@angular/core';
-import { CSWRecordModel, LayerModel, OnlineResourceModel, UtilitiesService } from '@auscope/portal-core-ui';
+import { CSWRecordModel } from '../../../../lib/portal-core-ui/model/data/cswrecord.model';
+import { LayerModel } from '../../../../lib/portal-core-ui/model/data/layer.model';
+import { OnlineResourceModel } from '../../../../lib/portal-core-ui/model/data/onlineresource.model';
+import { UtilitiesService } from '../../../../lib/portal-core-ui/utility/utilities.service';
 import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
 import { environment } from 'environments/environment';
 import { config } from 'environments/config';

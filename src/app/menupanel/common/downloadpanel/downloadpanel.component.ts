@@ -1,10 +1,19 @@
 import { Component, Input, OnInit, Inject } from '@angular/core';
+import { ResourceType, GeometryType } from '../../../lib/portal-core-ui/utility/constants.service';
 import { saveAs } from 'file-saver';
 import { config } from '../../../../environments/config';
 import { environment } from '../../../../environments/environment'; //CVP
 import { ChangeDetectorRef } from '@angular/core';
-import { Bbox, DownloadWcsService, DownloadWfsService, CsClipboardService, CsIrisService,
-         DownloadIrisService, LayerHandlerService, LayerModel, ResourceType, UtilitiesService, Polygon } from '@auscope/portal-core-ui';
+import { DownloadWcsService } from '../../../lib/portal-core-ui/service/wcs/download/download-wcs.service';
+import { DownloadWfsService } from '../../../lib/portal-core-ui/service/wfs/download/download-wfs.service';
+import { CsClipboardService } from '../../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
+import { CsIrisService } from '../../../lib/portal-core-ui/service/kml/cs-iris.service';
+import { DownloadIrisService } from '../../../lib/portal-core-ui/service/kml/download-iris.service';
+import { LayerHandlerService } from '../../../lib/portal-core-ui/service/cswrecords/layer-handler.service';
+import { LayerModel } from '../../../lib/portal-core-ui/model/data/layer.model';
+import { UtilitiesService } from '../../../lib/portal-core-ui/utility/utilities.service';
+import { Polygon } from '../../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
+import { Bbox } from '../../../lib/portal-core-ui/model/data/bbox.model';
 import { NVCLTSGDownloadComponent } from 'app/modalwindow/layeranalytic/nvcl/nvcl.tsgdownload.component';
 import { isNumber } from '@turf/helpers';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';

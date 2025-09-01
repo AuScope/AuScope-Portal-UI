@@ -1,6 +1,8 @@
 import { Component, Input, ViewChild, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { CSWRecordModel, LayerModel, LayerStatusService } from '@auscope/portal-core-ui';
+import { CSWRecordModel } from '../../lib/portal-core-ui/model/data/cswrecord.model';
+import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
+import { LayerStatusService } from '../../lib/portal-core-ui/utility/layerstatus.service';
 import { CesiumMapPreviewComponent } from '../common/infopanel/cesiummappreview/cesium.preview.component';
 
 @Component({

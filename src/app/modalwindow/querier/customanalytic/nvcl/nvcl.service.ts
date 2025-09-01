@@ -3,7 +3,8 @@ import { throwError as observableThrowError, Observable, BehaviorSubject } from 
 
 import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
 import { catchError, map, mergeMap } from 'rxjs/operators';
-import { UtilitiesService,DownloadWfsService } from '@auscope/portal-core-ui';
+import { UtilitiesService } from '../../../../lib/portal-core-ui/utility/utilities.service';
+import { DownloadWfsService } from '../../../../lib/portal-core-ui/service/wfs/download/download-wfs.service';
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';

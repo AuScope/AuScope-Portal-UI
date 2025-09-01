@@ -2,8 +2,9 @@
 import { throwError as observableThrowError, Observable } from 'rxjs';
 
 import { catchError, map } from 'rxjs/operators';
-import { LayerModel, RenderStatusService } from '@auscope/portal-core-ui';
-import { LayerHandlerService } from '@auscope/portal-core-ui';
+import { LayerModel } from '../../../lib/portal-core-ui/model/data/layer.model';
+import { RenderStatusService } from '../../../lib/portal-core-ui/service/cesium-map/renderstatus/render-status.service';
+import { LayerHandlerService } from '../../../lib/portal-core-ui/service/cswrecords/layer-handler.service';
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
