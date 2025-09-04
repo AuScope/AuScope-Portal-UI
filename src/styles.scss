@@ -887,15 +887,26 @@ fieldset.show-fieldset-borders-whitebg legend{
 .map-area.sidebar-open {
     margin-left: 320px; /* Adjust the margin to match the sidebar width */
 }
+
 .close-sidebar-btn {
     position: absolute;
     top: 10px;
     right: 10px;
-    background-color: #f00;
-    color: #fff;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
+    padding: 4px;
+    min-width: unset;
+    min-height: unset;
+    width: auto;
+    height: auto;
+    line-height: 1;
+
+    &:hover {
+        color: white;
+        transform: scale(1.2);
+    }
+
+    .close-sidebar-icon {
+        translate: -1px -1px;
+    }
 }
 
 .vertical-text-btn {
@@ -910,4 +921,4 @@ fieldset.show-fieldset-borders-whitebg legend{
     padding: 10px 5px;
     cursor: pointer;
     z-index: 1000;    
-}  
+}

@@ -1,6 +1,6 @@
-import { Component, Input, ViewChildren, QueryList, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, ViewChildren, QueryList, AfterViewInit, inject } from '@angular/core';
 import { CsMapService } from '../../lib/portal-core-ui/service/cesium-map/cs-map.service';
-import { ResourceType, GeometryType } from '../../lib/portal-core-ui/utility/constants.service';
+import { ResourceType } from '../../lib/portal-core-ui/utility/constants.service';
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 import { UtilitiesService } from '../../lib/portal-core-ui/utility/utilities.service';
 import { ManageStateService } from '../../lib/portal-core-ui/service/permanentlink/manage-state.service';
@@ -38,7 +38,18 @@ enum FilterMode {
     standalone: false
 })
 export class ActiveLayersPanelComponent implements AfterViewInit {
-  bsModalRef: BsModalRef;
+  csMapService = inject(CsMapService);
+  uiLayerModelService = inject(UILayerModelService);
+  layerManagerService = inject(LayerManagerService);
+  legendUiService = inject(LegendUiService);
+  modalService = inject(BsModalService);
+  layerHandlerService = inject(LayerHandlerService);
+  csClipboardService = inject(CsClipboardService);
+  userStateService = inject(UserStateService);
+  manageStateService = inject(ManageStateService);
+  authService = inject(AuthService);
+  activeModalService = inject(NgbModal);
+  bsModalRef = inject(BsModalRef);
 
   @ViewChildren(FilterPanelComponent) filterComponents: QueryList<FilterPanelComponent>;
   @ViewChildren(DownloadPanelComponent) downloadComponents: QueryList<DownloadPanelComponent>;
@@ -55,12 +66,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
   showingOnlyBookmarkedLayers = false;
   isSidebarOpen = false;
 
-  constructor(private csMapService: CsMapService,
-    private uiLayerModelService: UILayerModelService, private layerManagerService: LayerManagerService,
-    private legendUiService: LegendUiService, private modalService: BsModalService,
-    private layerHandlerService: LayerHandlerService, private csClipboardService: CsClipboardService,
-    private userStateService: UserStateService, private manageStateService: ManageStateService,
-    private authService: AuthService, private activeModalService: NgbModal, private ref: ChangeDetectorRef) {
+  constructor() {
     this.csClipboardService.filterLayersBS.subscribe(filterLayers => {
       this.areLayersPolygonFiltered = filterLayers;
     });
