@@ -6,6 +6,7 @@ import { UtilitiesService } from '../../lib/portal-core-ui/utility/utilities.ser
 import { ManageStateService } from '../../lib/portal-core-ui/service/permanentlink/manage-state.service';
 import { LayerHandlerService } from '../../lib/portal-core-ui/service/cswrecords/layer-handler.service';
 import { CsClipboardService } from '../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
+import { ref } from "../../../environments/ref";
 import { SplitDirection } from 'cesium';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
@@ -155,6 +156,16 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
     */
 
     return filterState;
+  }
+
+  /**
+   * Check if a layer has advanced filter components
+   * @param layerId the ID of the layer
+   * @returns true if layer has advanced filter components, false otherwise
+   */
+  public hasAdvancedFilters(layerId: string): boolean {
+    console.log("Checking advanced filter for: " + layerId);
+    return Object.prototype.hasOwnProperty.call(ref.advancedFilter, layerId);
   }
 
   /**

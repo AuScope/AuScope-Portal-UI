@@ -58,7 +58,7 @@
                 </div>
             </div>
             <!-- Filter panel -->
-            <div class="activeLayerFilterPanel" *ngIf="hasFilters(layer.id) || isDownloadSupportedLayer(layer)"> <!--  this div seems unnecessary, but remove it and drag breaks (more) -->
+            <div class="activeLayerFilterPanel" *ngIf="hasFilters(layer.id) || hasAdvancedFilters(layer.id) || isDownloadSupportedLayer(layer)"> <!--  this div seems unnecessary, but remove it and drag breaks (more) -->
                 <div style="position: inherit;" class="card card-with-tabs layer-card filter-card">
                     <div class="rh_info_wrap">
                         <div class="active-header">
