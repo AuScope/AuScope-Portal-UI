@@ -164,7 +164,6 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
    * @returns true if layer has advanced filter components, false otherwise
    */
   public hasAdvancedFilters(layerId: string): boolean {
-    console.log("Checking advanced filter for: " + layerId);
     return Object.prototype.hasOwnProperty.call(ref.advancedFilter, layerId);
   }
 
