@@ -303,32 +303,6 @@ input[type=checkbox] + label {
 .rh_info_wrap { display: inline-flex; }
 .rh_info { margin-left:auto; margin-top:auto; width: 60px; align-items: center; }
 
-/* Vertically align the opacity sliders with the "Opacity XX%" string */
-.opacity-slider-panel {
-    align-items: center;
-}
-
-.opacity-label {
-    width: 7em;
-    font-size: 0.8rem;
-}
-.opacity-slider {
-    width: 100%;
-    //margin-right: 2em;
-    // Material component styling
-    --mdc-slider-handle-color: white;
-    --mdc-slider-focus-handle-color: yellow;
-    --mdc-slider-hover-handle-color: yellow;
-    --mdc-slider-active-track-color: #F9E79F;
-    --mdc-slider-inactive-track-color: lightgray;
-    --mdc-slider-inactive-track-height: 12px;
-    --mdc-slider-handle-height: 15px;
-    --mdc-slider-handle-width: 15px;
-    --mdc-slider-inactive-track-shape: 12px;
-    --mat-mdc-slider-hover-ripple-color: rgba(226, 204, 77, 0.05);
-    --mat-mdc-slider-focus-ripple-color: rgba(226, 204, 77, 0.2);
-}
-
 .link-wrap {
     overflow-wrap: break-word;
     word-wrap: break-word;

@@ -28,14 +28,14 @@
 <nav id="sidebar" class="sidebar slimscroll sidebar-collapse show" [ngClass]="{'sidebar-show': isSidebarOpen, 'sidebar-close': !isSidebarOpen}"  style="overflow: auto;" >
     <!-- BEGIN Active Layers -->
     <h5 class="mb-1">
-        <label style="font-size: larger;" id="activeLayersLink" for="activeLayersBtn" class="mb-4" title="Layers added to map">
+        <label style="font-size: larger;" id="activeLayersLink" for="activeLayersBtn" class="mb-2" title="Layers added to map">
             <i class="ti-layers-alt"></i>
             Active Layers
         </label>
         <div appActiveLayers></div>
     </h5>
-    <button *ngIf="isSidebarOpen" (click)="toggleSidebar()" class="close-sidebar-btn">
-        <i class="fa fa-times" aria-hidden="true"></i>
+    <button mat-flat-button *ngIf="isSidebarOpen" title="Close active layers panel" (click)="toggleSidebar()" class="close-sidebar-btn" color="warn">
+        <i class="fa fa-times close-sidebar-icon" aria-hidden="true"></i>
     </button>
     <!-- END Active Layers -->
 </nav>
