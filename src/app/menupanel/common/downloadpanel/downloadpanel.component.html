@@ -70,21 +70,21 @@
 
 		<!-- Draw bounds/polygon -->
 		<div class="d-inline-block">
-			<button *ngIf="!bbox" type="button" class="btn btn-primary btn-xs" (click)="drawBounds()"
+			<button *ngIf="!bbox" type="button" class="btn btn-primary btn-xs bounds-btn" (click)="drawBounds()"
 				[title]="irisDownloadListOption?.selectedserviceType === 'Dataselect' ? 'Bounding box disabled for Dataselect' : 'Draw bounding box'"
 				[disabled]="downloadStarted || download4pStarted || download4PolygonKMLStarted || drawBoundsStarted || drawPolygonStarted || irisDownloadListOption?.selectedserviceType === 'Dataselect'">
 					<i class="fa fa-edit"></i>&nbsp;Draw Bounds
 			</button>
 			<button *ngIf="bbox" type="button" title="Remove bounds"
-					class="btn btn-danger btn-xs" [disabled]="downloadStarted || download4pStarted || download4PolygonKMLStarted || drawBoundsStarted || drawPolygonStarted" (click)="clearBounds()">
+					class="btn btn-danger btn-xs bounds-btn" [disabled]="downloadStarted || download4pStarted || download4PolygonKMLStarted || drawBoundsStarted || drawPolygonStarted" (click)="clearBounds()">
 					<i class="fa fa-refresh fa-sm"></i>&nbsp;Clear Bounds
 			</button>
-			<button *ngIf="!polygonFilter && isPolygonSupportedLayer" type="button" class="btn btn-primary btn-xs" [disabled]="downloadStarted || download4pStarted || download4PolygonKMLStarted || drawBoundsStarted || drawPolygonStarted"
+			<button *ngIf="!polygonFilter && isPolygonSupportedLayer" type="button" class="btn btn-primary btn-xs bounds-btn" [disabled]="downloadStarted || download4pStarted || download4PolygonKMLStarted || drawBoundsStarted || drawPolygonStarted"
 							title="Draw polygon" (click)="drawPolygon()">
 				<i *ngIf="download4pStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!download4pStarted" class="fa fa-edit"></i>&nbsp;Draw Polygon
 			</button>
 			<button *ngIf="polygonFilter && isPolygonSupportedLayer" type="button" title="Remove polygon"
-					class="btn btn-danger btn-xs" [disabled]="downloadStarted || download4pStarted || download4PolygonKMLStarted || drawBoundsStarted || drawPolygonStarted" (click)="clearPolygon()"><i class="fa fa-refresh">
+					class="btn btn-danger btn-xs bounds-btn" [disabled]="downloadStarted || download4pStarted || download4PolygonKMLStarted || drawBoundsStarted || drawPolygonStarted" (click)="clearPolygon()"><i class="fa fa-refresh">
 					</i>&nbsp;Clear Polygon
 			</button>
 		</div>
