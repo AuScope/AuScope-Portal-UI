@@ -9,7 +9,7 @@ import { LayerStatusService } from '../../../lib/portal-core-ui/utility/layersta
 import { Polygon } from '../../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
 import { UtilitiesService } from '../../../lib/portal-core-ui/utility/utilities.service';
 import { CsCSWService } from '../../../lib/portal-core-ui/service/wcsw/cs-csw.service';
-import { ApplicationRef, Component, Inject, Input, OnInit, AfterViewInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { ApplicationRef, Component, Inject, Input, OnInit, AfterViewInit, ViewChild, ViewContainerRef, OnChanges, SimpleChanges, inject } from '@angular/core';
 import * as _ from 'lodash';
 import { config } from '../../../../environments/config';
 import { ref } from '../../../../environments/ref';
@@ -26,7 +26,20 @@ import { LayerManagerService } from 'app/services/ui/layer-manager.service';
     styleUrls: ['./filterpanel.component.scss', '../../menupanel.scss'],
     standalone: false
 })
-export class FilterPanelComponent implements OnInit, AfterViewInit {
+export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
+  csMapService = inject(CsMapService);
+  layerHandlerService = inject(LayerHandlerService);
+  layerManagerService = inject(LayerManagerService);
+  filterService = inject(FilterService);
+  filterPanelService = inject(FilterPanelService);
+  modalService = inject(BsModalService);
+  csClipboardService = inject(CsClipboardService);
+  csWMSService = inject(CsWMSService);
+  csCSWService = inject(CsCSWService);
+  layerStatus = inject(LayerStatusService);
+  appRef = inject(ApplicationRef);
+  advancedComponentService = inject(AdvancedComponentService);
+
   @Input() layer: LayerModel;
   private providers: Array<Object>;
   public optionalFilters: Array<Object>; // Optional filters currently rendered by this component
@@ -43,19 +56,7 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
   @ViewChild('advancedFilterComponents', { static: true, read: ViewContainerRef }) advancedFilterComponents: ViewContainerRef;
 
 
-  constructor(private csMapService: CsMapService,
-    private layerHandlerService: LayerHandlerService,
-    private layerManagerService: LayerManagerService,
-    private filterService: FilterService,
-    private filterPanelService: FilterPanelService,
-    private modalService: BsModalService,
-    private csClipboardService: CsClipboardService,
-    private csWMSService: CsWMSService,
-    private csCSWService: CsCSWService,
-    public layerStatus: LayerStatusService,
-    private appRef: ApplicationRef,
-    private advancedComponentService: AdvancedComponentService,
-    @Inject('conf') private conf) {
+  constructor(@Inject('conf') private conf) {
     this.providers = [];
     this.optionalFilters = [];
     this.analyticMap = ref.layeranalytic;
@@ -103,7 +104,15 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
 
     // Add any layer specific advanced filter components
     this.advancedComponentService.addAdvancedFilterComponents(this.layer, this.advancedFilterComponents);
+  }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    // Will fire when a layer is added and remove all existing panel filters
+    if (changes.layer && changes.layer.currentValue) {
+        setTimeout(() => {
+            this.refreshFilter();
+        }, 0);
+    }
   }
 
   /**
@@ -128,7 +137,6 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
    * @param layerState layer state is JSON
    */
   public addLayerFromState(layerState: any) {
-
     // Populate layer times if necessary
     if (config.queryGetCapabilitiesTimes.indexOf(this.layer.id) > -1) {
       this.filterService.updateLayerTimes(this.layer, this.layerTimes);
