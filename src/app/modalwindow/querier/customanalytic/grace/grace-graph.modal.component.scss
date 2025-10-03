@@ -1,4 +1,7 @@
 :host {
+    .modal-header {
+        cursor: move;
+    }
     .citations {
         border: 1px solid gray;
         margin: 0 5px 5px 5px;

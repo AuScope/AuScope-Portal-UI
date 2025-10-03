@@ -1,4 +1,4 @@
-<div class="modal-header" cdkDrag cdkDragRootElement=".modal-content" #childElement cdkDragBoundary="body">
+<div class="modal-header" cdkDrag cdkDragRootElement=".modal-content" cdkDragHandle>
 	<h1 class="page-header">
 		GRACE Time Series
         <span *ngIf="queryStatus===QueryStatus.querying">&nbsp;&nbsp;-&nbsp;&nbsp;Querying&nbsp;&nbsp;<i class="fa fa-spinner fa-spin"></i></span>
