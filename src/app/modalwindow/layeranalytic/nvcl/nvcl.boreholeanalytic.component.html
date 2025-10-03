@@ -1,6 +1,6 @@
 <!-- Modal for querier-->
 <div class="modal-header">
-	<h1 class="page-header">
+	<h1 class="page-header" cdkDrag cdkDragRootElement=".modal-content" cdkDragHandle>
 		Borehole <small>analytics</small>
 	</h1>
 </div>
@@ -33,7 +33,7 @@
 				</div>
 			</div>
 
-			<div class="card card-default card-with-tabs" cdkDrag cdkDragRootElement=".modal-content" #childElement cdkDragBoundary="body">
+			<div class="card card-default card-with-tabs">
 				<!-- BEGIN card-header -->
 				<div class="card-header">
 					<ul class="nav nav-tabs float-right">
