@@ -1,5 +1,4 @@
 import { LayerModel } from '../../../lib/portal-core-ui/model/data/layer.model';
-import { ManageStateService } from '../../../lib/portal-core-ui/service/permanentlink/manage-state.service';
 import { Component, Input, AfterViewInit, OnInit, AfterContentChecked } from '@angular/core';
 import { LayerAnalyticInterface } from '../layer.analytic.interface';
 import { DownloadWfsService } from '../../../lib/portal-core-ui/service/wfs/download/download-wfs.service';
@@ -38,7 +37,7 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
   public urlsArray =[];
   public download1$: Observable<Download>;
 
-  constructor(public activeModal: NgbActiveModal, private manageStateService: ManageStateService, private downloadWfsService: DownloadWfsService , private nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService, private tsgDownloadService: TSGDownloadService,
+  constructor(public activeModal: NgbActiveModal, private downloadWfsService: DownloadWfsService , private nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService, private tsgDownloadService: TSGDownloadService,
     ) {
     this.tsgform = {};
     //this.tsgform.email = '';

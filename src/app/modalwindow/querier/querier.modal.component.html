@@ -1,7 +1,6 @@
 <!-- Modal for querier-->
-<div id="featureInfo" cdkDrag cdkDragRootElement=".modal-content" #childElement cdkDragBoundary="body"
-	bsModalRef="bsModalRef" style="overflow-x: clip;">
-	<div class="modal-header" cdkDragHandle [hidden]="!modalVisible">
+<div id="featureInfo" #childElement bsModalRef="bsModalRef" style="overflow-x: clip;">
+	<div class="modal-header" cdkDrag cdkDrag cdkDragRootElement=".modal-content" cdkDragHandle [hidden]="!modalVisible">
 		<div style="display:flex">
 			<div id="startContainer" class="alertHeading alert-success">
 				<h4 class="alert-heading">Feature Information</h4>
@@ -183,7 +182,6 @@
 						<app-custom-analytic [layer]="currentDoc.layer" [load]="currentDoc.loadSubComponent"
 							[onlineResource]="currentDoc.onlineResource" [featureId]="currentDoc.key" [doc]="currentDoc"></app-custom-analytic>
 					</div>
-
 				</div>
 			</div>
 		</div>

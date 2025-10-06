@@ -6,7 +6,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 
 @Component({
-    selector: 'info-panel',
+    selector: 'app-info-panel',
     templateUrl: './infopanel.component.html',
     providers: [LayerStatusService],
     styleUrls: ['../../menupanel.scss', './infopanel.component.scss'],

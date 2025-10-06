@@ -724,7 +724,7 @@ export class UtilitiesService {
     if (this.getLayerHasSupportedOnlineResourceType(layer)) {
         return true;
     }
-    // Addable if layer's CSWRecords have at leasr one bbox geographic element
+    // Addable if layer's CSWRecords have at least one bbox geographic element
     if (UtilitiesService.layerContainsBboxGeographicElement(layer)) {
       return true;
     }
