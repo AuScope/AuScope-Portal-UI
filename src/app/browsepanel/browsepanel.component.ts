@@ -31,6 +31,7 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
   public sidebarSubscription: Subscription;
   public layerBookmarked = {}; /* Object stores which layers are bookmarked. key is layer id, value is boolean */
   public showOnlyBookmarked = false; /* When true only bookmarked layers are shown in the browse menu */
+  public addedLayers = new Set<string>(); /* Set of layer IDs that have been added to the map */
 
   constructor(private layerHandlerService: LayerHandlerService,
       private layerManagerService: LayerManagerService,
@@ -176,6 +177,27 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
+   * Add layer and keep panel open for metadata viewing
+   *
+   * @param layer LayerModel for layer to add
+   */
+  public addLayerAndKeepOpen(layer: LayerModel): void {
+    // Fetch layer times and add layer (only take 1 or addLayer will fire every time layer times change)
+    this.filterService.getLayerTimesBS(layer.id).pipe(take(1)).subscribe(layerTimes => {
+      this.layerManagerService.addLayer(layer, [], null, layerTimes.currentTime);
+    });
+
+    // Track that this layer has been added
+    this.addedLayers.add(layer.id);
+
+    // Select the layer to show metadata
+    this.selectLayer(layer);
+    
+    // Keep panel open (don't call the original addLayer method to avoid panel closing)
+    this.sidebarService.setOpenState(true);
+  }
+
+  /**
    * Opens and closes browse panel
    *
    * @param open if true will open panel if false will close panel if missing will toggle
@@ -197,6 +219,16 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
    */
   public isLayerSelected(layer: any) {
     return this.selectedLayer === layer;
+  }
+
+  /**
+   * Is this layer added to the map?
+   *
+   * @param layer LayerModel for layer
+   * @returns true if this layer has been added to the map
+   */
+  public isLayerAdded(layer: any) {
+    return this.addedLayers.has(layer.id);
   }
 
   /**
