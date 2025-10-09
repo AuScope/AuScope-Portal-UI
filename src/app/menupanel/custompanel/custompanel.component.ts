@@ -156,7 +156,6 @@ export class CustomPanelComponent {
     this.getRemoteBlob(proxyUrl).subscribe(response => {
 
       const kmz = response;
-
       const reader = new FileReader();
 
       // This fires after the blob has been read/loaded.
@@ -203,14 +202,14 @@ export class CustomPanelComponent {
                 }
               })
               return kmlDom || Promise.reject("No kmz file found")
-            }).catch(function (err) {
+            }).catch((err) => {
               return console.log("ERROR [unzipping kmz]: " + err.msg + JSON.stringify(err));
             })
         };
 
         getKmzDom(kmzTxt).then(() => {
           // add the re-zipped and processed (proxy, metadata) kmz blob
-          zipKMZ.generateAsync({ type: "blob" }).then(function (kmzBlob) {
+          zipKMZ.generateAsync({ type: "blob" }).then((kmzBlob) => {
             // uncomment the following to save the kmz as a file
             //saveAs(kmzBlob, "zipKMZ.kmz");
             this.setupLayer(this, layerName, kmzBlob, proxyUrl, ResourceType.KMZ, "URL");
@@ -483,7 +482,6 @@ export class CustomPanelComponent {
    */
   public onFileSelected(event) {
     const getExtension = fileName => fileName.split(".").pop().toLowerCase()
-    const me = this;
     const file: File = event.target.files[0];
     if (file) {
       if (getExtension(file.name) === "geojson") {
@@ -523,7 +521,7 @@ export class CustomPanelComponent {
                 }
               })
               return kmlDom || Promise.reject("No kmz file found")
-            }).catch(function (err) {
+            }).catch((err) => {
               this.loading = false;
               return console.log("ERROR [unzipping kml]: " + err.msg + JSON.stringify(err));
             });
@@ -536,9 +534,9 @@ export class CustomPanelComponent {
           //saveAs(blob5, "kmlStr2.kml");
 
           // add the re-zipped and processed (proxy, metadata) kmz blob
-          zipKMZ.generateAsync({ type: "blob" }).then(function (kmzBlob) {
+          zipKMZ.generateAsync({ type: "blob" }).then((kmzBlob) => {
             //saveAs(kmzBlob, "zipKMZ.kmz");
-            this.setupLayer(me, file.name, kmzBlob, "", ResourceType.KMZ, "FILE");
+            this.setupLayer(this, file.name, kmzBlob, "", ResourceType.KMZ, "FILE");
             this.loading = false;
           }).catch(err => {
             console.log("Failed to generate KML blob", err);
