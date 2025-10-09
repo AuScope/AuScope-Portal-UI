@@ -177,24 +177,35 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * Add layer and keep panel open for metadata viewing
+   * Add layer to map when plus icon is clicked
    *
    * @param layer LayerModel for layer to add
    */
-  public addLayerAndKeepOpen(layer: LayerModel): void {
-    // Fetch layer times and add layer (only take 1 or addLayer will fire every time layer times change)
+  public addLayerToMap(layer: LayerModel): void {
     this.filterService.getLayerTimesBS(layer.id).pipe(take(1)).subscribe(layerTimes => {
       this.layerManagerService.addLayer(layer, [], null, layerTimes.currentTime);
     });
 
-    // Track that this layer has been added
     this.addedLayers.add(layer.id);
 
-    // Select the layer to show metadata
     this.selectLayer(layer);
     
-    // Keep panel open (don't call the original addLayer method to avoid panel closing)
     this.sidebarService.setOpenState(true);
+  }
+
+  /**
+   * Remove layer from map when trash icon is clicked
+   *
+   * @param layer LayerModel for layer to remove
+   */
+  public removeLayerFromMap(layer: LayerModel): void {
+    this.layerManagerService.removeLayer(layer);
+    
+    this.addedLayers.delete(layer.id);
+    
+    if (this.selectedLayer === layer) {
+      this.selectedLayer = null;
+    }
   }
 
   /**
