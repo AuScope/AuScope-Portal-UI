@@ -40,18 +40,15 @@
 		<a *ngIf="layerColumnHeader"><span style="font-weight: bold;" class="truncate-layer">{{layerColumnHeader}} Layers</span></a>
 		<div class="row align-items-start" *ngFor="let layer of layerColumn">
 			<!-- Layers -->
-			<div *ngIf="!showOnlyBookmarked || checkLayerBookmarked(layer.id)" class="col" (click)="selectLayer(layer)">
+			<div *ngIf="!showOnlyBookmarked || checkLayerBookmarked(layer.id)" class="col">
 				<a>
-					<span class="truncate-layer" [ngClass]="{'enbolden': isLayerSelected(layer)}" title="{{layer.name}}">
+					<span class="truncate-layer" [ngClass]="{'enbolden': isLayerSelected(layer)}" title="{{layer.name}}" (click)="selectLayer(layer)">
+						<i *ngIf="!isLayerAdded(layer)" class="fa fa-plus-circle" style="margin-right: 8px; color: #28a745;" title="Click to add layer" (click)="addLayerToMap(layer); $event.stopPropagation()"></i>
+						<i *ngIf="isLayerAdded(layer)" class="fa fa-trash" style="margin-right: 8px; color: #dc3545;" title="Click to remove layer" (click)="removeLayerFromMap(layer); $event.stopPropagation()"></i>
 						<i *ngIf="checkLayerBookmarked(layer.id)" class="ti-bookmark-alt bookmark-icon" title="This layer is bookmarked"></i>
 						{{layer.name}}
 					</span>
 				</a>
-				<!-- Add layer button -->
-				<button *ngIf="isLayerSelected(layer)" style="float:right; width:6em; padding:2px" class="btn btn-sm btn-success" type="button" title="Add layer" (click)="addLayer(layer)">
-					<i class="fa fa-plus-circle"></i>
-					&nbsp;Add
-				</button>
 			</div>
 		</div>
 	</div>
