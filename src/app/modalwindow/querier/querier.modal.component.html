@@ -79,11 +79,21 @@
 						<span class="btnSpan">Analytic</span>
 					</button>
 				</div>
+				<div *ngIf="currentDoc">
+					<button class="btn btnFeature btn-primary" (click)="downloadFeatureCSV()" title="Download Feature Information as CSV">
+						<span class="btnSpan"><i class="fa fa-download"></i> Download CSV</span>
+					</button>
+				</div>
 			</div>
 		</div>
 		<script>
 			$('[data-toggle-second="tooltip"]').tooltip();
 		</script>
+
+		<!-- Copy feedback toast -->
+		<div *ngIf="showCopyFeedbackToast" class="copy-feedback-toast">
+			<i class="fa fa-check-circle"></i> {{copyFeedbackMessage}}
+		</div>
 
 	</div>
 
