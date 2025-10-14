@@ -31,7 +31,6 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
   public sidebarSubscription: Subscription;
   public layerBookmarked = {}; /* Object stores which layers are bookmarked. key is layer id, value is boolean */
   public showOnlyBookmarked = false; /* When true only bookmarked layers are shown in the browse menu */
-  public addedLayers = new Set<string>(); /* Set of layer IDs that have been added to the map */
 
   constructor(private layerHandlerService: LayerHandlerService,
       private layerManagerService: LayerManagerService,
@@ -186,8 +185,6 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
       this.layerManagerService.addLayer(layer, [], null, layerTimes.currentTime);
     });
 
-    this.addedLayers.add(layer.id);
-
     this.selectLayer(layer);
     
     this.sidebarService.setOpenState(true);
@@ -200,8 +197,6 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
    */
   public removeLayerFromMap(layer: LayerModel): void {
     this.layerManagerService.removeLayer(layer);
-    
-    this.addedLayers.delete(layer.id);
     
     if (this.selectedLayer === layer) {
       this.selectedLayer = null;
@@ -239,7 +234,7 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
    * @returns true if this layer has been added to the map
    */
   public isLayerAdded(layer: any) {
-    return this.addedLayers.has(layer.id);
+    return this.uiLayerModelService.isLayerAdded(layer.id);
   }
 
   /**
