@@ -15,8 +15,6 @@ interface MiningActivityStyleParams {
 
 @Injectable()
 export class MiningActivityStyleService {
-  constructor(private styleService: StyleService) {}
-
   public static getSld(layerName: string, styleName: string, params: MiningActivityStyleParams): string {
     const ns = {
       sld: 'http://www.opengis.net/sld',
@@ -42,7 +40,7 @@ export class MiningActivityStyleService {
             ['sld:IsDefault', {}, '1'],
             ['sld:FeatureTypeStyle', {},
               ['sld:Rule', {},
-                this.createSymbolizer('#FF9900')
+                StyleService.createSymbolizer('#FF9900', 'circle', '1')
               ]
             ]
           ]
@@ -56,25 +54,5 @@ export class MiningActivityStyleService {
       ...acc,
       [`xmlns:${key}`]: value
     }), {});
-  }
-
-  private static createSymbolizer(color: string): any[] {
-    return [
-      'sld:PointSymbolizer', {},
-      ['sld:Graphic', {},
-        ['sld:Mark', {},
-          ['sld:WellKnownName', {}, 'circle'],
-          ['sld:Fill', {},
-            ['sld:CssParameter', { name: 'fill' }, color],
-            ['sld:CssParameter', { name: 'fill-opacity' }, '0.4']
-          ],
-          ['sld:Stroke', {},
-            ['sld:CssParameter', { name: 'stroke' }, color],
-            ['sld:CssParameter', { name: 'stroke-width' }, '1']
-          ]
-        ],
-        ['sld:Size', {}, '8']
-      ]
-    ];
   }
 }
