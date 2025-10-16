@@ -203,11 +203,13 @@ export class LayerHandlerService {
   public makeCustomKMZCSWRec(name: string, id: string, url: string): CSWRecordModel {
     const cswRec = new CSWRecordModel();
     cswRec.adminArea = '';
+    cswRec.authors = [];
     cswRec.childRecords = {};
     cswRec.constraints = '';
     cswRec.useLimitConstraints = '';
     cswRec.accessConstraints = '';
     cswRec.contactOrg = '';
+    cswRec.contactPerson = '';
     cswRec.funderOrg = '';
     cswRec.datasetURIs = {};
     cswRec.date = '';
@@ -236,11 +238,13 @@ export class LayerHandlerService {
   public makeCustomKMLCSWRec(name: string, id: string, url: string): CSWRecordModel {
     const cswRec = new CSWRecordModel();
     cswRec.adminArea = '';
+    cswRec.authors = [];
     cswRec.childRecords = {};
     cswRec.constraints = '';
     cswRec.useLimitConstraints = '';
     cswRec.accessConstraints = '';
     cswRec.contactOrg = '';
+    cswRec.contactPerson = '';
     cswRec.funderOrg = '';
     cswRec.datasetURIs = {};
     cswRec.date = '';
@@ -268,11 +272,13 @@ export class LayerHandlerService {
   public makeCustomJsonCSWRec(name: string, id: string, url: string): CSWRecordModel {
     const cswRec = new CSWRecordModel();
     cswRec.adminArea = '';
+    cswRec.authors = [];
     cswRec.childRecords = {};
     cswRec.constraints = '';
     cswRec.useLimitConstraints = '';
     cswRec.accessConstraints = '';
     cswRec.contactOrg = '';
+    cswRec.contactPerson = '';
     cswRec.funderOrg = '';
     cswRec.datasetURIs = {};
     cswRec.date = '';
