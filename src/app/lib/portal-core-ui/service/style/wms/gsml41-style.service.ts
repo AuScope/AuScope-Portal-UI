@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
-
 import { serialize } from '@thi.ng/hiccup';
-
 import { StyleService } from './style.service';
 
 /*
- * This is a static class designed to return WMS SLD_BODY style sheets for GeoSciML 4.1 borehole layers
+ * This is a static class designed to return WMS SLD_BODY style sheets for GeoSciML 4.1 borehole layers.
+ * Note: hasn't been refactored to use StyleService static methods.
  */
 @Injectable()
 export class GSML41StyleService {
@@ -38,7 +37,7 @@ export class GSML41StyleService {
         const userStyle = (body: string) => ['UserStyle', null, body];
         const body1 = serialize(name(styleName)) + serialize(['Title', null, 'GeoSciML4.1 Borehole'])
                     + serialize(['IsDefault', null, '1']) + this.getFeatureTypeStyle(bhName);
-        const body2 = serialize(name(layerName)) +  serialize(userStyle(body1));
+        const body2 = serialize(name(layerName)) + serialize(userStyle(body1));
         return xmlHeader + serialize(styledLayerDesc(namedLayer(body2)));
     }
 
@@ -51,8 +50,7 @@ export class GSML41StyleService {
      * @return XML 'sld:FeatureTypeStyle' string
      */
     private static getFeatureTypeStyle(bhName: string): string {
-        let rule = StyleService.getRule('gml:name', bhName, '#FF7401', '#FF7401', true, false);
+        const rule = StyleService.getRule('gml:name', bhName, '#FF7401', '#FF7401', true, false);
         return serialize(['FeatureTypeStyle', null, rule]);
     }
-
 }

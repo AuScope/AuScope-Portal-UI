@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { StyleService } from './style.service';
+import { OptionalFilter, StyleService } from './style.service';
 import { serialize } from '@thi.ng/hiccup';
+
 interface NVCLBoreholeStyleParams {
   filterNames: string[];
   filters: string[];
@@ -15,17 +16,9 @@ interface NVCLBoreholeStyleParams {
   };
   optionalFilters?: OptionalFilter[];
 }
-interface OptionalFilter {
-  value: string;
-  label: string;
-  xpath: string;
-  predicate: string;
-  type: string;
-  added: boolean;
-}
 @Injectable()
 export class NVCLBoreholeStyleService {
-  constructor(private styleService: StyleService) {}
+
   public static getSld(
     layerName: string,
     styleName: string,
@@ -54,8 +47,8 @@ export class NVCLBoreholeStyleService {
     }; // Get base filters from optional filters
     const baseFilter = this.createBaseFilter(styleParams.optionalFilters || []); // Generate rules based on analytics results or hylogged status
     const rules = styleParams.analyticsResults
-      ? this.createAnalyticsRules(styleParams.analyticsResults, baseFilter, ns)
-      : this.createHyloggedRules(baseFilter, ns);
+      ? this.createAnalyticsRules(styleParams.analyticsResults, baseFilter)
+      : this.createHyloggedRules(baseFilter);
     return serialize([
       'sld:StyledLayerDescriptor',
       {
@@ -94,6 +87,7 @@ export class NVCLBoreholeStyleService {
       ],
     ]);
   }
+
   private static createBaseFilter(filters: OptionalFilter[]): string {
     const filterParts: string[] = []; // Add hylogged filter - always required for NVCL
     const hylogged = this.createHyloggedFilter();
@@ -154,6 +148,7 @@ export class NVCLBoreholeStyleService {
     }
     return combined;
   }
+
   private static createPolygonFilter(filter: OptionalFilter): string {
     return `<ogc:Intersects>
              <ogc:PropertyName>${filter.xpath}</ogc:PropertyName>
@@ -170,21 +165,22 @@ export class NVCLBoreholeStyleService {
              <ogc:Literal>${filter.value}</ogc:Literal>
              </ogc:${operator}>`;
   }
+
   private static createHyloggedFilter(): string {
     return `<ogc:PropertyIsEqualTo>
              <ogc:PropertyName>gsmlp:nvclCollection</ogc:PropertyName>
              <ogc:Literal>true</ogc:Literal>
             </ogc:PropertyIsEqualTo>`;
   }
+
   private static createAnalyticsRules(
     analytics: any,
     baseFilter: string,
-    ns: any
   ): any[] {
     const rules = [];
     if (analytics.errorBoreholes?.length > 0) {
       rules.push(
-        this.createRule(
+        StyleService.createRule(
           'Error Boreholes',
           this.combineFilters([
             baseFilter,
@@ -192,13 +188,13 @@ export class NVCLBoreholeStyleService {
           ]),
           '#ff8000',
           'circle',
-          ns
+          '0.5'
         )
       );
     }
     if (analytics.failBoreholes?.length > 0) {
       rules.push(
-        this.createRule(
+        StyleService.createRule(
           'Fail Boreholes',
           this.combineFilters([
             baseFilter,
@@ -206,13 +202,13 @@ export class NVCLBoreholeStyleService {
           ]),
           '#cc0000',
           'circle',
-          ns
+          '0.5'
         )
       );
     }
     if (analytics.passBoreholes?.length > 0) {
       rules.push(
-        this.createRule(
+        StyleService.createRule(
           'Pass Boreholes',
           this.combineFilters([
             baseFilter,
@@ -220,15 +216,17 @@ export class NVCLBoreholeStyleService {
           ]),
           '#0000ff',
           'circle',
-          ns
+          '0.5'
         )
       );
     }
     return rules;
   }
-  private static createHyloggedRules(baseFilter: string, ns: any): any[] {
-    return [this.createRule('Hylogged', baseFilter, '#FF0000', 'circle', ns)];
+
+  private static createHyloggedRules(baseFilter: string): any[] {
+    return [StyleService.createRule('Hylogged', baseFilter, '#FF0000', 'circle', '0.5')];
   }
+
   private static createIdentifierFilter(identifiers: string[]): string {
     if (!identifiers?.length) return '';
     const conditions = identifiers.map(
@@ -241,114 +239,12 @@ export class NVCLBoreholeStyleService {
       ? `<ogc:Or>${conditions.join('')}</ogc:Or>`
       : conditions[0];
   }
+
   private static combineFilters(filters: string[]): string {
     const validFilters = filters.filter((f) => f);
     return validFilters.length > 1
       ? `<ogc:Filter><ogc:And>${validFilters.join('')}</ogc:And></ogc:Filter>`
       : `<ogc:Filter>${validFilters[0]}</ogc:Filter>`;
-  } // Reuse methods from BoreholeStyleService
-  private static createRule(
-    name: string,
-    filter: string,
-    color: string,
-    mark: string,
-    ns: any
-  ): any[] {
-    const filterXml = filter
-      ? filter.includes('<ogc:Filter>')
-        ? filter
-        : ['ogc:Filter', {}, filter]
-      : this.generateDefaultFilter(ns);
-    return [
-      'sld:FeatureTypeStyle',
-      {},
-      [
-        'sld:Rule',
-        {},
-        ['sld:Name', {}, name],
-        ['sld:MaxScaleDenominator', {}, '4000000'],
-        typeof filterXml === 'string' ? filterXml : filterXml,
-        this.createSymbolizer(color, mark, ns),
-        this.createLabelSymbolizer(ns),
-      ],
-      [
-        'sld:Rule',
-        {},
-        ['sld:MinScaleDenominator', {}, '4000000'],
-        typeof filterXml === 'string' ? filterXml : filterXml,
-        this.createSymbolizer(color, mark, ns),
-      ],
-    ];
   }
-  private static createSymbolizer(color: string, mark: string, ns: any): any[] {
-    return [
-      'sld:PointSymbolizer',
-      {},
-      [
-        'sld:Graphic',
-        {},
-        [
-          'sld:Mark',
-          {},
-          ['sld:WellKnownName', {}, mark],
-          [
-            'sld:Fill',
-            {},
-            ['sld:CssParameter', { name: 'fill' }, color],
-            ['sld:CssParameter', { name: 'fill-opacity' }, '0.4'],
-          ],
-          [
-            'sld:Stroke',
-            {},
-            ['sld:CssParameter', { name: 'stroke' }, color],
-            ['sld:CssParameter', { name: 'stroke-width' }, '0.5'],
-          ],
-        ],
-        ['sld:Size', {}, '8'],
-      ],
-    ];
-  }
-  private static createLabelSymbolizer(ns: any): any[] {
-    return [
-      'sld:TextSymbolizer',
-      {},
-      [
-        'sld:Label',
-        {},
-        [
-          'ogc:Function',
-          { name: 'strSubstringStart' },
-          ['ogc:PropertyName', {}, 'gsmlp:name'],
-          ['ogc:Function', { name: 'parseInt' }, ['ogc:Literal', {}, '27']],
-        ],
-      ],
-      [
-        'sld:Font',
-        {},
-        ['sld:CssParameter', { name: 'font-family' }, 'Arial'],
-        ['sld:CssParameter', { name: 'font-size' }, '12'],
-      ],
-      [
-        'sld:LabelPlacement',
-        {},
-        [
-          'sld:PointPlacement',
-          {},
-          [
-            'sld:Displacement',
-            {},
-            ['sld:DisplacementX', {}, '6'],
-            ['sld:DisplacementY', {}, '-6'],
-          ],
-        ],
-      ],
-      ['sld:Fill', {}, ['sld:CssParameter', { name: 'fill' }, '#000000']],
-    ];
-  }
-  private static generateDefaultFilter(ns: any): string {
-    return `<ogc:Filter><ogc:PropertyIsLike wildCard="*" singleChar="#" escapeChar="!">
-              <ogc:PropertyName>gsmlp:name</ogc:PropertyName>
-              <ogc:Literal>*</ogc:Literal>
-            </ogc:PropertyIsLike></ogc:Filter>`;
-  }
+
 }

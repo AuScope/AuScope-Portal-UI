@@ -1,14 +1,5 @@
 import { serialize } from '@thi.ng/hiccup';
-
-interface OptionalFilter {
-  type: string;
-  xpath: string;
-  value: string;
-  // Add other properties as needed from the sample input
-  label?: string;
-  predicate?: string;
-  added?: boolean;
-}
+import { OptionalFilter } from './style.service';
 
 interface GeologicalProvincesStyleParams {
   name?: string;
@@ -16,6 +7,12 @@ interface GeologicalProvincesStyleParams {
   gsmlpNamespace: string;
 }
 
+/**
+ * GeologicalProvincesStyleService
+ *
+ * Note this hasn't been refactored to use StyleService methods.
+ * There were issues with labels using 'NAME' instead of 'gsmlp:name' and default substrings.
+ */
 export class GeologicalProvincesStyleService {
   public static getSld(layerName: string, styleName: string, params: GeologicalProvincesStyleParams): string {
     const ns = {
@@ -29,7 +26,7 @@ export class GeologicalProvincesStyleService {
     };
 
     return serialize(
-      ['sld:StyledLayerDescriptor', { 
+      ['sld:StyledLayerDescriptor', {
         version: '1.0.0',
         'xmlns:sld': ns.sld,
         'xmlns:ogc': ns.ogc,
@@ -102,7 +99,7 @@ export class GeologicalProvincesStyleService {
       });
     }
 
-    return filters.length > 0 
+    return filters.length > 0
       ? ['ogc:Filter', {}, ['ogc:And', {}, ...filters]]
       : ['ogc:Filter', {}, ['ogc:PropertyIsLike', { wildCard: '*', singleChar: '#', escapeChar: '!' },
           ['ogc:PropertyName', {}, 'NAME'],
@@ -122,11 +119,11 @@ export class GeologicalProvincesStyleService {
         ['ogc:Literal', {}, '-3'], ['ogc:Literal', {}, '#ffffb3'],
         ['ogc:Literal', {}, '-2'], ['ogc:Literal', {}, '#bebada'],
         ['ogc:Literal', {}, '-1'], ['ogc:Literal', {}, '#fb8072'],
-        ['ogc:Literal', {}, '0'],  ['ogc:Literal', {}, '#80b1d3'],
-        ['ogc:Literal', {}, '1'],  ['ogc:Literal', {}, '#fdb462'],
-        ['ogc:Literal', {}, '2'],  ['ogc:Literal', {}, '#b3de69'],
-        ['ogc:Literal', {}, '3'],  ['ogc:Literal', {}, '#fccde5'],
-        ['ogc:Literal', {}, '4'],  ['ogc:Literal', {}, '#d9d9d9']
+        ['ogc:Literal', {}, '0'], ['ogc:Literal', {}, '#80b1d3'],
+        ['ogc:Literal', {}, '1'], ['ogc:Literal', {}, '#fdb462'],
+        ['ogc:Literal', {}, '2'], ['ogc:Literal', {}, '#b3de69'],
+        ['ogc:Literal', {}, '3'], ['ogc:Literal', {}, '#fccde5'],
+        ['ogc:Literal', {}, '4'], ['ogc:Literal', {}, '#d9d9d9']
       ]
     ];
   }
@@ -153,4 +150,4 @@ export class GeologicalProvincesStyleService {
       ]
     ];
   }
-} 
+}

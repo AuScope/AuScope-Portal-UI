@@ -3,6 +3,7 @@ import { serialize } from '@thi.ng/hiccup';
 /**
  * Service for generating SLD styles for generic layers
  * This replaces the backend doGenericFilterStyle.do endpoint
+ * Note: this has not yet been refactored to work with StyleService classes
  */
 export class GenericStyleService {
 
@@ -26,7 +27,7 @@ export class GenericStyleService {
     const styleColor = params.styleColor || '#FF0000';
     const labelProperty = params.labelProperty;
     const optionalFilters = params.optionalFilters;
-    const bboxJson = params.bbox;
+    const bboxJson = params.bbox; // XXX parsed later but never used
 
     // Debug log for IGSN layers
     if (layerName && (layerName.includes('igsn') || layerName.includes('IGSN'))) {
@@ -47,14 +48,13 @@ export class GenericStyleService {
 
     // Generate filter
     const filterXml = this.generateFilter(bboxJson, optionalFilters, spatialPropertyName);
-    
 
     // Generate style with or without label
     const rule = this.generateRule(filterXml, styleType, styleColor, labelProperty);
 
     // Generate complete SLD
     return serialize(
-      ['sld:StyledLayerDescriptor', { 
+      ['sld:StyledLayerDescriptor', {
         version: '1.0.0',
         'xmlns:sld': ns.sld,
         'xmlns:ogc': ns.ogc,
@@ -80,6 +80,7 @@ export class GenericStyleService {
 
   /**
    * Generate filter based on bounding box and optional filters
+   * Note: this should be refactored into StyleService.generateProertyFilter, but that doesn't currently deal with polygons/bboxes
    * @param bboxJson Bounding box as JSON string
    * @param optionalFilters Optional filters to apply
    * @param spatialPropertyName The spatial property name to use in the BBOX filter
@@ -123,13 +124,13 @@ export class GenericStyleService {
         }
 
         let propertyFilter: any = null;
-        
+
         // Handle different filter formats
         if (Array.isArray(filter)) {
           // This is likely the layers.yaml format: [label, field, null, operator]
           if (filter.length >= 4) {
             const [label, field, _, operator] = filter;
-            
+
             // Check if this filter has a value (added by UI)
             const arrayFilter = filter as unknown as { value?: string };
             if (field && arrayFilter.value) {
@@ -151,13 +152,13 @@ export class GenericStyleService {
           else if (filter.label && filter.value) {
             let field = filter.xpath || filter.field;
             let operator = filter.predicate || filter.operator || '=';
-            
+
             // Special case for IGSN Identifier
             if (filter.label === 'IGSN Identifier' || filter.label.includes('IGSN')) {
               field = field || 'igsn';
               operator = operator || 'ISLIKE';
             }
-            
+
             if (field) {
               propertyFilter = this.generatePropertyFilter(field, filter.value, operator);
             }
@@ -181,7 +182,6 @@ export class GenericStyleService {
 
     return null;
   }
-
 
   /**
    * Generate property filter
@@ -249,12 +249,12 @@ export class GenericStyleService {
    */
   private static generateRule(filter: any, styleType: string, styleColor: string, labelProperty?: string): any {
     const rule = ['sld:Rule', {}];
-    
+
     // Add filter if available
     if (filter) {
       rule.push(filter);
     }
-    
+
     // Add symbolizer based on style type
     switch (styleType) {
       case 'POLYGON':
@@ -299,7 +299,7 @@ export class GenericStyleService {
         );
         break;
     }
-    
+
     // Add label symbolizer if label property is specified
     if (labelProperty) {
       rule.push(
@@ -327,7 +327,7 @@ export class GenericStyleService {
         ]
       );
     }
-    
+
     return rule;
   }
-} 
+}

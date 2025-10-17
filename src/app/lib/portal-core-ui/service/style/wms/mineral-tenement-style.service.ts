@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { serialize } from '@thi.ng/hiccup';
+import { OptionalFilter, StyleService } from './style.service';
 
 // Add type for hiccup attributes
 type HiccupAttrs = Record<string, string | number | boolean> | null;
@@ -10,20 +11,15 @@ interface MineralTenementStyleParams {
   serviceUrl?: string;
 }
 
-interface OptionalFilter {
-  value: string;
-  label: string;
-  xpath: string;
-  predicate: string;
-  type: string;
-  added: boolean;
-}
-
 enum ServiceProviderType {
   GeoServer = 'GeoServer',
   ArcGIS = 'ArcGIS'
 }
 
+/**
+ * MineralTenementStyleService
+ * Not yet 100% refactored to use StyleService
+ */
 @Injectable()
 export class MineralTenementStyleService {
   private static readonly TENEMENT_COLOUR_MAP = {
@@ -95,7 +91,7 @@ export class MineralTenementStyleService {
 
   private static createRules(ccProperty?: string, optionalFilters?: OptionalFilter[], config?: any): any[] {
     const rules = [];
-    
+
     if (ccProperty === 'TenementType') {
       ['exploration', 'prospecting', 'miscellaneous', 'mining', 'licence'].forEach(type => {
         rules.push(...this.createRulePair(type, config, optionalFilters));
@@ -107,7 +103,7 @@ export class MineralTenementStyleService {
     } else {
       rules.push(...this.createRulePair('Default', config, optionalFilters));
     }
-    
+
     return rules;
   }
 
@@ -178,25 +174,17 @@ export class MineralTenementStyleService {
     ];
   }
 
-  private static createFilter(tenementType: string, config: any, optionalFilters?: OptionalFilter[]): any[] {
+  private static createFilter(tenementType: string, config: any, optionalFilters?: OptionalFilter[] | string): any {
+    // Build tenement type/status filter (if not Default)
     if (tenementType === 'Default') {
-      // If we have optional filters but no color coding, use those filters
-      if (optionalFilters?.length > 0) {
-        const filters = optionalFilters.map(filter => this.createOptionalFilter(filter, config));
-        return [
-          'ogc:Filter', null,
-          filters.length > 1 ? ['ogc:And', null, ...filters] : filters[0]
-        ];
-      }
+      // If optional filters are present, prefer them
+      const optFrag = StyleService.generateFilter(optionalFilters as any);
+      if (optFrag) { return optFrag; }
 
-      // Default filter when no options selected
-      return [
-        'ogc:Filter', null,
+      // fallback default wildcard name filter
+      return ['ogc:Filter', null,
         ['ogc:PropertyIsLike', {
-          wildCard: '*',
-          singleChar: '#',
-          escapeChar: '!',
-          matchCase: 'false'
+          wildCard: '*', singleChar: '#', escapeChar: '!', matchCase: 'false'
         } as HiccupAttrs,
           ['ogc:PropertyName', null, config.nameField],
           ['ogc:Literal', null, '*']
@@ -204,107 +192,30 @@ export class MineralTenementStyleService {
       ];
     }
 
-    // Keep the existing type/status filter logic for color coding
-    const typeFilter = [
-      'ogc:PropertyIsLike', {
-        wildCard: '*',
-        singleChar: '#',
-        escapeChar: '!',
-        matchCase: 'false'
-      } as HiccupAttrs,
-      ['ogc:PropertyName', null,
-        config.featureType === 'MineralTenement' 
-          ? (this.isTenementStatus(tenementType) ? config.statusField : config.typeField)
-          : (this.isTenementStatus(tenementType) ? 'mt:status' : 'mt:tenementType')
-      ],
-      ['ogc:Literal', null, 
-        this.isTenementStatus(tenementType) ? tenementType : `*${tenementType}*`
-      ]
+    const propertyName = config.featureType === 'MineralTenement'
+      ? (this.isTenementStatus(tenementType) ? config.statusField : config.typeField)
+      : (this.isTenementStatus(tenementType) ? 'mt:status' : 'mt:tenementType');
+
+    const typeFilter = ['ogc:PropertyIsLike', {
+      wildCard: '*', singleChar: '#', escapeChar: '!', matchCase: 'false'
+    } as HiccupAttrs,
+      ['ogc:PropertyName', null, propertyName],
+      ['ogc:Literal', null, this.isTenementStatus(tenementType) ? tenementType : `*${tenementType}*`]
     ];
 
-    // Add optional filters if present
-    const filters = [typeFilter];
-    if (optionalFilters?.length > 0) {
-      optionalFilters.forEach(filter => {
-        filters.push(this.createOptionalFilter(filter, config));
-      });
+    // Merge optional filters produced by StyleService (if any)
+    const optFrag = StyleService.generateFilter(optionalFilters as any);
+    if (!optFrag) {
+      return ['ogc:Filter', null, typeFilter];
     }
 
-    // Combine all filters
-    return [
-      'ogc:Filter', null,
-      filters.length > 1 ? ['ogc:And', null, ...filters] : filters[0]
-    ];
-  }
-
-  private static createOptionalFilter(filter: OptionalFilter, config: any): any[] {
-    // Handle different filter types
-    switch (filter.type) {
-      case 'OPTIONAL.DROPDOWNSELECTLIST':
-        // Handle dropdown selections (like Tenement Type)
-        const fieldName = config.featureType === 'MineralTenement'
-          ? filter.xpath.replace('mt:', '').toUpperCase()
-          : filter.xpath;
-
-        // Map the display value to the actual value if needed
-        let filterValue = filter.value;
-        if (filter.value === 'Mining Lease') {
-          filterValue = 'mining';
-        }
-
-        return [
-          'ogc:PropertyIsLike', {
-            wildCard: '*',
-            singleChar: '#',
-            escapeChar: '!',
-            matchCase: 'false'
-          } as HiccupAttrs,
-          ['ogc:PropertyName', null, fieldName],
-          ['ogc:Literal', null, `*${filterValue}*`]
-        ];
-
-      case 'OPTIONAL.TEXT':
-        // Handle text inputs (like Owner)
-        const textFieldName = config.featureType === 'MineralTenement'
-          ? filter.xpath.replace('mt:', '').toUpperCase()
-          : filter.xpath;
-
-        return [
-          'ogc:PropertyIsLike', {
-            wildCard: '*',
-            singleChar: '#',
-            escapeChar: '!',
-            matchCase: 'false'
-          } as HiccupAttrs,
-          ['ogc:PropertyName', null, textFieldName],
-          ['ogc:Literal', null, `*${filter.value}*`]
-        ];
-
-      case 'OPTIONAL.POLYGONBBOX':
-        return [
-          'ogc:Intersects', null,
-          ['ogc:PropertyName', null, config.shapeField],
-          ['gml:Polygon', { srsName: 'EPSG:4326' } as HiccupAttrs,
-            filter.value.replace('gsmlp:shape', config.shapeField)
-          ]
-        ];
-
-      case 'OPTIONAL.DATE':
-        const operator = filter.predicate === 'BIGGER_THAN' 
-          ? 'PropertyIsGreaterThan' 
-          : 'PropertyIsLessThan';
-        return [
-          `ogc:${operator}`, null,
-          ['ogc:PropertyName', null, 
-            config.featureType === 'MineralTenement' 
-              ? 'EXPIREDATE' 
-              : 'mt:expireDate'
-          ],
-          ['ogc:Literal', null, filter.value]
-        ];
-
-      default:
-        return [];
+    // optFrag is ['ogc:Filter', {}, innerFrag] -> extract inner fragment(s)
+    const innerFrag = Array.isArray(optFrag) && optFrag.length >= 3 ? optFrag[2] : optFrag;
+    if (Array.isArray(innerFrag) && innerFrag[0] === 'ogc:And') {
+      // Combine typeFilter with innerFrag's children
+      return ['ogc:Filter', null, ['ogc:And', null, typeFilter, ...innerFrag.slice(2)]];
+    } else {
+      return ['ogc:Filter', null, ['ogc:And', null, typeFilter, innerFrag]];
     }
   }
 
@@ -321,4 +232,4 @@ export class MineralTenementStyleService {
     }
     return ServiceProviderType.GeoServer;
   }
-} 
+}

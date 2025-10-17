@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { StyleService } from './style.service';
+import { OptionalFilter, StyleService } from './style.service';
 import { serialize } from '@thi.ng/hiccup';
 
 interface MineStyleParams {
@@ -7,18 +7,12 @@ interface MineStyleParams {
   optionalFilters?: OptionalFilter[];
 }
 
-interface OptionalFilter {
-  value: string;
-  label: string;
-  xpath: string;
-  predicate: string;
-  type: string;
-  added: boolean;
-}
-
+/**
+ * MineStyleService
+ * Note: Hasn't been fully refactored to use StyleService methods due to polygon differences.
+ */
 @Injectable()
 export class MineStyleService {
-  constructor(private styleService: StyleService) {}
 
   public static getSld(layerName: string, styleName: string, params: MineStyleParams): string {
     const ns = {
@@ -48,7 +42,7 @@ export class MineStyleService {
         switch (filter.type) {
           case 'OPTIONAL.POLYGONBBOX':
             fragments.push(['ogc:Intersects', {},
-              ['ogc:PropertyName', {}, 'er:location'],  // Use er:location as per backend
+              ['ogc:PropertyName', {}, 'er:location'], // Use er:location as per backend
               ['gml:Polygon', {}, filter.value]
             ]);
             break;
@@ -63,9 +57,9 @@ export class MineStyleService {
     }
 
     // Create filter
-    const filter = fragments.length > 0 ? 
+    const filter = fragments.length > 0 ?
       ['ogc:Filter', {},
-        fragments.length > 1 
+        fragments.length > 1
           ? ['ogc:And', {}, ...fragments]
           : fragments[0]
       ] : null;
@@ -85,7 +79,7 @@ export class MineStyleService {
             ['sld:FeatureTypeStyle', {},
               ['sld:Rule', {},
                 filter,
-                this.createSymbolizer('#FF9900')
+                StyleService.createSymbolizer('#FF9900', 'circle', '1')
               ]
             ]
           ]
@@ -100,24 +94,4 @@ export class MineStyleService {
       [`xmlns:${key}`]: value
     }), {});
   }
-
-  private static createSymbolizer(color: string): any[] {
-    return [
-      'sld:PointSymbolizer', {},
-      ['sld:Graphic', {},
-        ['sld:Mark', {},
-          ['sld:WellKnownName', {}, 'circle'],
-          ['sld:Fill', {},
-            ['sld:CssParameter', { name: 'fill' }, color],
-            ['sld:CssParameter', { name: 'fill-opacity' }, '0.4']
-          ],
-          ['sld:Stroke', {},
-            ['sld:CssParameter', { name: 'stroke' }, color],
-            ['sld:CssParameter', { name: 'stroke-width' }, '1']
-          ]
-        ],
-        ['sld:Size', {}, '8']
-      ]
-    ];
-  }
-} 
+}

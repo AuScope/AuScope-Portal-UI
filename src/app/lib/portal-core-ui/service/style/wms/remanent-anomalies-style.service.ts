@@ -1,13 +1,5 @@
 import { Injectable } from '@angular/core';
-
-interface OptionalFilter {
-  value: string;
-  label: string;
-  xpath: string;
-  predicate: string;
-  type: string;
-  added: boolean;
-}
+import { OptionalFilter } from './style.service';
 
 interface RemanentAnomaliesStyleParams {
   serviceUrl?: string;
@@ -415,4 +407,4 @@ export class RemanentAnomaliesStyleService {
         </NamedLayer>
       </StyledLayerDescriptor>`;
   }
-} 
+}
