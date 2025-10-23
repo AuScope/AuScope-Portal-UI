@@ -41,5 +41,23 @@ export const environment = {
                 'https://geology.data.vic.gov.au',
                 'http://geology.data.vic.gov.au',
                 'http://geoserver.octopusdata.org'],
-  appVersion: packagejson.version
+  appVersion: packagejson.version,
+
+  // Sentry configuration.
+  sentry: {
+    dsn: "https://e4c14bee42771399619e105ffc2c574d@o4510231275700224.ingest.us.sentry.io/4510231765254144",
+    enableUserErrorReporting: true,
+		tracing: {
+			tracesSampleRate: 1.0,
+			tracePropagationTargets: [ "https://auportal-dev.geoanalytics.group/*", "https://auportal-dev.geoanalytics.group/api/*" ],
+		},
+		replays: {
+			replaysSessionSampleRate: 1,
+			replaysOnErrorSampleRate: .1,
+			minReplayDuration: 10000,
+			maskAllText: false,
+			maskAllInputs: false,
+			blockAllMedia: false,
+		},
+	},
 }
