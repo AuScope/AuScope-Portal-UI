@@ -1,9 +1,12 @@
 import { environment } from '../environments/environment';
 import { config } from '../environments/config';
-import { NgModule } from '@angular/core';
+import { NgModule, provideAppInitializer, ErrorHandler, inject } from '@angular/core';
+import { Router } from "@angular/router";
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
+
+import * as Sentry from "@sentry/angular";
 
 // Cesium icons
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -42,9 +45,6 @@ import { AngularCesiumModule, AngularCesiumWidgetsModule } from '@auscope/angula
 
 import { QuerierModalComponent } from './modalwindow/querier/querier.modal.component';
 import { ClipboardModule } from 'ngx-clipboard';
-
-
-
 
 import { NgSelectModule } from '@ng-select/ng-select';
 
@@ -179,14 +179,34 @@ PlotlyModule.plotlyjs = PlotlyJS;
         ConfirmModalComponent,
         ToolbarComponent
     ],
-    providers: [ AuscopeApiService, FilterService, RectanglesEditorService, AdvancedComponentService, SearchService,
-                 NVCLService, MSCLService, BoundsService, GraceService, { provide: SAVER, useFactory: getSaver },
-                 LegendUiService, UserStateService, LayerManagerService, AuthGuard, AuthService,
-                 {
-                    provide: HTTP_INTERCEPTORS,
-                    useClass: AuthErrorHandlerInterceptor,
-                    multi: true,
-                 }
+    providers: [
+      AuscopeApiService, FilterService, RectanglesEditorService, AdvancedComponentService, SearchService,
+      NVCLService, MSCLService, BoundsService, GraceService, { provide: SAVER, useFactory: getSaver },
+      LegendUiService, UserStateService, LayerManagerService, AuthGuard, AuthService,
+      {
+        provide: HTTP_INTERCEPTORS,
+        useClass: AuthErrorHandlerInterceptor,
+        multi: true,
+      },
+      environment.sentry
+        ? [
+          {
+            provide: ErrorHandler,
+            useValue: Sentry.createErrorHandler({
+              showDialog: !!environment.sentry?.enableUserErrorReporting,
+            }),
+          },
+          {
+            provide: Sentry.TraceService,
+            deps: [ Router ],
+          },
+          provideAppInitializer(() =>
+          {
+            const initializerFn = ((_traceService: Sentry.TraceService) => () => Promise.resolve(null))(inject(Sentry.TraceService));
+            return initializerFn();
+          })
+        ]
+        : [],
     ],
     imports: [
         PortalCoreModule.forRoot(environment, config),

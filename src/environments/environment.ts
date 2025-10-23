@@ -8,14 +8,17 @@
 // Note: environment files replace the default, they don't override.  So, any change in this file
 // will almost always need an equivalent change in all the other environment files.
 
+import { isDevMode } from "@angular/core";
+import { random } from "lodash";
 import packagejson from '../../package.json';
+
 
 export const environment = {
   production: false,
   getCSWRecordEndP: 'getKnownLayers.do',
-  portalBaseUrl: 'http://localhost:8080/api/',
+  portalBaseUrl: 'https://auportal-dev.geoanalytics.group/api/',
   portalProxyUrl: '/api/',
-  authBaseUrl: 'http://localhost:8080/api/',
+  authBaseUrl: 'https://auportal-dev.geoanalytics.group/api/',
   hostUrl: 'http://localhost:4200',
   nVCLAnalyticalUrl: 'https://nvclanalytics.azurewebsites.net/NVCLAnalyticalServices/',
   googleAnalyticsKey: null,
@@ -35,11 +38,31 @@ export const environment = {
   grace: {
     hostUrl: 'https://insargrace.geoanalytics.csiro.au:/grace/grace'
   },
-  urlNeedProxy: ['http://ogc-jdlc.curtin.edu.au:80',
-                'https://geossdi.dmp.wa.gov.au',
-                'https://geology.data.vic.gov.au',
-                'http://geology.data.vic.gov.au',
-                'http://geoserver.octopusdata.org'],
-  appVersion: packagejson.version
+  urlNeedProxy: [
+    'http://ogc-jdlc.curtin.edu.au:80',
+    'https://geossdi.dmp.wa.gov.au',
+    'https://geology.data.vic.gov.au',
+    'http://geology.data.vic.gov.au',
+    'http://geoserver.octopusdata.org'
+  ],
 
+  appVersion: isDevMode() ? `0.0.0-dev+${ random(9999) }` : packagejson.version,
+
+  // Sentry configuration.
+  sentry: {
+    dsn: "https://e4c14bee42771399619e105ffc2c574d@o4510231275700224.ingest.us.sentry.io/4510231765254144",
+    enableUserErrorReporting: true,
+		tracing: {
+			tracesSampleRate: 1.0,
+			tracePropagationTargets: [ "http://localhost:4200/*", "https://auportal-dev.geoanalytics.group/api/*" ],
+		},
+		replays: {
+			replaysSessionSampleRate: 1,
+			replaysOnErrorSampleRate: .1,
+			minReplayDuration: 10000,
+			maskAllText: false,
+			maskAllInputs: false,
+			blockAllMedia: false,
+		},
+	},
 }
