@@ -21,9 +21,9 @@
             "index": "src/index.html",
             "main": "src/main.ts",
             "tsConfig": "src/tsconfig.app.json",
-            "sourceMap": false,
+            "sourceMap": true,
             "namedChunks": false,
-            "extractLicenses": true,
+            "extractLicenses": false,
             "vendorChunk": false,
             "optimization": {
               "scripts": false,
