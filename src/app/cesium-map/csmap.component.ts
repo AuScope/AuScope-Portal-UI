@@ -35,19 +35,23 @@ declare let Cesium: any;
     template: `
     <div #mapElement id="map" class="h-100 w-100" (mouseout)="mouseLongitude=undefined;mouseLatitude=undefined;">
       <ac-map>
-          <app-browse-menu></app-browse-menu>
-          <app-toolbar (splitToggleEvent)="toggleShowMapSplit()"></app-toolbar>
-          <div #mapSlider id="mapSlider" *ngIf="getSplitMapShown()">
+        <app-browse-menu></app-browse-menu>
+        <app-toolbar (splitToggleEvent)="toggleShowMapSplit()"></app-toolbar>
+        @if (getSplitMapShown()) {
+          <div #mapSlider id="mapSlider">
             <div class="slider-grabber">
               <div class="slider-grabber-inner"></div>
             </div>
           </div>
-          <div class="mouse-coordinates" *ngIf="mouseLongitude !== undefined && mouseLatitude !== undefined">
-              Longitude:&nbsp;{{ mouseLongitude }},&nbsp;Latitude:&nbsp;{{ mouseLatitude }}
+        }
+        @if (mouseLongitude !== undefined && mouseLatitude !== undefined) {
+          <div class="mouse-coordinates">
+            Longitude:&nbsp;{{ mouseLongitude }},&nbsp;Latitude:&nbsp;{{ mouseLatitude }}
           </div>
-          <div class="advancedmapcomponent">
-              <ng-template #advancedmapcomponents></ng-template>
-          </div>
+        }
+        <div class="advancedmapcomponent">
+          <ng-template #advancedmapcomponents></ng-template>
+        </div>
       </ac-map>
     </div>
     `,

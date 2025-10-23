@@ -1,30 +1,34 @@
 <div id="remanentanomalies-analytic-accordion">
-	<!-- BEGIN card -->
-	<div class="card card-default card-bordered">
-		<div id="remanentanomalies-analytic" class="card-collapse collapse" class="in">
-			<div class="modal-card-size">
-				<div style="position: inherit;">
-					<div class="d-none d-md-inline">
-						<a href="{{baseUrl}}getKml.aspx?anomalyid={{anomaliesId}}" data-toggle="tooltip"
-							title="Download KML" class="btn btn-light btn-sm"> <i class="ti-download"></i> KML
-						</a>
-						<a href="{{baseUrl}}getAnomalyData.ashx?anomalyid={{anomaliesId}}" data-toggle="tooltip"
-							title="Download GRID" class="btn btn-light btn-sm"> <i class="ti-download"></i> GRID
-						</a>
-						<a *ngIf="hasAnalyses" href="{{baseUrl}}getAllAnalysesForAnomaly.ashx?anomalyid={{anomaliesId}}" data-toggle="tooltip"
-							title="Download Analyses" class="btn btn-light btn-sm"> <i class="ti-download"></i> Analyses
-						</a>
-						<a *ngIf="hasModel" href="{{baseUrl}}getAllModelsForAnomaly.ashx?anomalyid={{anomaliesId}}" data-toggle="tooltip"
-							title="Download Models" class="btn btn-light btn-sm"> <i class="ti-download"></i> Models
-						</a>
-					</div>
+  <!-- BEGIN card -->
+  <div class="card card-default card-bordered">
+    <div id="remanentanomalies-analytic" class="card-collapse collapse" class="in">
+      <div class="modal-card-size">
+        <div style="position: inherit;">
+          <div class="d-none d-md-inline">
+            <a href="{{baseUrl}}getKml.aspx?anomalyid={{anomaliesId}}" data-toggle="tooltip"
+              title="Download KML" class="btn btn-light btn-sm"> <i class="ti-download"></i> KML
+            </a>
+            <a href="{{baseUrl}}getAnomalyData.ashx?anomalyid={{anomaliesId}}" data-toggle="tooltip"
+              title="Download GRID" class="btn btn-light btn-sm"> <i class="ti-download"></i> GRID
+            </a>
+            @if (hasAnalyses) {
+              <a href="{{baseUrl}}getAllAnalysesForAnomaly.ashx?anomalyid={{anomaliesId}}" data-toggle="tooltip"
+                title="Download Analyses" class="btn btn-light btn-sm"> <i class="ti-download"></i> Analyses
+              </a>
+            }
+            @if (hasModel) {
+              <a href="{{baseUrl}}getAllModelsForAnomaly.ashx?anomalyid={{anomaliesId}}" data-toggle="tooltip"
+                title="Download Models" class="btn btn-light btn-sm"> <i class="ti-download"></i> Models
+              </a>
+            }
+          </div>
 
-				</div>
-				<a target="_BLANK" href="http://remanentanomalies.csiro.au/getJpeg.ashx?anomalyId={{anomaliesId}}"><img
-					src="http://remanentanomalies.csiro.au/getJpeg.ashx?anomalyId={{anomaliesId}}" style="height: 90%;" /></a>
-			</div>
-		</div>
+        </div>
+        <a target="_BLANK" href="http://remanentanomalies.csiro.au/getJpeg.ashx?anomalyId={{anomaliesId}}"><img
+        src="http://remanentanomalies.csiro.au/getJpeg.ashx?anomalyId={{anomaliesId}}" style="height: 90%;" /></a>
+      </div>
+    </div>
 
-	</div>
-	<!-- END card -->
+  </div>
+  <!-- END card -->
 </div>

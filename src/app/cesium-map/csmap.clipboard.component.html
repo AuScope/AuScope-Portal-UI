@@ -2,37 +2,45 @@
 <rectangles-editor></rectangles-editor>
 
 <button class="cesium-button cesium-toolbar-button editor-toggle-button" (click)="toggleEditor()">
-    <em class="fa fa-edit" title="Draw or select polygon filter"></em>
+  <em class="fa fa-edit" title="Draw or select polygon filter"></em>
 </button>
 
-<div *ngIf="bShowClipboard" @fadeSlideInOut class="container-fluid editor-box" role="group">
-	<div class="editor-title">
-		Polygon Filter
-	</div>
-	<div class="editor-container">
-		<table class="table">
-			<tbody>
-				<tr>
-					<td *ngIf="!polygonBBox && !isDrawingPolygon">&nbsp;Click Draw to create polygon</td>
-					<td *ngIf="isDrawingPolygon">&nbsp;Click map to draw polygon, double-click to end</td>
-					<td *ngIf="!isDrawingPolygon && polygonBBox">{{ polygonBBox.name }}</td>
-				</tr>
-			</tbody>
-		</table>
-		<div class="btn-group mr-2 editor-button-group" role="group">
-			<button (click)='clearClipboard()' type="button" title="Clear polygon" [disabled]="!polygonBBox || isDrawingPolygon" class="cesium-button cesium-toolbar-button editor-button"><em class="fa fa-lg fa-times-circle" aria-hidden="true"></em>Clear</button>
-			<button (click)='drawPolygon()' type="button" title="Draw polygon" [ngStyle]="{'background-color': isDrawingPolygon ? '#282572' : '#303336'}" class="cesium-button cesium-toolbar-button editor-button"><i class="fa fa-lg fa-edit" aria-hidden="true"></i>Draw</button>
-			<input type="file" accept=".kml" class="file-input" (change)="onKmlFileSelected($event)" #KmlFileLoader>
-			<button (click)="KmlFileLoader.click()" type="button" title="Load polygon from KML file" [ngStyle]="{'background-color': isDrawingPolygon ? '#282572' : '#303336'}" class="cesium-button cesium-toolbar-button editor-button"><i class="fa fa-lg fa-file" aria-hidden="true"></i>Load</button>
-			<button (click)="onKmlFileSave()" type="button" title="Save polygon to KML file" [ngStyle]="{'background-color': isDrawingPolygon ? '#282572' : '#303336'}" class="cesium-button cesium-toolbar-button editor-button"><i class="fa fa-lg fa-floppy-o" aria-hidden="true"></i>Save</button>
-			<button (click)="onRoiSave()" type="button" title="Save to ROI" [ngStyle]="{'background-color': isDrawingPolygon ? '#282572' : '#303336'}" class="cesium-button cesium-toolbar-button editor-button" ><img src="extension/svg/polygon.svg" class="white-svg-button" fill="#000000" width="24" height="24" style="color:#edffff;">ROI </button>
-			<!-- Note: Toggle functionality not yet ported to new browse/search views
-			<button (click)='toggleFilterLayers()' type="button" title="Toggle applicable layers" class="cesium-button cesium-toolbar-button editor-button">
-				<i *ngIf="!isFilterLayerShown" class="fa fa-lg fa-toggle-off" aria-hidden="true"></i>
-				<i *ngIf="isFilterLayerShown" class="fa fa-lg fa-toggle-on" aria-hidden="true"></i>
-				Toggle
-			</button>
-			-->
-		</div>
-	</div>
-</div>
+@if (bShowClipboard) {
+  <div @fadeSlideInOut class="container-fluid editor-box" role="group">
+    <div class="editor-title">
+      Polygon Filter
+    </div>
+    <div class="editor-container">
+      <table class="table">
+        <tbody>
+          <tr>
+            @if (!polygonBBox && !isDrawingPolygon) {
+              <td>&nbsp;Click Draw to create polygon</td>
+            }
+            @if (isDrawingPolygon) {
+              <td>&nbsp;Click map to draw polygon, double-click to end</td>
+            }
+            @if (!isDrawingPolygon && polygonBBox) {
+              <td>{{ polygonBBox.name }}</td>
+            }
+          </tr>
+        </tbody>
+      </table>
+      <div class="btn-group mr-2 editor-button-group" role="group">
+        <button (click)='clearClipboard()' type="button" title="Clear polygon" [disabled]="!polygonBBox || isDrawingPolygon" class="cesium-button cesium-toolbar-button editor-button"><em class="fa fa-lg fa-times-circle" aria-hidden="true"></em>Clear</button>
+        <button (click)='drawPolygon()' type="button" title="Draw polygon" [ngStyle]="{'background-color': isDrawingPolygon ? '#282572' : '#303336'}" class="cesium-button cesium-toolbar-button editor-button"><i class="fa fa-lg fa-edit" aria-hidden="true"></i>Draw</button>
+        <input type="file" accept=".kml" class="file-input" (change)="onKmlFileSelected($event)" #KmlFileLoader>
+        <button (click)="KmlFileLoader.click()" type="button" title="Load polygon from KML file" [ngStyle]="{'background-color': isDrawingPolygon ? '#282572' : '#303336'}" class="cesium-button cesium-toolbar-button editor-button"><i class="fa fa-lg fa-file" aria-hidden="true"></i>Load</button>
+        <button (click)="onKmlFileSave()" type="button" title="Save polygon to KML file" [ngStyle]="{'background-color': isDrawingPolygon ? '#282572' : '#303336'}" class="cesium-button cesium-toolbar-button editor-button"><i class="fa fa-lg fa-floppy-o" aria-hidden="true"></i>Save</button>
+        <button (click)="onRoiSave()" type="button" title="Save to ROI" [ngStyle]="{'background-color': isDrawingPolygon ? '#282572' : '#303336'}" class="cesium-button cesium-toolbar-button editor-button" ><img src="extension/svg/polygon.svg" class="white-svg-button" fill="#000000" width="24" height="24" style="color:#edffff;">ROI </button>
+        <!-- Note: Toggle functionality not yet ported to new browse/search views
+        <button (click)='toggleFilterLayers()' type="button" title="Toggle applicable layers" class="cesium-button cesium-toolbar-button editor-button">
+          <i *ngIf="!isFilterLayerShown" class="fa fa-lg fa-toggle-off" aria-hidden="true"></i>
+          <i *ngIf="isFilterLayerShown" class="fa fa-lg fa-toggle-on" aria-hidden="true"></i>
+          Toggle
+        </button>
+        -->
+      </div>
+    </div>
+  </div>
+}

@@ -1,4 +1,8 @@
 <button class="cesium-button cesium-toolbar-button" (click)="toggleShowMapSplit()">
-    <em class="fa fa-map-signs" *ngIf="!splitMapShown()" title="Click to compare layers on a split map" style="color:#595959;"></em>
-    <em class="fa fa-map-signs" *ngIf="splitMapShown()" title="Click to remove split from map" style="color:white;"></em>
+  @if (!splitMapShown()) {
+    <em class="fa fa-map-signs" title="Click to compare layers on a split map" style="color:#595959;"></em>
+  }
+  @if (splitMapShown()) {
+    <em class="fa fa-map-signs" title="Click to remove split from map" style="color:white;"></em>
+  }
 </button>
