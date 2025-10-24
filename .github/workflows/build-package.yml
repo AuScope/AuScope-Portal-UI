@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Use Node.js 20.x
         uses: actions/setup-node@v4
         with:
@@ -37,6 +39,19 @@ jobs:
         run: |
           npm i
           npm run build-dev
+      - name: Sentry release
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        run: |
+          npm i
+          export PACKAGE_NAME=$(node -p "require('./dist/version.json').name")
+          export APP_VERSION=$(node -p "require('./dist/version.json').version")
+          npx sentry-cli releases new --org ${{ env.SENTRY_ORG }} --project ${{ env.SENTRY_PROJECT }} "$PACKAGE_NAME@$APP_VERSION"
+          npx sentry-cli sourcemaps upload --ignore-file .sentryignore --org ${{ env.SENTRY_ORG }} --project ${{ env.SENTRY_PROJECT }} --release=$PACKAGE_NAME@$APP_VERSION ./dist/
+          npx sentry-cli releases finalize --org ${{ env.SENTRY_ORG }} --project ${{ env.SENTRY_PROJECT }} "$PACKAGE_NAME@$APP_VERSION"
+
       - name: Zip artifact for deployment
         run: zip release.zip ./dist/* -r
       - name: file bundle artifact
