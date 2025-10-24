@@ -1,16 +1,14 @@
 {
-"/AuScope-Portal/**":
-{
-  "target": "http://localhost:8080/",
-  "secure": false,
-  "logLevel": "debug",
-  "changeOrigin": true
-},
-"/api/**":
-{
-  "target": "http://localhost:8080/",
-  "secure": false,
-  "logLevel": "debug",
-  "changeOrigin": true
-},
+  "/AuScope-Portal/**": {
+    "target": "http://localhost:8080/",
+    "secure": false,
+    "logLevel": "debug",
+    "changeOrigin": true
+  },
+  "/api/**": {
+    "target": "http://localhost:8080/",
+    "secure": false,
+    "logLevel": "debug",
+    "changeOrigin": true
+  }
 }
