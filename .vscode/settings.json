@@ -1,0 +1,12 @@
+{
+	"files.exclude": {
+		".angulardoc.json": true,
+		"*.code-workspace": true,
+		"**/.angular": true,
+		"**/dist/": true,
+		"**/node_modules/": true
+	},
+	"angular.enable-strict-mode-prompt": false,
+	"javascript.preferences.quoteStyle": "double",
+	"typescript.preferences.quoteStyle": "double"
+}

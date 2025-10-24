@@ -18,12 +18,13 @@
 *.sublime-workspace
 /.history
 
-# IDE - VSCode
+# Visual Studio Code
 .vscode/*
-.vscode/settings.json
+!.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+.history/*
 
 # misc
 /.angular/cache
