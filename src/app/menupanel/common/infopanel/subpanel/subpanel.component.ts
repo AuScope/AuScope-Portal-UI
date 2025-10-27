@@ -126,14 +126,14 @@ export class InfoPanelSubComponent implements OnInit {
 
     ngOnInit(): void {
 
-        // Accessed date
+        // Accessed date for citation
         const today = new Date();
         const dayDigit = String(today.getDate());
         const monthName = today.toLocaleString('default', { month: 'long' });
         const year = today.getFullYear();
         this.accessedDate = `${dayDigit} ${monthName}, ${year},`;
 
-        // Publication date
+        // Publication date for citation
         try {
             const isoDateStr = this.cswRecord.date.replace(" UTC", "Z");
             const pubDate = new Date(isoDateStr);
@@ -227,6 +227,18 @@ export class InfoPanelSubComponent implements OnInit {
                                 + ',' + bbox.eastBoundLongitude + ',' + bbox.northBoundLatitude + "&WIDTH=400&HEIGHT=400";
             }
         });
+    }
+
+    /**
+     * Catch the user click and copy citation to clipboard
+     * 
+     * @param event click event
+     */
+    public copyCite(element: HTMLElement) {
+        const text = element.innerText;
+        navigator.clipboard.writeText(text)
+          .then(() => alert("Copied to clipboard"))
+          .catch(err => console.error("Failed to copy:", err));
     }
 
     /**

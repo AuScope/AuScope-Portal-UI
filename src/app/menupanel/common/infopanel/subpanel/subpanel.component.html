@@ -54,13 +54,16 @@
     <p>{{cswRecord.description}}</p>
 
     <!-- How to cite, APA-style -->
-    <p><b>How to cite:</b>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span><b>How to cite:</b></span>
+        <i class="fa fa-regular fa-copy fa-lg" title="Copy citation to clipboard" (click)="copyCite(citation)"></i>
+    </div>
+    <div #citation>
     @if (DOIname) {
       {{DOIname}} [Producer] {{distributor}} [Distributor]. {{citeURL}}
     } @else {
         <!-- If there are authors -->
         @if (cswRecord.authors?.length > 0) {
-            <span>
             @for (author of cswRecord.authors; track $index) {
                 @if ($last) {
                   {{author}}
@@ -68,18 +71,17 @@
                   {{author}},
                 }
             }
-            </span>
-        <!-- If there is a contact person and it is not an enquiries line -->
-        } @else if (cswRecord.contactPerson && !cswRecord.contactPerson.includes("nquiries")) {
+        <!-- If there is a contact person and it is not an enquiries line etc. -->
+        } @else if (cswRecord.contactPerson && !(/enquiries|service|customer/i.test(cswRecord.contactPerson))) {
             {{cswRecord.contactPerson}}
         <!-- Use contact org if nothing is defined -->
         } @else {
             {{cswRecord.contactOrg}}
         <!-- The remainder of the citation -->
         } ({{publicationYear}}).
-        <i>{{cswRecord.name}}</i> [Data set]. {{cswRecord.contactOrg}} [Producer]. {{distributor}} [Distributor]. Retrieved {{accessedDate}} from {{citeURL}}
+        {{cswRecord.name}} [Data set]. {{cswRecord.contactOrg}} [Producer]. {{distributor}} [Distributor]. Retrieved {{accessedDate}} from {{citeURL}}
     }
-    </p>
+    </div>
 
     <!-- Organisation etc. -->
     <p><b>Contact org:</b> {{cswRecord.contactOrg}}</p>
@@ -90,7 +92,7 @@
     }
 
     <!-- Constraints -->
-     @if (cleanConstraints(cswRecord.constraints).length > 0) {
+    @if (cleanConstraints(cswRecord.constraints).length > 0) {
       <p><b>Constraints:</b> {{cleanConstraints(cswRecord.constraints)}}</p>
     }
 
