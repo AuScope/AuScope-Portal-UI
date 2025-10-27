@@ -95,9 +95,11 @@
         }
       </td>
       <!--
-      <div *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="progress progress-xs" style="height: 5px">
+      @if (getUILayerModel(layer.id).statusMap.getRenderStarted()) {
+      <div class="progress progress-xs" style="height: 5px">
         <div class="progress-bar bg-gradient-blue-purple" [style.width]="getUILayerModel(layer.id).statusMap.getCompletePercentage()" role="progressbar"></div>
       </div>
+    }
       -->
     </tr>
   }
