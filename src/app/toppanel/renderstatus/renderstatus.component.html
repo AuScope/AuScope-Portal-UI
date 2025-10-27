@@ -1,24 +1,26 @@
 <div class="modal-body">
   <div class="card card-default card-with-tabs">
-      <div class="card-header">
-          <h4 class="card-title">Status report</h4>
-      </div>
-     	<div class="card-body">
-			<table class="table">
-				<thead>
-					<tr>
-						<th>URL</th>
-						<th>Status</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr *ngFor="let resourceStatus of resourceMap | getKey">
-						<td class="content-break-word">{{resourceStatus.key}}</td>
-						<td>{{resourceStatus.value.status}}</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
+    <div class="card-header">
+      <h4 class="card-title">Status report</h4>
+    </div>
+    <div class="card-body">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>URL</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (resourceStatus of resourceMap | getKey; track resourceStatus) {
+            <tr>
+              <td class="content-break-word">{{resourceStatus.key}}</td>
+              <td>{{resourceStatus.value.status}}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 <div class="modal-footer">

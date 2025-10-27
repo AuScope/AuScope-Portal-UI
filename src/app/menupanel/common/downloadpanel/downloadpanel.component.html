@@ -1,185 +1,268 @@
 <div class="filter-form">
-	<div [hidden]='!(isCsvSupportedLayer || isDatasetURLSupportedLayer || isIRISDownloadSupported)' class="form-group">
-		<div style="font-size:small;" *ngIf="(!bbox && !drawBoundsStarted) && (!polygonFilter && !drawPolygonStarted)">
-			 <div class="alert alert-warning fade show">
-                <i class="ti-bell float-left"></i>
-                <p>Select an area of interest (bounding box or polygon) to reduce download time.</p>
-            </div>
-		</div>
-		<div *ngIf="drawBoundsStarted===true">
-			 <div class="alert alert-primary fade show">
-                <i class="ti-bell float-left"></i>
-                <p>Click on the map to draw bounding box.</p>
-            </div>
-		</div>
-		<div *ngIf="drawPolygonStarted===true">
-			<div class="alert alert-primary fade show">
-			   <i class="ti-bell float-left"></i>
-			   <p>Click on the map to draw polygon, double-click to end.</p>
-		   </div>
-	   </div>
-		<div *ngIf="bbox || (polygonBbox && !drawPolygonStarted)" class="container">
-			<div class="standard-title row">
-				<h4><span>Bounding Box</span></h4>
-			</div>
-			<h5><span class="badge badge-secondary d-inline ml-5 line-height-1-8">North: {{ (bbox ? bbox.northBoundLatitude : polygonBbox.northBoundLatitude) | number:'1.0-4' }}</span></h5>
-			<h5><span class="badge badge-secondary d-inline line-height-1-8">West: {{ (bbox ? bbox.westBoundLongitude : polygonBbox.westBoundLongitude) | number:'1.0-4' }}</span>
-			<span class="badge badge-secondary d-inline ml-3 line-height-1-8">East: {{ (bbox ? bbox.eastBoundLongitude : polygonBbox.eastBoundLongitude) | number:'1.0-4' }}</span></h5>
-			<h5><span class="badge badge-secondary d-inline ml-5 line-height-1-8">South: {{ (bbox ? bbox.southBoundLatitude : polygonBbox.southBoundLatitude) | number:'1.0-4' }}</span></h5>
-			<hr>
-		</div>
-
-		<p *ngIf="!bbox && !polygonFilter" class="small text-danger">If boundaries are too large the operation may time out after 5 minutes due to the size of the data.</p>
-
-    	<!-- AusPass Data Download -->
-		<div *ngIf="irisDownloadListOption" class="form-group  form-group-sm">
-			<label>Service:</label>
-			<select class="form-control form-control-sm" [(ngModel)]="irisDownloadListOption.selectedserviceType" (ngModelChange)="onServiceTypeChange()" >
-				<option [ngValue]="" disabled>{{SELECT_DEFAULT_DATA_TYPE}}</option>
-				<option *ngFor="let serviceType of irisDownloadListOption.serviceTypeList">{{serviceType}}</option>
-			</select>
-		</div>
-
-		<div *ngIf="irisDownloadListOption" class="form-group  form-group-sm">
-			<label>Station:</label>
-			<ng-select  [(ngModel)]="irisDownloadListOption.selectedStations" [multiple]="true" bindLabel="label" bindValue="value" placeholder="{{SELECT_DEFAULT_STATION}}" (ngModelChange)="onStationChange()">
-				<ng-option *ngFor="let station of irisDownloadListOption.stationLst"  ng-if="station.code!=''" [value]="station.code" >{{station.name}} : {{station.code}}</ng-option>
-			 </ng-select>
-		</div>
-
-		<div *ngIf="irisDownloadListOption" class="form-group form-group-sm">
-			<label>Channel:</label>
-
-			 <ng-select [items]="irisDownloadListOption.channelLst" bindLabel="code" bindValue="code" [(ngModel)]="irisDownloadListOption.selectedChannels" [multiple]="true"  placeholder="{{SELECT_DEFAULT_CHANNEL}}" >
-				<ng-template ng-option-tmp let-item="item">
-					<div title="Azimuth:{{item.azimuth}} , Dip:{{item.dip}} , SampleRate:{{item.sampleRate}}">{{item.code}}</div>
-				</ng-template>
-			</ng-select>
-		</div>
-
-		<div *ngIf="irisDownloadListOption" class="form-group form-group-sm">
-			<label>Start date: [from {{irisDownloadListOption.minDate}}]</label>
-			<input type="date" class="form-control form-control-sm" [(ngModel)]="irisDownloadListOption.dateFrom" placeholder="yyyy-mm-dd" dateFormat="yy-mm-dd" showIcon="true"/>
-		</div>
-
-		<div *ngIf="irisDownloadListOption " class="form-group form-group-sm">
-			<label>End date: [to {{irisDownloadListOption.maxDate}}]</label>
-			<input type="date" class="form-control form-control-sm" [(ngModel)]="irisDownloadListOption.dateTo" placeholder="yyyy-mm-dd" dateFormat="yy-mm-dd" showIcon="true"/>
-		</div>
-    	<!--End AusPass Data Download -->
-
-		<!-- Draw bounds/polygon -->
-		<div class="d-inline-block">
-			<button *ngIf="!bbox" type="button" class="btn btn-primary btn-xs bounds-btn" (click)="drawBounds()"
-				[title]="irisDownloadListOption?.selectedserviceType === 'Dataselect' ? 'Bounding box disabled for Dataselect' : 'Draw bounding box'"
-				[disabled]="downloadStarted || download4pStarted || download4PolygonKMLStarted || drawBoundsStarted || drawPolygonStarted || irisDownloadListOption?.selectedserviceType === 'Dataselect'">
-					<i class="fa fa-edit"></i>&nbsp;Draw Bounds
-			</button>
-			<button *ngIf="bbox" type="button" title="Remove bounds"
-					class="btn btn-danger btn-xs bounds-btn" [disabled]="downloadStarted || download4pStarted || download4PolygonKMLStarted || drawBoundsStarted || drawPolygonStarted" (click)="clearBounds()">
-					<i class="fa fa-refresh fa-sm"></i>&nbsp;Clear Bounds
-			</button>
-			<button *ngIf="!polygonFilter && isPolygonSupportedLayer" type="button" class="btn btn-primary btn-xs bounds-btn" [disabled]="downloadStarted || download4pStarted || download4PolygonKMLStarted || drawBoundsStarted || drawPolygonStarted"
-							title="Draw polygon" (click)="drawPolygon()">
-				<i *ngIf="download4pStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!download4pStarted" class="fa fa-edit"></i>&nbsp;Draw Polygon
-			</button>
-			<button *ngIf="polygonFilter && isPolygonSupportedLayer" type="button" title="Remove polygon"
-					class="btn btn-danger btn-xs bounds-btn" [disabled]="downloadStarted || download4pStarted || download4PolygonKMLStarted || drawBoundsStarted || drawPolygonStarted" (click)="clearPolygon()"><i class="fa fa-refresh">
-					</i>&nbsp;Clear Polygon
-			</button>
-		</div>
-
-		<!-- Download options for bounds, polygon or all (if irisDownloadListOption) -->
-		<div *ngIf="downloadButtonEnabled()" class="d-inline-block" ngbDropdown>
-			<button type="button" class="btn btn-primary btn-xs" title="Download data" ngbDropdownToggle
-									[disabled]="drawBoundsStarted || downloadStarted || download4pStarted || download4PolygonKMLStarted">
-				<i *ngIf="downloadStarted || download4pStarted || download4PolygonKMLStarted" class="fa fa-spinner fa-spin fa-fw"></i>
-				<i *ngIf="!downloadStarted && !download4pStarted && !download4PolygonKML" class="fa fa-cloud-download"></i>&nbsp;Download
-			</button>
-			<div ngbDropdownMenu>
-				<!-- Note: If you add or modify conditions here, be sure to update the downloadButtonEnabled() method -->
-				<button *ngIf="bbox || irisDownloadListOption" title="Download data" (click)="download()" ngbDropdownItem>Download Data</button>
-				<button *ngIf="polygonFilter && isPolygonSupportedLayer" title="Download data" (click)="download4Polygon()" ngbDropdownItem>Download Data</button>
-				<button *ngIf="(bbox || polygonFilter) && isWCSDownloadSupported" title="Download as KML. GoogleMap's maximum KML size is 5M!" (click)="download4PolygonKML()" ngbDropdownItem>Download KML</button>
-				<button *ngIf="isTsgDownloadAvailable" title="Download TSG files" (click)="popupTSGDownload()" ngbDropdownItem>Download TSG Files</button>
-                @if (bbox || (polygonFilter && isPolygonSupportedLayer)) {
-                    <hr class="menu-hr">
-                    <button (click)="downloadWithAuScopeCat()" ngbDropdownItem>Download with AuScope-Cat&nbsp;<i class="fa fa-plug menu-icon"></i></button>
-                }
-			</div>
-		</div>
-
-		<p class="small text-danger ng-star-inserted" *ngIf="showDOIs">
-			If you use this dataset please cite:
-			{{layer.cswRecords[0].onlineResources[1].name}}
-			URL: <a class="text-danger" target="_blank" href="{{layer.cswRecords[0].onlineResources[1].url}}">{{layer.cswRecords[0].onlineResources[1].url}}</a>
-		</p>
-	</div>
-
-	<div [hidden]='!isWCSDownloadSupported' class="form-group">
-		<div *ngIf="!bbox&&drawBoundsStarted===false">
-			<div class="alert alert-warning fade show">
-        <i class="ti-bell float-left"></i>
-          <p>Select an area to download <span *ngIf="downloadSizeLimit > 0">not exceeding {{downloadSizeLimit}} m<sup>2</sup>.</span></p>
+  <div [hidden]='!(isCsvSupportedLayer || isDatasetURLSupportedLayer || isIRISDownloadSupported)' class="form-group">
+    @if ((!bbox && !drawBoundsStarted) && (!polygonFilter && !drawPolygonStarted)) {
+      <div style="font-size:small;">
+        <div class="alert alert-warning fade show">
+          <i class="ti-bell float-left"></i>
+          <p>Select an area of interest (bounding box or polygon) to reduce download time.</p>
+        </div>
       </div>
-		</div>
-		<div *ngIf="drawBoundsStarted===true">
-			<div class="alert alert-primary fade show">
-				<i class="ti-bell float-left"></i>
-				<p>Click on the map to draw bounding box.</p>
-			</div>
-		</div>
-		<div *ngIf="bbox" class="container">
-			<div class="standard-title row">
-				<h4><span>Bounding Box</span></h4>
-			</div>
-			<h5><span class="badge badge-secondary d-inline ml-5 line-height-1-8">North: {{bbox.northBoundLatitude | number:'1.0-4'}}</span></h5>
-			<h5><span class="badge badge-secondary d-inline line-height-1-8">West: {{bbox.westBoundLongitude | number:'1.0-4'}}</span>
-			<span class="badge badge-secondary d-inline ml-2 line-height-1-8">East: {{bbox.eastBoundLongitude | number:'1.0-4'}}</span></h5>
-			<h5><span class="badge badge-secondary d-inline ml-5 line-height-1-8">South: {{bbox.southBoundLatitude | number:'1.0-4'}}</span></h5>
-			<hr>
-		</div>
+    }
+    @if (drawBoundsStarted===true) {
+      <div>
+        <div class="alert alert-primary fade show">
+          <i class="ti-bell float-left"></i>
+          <p>Click on the map to draw bounding box.</p>
+        </div>
+      </div>
+    }
+    @if (drawPolygonStarted===true) {
+      <div>
+        <div class="alert alert-primary fade show">
+          <i class="ti-bell float-left"></i>
+          <p>Click on the map to draw polygon, double-click to end.</p>
+        </div>
+      </div>
+    }
+    @if (bbox || (polygonBbox && !drawPolygonStarted)) {
+      <div class="container">
+        <div class="standard-title row">
+          <h4><span>Bounding Box</span></h4>
+        </div>
+        <h5><span class="badge badge-secondary d-inline ml-5 line-height-1-8">North: {{ (bbox ? bbox.northBoundLatitude : polygonBbox.northBoundLatitude) | number:'1.0-4' }}</span></h5>
+        <h5><span class="badge badge-secondary d-inline line-height-1-8">West: {{ (bbox ? bbox.westBoundLongitude : polygonBbox.westBoundLongitude) | number:'1.0-4' }}</span>
+        <span class="badge badge-secondary d-inline ml-3 line-height-1-8">East: {{ (bbox ? bbox.eastBoundLongitude : polygonBbox.eastBoundLongitude) | number:'1.0-4' }}</span></h5>
+        <h5><span class="badge badge-secondary d-inline ml-5 line-height-1-8">South: {{ (bbox ? bbox.southBoundLatitude : polygonBbox.southBoundLatitude) | number:'1.0-4' }}</span></h5>
+        <hr>
+        </div>
+      }
 
-		<div *ngIf="wcsDownloadListOption" class="form-group  form-group-sm">
-			<label>Reference System:</label>
-			<select class="form-control form-control-sm" [(ngModel)]="wcsDownloadForm.inputCrs">
-				<option [ngValue]="" disabled>{{SELECT_DEFAULT_REF_SYSTEM}}</option>
-				<option *ngFor="let inputCrs of wcsDownloadListOption.inputCrsList">{{inputCrs}}</option>
-			</select>
-		</div>
-		<div *ngIf="wcsDownloadListOption" class="form-group  form-group-sm">
-			<label>Format:</label>
-			<select class="form-control form-control-sm" [(ngModel)]="wcsDownloadForm.downloadFormat">
-				<option [ngValue]="" disabled>{{SELECT_DEFAULT_DOWNLOAD_FMT}}</option>
-				<option *ngFor="let downloadFormat of wcsDownloadListOption.downloadFormatList">{{downloadFormat}}</option>
-			</select>
-		</div>
-		<div *ngIf="wcsDownloadListOption" class="form-group  form-group-sm">
-			<label>Output CRS:</label>
-			<select class="form-control form-control-sm" [(ngModel)]="wcsDownloadForm.outputCrs">
-				<option [ngValue]="" disabled>{{SELECT_DEFAULT_OUTPUT_CRS}}</option>
-				<option *ngFor="let outputCrs of wcsDownloadListOption.outputCrsList">{{outputCrs}}</option>
-			</select>
-		</div>
-		<div *ngIf="wcsDownloadListOption && wcsDownloadListOption.timePositionList.length > 0" class="form-group  form-group-sm">
-			<label>Time Position:</label>
-			<select class="form-control form-control-sm" [(ngModel)]="wcsDownloadForm.timePosition">
-				<option [ngValue]="" disabled>{{SELECT_DEFAULT_TIME_POS}}</option>
-				<option *ngFor="let timePos of wcsDownloadListOption.timePositionList">{{timePos}}</option>
-			</select>
-		</div>
+      @if (!bbox && !polygonFilter) {
+        <p class="small text-danger">If boundaries are too large the operation may time out after 5 minutes due to the size of the data.</p>
+      }
 
-		<!-- Bounding box download -->
-		<div style="display:flex;">
-			<button *ngIf="!bbox" type="button" title="Draw bounding box"
-					class="btn btn-primary btn-xs" [disabled]="downloadStarted || drawBoundsStarted" (click)="drawBounds()"><i class="fa fa-edit"></i>&nbsp;Draw Bounds</button>
-			<button *ngIf="bbox" type="button" title="Remove bounds"
-					class="btn btn-danger btn-xs" [disabled]="downloadStarted" (click)="clearBounds()"><i class="fa fa-refresh"></i>&nbsp;Clear Bounds</button>
-			<button type="button" class="btn btn-primary btn-xs" style="margin-left:auto;width:9rem;" [disabled]="!bbox || downloadStarted" title="Download data for bounding box" (click)="download()">
-				<i *ngIf="downloadStarted" class="fa fa-spinner fa-spin fa-fw"></i><i *ngIf="!downloadStarted" class="fa fa-cloud-download"></i>&nbsp;Download
-			</button>
-		</div>
+      <!-- AusPass Data Download -->
+      @if (irisDownloadListOption) {
+        <div class="form-group  form-group-sm">
+          <label>Service:</label>
+          <select class="form-control form-control-sm" [(ngModel)]="irisDownloadListOption.selectedserviceType" (ngModelChange)="onServiceTypeChange()" >
+            <option [ngValue]="" disabled>{{SELECT_DEFAULT_DATA_TYPE}}</option>
+            @for (serviceType of irisDownloadListOption.serviceTypeList; track serviceType) {
+              <option>{{serviceType}}</option>
+            }
+          </select>
+        </div>
+      }
 
-	</div>
+      @if (irisDownloadListOption) {
+        <div class="form-group  form-group-sm">
+          <label>Station:</label>
+          <ng-select  [(ngModel)]="irisDownloadListOption.selectedStations" [multiple]="true" bindLabel="label" bindValue="value" placeholder="{{SELECT_DEFAULT_STATION}}" (ngModelChange)="onStationChange()">
+            @for (station of irisDownloadListOption.stationLst; track station) {
+              <ng-option  ng-if="station.code!=''" [value]="station.code" >{{station.name}} : {{station.code}}</ng-option>
+            }
+          </ng-select>
+        </div>
+      }
 
-</div>
+      @if (irisDownloadListOption) {
+        <div class="form-group form-group-sm">
+          <label>Channel:</label>
+          <ng-select [items]="irisDownloadListOption.channelLst" bindLabel="code" bindValue="code" [(ngModel)]="irisDownloadListOption.selectedChannels" [multiple]="true"  placeholder="{{SELECT_DEFAULT_CHANNEL}}" >
+            <ng-template ng-option-tmp let-item="item">
+              <div title="Azimuth:{{item.azimuth}} , Dip:{{item.dip}} , SampleRate:{{item.sampleRate}}">{{item.code}}</div>
+            </ng-template>
+          </ng-select>
+        </div>
+      }
+
+      @if (irisDownloadListOption) {
+        <div class="form-group form-group-sm">
+          <label>Start date: [from {{irisDownloadListOption.minDate}}]</label>
+          <input type="date" class="form-control form-control-sm" [(ngModel)]="irisDownloadListOption.dateFrom" placeholder="yyyy-mm-dd" dateFormat="yy-mm-dd" showIcon="true"/>
+        </div>
+      }
+
+      @if (irisDownloadListOption ) {
+        <div class="form-group form-group-sm">
+          <label>End date: [to {{irisDownloadListOption.maxDate}}]</label>
+          <input type="date" class="form-control form-control-sm" [(ngModel)]="irisDownloadListOption.dateTo" placeholder="yyyy-mm-dd" dateFormat="yy-mm-dd" showIcon="true"/>
+        </div>
+      }
+      <!--End AusPass Data Download -->
+
+      <!-- Draw bounds/polygon -->
+      <div class="d-inline-block">
+        @if (!bbox) {
+          <button type="button" class="btn btn-primary btn-xs bounds-btn" (click)="drawBounds()"
+            [title]="irisDownloadListOption?.selectedserviceType === 'Dataselect' ? 'Bounding box disabled for Dataselect' : 'Draw bounding box'"
+            [disabled]="downloadStarted || download4pStarted || download4PolygonKMLStarted || drawBoundsStarted || drawPolygonStarted || irisDownloadListOption?.selectedserviceType === 'Dataselect'">
+            <i class="fa fa-edit"></i>&nbsp;Draw Bounds
+          </button>
+        }
+        @if (bbox) {
+          <button type="button" title="Remove bounds"
+            class="btn btn-danger btn-xs bounds-btn" [disabled]="downloadStarted || download4pStarted || download4PolygonKMLStarted || drawBoundsStarted || drawPolygonStarted" (click)="clearBounds()">
+            <i class="fa fa-refresh fa-sm"></i>&nbsp;Clear Bounds
+          </button>
+        }
+        @if (!polygonFilter && isPolygonSupportedLayer) {
+          <button type="button" class="btn btn-primary btn-xs bounds-btn" [disabled]="downloadStarted || download4pStarted || download4PolygonKMLStarted || drawBoundsStarted || drawPolygonStarted"
+            title="Draw polygon" (click)="drawPolygon()">
+            @if (download4pStarted) {
+              <i class="fa fa-spinner fa-spin fa-fw"></i>
+              }@if (!download4pStarted) {
+              <i class="fa fa-edit"></i>
+              }&nbsp;Draw Polygon
+            </button>
+          }
+          @if (polygonFilter && isPolygonSupportedLayer) {
+            <button type="button" title="Remove polygon"
+              class="btn btn-danger btn-xs bounds-btn" [disabled]="downloadStarted || download4pStarted || download4PolygonKMLStarted || drawBoundsStarted || drawPolygonStarted" (click)="clearPolygon()"><i class="fa fa-refresh">
+            </i>&nbsp;Clear Polygon
+          </button>
+        }
+      </div>
+
+      <!-- Download options for bounds, polygon or all (if irisDownloadListOption) -->
+      @if (downloadButtonEnabled()) {
+        <div class="d-inline-block" ngbDropdown>
+          <button type="button" class="btn btn-primary btn-xs" title="Download data" ngbDropdownToggle
+            [disabled]="drawBoundsStarted || downloadStarted || download4pStarted || download4PolygonKMLStarted">
+            @if (downloadStarted || download4pStarted || download4PolygonKMLStarted) {
+              <i class="fa fa-spinner fa-spin fa-fw"></i>
+            }
+            @if (!downloadStarted && !download4pStarted && !download4PolygonKML) {
+              <i class="fa fa-cloud-download"></i>
+              }&nbsp;Download
+            </button>
+            <div ngbDropdownMenu>
+              <!-- Note: If you add or modify conditions here, be sure to update the downloadButtonEnabled() method -->
+              @if (bbox || irisDownloadListOption) {
+                <button title="Download data" (click)="download()" ngbDropdownItem>Download Data</button>
+              }
+              @if (polygonFilter && isPolygonSupportedLayer) {
+                <button title="Download data" (click)="download4Polygon()" ngbDropdownItem>Download Data</button>
+              }
+              @if ((bbox || polygonFilter) && isWCSDownloadSupported) {
+                <button title="Download as KML. GoogleMap's maximum KML size is 5M!" (click)="download4PolygonKML()" ngbDropdownItem>Download KML</button>
+              }
+              @if (isTsgDownloadAvailable) {
+                <button title="Download TSG files" (click)="popupTSGDownload()" ngbDropdownItem>Download TSG Files</button>
+              }
+              @if (bbox || (polygonFilter && isPolygonSupportedLayer)) {
+                <hr class="menu-hr">
+                <button (click)="downloadWithAuScopeCat()" ngbDropdownItem>Download with AuScope-Cat&nbsp;<i class="fa fa-plug menu-icon"></i></button>
+              }
+            </div>
+          </div>
+        }
+
+        @if (showDOIs) {
+          <p class="small text-danger ng-star-inserted">
+            If you use this dataset please cite:
+            {{layer.cswRecords[0].onlineResources[1].name}}
+            URL: <a class="text-danger" target="_blank" href="{{layer.cswRecords[0].onlineResources[1].url}}">{{layer.cswRecords[0].onlineResources[1].url}}</a>
+          </p>
+        }
+      </div>
+
+      <div [hidden]='!isWCSDownloadSupported' class="form-group">
+        @if (!bbox&&drawBoundsStarted===false) {
+          <div>
+            <div class="alert alert-warning fade show">
+              <i class="ti-bell float-left"></i>
+              <p>Select an area to download @if (downloadSizeLimit > 0) {
+                <span>not exceeding {{downloadSizeLimit}} m<sup>2</sup>.</span>
+              }</p>
+            </div>
+          </div>
+        }
+        @if (drawBoundsStarted===true) {
+          <div>
+            <div class="alert alert-primary fade show">
+              <i class="ti-bell float-left"></i>
+              <p>Click on the map to draw bounding box.</p>
+            </div>
+          </div>
+        }
+        @if (bbox) {
+          <div class="container">
+            <div class="standard-title row">
+              <h4><span>Bounding Box</span></h4>
+            </div>
+            <h5><span class="badge badge-secondary d-inline ml-5 line-height-1-8">North: {{bbox.northBoundLatitude | number:'1.0-4'}}</span></h5>
+            <h5><span class="badge badge-secondary d-inline line-height-1-8">West: {{bbox.westBoundLongitude | number:'1.0-4'}}</span>
+            <span class="badge badge-secondary d-inline ml-2 line-height-1-8">East: {{bbox.eastBoundLongitude | number:'1.0-4'}}</span></h5>
+            <h5><span class="badge badge-secondary d-inline ml-5 line-height-1-8">South: {{bbox.southBoundLatitude | number:'1.0-4'}}</span></h5>
+            <hr>
+            </div>
+          }
+
+          @if (wcsDownloadListOption) {
+            <div class="form-group  form-group-sm">
+              <label>Reference System:</label>
+              <select class="form-control form-control-sm" [(ngModel)]="wcsDownloadForm.inputCrs">
+                <option [ngValue]="" disabled>{{SELECT_DEFAULT_REF_SYSTEM}}</option>
+                @for (inputCrs of wcsDownloadListOption.inputCrsList; track inputCrs) {
+                  <option>{{inputCrs}}</option>
+                }
+              </select>
+            </div>
+          }
+          @if (wcsDownloadListOption) {
+            <div class="form-group  form-group-sm">
+              <label>Format:</label>
+              <select class="form-control form-control-sm" [(ngModel)]="wcsDownloadForm.downloadFormat">
+                <option [ngValue]="" disabled>{{SELECT_DEFAULT_DOWNLOAD_FMT}}</option>
+                @for (downloadFormat of wcsDownloadListOption.downloadFormatList; track downloadFormat) {
+                  <option>{{downloadFormat}}</option>
+                }
+              </select>
+            </div>
+          }
+          @if (wcsDownloadListOption) {
+            <div class="form-group  form-group-sm">
+              <label>Output CRS:</label>
+              <select class="form-control form-control-sm" [(ngModel)]="wcsDownloadForm.outputCrs">
+                <option [ngValue]="" disabled>{{SELECT_DEFAULT_OUTPUT_CRS}}</option>
+                @for (outputCrs of wcsDownloadListOption.outputCrsList; track outputCrs) {
+                  <option>{{outputCrs}}</option>
+                }
+              </select>
+            </div>
+          }
+          @if (wcsDownloadListOption && wcsDownloadListOption.timePositionList.length > 0) {
+            <div class="form-group  form-group-sm">
+              <label>Time Position:</label>
+              <select class="form-control form-control-sm" [(ngModel)]="wcsDownloadForm.timePosition">
+                <option [ngValue]="" disabled>{{SELECT_DEFAULT_TIME_POS}}</option>
+                @for (timePos of wcsDownloadListOption.timePositionList; track timePos) {
+                  <option>{{timePos}}</option>
+                }
+              </select>
+            </div>
+          }
+
+          <!-- Bounding box download -->
+          <div style="display:flex;">
+            @if (!bbox) {
+              <button type="button" title="Draw bounding box"
+                class="btn btn-primary btn-xs" [disabled]="downloadStarted || drawBoundsStarted" (click)="drawBounds()"><i class="fa fa-edit"></i>&nbsp;Draw Bounds</button>
+              }
+              @if (bbox) {
+                <button type="button" title="Remove bounds"
+                  class="btn btn-danger btn-xs" [disabled]="downloadStarted" (click)="clearBounds()"><i class="fa fa-refresh"></i>&nbsp;Clear Bounds</button>
+                }
+                <button type="button" class="btn btn-primary btn-xs" style="margin-left:auto;width:9rem;" [disabled]="!bbox || downloadStarted" title="Download data for bounding box" (click)="download()">
+                  @if (downloadStarted) {
+                    <i class="fa fa-spinner fa-spin fa-fw"></i>
+                    }@if (!downloadStarted) {
+                    <i class="fa fa-cloud-download"></i>
+                    }&nbsp;Download
+                  </button>
+                </div>
+
+              </div>
+
+            </div>

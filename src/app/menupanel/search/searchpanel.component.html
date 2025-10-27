@@ -1,204 +1,271 @@
 <div class="search-panel">
-    <!-- Search bar and buttons -->
-    <div class="input-group">
-        <div class="input-group-prepend">
-            <button tabindex="-1" class="btn btn-auscope-primary search-toggle-button" type="button" title="{{showingResultsPanel ? 'Hide results' : 'Show results'}}" (click)="setShowingResultsPanel(!showingResultsPanel)">
-                <span *ngIf="!showingResultsPanel" class="fa-layers fa-fw">
-                    <i class="fa fa-list"></i>
-                    <i class="fa fa-caret-down caret-icon"></i>
-                </span>
-                <span *ngIf="showingResultsPanel" class="fa-layers fa-fw">
-                    <i class="fa fa-list"></i>
-                    <i class="fa fa-caret-up caret-icon"></i>
-                </span>
-            </button>
-        </div>
-        <div class="search-dropdown" ngbDropdown #suggesterDropdown="ngbDropdown">
-            <!-- Search text field -->
-            <div>
-                <input type="text" class="form-control" #queryinput placeholder="Enter search term here..." [(ngModel)]="queryText" (keyup)="onKeyUp($event)" (keydown)="onKeyDown($event)" [disabled]="searching">
-                <!-- Clear query text button -->
-                <button *ngIf="!searching && queryText && queryText !== ''" class="clear-query-button" type="button" title="Clear search" (click)="clearQueryText()">&times;</button>
-            </div>
-            <!-- Suggester -->
-			<div ngbDropdownMenu>
-                <div *ngFor="let term of suggestedTerms; let i = index;">
-                    <button type="button" class="btn suggestion-button" (click)="suggestedTermSelected(term)" (mouseover)="highlightedSuggestionIndex=i" [ngStyle]="{'background-color': i !== highlightedSuggestionIndex ? 'white' : 'lightgray'}"> {{ term }} </button>
-                </div>
-            </div>
-        </div>
-        <div class="input-group-append">
-            <!-- Search button -->
-            <button *ngIf="!searching" tabindex="-1" class="btn btn-auscope-primary search-button" type="button" title="Search layers" (click)="search(true)"><i class="fa fa-search"></i></button>
-            <button *ngIf="searching" tabindex="-1" class="btn btn-auscope-primary search-button" type="button" title="Searching layers"><i class="fa fa-spin fa-spinner" *ngIf="!showingKmlOgcOptions"></i></button>
-            <!-- Advanced options selection -->
-            <button tabindex="-1" class="btn btn-auscope-primary advanced-options-button" title="{{showingAdvancedOptions ? 'Hide advanced search options' : 'Show advanced search options'}}" (click)="showingAdvancedOptions=!showingAdvancedOptions">
-                <span class="fa-layers">
-                    <i class="fa fa-sliders"></i>
-                    <i *ngIf="!showingAdvancedOptions" class="fa fa-caret-down caret-icon"></i>
-                    <i *ngIf="showingAdvancedOptions" class="fa fa-caret-up caret-icon"></i>
-                </span>
-            </button>
-            <!-- small gap -->
-            <!-- KML/OGC -->
-            <button tabindex="-1" class="btn btn-auscope-primary custom-layers-button" title="{{showingKmlOgcOptions ? 'Hide custom layer options' : 'Add custom layers'}}" (click)="setShowingKmlOgcOptions(!showingKmlOgcOptions)">
-                <span class="fa-layers">
-                    <span class="custom-layers-label">Custom Layers</span>
-                    <i *ngIf="!showingKmlOgcOptions" class="fa fa-caret-down caret-icon"></i>
-                    <i *ngIf="showingKmlOgcOptions" class="fa fa-caret-up caret-icon"></i>
-                </span>
-            </button>
-        </div>
+  <!-- Search bar and buttons -->
+  <div class="input-group">
+    <div class="input-group-prepend">
+      <button tabindex="-1" class="btn btn-auscope-primary search-toggle-button" type="button" title="{{showingResultsPanel ? 'Hide results' : 'Show results'}}" (click)="setShowingResultsPanel(!showingResultsPanel)">
+        @if (!showingResultsPanel) {
+          <span class="fa-layers fa-fw">
+            <i class="fa fa-list"></i>
+            <i class="fa fa-caret-down caret-icon"></i>
+          </span>
+        }
+        @if (showingResultsPanel) {
+          <span class="fa-layers fa-fw">
+            <i class="fa fa-list"></i>
+            <i class="fa fa-caret-up caret-icon"></i>
+          </span>
+        }
+      </button>
     </div>
-    <!-- Search alerts -->
-    <div *ngIf="alertMessage && alertMessage !== ''" #alert class="search-alert">
-        <label class="search-alert-label">{{ alertMessage }}
+    <div class="search-dropdown" ngbDropdown #suggesterDropdown="ngbDropdown">
+      <!-- Search text field -->
+      <div>
+        <input type="text" class="form-control" #queryinput placeholder="Enter search term here..." [(ngModel)]="queryText" (keyup)="onKeyUp($event)" (keydown)="onKeyDown($event)" [disabled]="searching">
+        <!-- Clear query text button -->
+        @if (!searching && queryText && queryText !== '') {
+          <button class="clear-query-button" type="button" title="Clear search" (click)="clearQueryText()">&times;</button>
+        }
+      </div>
+      <!-- Suggester -->
+      <div ngbDropdownMenu>
+        @for (term of suggestedTerms; track term; let i = $index) {
+          <div>
+            <button type="button" class="btn suggestion-button" (click)="suggestedTermSelected(term)" (mouseover)="highlightedSuggestionIndex=i" [ngStyle]="{'background-color': i !== highlightedSuggestionIndex ? 'white' : 'lightgray'}"> {{ term }} </button>
+          </div>
+        }
+      </div>
+    </div>
+    <div class="input-group-append">
+      <!-- Search button -->
+      @if (!searching) {
+        <button tabindex="-1" class="btn btn-auscope-primary search-button" type="button" title="Search layers" (click)="search(true)"><i class="fa fa-search"></i></button>
+      }
+      @if (searching) {
+        <button tabindex="-1" class="btn btn-auscope-primary search-button" type="button" title="Searching layers">@if (!showingKmlOgcOptions) {
+          <i class="fa fa-spin fa-spinner"></i>
+        }</button>
+      }
+      <!-- Advanced options selection -->
+      <button tabindex="-1" class="btn btn-auscope-primary advanced-options-button" title="{{showingAdvancedOptions ? 'Hide advanced search options' : 'Show advanced search options'}}" (click)="showingAdvancedOptions=!showingAdvancedOptions">
+        <span class="fa-layers">
+          <i class="fa fa-sliders"></i>
+          @if (!showingAdvancedOptions) {
+            <i class="fa fa-caret-down caret-icon"></i>
+          }
+          @if (showingAdvancedOptions) {
+            <i class="fa fa-caret-up caret-icon"></i>
+          }
+        </span>
+      </button>
+      <!-- small gap -->
+      <!-- KML/OGC -->
+      <button tabindex="-1" class="btn btn-auscope-primary custom-layers-button" title="{{showingKmlOgcOptions ? 'Hide custom layer options' : 'Add custom layers'}}" (click)="setShowingKmlOgcOptions(!showingKmlOgcOptions)">
+        <span class="fa-layers">
+          <span class="custom-layers-label">Custom Layers</span>
+          @if (!showingKmlOgcOptions) {
+            <i class="fa fa-caret-down caret-icon"></i>
+          }
+          @if (showingKmlOgcOptions) {
+            <i class="fa fa-caret-up caret-icon"></i>
+          }
+        </span>
+      </button>
+    </div>
+  </div>
+  <!-- Search alerts -->
+  @if (alertMessage && alertMessage !== '') {
+    <div #alert class="search-alert">
+      <label class="search-alert-label">{{ alertMessage }}
         <button type="button" class="search-alert-button close" aria-label="Close" (click)="alertMessage='';">
           <span aria-hidden="true">&times;</span>
         </button>
-    </label>
+      </label>
     </div>
-    <!-- Search options -->
-    <div class="options-panel" *ngIf="showingAdvancedOptions">
-        <div class="options-dropdowns">
-            <!-- Search fields -->
-            <div ngbDropdown>
-                <button class="btn btn-sm btn-secondary" type="button" ngbDropdownToggle>{{ getSearchFieldTitle() }}</button>
-                <div ngbDropdownMenu class="advanced-options-panel">
-                    <input type="checkbox" class="options-checkbox" [(ngModel)]="allSearchField.checked" (change)="allSearchFieldChange()">&nbsp;All
-                    <div *ngFor="let field of searchFields">
-                        <input type="checkbox" class="options-checkbox" [(ngModel)]="field.checked" [disabled]="allSearchField.checked" (change)="searchFieldChange(field.name)">&nbsp;{{ field.name }}
-                    </div>
-                </div>
-            </div>
-            <!-- Services -->
-            <div ngbDropdown>
-                <button class="btn btn-sm btn-secondary" type="button" ngbDropdownToggle>{{ getServicesTitle() }}</button>
-                <div ngbDropdownMenu class="advanced-options-panel">
-                    <input type="checkbox" class="options-checkbox" [(ngModel)]="allOGCServices.checked" (change)="allOGCServicesChange()">&nbsp;All
-                    <div *ngFor="let service of ogcServices">
-                        <input type="checkbox" class="options-checkbox" [(ngModel)]="service.checked" [disabled]="allOGCServices.checked" (change)="ogcServiceChange(service.name)">&nbsp;{{ service.name }}
-                    </div>
-                </div>
-            </div>
-            <!-- Spatial bounds -->
-            <div ngbDropdown #spatialOptionsDropdown="ngbDropdown">
-                <button class="btn btn-sm btn-secondary" type="button" ngbDropdownToggle>{{ getSpatialBoundsTitle() }}</button>
-                <div ngbDropdownMenu class="advanced-options-panel spatial-options-panel">
-                        <input type="checkbox" class="options-checkbox" title="Toggle bounds restriction" [(ngModel)]="restrictBounds"><label><strong>Restrict Spatial Bounds</strong></label>
-                        <div style="display:flex;">
-                            <button type="button" class="btn btn-sm btn-primary" title="Draw bounds on map" (click)="drawBounds()">Draw Bounds</button>
-                            <button type="button" class="btn btn-sm btn-primary" title="Clear bounds from map" (click)="clearBounds()" [disabled]="!bbox">Clear Bounds</button>
-                        </div>
-                        <div>
-                            <div ngbDropdown>
-                                <button class="btn btn-sm btn-primary" type="button" title="How layers relate to bounds" ngbDropdownToggle>Relationship: {{ boundsRelationship }}</button>
-                                <div ngbDropdownMenu style="padding:10px;">
-                                    <input type="radio" id="intersects-relation" name="relationship-radio" value="Intersects" [(ngModel)]="boundsRelationship">
-                                    <label for="intersects-relation">&nbsp;Intersects</label><br>
-                                    <input type="radio" id="contains-relation" name="relationship-radio" value="Contains" [(ngModel)]="boundsRelationship">
-                                    <label for="contains-relation">&nbsp;Contains</label><br>
-                                    <input type="radio" id="within-relation" name="relationship-radio" value="Within" [(ngModel)]="boundsRelationship">
-                                    <label for="within-relation">&nbsp;Within</label><br>
-                                </div>
-                            </div>
-                    </div>
-                    <div *ngIf="bbox" class="container">
-                        <div class="row">
-                            <label style="margin-left:8px;margin-top:4px;"><strong>Bounding Box</strong></label>
-                        </div>
-                        <label><span class="badge badge-secondary d-inline ml-5 line-height-1-8">North: {{bbox.northBoundLatitude | number:'1.0-4'}}</span></label>
-                        <label><span class="badge badge-secondary d-inline line-height-1-8">West: {{bbox.westBoundLongitude | number:'1.0-4'}}</span>
-                        <span class="badge badge-secondary d-inline ml-3 line-height-1-8">East: {{bbox.eastBoundLongitude | number:'1.0-4'}}</span></label>
-                        <label><span class="badge badge-secondary d-inline ml-5 line-height-1-8">South: {{bbox.southBoundLatitude | number:'1.0-4'}}</span></label>
-                    </div>
-                </div>
-            </div>
-            <!-- Reset advanced search options button -->
-            <button style="margin-left:auto;margin-right:6px;" class="btn btn-sm btn-secondary" (click)="resetAdvancedSearch()"><i class="fa fa-ban"></i>&nbsp;Reset All</button>
+  }
+  <!-- Search options -->
+  @if (showingAdvancedOptions) {
+    <div class="options-panel">
+      <div class="options-dropdowns">
+        <!-- Search fields -->
+        <div ngbDropdown>
+          <button class="btn btn-sm btn-secondary" type="button" ngbDropdownToggle>{{ getSearchFieldTitle() }}</button>
+          <div ngbDropdownMenu class="advanced-options-panel">
+            <input type="checkbox" class="options-checkbox" [(ngModel)]="allSearchField.checked" (change)="allSearchFieldChange()">&nbsp;All
+            @for (field of searchFields; track field) {
+              <div>
+                <input type="checkbox" class="options-checkbox" [(ngModel)]="field.checked" [disabled]="allSearchField.checked" (change)="searchFieldChange(field.name)">&nbsp;{{ field.name }}
+              </div>
+            }
+          </div>
         </div>
+        <!-- Services -->
+        <div ngbDropdown>
+          <button class="btn btn-sm btn-secondary" type="button" ngbDropdownToggle>{{ getServicesTitle() }}</button>
+          <div ngbDropdownMenu class="advanced-options-panel">
+            <input type="checkbox" class="options-checkbox" [(ngModel)]="allOGCServices.checked" (change)="allOGCServicesChange()">&nbsp;All
+            @for (service of ogcServices; track service) {
+              <div>
+                <input type="checkbox" class="options-checkbox" [(ngModel)]="service.checked" [disabled]="allOGCServices.checked" (change)="ogcServiceChange(service.name)">&nbsp;{{ service.name }}
+              </div>
+            }
+          </div>
+        </div>
+        <!-- Spatial bounds -->
+        <div ngbDropdown #spatialOptionsDropdown="ngbDropdown">
+          <button class="btn btn-sm btn-secondary" type="button" ngbDropdownToggle>{{ getSpatialBoundsTitle() }}</button>
+          <div ngbDropdownMenu class="advanced-options-panel spatial-options-panel">
+            <input type="checkbox" class="options-checkbox" title="Toggle bounds restriction" [(ngModel)]="restrictBounds"><label><strong>Restrict Spatial Bounds</strong></label>
+            <div style="display:flex;">
+              <button type="button" class="btn btn-sm btn-primary" title="Draw bounds on map" (click)="drawBounds()">Draw Bounds</button>
+              <button type="button" class="btn btn-sm btn-primary" title="Clear bounds from map" (click)="clearBounds()" [disabled]="!bbox">Clear Bounds</button>
+            </div>
+            <div>
+              <div ngbDropdown>
+                <button class="btn btn-sm btn-primary" type="button" title="How layers relate to bounds" ngbDropdownToggle>Relationship: {{ boundsRelationship }}</button>
+                <div ngbDropdownMenu style="padding:10px;">
+                  <input type="radio" id="intersects-relation" name="relationship-radio" value="Intersects" [(ngModel)]="boundsRelationship">
+                  <label for="intersects-relation">&nbsp;Intersects</label><br>
+                  <input type="radio" id="contains-relation" name="relationship-radio" value="Contains" [(ngModel)]="boundsRelationship">
+                  <label for="contains-relation">&nbsp;Contains</label><br>
+                  <input type="radio" id="within-relation" name="relationship-radio" value="Within" [(ngModel)]="boundsRelationship">
+                  <label for="within-relation">&nbsp;Within</label><br>
+                </div>
+              </div>
+            </div>
+            @if (bbox) {
+              <div class="container">
+                <div class="row">
+                  <label style="margin-left:8px;margin-top:4px;"><strong>Bounding Box</strong></label>
+                </div>
+                <label><span class="badge badge-secondary d-inline ml-5 line-height-1-8">North: {{bbox.northBoundLatitude | number:'1.0-4'}}</span></label>
+                <label><span class="badge badge-secondary d-inline line-height-1-8">West: {{bbox.westBoundLongitude | number:'1.0-4'}}</span>
+                <span class="badge badge-secondary d-inline ml-3 line-height-1-8">East: {{bbox.eastBoundLongitude | number:'1.0-4'}}</span></label>
+                <label><span class="badge badge-secondary d-inline ml-5 line-height-1-8">South: {{bbox.southBoundLatitude | number:'1.0-4'}}</span></label>
+              </div>
+            }
+          </div>
+        </div>
+        <!-- Reset advanced search options button -->
+        <button style="margin-left:auto;margin-right:6px;" class="btn btn-sm btn-secondary" (click)="resetAdvancedSearch()"><i class="fa fa-ban"></i>&nbsp;Reset All</button>
+      </div>
     </div>
-    <!-- Search results -->
-    <div *ngIf="showingResultsPanel && !searching" class="results-panel">
-        <div *ngIf="!searchResults || searchResults.length === 0">
-            <strong>No results found, try refining your search.</strong>
+  }
+  <!-- Search results -->
+  @if (showingResultsPanel && !searching) {
+    <div class="results-panel">
+      @if (!searchResults || searchResults.length === 0) {
+        <div>
+          <strong>No results found, try refining your search.</strong>
         </div>
-        <table *ngIf="searchResults?.length > 0" class="results-table">
-            <tr class = "results-row">
-                <td class="results-column">
-                    <div class="search-results-title">
-                        <label><strong>{{ getSearchResultsTitle() }}</strong></label>
-                        <button *ngIf="!showingAllLayers" title="Show all layers" class="btn btn-sm btn-danger clear-search-results-button" type="button" (click)="showFeaturedLayers()"><i class="fa fa-ban"></i>&nbsp;Clear</button>
-                    </div>
-
-                    <div class="results-list">
-                        <!-- Accordion layout with filter/download/info options -->
-                        <div *ngFor="let searchResult of paginatedSearchResults();" [id]="searchResult.layer.id">
-                            <span [ngClass]="searchResult  === selectedSearchResult ? 'selected-layer-header' : 'layer-header'" (click)="selectSearchResult(searchResult)">
-                                <span class="layer-header-label" title="{{searchResult.layer.name}}">{{ searchResult.layer.name }}</span>
-                                <span class="csw-label search-result-button" *ngIf="searchResult.layer.id.startsWith('registry-csw:')">CSW</span>
-                                <span class="layer-label search-result-button" *ngIf="!searchResult.layer.id.startsWith('registry-csw:')">Featured</span>
-                                <button *ngIf="!isLayerAdded(searchResult.layer.id)" [disabled]="!isMapSupportedLayer(searchResult.layer)" class="btn btn-sm btn-success search-result-button" type="button" title="Add layer" (click)="addLayer(searchResult.layer)"><i class="fa fa-plus-circle"></i>&nbsp;Add</button>
-                                <button *ngIf="isLayerAdded(searchResult.layer.id)" class="btn btn-sm btn-danger search-result-button" type="button" title="Remove layer" (click)="removeLayer($event, searchResult.layer)"><i class="fa fa-trash"></i>&nbsp;Remove</button>
-                                <button class="btn btn-sm btn-info" type="button" title="Layer information" (click)="showLayerInformation($event, searchResult.layer)"><i class="fa fa-info-circle"></i>&nbsp;Info</button>
-                                <button class="btn btn-sm btn-primary search-result-button" type="button" title="Add to download" [style.visibility]="isCsvDownloadable(searchResult.layer) ? 'visible' : 'hidden'">
-                                    <input type="checkbox" class="faChkSqr" style="vertical-align: middle;" [checked]="mapDownloadLayers.get(searchResult.layer.id)" (change)="OnChangeDownloadLayers(searchResult.layer)">
-                                </button>
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="pagination" *ngIf="searchResults.length > resultsPerPage">
-                        <ngb-pagination [collectionSize]="searchResults.length" [(page)]="currentPage" [maxSize]="5" [pageSize]="resultsPerPage" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>
-                    </div>
-
-                    <!-- Pagination if more than one page of search results -->
-                    <div class="pagination" *ngIf="searchResults.length > RESULTS_PER_PAGE">
-                        <ngb-pagination [collectionSize]="searchResults.length" [(page)]="currentPage" [maxSize]="5" [pageSize]="RESULTS_PER_PAGE" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>
-                    </div>
-
-                </td>
-
-                <!-- Search Info Panel -->
-                <td class="search-info-panel" *ngIf="selectedSearchResult && showingInfoPanel && !searching">
-                    <a style="font-weight: bolder;">Information</a>
-                    <div *ngFor="let cswRecord of selectedSearchResult.layer.cswRecords; index as i">
-                        <info-sub-panel *ngIf="selectedSearchResult" [cswRecord]="cswRecord" [layer]="selectedSearchResult.layer" [expanded]=1></info-sub-panel>
-                        <div *ngIf="i !== selectedSearchResult.layer.cswRecords.length - 1" class="break-border"></div>
-                    </div>
-                </td>
-            </tr>
+      }
+      @if (searchResults?.length > 0) {
+        <table class="results-table">
+          <tr class = "results-row">
+            <td class="results-column">
+              <div class="search-results-title">
+                <label><strong>{{ getSearchResultsTitle() }}</strong></label>
+                @if (!showingAllLayers) {
+                  <button title="Show all layers" class="btn btn-sm btn-danger clear-search-results-button" type="button" (click)="showFeaturedLayers()"><i class="fa fa-ban"></i>&nbsp;Clear</button>
+                }
+              </div>
+              <div class="results-list">
+                <!-- Accordion layout with filter/download/info options -->
+                @for (searchResult of paginatedSearchResults(); track searchResult) {
+                  <div [id]="searchResult.layer.id">
+                    <span [ngClass]="searchResult  === selectedSearchResult ? 'selected-layer-header' : 'layer-header'" (click)="selectSearchResult(searchResult)">
+                      <span class="layer-header-label" title="{{searchResult.layer.name}}">{{ searchResult.layer.name }}</span>
+                      @if (searchResult.layer.id.startsWith('registry-csw:')) {
+                        <span class="csw-label search-result-button">CSW</span>
+                      }
+                      @if (!searchResult.layer.id.startsWith('registry-csw:')) {
+                        <span class="layer-label search-result-button">Featured</span>
+                      }
+                      @if (!isLayerAdded(searchResult.layer.id)) {
+                        <button [disabled]="!isMapSupportedLayer(searchResult.layer)" class="btn btn-sm btn-success search-result-button" type="button" title="Add layer" (click)="addLayer(searchResult.layer)"><i class="fa fa-plus-circle"></i>&nbsp;Add</button>
+                      }
+                      @if (isLayerAdded(searchResult.layer.id)) {
+                        <button class="btn btn-sm btn-danger search-result-button" type="button" title="Remove layer" (click)="removeLayer($event, searchResult.layer)"><i class="fa fa-trash"></i>&nbsp;Remove</button>
+                      }
+                      <button class="btn btn-sm btn-info" type="button" title="Layer information" (click)="showLayerInformation($event, searchResult.layer)"><i class="fa fa-info-circle"></i>&nbsp;Info</button>
+                      <button class="btn btn-sm btn-primary search-result-button" type="button" title="Add to download" [style.visibility]="isCsvDownloadable(searchResult.layer) ? 'visible' : 'hidden'">
+                        <input type="checkbox" class="faChkSqr" style="vertical-align: middle;" [checked]="mapDownloadLayers.get(searchResult.layer.id)" (change)="OnChangeDownloadLayers(searchResult.layer)">
+                      </button>
+                    </span>
+                  </div>
+                }
+              </div>
+              @if (searchResults.length > resultsPerPage) {
+                <div class="pagination">
+                  <ngb-pagination [collectionSize]="searchResults.length" [(page)]="currentPage" [maxSize]="5" [pageSize]="resultsPerPage" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>
+                </div>
+              }
+              <!-- Pagination if more than one page of search results -->
+              @if (searchResults.length > RESULTS_PER_PAGE) {
+                <div class="pagination">
+                  <ngb-pagination [collectionSize]="searchResults.length" [(page)]="currentPage" [maxSize]="5" [pageSize]="RESULTS_PER_PAGE" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>
+                </div>
+              }
+            </td>
+            <!-- Search Info Panel -->
+            @if (selectedSearchResult && showingInfoPanel && !searching) {
+              <td class="search-info-panel">
+                <a style="font-weight: bolder;">Information</a>
+                @for (cswRecord of selectedSearchResult.layer.cswRecords; track cswRecord; let i = $index) {
+                  <div>
+                    @if (selectedSearchResult) {
+                      <info-sub-panel [cswRecord]="cswRecord" [layer]="selectedSearchResult.layer" [expanded]=1></info-sub-panel>
+                    }
+                    @if (i !== selectedSearchResult.layer.cswRecords.length - 1) {
+                      <div class="break-border"></div>
+                    }
+                  </div>
+                }
+              </td>
+            }
+          </tr>
         </table>
+      }
     </div>
+  }
 
-    <!-- Downloads -->
-    <div *ngIf="mapDownloadLayers.size > 0 && showingResultsPanel && !searching" class="results-list downloads-list">
-        <div class="break-border"></div>
-        <div class="search-results-title">
-            <label><strong>Selected Layers To Download:&nbsp;</strong></label>
-            <span class="layer-header-label">Layers:&nbsp;{{total0}}:{{completed0}}</span>
-            <span class="layer-header-label">&nbsp;&nbsp;Files:&nbsp;{{total}}:{{completed}}</span>
-            <button title="Clear all layers" class="btn btn-sm btn-danger clear-search-results-button" type="button" (click)="clearDownloadLayers()"><i class="fa fa-ban"></i>&nbsp;Clear&nbsp;</button>
-            <button title="Download all layers" style="float:right;" class="btn btn-sm btn-success clear-search-results-button" type="button" (click)="downloadAll()"><i class="fa fa-download"></i>&nbsp;All</button>
+  <!-- Downloads -->
+  @if (mapDownloadLayers.size > 0 && showingResultsPanel && !searching) {
+    <div class="results-list downloads-list">
+      <div class="break-border"></div>
+      <div class="search-results-title">
+        <label><strong>Selected Layers To Download:&nbsp;</strong></label>
+        <span class="layer-header-label">Layers:&nbsp;{{total0}}:{{completed0}}</span>
+        <span class="layer-header-label">&nbsp;&nbsp;Files:&nbsp;{{total}}:{{completed}}</span>
+        <button title="Clear all layers" class="btn btn-sm btn-danger clear-search-results-button" type="button" (click)="clearDownloadLayers()"><i class="fa fa-ban"></i>&nbsp;Clear&nbsp;</button>
+        <button title="Download all layers" style="float:right;" class="btn btn-sm btn-success clear-search-results-button" type="button" (click)="downloadAll()"><i class="fa fa-download"></i>&nbsp;All</button>
+      </div>
+      <!-- DownloadLayers list -->
+      <div class="download-layers-list">
+        @for (downloadLayer of mapDownloadLayers | keyvalue; track downloadLayer) {
+          <div>
+            <button style="line-height:1.7em;height:2.2em;padding:2px 5px 0px 5px;margin-bottom:2px;" class="btn layer-header" style="align-items: baseline;">
+              <button style="float:right;padding:2px 2px 2px 0;margin-left:0px;margin-right:8px;line-height:100%;" class="btn btn-sm btn-warning" type="button" title="Click to remove" (click)="removeDownloadLayer(downloadLayer.value.Layer)"><i class="fa fa-close" style="color:red"></i></button>
+              <span class="layer-header-label" title="{{downloadLayer.value.Layer.name}}">{{ downloadLayer.value.Layer.name }}</span>
+            <!--
+            @if (downloadLayer.value.Ob | async as download) {
+              <mat-progress-bar [mode]="download.state === 'PENDING' ? 'buffer' : 'determinate'" [value]="download.progress"></mat-progress-bar> 
+            }
+            -->
+            @if (downloadLayer.value.Ob) {
+              <mat-progress-bar style="height: 10px;" [mode]="determinate" [value]="downloadLayer.value.Ob.progress" ></mat-progress-bar>
+            }
+            <button class="btn btn-sm btn-primary download-button" type="button" title="Click to download" (click)="downloadAsCSV(downloadLayer.value.Layer)"><i class="fa fa-download"></i></button>
+            <button class="btn btn-sm btn-primary download-button" type="button" title="Download with AuScope-Cat" (click)="downloadWithAuScopeCat(downloadLayer.value.Layer)"><i class="fa fa-plug"></i></button>
+          </button>
         </div>
-        <!-- DownloadLayers list -->
-        <div class="download-layers-list">
-            <div *ngFor="let downloadLayer of mapDownloadLayers | keyvalue">
-                <button style="line-height:1.7em;height:2.2em;padding:2px 5px 0px 5px;margin-bottom:2px;" class="btn layer-header" style="align-items: baseline;">
-                    <button style="float:right;padding:2px 2px 2px 0;margin-left:0px;margin-right:8px;line-height:100%;" class="btn btn-sm btn-warning" type="button" title="Click to remove" (click)="removeDownloadLayer(downloadLayer.value.Layer)"><i class="fa fa-close" style="color:red"></i></button>
-                    <span class="layer-header-label" title="{{downloadLayer.value.Layer.name}}">{{ downloadLayer.value.Layer.name }}</span>
-                    <!--mat-progress-bar *ngIf= "downloadLayer.value.Ob | async as download" [mode]="download.state === 'PENDING' ? 'buffer' : 'determinate'" [value]="download.progress"></mat-progress-bar-->
-                    <mat-progress-bar *ngIf= "downloadLayer.value.Ob" style="height: 10px;" [mode]="determinate" [value]="downloadLayer.value.Ob.progress" ></mat-progress-bar>
-                    <button class="btn btn-sm btn-primary download-button" type="button" title="Click to download" (click)="downloadAsCSV(downloadLayer.value.Layer)"><i class="fa fa-download"></i></button>
-                    <button class="btn btn-sm btn-primary download-button" type="button" title="Download with AuScope-Cat" (click)="downloadWithAuScopeCat(downloadLayer.value.Layer)"><i class="fa fa-plug"></i></button>
-                </button>
-            </div>
-        </div>
+      }
     </div>
+  </div>
+}
 
-    <!-- KML/OGC options -->
-    <div class="options-panel kml-options-panel" [style.display]="showingKmlOgcOptions ? 'block' : 'none'">
-        <ul class="card-sub" appCustomPanel style="display:contents;"></ul>
-    </div>
+<!-- KML/OGC options -->
+<div class="options-panel kml-options-panel" [style.display]="showingKmlOgcOptions ? 'block' : 'none'">
+  <ul class="card-sub" appCustomPanel style="display:contents;"></ul>
+</div>
 
 </div>

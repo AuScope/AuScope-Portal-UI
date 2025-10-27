@@ -1,15 +1,17 @@
 <div id="legendNVCL">
   <div class="modal-header" style="cursor: move;" cdkDrag cdkDragRootElement=".modal-content" cdkDragHandle>
-      <div class="alert alert-success" role="alert">
-          <h6 class="alert-heading">Legend</h6>
-      </div>
+    <div class="alert alert-success" role="alert">
+      <h6 class="alert-heading">Legend</h6>
+    </div>
   </div>
   <div class="modal-body">
-      <ul style="list-style: none; font-size:16px;">
-          <li *ngFor="let scalarClass of scalarClasses | getKey">
-              <span style="border: 1px solid #ccc; float: left; width: 12px; height: 12px; margin: 2px;"
-                  [style.background-color]="scalarClass.value"></span> {{scalarClass.key}}
-          </li>
-      </ul>
+    <ul style="list-style: none; font-size:16px;">
+      @for (scalarClass of scalarClasses | getKey; track scalarClass) {
+        <li>
+          <span style="border: 1px solid #ccc; float: left; width: 12px; height: 12px; margin: 2px;"
+          [style.background-color]="scalarClass.value"></span> {{scalarClass.key}}
+        </li>
+      }
+    </ul>
   </div>
 </div>

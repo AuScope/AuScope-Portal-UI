@@ -1,26 +1,30 @@
 <!-- Main button to trigger anonymous or user dialog -->
 <button class="cesium-button cesium-toolbar-button editor-toggle-button" (click)="permanentLinkClick()">
-	<em class="fa fa-link" title="Create Permanent Link"></em>
+  <em class="fa fa-link" title="Create Permanent Link"></em>
 </button>
 <!-- Anonymous user dialog -->
-<div *ngIf="!user && bShowDialog" class="editor-box hasEvent">
-	<a id="PermanentLinkAnonymous" class="popup" (click)="generateAnonymousPermanentLink()"><i class="ti-link"></i><span title="Create a link preserving current map layers">Permanent Link</span>
-		<div class="popuptext container-fluid" [ngClass]="{'show':bShowDialog}" style="z-index: 10;">
-			<div class="row ml-3 mb-3">
-				<div class="input-group ">
-					<div class="input-group-prepend">
-						<button for="permanentlink-text-copy" class="btn btn-danger" ngxClipboard [cbContent]="permanentlink" type="button">
-							<i class="fa fa-files-o"></i>
-						</button>
-					</div>
-					<div appStopPropagation>
-						<input type="text" readonly class="form-control" id="permanentlink-text-copy" [(ngModel)]=permanentlink>
-					</div>
-				</div>
-			</div>
-			<div class="row ml-3">
-				<div *ngIf="shorteningMode" class="small">URL shortening in progress ...</div>
-			</div>
-		</div>
-	</a>
+@if (!user && bShowDialog) {
+  <div class="editor-box hasEvent">
+    <a id="PermanentLinkAnonymous" class="popup" (click)="generateAnonymousPermanentLink()"><i class="ti-link"></i><span title="Create a link preserving current map layers">Permanent Link</span>
+    <div class="popuptext container-fluid" [ngClass]="{'show':bShowDialog}" style="z-index: 10;">
+      <div class="row ml-3 mb-3">
+        <div class="input-group ">
+          <div class="input-group-prepend">
+            <button for="permanentlink-text-copy" class="btn btn-danger" ngxClipboard [cbContent]="permanentlink" type="button">
+              <i class="fa fa-files-o"></i>
+            </button>
+          </div>
+          <div appStopPropagation>
+            <input type="text" readonly class="form-control" id="permanentlink-text-copy" [(ngModel)]=permanentlink>
+          </div>
+        </div>
+      </div>
+      <div class="row ml-3">
+        @if (shorteningMode) {
+          <div class="small">URL shortening in progress ...</div>
+        }
+      </div>
+    </div>
+  </a>
 </div>
+}

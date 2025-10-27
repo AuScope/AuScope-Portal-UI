@@ -1,9 +1,15 @@
 <div class="legend-modal">
-	<div class="legend-title-panel" cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle>
-		<h5 class="legend-title">{{ legendTitle }}</h5><i *ngIf="legendLoading" class="fa fa-spin fa-spinner legend-spinner"></i><button class="btn btn-sm btn-outline close-legend-button" (click)="closeLegend()"><i class="fa fa-times"></i></button>
-	</div>
-	<div mat-dialog-content class="legend-content">
-		<h4 class="legend-error" *ngIf="!legendLoading && requestLegendFailed">No legend available</h4>
-		<img *ngIf="!requestLegendFailed && legendImage" [src]="legendImage" alt="Legend" (load)="legendLoading=false;" />
-	</div>
+  <div class="legend-title-panel" cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle>
+    <h5 class="legend-title">{{ legendTitle }}</h5>@if (legendLoading) {
+    <i class="fa fa-spin fa-spinner legend-spinner"></i>
+    }<button class="btn btn-sm btn-outline close-legend-button" (click)="closeLegend()"><i class="fa fa-times"></i></button>
+  </div>
+  <div mat-dialog-content class="legend-content">
+    @if (!legendLoading && requestLegendFailed) {
+      <h4 class="legend-error">No legend available</h4>
+    }
+    @if (!requestLegendFailed && legendImage) {
+      <img [src]="legendImage" alt="Legend" (load)="legendLoading=false;" />
+    }
+  </div>
 </div>

@@ -1,31 +1,32 @@
 <!-- Modal for querier-->
 <div id="featureInfo" #childElement bsModalRef="bsModalRef" style="overflow-x: clip;">
-	<div class="modal-header" cdkDrag cdkDrag cdkDragRootElement=".modal-content" cdkDragHandle [hidden]="!modalVisible">
-		<div style="display:flex">
-			<div id="startContainer" class="alertHeading alert-success">
-				<h4 class="alert-heading">Feature Information</h4>
-			</div>
-			<div id="middleContainer">
-				<p class="tip-info">Tip: Drag the "Feature Information" header to move this window. Resize by
-					dragging
-					the
-					bottom right corner.
-				</p>
-			</div>
-			<div id="endContainer">
-				<button type="button" class="close" (click)="bsModalRef.hide()" title="Close" aria-label="Close">
-					<span aria-hidden="true" class="closeBtn">&times;</span>
-				</button>
-			</div>
-		</div>
-		<div class="toolbar-header">
-			<div *ngIf="!downloading && (docs.length > 0 || htmls.length > 0)" class="rowFeature">
-
-				<!-- Feature tab button -->
-				<div class="btn-group">
-					<button type="button" class="btn btn-primary tablinks" title="{{selectedToolTip}}"
-						data-data-toggle-second="tooltip" *ngIf="selectedLayer" (click)="analytic_tab = false; openTab($event, 'wfs');">
-						<span>{{selectedLayer}}</span><br />
+  <div class="modal-header" cdkDrag cdkDrag cdkDragRootElement=".modal-content" cdkDragHandle [hidden]="!modalVisible">
+    <div style="display:flex">
+      <div id="startContainer" class="alertHeading alert-success">
+        <h4 class="alert-heading">Feature Information</h4>
+      </div>
+      <div id="middleContainer">
+        <p class="tip-info">Tip: Drag the "Feature Information" header to move this window. Resize by
+          dragging
+          the
+          bottom right corner.
+        </p>
+      </div>
+      <div id="endContainer">
+        <button type="button" class="close" (click)="bsModalRef.hide()" title="Close" aria-label="Close">
+          <span aria-hidden="true" class="closeBtn">&times;</span>
+        </button>
+      </div>
+    </div>
+    <div class="toolbar-header">
+      @if (!downloading && (docs.length > 0 || htmls.length > 0)) {
+        <div class="rowFeature">
+          <!-- Feature tab button -->
+          <div class="btn-group">
+            @if (selectedLayer) {
+              <button type="button" class="btn btn-primary tablinks" title="{{selectedToolTip}}"
+                data-data-toggle-second="tooltip" (click)="analytic_tab = false; openTab($event, 'wfs');">
+                <span>{{selectedLayer}}</span><br />
 						<span style="
                             display: inline-block;
                             max-width: 200px;
@@ -33,168 +34,237 @@
                             overflow: hidden;
                             text-overflow: ellipsis;
                         ">{{selectedFeature}}</span>
-					</button>
-					<button *ngIf="docs.length + htmls.length > 1" type="button"
-						class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"
-						aria-haspopup="true" aria-expanded="false">
-						<span class="sr-only">Toggle Dropdown</span>
-					</button>
-					<ul class="dropdown-menu">
-						<!-- For layers that are derived from XML feature data -->
-						<li active *ngFor="let doc of docs; let i = index;">
-							<a class="dropdown-item" (click)="analytic_tab = false; setWFS(doc, i);openTab($event, 'wfs');" *ngIf="i < 10 && doc.node_name !== null"
-								data-toggle="collapse">
-								<div *ngIf="doc.node_name">
-									{{doc.layer.name}}{{doc.node_name ? ': ' + doc.node_name : ''}}
-								</div>
-								<div *ngIf="!doc.node_name && doc.key">
-									{{doc.layer.name}}{{doc.key ? ': ' + doc.key : ''}}
-								</div>
-							</a>
-						</li>
-						<!-- For layers that display as HTML derived from KML, CSW records etc. -->
-						<li *ngFor="let html of htmls; let i = index;">
-							<a *ngIf="i < 10" class="dropdown-item" (click)="setHTML(html.key)">{{html.key}}</a>
-						</li>
-					</ul>
-				</div>
+              </button>
+            }
+            @if (docs.length + htmls.length > 1) {
+              <button type="button"
+                class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">
+                <span class="sr-only">Toggle Dropdown</span>
+              </button>
+            }
+            <ul class="dropdown-menu">
+              <!-- For layers that are derived from XML feature data -->
+              @for (doc of docs; track doc; let i = $index) {
+                <li active>
+                  @if (i < 10 && doc.node_name !== null) {
+                    <a class="dropdown-item" (click)="analytic_tab = false; setWFS(doc, i);openTab($event, 'wfs');"
+                      data-toggle="collapse">
+                      @if (doc.node_name) {
+                        <div>
+                          {{doc.layer.name}}{{doc.node_name ? ': ' + doc.node_name : ''}}
+                        </div>
+                      }
+                      @if (!doc.node_name && doc.key) {
+                        <div>
+                          {{doc.layer.name}}{{doc.key ? ': ' + doc.key : ''}}
+                        </div>
+                      }
+                    </a>
+                  }
+                </li>
+              }
+              <!-- For layers that display as HTML derived from KML, CSW records etc. -->
+              @for (html of htmls; track html; let i = $index) {
+                <li>
+                  @if (i < 10) {
+                    <a class="dropdown-item" (click)="setHTML(html.key)">{{html.key}}</a>
+                  }
+                </li>
+              }
+            </ul>
+          </div>
+          @if (imScDoButtonsEnabled && flagNVCLAnalytic) {
+            <div>
+              <button class="btn btnFeature btn-primary tablinks" (click)="openTab($event, 'image')">
+                <span class="btnSpan">Image</span>
+              </button>
+            </div>
+          }
+          @if (imScDoButtonsEnabled && flagNVCLAnalytic) {
+            <div>
+              <button class="btn btnFeature btn-primary tablinks"  [disabled]="!isScalarLoaded" (click)="analytic_tab = true; openTab($event, 'scalar');">
+                <span class="btnSpan">@if (!isScalarLoaded) {
+                  <i class="fa fa-spinner fa-spin fa-fw"></i>
+                }Scalar</span>
+              </button>
+            </div>
+          }
+          @if (imScDoButtonsEnabled && flagNVCLAnalytic) {
+            <div>
+              <button class="btn btnFeature btn-primary tablinks" (click)="openTab($event, 'download')">
+                <span class="btnSpan">Download</span>
+              </button>
+            </div>
+          }
+          @if (analyticEnabled) {
+            <div>
+              <button class="btn btnFeature btn-primary tablinks" (click)="analytic_tab = true; openTab($event, 'analytic_tab')">
+                <span class="btnSpan">Analytic</span>
+              </button>
+            </div>
+          }
+          @if (currentDoc) {
+            <div>
+              <button class="btn btnFeature btn-primary" (click)="downloadFeatureCSV()" title="Download Feature Information as CSV">
+                <span class="btnSpan"><i class="fa fa-download"></i> Download CSV</span>
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+    <script>
+      $('[data-toggle-second="tooltip"]').tooltip();
+    </script>
 
-				<div *ngIf="imScDoButtonsEnabled && flagNVCLAnalytic">
-					<button class="btn btnFeature btn-primary tablinks" (click)="openTab($event, 'image')">
-						<span class="btnSpan">Image</span>
-					</button>
-				</div>
-				<div *ngIf="imScDoButtonsEnabled && flagNVCLAnalytic">
-					<button class="btn btnFeature btn-primary tablinks"  [disabled]="!isScalarLoaded" (click)="analytic_tab = true; openTab($event, 'scalar');">
-						<span class="btnSpan"><i *ngIf="!isScalarLoaded" class="fa fa-spinner fa-spin fa-fw"></i>Scalar</span>
-					</button>
-				</div>
-				<div *ngIf="imScDoButtonsEnabled && flagNVCLAnalytic">
-					<button class="btn btnFeature btn-primary tablinks" (click)="openTab($event, 'download')">
-						<span class="btnSpan">Download</span>
-					</button>
-				</div>
-				<div *ngIf="analyticEnabled">
-					<button class="btn btnFeature btn-primary tablinks" (click)="analytic_tab = true; openTab($event, 'analytic_tab')">
-						<span class="btnSpan">Analytic</span>
-					</button>
-				</div>
-				<div *ngIf="currentDoc">
-					<button class="btn btnFeature btn-primary" (click)="downloadFeatureCSV()" title="Download Feature Information as CSV">
-						<span class="btnSpan"><i class="fa fa-download"></i> Download CSV</span>
-					</button>
-				</div>
-			</div>
-		</div>
-		<script>
-			$('[data-toggle-second="tooltip"]').tooltip();
-		</script>
+    <!-- Copy feedback toast -->
+    @if (showCopyFeedbackToast) {
+      <div class="copy-feedback-toast">
+        <i class="fa fa-check-circle"></i> {{copyFeedbackMessage}}
+      </div>
+    }
 
-		<!-- Copy feedback toast -->
-		<div *ngIf="showCopyFeedbackToast" class="copy-feedback-toast">
-			<i class="fa fa-check-circle"></i> {{copyFeedbackMessage}}
-		</div>
+  </div>
 
-	</div>
+  <!-- HTML is displayed here -->
+  @if (htmls.length > 0) {
+    <div style="padding: 10px;" [innerHTML]="currentHTML"></div>
+  }
 
-	<!-- HTML is displayed here -->
-	<div *ngIf="htmls.length > 0" style="padding: 10px;" [innerHTML]="currentHTML"></div>
+  <!-- Message if downloading -->
+  @if (downloading) {
+    <div class="message-tab">
+      Downloading feature information...<br>
+      <i class="fa fa-spin fa-spinner"></i>
+    </div>
+  }
 
-	<!-- Message if downloading -->
-	<div *ngIf="downloading" class="message-tab">
-		Downloading feature information...<br>
-		<i class="fa fa-spin fa-spinner"></i>
-	</div>
+  <!-- Anatylics NVCL error  -->
+  @if (imScDoButtonsEnabled && !flagNVCLAnalytic) {
+    <div class="message-tab">
+      Analytics unavailable for this site...<br>
+    </div>
+  }
 
-	<!-- Anatylics NVCL error  -->
-	<div *ngIf="imScDoButtonsEnabled && !flagNVCLAnalytic" class="message-tab">
-		Analytics unavailable for this site...<br>
-	</div>
+  <!-- Message if no features found -->
+  @if (!downloading && docs?.length === 0 && htmls.length === 0) {
+    <div class="message-tab">
+      It looks like there aren't any results where you have clicked.<br>Try zooming in for greater accuracy.
+    </div>
+  }
 
-	<!-- Message if no features found -->
-	<div *ngIf="!downloading && docs?.length === 0 && htmls.length === 0" class="message-tab">
-		It looks like there aren't any results where you have clicked.<br>Try zooming in for greater accuracy.
-	</div>
+  <!-- Message if more than 1 result and no document has been selected -->
+  @if (!downloading && (docs?.length > 1 || htmls?.length > 1) && currentDoc === undefined) {
+    <div
+      class="message-tab">
+      Please select a feature from the Layer Feature list above.
+    </div>
+  }
 
-	<!-- Message if more than 1 result and no document has been selected -->
-	<div *ngIf="!downloading && (docs?.length > 1 || htmls?.length > 1) && currentDoc === undefined"
-		class="message-tab">
-		Please select a feature from the Layer Feature list above.
-	</div>
+  <div id="wfs" class="tabcontent">
+    @if (list) {
+      <div>
+        @if (currentDoc) {
+          <div>
+            <div class="modal-body row">
+              @if (bToClipboard || supportOpenInNewWindow(currentDoc)) {
+                <div
+                  style="position: inherit;padding-top: unset;margin-bottom: 20px;">
+                  <div class="float-left d-none d-md-inline mt-0 w-100">
+                    @if (bToClipboard) {
+                      <div data-toggle="tooltip" title="Copy to Clipboard"
+                        (click)="copyToClipboard(currentDoc)" class="btn btn-primary btn-sm">
+                        <span><i class="ti-clip"></i>Copy to Clipboard</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+              @if (currentDoc.transformed) {
+                <div [innerHtml]="currentDoc.transformed"></div>
+              }
+              <!-- Show default XML Tree if there is no HTML transformation -->
+              @if (flatTreeControl[currentDoc.key]) {
+                <div>
+                  @if (flatTreeControl[currentDoc.key].dataNodes[0]) {
+                    <div>
+                      @if (flatTreeControl[currentDoc.key].dataNodes[0].filename) {
+                        <div>
+                          <!--{{flatTreeControl[currentDoc.key].dataNodes[0].filename}}-->
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+              @if (flatTreeDataSource[currentDoc.key]) {
+                <mat-tree style="margin-top: 20px;"
+                  [dataSource]="flatTreeDataSource[currentDoc.key]"
+                  [treeControl]="flatTreeControl[currentDoc.key]">
+                  <dl>
+                    <!-- Node without children -->
+                    <mat-tree-node *matTreeNodeDef="let node"
+                      style="font-size: 12px !important; margin-right:10px; min-height: 0px"
+                      [matTreeNodePaddingIndent]="10" matTreeNodePadding>
+                      <dt style="flex: auto;">{{node.filename}}</dt>
+                      @if (node.type && node.type.toString().startsWith('<')) {
+                        <dd [innerHtml]="node.type">
+                        </dd>
+                      }
+                      @if (!(node.type && node.type.toString().startsWith('<'))) {
+                        <dd>
+                          {{node.type}}
+                          @if (node.type && node.type.toString().startsWith('http')) {
+                            <a target="_blank"
+                              href="{{node.type}}">
+                              <i class="fa fa-external-link-square" aria-hidden="true"></i>
+                            </a>
+                          }
+                        </dd>
+                      }
+                    </mat-tree-node>
+                    <!-- Node with children -->
+                    <mat-tree-node *matTreeNodeDef="let node; when: hasChild" [matTreeNodePaddingIndent]="10"
+                      matTreeNodePadding>
+                      <dt style="flex: auto; font-size: 12px !important">{{node.filename}}
+                      </dt>
+                      <dd>
+                        <dl [class.feature-tree-invisible]="!flatTreeControl[currentDoc.key].isExpanded(node)"
+                          style="margin-left:10px;">
+                          <ng-container matTreeNodeOutlet></ng-container>
+                        </dl>
+                      </dd>
+                    </mat-tree-node>
+                  </dl>
+                </mat-tree>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
 
-	<div id="wfs" class="tabcontent">
-		<div *ngIf="list">
-			<div *ngIf="currentDoc">
-				<div class="modal-body row">
-					<div *ngIf="bToClipboard || supportOpenInNewWindow(currentDoc)"
-						style="position: inherit;padding-top: unset;margin-bottom: 20px;">
-						<div class="float-left d-none d-md-inline mt-0 w-100">
-							<div *ngIf="bToClipboard" data-toggle="tooltip" title="Copy to Clipboard"
-								(click)="copyToClipboard(currentDoc)" class="btn btn-primary btn-sm">
-								<span><i class="ti-clip"></i>Copy to Clipboard</span>
-							</div>
-						</div>
-					</div>
-					<div *ngIf="currentDoc.transformed" [innerHtml]="currentDoc.transformed"></div>
-					<!-- Show default XML Tree if there is no HTML transformation -->
-					<div *ngIf="flatTreeControl[currentDoc.key]">
-						<div *ngIf="flatTreeControl[currentDoc.key].dataNodes[0]">
-							<div *ngIf="flatTreeControl[currentDoc.key].dataNodes[0].filename">
-								<!--{{flatTreeControl[currentDoc.key].dataNodes[0].filename}}-->
-							</div>
-						</div>
-					</div>
-					<mat-tree style="margin-top: 20px;" *ngIf="flatTreeDataSource[currentDoc.key]"
-						[dataSource]="flatTreeDataSource[currentDoc.key]"
-						[treeControl]="flatTreeControl[currentDoc.key]">
-						<dl>
-							<!-- Node without children -->
-							<mat-tree-node *matTreeNodeDef="let node"
-								style="font-size: 12px !important; margin-right:10px; min-height: 0px"
-								[matTreeNodePaddingIndent]="10" matTreeNodePadding>
-								<dt style="flex: auto;">{{node.filename}}</dt>
-								<dd *ngIf="node.type && node.type.toString().startsWith('<')" [innerHtml]="node.type">
-								</dd>
-								<dd *ngIf="!(node.type && node.type.toString().startsWith('<'))">
-									{{node.type}}
-									<a *ngIf="node.type && node.type.toString().startsWith('http')" target="_blank"
-										href="{{node.type}}">
-										<i class="fa fa-external-link-square" aria-hidden="true"></i>
-									</a>
-								</dd>
-							</mat-tree-node>
-							<!-- Node with children -->
-							<mat-tree-node *matTreeNodeDef="let node; when: hasChild" [matTreeNodePaddingIndent]="10"
-								matTreeNodePadding>
-								<dt style="flex: auto; font-size: 12px !important">{{node.filename}}
-								</dt>
-								<dd>
-									<dl [class.feature-tree-invisible]="!flatTreeControl[currentDoc.key].isExpanded(node)"
-										style="margin-left:10px;">
-										<ng-container matTreeNodeOutlet></ng-container>
-									</dl>
-								</dd>
-							</mat-tree-node>
-						</dl>
-					</mat-tree>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div id="analytic_tab" [hidden]="!analytic_tab">
-		<div *ngIf="analytic_tab">
-			<div *ngIf="currentDoc">
-				<div class="modal-body">
-					<!-- Content of Analytics Tab -->
-					<div *ngIf="analyticEnabled || true" class="tab-pane fade" [ngClass]="{'active show':true}"
-						id="{{currentDoc.key}}-analytic-tab">
-						<app-custom-analytic [layer]="currentDoc.layer" [load]="currentDoc.loadSubComponent"
-							[onlineResource]="currentDoc.onlineResource" [featureId]="currentDoc.key" [doc]="currentDoc"></app-custom-analytic>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+  <div id="analytic_tab" [hidden]="!analytic_tab">
+    @if (analytic_tab) {
+      <div>
+        @if (currentDoc) {
+          <div>
+            <div class="modal-body">
+              <!-- Content of Analytics Tab -->
+              @if (analyticEnabled || true) {
+                <div class="tab-pane fade" [ngClass]="{'active show':true}"
+                  id="{{currentDoc.key}}-analytic-tab">
+                  <app-custom-analytic [layer]="currentDoc.layer" [load]="currentDoc.loadSubComponent"
+                  [onlineResource]="currentDoc.onlineResource" [featureId]="currentDoc.key" [doc]="currentDoc"></app-custom-analytic>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
 
 </div>
