@@ -26,6 +26,24 @@ export class InfoPanelSubComponent implements OnInit {
     wmsLoaded = false;
     legendLoaded = false;
 
+    // Publication year, if available
+    publicationYear: string;
+
+    // URL used in the citation
+    citeURL: string;
+
+    // Accessed date in citation
+    accessedDate: string;
+
+    // Distributors in citation
+    distributor: string
+
+    // Saves the DOI reference
+    DOIname: string;
+
+    // A regexp to catch customer service/enquiries names
+    regex: RegExp = new RegExp("enquiries|service|customer|infocentre", "i");
+
     constructor(@Inject('env') private env, private filterService: FilterService) {}
 
     /**
@@ -110,6 +128,54 @@ export class InfoPanelSubComponent implements OnInit {
     }
 
     ngOnInit(): void {
+
+        // Accessed date for citation
+        const today = new Date();
+        const dayDigit = String(today.getDate());
+        const monthName = today.toLocaleString('default', { month: 'long' });
+        const year = today.getFullYear();
+        this.accessedDate = `${dayDigit} ${monthName}, ${year},`;
+
+        // Publication date for citation
+        try {
+            const isoDateStr = this.cswRecord.date.replace(" UTC", "Z");
+            const pubDate = new Date(isoDateStr);
+            this.publicationYear = pubDate.getFullYear().toString();
+        } catch (error) {
+            this.publicationYear = 'unknown';
+        }
+
+        // Citation URL
+        this.citeURL = this.cswRecord.recordInfoUrl;
+        this.DOIname = '';
+        let usesNCI = false;
+        let foundDOI = false;
+        for (let onlineResource of this.cswRecord.onlineResources) {
+            // If uses NCI facilities then should include them as distributor
+            if (onlineResource.url.includes('nci.org.au')) {
+                usesNCI = true;
+            }
+            // Prefer to use a DOI if one is found
+            if (onlineResource.type==='DOI') {
+                this.citeURL = onlineResource.url;
+                this.DOIname = onlineResource.name;
+                foundDOI = true;
+            }
+            if (!foundDOI && onlineResource.type!=='Unsupported') {
+                if (this.isGetCapabilitiesType(onlineResource)) {
+                    this.citeURL = this.onlineResourceGetCapabilitiesUrl(onlineResource);
+                } else {
+                    this.citeURL = this.removeProxy(onlineResource.url);
+                }
+            }
+        }
+
+        // Distributor in citation
+        this.distributor = "AuScope Discovery Portal http://hdl.handle.net/102.100.100/483116";
+        if (usesNCI) {
+            this.distributor += " & NCI Australia https://nci.org.au";
+        }
+
         // Update layer times for this layer if required
         if (config.queryGetCapabilitiesTimes.indexOf(this.layer.id) > -1) {
             this.filterService.updateLayerTimes(this.layer, new LayerTimes());
@@ -164,6 +230,18 @@ export class InfoPanelSubComponent implements OnInit {
                                 + ',' + bbox.eastBoundLongitude + ',' + bbox.northBoundLatitude + "&WIDTH=400&HEIGHT=400";
             }
         });
+    }
+
+    /**
+     * Catch the user click and copy citation to clipboard
+     * 
+     * @param event click event
+     */
+    public copyCite(element: HTMLElement) {
+        const text = element.innerText;
+        navigator.clipboard.writeText(text)
+          .then(() => alert("Copied to clipboard"))
+          .catch(err => console.error("Failed to copy:", err));
     }
 
     /**

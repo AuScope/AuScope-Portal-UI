@@ -190,7 +190,8 @@ export class GetCapsService {
       'id': 'string(./xsi:Name)',
       'description': 'string(./xsi:Abstract)',
       'adminArea': 'string(/xsi:WMS_Capabilities/xsi:Service/xsi:ContactInformation/xsi:ContactAddress/xsi:StateOrProvince)',
-      'contactOrg': 'string(/xsi:WMS_Capabilities/xsi:Service/xsi:ContactInformation/xsi:ContactPersonPrimary/xsi:ContactOrganization)'
+      'contactOrg': 'string(/xsi:WMS_Capabilities/xsi:Service/xsi:ContactInformation/xsi:ContactPersonPrimary/xsi:ContactOrganization)',
+      'contactPerson': 'string(/xsi:WMS_Capabilities/xsi:Service/xsi:ContactInformation/xsi:ContactPersonPrimary/xsi:ContactPerson)'
     };
     const cswRecElems = {};
     for (const xpath of Object.keys(CSW_REC)) {
@@ -385,6 +386,7 @@ export class GetCapsService {
         service: false,
         adminArea: cswRecElems['adminArea'],
         contactOrg: cswRecElems['contactOrg'],
+        contactPerson: cswRecElems['contactPerson'],
         onlineResources: [ onlineResElems ],
         geographicElements: [ geoElems ],
         descriptiveKeywords: [],

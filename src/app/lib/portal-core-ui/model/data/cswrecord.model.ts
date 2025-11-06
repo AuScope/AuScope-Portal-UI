@@ -6,6 +6,8 @@ import { TemporalExtentModel } from './temporal-extent.model';
  */
 export class CSWRecordModel {
   adminArea: string;
+  contactPerson: string;
+  authors: string[];
   childRecords: any;
   constraints: any;
   useLimitConstraints: any;
