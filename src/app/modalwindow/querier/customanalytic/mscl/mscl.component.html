@@ -1,68 +1,78 @@
-  <div class="modal-header">
-  	<h1 class="page-header">
-  		MSCL Analytics: Borehole {{featureId}}
-  	</h1>
-  </div>
-  <div class="modal-body">
-  	<div class="card card-default">
-  		<div class="card-body">
-            <fieldset class="show-fieldset-borders-whitebg mb-3">
-                <legend><h6>Select Sensor or Metrics</h6></legend>
-                <div class="checkbox col">
-                    <input id="mscl-metrics-all" type="checkbox" [(ngModel)]="allTicked" (change)="toggle_all_chkbox()" />
-                    <label for="mscl-metrics-all">&nbsp;ALL</label>
-                </div>
-                <fieldset class="show-fieldset-borders-whitebg mb-3">
-                    <legend><h6>Sensor</h6></legend>
-                    <div class="form-row">
-                        <div *ngFor="let group of metricGroupList">
-                            <div class="checkbox col">
-                                <input id="mscl-metrics-grp" type="checkbox" [(ngModel)]="msclform.bGroup[group]" (change)="toggle_grp_chkbox(group)"/>
-                                <label for="mscl-metrics-grp">&nbsp;{{group}}</label>
-                            </div>
-                        </div>
-                    </div>
-                </fieldset>
-                <fieldset class="show-fieldset-borders-whitebg mb-3">
-                <legend><h6>Metrics</h6></legend>
-                    <div class="form-row">
-                        <div *ngFor="let pname of metricPNameList">
-                                <div class="checkbox col">
-                                    <input id="mscl-metrics" type="checkbox" [(ngModel)]="msclform.bMetric[pname]" />
-                                    <label for="mscl-metrics">&nbsp;{{pname}}</label>
-                                </div>
-                        </div>
-                    </div>
-                </fieldset>
-            </fieldset>
-            <fieldset class="show-fieldset-borders-whitebg mb-3">
-                <legend><h6>Select Depth Range</h6></legend>
-                <div class="form-row justify-content-start mb-4">
-                    <div class="col-md-3 input-group input-group-sm">
-                        <input id="roi-from" type="number" class="form-control"  [(ngModel)]="msclform.startDepth" name="startDepth" ngModel #startDepth="ngModel"  required min="0" max="9999">
-                        <div class="input-group-append">
-                             <span class="input-group-text">metres</span>
-                        </div>
-                        <span class="validity" *ngIf="!startDepth.valid && startDepth.touched"></span>
-                    </div>
-                    <label for="roi-to" class="col-md-1">to</label>
-                    <div class="col-md-3 input-group input-group-sm">
-                        <input id="roi-to" type="number" class="form-control"  [(ngModel)]="msclform.endDepth" name="endDepth" ngModel #endDepth="ngModel" required min="0" max="9999">
-                        <div class="input-group-append">
-                             <span class="input-group-text">metres</span>
-                        </div>
-                        <span class="validity" *ngIf="!endDepth.valid && endDepth.touched"></span>
-                    </div>
-                </div>
-            </fieldset>
-            <fieldset>
-                <div *ngIf="showSelectMetricError" class="alert alert-danger">
-                    Please select at least one metric or sensor
-                </div>
-            </fieldset>
-            <fieldset>
-                <div class="float-left"><button (click)="createGraphModal()" class="btn btn-primary">Draw Graph</button></div>
-            </fieldset>
+<div class="modal-header">
+  <h1 class="page-header">
+    MSCL Analytics: Borehole {{featureId}}
+  </h1>
+</div>
+<div class="modal-body">
+  <div class="card card-default">
+    <div class="card-body">
+      <fieldset class="show-fieldset-borders-whitebg mb-3">
+        <legend><h6>Select Sensor or Metrics</h6></legend>
+        <div class="checkbox col">
+          <input id="mscl-metrics-all" type="checkbox" [(ngModel)]="allTicked" (change)="toggle_all_chkbox()" />
+          <label for="mscl-metrics-all">&nbsp;ALL</label>
         </div>
+        <fieldset class="show-fieldset-borders-whitebg mb-3">
+          <legend><h6>Sensor</h6></legend>
+          <div class="form-row">
+            @for (group of metricGroupList; track group) {
+              <div>
+                <div class="checkbox col">
+                  <input id="mscl-metrics-grp" type="checkbox" [(ngModel)]="msclform.bGroup[group]" (change)="toggle_grp_chkbox(group)"/>
+                  <label for="mscl-metrics-grp">&nbsp;{{group}}</label>
+                </div>
+              </div>
+            }
+          </div>
+        </fieldset>
+        <fieldset class="show-fieldset-borders-whitebg mb-3">
+          <legend><h6>Metrics</h6></legend>
+          <div class="form-row">
+            @for (pname of metricPNameList; track pname) {
+              <div>
+                <div class="checkbox col">
+                  <input id="mscl-metrics" type="checkbox" [(ngModel)]="msclform.bMetric[pname]" />
+                  <label for="mscl-metrics">&nbsp;{{pname}}</label>
+                </div>
+              </div>
+            }
+          </div>
+        </fieldset>
+      </fieldset>
+      <fieldset class="show-fieldset-borders-whitebg mb-3">
+        <legend><h6>Select Depth Range</h6></legend>
+        <div class="form-row justify-content-start mb-4">
+          <div class="col-md-3 input-group input-group-sm">
+            <input id="roi-from" type="number" class="form-control"  [(ngModel)]="msclform.startDepth" name="startDepth" ngModel #startDepth="ngModel"  required min="0" max="9999">
+            <div class="input-group-append">
+              <span class="input-group-text">metres</span>
+            </div>
+            @if (!startDepth.valid && startDepth.touched) {
+              <span class="validity"></span>
+            }
+          </div>
+          <label for="roi-to" class="col-md-1">to</label>
+          <div class="col-md-3 input-group input-group-sm">
+            <input id="roi-to" type="number" class="form-control"  [(ngModel)]="msclform.endDepth" name="endDepth" ngModel #endDepth="ngModel" required min="0" max="9999">
+            <div class="input-group-append">
+              <span class="input-group-text">metres</span>
+            </div>
+            @if (!endDepth.valid && endDepth.touched) {
+              <span class="validity"></span>
+            }
+          </div>
+        </div>
+      </fieldset>
+      <fieldset>
+        @if (showSelectMetricError) {
+          <div class="alert alert-danger">
+            Please select at least one metric or sensor
+          </div>
+        }
+      </fieldset>
+      <fieldset>
+        <div class="float-left"><button (click)="createGraphModal()" class="btn btn-primary">Draw Graph</button></div>
+      </fieldset>
     </div>
   </div>
+</div>

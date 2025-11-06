@@ -1,22 +1,28 @@
 <div class="modal-header" cdkDrag cdkDragRootElement=".modal-content" cdkDragHandle>
-	<h1 class="page-header">
-		GRACE Time Series
-        <span *ngIf="queryStatus===QueryStatus.querying">&nbsp;&nbsp;-&nbsp;&nbsp;Querying&nbsp;&nbsp;<i class="fa fa-spinner fa-spin"></i></span>
-	</h1>
-    <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="closeDialog()">
-        <span aria-hidden="true" class="visually-hidden">&times;</span>
-    </button>
+  <h1 class="page-header">
+    GRACE Time Series
+    @if (queryStatus===QueryStatus.querying) {
+      <span>&nbsp;&nbsp;-&nbsp;&nbsp;Querying&nbsp;&nbsp;<i class="fa fa-spinner fa-spin"></i></span>
+    }
+  </h1>
+  <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="closeDialog()">
+    <span aria-hidden="true" class="visually-hidden">&times;</span>
+  </button>
 </div>
 <div class="modal-body">
-    <div class="error" *ngIf="queryStatus===QueryStatus.error">
-        Unable to retrieve GRACE data, please try again.
+  @if (queryStatus===QueryStatus.error) {
+    <div class="error">
+      Unable to retrieve GRACE data, please try again.
     </div>
-    <plotly-plot #gracePlot id="gracePlot" [divId]="gracePlot" [updateOnDataChange]="true" [data]="graph.data" [layout]="graph.layout" [config]="graph.config"></plotly-plot>
+  }
+  <plotly-plot #gracePlot id="gracePlot" [divId]="gracePlot" [updateOnDataChange]="true" [data]="graph.data" [layout]="graph.layout" [config]="graph.config"></plotly-plot>
 </div>
-<div class="citations" *ngIf="queryStatus===QueryStatus.loaded">
+@if (queryStatus===QueryStatus.loaded) {
+  <div class="citations">
     If you use these data, please cite the following articles:<br>
     Allgeyer, S., P Tregoning, H. McQueen, S.C. McClusky, E.-K. Potter, J. Pfeffer, R. McGirr, A.P. Purcell, T.A. Herring and J.-P. Montillet , ANU GRACE data analysis: Orbit modelling, regularisation and inter-satellite range acceleration observations, Journal of Geophysical Research,&nbsp;
     <a href="https://doi.org/10.1029/2021JB022489" target="_blank">https://doi.org/10.1029/2021JB022489</a><br>
     Tregoning, P., R. McGirr, J. Pfeffer, A.P. Purcell, H. McQueen, S. Allgeyer and S.C. McClusky, ANU GRACE data analysis: Characteristics and benefits of using irregularly shaped mascons, Journal of Geophysical Research,&nbsp;
     <a href="https://doi.org/10.1029/2021JB022412" target="_blank">https://doi.org/10.1029/2021JB022412</a>
-</div>
+  </div>
+}

@@ -1,70 +1,106 @@
 <!-- Custom Layer Input for WMS service -->
 <div class="form-group">
-	<label class="control-label" for="inputSuccess1"><span class="white">URL (KML/KMZ/GeoJSON or OGC WMS Service)</span></label>
-	<div class="input-group" style="margin-left:1em;right:1em;">
-		<input type="text" class="form-control" [(ngModel)] = "searchUrl" (keyup)="onKeyUp($event)">
-		<div class="input-group-append" title="Add KML, KMZ, GeoJSON or OGC WMS service URL layer to map" (click)="search()">
-			<button class="btn btn-auscope-primary" type="button" [disabled]="!searchUrl || searchUrl.trim() === ''">
-				<i *ngIf="!loading" class="fa fa-search"></i>
-				<i *ngIf="loading" class="fa fa-spinner fa-spin fa-fw"></i>
-			</button>
-		</div>
-	</div>
-	 <span class="help-block small" [innerHTML]="statusMsg">
-	</span>
+  <label class="control-label" for="inputSuccess1"><span class="white">URL (KML/KMZ/GeoJSON or OGC WMS Service)</span></label>
+  <div class="input-group" style="margin-left:1em;right:1em;">
+    <input type="text" class="form-control" [(ngModel)] = "searchUrl" (keyup)="onKeyUp($event)">
+    <div class="input-group-append" title="Add KML, KMZ, GeoJSON or OGC WMS service URL layer to map" (click)="search()">
+      <button class="btn btn-auscope-primary" type="button" [disabled]="!searchUrl || searchUrl.trim() === ''">
+        @if (!loading) {
+          <i class="fa fa-search"></i>
+        }
+        @if (loading) {
+          <i class="fa fa-spinner fa-spin fa-fw"></i>
+        }
+      </button>
+    </div>
+  </div>
+  <span class="help-block small" [innerHTML]="statusMsg">
+  </span>
 </div>
 <!-- Once a URL has been selected and processed, its available layers are shown here -->
 <table class="custom-table">
-	<tr *ngFor="let layer of urlLayers" class="custom-result-row">
-		<td class="text-truncate">
-					{{layer.name}}
-					<div *ngIf="layer.capabilityRecords[0]?.layers[0]?.minScaleDenominator || layer.capabilityRecords[0]?.layers[0]?.maxScaleDenominator" class="scale-text">
-						This layer has scale constraints and may not display at certain zoom levels.<br>
-						Adjust zoom level if the data does not display.
-				<i *ngIf="getUILayerModel(layer.id)?.statusMap.getRenderStarted() && !getUILayerModel(layer.id)?.statusMap.getRenderComplete()" class="float-right light-blue fa fa-spin fa-spinner"></i>
-				<i *ngIf="getUILayerModel(layer.id)?.statusMap.getRenderStarted() && getUILayerModel(layer.id)?.statusMap.getContainsError()" class="fa fa-warning text-warning"></i>
-			</div>
-		</td>
-		<td style="vertical-align: middle;">
-			<button *ngIf="!uiLayerModelService.isLayerAdded(layer.id)" class="btn-sm btn-success custom-btn" (click)="addLayer(layer)">Add&nbsp;<i class="fa fa-plus"></i></button>
-			<button *ngIf="uiLayerModelService.isLayerAdded(layer.id)" class="btn-sm btn-danger custom-btn" (click)="removeLayer(layer)">Remove&nbsp;<i class="fa fa-trash"></i></button>
-			<button *ngIf="!['kml-layer', 'kmz-layer', 'geojson-layer'].includes(layer.group)" class="btn-sm btn-info custom-btn" (click)="displayRecordInfo(layer)">Info&nbsp;<i class="fa fa-info-circle"></i></button>
-		</td>
-	</tr>
+  @for (layer of urlLayers; track layer) {
+    <tr class="custom-result-row">
+      <td class="text-truncate">
+        {{layer.name}}
+        @if (layer.capabilityRecords[0]?.layers[0]?.minScaleDenominator || layer.capabilityRecords[0]?.layers[0]?.maxScaleDenominator) {
+          <div class="scale-text">
+            This layer has scale constraints and may not display at certain zoom levels.<br>
+            Adjust zoom level if the data does not display.
+            @if (getUILayerModel(layer.id)?.statusMap.getRenderStarted() && !getUILayerModel(layer.id)?.statusMap.getRenderComplete()) {
+              <i class="float-right light-blue fa fa-spin fa-spinner"></i>
+            }
+            @if (getUILayerModel(layer.id)?.statusMap.getRenderStarted() && getUILayerModel(layer.id)?.statusMap.getContainsError()) {
+              <i class="fa fa-warning text-warning"></i>
+            }
+          </div>
+        }
+      </td>
+      <td style="vertical-align: middle;">
+        @if (!uiLayerModelService.isLayerAdded(layer.id)) {
+          <button class="btn-sm btn-success custom-btn" (click)="addLayer(layer)">Add&nbsp;<i class="fa fa-plus"></i></button>
+        }
+        @if (uiLayerModelService.isLayerAdded(layer.id)) {
+          <button class="btn-sm btn-danger custom-btn" (click)="removeLayer(layer)">Remove&nbsp;<i class="fa fa-trash"></i></button>
+        }
+        @if (!['kml-layer', 'kmz-layer', 'geojson-layer'].includes(layer.group)) {
+          <button class="btn-sm btn-info custom-btn" (click)="displayRecordInfo(layer)">Info&nbsp;<i class="fa fa-info-circle"></i></button>
+        }
+      </td>
+    </tr>
+  }
 </table>
 
 <!-- Custom Layer KML, KMZ or GeoJSON File Input -->
 <div class="form-group">
-	<label class="control-label" for="inputSuccess2"><span class="white">Upload KML/KMZ/GeoJSON file</span></label>
-	<div class="input-group">
-		<input type="file" accept=".kml, .kmz, .geojson" style="display:none" class="file-input" (change)="onFileSelected($event)" #customFileLoader>
-		<button (click)="customFileLoader.click()" type="button" title="Load KML/KMZ/GeoJSON file"  class="btn-primary btn-sm">
-			<i class="fa fa-lg fa-file" aria-hidden="true"></i>
-			&nbsp;Load KML/KMZ/GeoJSON
-			<i *ngIf="!loading" class="fa"></i>
-			<i *ngIf="loading" class="fa fa-spinner fa-spin fa-fw"></i>
-		</button>
-	</div>
+  <label class="control-label" for="inputSuccess2"><span class="white">Upload KML/KMZ/GeoJSON file</span></label>
+  <div class="input-group">
+    <input type="file" accept=".kml, .kmz, .geojson" style="display:none" class="file-input" (change)="onFileSelected($event)" #customFileLoader>
+    <button (click)="customFileLoader.click()" type="button" title="Load KML/KMZ/GeoJSON file"  class="btn-primary btn-sm">
+      <i class="fa fa-lg fa-file" aria-hidden="true"></i>
+      &nbsp;Load KML/KMZ/GeoJSON
+      @if (!loading) {
+        <i class="fa"></i>
+      }
+      @if (loading) {
+        <i class="fa fa-spinner fa-spin fa-fw"></i>
+      }
+    </button>
+  </div>
 </div>
 <!-- Once a file has been uploaded, its layer is shown here -->
 <table class="custom-table">
-	<tr *ngFor="let layer of fileLayers" class="custom-result-row">
-		<td>
-			<div>
-				<div class="text-truncate">{{layer.name}}</div>
-				<i *ngIf="getUILayerModel(layer.id)?.statusMap.getRenderStarted() && !getUILayerModel(layer.id)?.statusMap.getRenderComplete()" class="float-right light-blue fa fa-spin fa-spinner"></i>
-				<i *ngIf="getUILayerModel(layer.id)?.statusMap.getRenderStarted() && getUILayerModel(layer.id)?.statusMap.getContainsError()" class="fa fa-warning text-warning"></i>
-			</div>
-		</td>
-		<td>
-			<button *ngIf="!uiLayerModelService.isLayerAdded(layer.id)" class="btn-sm btn-success custom-btn" (click)="addLayer(layer)">Add&nbsp;<i class="fa fa-plus"></i></button>
-			<button *ngIf="uiLayerModelService.isLayerAdded(layer.id)" class="btn-sm btn-danger custom-btn" (click)="removeLayer(layer)">Remove&nbsp;<i class="fa fa-trash"></i></button>
-			<button *ngIf="!['kml-layer', 'kmz-layer', 'geojson-layer'].includes(layer.group)" class="btn-sm btn-info custom-btn" (click)="displayRecordInfo(layer)">Info&nbsp;<i class="fa fa-info-circle"></i></button>
-		</td>
-		<!--
-		<div *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="progress progress-xs" style="height: 5px">
-			<div class="progress-bar bg-gradient-blue-purple" [style.width]="getUILayerModel(layer.id).statusMap.getCompletePercentage()" role="progressbar"></div>
-		</div>
-		-->
-	</tr>
+  @for (layer of fileLayers; track layer) {
+    <tr class="custom-result-row">
+      <td>
+        <div>
+          <div class="text-truncate">{{layer.name}}</div>
+          @if (getUILayerModel(layer.id)?.statusMap.getRenderStarted() && !getUILayerModel(layer.id)?.statusMap.getRenderComplete()) {
+            <i class="float-right light-blue fa fa-spin fa-spinner"></i>
+          }
+          @if (getUILayerModel(layer.id)?.statusMap.getRenderStarted() && getUILayerModel(layer.id)?.statusMap.getContainsError()) {
+            <i class="fa fa-warning text-warning"></i>
+          }
+        </div>
+      </td>
+      <td>
+        @if (!uiLayerModelService.isLayerAdded(layer.id)) {
+          <button class="btn-sm btn-success custom-btn" (click)="addLayer(layer)">Add&nbsp;<i class="fa fa-plus"></i></button>
+        }
+        @if (uiLayerModelService.isLayerAdded(layer.id)) {
+          <button class="btn-sm btn-danger custom-btn" (click)="removeLayer(layer)">Remove&nbsp;<i class="fa fa-trash"></i></button>
+        }
+        @if (!['kml-layer', 'kmz-layer', 'geojson-layer'].includes(layer.group)) {
+          <button class="btn-sm btn-info custom-btn" (click)="displayRecordInfo(layer)">Info&nbsp;<i class="fa fa-info-circle"></i></button>
+        }
+      </td>
+      <!--
+      @if (getUILayerModel(layer.id).statusMap.getRenderStarted()) {
+      <div class="progress progress-xs" style="height: 5px">
+        <div class="progress-bar bg-gradient-blue-purple" [style.width]="getUILayerModel(layer.id).statusMap.getCompletePercentage()" role="progressbar"></div>
+      </div>
+    }
+      -->
+    </tr>
+  }
 </table>

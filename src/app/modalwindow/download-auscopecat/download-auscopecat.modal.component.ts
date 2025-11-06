@@ -1,5 +1,5 @@
 import { Clipboard } from '@angular/cdk/clipboard';
-import { CommonModule } from '@angular/common';
+
 import { Component, inject, Input, OnInit } from '@angular/core';
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 import { OnlineResourceModel } from '../../lib/portal-core-ui/model/data/onlineresource.model';
@@ -18,7 +18,7 @@ type LatLon = [number, number];
     selector: 'app-download-auscopecat-modal',
     templateUrl: './download-auscopecat.modal.component.html',
     styleUrls: ['./download-auscopecat.modal.component.scss'],
-    imports: [CommonModule],
+    imports: [],
     standalone: true
 })
 export class DownloadAuScopeCatModalComponent implements OnInit {

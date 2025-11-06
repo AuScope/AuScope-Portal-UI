@@ -8,10 +8,12 @@
     <div class="modal-body">
         <div>scalarClasses = {{scalarClasses}}</div>
         <ul style="list-style: none; font-size:16px;">
-            <li *ngFor="let scalarClass of scalarClasses | getKey">
-                <span style="border: 1px solid #ccc; float: left; width: 12px; height: 12px; margin: 2px;"
-                    [style.background-color]="scalarClass.value"></span> {{scalarClass.key}}
-            </li>
+            @for (scalarClass of scalarClasses | getKey; track scalarClass) {
+                <li>
+                    <span style="border: 1px solid #ccc; float: left; width: 12px; height: 12px; margin: 2px;"
+                        [style.background-color]="scalarClass.value"></span> {{scalarClass.key}}
+                </li>
+            }
         </ul>
     </div>
 </div>

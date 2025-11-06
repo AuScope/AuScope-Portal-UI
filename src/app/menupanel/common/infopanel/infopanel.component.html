@@ -1,49 +1,63 @@
 <div class="modal-header" cdkDrag cdkDragRootElement=".modal-content" cdkDragHandle style="background: #EEE;">
-    <h5 class="modal-title" id="exampleModalLongTitle">Record Information</h5>
-    <button type="button" class="close" (click)="activeModal.close()" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-    </button>
+  <h5 class="modal-title" id="exampleModalLongTitle">Record Information</h5>
+  <button type="button" class="close" (click)="activeModal.close()" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
 </div>
 
 <div class="modal-body" style="margin-left:10px;margin-right:10px;">
-    <form>
-        <div *ngIf="layer.name !== undefined">
-            <h4><span class="text-primary">Layer Name</span></h4>
-            <p>{{layer.name}}</p>
-        </div>
-        <div *ngIf="layer.description !== undefined">
-            <h4><span class="text-primary">Brief Description</span></h4>
-            <p>{{layer.description}}</p>
-        </div>
-        <div *ngIf="layer.iconUrl !== undefined">
-            <h4><span class="text-primary">Icon</span></h4>
-            <img src="{{layer.iconUrl}}" width="20" height="20">
-        </div>
-        <div *ngIf="cswRecords.length > 0">
-            <h4><span class="text-primary">Metadata</span></h4>
-            <div class="card">
-                <div class="card-body" style="padding-left: 0px;padding-right: 0px;">
-                    <div>
-                    <div *ngFor="let cswRecord of cswRecords.slice(0,10); let i = index;" class="card card-bordered">
-                        <div class="card-header">
-                            <h4 class="card-title">
-                                <a class="accordion-link" data-toggle="collapse" href="#info-link{{i}}" (click)="cswRecord.expanded = !cswRecord.expanded" >
-                                    <i *ngIf='layerStatus.showInfoWarning(layer.id, cswRecord)' class="fa fa-warning text-warning"> </i>{{cswRecord.contactOrg !=='' && cswRecord.contactOrg !== null ? cswRecord.contactOrg : 'More Information'}}
-                                </a>
-                            </h4>
-                        </div>
-                        <div id="info-link{{i}}" class="card-body card-collapse collapse">
-                                <p *ngIf='layerStatus.showInfoWarning(layer.id, cswRecord)' class='text-danger small'><i class="fa fa-warning text-warning"> </i>This service is currently experiencing some problem and may not work as expected</p>
-                                <info-sub-panel [cswRecord]=cswRecord [layer]=layer [expanded]=cswRecord.expanded ></info-sub-panel>
-                            </div>
-                        </div>
+  <form>
+    @if (layer.name !== undefined) {
+      <div>
+        <h4><span class="text-primary">Layer Name</span></h4>
+        <p>{{layer.name}}</p>
+      </div>
+    }
+    @if (layer.description !== undefined) {
+      <div>
+        <h4><span class="text-primary">Brief Description</span></h4>
+        <p>{{layer.description}}</p>
+      </div>
+    }
+    @if (layer.iconUrl !== undefined) {
+      <div>
+        <h4><span class="text-primary">Icon</span></h4>
+        <img src="{{layer.iconUrl}}" width="20" height="20">
+      </div>
+    }
+    @if (cswRecords.length > 0) {
+      <div>
+        <h4><span class="text-primary">Metadata</span></h4>
+        <div class="card">
+          <div class="card-body" style="padding-left: 0px;padding-right: 0px;">
+            <div>
+              @for (cswRecord of cswRecords.slice(0,10); track cswRecord; let i = $index) {
+                <div class="card card-bordered">
+                  <div class="card-header">
+                    <h4 class="card-title">
+                      <a class="accordion-link" data-toggle="collapse" href="#info-link{{i}}" (click)="cswRecord.expanded = !cswRecord.expanded" >
+                        @if (layerStatus.showInfoWarning(layer.id, cswRecord)) {
+                          <i class="fa fa-warning text-warning"> </i>
+                          }{{cswRecord.contactOrg !=='' && cswRecord.contactOrg !== null ? cswRecord.contactOrg : 'More Information'}}
+                        </a>
+                      </h4>
                     </div>
-                </div>
+                    <div id="info-link{{i}}" class="card-body card-collapse collapse">
+                      @if (layerStatus.showInfoWarning(layer.id, cswRecord)) {
+                        <p class='text-danger small'><i class="fa fa-warning text-warning"> </i>This service is currently experiencing some problem and may not work as expected</p>
+                      }
+                      <info-sub-panel [cswRecord]=cswRecord [layer]=layer [expanded]=cswRecord.expanded ></info-sub-panel>
+                    </div>
+                  </div>
+                }
+              </div>
             </div>
+          </div>
         </div>
+      }
     </form>
-</div>
+  </div>
 
-<div class="modal-footer">
+  <div class="modal-footer">
     <button type="button" class="btn btn-light" (click)="activeModal.close()">Close</button>
-</div>
+  </div>

@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { StyleService } from './style.service';
 import { serialize } from '@thi.ng/hiccup';
 
 interface RotationRule {
@@ -22,8 +21,6 @@ export class RemanentAnomaliesAutoSearchStyleService {
         { min: 120, max: 150, color: '#FFA500', name: 'Rotation 120-150', title: 'Rotation between 120 and 150 degrees' },
         { min: 150, max: 180, color: '#FF0000', name: 'Rotation 150-180', title: 'Rotation between 150 and 180 degrees' }
     ];
-
-    constructor(private styleService: StyleService) {}
 
     public static getSld(layerName: string, styleName: string): string {
         const rules = this.ROTATION_RULES.map(rule => this.createRotationRule(rule));
@@ -85,4 +82,4 @@ export class RemanentAnomaliesAutoSearchStyleService {
             ]
         ];
     }
-} 
+}

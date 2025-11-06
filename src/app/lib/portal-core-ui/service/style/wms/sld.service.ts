@@ -10,10 +10,8 @@ import { catchError, map } from 'rxjs/operators';
 import { OnlineResourceModel } from '../../../model/data/onlineresource.model';
 import { UtilitiesService } from '../../../utility/utilities.service';
 import { GSML41StyleService } from './gsml41-style.service';
-import { MinTenemStyleService } from './min-tenem-style.service';
 import { BoreholeStyleService } from './borehole-style.service';
 import { NVCLBoreholeStyleService } from './nvcl-borehole-style.service';
-import { MinOccurViewStyleService } from './min-occur-view-style.service';
 import { MineStyleService } from './mine-style.service';
 import { MineralOccurrenceStyleService } from './mineral-occurrence-style.service';
 import { MiningActivityStyleService } from './mining-activity-style.service';
@@ -108,8 +106,6 @@ export class SldService {
           }
 
           // Just merge the params and pass them through
-          
-          
           const sldBody = StyleService.getSld(
             onlineResource.name,
             param.styles,
@@ -167,5 +163,4 @@ export class SldService {
         );
     }
   }
-
 }

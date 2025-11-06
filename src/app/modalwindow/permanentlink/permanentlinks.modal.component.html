@@ -1,45 +1,51 @@
-	<div class="modal-header">
-		<h4>States</h4><button class="btn btn-sm btn-outline pull-right" aria-label="Close" (click)="activeModal.close()"><i class="fa fa-times"></i></button>
-	</div>
-	<div class="modal-body">
-		<form [formGroup]="statesFormArray" class="text-left">
-			<div class="state-group" *ngFor="let state of statesFormArray.controls; let i=index">
-				<div class="form-group" formGroupName="{{i}}">
-					<div class="form-pair">
-						<label class="form-label" for="name">Name</label>
-						<input id="name" formControlName="name" class="form-control checking-field" placeholder="Name" type="text">
-					</div>
-					<div class="form-pair">
-						<label class="form-label" for="date">Date</label>
-						<input id="date" formControlName="date" class="form-control checking-field" type="text">
-					</div>
-					<div class="form-pair">
-						<label class="form-label" for="description">Description</label>
-						<input id="description" formControlName="description" class="form-control checking-field" placeholder="Description" type="text">
-					</div>
-					<div class="form-pair">
-						<label class="form-label" for="link">Link</label>
-						<div class="input-group">
-							<input id="link" formControlName="link" class="form-control checking-field" type="text">
-							<div class="input-group-append">
-								<button for="link" class="btn btn-primary" title="Copy to Clipboard" ngxClipboard [cbContent]="state.get('link').value" type="button">
-									<i class="fa fa-files-o"></i>
-								</button>
-							</div>
-						</div>
-					</div>
-					<div class="form-pair">
-						<label class="form-label" for="isPublic">Is Public</label>
-						<input id="isPublic" formControlName="isPublic" class="form-control checking-field" style="width:auto;margin-right:auto;" type="checkbox">
-					</div>
-				</div>
-				<button class="btn btn-sm btn-primary state-form-button pull-right" (click)="loadState(i)"><a #loadStateLink class="state-link" href="/?state={{userStates[i].id}}"><i class="fa fa-refresh"></i>&nbsp;Load State</a></button>
-				<button class="btn btn-sm btn-primary state-form-button pull-right" (click)="deleteState(i)"><i class="fa fa-trash"></i>&nbsp;Delete</button>
-				<button *ngIf="editingState !== i" class="btn btn-sm btn-primary state-form-button pull-right" (click)="editState(i)"><i class="fa fa-pencil"></i>&nbsp;Edit</button>
-				<button *ngIf="editingState === i" class="btn btn-sm btn-primary state-form-button pull-right" (click)="saveState(i)"><i class="fa fa-disk"></i>&nbsp;Save Changes</button>
-			</div>
-		</form>
-	</div>
-	<div class="modal-footer">
-		<button class="btn btn-primary" (click)="close()">Close</button>
-	</div>
+<div class="modal-header">
+  <h4>States</h4><button class="btn btn-sm btn-outline pull-right" aria-label="Close" (click)="activeModal.close()"><i class="fa fa-times"></i></button>
+</div>
+<div class="modal-body">
+  <form [formGroup]="statesFormArray" class="text-left">
+    @for (state of statesFormArray.controls; track state; let i = $index) {
+      <div class="state-group">
+        <div class="form-group" formGroupName="{{i}}">
+          <div class="form-pair">
+            <label class="form-label" for="name">Name</label>
+            <input id="name" formControlName="name" class="form-control checking-field" placeholder="Name" type="text">
+          </div>
+          <div class="form-pair">
+            <label class="form-label" for="date">Date</label>
+            <input id="date" formControlName="date" class="form-control checking-field" type="text">
+          </div>
+          <div class="form-pair">
+            <label class="form-label" for="description">Description</label>
+            <input id="description" formControlName="description" class="form-control checking-field" placeholder="Description" type="text">
+          </div>
+          <div class="form-pair">
+            <label class="form-label" for="link">Link</label>
+            <div class="input-group">
+              <input id="link" formControlName="link" class="form-control checking-field" type="text">
+              <div class="input-group-append">
+                <button for="link" class="btn btn-primary" title="Copy to Clipboard" ngxClipboard [cbContent]="state.get('link').value" type="button">
+                  <i class="fa fa-files-o"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="form-pair">
+            <label class="form-label" for="isPublic">Is Public</label>
+            <input id="isPublic" formControlName="isPublic" class="form-control checking-field" style="width:auto;margin-right:auto;" type="checkbox">
+          </div>
+        </div>
+        <button class="btn btn-sm btn-primary state-form-button pull-right" (click)="loadState(i)"><a #loadStateLink class="state-link" href="/?state={{userStates[i].id}}"><i class="fa fa-refresh"></i>&nbsp;Load State</a></button>
+        <button class="btn btn-sm btn-primary state-form-button pull-right" (click)="deleteState(i)"><i class="fa fa-trash"></i>&nbsp;Delete</button>
+        @if (editingState !== i) {
+          <button class="btn btn-sm btn-primary state-form-button pull-right" (click)="editState(i)"><i class="fa fa-pencil"></i>&nbsp;Edit</button>
+        }
+        @if (editingState === i) {
+          <button class="btn btn-sm btn-primary state-form-button pull-right" (click)="saveState(i)"><i class="fa fa-disk"></i>&nbsp;Save Changes</button>
+        }
+      </div>
+    }
+  </form>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-primary" (click)="close()">Close</button>
+</div>

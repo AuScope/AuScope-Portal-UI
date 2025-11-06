@@ -1,17 +1,17 @@
 import { Injectable } from '@angular/core';
 import { serialize } from '@thi.ng/hiccup';
- 
+import { OptionalFilter, StyleService } from './style.service';
+
 interface ErlMineralOccurrenceStyleParams {
-  optionalFilters?: any[];
+  optionalFilters?: OptionalFilter[];
   color?: string;
   gsmlNamespace?: string;
   gmlNamespace?: string;
   erlNamespace?: string;
 }
- 
+
 @Injectable()
 export class ErlMineralOccurrenceStyleService {
- 
   /**
    * Generate SLD for ERL Mineral Occurrence layers
    * @param layerName The name of the layer
@@ -30,10 +30,10 @@ export class ErlMineralOccurrenceStyleService {
       ows: 'http://www.opengis.net/ows',
       xsi: 'http://www.w3.org/2001/XMLSchema-instance'
     };
- 
+
     const color = params.color || '#e02e16';
-    const filter = this.generateFilter(params.optionalFilters || []);
- 
+    const filter = StyleService.generateFilter(params.optionalFilters || []);
+
     const sld = serialize(
       ['sld:StyledLayerDescriptor', {
         version: '1.0.0',
@@ -62,290 +62,13 @@ export class ErlMineralOccurrenceStyleService {
                 ['sld:Title', {}, 'ERL Mineral Occurrence View'],
                 ['sld:Abstract', {}, 'Circle'],
                 filter,
-                this.createSymbolizer(color, ns)
+                StyleService.createSymbolizer(color,'circle', '1')
               ]
             ]
           ]
         ]
       ]
     );
- 
     return sld;
-  }
- 
-  /**
-   * Generate filter based on optional filters
-   * @param optionalFilters Array of optional filters
-   * @returns Filter XML structure or null if no filters
-   */
-  private static generateFilter(optionalFilters: any[]): any {
-    // Parse optional filters if they're a string
-    let parsedFilters: any[] = [];
-    try {
-      if (optionalFilters && typeof optionalFilters === 'string') {
-        parsedFilters = JSON.parse(optionalFilters);
-      } else if (Array.isArray(optionalFilters)) {
-        parsedFilters = optionalFilters;
-      }
-    } catch (e) {
-      console.error('Failed to parse optional filters', e);
-    }
- 
-    // Build filter fragments
-    const filterFragments: any[] = [];
- 
-    if (parsedFilters && parsedFilters.length > 0) {
-      for (const filter of parsedFilters) {
-        // Skip disabled filters
-        if (filter.enabled !== undefined && !filter.enabled) {
-          continue;
-        }
- 
-        let propertyFilter: any = null;
- 
-        // Handle filter types explicitly
-        if (filter.type) {
-          switch (filter.type) {
-            case 'OPTIONAL.TEXT':
-              propertyFilter = this.handleTextFilter(filter);
-              break;
-            case 'OPTIONAL.DROPDOWNREMOTE':
-              propertyFilter = this.handleDropdownFilter(filter);
-              break;
-            case 'OPTIONAL.POLYGONBBOX':
-              propertyFilter = this.handlePolygonFilter(filter);
-              break;
-            case 'OPTIONAL.DATE':
-              propertyFilter = this.handleDateFilter(filter);
-              break;
-            case 'OPTIONAL.PROVIDER':
-              // Provider filters don't add any OGC filter - they're handled at the request level
-              // by filtering which service URLs are called
-              continue;
-            default:
-              // For other optional filters, try to handle as text filter
-              if (filter.xpath && filter.value) {
-                propertyFilter = this.generatePropertyFilter(filter.xpath, filter.value, filter.predicate || 'ISEQUAL');
-              }
-              break;
-          }
-        }
-        // Handle different filter formats for backward compatibility
-        else if (Array.isArray(filter)) {
-          // This is likely the layers.yaml format: [label, field, null, operator]
-          if (filter.length >= 4) {
-            const [label, field, _, operator] = filter;
-            
-            // Check if this filter has a value (added by UI)
-            const arrayFilter = filter as unknown as { value?: string };
-            if (field && arrayFilter.value) {
-              propertyFilter = this.generatePropertyFilter(field, arrayFilter.value, operator || 'ISEQUAL');
-            }
-          }
-        }
-        // Handle standard object format without explicit type
-        else if (typeof filter === 'object') {
-          // Handle filters with xpath and value
-          if (filter.label && filter.value && filter.xpath) {
-            let operator = filter.predicate || 'ISEQUAL';
-            propertyFilter = this.generatePropertyFilter(filter.xpath, filter.value, operator);
-          }
-          // Standard filter with field and value
-          else if (filter.field && filter.value) {
-            propertyFilter = this.generatePropertyFilter(
-              filter.field,
-              filter.value,
-              filter.operator || 'ISEQUAL'
-            );
-          }
-        }
- 
-        if (propertyFilter) {
-          filterFragments.push(propertyFilter);
-        }
-      }
-    }
- 
-    // Combine filters - use ogc: prefixes for proper OGC namespace handling
-    if (filterFragments.length > 0) {
-      const result = filterFragments.length === 1
-        ? ['ogc:Filter', {}, filterFragments[0]]
-        : ['ogc:Filter', {}, ['ogc:And', {}, ...filterFragments]];
-      
-      // Log the final filter for debugging data issues
-      console.log('ERL Mineral Occurrence Style - Generated filter for:',
-        parsedFilters.map(f => `${f.label}: ${f.value}`).join(', '));
-      return result;
-    }
- 
-    return null;
-  }
- 
-  /**
-   * Generate property filter
-   * @param field Field name
-   * @param value Field value
-   * @param operator Operator to use
-   * @returns Property filter structure
-   */
-  private static generatePropertyFilter(field: string, value: string, operator: string): any {
-    if (!field || value === undefined || value === null) return null;
- 
-    const operatorUpper = (operator || 'ISEQUAL').toUpperCase();
- 
-    switch (operatorUpper) {
-      case 'ISEQUAL':
-      case '=':
-        return ['ogc:PropertyIsEqualTo', { matchCase: 'false' },
-          ['ogc:PropertyName', {}, field],
-          ['ogc:Literal', {}, value]
-        ];
-      case 'ISNOTEQUAL':
-      case '!=':
-        return ['ogc:PropertyIsNotEqualTo', { matchCase: 'false' },
-          ['ogc:PropertyName', {}, field],
-          ['ogc:Literal', {}, value]
-        ];
-      case 'BIGGER_THAN':
-      case '>':
-        return ['ogc:PropertyIsGreaterThan', {},
-          ['ogc:PropertyName', {}, field],
-          ['ogc:Literal', {}, value]
-        ];
-      case 'SMALLER_THAN':
-      case '<':
-        return ['ogc:PropertyIsLessThan', {},
-          ['ogc:PropertyName', {}, field],
-          ['ogc:Literal', {}, value]
-        ];
-      case 'ISLIKE':
-      case 'LIKE':
-        // Use % wildcards for GeoServer compatibility
-        const formattedValue = value.includes('%') ? value : `%${value}%`;
-        return ['ogc:PropertyIsLike', { wildCard: '%', singleChar: '_', escape: '!', matchCase: 'false' },
-          ['ogc:PropertyName', {}, field],
-          ['ogc:Literal', {}, formattedValue]
-        ];
-      default:
-        return ['ogc:PropertyIsEqualTo', { matchCase: 'false' },
-          ['ogc:PropertyName', {}, field],
-          ['ogc:Literal', {}, value]
-        ];
-    }
-  }
- 
-  /**
-   * Handle text filter
-   * @param filter Filter object
-   * @returns Property filter structure
-   */
-  private static handleTextFilter(filter: any): any {
-    if (!filter.xpath || !filter.value) {
-      return null;
-    }
-    
-    if (filter.predicate === 'ISLIKE') {
-      return ['ogc:PropertyIsLike', { wildCard: '%', singleChar: '_', escape: '!', matchCase: 'false' },
-        ['ogc:PropertyName', {}, filter.xpath],
-        ['ogc:Literal', {}, `%${filter.value}%`]
-      ];
-    } else if (filter.predicate === 'ISEQUAL') {
-      return ['ogc:PropertyIsEqualTo', { matchCase: 'false' },
-        ['ogc:PropertyName', {}, filter.xpath],
-        ['ogc:Literal', {}, filter.value]
-      ];
-    }
-    
-    return null;
-  }
- 
-  /**
-   * Handle dropdown filter
-   * @param filter Filter object
-   * @returns Property filter structure
-   */
-  private static handleDropdownFilter(filter: any): any {
-    if (!filter.xpath || !filter.value) {
-      return null;
-    }
-    
-    if (filter.predicate === 'ISEQUAL') {
-      return ['ogc:PropertyIsEqualTo', { matchCase: 'false' },
-        ['ogc:PropertyName', {}, filter.xpath],
-        ['ogc:Literal', {}, filter.value]
-      ];
-    }
-    
-    return null;
-  }
- 
-  /**
-   * Handle polygon/bbox filter
-   * @param filter Filter object
-   * @returns Property filter structure
-   */
-  private static handlePolygonFilter(filter: any): any {
-    if (!filter.xpath || !filter.value) {
-      return null;
-    }
-    
-    if (filter.predicate === 'ISEQUAL') {
-      return ['ogc:Intersects', {},
-        ['ogc:PropertyName', {}, filter.xpath],
-        filter.value // Should already be GML polygon string
-      ];
-    }
-    
-    return null;
-  }
- 
-  /**
-   * Handle date filter
-   * @param filter Filter object
-   * @returns Property filter structure
-   */
-  private static handleDateFilter(filter: any): any {
-    if (!filter.xpath || !filter.value) {
-      return null;
-    }
-    
-    if (filter.predicate === 'BIGGER_THAN') {
-      return ['ogc:PropertyIsGreaterThan', {},
-        ['ogc:PropertyName', {}, filter.xpath],
-        ['ogc:Literal', {}, filter.value]
-      ];
-    } else if (filter.predicate === 'SMALLER_THAN') {
-      return ['ogc:PropertyIsLessThan', {},
-        ['ogc:PropertyName', {}, filter.xpath],
-        ['ogc:Literal', {}, filter.value]
-      ];
-    }
-    
-    return null;
-  }
- 
-  /**
-   * Create point symbolizer for the style
-   * @param color Fill and stroke color
-   * @param ns Namespace object
-   * @returns Symbolizer structure
-   */
-  private static createSymbolizer(color: string, ns: any): any[] {
-    return ['sld:PointSymbolizer', {},
-      ['sld:Graphic', {},
-        ['sld:Mark', {},
-          ['sld:WellKnownName', {}, 'circle'],
-          ['sld:Fill', {},
-            ['sld:CssParameter', { name: 'fill' }, color],
-            ['sld:CssParameter', { name: 'fill-opacity' }, '0.4']
-          ],
-          ['sld:Stroke', {},
-            ['sld:CssParameter', { name: 'stroke' }, color],
-            ['sld:CssParameter', { name: 'stroke-width' }, '1']
-          ]
-        ],
-        ['sld:Size', {}, '8']
-      ]
-    ];
   }
 }

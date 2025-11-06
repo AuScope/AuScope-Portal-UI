@@ -176,6 +176,34 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
+   * Add layer to map when plus icon is clicked
+   *
+   * @param layer LayerModel for layer to add
+   */
+  public addLayerToMap(layer: LayerModel): void {
+    this.filterService.getLayerTimesBS(layer.id).pipe(take(1)).subscribe(layerTimes => {
+      this.layerManagerService.addLayer(layer, [], null, layerTimes.currentTime);
+    });
+
+    this.selectLayer(layer);
+    
+    this.sidebarService.setOpenState(true);
+  }
+
+  /**
+   * Remove layer from map when trash icon is clicked
+   *
+   * @param layer LayerModel for layer to remove
+   */
+  public removeLayerFromMap(layer: LayerModel): void {
+    this.layerManagerService.removeLayer(layer);
+    
+    if (this.selectedLayer === layer) {
+      this.selectedLayer = null;
+    }
+  }
+
+  /**
    * Opens and closes browse panel
    *
    * @param open if true will open panel if false will close panel if missing will toggle
@@ -197,6 +225,16 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
    */
   public isLayerSelected(layer: any) {
     return this.selectedLayer === layer;
+  }
+
+  /**
+   * Is this layer added to the map?
+   *
+   * @param layer LayerModel for layer
+   * @returns true if this layer has been added to the map
+   */
+  public isLayerAdded(layer: any) {
+    return this.uiLayerModelService.isLayerAdded(layer.id);
   }
 
   /**
