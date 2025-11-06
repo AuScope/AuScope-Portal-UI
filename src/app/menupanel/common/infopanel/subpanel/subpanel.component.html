@@ -72,7 +72,7 @@
                 }
             }
         <!-- If there is a contact person and it is not an enquiries line etc. -->
-        } @else if (cswRecord.contactPerson && !(/enquiries|service|customer/i.test(cswRecord.contactPerson))) {
+        } @else if (cswRecord.contactPerson && !regex.test(cswRecord.contactPerson)) {
             {{cswRecord.contactPerson}}
         <!-- Use contact org if nothing is defined -->
         } @else {

@@ -41,6 +41,9 @@ export class InfoPanelSubComponent implements OnInit {
     // Saves the DOI reference
     DOIname: string;
 
+    // A regexp to catch customer service/enquiries names
+    regex: RegExp = new RegExp("enquiries|service|customer|infocentre", "i");
+
     constructor(@Inject('env') private env, private filterService: FilterService) {}
 
     /**
