@@ -49,6 +49,9 @@
               }
             ],
             "styles": [
+              "node_modules/jquery-ui/dist/themes/base/jquery-ui.min.css",
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
               "./node_modules/@angular/material/prebuilt-themes/purple-green.css",
               "src/styles.scss",
               "node_modules/rickshaw/rickshaw.min.css",
@@ -58,6 +61,10 @@
               "./node_modules/cesium/Build/Cesium/Widgets/widgets.css"
             ],
             "scripts": [
+              "node_modules/jquery/dist/jquery.min.js",
+              "node_modules/jquery-ui/dist/jquery-ui.min.js",
+              "node_modules/popper.js/dist/umd/popper.min.js",
+              "node_modules/bootstrap/dist/js/bootstrap.min.js",
               "node_modules/d3/d3.min.js",
               "node_modules/rickshaw/rickshaw.min.js",
               "src/extension/js/extensions.js",
