@@ -18,7 +18,7 @@ import { Entity, ProviderViewModel, buildModuleUrl, OpenStreetMapImageryProvider
          ArcGisMapServerImageryProvider, Cartesian2, WebMercatorProjection,  SplitDirection, 
          Rectangle} from 'cesium';
 import { UtilitiesService } from '../../utility/utilities.service';
-import ImageryLayerCollection from 'cesium/Source/Scene/ImageryLayerCollection';
+import { ImageryLayerCollection } from 'cesium';
 import { CsGeoJsonService } from '../geojson/cs-geojson.service';
 declare var Cesium: any;
 
@@ -584,20 +584,20 @@ export class CsMapService {
             break;
         }
         baseMapLayers.push(
-          new ProviderViewModel({
+          new Cesium.ProviderViewModel({
             name: layer.viewValue,
             iconUrl: buildModuleUrl('Widgets/Images/ImageryProviders/' + bingMapsIcon),
             tooltip: layer.tooltip,
-            creationFunction() {
-              return new BingMapsImageryProvider({
-                url: 'https://dev.virtualearth.net',
-                key: this.env.bingMapsKey,
-                mapStyle: bingMapsStyle,
-                // defaultAlpha: 1.0,
-              });
-            },
-          })
-        );
+            creationFunction: async function() {
+              return await Cesium.BingMapsImageryProvider.fromUrl(
+                'https://dev.virtualearth.net',
+                { 
+                  key: this.env.bingMapsKey,
+                  mapStyle: bingMapsStyle,
+                }
+              )
+            }
+        }));
       } else if (layer.layerType === 'ESRI') {
         const esriUrl =
           'https://services.arcgisonline.com/ArcGIS/rest/services/' + layer.value + '/MapServer';
@@ -631,15 +631,15 @@ export class CsMapService {
             break;
         }
         baseMapLayers.push(
-          new ProviderViewModel({
+          new Cesium.ProviderViewModel({
             name: layer.viewValue,
-            iconUrl: buildModuleUrl('Widgets/Images/ImageryProviders/' + esriIcon),
+            iconUrl: Cesium.buildModuleUrl('Widgets/Images/ImageryProviders/' + esriIcon),
             tooltip: layer.tooltip,
-            creationFunction() {
-              return new ArcGisMapServerImageryProvider({
-                url: esriUrl,
-              });
-            },
+            creationFunction: async function() {
+              return await ArcGisMapServerImageryProvider.fromUrl(
+                esriUrl
+              );
+            }
           })
         );
       }
