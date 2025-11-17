@@ -36,8 +36,9 @@ ContextService.load()
 
 declare let require;
 
-// This access token is taken from the "angular-cesium" website - you can replace it with your own one
-Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2YTY1NDYzYS01YzgxLTQ2MGUtODBiYy0zODRmY2MwOGY4MDIiLCJpZCI6MjA1LCJpYXQiOjE1MDQ3MjQ1Njh9.rKgXUKAfFiiSAm_b9T8bpsDVdj0YyZeqGxNpzLlhxpk';
+// If required, Cesium access token can be set here
+// Ion.defaultAccessToken =
+
 window['CESIUM_BASE_URL'] = '/assets/cesium/';
 
 /*
