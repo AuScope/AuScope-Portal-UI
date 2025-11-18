@@ -604,13 +604,14 @@ export class CsMapService {
         let esriIcon = '';
         switch (layer.value) {
           case 'World_Imagery':
-            esriIcon = 'esriWorldImagery.png';
+            esriIcon = 'ArcGisMapServiceWorldImagery.png';
             break;
           case 'NatGeo_World_Map':
-            esriIcon = 'esriNationalGeographic.png';
+            esriIcon = 'ArcGisMapServiceWorldOcean.png';
             break;
           case 'World_Street_Map':
-            esriIcon = 'esriWorldStreetMap.png';
+            // There is no ESRI street map icon image, use Bing instead
+            esriIcon = 'bingRoads.png';
             break;
           // No provided icon
           case 'World_Terrain_Base':
