@@ -382,7 +382,7 @@ export class NVCLDatasetListComponent implements OnInit {
     this.nvclService.getNVCL2_0_JSONDataBinned(this.onlineResource.url, [this.selectedScalar]).
       subscribe(response => {
         if ('success' in response && response.success === true && response.data.length > 0) {
-          const this_ptr = this;
+          const me = this;
           const metricColours: any = {};
           let minval = 999999999;
           let maxval = -999999999;
@@ -393,7 +393,7 @@ export class NVCLDatasetListComponent implements OnInit {
             ['stringValues', 'numericValues'].forEach(dataType => {
               if (bv.hasOwnProperty(dataType) && bv[dataType].length > 0) {
                 // Find the log name for our log id, this will be our 'metric_name'
-                const metric_name = this_ptr.datasetScalars[datasetId].filter(x => x.logId === bv.logId)[0].logName;
+                const metric_name = me.datasetScalars[datasetId].filter(x => x.logId === bv.logId)[0].logName;
                 if (metric_name.length > 0) {
                   bv[dataType].forEach(function (val) {
 
@@ -402,7 +402,7 @@ export class NVCLDatasetListComponent implements OnInit {
                       const key = val.classText;
                       // Use the supplied colour for each metric
                       if (!(key in metricColours)) {
-                        metricColours[key] = this_ptr._colourConvert(val.colour);
+                        metricColours[key] = me._colourConvert(val.colour);
                       }
                       hasData = true;
                     } else if (dataType === 'numericValues') {
@@ -417,7 +417,7 @@ export class NVCLDatasetListComponent implements OnInit {
                   }); // for each
                   if (dataType === 'numericValues') {
                     for (let j = 0; j < 9; j++) {
-                      metricColours[(minval + (maxval - minval) * (j / 8)).toLocaleString()] = this_ptr._colourConvert(this_ptr.linPal[256 * (8 - j) / 8]);
+                      metricColours[(minval + (maxval - minval) * (j / 8)).toLocaleString()] = me._colourConvert(me.linPal[256 * (8 - j) / 8]);
                     }
                     metricColours.sort();
                   }
