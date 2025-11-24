@@ -12,7 +12,7 @@ import { QueryWMSService } from '../lib/portal-core-ui/service/wms/query-wms.ser
 import { SimpleXMLService } from '../lib/portal-core-ui/utility/simplexml.service';
 import { UtilitiesService } from '../lib/portal-core-ui/utility/utilities.service';
 import { CsMapObject } from '../lib/portal-core-ui/service/cesium-map/cs-map-object';
-import { ResourceType, GeometryType } from '../lib/portal-core-ui/utility/constants.service';
+import { ResourceType } from '../lib/portal-core-ui/utility/constants.service';
 import {
   Cartesian3, MapMode2D, Math, ScreenSpaceEventHandler, SceneMode, ScreenSpaceEventType, Rectangle, SplitDirection,
   Cartesian2, WebMapServiceImageryProvider, WebMercatorProjection, Cartographic, GeographicProjection

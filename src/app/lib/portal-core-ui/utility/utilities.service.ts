@@ -468,7 +468,7 @@ export class UtilitiesService {
      * filter object into a HttpParams
      * @param httpParam the httpParam to set the parameters
      */
-    public static convertObjectToHttpParam(httpParam: HttpParams, paramObject: Object): HttpParams {
+    public static convertObjectToHttpParam(httpParam: HttpParams, paramObject: object): HttpParams {
       // https://github.com/angular/angular/pull/18490 (this is needed to parse object into parameter
       if(paramObject && paramObject['optionalFilters']) {
         let first = true;

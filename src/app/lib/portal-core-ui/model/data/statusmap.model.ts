@@ -9,7 +9,7 @@ export class StatusMapModel {
   private total: number;
   private completed: number;
   private completePercentage: string;
-  public resourceMap: Object;
+  public resourceMap: object;
   private renderComplete: boolean;
   private renderStarted: boolean;
   private errorMessage: string;

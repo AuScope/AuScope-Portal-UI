@@ -16,7 +16,7 @@ export class FilterService {
     // Collection of filters (filterCollection) for a given layer
     private layerFilterCollections: Map<string, BehaviorSubject<any>> = new Map<string, BehaviorSubject<any>>();
     // Providers for a given layer
-    private layerProviders: Map<string, BehaviorSubject<Array<Object>>> = new Map<string, BehaviorSubject<Array<Object>>>();
+    private layerProviders: Map<string, BehaviorSubject<Array<object>>> = new Map<string, BehaviorSubject<Array<object>>>();
     // Layer times retrieved from GetCaps
     private layerTimes: Map<string, BehaviorSubject<LayerTimes>> = new Map<string, BehaviorSubject<LayerTimes>>();
 
@@ -61,7 +61,7 @@ export class FilterService {
      * @returns the existing providers as an Observable array if they have already been registered,
      *          or a new providers array otherwise
      */
-    public registerLayerProviders(layer: LayerModel): Observable<Array<Object>> {
+    public registerLayerProviders(layer: LayerModel): Observable<Array<object>> {
         const existingLayerProviders = this.layerProviders.get(layer.id);
         if (!existingLayerProviders) {
             const layerProviders = [];
@@ -84,7 +84,7 @@ export class FilterService {
                     value: contactOrgsMap[key]
                 });
             }
-            const layerProvidersBS: BehaviorSubject<Array<Object>> = new BehaviorSubject(layerProviders);
+            const layerProvidersBS: BehaviorSubject<Array<object>> = new BehaviorSubject(layerProviders);
             this.layerProviders.set(layer.id, layerProvidersBS);
             return layerProvidersBS;
         }

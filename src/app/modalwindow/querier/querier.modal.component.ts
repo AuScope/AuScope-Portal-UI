@@ -49,7 +49,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   public uniqueLayerNames: string[] = [];
   public selectLayerNameFilter = 'ALL';
   public analyticMap;
-  public tab: {};
+  public tab: object;
   public bToClipboard = false;
   public hasMsclAnalytics = false; // Display 'Analytics' tab to analyse GML observation
   public selectedNode: string;

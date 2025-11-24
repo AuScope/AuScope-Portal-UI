@@ -22,7 +22,7 @@ export class DataExplorerRecordComponent implements OnInit {
   @Input() cswRecord: CSWRecordModel;
   @Input() layer: LayerModel;
 
-  public optionalFilters: Array<Object>;
+  public optionalFilters: Array<object>;
 
   constructor(
     private dataExplorerService: DataExplorerService,

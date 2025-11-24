@@ -17,7 +17,7 @@ declare let Cesium;
 @Injectable()
 export class CsMapObject {
 
-  private groupLayer: {};
+  private groupLayer: object;
   private clickHandlerList: ((p: any) => void)[] = [];
   private ignoreMapClick = false;
   private polygonEditable$: PolygonEditorObservable;

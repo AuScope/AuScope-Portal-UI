@@ -42,7 +42,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
 
   @Input() layer: LayerModel;
   private providers: Array<Object>;
-  public optionalFilters: Array<Object>; // Optional filters currently rendered by this component
+  public optionalFilters: Array<object>; // Optional filters currently rendered by this component
   public selectedFilter;
   public advancedParam = [];
   public analyticMap;
@@ -195,7 +195,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
    * @param filter the filter to test
    * @returns true if the filter contains a valid value
    */
-  private filterHasValue(filter: Object): boolean {
+  private filterHasValue(filter: object): boolean {
     let hasValue = false;
     if (filter['type'] === 'OPTIONAL.PROVIDER') {
       for (const provider in filter['value']) {
@@ -297,11 +297,11 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
     });
   }
 
-  public getKey(options: Object): string {
+  public getKey(options: object): string {
     return UtilitiesService.getKey(options);
   }
 
-  public getValue(options: Object): string {
+  public getValue(options: object): string {
     return UtilitiesService.getValue(options);
   }
 

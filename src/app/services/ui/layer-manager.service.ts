@@ -81,7 +81,7 @@ export class LayerManagerService {
    * TODO: FilterPanel is only place bounding box filter can currently be set, better to shift flag to FilterService
    * and apply here when it's needed to adding from SearchPanel etc. will apply filter as well
    */
-  public addLayer(layer: LayerModel, optionalFilters: Array<Object>, layerFilterCollection: any, layerTime: Date) {
+  public addLayer(layer: LayerModel, optionalFilters: Array<object>, layerFilterCollection: any, layerTime: Date) {
     if (environment.googleAnalyticsKey && typeof gtag === 'function') {
       gtag('event', 'Addlayer', {
         event_category: 'Addlayer',
@@ -177,7 +177,7 @@ export class LayerManagerService {
    * @param filter the filter to test
    * @returns true if the filter contains a valid value
    */
-  private filterHasValue(filter: Object): boolean {
+  private filterHasValue(filter: object): boolean {
     let hasValue = false;
     if (filter['type'] === 'OPTIONAL.PROVIDER') {
       for (const provider in filter['value']) {
