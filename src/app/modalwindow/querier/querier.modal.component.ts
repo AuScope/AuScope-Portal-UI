@@ -307,7 +307,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     // set all the "tabs" to display:none - ie hidden
     const tabcontent = document.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
-      tabcontent[i].style.display = "none";
+      (tabcontent[i] as HTMLElement).style.display = "none";
     }
     const tablinks = document.getElementsByClassName("tablinks");
     for (i = 0; i < tablinks.length; i++) {
