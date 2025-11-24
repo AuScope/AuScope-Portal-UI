@@ -54,7 +54,7 @@
         "@typescript-eslint/consistent-type-definitions": ["warn", "interface"],
         "@typescript-eslint/no-empty-function": "warn",
         "@typescript-eslint/ban-types": "warn",
-        "@typescript-eslint/no-this-alias": "warn",
+        "@typescript-eslint/no-this-alias": ["warn", {"allowedNames": ["me"]}],
         // Unfortunately this flags every single void method not marked as void
         "@typescript-eslint/explicit-module-boundary-types": "off",
         // This one causes almost every file to error due to "standalone: false: which isn't recommended in Angular 19
