@@ -6,6 +6,7 @@ import { UtilitiesService } from '../../../../lib/portal-core-ui/utility/utiliti
 import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
 import { environment } from 'environments/environment';
 import { config } from 'environments/config';
+import { ResourceType } from '../../../../lib/portal-core-ui/utility/constants.service';
 
 @Component({
     selector: 'info-sub-panel',
@@ -85,7 +86,7 @@ export class InfoPanelSubComponent implements OnInit {
      * @returns true if OnlineResource is of type WMS, WFS, WCS or CSW
      */
     public isGetCapabilitiesType(onlineResource: OnlineResourceModel): boolean {
-        return onlineResource.type === 'WMS' || onlineResource.type === 'WFS' || onlineResource.type === 'WCS' || onlineResource.type === 'CSW';
+        return onlineResource.type === ResourceType.WMS || onlineResource.type === ResourceType.WFS || onlineResource.type === ResourceType.WCS || onlineResource.type === ResourceType.CSW;
     }
 
     /** Removes proxy from URL for display purposes

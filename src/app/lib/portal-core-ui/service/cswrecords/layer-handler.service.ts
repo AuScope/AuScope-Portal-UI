@@ -39,7 +39,7 @@ export class LayerHandlerService {
           map(response => {
             const newLayerRecord = {};
             const cswRecord = response['data'];
-            cswRecord.forEach(function(item, i, ar) {
+            cswRecord.forEach(function(item, _i, _ar) {
               if (newLayerRecord[item.group] === undefined) {
                 newLayerRecord[item.group] = [];
               }
@@ -97,7 +97,7 @@ export class LayerHandlerService {
       const itemLayers: LayerModel[] = [];
       const cswRecord = response['data']['cswRecords'];
       if (cswRecord) {
-        cswRecord.forEach(function (item, i, ar) {
+        cswRecord.forEach(function (item, _i, _ar) {
             const itemLayer = new LayerModel();
             itemLayer.cswRecords = [item];
             itemLayer['expanded'] = false;
@@ -132,7 +132,7 @@ export class LayerHandlerService {
    * @param name Name of custom KML layer
    * @returns LayerModel object
    */
-  public makeCustomKMLLayerRecord(name: string, url: string, kmlDoc: {}): LayerModel {
+  public makeCustomKMLLayerRecord(name: string, url: string, kmlDoc: object): LayerModel {
     const id = 'KML_' + name.substring(0, 10) + '_' + Math.floor(Math.random() * 10000).toString();
     const itemLayer = new LayerModel();
     const cswRec = this.makeCustomKMLCSWRec(name, id, url);
@@ -154,7 +154,7 @@ export class LayerHandlerService {
    * @param name Name of custom GEOJSON layer
    * @returns LayerModel object
    */
-  public makeCustomGEOJSONLayerRecord(name: string, url: string, jsonDoc: {}): LayerModel {
+  public makeCustomGEOJSONLayerRecord(name: string, url: string, jsonDoc: object): LayerModel {
     const id = 'GEOJSON_' + name;
     const itemLayer = new LayerModel();
     const cswRec = this.makeCustomJsonCSWRec(name, id, url);
@@ -176,7 +176,7 @@ export class LayerHandlerService {
    * @param name Name of custom KMZ layer
    * @returns LayerModel object
    */
-    public makeCustomKMZLayerRecord(name: string, url: string, kmzDoc: {}): LayerModel {
+    public makeCustomKMZLayerRecord(name: string, url: string, kmzDoc: object): LayerModel {
       const id = 'KMZ_' + name.substring(0, 10) + '_' + Math.floor(Math.random() * 10000).toString();
       const itemLayer = new LayerModel();
       const cswRec = this.makeCustomKMZCSWRec(name, id, url);
@@ -219,7 +219,7 @@ export class LayerHandlerService {
     cswRec.id = id;
     cswRec.name = name;
     cswRec.noCache = true;
-    const ormRec = this.makeCustomOnlineResourceModel('KMZ', name, url);
+    const ormRec = this.makeCustomOnlineResourceModel(ResourceType.KMZ, name, url);
     cswRec.onlineResources = [ormRec];
     cswRec.recordInfoUrl = '';
     cswRec.resourceProvider = '';
@@ -254,7 +254,7 @@ export class LayerHandlerService {
     cswRec.id = id;
     cswRec.name = name;
     cswRec.noCache = true;
-    const ormRec = this.makeCustomOnlineResourceModel('KML', name, url);
+    const ormRec = this.makeCustomOnlineResourceModel(ResourceType.KML, name, url);
     cswRec.onlineResources = [ormRec];
     cswRec.recordInfoUrl = '';
     cswRec.resourceProvider = '';
@@ -288,7 +288,7 @@ export class LayerHandlerService {
     cswRec.id = id;
     cswRec.name = name;
     cswRec.noCache = true;
-    const ormRec = this.makeCustomOnlineResourceModel('GEOJSON', name, url);
+    const ormRec = this.makeCustomOnlineResourceModel(ResourceType.GEOJSON, name, url);
     cswRec.onlineResources = [ormRec];
     cswRec.recordInfoUrl = '';
     cswRec.resourceProvider = '';
@@ -302,7 +302,7 @@ export class LayerHandlerService {
    * @param name name of layer
    * @returns OnlineResourceModel object
    */
-  public makeCustomOnlineResourceModel(type: string, name: string, url: string): OnlineResourceModel {
+  public makeCustomOnlineResourceModel(type: ResourceType, name: string, url: string): OnlineResourceModel {
     const ormRec = new OnlineResourceModel();
     ormRec.applicationProfile = '';
     ormRec.description = '';

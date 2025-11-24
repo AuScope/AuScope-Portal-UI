@@ -93,7 +93,7 @@ export class DownloadPanelComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.layer.group === 'Passive Seismic' && this.layer.cswRecords[0].onlineResources[1]?.type === 'DOI') {
+    if (this.layer.group === 'Passive Seismic' && this.layer.cswRecords[0].onlineResources[1]?.type === ResourceType.DOI) {
       this.showDOIs = true;
     }
     if (this.layer) {

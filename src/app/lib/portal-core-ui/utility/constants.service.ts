@@ -19,7 +19,9 @@ export enum ResourceType {
   WFS = "WFS",
   WCS = "WCS",
   WWW = "WWW",
-  GEOJSON = "GEOJSON"
+  GEOJSON = "GEOJSON",
+  DOI = "DOI",
+  CSW = "CSW"
 }
 
 export enum GeometryType {
