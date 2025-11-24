@@ -13,9 +13,7 @@ declare let RenderControls: any;
 @Injectable()
 export class RickshawService {
 
-  constructor() {}
-
-  public _findLogName(bvLogId, logIds, logNames) {
+  public _findLogName(bvLogId: string, logIds: Array<string>, logNames: Array<string>) {
     let logIdx = 0;
     while (logIdx < logIds.length) {
       if (logIds[logIdx] === bvLogId) {
@@ -26,15 +24,15 @@ export class RickshawService {
     return '';
   }
 
-  public _colourConvert(BGRColorNumber) {
+  public _colourConvert(BGRColorNumber: number) {
     return '#' + UtilitiesService.leftPad((BGRColorNumber & 255).toString(16), 2, '0') +
       UtilitiesService.leftPad(((BGRColorNumber & 65280) >> 8).toString(16), 2, '0') +
       UtilitiesService.leftPad((BGRColorNumber >> 16).toString(16), 2, '0');
   }
 
 
-  public drawNVCLDataGraph(response, logIds, logNames) {
-    const this_ptr = this;
+  public drawNVCLDataGraph(response: string, logIds: Array<string>, logNames: Array<string>) {
+    const me = this;
     // Once we have received the plot data, reformat it into (x,y) values and create colour table
     const metric_colours = new Object;
     const data_bin = new Object;
@@ -50,7 +48,7 @@ export class RickshawService {
           ['stringValues', 'numericValues'].forEach(function(dataType) {
         if (bv.hasOwnProperty(dataType) && bv[dataType].length > 0) {
           // Find the log name for our log id, this will be our 'metric_name'
-          const metric_name = this_ptr._findLogName(bv.logId, logIds, logNames);
+          const metric_name = me._findLogName(bv.logId, logIds, logNames);
           if (metric_name.length > 0) {
             if (!(metric_name in data_bin)) {
               data_bin[metric_name] = new Object;
@@ -62,7 +60,7 @@ export class RickshawService {
                 const key = val.classText;
                 // Use the supplied colour for each metric
                 if (!(key in metric_colours)) {
-                  metric_colours[key] = this_ptr._colourConvert(val.colour);
+                  metric_colours[key] = me._colourConvert(val.colour);
                 }
 
                 // Start to create graphing data
@@ -125,7 +123,7 @@ export class RickshawService {
               data_bin[metric_name] = new Object;
             }
 
-              bv[dataType].forEach(function(val, idx, arr) {
+              bv[dataType].forEach(function(val, idx, _arr) {
 
               // "stringValues" ==> units are called "Sample Count" and "numericValues" ==> "Meter Average"
               if (dataType === 'stringValues') {
@@ -207,7 +205,7 @@ export class RickshawService {
     let depth_list = [];
 
     d3.keys(data_bin).forEach(function(dataType) {
-      const temp_depth_list = [].concat.apply([], d3.values(data_bin[dataType])).map(function(a) {return a.x; });
+      const temp_depth_list = [].concat(...d3.values(data_bin[dataType])).map(a => a.x);
       depth_list = depth_list.concat(temp_depth_list);
     });
     const global_depth_set = d3.set(depth_list);
@@ -235,7 +233,7 @@ export class RickshawService {
     const max_y_val = new Object;
     const min_y_val = new Object;
     d3.keys(data_bin).forEach(function(dataType) {
-      const temp_y_list = [].concat.apply([], d3.values(data_bin[dataType])).map(function(a) {return a.y; });
+      const temp_y_list = [].concat(...d3.values(data_bin[dataType])).map(a => a.y);
       max_y_val[dataType] = d3.max(temp_y_list);
       min_y_val[dataType] = d3.min(temp_y_list);
     });
@@ -274,7 +272,7 @@ export class RickshawService {
     };
 
     // Draw each graph
-    yaxis_keys.forEach(function(yaxis_key, idx, arr) {
+    yaxis_keys.forEach(function(yaxis_key, idx, _arr) {
 
       // Create an array of all the X-values for the graph, values must be sorted by x-value
       const seriesX = [];
@@ -318,12 +316,12 @@ export class RickshawService {
       graph_list.push(graph);
 
       // Set up a popup box with shows upon mouseover
-      const hoverDetail = new Rickshaw.Graph.HoverDetail({
+      const _hoverDetail = new Rickshaw.Graph.HoverDetail({
         graph: graph,
         formatter: function(series, x, y) {
           return series.name + ': ' + x.toString() + ',' + y.toString();
         },
-        xFormatter: function(x) {return null; } // This stops annoying times hovering at the top of the graph
+        xFormatter: function(_x) {return null; } // This stops annoying times hovering at the top of the graph
       });
 
       // Create a legend, listing all the metrics
@@ -333,19 +331,19 @@ export class RickshawService {
       });
 
       // Can turn on/off a metric by clicking on its name in the legend
-      const shelving = new Rickshaw.Graph.Behavior.Series.Toggle({
+      const _shelving = new Rickshaw.Graph.Behavior.Series.Toggle({
         graph: graph,
         legend: legend
       });
 
       // Can re-order the metric in the legend, and it will be reflected in the graph
-      const order = new Rickshaw.Graph.Behavior.Series.Order({
+      const _order = new Rickshaw.Graph.Behavior.Series.Order({
         graph: graph,
         legend: legend
       });
 
       // This makes the graph highlight the colours of a metric when mouseover the name of the metric in the legend
-      const highlighter = new Rickshaw.Graph.Behavior.Series.Highlight({
+      const _highlighter = new Rickshaw.Graph.Behavior.Series.Highlight({
         graph: graph,
         legend: legend
       });
@@ -353,7 +351,7 @@ export class RickshawService {
 
 
       // Graph's x-axis
-      const xAxis = new Rickshaw.Graph.Axis.X({
+      const _xAxis = new Rickshaw.Graph.Axis.X({
         graph: graph,
         width: 500,
         tickFormat: formatMetres,
@@ -363,7 +361,7 @@ export class RickshawService {
       });
 
       // Graph's y-axes
-      const yAxis = new Rickshaw.Graph.Axis.Y.Scaled({
+      const _yAxis = new Rickshaw.Graph.Axis.Y.Scaled({
         graph: graph,
         tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
         ticksTreatment: ticksTreatment,
@@ -405,7 +403,7 @@ export class RickshawService {
     }); // forEach yaxis_key
 
     // Render graph
-    graph_list.forEach(function (graph, idx, arr) {
+    graph_list.forEach(function (graph, idx, _arr) {
 
       // Create range slider underneath graphs
       const preview = new Rickshaw.Graph.RangeSlider.MultiPreview({
@@ -417,13 +415,13 @@ export class RickshawService {
       });
 
       // One set of controls for each graph
-      const controls = new RenderControls({
+      const _controls = new RenderControls({
         element: local_div.select('[id=left_side_panel_' + idx.toString() + ']').node(),
         graph: graph
       });
 
       // A slider which can be used to smooth out the peaks in the graph
-      const smoother = new Rickshaw.Graph.SmootherPlus({
+      const _smoother = new Rickshaw.Graph.SmootherPlus({
         graph: graph,
         element: local_div.select('[id=smoother_' + idx.toString() + ']').node()
       });
