@@ -10,7 +10,7 @@ import { RenderStatusService } from '../cesium-map/renderstatus/render-status.se
 import { UtilitiesService } from '../../utility/utilities.service';
 
 
-declare var Cesium;
+declare let Cesium;
 
 /**
  * Use Cesium to add layer to map. This service class adds GeoJSON layer to the map
@@ -83,7 +83,7 @@ export class CsGeoJsonService {
         }
         promise
           .then(function (dataSource) {
-            viewer.dataSources.add(dataSource);      
+            viewer.dataSources.add(dataSource);
             //Get the array of entities
             for (const entity of dataSource.entities.values) {
               // Style each geoJson point
@@ -95,7 +95,7 @@ export class CsGeoJsonService {
           })
           .catch(function (error) {
             window.alert(error);
-          });      
+          });
 
       }
     }

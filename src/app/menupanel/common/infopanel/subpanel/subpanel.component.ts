@@ -150,7 +150,7 @@ export class InfoPanelSubComponent implements OnInit {
         this.DOIname = '';
         let usesNCI = false;
         let foundDOI = false;
-        for (let onlineResource of this.cswRecord.onlineResources) {
+        for (const onlineResource of this.cswRecord.onlineResources) {
             // If uses NCI facilities then should include them as distributor
             if (onlineResource.url.includes('nci.org.au')) {
                 usesNCI = true;
@@ -234,7 +234,7 @@ export class InfoPanelSubComponent implements OnInit {
 
     /**
      * Catch the user click and copy citation to clipboard
-     * 
+     *
      * @param event click event
      */
     public copyCite(element: HTMLElement) {

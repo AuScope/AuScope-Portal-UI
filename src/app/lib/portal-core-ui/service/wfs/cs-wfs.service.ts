@@ -1,7 +1,7 @@
 
-import {throwError as observableThrowError,  Observable } from 'rxjs';
+import { throwError as observableThrowError, Observable } from 'rxjs';
 
-import {catchError, map} from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 
 import { Injectable, Inject } from '@angular/core';
 import { LayerModel } from '../../model/data/layer.model';
@@ -59,7 +59,7 @@ export class CsWFSService {
       (error: HttpResponse<any>) => {
           return observableThrowError(error);
         }
-      ), );
+      ),);
     }
   }
 

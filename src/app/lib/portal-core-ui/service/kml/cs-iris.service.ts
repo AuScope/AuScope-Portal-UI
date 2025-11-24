@@ -12,8 +12,8 @@ import { ResourceType } from '../../utility/constants.service';
 import { RenderStatusService } from '../cesium-map/renderstatus/render-status.service';
 
 // NB: Cannot use "import { XXX, YYY, ZZZ, Color } from 'cesium';" - it prevents initialising ContextLimits.js properly
-// which causes a 'DeveloperError' when trying to draw the KML 
-declare var Cesium;
+// which causes a 'DeveloperError' when trying to draw the KML
+declare let Cesium;
 
 /**
  * Use Cesium to add layer to map. This service class adds IRIS layer to the map
@@ -61,7 +61,7 @@ export class CsIrisService {
 
   /**
    * Retrieves station details including the channel information from the IRIS service
-   * 
+   *
    * @param layer the IRIS layer for the getfeature request to be made
    * @return Observable the observable from the http request
    */
@@ -71,20 +71,20 @@ export class CsIrisService {
       return this.getKMLFeature(layer).pipe(map(
         (response) => {
           const parser = new DOMParser();
-          let stationLst = []; // List of stations in a network
+          const stationLst = []; // List of stations in a network
           let minStartDate: string | number | Date = null; // Earliest start date for all stations in a network
           let maxEndDate: string | number | Date = null; // Latest end date for all stations in a network
           const dom = parser.parseFromString(response, "application/xml");
-          let placemarks = dom.querySelectorAll("Placemark");
+          const placemarks = dom.querySelectorAll("Placemark");
           // for each station
           placemarks.forEach(placemark => {
             let channelLst = []; // List of channels for a station
-            let extendedData = placemark.querySelector("ExtendedData").querySelectorAll("Data");
+            const extendedData = placemark.querySelector("ExtendedData").querySelectorAll("Data");
             let stationCode: string;
             let startDate: string | number | Date; // Start date for a station's data
             let endDate: string | number | Date; // End date for a station's data
             extendedData.forEach(data => {
-              let att = data.getAttribute('name');
+              const att = data.getAttribute('name');
               if (att == 'Code') {
                 stationCode = data.querySelector("value").textContent;
               }
@@ -98,7 +98,7 @@ export class CsIrisService {
             channelLst = this.parseChannelInfo(placemark);
 
             // Assemble a list of station information
-            let station = {
+            const station = {
               name: placemark.querySelector("name").textContent,
               description: placemark.querySelector("description").textContent,
               code: stationCode,
@@ -128,15 +128,15 @@ export class CsIrisService {
 
   /**
  * Parse to extract channel information
- * 
+ *
  * @param placemark Element representing the station part of the response
- * @return List of channels  
+ * @return List of channels
  */
   private parseChannelInfo(placemark: Element) {
-    let channelLst = [];
+    const channelLst = [];
     //extract channel information
-    let channels = placemark.querySelector("Channels")
-    let channelItems=channels?channels.querySelectorAll("Channel"):[];
+    const channels = placemark.querySelector("Channels")
+    const channelItems=channels?channels.querySelectorAll("Channel"):[];
     //for each channel
     channelItems.forEach(channel => {
       channelLst.push({
@@ -151,7 +151,7 @@ export class CsIrisService {
 
   /**
    * Retrieves KML features from the IRIS service via proxy/conversion service
-   * 
+   *
    * @param layer the IRIS layer for the getfeature request to be made
    * @return Observable the observable from the http request
    */
@@ -186,7 +186,7 @@ export class CsIrisService {
 
   /**
    * Private function to style the KML using Cesium's API
-   * @param entity 
+   * @param entity
    */
   private styleIrisEntity(entity) {
     if (entity.name) {
@@ -245,10 +245,10 @@ export class CsIrisService {
         };
         const stylefn = me.styleIrisEntity;
         // Create data source
-        let source = new Cesium.KmlDataSource(options);
+        const source = new Cesium.KmlDataSource(options);
 
         // Load KML
-        let selectedLayer = this.irisLayers.find(l => l.layerId === layer.id);
+        const selectedLayer = this.irisLayers.find(l => l.layerId === layer.id);
         source.load(dom).then(function (dataSource) {
           for (const entity of dataSource.entities.values) {
             entity['color'] = selectedLayer ? selectedLayer.color : Cesium.Color.CRIMSON;
@@ -285,7 +285,7 @@ export class CsIrisService {
     this.renderStatusService.resetLayer(layer.id)
   }
 
-  /** 
+  /**
    * Fetches Cesium 'Viewer'
   */
   private getViewer() {

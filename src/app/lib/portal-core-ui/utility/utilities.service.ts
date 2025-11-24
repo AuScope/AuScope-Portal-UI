@@ -11,7 +11,7 @@ import proj4 from "proj4";
 import epsg from "epsg-index/all.json";
 import { EpsgEntry } from "../types/epsg";
 declare function unescape(s: string): string;
-declare var Cesium;
+declare let Cesium;
 
 /**
  * Port over from old portal-core extjs for dealing with xml in wfs
@@ -100,7 +100,7 @@ export class UtilitiesService {
      * @param options - splitArgs - {Boolean} Split comma delimited params into arrays? Default is true
      */
     public static getUrlParameters(url: string, options?: any): any {
-        const localStringContain  = function(s, c) {
+        const localStringContain = function(s, c) {
             return s.indexOf(c) !== -1;
         };
         options = options || {};
@@ -205,7 +205,7 @@ export class UtilitiesService {
      * Get base from URL
      * e.g. "https://abc.bca.org/blagg?id=56&ty=78" -> "https://abc.bca.org"
      *
-     * @param url 
+     * @param url
      */
     public static getBaseUrl(url): string {
         const splitUrl = url.split('://');
@@ -227,7 +227,7 @@ export class UtilitiesService {
         for (idx in params) {
             if (params[idx].type === 'OPTIONAL.PROVIDER') {
                 containProviderFilter = true;
-                for (domain in params[idx].value ) {
+                for (domain in params[idx].value) {
                     if (params[idx].value[domain] && url.indexOf(domain) !== -1) {
                         urlMatch = true;
                     }
@@ -250,7 +250,7 @@ export class UtilitiesService {
      * @return unique count by url
      */
     public static uniqueCountOfResourceByUrl(onlineResources: { [key: string]: any; }): number {
-        const unique =  {};
+        const unique = {};
 
         for (const key in onlineResources) {
            unique[onlineResources[key].url] = true;
@@ -368,7 +368,7 @@ export class UtilitiesService {
         let c = 0, c2 = 0, c3 = 0;
         const c1 = 0;
 
-        while ( i < utftext.length ) {
+        while (i < utftext.length) {
 
             c = utftext.charCodeAt(i);
 
@@ -509,7 +509,7 @@ export class UtilitiesService {
      * @param filter The full filter
      */
     public static getPolygonFilter(filter: string) {
-        return filter.slice( filter.indexOf('<ogc:Intersects>') , filter.indexOf('</ogc:Intersects>') + '</ogc:Intersects>'.length);
+        return filter.slice(filter.indexOf('<ogc:Intersects>') , filter.indexOf('</ogc:Intersects>') + '</ogc:Intersects>'.length);
     }
 
     /**
@@ -548,15 +548,15 @@ export class UtilitiesService {
      * Return the browser type.
      */
     public static getBrowserName(): string {
-        if ((navigator.userAgent.indexOf('Opera') || navigator.userAgent.indexOf('OPR')) !== -1 ) {
+        if ((navigator.userAgent.indexOf('Opera') || navigator.userAgent.indexOf('OPR')) !== -1) {
             return 'Opera';
-        } else if (navigator.userAgent.indexOf('Chrome') !== -1 ){
+        } else if (navigator.userAgent.indexOf('Chrome') !== -1){
             return 'Chrome';
         } else if (navigator.userAgent.indexOf('Safari') !== -1){
             return 'Safari';
-        } else if (navigator.userAgent.indexOf('Firefox') !== -1 ) {
+        } else if (navigator.userAgent.indexOf('Firefox') !== -1) {
              return 'Firefox';
-        } else if (navigator.userAgent.indexOf('MSIE') !== -1 ){
+        } else if (navigator.userAgent.indexOf('MSIE') !== -1){
           return 'IE';
         } else {
            return 'unknown';
@@ -638,7 +638,7 @@ export class UtilitiesService {
 
   /**
    * Convert bbox coordinates to a desired CRS
-   * 
+   *
    * @param bbox bounding box
    * @param crs desired coord ref system e.g. 'EPSG:12345'
    * @returns Bbox
@@ -742,7 +742,7 @@ export class UtilitiesService {
       for (const record of layer.cswRecords) {
         if (record.geographicElements?.length > 0) {
           for (const geoElement of record.geographicElements) {
-            if (geoElement.type && geoElement.type === 'bbox' && 
+            if (geoElement.type && geoElement.type === 'bbox' &&
                 geoElement.northBoundLatitude && geoElement.eastBoundLongitude &&
                 geoElement.southBoundLatitude && geoElement.westBoundLongitude) {
               return true;

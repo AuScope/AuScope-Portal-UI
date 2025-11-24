@@ -42,7 +42,7 @@ export class StyleService {
      * @return XML 'sld:Filter' string
      */
     public static getFilter(propName: string, litName: string, noNS: boolean): string {
-        const isEqualTo = (body: string) => [noNS?'PropertyIsEqualTo':'ogc:PropertyIsEqualTo', {'matchCase': 'false'}, body];
+        const isEqualTo = (body: string) => [noNS?'PropertyIsEqualTo':'ogc:PropertyIsEqualTo', { 'matchCase': 'false' }, body];
         const propertyName = (propName: string) => [noNS?'PropertyName':'ogc:PropertyName', null, propName];
         const literal = (litName: string) => [noNS?'Literal':'ogc:Literal', null, litName];
         const body = serialize(propertyName(propName)) + serialize(literal(litName));

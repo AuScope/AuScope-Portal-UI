@@ -1,6 +1,6 @@
 import { CSWRecordModel } from '../../model/data/cswrecord.model';
 import { Injectable, Inject } from '@angular/core';
-import {BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { point } from '@turf/helpers';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import bboxPolygon from '@turf/bbox-polygon';
@@ -15,12 +15,12 @@ import { CsKMLService } from '../kml/cs-kml.service';
 import { CsVMFService } from '../vmf/cs-vmf.service';
 import { MapsManagerService, RectangleEditorObservable, EventRegistrationInput, CesiumEvent, EventResult } from '@auscope/angular-cesium';
 import { Entity, ProviderViewModel, buildModuleUrl, OpenStreetMapImageryProvider, BingMapsStyle, BingMapsImageryProvider,
-         ArcGisMapServerImageryProvider, Cartesian2, WebMercatorProjection,  SplitDirection, 
-         Rectangle} from 'cesium';
+         ArcGisMapServerImageryProvider, Cartesian2, WebMercatorProjection, SplitDirection,
+         Rectangle } from 'cesium';
 import { UtilitiesService } from '../../utility/utilities.service';
 import ImageryLayerCollection from 'cesium/Source/Scene/ImageryLayerCollection';
 import { CsGeoJsonService } from '../geojson/cs-geojson.service';
-declare var Cesium: any;
+declare let Cesium: any;
 
 /**
  * Wrapper class to provide all things related to the drawing of polygons and bounding boxes in CesiumJS
@@ -44,7 +44,7 @@ export class CsMapService {
               private csCSWService: CsCSWService, private csIrisService: CsIrisService,
               private csKMLService: CsKMLService, private mapsManagerService: MapsManagerService,
               private csVMFService: CsVMFService, private csGeoJsonService: CsGeoJsonService,
-              @Inject('env') private env, @Inject('conf') private conf)  {
+              @Inject('env') private env, @Inject('conf') private conf) {
     this.csMapObject.registerClickHandler(this.mapClickHandler.bind(this));
     this.addLayerSubject = new Subject<LayerModel>();
   }
@@ -143,7 +143,7 @@ export class CsMapService {
         for (let i = 0; i < cswRecords.length; i++) {
           let bboxes = [];
           // Look for 'geographicElements' in 'onlineResource's
-          if (cswRecords[i].onlineResources.length > 0 && 
+          if (cswRecords[i].onlineResources.length > 0 &&
               cswRecords[i].onlineResources[0].hasOwnProperty('geographicElements') &&
               cswRecords[i].onlineResources[0].geographicElements.length > 0) {
             // Only take the first one, assuming all the onlineresoures have the same bbox
@@ -224,7 +224,7 @@ export class CsMapService {
 
   /**
    * Updates this service's layer models with new filter values so they can be displayed
-   * 
+   *
    * @param layerId id string of layer
    * @param optionalFilters list of optional filters to be enabled
    */
@@ -244,11 +244,11 @@ export class CsMapService {
       }
     }
   }
-  
+
   /**
    * Add a layer to the map. Calls other 'addLayer' functions according to the resource type
    * e.g. WMS, CSW, KML ...
-   * 
+   *
    * @param layer the layer to add to the map
    */
   public addLayer(layer: LayerModel, param: any): void {
@@ -286,7 +286,7 @@ export class CsMapService {
       // Add a GeoJson layer to map
       this.csGeoJsonService.addLayer(layer, param);
       this.cacheLayerModelList(layer);
-    } 
+    }
     // Stu: be sure to leave whole blocks commented out until implemented or records with these resources will
     //      fire before hitting the catch-all CSW element below which should always remain the last in the chain
     /*
@@ -473,7 +473,7 @@ export class CsMapService {
    */
   public layerHasOpacity(layer: LayerModel): boolean {
     if (this.layerExists(layer.id)) {
-      if (UtilitiesService.layerContainsResourceType(layer, ResourceType.WMS) || 
+      if (UtilitiesService.layerContainsResourceType(layer, ResourceType.WMS) ||
           UtilitiesService.layerContainsBboxGeographicElement(layer)) {
         return true;
       }

@@ -32,7 +32,7 @@ export class CsWWWService {
 
 
   public addPolygon(layer: LayerModel, cswRecord: CSWRecordModel, primitive: PrimitiveModel): void {
-  
+
     // FIXME Use cs map service & cesium to add a polgon
   }
 

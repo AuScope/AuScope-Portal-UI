@@ -13,7 +13,7 @@ const POLYGON_ALPHA = 0.4;
 // Colour of the CSW bounding box rectangles
 const POLYGON_COLOUR = new Color(0.0, 0.0, 1.0, POLYGON_ALPHA);
 
-// Colour of the font and background used to label the CSW rectangles on the map 
+// Colour of the font and background used to label the CSW rectangles on the map
 const LABEL_COLOUR = Color.ANTIQUEWHITE;
 const LABEL_BACKGROUND_COLOUR = Color.BLACK;
 
@@ -29,14 +29,14 @@ export class CsCSWService {
 
   private map: AcMapComponent = null;
   private viewer: any = null;
-  
+
 
   constructor(private layerHandlerService: LayerHandlerService,
-                  private renderStatusService: RenderStatusService, 
+                  private renderStatusService: RenderStatusService,
                   private mapsManagerService: MapsManagerService) {
   }
 
-  
+
   /**
    * rmLayer - remove layer from map
    * @param layer layer to be removed
@@ -56,7 +56,7 @@ export class CsCSWService {
   /**
    * setLayerOpacity - sets opacity for a given layer
    * @param layer the LayerModel
-   * @param opacity value from 0.0 to 1.0 
+   * @param opacity value from 0.0 to 1.0
    */
   public setLayerOpacity(layer, opacity: number) {
     for (const entity of layer.csLayers) {
@@ -71,7 +71,7 @@ export class CsCSWService {
 
   /**
    * addLabel - adds a label to screen
-   * @param name - name to be put on label 
+   * @param name - name to be put on label
    * @param lon - longitude in degrees
    * @param lat - latitude in degrees
    */
@@ -79,7 +79,7 @@ export class CsCSWService {
     return this.viewer.entities.add({
       position : Cartesian3.fromDegrees(lon, lat),
       label : {
-          text : name.substring(0,70),  // Label only displays first 70 characters
+          text : name.substring(0,70), // Label only displays first 70 characters
           font : '16px sans-serif',
           fillColor:  LABEL_COLOUR,
           showBackground : true,
@@ -93,7 +93,7 @@ export class CsCSWService {
 
   /**
    * addPolygon - adds a polygon to screen
-   * @param name - name to be put on label 
+   * @param name - name to be put on label
    * @param bbox - bounding box object; members: westBoundLongitude, southBoundLatitude, eastBoundLongitude, northBoundLatitude
    */
   private addPolygon(name, bbox): Entity {
@@ -102,7 +102,7 @@ export class CsCSWService {
       rectangle: {
         coordinates: Rectangle.fromDegrees(
           bbox.westBoundLongitude, // West
-          bbox.southBoundLatitude,  // South
+          bbox.southBoundLatitude, // South
           bbox.eastBoundLongitude, // East
           bbox.northBoundLatitude // North
         ),

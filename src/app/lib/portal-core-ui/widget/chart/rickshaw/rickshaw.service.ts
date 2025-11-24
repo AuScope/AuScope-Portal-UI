@@ -1,9 +1,9 @@
 import { UtilitiesService } from '../../../utility/utilities.service';
 import { Injectable } from '@angular/core';
 
-declare var d3: any;
-declare var Rickshaw: any;
-declare var RenderControls: any;
+declare let d3: any;
+declare let Rickshaw: any;
+declare let RenderControls: any;
 
 /**
  * Service class to handle rendering of rickshaw chart
@@ -75,7 +75,7 @@ export class RickshawService {
                 }
 
                 // Depth is 'x' and 'y' is our measured value
-                    data_bin[metric_name][key].push({'x': parseFloat(val.roundedDepth), 'y': parseFloat(val.classCount)});
+                    data_bin[metric_name][key].push({ 'x': parseFloat(val.roundedDepth), 'y': parseFloat(val.classCount) });
                 has_data = true;
 
               } else if (dataType === 'numericValues') {
@@ -88,7 +88,7 @@ export class RickshawService {
                   }
                 }
                 // Depth is 'x' and 'y' is our measured value
-                    data_bin[metric_name][metric_name].push({'x': parseFloat(val.roundedDepth), 'y': parseFloat(val.averageValue)});
+                    data_bin[metric_name][metric_name].push({ 'x': parseFloat(val.roundedDepth), 'y': parseFloat(val.averageValue) });
                 has_data = true;
               } // if
             }); // for each
@@ -158,7 +158,7 @@ export class RickshawService {
                   }
 
                   // Depth is 'x' and 'y' is our measured value
-                    data_bin[metric_name][key].push({'x': parseFloat(bv.startDepths[idx]), 'y': parseFloat(meas.value)});
+                    data_bin[metric_name][key].push({ 'x': parseFloat(bv.startDepths[idx]), 'y': parseFloat(meas.value) });
                   has_data = true;
 
                 });
@@ -172,7 +172,7 @@ export class RickshawService {
                   }
                 }
                 // Depth is 'x' and 'y' is our measured value
-                  data_bin[metric_name][metric_name].push({'x': parseFloat(bv.startDepths[idx]), 'y': parseFloat(val)});
+                  data_bin[metric_name][metric_name].push({ 'x': parseFloat(bv.startDepths[idx]), 'y': parseFloat(val) });
                 has_data = true;
               } // if
             }); // for each
@@ -225,7 +225,7 @@ export class RickshawService {
           // console.log("db_val JSON: "+JSON.stringify(data_bin[dataType][db_key]));
           const local_depth_set = d3.set(local_depth_list);
           if (!local_depth_set.has(global_depth)) {
-            data_bin[dataType][db_key].push({'x': parseFloat(global_depth), 'y': 0.0});
+            data_bin[dataType][db_key].push({ 'x': parseFloat(global_depth), 'y': 0.0 });
           }
         });
       });
@@ -397,7 +397,7 @@ export class RickshawService {
       }; // end of callback function
 
       // Configure graph. Input the starting values. These must match the HTML radio buttons etc. above.
-      graph.configure({'renderer': 'bar', 'interpolation': 'cardinal', 'unstack': false, 'offset': 'zero'});
+      graph.configure({ 'renderer': 'bar', 'interpolation': 'cardinal', 'unstack': false, 'offset': 'zero' });
 
       // Register routine to redraw labels upon graph update
       graph.onUpdate(render_labels);

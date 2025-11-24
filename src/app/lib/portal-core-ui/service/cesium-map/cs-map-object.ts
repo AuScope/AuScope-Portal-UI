@@ -1,7 +1,7 @@
 import { RenderStatusService } from './renderstatus/render-status.service';
 import { UtilitiesService } from '../../utility/utilities.service';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject} from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { EditActions, MapsManagerService, PolygonEditorObservable, PolygonEditUpdate, PolygonsEditorService,
          RectangleEditorObservable, RectanglesEditorService } from '@auscope/angular-cesium';
 import { Camera, Cartesian2, Cartesian3, Color, ColorMaterialProperty, Ellipsoid, SceneMode, ScreenSpaceEventHandler,
@@ -9,7 +9,7 @@ import { Camera, Cartesian2, Cartesian3, Color, ColorMaterialProperty, Ellipsoid
 import { LayerModel } from '../../model/data/layer.model';
 import { MapState } from '../../model/data/mapstate.model';
 
-declare var Cesium;
+declare let Cesium;
 
 /**
  * A wrapper around the cesium object for use in the portal.
@@ -18,7 +18,7 @@ declare var Cesium;
 export class CsMapObject {
 
   private groupLayer: {};
-  private clickHandlerList: ((p: any) => void )[] = [];
+  private clickHandlerList: ((p: any) => void)[] = [];
   private ignoreMapClick = false;
   private polygonEditable$: PolygonEditorObservable;
   public isDrawingPolygonBS = new BehaviorSubject<boolean>(false);
@@ -30,9 +30,9 @@ export class CsMapObject {
 
   /**
    * Process a map click event by calling click event handlers and passing in map click coordinates
-   * 
+   *
    * @param p map click coordinates
-   * @returns 
+   * @returns
    */
   public processClick(p: number[]) {
      if (this.ignoreMapClick) {
@@ -47,13 +47,13 @@ export class CsMapObject {
    * Register a click handler callback function which is called when there is a click event
    * @param clickHandler callback function, input parameter is the pixel coords that were clicked on
    */
-  public registerClickHandler( clickHandler: (p: number[]) => void) {
+  public registerClickHandler(clickHandler: (p: number[]) => void) {
     this.clickHandlerList.push(clickHandler);
   }
 
   /**
    * Returns [width, height] of canvas in pixels
-   * 
+   *
    * @returns [width, height] of canvas
    */
   public getViewSize(): [number, number] {
@@ -63,7 +63,7 @@ export class CsMapObject {
 
   /**
    * Get the current state of the map in an object containing the camera state and scene mode
-   * 
+   *
    * @returns a MapState object
    */
    public getCurrentMapState(): MapState {
@@ -82,7 +82,7 @@ export class CsMapObject {
 
   /**
    * Given the state of the map in an object, resume the map in the given state
-   * 
+   *
    * @param mapState The state of the map in simple JSON
    */
    public resumeMapState(mapState: any) {
@@ -103,7 +103,7 @@ export class CsMapObject {
     const width = viewer.canvas.width;
     const height = viewer.canvas.height;
     const posWS = viewer.camera.pickEllipsoid(new Cesium.Cartesian2(1, height), Cesium.Ellipsoid.WGS84);
-    const posEN = viewer.camera.pickEllipsoid(new Cesium.Cartesian2(width, 1 ), Cesium.Ellipsoid.WGS84);
+    const posEN = viewer.camera.pickEllipsoid(new Cesium.Cartesian2(width, 1), Cesium.Ellipsoid.WGS84);
     let distPerPixel = 0.01; // 1.11km
     if (posWS != null && posEN != null) {
       const cartographicWS = viewer.scene.globe.ellipsoid.cartesianToCartographic(posWS);
@@ -119,15 +119,15 @@ export class CsMapObject {
 
   /**
    * A bounding box of the view area in 3d Cartesian map coordinates
-   * 
-   * @returns [ minX, minY, maxX, maxY ] 
+   *
+   * @returns [ minX, minY, maxX, maxY ]
    */
   public getMapViewBounds(): any {
     const viewer = this.mapsManagerService.getMap().getCesiumViewer();
     const width = viewer.canvas.width;
     const height = viewer.canvas.height;
     const posWS = viewer.camera.pickEllipsoid(new Cesium.Cartesian2(1, height), Cesium.Ellipsoid.WGS84);
-    const posEN = viewer.camera.pickEllipsoid(new Cesium.Cartesian2(width, 1 ), Cesium.Ellipsoid.WGS84);
+    const posEN = viewer.camera.pickEllipsoid(new Cesium.Cartesian2(width, 1), Cesium.Ellipsoid.WGS84);
 
     if (posWS != null && posEN != null) {
       const cartographicWS = viewer.scene.globe.ellipsoid.cartesianToCartographic(posWS);
@@ -152,7 +152,7 @@ export class CsMapObject {
       this.groupLayer[id] = [];
     }
     // LJ:skip the polygon search for getFeatureInfo.
-    if (layer.sldBody && layer.sldBody.indexOf('<ogc:Intersects>') >= 0)  {
+    if (layer.sldBody && layer.sldBody.indexOf('<ogc:Intersects>') >= 0) {
       // RA: but retain the other filters
       const polygonFilter = UtilitiesService.getPolygonFilter(layer.sldBody);
       layer.sldBody = layer.sldBody.replace(polygonFilter, '');
@@ -173,7 +173,7 @@ export class CsMapObject {
    * Method for rendering a polygon shape (EPSG:4326 Lng lat format) on the map.
    * @param coordsArray [139,-33 141,-33 142,-36 139,-36 139,-33 lng,lat]
    */
-  public renderPolygon(coordsArray: Number[]) {
+  public renderPolygon(coordsArray: number[]) {
     if (this.polygonEditable$) {
       this.clearPolygon();
     }
@@ -224,7 +224,7 @@ export class CsMapObject {
           .map(p => p.getPosition());
         cartesian3.push(cartesian3[0]);
         const coords = cartesian3
-            .map(cart => Ellipsoid.WGS84.cartesianToCartographic(cart as Cartesian3))
+            .map(cart => Ellipsoid.WGS84.cartesianToCartographic(cart))
               .map(latLon => [latLon.latitude * 180 / Math.PI , latLon.longitude * 180 / Math.PI]);
         coordString = coords.join(' ');
         polygonStringBS.next(coordString);

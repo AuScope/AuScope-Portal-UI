@@ -41,7 +41,7 @@ export class LayerStatusService {
    * @return true if one of the services is down
    */
   public isLayerDown(layerId: string): boolean {
-    var failingHosts = this.layerStatusMap ? this.layerStatusMap.get(layerId) : null;
+    const failingHosts = this.layerStatusMap ? this.layerStatusMap.get(layerId) : null;
     if (failingHosts && failingHosts.length > 0) {
       return true;
     }

@@ -13,7 +13,7 @@ export class GetCapsService {
 
   /**
    * Namespace resolver for version 1.3 'GetCapabilities' document
-   * 
+   *
    * @param string namespace prefix
    * @returns URL of namespace
    */
@@ -37,7 +37,7 @@ export class GetCapsService {
 
   /**
    * Function used to detect various implementations of WMS server
-   * 
+   *
    * @param doc Document interface of GetCapabilities response
    * @param nsResolver namespace resolver function
    * @returns applicationProfile string
@@ -45,7 +45,7 @@ export class GetCapsService {
   private findApplicationProfile(doc: Document, nsResolver: (prefix: string) => string): string {
     const SCHEMA_LOCATION = "string(/xsi:WMS_Capabilities/@*[local-name()='schemaLocation'])";
     const SERVICE_TITLE = "string(/xsi:WMS_Capabilities/xsi:Service/xsi:Title)";
-    
+
     const schemaLocation = SimpleXMLService.evaluateXPathString(doc, doc, SCHEMA_LOCATION, nsResolver);
     if (schemaLocation.includes('http://www.esri.com/wms')) {
       return "Esri:ArcGIS Server";
@@ -62,7 +62,7 @@ export class GetCapsService {
 
   /**
    * Extracts online resources from GetCapabilities response
-   * 
+   *
    * @param doc Document interface of GetCapabilities response
    * @param node the layer Node
    * @param nsResolver namespace resolver function
@@ -99,7 +99,7 @@ export class GetCapsService {
 
   /**
    * Retrieves a bounding box from GetCapabilities response
-   * 
+   *
    * @param doc Document interface of GetCapabilities response
    * @param node the layer Node
    * @param nsResolver namespace resolver function
@@ -135,7 +135,7 @@ export class GetCapsService {
 
   /**
    * Fetches a list of map formats from GetCapabilities response
-   * 
+   *
    * @param doc Document interface of GetCapabilities response
    * @param node Node class representing a part of the GetCapabilities response
    * @param nsResolver namespace resolver function
@@ -153,7 +153,7 @@ export class GetCapsService {
 
   /**
    * Fetches a list of a coordinate reference systems (CRS) supported by a layer
-   * 
+   *
    * @param doc DOM's Document interface
    * @param node Node class representing a part of the GetCapabilities response
    * @param nsResolver namespace resolver function
@@ -178,7 +178,7 @@ export class GetCapsService {
 
   /**
    * Constructs a CSWRecord for a layer from the GetCapabilities response
-   * 
+   *
    * @param doc DOM's Document interface
    * @param node Node class representing a part of the GetCapabilities response
    * @param nsResolver namespace resolver function
@@ -202,7 +202,7 @@ export class GetCapsService {
 
   /**
    * Find all the dimensions of a certain kind
-   * 
+   *
    * @param doc Document interface
    * @param node Node class representing a part of the GetCapabilities response
    * @param nsResolver namespace resolver function
@@ -237,7 +237,7 @@ export class GetCapsService {
     private findAccessConstraints(doc: Document, nsResolver: (prefix: string) => string): string[] {
     const mapFormats = "string(/xsi:WMS_Capabilities/xsi:Service/xsi:AccessConstraints)";
     const accessConstraints = [];
-    accessConstraints.push( SimpleXMLService.evaluateXPathString(doc, doc, mapFormats, nsResolver));
+    accessConstraints.push(SimpleXMLService.evaluateXPathString(doc, doc, mapFormats, nsResolver));
     return accessConstraints;
   }
 
@@ -348,7 +348,7 @@ export class GetCapsService {
     const mapFormats = this.getMapFormats(rootNode, rootNode, this.nsResolver);
     const applicationProfile = this.findApplicationProfile(rootNode, this.nsResolver);
     const accessConstraints = this.findAccessConstraints(rootNode, this.nsResolver);
-    
+
     const retVal = { data: { cswRecords: [], capabilityRecords: [], invalidLayerCount: 0 }, msg: '', success: true, serviceUrl: '' };
 
     if (rootLayers.length == 0) {
@@ -503,8 +503,8 @@ export class GetCapsService {
   public getCaps(serviceUrl: string, from?: string): Observable<any> {
 
     const settings = this.setupCaps(serviceUrl, from);
-    let httpParams = settings.params;
-    let capsUrl = settings.capsUrl;
+    const httpParams = settings.params;
+    const capsUrl = settings.capsUrl;
 
     return this.http.get(capsUrl, { params: httpParams, responseType: 'text' }).pipe(switchMap(
       (response) => {
@@ -513,12 +513,12 @@ export class GetCapsService {
         ret = this.getLayersFromGetCapabilities(response);
 
         if (ret.serviceUrl !== '') {
-          let innerCapsUrl = ret.serviceUrl;
-          
+          const innerCapsUrl = ret.serviceUrl;
+
           const settings = this.setupCaps(innerCapsUrl, from);
-          let httpParams = settings.params;
-          let capsUrl = settings.capsUrl;
-          
+          const httpParams = settings.params;
+          const capsUrl = settings.capsUrl;
+
           return this.http.get(capsUrl, { params: httpParams, responseType: 'text' }).pipe(
             map(response => {
               let retInner;

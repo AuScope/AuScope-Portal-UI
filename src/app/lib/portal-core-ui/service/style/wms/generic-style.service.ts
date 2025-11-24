@@ -137,14 +137,14 @@ export class GenericStyleService {
               propertyFilter = this.generatePropertyFilter(field, arrayFilter.value, operator || '=');
             }
           }
-        } 
+        }
         // Handle standard object format
         else if (typeof filter === 'object') {
           // Standard filter with field and value
           if (filter.field && filter.value) {
             propertyFilter = this.generatePropertyFilter(
-              filter.field, 
-              filter.value, 
+              filter.field,
+              filter.value,
               filter.operator || '='
             );
           }

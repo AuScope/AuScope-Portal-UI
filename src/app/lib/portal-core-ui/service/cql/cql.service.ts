@@ -2,7 +2,7 @@ export class CQLService {
 
     /**
      * Assembles a CQL string using filters
-     * 
+     *
      * @param filters filter specification for a layer [ { predicate: string, value: []|string,  xpath: string }, ... ]
      * @returns string
      */

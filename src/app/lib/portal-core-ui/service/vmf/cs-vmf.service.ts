@@ -13,8 +13,8 @@ import { RenderStatusService } from '../cesium-map/renderstatus/render-status.se
 import { UtilitiesService } from '../../utility/utilities.service';
 
 // NB: Cannot use "import { XXX, YYY, ZZZ, Color } from 'cesium';" - it prevents initialising ContextLimits.js properly
-// which causes a 'DeveloperError' when trying to draw the VMF 
-declare var Cesium;
+// which causes a 'DeveloperError' when trying to draw the VMF
+declare let Cesium;
 
 /**
  * Use Cesium to add layer to map. This service class adds GeoJSON layer to the map
@@ -81,9 +81,9 @@ export class CsVMFService {
         ]
       }
     };
-    
+
     //url="https://native-land.ca/api/index.php";
-    return this.http.post(url, body, { 
+    return this.http.post(url, body, {
       // this will cause a preflight )OPTIONS/CORS) error - 'application/json'
       headers: new HttpHeaders().set('Content-Type', 'text/plain')
     }).pipe(map(response => {
@@ -142,9 +142,9 @@ export class CsVMFService {
         //const proxyUrl = "https://portal.auscope.org.au/"  + "getViaProxy.do?usewhitelist=false&url=" + onlineResource.url;
         const proxyUrl = onlineResource.url;
         const polygon = layer["geojson"]["polygon"];
-        var polygonStr = "[";
-        var delim = ",";
-        var i = 0;
+        let polygonStr = "[";
+        let delim = ",";
+        let i = 0;
         for (const coord of polygon) {
           const lon = coord[0];
           const lat = coord[1];
@@ -158,9 +158,9 @@ export class CsVMFService {
         this.getVMFFeature(proxyUrl,polygonStr,apikey,maps).subscribe(geojsonTxt => {
           geojsonTxt = JSON.stringify(geojsonTxt);
           // make a geojson features collection
-          let fcTxt = '{"type": "FeatureCollection","features":' + geojsonTxt + '}';
-          let geojson = JSON.parse(fcTxt);
-     
+          const fcTxt = '{"type": "FeatureCollection","features":' + geojsonTxt + '}';
+          const geojson = JSON.parse(fcTxt);
+
           source.load(geojson).then(dataSource => {
             if (this.cancelledLayers.indexOf(layer.id) === -1) {
               viewer.dataSources.add(dataSource).then(dataSrc => {
@@ -176,12 +176,12 @@ export class CsVMFService {
                   let value = color._value;
                   // remake the color as a hex string (RGB) with opactiy first
                   value = "0x40" + value.substring(5,7)+value.substring(3,5)+value.substring(1,3);
-                  var cesiumColor = Cesium.Color.fromRgba(value);
+                  const cesiumColor = Cesium.Color.fromRgba(value);
                   //Set the polygon material to our color.
                   entity.polygon.material = cesiumColor;
                   //Remove the outlines.
                   entity.polygon.outline = false;
-                  //Extrude the polygon 
+                  //Extrude the polygon
                   entity.polygon.extrudedHeight = 1.0;
                 }
 

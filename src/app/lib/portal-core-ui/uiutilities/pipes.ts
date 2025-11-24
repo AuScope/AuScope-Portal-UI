@@ -12,7 +12,7 @@ export class KeysPipe implements PipeTransform {
   transform(value, args: string[]): any {
     const keys = [];
     for (const key in value) {
-      keys.push({key: key, value: value[key]});
+      keys.push({ key: key, value: value[key] });
     }
     return keys;
   }
@@ -30,7 +30,7 @@ export class QuerierFeatureSearchPipe implements PipeTransform {
     if (value && value.length > 0) {
       return value.filter(feature => {
         if (feature.layer.name) {
-          if (feature.layer.name === args || args === 'ALL' ) {
+          if (feature.layer.name === args || args === 'ALL') {
             return true;
           }
         }

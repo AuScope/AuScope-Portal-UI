@@ -186,7 +186,7 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     this.selectLayer(layer);
-    
+
     this.sidebarService.setOpenState(true);
   }
 
@@ -197,7 +197,7 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
    */
   public removeLayerFromMap(layer: LayerModel): void {
     this.layerManagerService.removeLayer(layer);
-    
+
     if (this.selectedLayer === layer) {
       this.selectedLayer = null;
     }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
-declare var window: any;
-declare var XPathResult: any;
+declare let window: any;
+declare let XPathResult: any;
 
 export enum ResourceType {
   CSWService = "CSWService",
@@ -28,7 +28,7 @@ export enum GeometryType {
   POLYGON = "POLYGON",
   MULTIPOLYGON = "MULTIPOLYGON"
 };
-  
+
 
 /**
  * Constants

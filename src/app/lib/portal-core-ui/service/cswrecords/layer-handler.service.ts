@@ -5,7 +5,7 @@ import { CSWRecordModel } from '../../model/data/cswrecord.model';
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 
-import { LayerModel} from '../../model/data/layer.model';
+import { LayerModel } from '../../model/data/layer.model';
 import { OnlineResourceModel } from '../../model/data/onlineresource.model';
 import { ResourceType } from '../../utility/constants.service';
 import { SplitDirection } from 'cesium';
@@ -192,10 +192,10 @@ export class LayerHandlerService {
       itemLayer.kmlDoc = kmzDoc;
       return itemLayer;
     }
-  
+
   /**
    * Make a custom CSW Record with a KMZ layer inside
-   * 
+   *
    * @param name name of KMZ layer
    * @param id KMZ layer id
    * @returns CSWRecordModel object
@@ -230,7 +230,7 @@ export class LayerHandlerService {
 
   /**
    * Make a custom CSW Record with a KML layer inside
-   * 
+   *
    * @param name name of KML layer
    * @param id KML layer id
    * @returns CSWRecordModel object
@@ -264,7 +264,7 @@ export class LayerHandlerService {
   }
   /**
    * Make a custom CSW Record with a GEOJSON layer inside
-   * 
+   *
    * @param name name of GEOJSON layer
    * @param id GEOJSON layer id
    * @returns CSWRecordModel object

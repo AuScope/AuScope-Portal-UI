@@ -41,7 +41,7 @@ export class CsClipboardService {
     // if no clipboard, recover the all layers list.
     if (!this.bShowClipboard) {
       this.bFilterLayers = false ;
-      this.filterLayersBS.next(this.bFilterLayers );
+      this.filterLayersBS.next(this.bFilterLayers);
     }
   }
 
@@ -68,7 +68,7 @@ export class CsClipboardService {
   public LatLng2LngLat(latLng:string):string { //
     latLng = latLng.trim().replace(/\r?\n|\r/g, ' ');
     const latLngList = latLng.split(' ');
-    let lngLatList = [];
+    const lngLatList = [];
     for (let i = 0; i<latLngList.length; i++) {
       const coord = latLngList[i].split(',');
       const lat = parseFloat(coord[0]).toFixed(3);
@@ -94,7 +94,7 @@ export class CsClipboardService {
     }
     return coordString;
   }
-  
+
 
   /**
    * swap coordinates for geometry.
@@ -134,7 +134,7 @@ export class CsClipboardService {
    * @param coordsArray array of coords
    * @returns void.
    */
-  public renderPolygon(coordsArray: Number[]) {
+  public renderPolygon(coordsArray: number[]) {
     this.csMapObject.renderPolygon(coordsArray);
   }
 
@@ -144,9 +144,9 @@ export class CsClipboardService {
    */
   public drawPolygon() {
     this.csMapObject.drawPolygon().subscribe((coords) => {
-     let strToday=new Date(); 
-     let dt= new Date(strToday).toISOString();
-     let name = 'Polygon-' + dt.slice(0,dt.lastIndexOf('.'));
+     const strToday=new Date();
+     const dt= new Date(strToday).toISOString();
+     const name = 'Polygon-' + dt.slice(0,dt.lastIndexOf('.'));
       const newPolygon = {
         name: name,
         srs: 'EPSG:4326',
@@ -207,7 +207,7 @@ export class CsClipboardService {
    * @param roi roi polygon object, contains , assumes EPSG:4326
    */
   public loadPolygonFromROI(roi) {
-    let coords = roi.coordinates;
+    const coords = roi.coordinates;
     const coordsList = coords.split(' ');
     const coordsListLngLat = [];
     for (let i = 0; i < coordsList.length; i++) {
@@ -234,7 +234,7 @@ export class CsClipboardService {
       return;
     }
 
-    const coordString = this.getCoordinates( newPolygon.coordinates);
+    const coordString = this.getCoordinates(newPolygon.coordinates);
     const coordsArray = coordString.split(' ');
     let coords4326ListLngLat = []; //for rendering
     let coords4326ListLatLng = []; //for polygon wms query

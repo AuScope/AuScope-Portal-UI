@@ -14,8 +14,8 @@ import { KMLDocService } from './kml.service';
 import { UtilitiesService } from '../../utility/utilities.service';
 
 // NB: Cannot use "import { XXX, YYY, ZZZ, Color } from 'cesium';" - it prevents initialising ContextLimits.js properly
-// which causes a 'DeveloperError' when trying to draw the KML 
-declare var Cesium;
+// which causes a 'DeveloperError' when trying to draw the KML
+declare let Cesium;
 
 /**
  * Use Cesium to add layer to map. This service class adds KML layer to the map
@@ -114,7 +114,7 @@ export class CsKMLService {
           source.load(onlineResource.url).then(dataSource => {
             viewer.dataSources.add(dataSource).then(dataSrc => {
               layer.csLayers.push(dataSrc);
-              this.incrementLayersAdded(layer,  kmlOnlineResources.length);
+              this.incrementLayersAdded(layer, kmlOnlineResources.length);
             });
           });
 

@@ -1,4 +1,4 @@
-import { throwError as observableThrowError,  Observable, ReplaySubject, Subject } from 'rxjs';
+import { throwError as observableThrowError, Observable, ReplaySubject, Subject } from 'rxjs';
 
 import { catchError, map, timeoutWith, mergeMap } from 'rxjs/operators';
 import { Bbox } from '../../../model/data/bbox.model';
@@ -8,7 +8,7 @@ import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from '@angular/comm
 import { Injectable, Inject } from '@angular/core';
 import * as $ from 'jquery';
 
-declare var gtag: Function;
+declare let gtag: Function;
 
 /**
  * Service to download WFS data
@@ -16,7 +16,7 @@ declare var gtag: Function;
 // @dynamic
 @Injectable()
 export class DownloadWfsService {
-  public tsgDownloadBS: Subject<string> = null; 
+  public tsgDownloadBS: Subject<string> = null;
   public tsgDownloadStartBS:Subject<string> = null;
 
 
@@ -60,7 +60,7 @@ export class DownloadWfsService {
     try {
       const wfsResources = this.layerHandlerService.getWFSResource(layer);
       if (this.env.googleAnalyticsKey && typeof gtag === 'function') {
-        gtag('event', 'DatasetDownload',  { 'event_category': 'DatasetDownload', 'event_action': layer.id });
+        gtag('event', 'DatasetDownload', { 'event_category': 'DatasetDownload', 'event_action': layer.id });
       }
       omitGsmlpShapeProperty = omitGsmlpShapeProperty !== undefined ? omitGsmlpShapeProperty : false;
       let httpParams = new HttpParams();
@@ -73,7 +73,7 @@ export class DownloadWfsService {
                              .set('filter', '')
                              .set('omitGsmlpShapeProperty', omitGsmlpShapeProperty);
       // Call WFS GetFeature to find the dataset URLs
-      return this.http.get(this.env.portalBaseUrl + 'doBoreholeViewFilter.do', { params: httpParams}).pipe(
+      return this.http.get(this.env.portalBaseUrl + 'doBoreholeViewFilter.do', { params: httpParams }).pipe(
         timeoutWith(300000, observableThrowError(new Error('Request has timed out after 5 minutes'))),
         // 'mergeMap' can be used when you want to create nested observables
         mergeMap((response) => {
@@ -119,7 +119,7 @@ export class DownloadWfsService {
       try {
         const wfsResources = this.layerHandlerService.getWFSResource(layer);
         if (this.env.googleAnalyticsKey && typeof gtag === 'function') {
-          gtag('event', 'CSVDownload',  {'event_category': 'CSVDownload', 'event_action': layer.id });
+          gtag('event', 'CSVDownload', { 'event_category': 'CSVDownload', 'event_action': layer.id });
         }
         let downloadUrl = 'getAllFeaturesInCSV.do';
         if (layer.proxyDownloadUrl && layer.proxyDownloadUrl.length > 0) {
@@ -153,7 +153,7 @@ export class DownloadWfsService {
             return response;
       }), catchError((error: HttpResponse<any>) => {
             return observableThrowError(error);
-          }), );
+          }),);
       } catch (e) {
         return observableThrowError(e);
       }
@@ -167,23 +167,23 @@ export class DownloadWfsService {
         return response;
     }), catchError((error: HttpResponse<any>) => {
         return observableThrowError(error);
-    }), );
+    }),);
   }
 
   /**
    * Download a TSG file
    *
-   * @param url 
+   * @param url
    */
   public downloadTsgFile(url: string): Observable<any> {
     //https://nvcldb.blob.core.windows.net/nvcldb/GBD021_chips.zip
     //https://nvclanalyticscache.z8.web.core.windows.net/Qld/Mirrica1.zip'
-    return this.http.get( url, { responseType: 'blob'}).pipe(timeoutWith(6000000, observableThrowError(new Error('Request have timeout out after 100 minutes'))),
+    return this.http.get(url, { responseType: 'blob' }).pipe(timeoutWith(6000000, observableThrowError(new Error('Request have timeout out after 100 minutes'))),
       map((response) => { // download file
       return response;
     }), catchError((error: HttpResponse<any>) => {
         return observableThrowError(error);
-    }), );
+    }),);
 
   }
 
@@ -195,12 +195,12 @@ export class DownloadWfsService {
    * @param polygonFilter WFS filter parameter
    * @param bZip download as a zip file
    */
-  public downloadCSV(layer: LayerModel, bbox: Bbox, polygonFilter: String, bZip: boolean): Observable<any> {
+  public downloadCSV(layer: LayerModel, bbox: Bbox, polygonFilter: string, bZip: boolean): Observable<any> {
 
     try {
       const wfsResources = this.layerHandlerService.getWFSResource(layer);
       if (this.env.googleAnalyticsKey && typeof gtag === 'function') {
-        gtag('event', 'CSVDownload',  {'event_category': 'CSVDownload', 'event_action': layer.id });
+        gtag('event', 'CSVDownload', { 'event_category': 'CSVDownload', 'event_action': layer.id });
       }
       let downloadUrl = 'getAllFeaturesInCSV.do';
       if (layer.proxyDownloadUrl && layer.proxyDownloadUrl.length > 0) {
@@ -224,15 +224,15 @@ export class DownloadWfsService {
         const serviceUrl = this.env.portalBaseUrl + downloadUrl + '?';
         httpParams = httpParams.append('serviceUrls', serviceUrl + $.param(filterParameters));
       }
-      let downloadObserver; 
+      let downloadObserver;
       if (bZip) {
         downloadObserver = this.http.post(this.env.portalBaseUrl + 'downloadGMLAsZip.do', httpParams.toString(), {
-          headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'), 
+          headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
           responseType: 'blob'
         });
       } else {
         downloadObserver = this.http.post(this.env.portalBaseUrl + 'downloadNvclCSV.do', httpParams.toString(), {
-          headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'), 
+          headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
           responseType: 'text'
         });
       }
@@ -241,7 +241,7 @@ export class DownloadWfsService {
           return response;
         }), catchError((error: HttpResponse<any>) => {
           return observableThrowError(error);
-        }), );
+        }),);
     } catch (e) {
       return observableThrowError(e);
     }

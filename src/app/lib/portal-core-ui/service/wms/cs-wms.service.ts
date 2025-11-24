@@ -445,7 +445,7 @@ export class CsWMSService {
         });
       } else {
         // Keep old function call
-        let oldCreateImage = (Resource as any)._Implementations.createImage;
+        const oldCreateImage = (Resource as any)._Implementations.createImage;
 
         // Overwrite CesiumJS 'createImage' function to allow us to do 'POST' requests via a proxy
         // If there is a 'usepost' parameter in the URL, then 'POST' via proxy else uses standard 'GET'

@@ -705,14 +705,14 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
    */
   private generateSimpleCSV(): string {
     const csvRows: string[] = [];
-    
+
     // CSV Header
     csvRows.push('Field,Value');
-    
+
     // Add basic information
     csvRows.push(`Layer,${this.escapeCSV(this.selectedLayer)}`);
     csvRows.push(`Feature,${this.escapeCSV(this.selectedFeature)}`);
-    
+
     // Add properties from HTML table
     if (this.currentDoc.transformed) {
       const tableData = this.extractTableDataForCSV();
@@ -720,13 +720,13 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
         csvRows.push(`${this.escapeCSV(item.key)},${this.escapeCSV(item.value)}`);
       });
     }
-    
+
     // Add XML tree data (flattened)
     if (this.flatTreeDataSource[this.currentDoc.key]) {
       const treeData = this.flatTreeDataSource[this.currentDoc.key].data;
       this.addTreeDataToCSV(treeData, csvRows);
     }
-    
+
     return csvRows.join('\n');
   }
 
@@ -735,38 +735,38 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
    */
   private extractTableDataForCSV(): Array<{key: string, value: string}> {
     const data: Array<{key: string, value: string}> = [];
-    
+
     if (this.currentDoc.transformed) {
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = this.currentDoc.transformed;
-      
+
       // Remove style and script tags
       const styleTags = tempDiv.querySelectorAll('style, script');
       styleTags.forEach(tag => tag.remove());
-      
+
       const table = tempDiv.querySelector('table');
       if (table) {
         const rows = table.querySelectorAll('tr');
-        
+
         rows.forEach(row => {
           const cells = row.querySelectorAll('td, th');
           if (cells.length >= 2) {
             const key = cells[0].textContent?.trim();
             const value = cells[1].textContent?.trim();
-            
-            if (key && value && key !== value && 
-                !key.includes('SafeValue') && 
+
+            if (key && value && key !== value &&
+                !key.includes('SafeValue') &&
                 !value.includes('SafeValue') &&
                 !key.includes('body {') &&
                 !value.includes('font-family')) {
-              
+
               data.push({ key, value });
             }
           }
         });
       }
     }
-    
+
     return data;
   }
 
@@ -779,9 +779,9 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
         // Use just the filename, no prefixes or paths
         const fieldName = node.filename;
         const value = node.type && !node.type.toString().startsWith('<') ? node.type : '';
-        
+
         csvRows.push(`${this.escapeCSV(fieldName)},${this.escapeCSV(value)}`);
-        
+
         if (node.children && node.children.length > 0) {
           this.addTreeDataToCSV(node.children, csvRows, level + 1);
         }
@@ -794,12 +794,12 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
    */
   private escapeCSV(value: string): string {
     if (!value) return '';
-    
+
     // If value contains comma, quote, or newline, wrap in quotes and escape internal quotes
     if (value.includes(',') || value.includes('"') || value.includes('\n') || value.includes('\r')) {
       return `"${value.replace(/"/g, '""')}"`;
     }
-    
+
     return value;
   }
 
@@ -809,7 +809,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   private downloadCSVFile(csvContent: string, filename: string): void {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
-    
+
     if (link.download !== undefined) {
       const url = URL.createObjectURL(blob);
       link.setAttribute('href', url);
