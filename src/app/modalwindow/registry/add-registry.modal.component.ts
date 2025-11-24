@@ -5,6 +5,7 @@ import { Registry } from 'app/menupanel/data-explorer/data-model';
 import { v4 as uuidv4 } from 'uuid';
 import { environment } from 'environments/environment';
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 declare let gtag: Function;
 
 @Component({
