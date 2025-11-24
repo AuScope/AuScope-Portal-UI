@@ -301,15 +301,15 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
  * @param tabName
  */
   public openTab(evt, tabName) {
-    let i, tabcontent, tablinks;
+    let i;
     if (this.imScDoButtonsEnabled) { this.analytic_tab = true; }
 
     // set all the "tabs" to display:none - ie hidden
-    tabcontent = document.getElementsByClassName("tabcontent");
+    const tabcontent = document.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
       tabcontent[i].style.display = "none";
     }
-    tablinks = document.getElementsByClassName("tablinks");
+    const tablinks = document.getElementsByClassName("tablinks");
     for (i = 0; i < tablinks.length; i++) {
       tablinks[i].className = tablinks[i].className.replace(" active", "");
     }
@@ -636,7 +636,6 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   }
 
   public updateDropDownButtonText(doc) {
-    const d = document.getElementById("dropdownMenuFeature");
     this.selectedFeature = '';
     if (doc.node_name) {
       this.selectedFeature = doc.node_name;

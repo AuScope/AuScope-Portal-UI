@@ -366,7 +366,6 @@ export class UtilitiesService {
         let string = '';
         let i = 0;
         let c = 0, c2 = 0, c3 = 0;
-        const c1 = 0;
 
         while (i < utftext.length) {
 
@@ -422,11 +421,11 @@ export class UtilitiesService {
         if (layer.filterCollection.hiddenParams) {
           hiddenParams = layer.filterCollection.hiddenParams;
         }
-        for (const idx in hiddenParams) {
-          if (hiddenParams[idx].type === 'MANDATORY.UIHiddenResourceAttribute') {
-            param[hiddenParams[idx].parameter] = onlineResource[hiddenParams[idx].attribute];
+        for (const hiddenParam of hiddenParams) {
+          if (hiddenParam.type === 'MANDATORY.UIHiddenResourceAttribute') {
+            param[hiddenParam.parameter] = onlineResource[hiddenParam.attribute];
           } else {
-            param[hiddenParams[idx].parameter] = hiddenParams[idx].value;
+            param[hiddenParam.parameter] = hiddenParam.value;
           }
         }
 
@@ -435,8 +434,8 @@ export class UtilitiesService {
         if (layer.filterCollection.mandatoryFilters) {
           mandatoryFilters = layer.filterCollection.mandatoryFilters;
         }
-        for (const idx in mandatoryFilters) {
-          param[mandatoryFilters[idx].parameter] = mandatoryFilters[idx].value;
+        for (const filter of mandatoryFilters) {
+          param[filter.parameter] = filter.value;
         }
       }
 

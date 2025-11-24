@@ -41,7 +41,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
   advancedComponentService = inject(AdvancedComponentService);
 
   @Input() layer: LayerModel;
-  private providers: Array<Object>;
+  private providers: Array<object>;
   public optionalFilters: Array<object>; // Optional filters currently rendered by this component
   public selectedFilter;
   public advancedParam = [];
@@ -328,7 +328,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
    * @param filter filter object to be added to the panel
    * @param addEmpty if true, set filter value to be empty.
    */
-  public addFilter(filter, addEmpty?: boolean): void {
+  public addFilter(filter, _addEmpty?: boolean): void {
     if (filter == null) {
       return;
     }

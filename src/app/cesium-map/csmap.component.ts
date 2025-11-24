@@ -345,22 +345,22 @@ export class CsMapComponent implements AfterViewInit {
       const layer: LayerModel = this.csMapService.getLayerForEntity(entity);
       if (layer !== null) {
         // IRIS layers
-        if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type as ResourceType === ResourceType.IRIS))) {
+        if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.IRIS))) {
           this.displayModal(mapClickInfo.clickCoord);
           const handler = new IrisQuerierHandler(layer, entity);
           this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.bsModalRef);
           // KML/KMZ layers
-        } else if ((layer.cswRecords.find(c => c.onlineResources.find(o => o.type as ResourceType === ResourceType.KML))) ||
-          (layer.cswRecords.find(c => c.onlineResources.find(o => o.type as ResourceType === ResourceType.KMZ)))) {
+        } else if ((layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.KML))) ||
+          (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.KMZ)))) {
           this.displayModal(mapClickInfo.clickCoord);
           const handler = new KMLQuerierHandler(entity);
           this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.bsModalRef);
           // KML/KMZ layers
-        } else if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type as ResourceType === ResourceType.VMF))) {
+        } else if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.VMF))) {
           this.displayModal(mapClickInfo.clickCoord);
           const handler = new VMFQuerierHandler(entity);
           this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.bsModalRef);
-        } else if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type as ResourceType === ResourceType.GEOJSON))) {
+        } else if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.GEOJSON))) {
           this.displayModal(mapClickInfo.clickCoord);
           const handler = new GeoJsonQuerierHandler(entity);
           this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.bsModalRef);
@@ -411,7 +411,7 @@ export class CsMapComponent implements AfterViewInit {
     // Build list of GetFeatureInfo requests
     const getFeatureInfoRequests: Observable<any>[] = [];
     // Total number of features returned from GetFeatureInfo requests
-    let numberOfFeatures = 0;
+    let _numberOfFeatures = 0;
 
     // get the list of optional filter - providers
     // we will use this to filter calls to the backend i.e. wmsMarkerPopup.do
@@ -522,7 +522,7 @@ export class CsMapComponent implements AfterViewInit {
                     const feature = { onlineResource: onlineResource, layer: maplayer };
                     const numberOfLayerFeatures = this.setModal(maplayer.id, result, feature, mapClickInfo.clickCoord);
                     if (numberOfLayerFeatures > 0) {
-                      numberOfFeatures += numberOfLayerFeatures;
+                      _numberOfFeatures += numberOfLayerFeatures;
                     }
                   }), catchError((error) => {
                     return throwError(error);
@@ -574,7 +574,7 @@ export class CsMapComponent implements AfterViewInit {
    * Display the querier modal on map click
    * @param clickCoord map click coordinates
    */
-  private displayModal(clickCoord: { x: number, y: number, z: number } | null) {
+  private displayModal(_clickCoord: { x: number, y: number, z: number } | null) {
     if (!this.modalDisplayed) {
       this.bsModalRef = this.modalService.show(QuerierModalComponent, { class : 'modal-lg modal-dialog-scrollable modal-dialog-centered' });
       this.modalDisplayed = true;

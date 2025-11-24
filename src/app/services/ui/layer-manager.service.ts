@@ -9,6 +9,7 @@ import { environment } from 'environments/environment';
 import * as _ from 'lodash';
 import * as $ from 'jquery';
 
+/* eslint-disable */
 declare let gtag: Function;
 
 /**

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, Inject } from '@angular/core';
-import { ResourceType, GeometryType } from '../../../lib/portal-core-ui/utility/constants.service';
+import { ResourceType } from '../../../lib/portal-core-ui/utility/constants.service';
 import { saveAs } from 'file-saver';
 import { config } from '../../../../environments/config';
 import { environment } from '../../../../environments/environment'; //CVP
@@ -23,6 +23,7 @@ import { shareReplay } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { DownloadAuScopeCatModalComponent } from 'app/modalwindow/download-auscopecat/download-auscopecat.modal.component';
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 declare let gtag: Function;
 
 @Component({

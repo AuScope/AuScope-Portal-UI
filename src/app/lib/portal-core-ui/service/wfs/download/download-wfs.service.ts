@@ -8,6 +8,7 @@ import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from '@angular/comm
 import { Injectable, Inject } from '@angular/core';
 import * as $ from 'jquery';
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 declare let gtag: Function;
 
 /**

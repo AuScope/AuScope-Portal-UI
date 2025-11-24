@@ -34,7 +34,7 @@ export class FilterPanelService {
       map(response => {
         const data = response['data'];
         const result = [];
-        data.forEach(function(item, i, ar) {
+        data.forEach(function(item, _i, _ar) {
           result.push({
             key: item[1],
             value: item[0]
