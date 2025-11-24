@@ -9,7 +9,7 @@ import { DomSanitizer } from '@angular/platform-browser';
     standalone: false
 })
 export class KeysPipe implements PipeTransform {
-  transform(value, args: string[]): any {
+  transform(value, _args: string[]): any {
     const keys = [];
     for (const key in value) {
       keys.push({ key: key, value: value[key] });

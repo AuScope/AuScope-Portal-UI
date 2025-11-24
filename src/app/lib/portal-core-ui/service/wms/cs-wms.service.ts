@@ -458,7 +458,7 @@ export class CsWMSService {
           }
           // Initiate loading WMS tiles via POST & a proxy
           (Resource as any).supportsImageBitmapOptions()
-            .then(function (supportsImageBitmap) {
+            .then(function (_supportsImageBitmap) {
               const responseType = "blob";
               const method = "POST";
               const xhrDeferred = when.defer();

@@ -86,7 +86,7 @@ export class GenericStyleService {
    * @param spatialPropertyName The spatial property name to use in the BBOX filter
    * @returns Filter XML structure
    */
-  private static generateFilter(bboxJson: any, optionalFilters: any, spatialPropertyName: string): any {
+  private static generateFilter(bboxJson: any, optionalFilters: any, _spatialPropertyName: string): any {
     // Parse optional filters
     let parsedFilters: any[] = [];
     try {
@@ -108,7 +108,7 @@ export class GenericStyleService {
         bbox = bboxJson;
       }
     } catch (e) {
-      console.error('Failed to parse bounding box', e);
+      console.error('Failed to parse bounding box', bbox, e);
     }
 
     // Build filter fragments

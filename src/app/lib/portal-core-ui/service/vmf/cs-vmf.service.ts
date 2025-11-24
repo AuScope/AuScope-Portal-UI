@@ -99,7 +99,7 @@ export class CsVMFService {
    * @param layer the VMF layer to add to the map
    * @param param parameters for the VMF layer
    */
-  public addLayer(layer: LayerModel, param?: any): void {
+  public addLayer(layer: LayerModel, _param?: any): void {
     // Remove from cancelled layer list (if present)
     this.cancelledLayers = this.cancelledLayers.filter(l => l !== layer.id);
 

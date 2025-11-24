@@ -290,7 +290,6 @@ export class SimpleXMLService {
    * @return dom - return the result in a dom
    */
   public static parseStringToDOM(xmlString: string): Document {
-    const isIE11 = !!navigator.userAgent.match(/Trident.*rv[ :]*11\./);
     // Load our xml string into DOM
     let xmlDocument = null;
     if (window.DOMParser) {

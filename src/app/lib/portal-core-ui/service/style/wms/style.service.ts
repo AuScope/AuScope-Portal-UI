@@ -241,7 +241,7 @@ export class StyleService {
       return f && typeof f === 'object' && f.enabled !== undefined && !f.enabled;
     }
 
-    private static handleLegacyArrayFilter(filter: any): any | null {
+    private static handleLegacyArrayFilter(filter: any): any {
       if (!Array.isArray(filter) || filter.length < 4) { return null; }
       const [ , field ] = filter;
       const arrayFilter = filter as unknown as { value?: string; };
@@ -251,7 +251,7 @@ export class StyleService {
       return null;
     }
 
-    private static handleStandardObjectFilter(filter: any): any | null {
+    private static handleStandardObjectFilter(filter: any): any {
       if (!filter || typeof filter !== 'object') { return null; }
       if (filter.xpath && filter.value && filter.label) {
         const op = filter.predicate || 'ISEQUAL';
@@ -268,9 +268,9 @@ export class StyleService {
      * @param filter the filter
      * @returns a property filter
      */
-    private static handleByType(filter: any): any | null {
+    private static handleByType(filter: any): any {
       if (!filter || !filter.type) { return null; }
-      const handlers: Record<string, (f: any) => any | null> = {
+      const handlers: Record<string, (f: any) => any> = {
         'OPTIONAL.TEXT': (f) => this.handleTextFilter(f),
         'OPTIONAL.DROPDOWNREMOTE': (f) => this.handleDropdownFilter(f),
         'OPTIONAL.POLYGONBBOX': (f) => this.handlePolygonFilter(f),

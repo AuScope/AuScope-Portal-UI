@@ -223,7 +223,7 @@ export class CsIrisService {
    * @param layer the IRIS layer to add to the map
    * @param param parameters for the IRIS layer
    */
-  public addLayer(layer: LayerModel, param?: any): void {
+  public addLayer(layer: LayerModel, _param?: any): void {
     const irisOnlineResources = this.layerHandlerService.getOnlineResources(layer, ResourceType.IRIS);
     const me = this;
 
@@ -265,7 +265,7 @@ export class CsIrisService {
         // Tell UI that we have completed updating the map
         me.renderStatusService.updateComplete(layer, onlineResource);
       },
-        err => {
+        _err => {
           me.renderStatusService.updateComplete(layer, onlineResource, true);
         });
     }

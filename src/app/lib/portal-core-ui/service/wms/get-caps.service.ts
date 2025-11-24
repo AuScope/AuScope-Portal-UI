@@ -508,9 +508,7 @@ export class GetCapsService {
 
     return this.http.get(capsUrl, { params: httpParams, responseType: 'text' }).pipe(switchMap(
       (response) => {
-
-        let ret;
-        ret = this.getLayersFromGetCapabilities(response);
+        const ret = this.getLayersFromGetCapabilities(response);
 
         if (ret.serviceUrl !== '') {
           const innerCapsUrl = ret.serviceUrl;
@@ -521,9 +519,7 @@ export class GetCapsService {
 
           return this.http.get(capsUrl, { params: httpParams, responseType: 'text' }).pipe(
             map(response => {
-              let retInner;
-              retInner = this.getLayersFromGetCapabilities(response);
-              return retInner;
+              return this.getLayersFromGetCapabilities(response);
             }), catchError(
                 (error: HttpResponse<any>) => {
                   return observableThrowError(error);

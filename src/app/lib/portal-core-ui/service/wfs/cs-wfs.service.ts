@@ -68,7 +68,7 @@ export class CsWFSService {
    * @param layer the layer where this point derived from
    * @param primitive the point primitive
    */
-  public addPoint(layer: LayerModel, onlineResource: OnlineResourceModel, primitive: PrimitiveModel): void {
+  public addPoint(_layer: LayerModel, _onlineResource: OnlineResourceModel, _primitive: PrimitiveModel): void {
     /*
      const geom = new olPoint(olProj.transform([primitive.coords.lng, primitive.coords.lat], 'EPSG:4326', 'EPSG:3857'));
        const feature = new olFeature(geom);
@@ -97,21 +97,13 @@ export class CsWFSService {
     */
   }
 
-  public addLine(primitive: PrimitiveModel): void {
-
-  }
-
-  public addPoloygon(primitive: PrimitiveModel): void {
-
-  }
-
   /**
    * Add the wfs layer
    * @param layer the layer to add to the map
    * @param the wfs layer to be added to the map
    */
-  public addLayer(layer: LayerModel, param?: any): void {
-    const wfsOnlineResources = this.layerHandlerService.getWFSResource(layer);
+  public addLayer(layer: LayerModel, _param?: any): void {
+    const _wfsOnlineResources = this.layerHandlerService.getWFSResource(layer);
 
     /*
     // VT: create the vector on the map if it does not exist.

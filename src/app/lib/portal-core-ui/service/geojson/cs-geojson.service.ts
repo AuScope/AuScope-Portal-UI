@@ -35,7 +35,7 @@ export class CsGeoJsonService {
    * @param layer the geoJson layer to add to the map
    * @param param parameters for the geoJson layer
    */
-  public addLayer(layer: LayerModel, param?: any): void {
+  public addLayer(layer: LayerModel, _param?: any): void {
     // Remove from cancelled layer list (if present)
     this.cancelledLayers = this.cancelledLayers.filter(l => l !== layer.id);
 

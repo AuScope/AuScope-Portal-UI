@@ -107,7 +107,7 @@ export class CsCSWService {
           bbox.northBoundLatitude // North
         ),
         // 'CallBackProperty' is used to avoid flickering when material colour is changed
-        material: new ColorMaterialProperty(new CallbackProperty(function(time, result) {
+        material: new ColorMaterialProperty(new CallbackProperty(function(_time, _result) {
           return Color.fromAlpha(POLYGON_COLOUR, POLYGON_ALPHA);
          }, true))
       },

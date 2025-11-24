@@ -29,7 +29,7 @@ export class LayerStatusService {
       return this.http.get(this.env.portalBaseUrl + this.env.getCSWRecordEndP)
         .subscribe((response) => {
           const layerList = response['data'];
-          layerList.forEach(function (item, i) {
+          layerList.forEach(function (item, _i) {
             me.layerStatusMap.set(item.id, item.stackdriverFailingHosts);
           });
        });

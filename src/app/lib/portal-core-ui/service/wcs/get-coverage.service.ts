@@ -1,7 +1,7 @@
 import { SimpleXMLService } from './../../utility/simplexml.service';
 import { UtilitiesService } from './../../utility/utilities.service';
 import { Injectable, Inject } from '@angular/core';
-import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Constants } from '../../utility/constants.service';
@@ -405,7 +405,7 @@ export class GetCoverageService {
    * @returns Get the timePosition
    */
 
-  private simpleTimePosition(node: Node, nsResolver: (prefix: string) => string) {
+  private simpleTimePosition(node: Node, _nsResolver: (prefix: string) => string) {
     const timePosition = Date.parse(node.textContent)
     return {
       timePosition: timePosition,
