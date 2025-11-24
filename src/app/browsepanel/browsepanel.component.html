@@ -99,7 +99,7 @@
           @for (cswRecord of selectedLayer.cswRecords; track cswRecord; let i = $index) {
             <div>
               @if (selectedLayer) {
-                <info-sub-panel [cswRecord]="cswRecord" [layer]="selectedLayer" [expanded]=1></info-sub-panel>
+                <app-info-sub-panel [cswRecord]="cswRecord" [layer]="selectedLayer" [expanded]=1></info-sub-panel>
               }
               @if (i !== selectedLayer.cswRecords.length - 1) {
                 <div style="border-bottom:2px solid #ccc;margin-bottom:1rem;"></div>

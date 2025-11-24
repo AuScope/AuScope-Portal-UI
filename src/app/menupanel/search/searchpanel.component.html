@@ -213,7 +213,7 @@
                 @for (cswRecord of selectedSearchResult.layer.cswRecords; track cswRecord; let i = $index) {
                   <div>
                     @if (selectedSearchResult) {
-                      <info-sub-panel [cswRecord]="cswRecord" [layer]="selectedSearchResult.layer" [expanded]=1></info-sub-panel>
+                      <app-info-sub-panel [cswRecord]="cswRecord" [layer]="selectedSearchResult.layer" [expanded]=1></info-sub-panel>
                     }
                     @if (i !== selectedSearchResult.layer.cswRecords.length - 1) {
                       <div class="break-border"></div>

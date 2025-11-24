@@ -9,7 +9,7 @@ import { config } from 'environments/config';
 import { ResourceType } from '../../../../lib/portal-core-ui/utility/constants.service';
 
 @Component({
-    selector: 'info-sub-panel',
+    selector: 'app-info-sub-panel',
     templateUrl: './subpanel.component.html',
     styleUrls: ['../../../menupanel.scss', './subpanel.component.scss'],
     standalone: false
@@ -157,12 +157,12 @@ export class InfoPanelSubComponent implements OnInit {
                 usesNCI = true;
             }
             // Prefer to use a DOI if one is found
-            if (onlineResource.type==='DOI') {
+            if (onlineResource.type === ResourceType.DOI) {
                 this.citeURL = onlineResource.url;
                 this.DOIname = onlineResource.name;
                 foundDOI = true;
             }
-            if (!foundDOI && onlineResource.type!=='Unsupported') {
+            if (!foundDOI && onlineResource.type!== ResourceType.UNSUPPORTED) {
                 if (this.isGetCapabilitiesType(onlineResource)) {
                     this.citeURL = this.onlineResourceGetCapabilitiesUrl(onlineResource);
                 } else {

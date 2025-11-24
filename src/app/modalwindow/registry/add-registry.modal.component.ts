@@ -9,7 +9,7 @@ import { environment } from 'environments/environment';
 declare let gtag: Function;
 
 @Component({
-    selector: 'add-registry-modal-window',
+    selector: 'app-add-registry-modal-window',
     templateUrl: './add-registry.modal.component.html',
     styleUrls: ['./add-registry.component.scss'],
     standalone: false
