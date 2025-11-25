@@ -272,7 +272,6 @@ export class GetCoverageService {
       console.log("does not have two gml:pos nodes");
       return retVal;
     }
-    tempNodeList[0]
     const southWestPoints = tempNodeList[0].textContent.split(" ");
     const northEastPoints = tempNodeList[1].textContent.split(" ");
     if (southWestPoints.length < 2 || northEastPoints.length < 2) {

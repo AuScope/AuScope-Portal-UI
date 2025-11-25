@@ -135,7 +135,7 @@ export class SimpleXMLService {
     let xpathResult = null;
     try {
       xpathResult = this.evaluateXPath(document, domNode, xPath, XPathResult.UNORDERED_NODE_ITERATOR_TYPE, nsResolver);
-    } catch (err) {
+    } catch (_err: any) {
       return [];
     }
     const matchingNodes = [];

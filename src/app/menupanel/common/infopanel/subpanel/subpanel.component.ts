@@ -142,7 +142,7 @@ export class InfoPanelSubComponent implements OnInit {
             const isoDateStr = this.cswRecord.date.replace(" UTC", "Z");
             const pubDate = new Date(isoDateStr);
             this.publicationYear = pubDate.getFullYear().toString();
-        } catch (error) {
+        } catch (_error) {
             this.publicationYear = 'unknown';
         }
 

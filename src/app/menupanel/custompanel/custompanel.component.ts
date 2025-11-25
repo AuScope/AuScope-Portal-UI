@@ -109,14 +109,14 @@ export class CustomPanelComponent {
           const kmlTxt = e.target.result;
 
           // Remove unwanted characters and inject proxy for embedded URLs
-          const kmlStr = this.kmlService.cleanKML(String(kmlTxt));
+          if (typeof kmlTxt === "string") {
+            const kmlStr = this.kmlService.cleanKML(kmlTxt);
+            const parser = new DOMParser();
+            let kmlDoc = parser.parseFromString(kmlStr, "text/xml");
+            kmlDoc = this.parseExtendedData(kmlDoc);
 
-          const parser = new DOMParser();
-          let kmlDoc = parser.parseFromString(kmlStr, "text/xml");
-          kmlDoc = this.parseExtendedData(kmlDoc);
-
-          this.setupLayer(this, layerName, kmlDoc, proxyUrl, ResourceType.KML, "URL");
-
+            this.setupLayer(this, layerName, kmlDoc, proxyUrl, ResourceType.KML, "URL");
+          }
           this.loading = false;
         });
 
@@ -201,7 +201,7 @@ export class CustomPanelComponent {
                   });
                 }
               })
-              return kmlDom || Promise.reject("No kmz file found")
+              return kmlDom || Promise.reject(Error("No kmz file found"))
             }).catch((err) => {
               return console.log("ERROR [unzipping kmz]: " + err.msg + JSON.stringify(err));
             })
@@ -488,10 +488,11 @@ export class CustomPanelComponent {
         const reader = new FileReader();
         // When file has been read this function is called
         reader.onload = () => {
-          const jsonStr = String(reader.result);
-          this.setupLayer(this, file.name, jsonStr, "", ResourceType.GEOJSON, "FILE");
+          if (typeof reader.result === "string") {
+            this.setupLayer(this, file.name, reader.result, "", ResourceType.GEOJSON, "FILE");
+          }
         };
-        // Initiate reading the GEOJSON file
+        // Initiate reading the GEOJSON file as text, result will be a string
         reader.readAsText(file);
       } else if (getExtension(file.name) === "kmz") {
         this.loading = true; // start spinner
@@ -520,7 +521,7 @@ export class CustomPanelComponent {
                   });
                 }
               })
-              return kmlDom || Promise.reject("No kmz file found")
+              return kmlDom || Promise.reject(Error("No kmz file found"))
             }).catch((err) => {
               this.loading = false;
               return console.log("ERROR [unzipping kml]: " + err.msg + JSON.stringify(err));
@@ -550,17 +551,16 @@ export class CustomPanelComponent {
         const reader = new FileReader();
         // When file has been read this function is called
         reader.onload = () => {
-          let kmlStr = String(reader.result);
-
-          // Remove unwanted characters and inject proxy for embedded URLs
-          kmlStr = this.kmlService.cleanKML(kmlStr);
-          const parser = new DOMParser();
-          let kmlDoc = parser.parseFromString(kmlStr, "text/xml");
-          kmlDoc = this.parseExtendedData(kmlDoc);
-
-          this.setupLayer(this, file.name, kmlDoc, "", ResourceType.KML, "FILE");
+          if (typeof reader.result === "string") {
+            // Remove unwanted characters and inject proxy for embedded URLs
+            const kmlStr = this.kmlService.cleanKML(reader.result);
+            const parser = new DOMParser();
+            let kmlDoc = parser.parseFromString(kmlStr, "text/xml");
+            kmlDoc = this.parseExtendedData(kmlDoc);
+            this.setupLayer(this, file.name, kmlDoc, "", ResourceType.KML, "FILE");
+          }
         };
-        // Initiate reading the KML file
+        // Initiate reading the KML file as text, result will be a string
         reader.readAsText(file);
       }
     }

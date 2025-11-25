@@ -574,7 +574,7 @@ export class CsMapComponent implements AfterViewInit {
    * Display the querier modal on map click
    * @param clickCoord map click coordinates
    */
-  private displayModal(_clickCoord: { x: number, y: number, z: number } | null) {
+  private displayModal(_clickCoord: { x: number, y: number, z: number }) {
     if (!this.modalDisplayed) {
       this.bsModalRef = this.modalService.show(QuerierModalComponent, { class : 'modal-lg modal-dialog-scrollable modal-dialog-centered' });
       this.modalDisplayed = true;
@@ -646,7 +646,8 @@ export class CsMapComponent implements AfterViewInit {
           }
         }
       }
-    } catch (err) {
+    } catch (err: any) {
+      console.error("Could not parse JSON", err);
       return [];
     }
     return treeCollections;
@@ -661,7 +662,7 @@ export class CsMapComponent implements AfterViewInit {
    * @param clickCoord map click coordinates
    * @param gmlid a optional filter to only display the gmlId specified
    */
-  private setModal(layerId: string, result: string, feature: any, clickCoord: { x: number, y: number, z: number } | null, gmlid?: string) {
+  private setModal(layerId: string, result: string, feature: any, clickCoord: { x: number, y: number, z: number }, gmlid?: string) {
     let treeCollections = [];
 
     // Some layers return JSON

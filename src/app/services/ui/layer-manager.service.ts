@@ -9,8 +9,7 @@ import { environment } from 'environments/environment';
 import * as _ from 'lodash';
 import * as $ from 'jquery';
 
-
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 declare let gtag: Function;
 
 /**

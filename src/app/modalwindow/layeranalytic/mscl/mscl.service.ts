@@ -422,7 +422,7 @@ export class MSCLService {
         // A new plot for each metric
         for (const metric of metricList) {
             // Draw lines of varying degrees of smoothing in each plot
-            const trace_sm: { string: Data } | object = {};
+            const trace_sm: object = {};
             for (const win of SM_WINDOW_LIST) {
                 trace_sm[win] = {
                     x: xLists_sm[win][metric],

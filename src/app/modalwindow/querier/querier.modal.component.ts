@@ -336,27 +336,27 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     for (let i = 0; i < this.docs.length; i++) {
       const doc = new DOMParser().parseFromString(this.docs[i].raw, 'text/xml');
       if (doc.getElementsByTagName('gml:name').length != 0) {
-        for (const html in doc.getElementsByTagName('gml:name')) {
-          if (!objExp.test(doc.getElementsByTagName('gml:name')[html].innerHTML)) {
-            htmldata.push(doc.getElementsByTagName('gml:name')[html].innerHTML)
+        for (let nameIdx = 0; nameIdx < doc.getElementsByTagName('gml:name').length; nameIdx++) {
+          if (!objExp.test(doc.getElementsByTagName('gml:name')[nameIdx].innerHTML)) {
+            htmldata.push(doc.getElementsByTagName('gml:name')[nameIdx].innerHTML)
           }
         }
       } else if (doc.getElementsByTagName('gml:NAME').length != 0) {
-        for (const html in doc.getElementsByTagName('gml:NAME')) {
-          if (!objExp.test(doc.getElementsByTagName('gml:NAME')[html].innerHTML)) {
-            htmldata.push(doc.getElementsByTagName('gml:NAME')[html].innerHTML)
+        for (let nameIdx = 0; nameIdx < doc.getElementsByTagName('gml:NAME').length; nameIdx++) {
+          if (!objExp.test(doc.getElementsByTagName('gml:NAME')[nameIdx].innerHTML)) {
+            htmldata.push(doc.getElementsByTagName('gml:NAME')[nameIdx].innerHTML)
           }
         }
       } else if (doc.getElementsByTagName('gsmlp:name').length != 0) {
-        for (const html in doc.getElementsByTagName('gsmlp:name')) {
-          if (!objExp.test(doc.getElementsByTagName('gsmlp:name')[html].innerHTML)) {
-            htmldata.push(doc.getElementsByTagName('gsmlp:name')[html].innerHTML)
+        for (let nameIdx = 0; nameIdx < doc.getElementsByTagName('gsmlp:name').length; nameIdx++) {
+          if (!objExp.test(doc.getElementsByTagName('gsmlp:name')[nameIdx].innerHTML)) {
+            htmldata.push(doc.getElementsByTagName('gsmlp:name')[nameIdx].innerHTML)
           }
         }
       } else if (doc.getElementsByTagName('null:name').length != 0) {
-        for (const html in doc.getElementsByTagName('null:name')) {
-          if (!objExp.test(doc.getElementsByTagName('null:name')[html].innerHTML)) {
-            htmldata.push(doc.getElementsByTagName('null:name')[html].innerHTML)
+        for (let nameIdx = 0; nameIdx < doc.getElementsByTagName('null:name').length; nameIdx++) {
+          if (!objExp.test(doc.getElementsByTagName('null:name')[nameIdx].innerHTML)) {
+            htmldata.push(doc.getElementsByTagName('null:name')[nameIdx].innerHTML)
           }
         }
       }

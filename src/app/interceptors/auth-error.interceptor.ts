@@ -21,14 +21,18 @@ export class AuthErrorHandlerInterceptor implements HttpInterceptor {
 
   // Customize the default error handler here if needed
   private errorHandler(error: HttpEvent<any>): Observable<HttpEvent<any>> {
-    if (error instanceof HttpErrorResponse && error.status === 403 && error.error.path !== '/api/secure/getUser.do') {
-      this.userStateService.logoutUser();
-      this.showSessionTimedOutAlert();
-      this.router.navigate(['login']).catch(
-          (navError) => console.error("Could not navigate to login page", navError)
-      );
+    if (error instanceof HttpErrorResponse) {
+        if (error.status === 403 && error.error.path !== '/api/secure/getUser.do') {
+            this.userStateService.logoutUser();
+            this.showSessionTimedOutAlert();
+            this.router.navigate(['login']).catch(
+                (navError) => console.error("Could not navigate to login page", navError)
+            );
+        } else {
+             throw Error(error.message);
+        }
     }
-    throw error;
+    throw Error("AuthErrorHandlerInterceptor returned error");
   }
 
   /**

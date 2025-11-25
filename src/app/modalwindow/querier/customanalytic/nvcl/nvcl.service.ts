@@ -8,7 +8,7 @@ import { DownloadWfsService } from '../../../../lib/portal-core-ui/service/wfs/d
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 declare let gtag: Function;
 @Injectable()
 export class NVCLService {

@@ -125,7 +125,7 @@ export class UtilitiesService {
                 let key = keyValue[0];
                 try {
                     key = decodeURIComponent(key);
-                } catch (err) {
+                } catch (__err: any) {
                     key = unescape(key);
                 }
 
@@ -133,7 +133,7 @@ export class UtilitiesService {
 
                 try {
                     value = decodeURIComponent(value);
-                } catch (err) {
+                } catch (__err: any) {
                     value = unescape(value);
                 }
 
@@ -629,7 +629,7 @@ export class UtilitiesService {
    * @param epsgCode
    * @returns EPSG number or null
    */
-  private static getEPSGNum(epsgCode: string): number|null {
+  private static getEPSGNum(epsgCode: string): number {
     const match = epsgCode.match(/\d+/);
     return match ? parseInt(match[0], 10) : null;
 }

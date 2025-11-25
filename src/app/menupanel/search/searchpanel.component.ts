@@ -674,8 +674,8 @@ export class SearchPanelComponent implements OnInit {
     layer.group = 'registry-csw';
     layer.name = record.name;
     layer.description = record.description;
-    layer.useDefaultProxy = false, // Use the default proxy (getViaProxy.do) if true (custom layers)
-    layer.useProxyWhitelist = true, // Use the default proxy whitelist if true (custom layers)
+    layer.useDefaultProxy = false; // Use the default proxy (getViaProxy.do) if true (custom layers)
+    layer.useProxyWhitelist = true; // Use the default proxy whitelist if true (custom layers)
     layer.cswRecords = [record];
     return layer;
   }

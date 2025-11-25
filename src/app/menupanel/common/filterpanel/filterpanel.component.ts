@@ -270,6 +270,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
       });
     } catch (error) {
       alert('Unable to getNvclFilter');
+      console.error('Unable to getNvclFilter', error);
     }
   }
 
