@@ -24,7 +24,9 @@ export class AuthErrorHandlerInterceptor implements HttpInterceptor {
     if (error instanceof HttpErrorResponse && error.status === 403 && error.error.path !== '/api/secure/getUser.do') {
       this.userStateService.logoutUser();
       this.showSessionTimedOutAlert();
-      await this.router.navigate(['login']);
+      this.router.navigate(['login']).catch(
+          (navError) => console.error("Could not navigate to login page", navError)
+      );
     }
     throw error;
   }

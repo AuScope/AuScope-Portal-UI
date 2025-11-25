@@ -32,7 +32,9 @@ export class AuthGuard {
         ));
     }
     // Navigate to the login page
-    await this.router.navigate(['/login']);
+    this.router.navigate(['/login']).catch(
+        (navError) => console.error("Could not navigate to login page", navError)
+    );
     return false;
   }
 

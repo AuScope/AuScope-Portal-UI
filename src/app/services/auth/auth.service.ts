@@ -21,12 +21,15 @@ export class AuthService {
   logout(): void {
     this.http.get(environment.portalProxyUrl + 'logout').subscribe(() => {
       this.userStateService.logoutUser();
-      await this.router.navigate(['']);
+      this.router.navigate(['']).catch(
+        (navError) => console.error("Could not navigate to home page", navError));
     });
   }
 
   onLoggedIn() {
-    await this.router.navigate(['/']);
+    this.router.navigate(['/']).catch(
+        (navError) => console.error("Could not navigate to home page", navError)
+    );
   }
 
   public get isLoggedIn(): boolean {

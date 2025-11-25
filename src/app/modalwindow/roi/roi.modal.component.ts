@@ -54,11 +54,12 @@ export class ROIModalComponent {
       modalRef.componentInstance.modalContent = 'You have unsaved changes, do you wish to continue without saving?';
       modalRef.componentInstance.cancelButtonText = 'Cancel';
       modalRef.componentInstance.confirmButtonText = 'OK';
-      await modalRef.result.then(result => {
+      modalRef.result.then(result => {
         if (result && result === 'OK') {
          this.activeModal.close();
         }
-      });
+      }).catch(
+        (error) => console.error("Could not close modal", error));
     } else {
       // Save the ROI to storage.
       this.userStateService.saveROI();

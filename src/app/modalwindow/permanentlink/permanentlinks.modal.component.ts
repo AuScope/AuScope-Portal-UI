@@ -89,7 +89,7 @@ export class PermanentLinksModalComponent implements OnInit {
     modalRef.componentInstance.modalContent = 'Are you sure you wish to delete this state?';
     modalRef.componentInstance.cancelButtonText = 'Cancel';
     modalRef.componentInstance.confirmButtonText = 'Delete';
-    await modalRef.result.then(result => {
+    modalRef.result.then(result => {
       if (result && result === 'OK') {
         const stateId = this.userStates[stateNo].id;
         this.userStateService.removeState(stateId).subscribe(() => {
@@ -98,7 +98,9 @@ export class PermanentLinksModalComponent implements OnInit {
           alert('Error removing state: ' + err.message);
         });
       }
-    });
+    }).catch(
+        (error) => console.error("Could not delete state", error)
+    );
   }
 
   /**
@@ -145,13 +147,13 @@ export class PermanentLinksModalComponent implements OnInit {
         modalRef.componentInstance.modalContent = 'You have unsaved changes, do you wish to save?';
         modalRef.componentInstance.cancelButtonText = 'Cancel';
         modalRef.componentInstance.confirmButtonText = 'Save';
-        await modalRef.result.then(result => {
+        modalRef.result.then(result => {
           if (result && result === 'OK') {
            this.saveState(this.editingState);
            this.editingState = -1;
            this.editState(stateNo);
           }
-        });
+        }).catch((error) => console.error("Could not save changes", error));
       } else {
 
         if (this.editingState !== -1) {
@@ -195,11 +197,11 @@ export class PermanentLinksModalComponent implements OnInit {
       modalRef.componentInstance.modalContent = 'You have unsaved changes, do you wish to continue without saving?';
       modalRef.componentInstance.cancelButtonText = 'Cancel';
       modalRef.componentInstance.confirmButtonText = 'OK';
-      await modalRef.result.then(result => {
+      modalRef.result.then(result => {
         if (result && result === 'OK') {
          this.activeModal.close();
         }
-      });
+      }).catch((error) => console.error('Could not close permlink dialog', error));
     } else {
       this.activeModal.close();
     }
