@@ -21,6 +21,10 @@
         ],
         "createDefaultProgram": true
       },
+      "plugins": [
+        "@typescript-eslint/eslint-plugin",
+        "@angular-eslint/eslint-plugin-template"
+      ],
       "extends": [
         "plugin:@angular-eslint/recommended",
         "plugin:@angular-eslint/template/process-inline-templates",
@@ -50,10 +54,15 @@
         ],
         // ESLint
         "@typescript-eslint/no-floating-promises": "error",
-        "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": ["warn",
+        { 
+            "argsIgnorePattern": "^_",
+            "varsIgnorePattern": "^_",
+            "caughtErrorsIgnorePattern": "^_"
+        }],
         "@typescript-eslint/consistent-type-definitions": ["warn", "interface"],
         "@typescript-eslint/no-empty-function": "warn",
-        "@typescript-eslint/ban-types": "warn",
         "@typescript-eslint/no-this-alias": ["warn", {"allowedNames": ["me"]}],
         // Unfortunately this flags every single void method not marked as void
         "@typescript-eslint/explicit-module-boundary-types": "off",
