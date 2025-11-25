@@ -32,7 +32,7 @@ export class AuthGuard {
         ));
     }
     // Navigate to the login page
-    this.router.navigate(['/login']);
+    await this.router.navigate(['/login']);
     return false;
   }
 

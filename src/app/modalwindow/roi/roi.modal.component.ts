@@ -54,7 +54,7 @@ export class ROIModalComponent {
       modalRef.componentInstance.modalContent = 'You have unsaved changes, do you wish to continue without saving?';
       modalRef.componentInstance.cancelButtonText = 'Cancel';
       modalRef.componentInstance.confirmButtonText = 'OK';
-      modalRef.result.then(result => {
+      await modalRef.result.then(result => {
         if (result && result === 'OK') {
          this.activeModal.close();
         }

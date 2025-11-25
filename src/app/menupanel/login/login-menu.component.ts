@@ -32,7 +32,7 @@ export class LoginMenuComponent {
    * Redirect to login page
    */
   login() {
-    this.router.navigate(['login']);
+    await this.router.navigate(['login']);
   }
 
   /**

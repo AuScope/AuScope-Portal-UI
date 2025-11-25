@@ -89,7 +89,7 @@ export class PermanentLinksModalComponent implements OnInit {
     modalRef.componentInstance.modalContent = 'Are you sure you wish to delete this state?';
     modalRef.componentInstance.cancelButtonText = 'Cancel';
     modalRef.componentInstance.confirmButtonText = 'Delete';
-    modalRef.result.then(result => {
+    await modalRef.result.then(result => {
       if (result && result === 'OK') {
         const stateId = this.userStates[stateNo].id;
         this.userStateService.removeState(stateId).subscribe(() => {
@@ -145,7 +145,7 @@ export class PermanentLinksModalComponent implements OnInit {
         modalRef.componentInstance.modalContent = 'You have unsaved changes, do you wish to save?';
         modalRef.componentInstance.cancelButtonText = 'Cancel';
         modalRef.componentInstance.confirmButtonText = 'Save';
-        modalRef.result.then(result => {
+        await modalRef.result.then(result => {
           if (result && result === 'OK') {
            this.saveState(this.editingState);
            this.editingState = -1;
@@ -195,7 +195,7 @@ export class PermanentLinksModalComponent implements OnInit {
       modalRef.componentInstance.modalContent = 'You have unsaved changes, do you wish to continue without saving?';
       modalRef.componentInstance.cancelButtonText = 'Cancel';
       modalRef.componentInstance.confirmButtonText = 'OK';
-      modalRef.result.then(result => {
+      await modalRef.result.then(result => {
         if (result && result === 'OK') {
          this.activeModal.close();
         }

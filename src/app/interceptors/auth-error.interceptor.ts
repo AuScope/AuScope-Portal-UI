@@ -24,7 +24,7 @@ export class AuthErrorHandlerInterceptor implements HttpInterceptor {
     if (error instanceof HttpErrorResponse && error.status === 403 && error.error.path !== '/api/secure/getUser.do') {
       this.userStateService.logoutUser();
       this.showSessionTimedOutAlert();
-      this.router.navigate(['login']);
+      await this.router.navigate(['login']);
     }
     throw error;
   }

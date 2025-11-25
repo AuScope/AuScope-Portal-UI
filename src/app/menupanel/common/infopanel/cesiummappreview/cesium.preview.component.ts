@@ -164,7 +164,7 @@ export class CesiumMapPreviewComponent {
             }
         });
         const bboxEntity = this.viewer.entities.getById('temp-bbox');
-        this.viewer.zoomTo(bboxEntity).then(() => {
+        await this.viewer.zoomTo(bboxEntity).then(() => {
             this.viewer.entities.removeById('temp-bbox');
         });
     }

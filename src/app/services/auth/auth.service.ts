@@ -21,12 +21,12 @@ export class AuthService {
   logout(): void {
     this.http.get(environment.portalProxyUrl + 'logout').subscribe(() => {
       this.userStateService.logoutUser();
-      this.router.navigate(['']);
+      await this.router.navigate(['']);
     });
   }
 
   onLoggedIn() {
-    this.router.navigate(['/']);
+    await this.router.navigate(['/']);
   }
 
   public get isLoggedIn(): boolean {
