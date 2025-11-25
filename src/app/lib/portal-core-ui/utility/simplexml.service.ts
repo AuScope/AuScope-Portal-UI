@@ -449,7 +449,7 @@ export class SimpleXMLService {
       const sldDoc = sldParser.parseFromString(sldBody, 'text/xml');
 
       // Intersects will be inside Filters...
-      const filterNodes = sldDoc.evaluate('//ogc:Filter', sldDoc, SimpleXMLService.namespaceResolver,
+      const filterNodes = sldDoc.evaluate('//ogc:Filter', sldDoc, (prefix: string) => SimpleXMLService.namespaceResolver(prefix),
                                           XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
       for (let f = 0; f < filterNodes.snapshotLength; f++) {
         const currentFilterNode = filterNodes.snapshotItem(f);
@@ -479,7 +479,7 @@ export class SimpleXMLService {
 
     // Get non-And (Filter) nodes of parent that are not Intersects
     const childOtherNodes = sldDoc.evaluate('./*[not(self::ogc:And)]', parentNode,
-                                            SimpleXMLService.namespaceResolver, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+                                            (prefix: string) => SimpleXMLService.namespaceResolver(prefix), XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
     for (let i = 0; i < childOtherNodes.snapshotLength; i++) {
       const currentOtherNode = childOtherNodes.snapshotItem(i);
       if (currentOtherNode.nodeName !== 'ogc:Intersects') {
@@ -489,7 +489,7 @@ export class SimpleXMLService {
     }
 
     // Recurse any And nodes
-    const childAndNodes = sldDoc.evaluate('ogc:And', parentNode, SimpleXMLService.namespaceResolver,
+    const childAndNodes = sldDoc.evaluate('ogc:And', parentNode, (prefix: string) => SimpleXMLService.namespaceResolver(prefix),
                                           XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
     for (let i = 0; i < childAndNodes.snapshotLength; i++) {
       const currentAndNode = childAndNodes.snapshotItem(i);

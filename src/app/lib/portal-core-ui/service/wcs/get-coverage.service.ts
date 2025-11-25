@@ -83,37 +83,36 @@ export class GetCoverageService {
    * @Return a single <CoverageOffering> element from a WCS DescribeCoverage response.
    */
   public parseCoverageRes(response: string) {
-    let rootNode;
-    let nodes: Node[];
-    let node: Node;
     let MAP_FORMATS;
-    rootNode = SimpleXMLService.parseStringToDOM(response);
+    const rootNode = SimpleXMLService.parseStringToDOM(response);
+    const nsResolverFn = (prefix: any) => this.nsResolver(prefix);
     MAP_FORMATS = '/wcs:CoverageDescription/wcs:CoverageOffering';
-    nodes = SimpleXMLService.evaluateXPathNodeArray(rootNode, rootNode, MAP_FORMATS, this.nsResolver);
-    node = nodes[0];
+    const nodes = SimpleXMLService.evaluateXPathNodeArray(rootNode, rootNode, MAP_FORMATS, nsResolverFn);
+    const node = nodes[0];
+
     if (!node) {
       const retVal = { data: [], msg: "", success: false };
       return retVal;
     }
     else {
-      const wcsRecElems = this.getWCSRecElems(rootNode, node, this.nsResolver);
-      const { supportedRequestCRSs, supportedResponseCRSs } = this.getSupportedReqRes(rootNode, node, this.nsResolver);
+      const wcsRecElems = this.getWCSRecElems(rootNode, node, nsResolverFn);
+      const { supportedRequestCRSs, supportedResponseCRSs } = this.getSupportedReqRes(rootNode, node, nsResolverFn);
 
       MAP_FORMATS = 'wcs:supportedFormats/wcs:formats';
-      const supportedFormats = this.getNodeArray(rootNode, node, this.nsResolver, MAP_FORMATS);
+      const supportedFormats = this.getNodeArray(rootNode, node, nsResolverFn, MAP_FORMATS);
 
       MAP_FORMATS = 'wcs:supportedInterpolations/wcs:interpolationMethod';
-      const supportedInterpolations = this.getNodeArray(rootNode, node, this.nsResolver, MAP_FORMATS);
+      const supportedInterpolations = this.getNodeArray(rootNode, node, nsResolverFn, MAP_FORMATS);
 
       MAP_FORMATS = 'wcs:supportedCRSs/wcs:nativeCRSs';
-      const nativeCRSs = this.getNodeArray(rootNode, node, this.nsResolver, MAP_FORMATS);
+      const nativeCRSs = this.getNodeArray(rootNode, node, nsResolverFn, MAP_FORMATS);
 
       MAP_FORMATS = 'wcs:domainSet/wcs:spatialDomain';
-      const spatialDomainNode = SimpleXMLService.evaluateXPathNodeArray(rootNode, node, MAP_FORMATS, this.nsResolver);
-      const spatialDomain = this.getSpatialDomain(rootNode, spatialDomainNode[0], this.nsResolver);
+      const spatialDomainNode = SimpleXMLService.evaluateXPathNodeArray(rootNode, node, MAP_FORMATS, nsResolverFn);
+      const spatialDomain = this.getSpatialDomain(rootNode, spatialDomainNode[0], nsResolverFn);
 
-      const temporalDomain = this.getTemporalDomain(rootNode, node, this.nsResolver);
-      const rangeSet = this.getRangeSet(rootNode, node, this.nsResolver);
+      const temporalDomain = this.getTemporalDomain(rootNode, node, nsResolverFn);
+      const rangeSet = this.getRangeSet(rootNode, node, nsResolverFn);
 
       const retVal = { data: [], msg: "", success: true };
       retVal.data.push({

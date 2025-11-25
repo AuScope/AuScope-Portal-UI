@@ -534,7 +534,7 @@ export class CsWMSService {
       }
       const errorPayload = new ErrorPayload(this, layer);
 
-      wmsImagProv.errorEvent.addEventListener(errorPayload.errorEvent, errorPayload);
+      wmsImagProv.errorEvent.addEventListener((evt: any) => errorPayload.errorEvent(evt), errorPayload);
       return viewer.imageryLayers.addImageryProvider(wmsImagProv);
     }
     return null;

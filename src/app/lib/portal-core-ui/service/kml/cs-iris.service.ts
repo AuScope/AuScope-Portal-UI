@@ -243,7 +243,7 @@ export class CsIrisService {
           camera: viewer.scene.camera,
           canvas: viewer.scene.canvas
         };
-        const stylefn = me.styleIrisEntity;
+        const stylefn = (entity: any) => me.styleIrisEntity(entity);
         // Create data source
         const source = new Cesium.KmlDataSource(options);
 

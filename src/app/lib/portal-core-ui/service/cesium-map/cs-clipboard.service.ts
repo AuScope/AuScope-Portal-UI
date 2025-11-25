@@ -167,6 +167,7 @@ export class CsClipboardService {
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
+          // eslint-disable-next-line @typescript-eslint/no-base-to-string
           const kml = reader.result.toString();
           const coordsString = kml.substring(
             kml.indexOf("<coordinates>") + "<coordinates>".length,

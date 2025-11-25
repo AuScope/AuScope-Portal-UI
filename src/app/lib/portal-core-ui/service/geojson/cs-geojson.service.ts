@@ -73,9 +73,9 @@ export class CsGeoJsonService {
       if (UtilitiesService.layerContainsResourceType(layer, ResourceType.GEOJSON)) {
         // add geoJson to map
         if (! layer.stylefn) {
-           layer.stylefn = me.styleGeoJsonEntity;
+           layer.stylefn = (entity: any) => me.styleGeoJsonEntity(entity);
         }
-        var promise;
+        let promise;
         if (layer.jsonDoc) {
           promise = Cesium.GeoJsonDataSource.load(JSON.parse(layer.jsonDoc));
         } else {

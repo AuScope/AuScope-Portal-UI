@@ -2,7 +2,7 @@
 import { throwError as observableThrowError, Observable } from 'rxjs';
 import { Injectable, Inject } from '@angular/core';
 import { timeoutWith, map, catchError } from 'rxjs/operators';
-import { HttpClient, HttpParams, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 
 import { Bbox } from '../../../model/data/bbox.model';
 import { LayerModel } from '../../../model/data/layer.model';

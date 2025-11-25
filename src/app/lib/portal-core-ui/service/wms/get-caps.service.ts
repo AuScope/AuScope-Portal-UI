@@ -342,38 +342,39 @@ export class GetCapsService {
    */
   public getLayersFromGetCapabilities(getCapsResponse: any): any {
     const rootNode = SimpleXMLService.parseStringToDOM(getCapsResponse);
+    const nsResolverFn = (prefix: string) => this.nsResolver(prefix);
     // Root layers are all layers with an attribute "queryable=1"
     const ROOT_LAYERS = '//xsi:Layer[@queryable=1]';
-    const rootLayers: Element[] = SimpleXMLService.evaluateXPathNodeArray(rootNode, rootNode, ROOT_LAYERS, this.nsResolver);
-    const mapFormats = this.getMapFormats(rootNode, rootNode, this.nsResolver);
-    const applicationProfile = this.findApplicationProfile(rootNode, this.nsResolver);
-    const accessConstraints = this.findAccessConstraints(rootNode, this.nsResolver);
+    const rootLayers: Element[] = SimpleXMLService.evaluateXPathNodeArray(rootNode, rootNode, ROOT_LAYERS, nsResolverFn);
+    const mapFormats = this.getMapFormats(rootNode, rootNode, nsResolverFn);
+    const applicationProfile = this.findApplicationProfile(rootNode, nsResolverFn);
+    const accessConstraints = this.findAccessConstraints(rootNode, nsResolverFn);
 
     const retVal = { data: { cswRecords: [], capabilityRecords: [], invalidLayerCount: 0 }, msg: '', success: true, serviceUrl: '' };
 
     if (rootLayers.length == 0) {
       // check for the element "mdb:identificationInfo"
       const SERVICE_GET_CAP = '//mdb:identificationInfo/srv:SV_ServiceIdentification/srv:containsOperations/srv:SV_OperationMetadata/srv:connectPoint';
-      const serviceCapsUrl = SimpleXMLService.evaluateXPathString(rootNode, rootNode, SERVICE_GET_CAP, this.nsResolver);
+      const serviceCapsUrl = SimpleXMLService.evaluateXPathString(rootNode, rootNode, SERVICE_GET_CAP, nsResolverFn);
 
       retVal.serviceUrl = serviceCapsUrl;
     }
 
     for (let i = 0; i < rootLayers.length; i++) {
       const layerNode = rootLayers[i];
-      const cswRecElems = this.getCSWRecElems(rootNode, layerNode, this.nsResolver);
-      const onlineResElems = this.getOnlineResElems(rootNode, layerNode, this.nsResolver);
+      const cswRecElems = this.getCSWRecElems(rootNode, layerNode, nsResolverFn);
+      const onlineResElems = this.getOnlineResElems(rootNode, layerNode, nsResolverFn);
 
       onlineResElems['applicationProfile'] = applicationProfile;
-      const geoElems = this.getGeoElems(rootNode, layerNode, this.nsResolver);
-      const timeExtent = this.findDims(rootNode, layerNode, this.nsResolver, 'time');
-      const layerSRS = this.getLayerSRS(rootNode, layerNode, this.nsResolver, []);
-      const metadataUrl = this.getMetadataUrl(rootNode, layerNode, this.nsResolver);
-      const legendUrl = this.getLegendUrl(rootNode, layerNode, this.nsResolver);
+      const geoElems = this.getGeoElems(rootNode, layerNode, nsResolverFn);
+      const timeExtent = this.findDims(rootNode, layerNode, nsResolverFn, 'time');
+      const layerSRS = this.getLayerSRS(rootNode, layerNode, nsResolverFn, []);
+      const metadataUrl = this.getMetadataUrl(rootNode, layerNode, nsResolverFn);
+      const legendUrl = this.getLegendUrl(rootNode, layerNode, nsResolverFn);
 
       // Only some layers will have Min/MaxScaleDenominators, these can affect if a layer will display at some zoom levels
-      const minScaleDenominator = this.getMinScaleDenominator(rootNode, layerNode, this.nsResolver);
-      const maxScaleDenominator = this.getMaxScaleDenominator(rootNode, layerNode, this.nsResolver);
+      const minScaleDenominator = this.getMinScaleDenominator(rootNode, layerNode, nsResolverFn);
+      const maxScaleDenominator = this.getMaxScaleDenominator(rootNode, layerNode, nsResolverFn);
 
       // One cswRecord object per layer
       retVal.data.cswRecords.push({

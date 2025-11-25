@@ -129,7 +129,7 @@ export class GenericStyleService {
         if (Array.isArray(filter)) {
           // This is likely the layers.yaml format: [label, field, null, operator]
           if (filter.length >= 4) {
-            const [label, field, _, operator] = filter;
+            const [_label, field, _, operator] = filter;
 
             // Check if this filter has a value (added by UI)
             const arrayFilter = filter as unknown as { value?: string };
