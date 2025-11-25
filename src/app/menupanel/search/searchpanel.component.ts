@@ -456,7 +456,7 @@ export class SearchPanelComponent implements OnInit {
   public layerWarningMessage(_layer: LayerModel): string {
     return 'This layer cannot be displayed. For Featured Layers, please wait for the layer cache to rebuild itself. ' +
       'For Custom Layers please note that only the following online resource types can be added to the map: ' +
-      UtilitiesService.getSupportedOnlineResourceTypes();
+      UtilitiesService.getSupportedOnlineResourceTypes().join(" ");
   }
 
   /**

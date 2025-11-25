@@ -225,7 +225,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
    */
   public getUnsupportedLayerMessage(): string {
     return 'This layer cannot be displayed. Only the following online resource types can be added to the map: ' +
-      UtilitiesService.getSupportedOnlineResourceTypes();
+      UtilitiesService.getSupportedOnlineResourceTypes().join(" ")
   }
 
   /**

@@ -222,7 +222,7 @@ export class InfoPanelSubComponent implements OnInit {
 
                 // Add default time if present
                 if (layerTimes?.currentTime) {
-                    params += '&TIME=' + layerTimes.currentTime;
+                    params += '&TIME=' + layerTimes.currentTimed.toISOString();
                 }
 
                 this.wmsUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(wmsOnlineResource.url), params);

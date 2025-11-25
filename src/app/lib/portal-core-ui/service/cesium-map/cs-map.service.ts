@@ -197,15 +197,6 @@ export class CsMapService {
   }
 
   /**
-   * Get a list of current map supported OnlineResource types.
-   * Excludes config CSW renderer list.
-   * @returns a list of supported OnlineResource types as strings
-   */
-  public getSupportedOnlineResourceTypes(): ResourceType[] {
-    return [ResourceType.WMS, ResourceType.IRIS, ResourceType.KML, ResourceType.KMZ, ResourceType.VMF, ResourceType.GEOJSON];
-  }
-
-  /**
    * Check if a layer is supported to be added to the map
    * @param layer layer to be added to map
    * @returns true if layer is supported, false otherwise
@@ -214,7 +205,7 @@ export class CsMapService {
     if (this.conf.cswrenderer && this.conf.cswrenderer.includes(layer.id)) {
       return true;
     }
-    for (const resourceType of this.getSupportedOnlineResourceTypes()) {
+    for (const resourceType of UtilitiesService.getSupportedOnlineResourceTypes()) {
       if (UtilitiesService.layerContainsResourceType(layer, resourceType)) {
         return true;
       }
