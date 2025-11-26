@@ -176,6 +176,9 @@ export class FilterService {
         if (!(layer.capabilityRecords && layer.capabilityRecords.length > 0)) {
             this.getCapabilityRecord(layer).subscribe(updatedLayer => {
                 this.processLayerTimes(updatedLayer, layerTimes, layerTimesBS);
+            }, () => {
+                // On error, proceed with processing using the original layer
+                this.processLayerTimes(layer, layerTimes, layerTimesBS);
             });
         } else {
             this.processLayerTimes(layer, layerTimes, layerTimesBS);
