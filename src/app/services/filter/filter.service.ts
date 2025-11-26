@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { LayerHandlerService } from '../../lib/portal-core-ui/service/cswrecords/layer-handler.service';
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 import { UtilitiesService } from '../../lib/portal-core-ui/utility/utilities.service';
@@ -91,39 +92,42 @@ export class FilterService {
         return existingLayerProviders;
     }
 
-    private getCapabilityRecord(layer: LayerModel): LayerModel {
+    private getCapabilityRecord(layer: LayerModel): Observable<LayerModel> {
         let wmsEndpointUrl = null;
         let layerName = null;
         // Check if WMS capability record present
         if (layer.capabilityRecords && layer.capabilityRecords.length > 0) {
-            return;
+            return of(layer);
         }
         // Look for WMS endpoint in CSW records if not already found
         if (layer.cswRecords && layer.cswRecords.length > 0) {
             for (const cswRecord of layer.cswRecords) {
-            if (cswRecord.onlineResources) {
-                const resource = cswRecord.onlineResources.find(o => o.type.toLowerCase() === 'wms');
-                if (resource) {
-                wmsEndpointUrl = resource.url;
-                layerName = resource.name;
-                continue;
+                if (cswRecord.onlineResources) {
+                    const resource = cswRecord.onlineResources.find(o => o.type.toLowerCase() === 'wms');
+                    if (resource) {
+                        wmsEndpointUrl = resource.url;
+                        layerName = resource.name;
+                        continue;
+                    }
                 }
-            }
             }
         }
 
         // Query WMS GetCapabilities for timeExtent
         if (wmsEndpointUrl !== null && layerName !== null) {
             if (wmsEndpointUrl.indexOf('?') !== -1) {
-            wmsEndpointUrl = wmsEndpointUrl.substring(0, wmsEndpointUrl.indexOf('?'));
+                wmsEndpointUrl = wmsEndpointUrl.substring(0, wmsEndpointUrl.indexOf('?'));
             }
-            this.getCapsService.getCaps(wmsEndpointUrl).subscribe(response => {
-            if (response.data && response.data.capabilityRecords.length === 1) {
-                layer.capabilityRecords = response.data.capabilityRecords;
-            }
-            });
+            return this.getCapsService.getCaps(wmsEndpointUrl).pipe(
+                map(response => {
+                    if (response.data && response.data.capabilityRecords.length === 1) {
+                        layer.capabilityRecords = response.data.capabilityRecords;
+                    }
+                    return layer;
+                })
+            );
         }
-        return layer;
+        return of(layer);
     }
 
     /**
@@ -168,14 +172,26 @@ export class FilterService {
             this.layerTimes.set(layer.id, layerTimesBS);
         }
 
-
-        let wmsEndpointUrl = null;
-        let layerName = null;
-
         // Check if WMS capability record present
         if (!(layer.capabilityRecords && layer.capabilityRecords.length > 0)) {
-            layer = this.getCapabilityRecord(layer);
+            this.getCapabilityRecord(layer).subscribe(updatedLayer => {
+                this.processLayerTimes(updatedLayer, layerTimes, layerTimesBS);
+            });
+        } else {
+            this.processLayerTimes(layer, layerTimes, layerTimesBS);
         }
+    }
+
+    /**
+     * Process layer times after capability records have been retrieved
+     *
+     * @param layer the layer with capability records
+     * @param layerTimes the layer times to update
+     * @param layerTimesBS the behavior subject to emit updates
+     */
+    private processLayerTimes(layer: LayerModel, layerTimes: LayerTimes, layerTimesBS: BehaviorSubject<LayerTimes>) {
+        let wmsEndpointUrl = null;
+        let layerName = null;
 
         // Check if WMS capability record present and time extent set
         if (layer.capabilityRecords && layer.capabilityRecords.length > 0) {
@@ -190,14 +206,14 @@ export class FilterService {
         // Look for WMS endpoint in CSW records if not already found
         if (!layerTimes.currentTime && layer.cswRecords && layer.cswRecords.length > 0) {
             for (const cswRecord of layer.cswRecords) {
-            if (cswRecord.onlineResources) {
-                const resource = cswRecord.onlineResources.find(o => o.type.toLowerCase() === 'wms');
-                if (resource) {
-                    wmsEndpointUrl = resource.url;
-                    layerName = resource.name;
-                    continue;
+                if (cswRecord.onlineResources) {
+                    const resource = cswRecord.onlineResources.find(o => o.type.toLowerCase() === 'wms');
+                    if (resource) {
+                        wmsEndpointUrl = resource.url;
+                        layerName = resource.name;
+                        continue;
+                    }
                 }
-            }
             }
         }
         // Query WMS GetCapabilities for timeExtent
@@ -207,24 +223,24 @@ export class FilterService {
                 wmsEndpointUrl = wmsEndpointUrl.substring(0, wmsEndpointUrl.indexOf('?'));
             }
             this.getCapsService.getCaps(wmsEndpointUrl).subscribe(response => {
-            if (response.data && response.data.capabilityRecords.length === 1 && response.data.capabilityRecords[0].layers.length > 0) {
-                const responseLayers = response.data.capabilityRecords[0].layers.filter(l => l.name === layerName);
-                if (responseLayers && responseLayers.length > 0 && responseLayers[0].timeExtent) {
-                    // Sort by date (newest first)
-                    layerTimes.timeExtent = responseLayers[0].timeExtent.sort((a, b) => {
-                        return <any>new Date(b) - <any>new Date(a);
-                    });
-                    // Time may have already been set from retrieving state
-                    if (!layerTimes.currentTime) {
-                        layerTimes.currentTime = layerTimes.timeExtent[0];
+                if (response.data && response.data.capabilityRecords.length === 1 && response.data.capabilityRecords[0].layers.length > 0) {
+                    const responseLayers = response.data.capabilityRecords[0].layers.filter(l => l.name === layerName);
+                    if (responseLayers && responseLayers.length > 0 && responseLayers[0].timeExtent) {
+                        // Sort by date (newest first)
+                        layerTimes.timeExtent = responseLayers[0].timeExtent.sort((a, b) => {
+                            return <any>new Date(b) - <any>new Date(a);
+                        });
+                        // Time may have already been set from retrieving state
+                        if (!layerTimes.currentTime) {
+                            layerTimes.currentTime = layerTimes.timeExtent[0];
+                        }
                     }
                 }
-            }
-            layerTimes.loadingTimeExtent = false;
-            layerTimesBS.next(layerTimes);
+                layerTimes.loadingTimeExtent = false;
+                layerTimesBS.next(layerTimes);
             }, () => {
-            layerTimes.loadingTimeExtent = false;
-            layerTimesBS.next(layerTimes);
+                layerTimes.loadingTimeExtent = false;
+                layerTimesBS.next(layerTimes);
             });
         } else {
             layerTimes.loadingTimeExtent = false;
