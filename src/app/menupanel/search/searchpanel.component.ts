@@ -29,11 +29,11 @@ import { DownloadAuScopeCatModalComponent } from 'app/modalwindow/download-ausco
 // Search fields
 const SEARCH_FIELDS = [{
   name: 'Name',
-  fields: ['knownLayerNames', 'belongingRecords.serviceName', 'serviceName'],
+  fields: ['knownLayerNames', 'serviceName'],
   checked: true
 }, {
   name: 'Record Keywords',
-  fields: ['belongingRecords.descriptiveKeywords', 'descriptiveKeywords'],
+  fields: ['descriptiveKeywords'],
   checked: true
 }, {
   name: 'Record Abstract',
@@ -41,7 +41,7 @@ const SEARCH_FIELDS = [{
   checked: true
 }, {
   name: 'Record Layer Name',
-  fields: ['belongingRecords.layerName', 'layerName'],
+  fields: ['layerName'],
   checked: true
 }];
 
@@ -307,7 +307,6 @@ export class SearchPanelComponent implements OnInit {
    * remove one Layer from  MapDownloadLayers
    */
   public removeDownloadLayer(layer: LayerModel){
-    console.log('removeDownloadLayer');
     this.mapDownloadLayers.delete(layer.id);
     return;
   }
@@ -316,7 +315,6 @@ export class SearchPanelComponent implements OnInit {
    * clearDownloadLayers
    */
   public clearDownloadLayers() {
-    console.log('clearDownloadLayers');
     this.mapDownloadLayers.clear();
     return;
   }
@@ -329,7 +327,6 @@ export class SearchPanelComponent implements OnInit {
       return;
     }
     if (layer.id) {
-      console.log(layer.name);
       if (this.mapDownloadLayers.has(layer.id)) {
         this.mapDownloadLayers.delete(layer.id);
       } else {
@@ -342,7 +339,6 @@ export class SearchPanelComponent implements OnInit {
    * downloadAll event
    */
   public async downloadAll() {
-    console.log('downloadAll');
     this.completed0 = 0;
     this.total0 = this.mapDownloadLayers.size;
     for(const key of this.mapDownloadLayers.keys()) {
@@ -382,10 +378,6 @@ export class SearchPanelComponent implements OnInit {
         continue;
       }
       const typename = onlineResourcesWFS.name;
-      const type = onlineResourcesWFS.type;
-      if (!type || type.toLowerCase().indexOf('wfs')<0) {
-        console.log('No WFS finded for');
-      }
 
       const httpParams = new HttpParams({
         encoder: new HttpUrlEncodingCodec(),
@@ -687,15 +679,11 @@ export class SearchPanelComponent implements OnInit {
     this.searchResults = [];
     this.alertMessage = '';
 
-    // TODO: ADD A CHECKBOX FOR INCLUDING CSWRECORDS
-    const includeCSWResults = true;
-
     const selectedSearchFields: string[] = [];
     for (const sField of this.searchFields.filter(f => f.checked === true)) {
-      selectedSearchFields.push(sField.fields[0]);
-      // If including CSW results and there's an associated CSWRecord field, add it
-      if (includeCSWResults && sField.fields.length === 2) {
-        selectedSearchFields.push(sField.fields[1]);
+
+      for (const field of sField.fields) {
+        selectedSearchFields.push(field);
       }
     }
 
