@@ -16,19 +16,31 @@
     }
 }
 
-// Widen search results, remove info-panel and add info-btn when screen width below 1000px
+// Widen search results/downloads and add info-btn on small screens
 @media only screen and (max-width: 1300px) {
-    .results-pane {
+    .results-panel {
         width: 100%;
         min-width: 100%;
-    }
-    
-    .search-info-panel {
-        display: none;
-    }
 
-    .btn-info {
-        display: block;
+        .search-info-panel {
+            display: none;
+            position: static;
+            width: 0;
+        }
+
+        .results-row {
+            width: 100%;
+            display: block;
+
+            .results-column {
+                width: 100% !important;
+                flex: none;
+
+                .results-list {
+                    overflow-y: visible !important;
+                }
+            }
+        }
     }
 }
 
@@ -149,6 +161,7 @@
             .advanced-options-panel {
                 padding-left: 5px;
                 padding-right: 5px;
+                min-width: max-content;
             }
 
             .spatial-options-panel {
@@ -166,43 +179,163 @@
     .results-panel {
         position: relative;
         width: 100%;
-        max-height: 420px;
         overflow-y: clip;
-        padding: 8px 0 0px 8px;
         background-color: #fdfdfd;
 
-        .results-table {
-            position: fixed;
-            display: contents;
+        .results-row {
+            display: flex;
+            position: relative;
 
-            .results-row {
+            .results-column {
+                width: 60%;
                 display: flex;
+                flex-direction: column;
+                flex: 0 0 auto;
+                padding: 0.5rem;
 
-                .results-column {
-                    width: 60%;
-                    display: flex;
-                    flex-direction: column;
-                    height: 410px;
+                .results-list {
+                    max-height: 420px;
+                    overflow-y: auto;
+                    flex: 0 0 auto;
 
-                    .clear-search-results-button {
-                        margin: 0px 0px 0px 20px;
-                        padding: 0px 2px 0px 0px;
-                        border-radius: 2px;
+                    .layer-header, .selected-layer-header {
+                        display: flex;
+                        width: 100%;
+                        height:2.2em;
+                        line-height:1.7em;
+                        margin-bottom:2px;cursor:pointer;
+                        padding:2px 5px 0px 5px;
+                        background-color: #f2f4f4;
+                        border-radius: 4px;
+                        text-align: start;
+
+                        .layer-header-label {
+                            width: 100%;
+                            color: black;
+                            display: block;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                            // Prevent selection
+                            -webkit-user-select: none; /* Safari */
+                            -ms-user-select: none; /* IE 10 and IE 11 */
+                            user-select: none; /* Standard syntax */
+                        }
+
+                        .download-button {
+                            float: right;
+                            padding: 2px;
+                            margin-left:8px;
+                            line-height:100%;
+                        }
                     }
 
+                    // Override bg-color for selected search result
+                    .selected-layer-header {
+                        background-color:  #f9e79f;
+                    }
+
+                    .layer-header:hover  {
+                        background-color: lightgray;
+                    }
+
+                    .selected-layer-header:hover {
+                        background-color:  #f9e79f;
+                    }
+
+                    .search-result-button {
+                        height: 90%;
+                        width: 8.5rem;  // consistency so Add/Remove don't push the CSW/Featured labels out and break alignment
+                        text-align: center;
+                        float: right;
+                        padding: 2px;
+                        margin-left: 8px;
+                        min-height: 8px;
+                    }
+
+                    .download-checkbox-button {
+                        height: 90%;
+                        width: 3rem; // consistency so Add/Remove don't push the CSW/Featured labels out and break alignment
+                        min-width: 3rem;
+                        text-align: center;
+                        float: right;
+                        padding: 2px;
+                        margin-left: 8px;
+                        min-height: 8px;
+
+                        .download-icon {
+                            margin: 0 2px 0 -2px;
+                            vertical-align: inherit;
+                        }
+                    }
+
+                    .csw-label {
+                        border-radius: 5px;
+                        background-color: #AED6F1;
+                        font-size: smaller;
+                        padding: 0px 4px;
+                        margin-left: 2px;
+                    }
+
+                    .layer-label {
+                        border-radius: 5px;
+                        background-color: #A9DFBF;
+                        font-size: smaller;
+                        padding: 0px 4px;
+                        margin-left: 2px;
+                    }
+
+                    // Overriding LayerPanel card styles to better fit this panel
+                    .card {
+                        margin-bottom: 0px;
+
+                        .nav-tabs {
+                            margin-top: 0px;
+                            padding-bottom: 0px;
+
+                            a {
+                                padding: 6px;
+                            }
+                        }   
+                    }
                 }
 
-                .search-info-panel {
-                    background-color: white;
-                    width: 40%;
-                    height: 410px;
-                    padding-left: 1rem;
-                    margin-left: 5px;
-                    overflow-y: auto;
-                    border-left: 1px solid #ccc;
+                .clear-search-results-button {
+                    margin: 0px 0px 0px 20px;
+                    padding: 0px 2px 0px 0px;
+                    border-radius: 2px;
+                }
+
+                .downloads-panel {
+                  margin-top: 0.5rem;
+                  flex: 0 0 auto;
+
+                  .downloads-list {
+                      background-color: rgb(220, 220, 220);
+                      border-radius: 0.5rem;
+                      padding: 0.5rem;
+                      max-width: 100%;
+
+                      .download-layers-list {
+                          max-height: calc(100vh - 560px);
+                          overflow-y: auto;
+                      }
+                  }
                 }
             }
 
+            .search-info-panel {
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 40%;
+                height: 100%;
+                margin-left: 5px;
+                overflow-y: auto;
+                padding: 0.5rem;
+                background-color: white;
+                border-left: 1px solid #ccc;
+            }
         }
 
         ::ng-deep .accordion-item {
@@ -212,6 +345,7 @@
 
     .pagination {
         overflow: hidden;
+        margin-bottom: -17px; // too much default room underneath this component
 
         button {
             margin: 0px 4px 0px 0px;
@@ -222,113 +356,6 @@
             display: none;
         }
     }
-
-    .results-list {
-        height:100%;
-        overflow-y: auto;
-
-        .layer-header, .selected-layer-header {
-            display: flex;
-            width: 100%;
-            height:2.2em;
-            line-height:1.7em;
-            margin-bottom:2px;cursor:pointer;
-            padding:2px 5px 0px 5px;
-            background-color: #f2f4f4;
-            border-radius: 4px;
-            text-align: start;
-
-            .layer-header-label {
-                width: 100%;
-                color: black;
-                display: block;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                // Prevent selection
-                -webkit-user-select: none; /* Safari */
-                -ms-user-select: none; /* IE 10 and IE 11 */
-                user-select: none; /* Standard syntax */
-            }
-
-            .download-button {
-                float: right;
-                padding: 2px;
-                margin-left:8px;
-                line-height:100%;
-            }
-
-        }
-
-        // Override bg-color for selected search result
-        .selected-layer-header {
-            background-color:  #f9e79f;
-        }
-
-        .layer-header:hover  {
-            background-color: lightgray;
-        }
-
-        .selected-layer-header:hover {
-            background-color:  #f9e79f;
-        }
-
-        .search-result-button {
-            height: 90%;
-            width: 8.5rem;  // consistency so Add/Remove don't push the CSW/Featured labels out and break alignment
-            text-align: center;
-            float: right;
-            padding: 2px;
-            margin-left: 8px;
-            min-height: 8px;
-        }
-
-        .csw-label {
-            border-radius: 5px;
-            background-color: #AED6F1;
-            font-size: smaller;
-            padding: 0px 4px;
-            margin-left: 2px;
-        }
-
-        .layer-label {
-            border-radius: 5px;
-            background-color: #A9DFBF;
-            font-size: smaller;
-            padding: 0px 4px;
-            margin-left: 2px;
-        }
-
-        // Overriding LayerPanel card styles to better fit this panel
-        .card {
-            margin-bottom: 0px;
-
-            .nav-tabs {
-                margin-top: 0px;
-                padding-bottom: 0px;
-
-                a {
-                    padding: 6px;
-                }
-            }   
-        }
-    }
-
-    .downloads-list {
-        background-color: white;
-        padding: 0.5rem;
-
-        .download-layers-list {
-            max-height: calc(100vh - 580px);
-            overflow-y: auto;
-        }
-    }
-
-    .break-border {
-        border-bottom: 2px solid #ccc;
-        margin-bottom: 0.5rem;
-    }
-
 }
 
 input:disabled {

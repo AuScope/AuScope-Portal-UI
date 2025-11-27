@@ -159,9 +159,9 @@
         </div>
       }
       @if (searchResults?.length > 0) {
-        <table class="results-table">
-          <tr class = "results-row">
-            <td class="results-column">
+          <div class = "results-row">
+            <!-- left column, search results and optional downloads -->
+            <div class="results-column">
               <div class="search-results-title">
                 <label><strong>{{ getSearchResultsTitle() }}</strong></label>
                 @if (!showingAllLayers) {
@@ -175,7 +175,7 @@
                     <span [ngClass]="searchResult  === selectedSearchResult ? 'selected-layer-header' : 'layer-header'" (click)="selectSearchResult(searchResult)">
                       <span class="layer-header-label" title="{{searchResult.layer.name}}">{{ searchResult.layer.name }}</span>
                       @if (searchResult.layer.id.startsWith('registry-csw:')) {
-                        <span class="csw-label search-result-button">CSW</span>
+                        <span class="csw-label search-result-button">Record</span>
                       }
                       @if (!searchResult.layer.id.startsWith('registry-csw:')) {
                         <span class="layer-label search-result-button">Featured</span>
@@ -186,8 +186,9 @@
                       @if (isLayerAdded(searchResult.layer.id)) {
                         <button class="btn btn-sm btn-danger search-result-button" type="button" title="Remove layer" (click)="removeLayer($event, searchResult.layer)"><i class="fa fa-trash"></i>&nbsp;Remove</button>
                       }
-                      <button class="btn btn-sm btn-info" type="button" title="Layer information" (click)="showLayerInformation($event, searchResult.layer)"><i class="fa fa-info-circle"></i>&nbsp;Info</button>
-                      <button class="btn btn-sm btn-primary search-result-button" type="button" title="Add to download" [style.visibility]="isCsvDownloadable(searchResult.layer) ? 'visible' : 'hidden'">
+                      <button class="btn btn-sm btn-info search-result-button" type="button" title="Layer information" (click)="showLayerInformation($event, searchResult.layer)"><i class="fa fa-info-circle"></i>&nbsp;Info</button>
+                      <button class="btn btn-sm btn-primary download-checkbox-button" type="button" title="Add to download list" [style.visibility]="isCsvDownloadable(searchResult.layer) ? 'visible' : 'hidden'">
+                        <i class="fa fa-download download-icon"></i>
                         <input type="checkbox" class="faChkSqr" style="vertical-align: middle;" [checked]="mapDownloadLayers.get(searchResult.layer.id)" (change)="OnChangeDownloadLayers(searchResult.layer)">
                       </button>
                     </span>
@@ -205,10 +206,47 @@
                   <ngb-pagination [collectionSize]="searchResults.length" [(page)]="currentPage" [maxSize]="5" [pageSize]="RESULTS_PER_PAGE" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>
                 </div>
               }
-            </td>
+
+              <!-- Downloads -->
+              @if (mapDownloadLayers.size > 0 && showingResultsPanel && !searching) {
+                <div class="downloads-panel">
+                  <div class="results-list downloads-list">
+                    <!--<div class="break-border"></div>-->
+                    <div class="search-results-title">
+                      <label><strong>Selected Layers To Download:&nbsp;</strong></label>
+                      <span class="layer-header-label">Layers:&nbsp;{{total0}}:{{completed0}}</span>
+                      <span class="layer-header-label">&nbsp;&nbsp;Files:&nbsp;{{total}}:{{completed}}</span>
+                      <button title="Clear all layers" class="btn btn-sm btn-danger clear-search-results-button" type="button" (click)="clearDownloadLayers()"><i class="fa fa-ban"></i>&nbsp;Clear&nbsp;</button>
+                      <button title="Download all layers" style="float:right;" class="btn btn-sm btn-success clear-search-results-button" type="button" (click)="downloadAll()"><i class="fa fa-download"></i>&nbsp;All</button>
+                    </div>
+                    <!-- DownloadLayers list -->
+                    <div class="download-layers-list">
+                      @for (downloadLayer of mapDownloadLayers | keyvalue; track downloadLayer) {
+                        <div>
+                          <button style="line-height:1.7em;height:2.2em;padding:2px 5px 0px 5px;margin-bottom:2px;" class="btn layer-header" style="align-items: baseline;">
+                            <button style="float:right;padding:2px 2px 2px 0;margin-left:0px;margin-right:8px;line-height:100%;" class="btn btn-sm btn-warning" type="button" title="Click to remove" (click)="removeDownloadLayer(downloadLayer.value.Layer)"><i class="fa fa-close" style="color:red"></i></button>
+                            <span class="layer-header-label" title="{{downloadLayer.value.Layer.name}}">{{ downloadLayer.value.Layer.name }}</span>
+                            <!--
+                            @if (downloadLayer.value.Ob | async as download) {
+                              <mat-progress-bar [mode]="download.state === 'PENDING' ? 'buffer' : 'determinate'" [value]="download.progress"></mat-progress-bar> 
+                            }
+                            -->
+                            @if (downloadLayer.value.Ob) {
+                              <mat-progress-bar style="height: 10px;" [mode]="determinate" [value]="downloadLayer.value.Ob.progress" ></mat-progress-bar>
+                            }
+                            <button class="btn btn-sm btn-primary download-button" type="button" title="Click to download" (click)="downloadAsCSV(downloadLayer.value.Layer)"><i class="fa fa-download"></i></button>
+                            <button class="btn btn-sm btn-primary download-button" type="button" title="Download with AuScope-Cat" (click)="downloadWithAuScopeCat(downloadLayer.value.Layer)"><i class="fa fa-plug"></i></button>
+                          </button>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
             <!-- Search Info Panel -->
             @if (selectedSearchResult && showingInfoPanel && !searching) {
-              <td class="search-info-panel">
+              <div class="search-info-panel">
                 <a style="font-weight: bolder;">Information</a>
                 @for (cswRecord of selectedSearchResult.layer.cswRecords; track cswRecord; let i = $index) {
                   <div>
@@ -220,48 +258,12 @@
                     }
                   </div>
                 }
-              </td>
+              </div>
             }
-          </tr>
-        </table>
+          </div>
       }
     </div>
   }
-
-  <!-- Downloads -->
-  @if (mapDownloadLayers.size > 0 && showingResultsPanel && !searching) {
-    <div class="results-list downloads-list">
-      <div class="break-border"></div>
-      <div class="search-results-title">
-        <label><strong>Selected Layers To Download:&nbsp;</strong></label>
-        <span class="layer-header-label">Layers:&nbsp;{{total0}}:{{completed0}}</span>
-        <span class="layer-header-label">&nbsp;&nbsp;Files:&nbsp;{{total}}:{{completed}}</span>
-        <button title="Clear all layers" class="btn btn-sm btn-danger clear-search-results-button" type="button" (click)="clearDownloadLayers()"><i class="fa fa-ban"></i>&nbsp;Clear&nbsp;</button>
-        <button title="Download all layers" style="float:right;" class="btn btn-sm btn-success clear-search-results-button" type="button" (click)="downloadAll()"><i class="fa fa-download"></i>&nbsp;All</button>
-      </div>
-      <!-- DownloadLayers list -->
-      <div class="download-layers-list">
-        @for (downloadLayer of mapDownloadLayers | keyvalue; track downloadLayer) {
-          <div>
-            <button style="line-height:1.7em;height:2.2em;padding:2px 5px 0px 5px;margin-bottom:2px;" class="btn layer-header" style="align-items: baseline;">
-              <button style="float:right;padding:2px 2px 2px 0;margin-left:0px;margin-right:8px;line-height:100%;" class="btn btn-sm btn-warning" type="button" title="Click to remove" (click)="removeDownloadLayer(downloadLayer.value.Layer)"><i class="fa fa-close" style="color:red"></i></button>
-              <span class="layer-header-label" title="{{downloadLayer.value.Layer.name}}">{{ downloadLayer.value.Layer.name }}</span>
-            <!--
-            @if (downloadLayer.value.Ob | async as download) {
-              <mat-progress-bar [mode]="download.state === 'PENDING' ? 'buffer' : 'determinate'" [value]="download.progress"></mat-progress-bar> 
-            }
-            -->
-            @if (downloadLayer.value.Ob) {
-              <mat-progress-bar style="height: 10px;" [mode]="determinate" [value]="downloadLayer.value.Ob.progress" ></mat-progress-bar>
-            }
-            <button class="btn btn-sm btn-primary download-button" type="button" title="Click to download" (click)="downloadAsCSV(downloadLayer.value.Layer)"><i class="fa fa-download"></i></button>
-            <button class="btn btn-sm btn-primary download-button" type="button" title="Download with AuScope-Cat" (click)="downloadWithAuScopeCat(downloadLayer.value.Layer)"><i class="fa fa-plug"></i></button>
-          </button>
-        </div>
-      }
-    </div>
-  </div>
-}
 
 <!-- KML/OGC options -->
 <div class="options-panel kml-options-panel" [style.display]="showingKmlOgcOptions ? 'block' : 'none'">
