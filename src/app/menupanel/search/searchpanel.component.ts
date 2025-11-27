@@ -29,35 +29,19 @@ import { DownloadAuScopeCatModalComponent } from 'app/modalwindow/download-ausco
 // Search fields
 const SEARCH_FIELDS = [{
   name: 'Name',
-  fields: ['knownLayerNames'],
+  fields: ['knownLayerNames', 'belongingRecords.serviceName', 'serviceName'],
   checked: true
 }, {
-  name: 'Description',
-  fields: ['knownLayerDescriptions'],
-  checked: true
-}, {
-  name: 'CSW Keywords',
+  name: 'Record Keywords',
   fields: ['belongingRecords.descriptiveKeywords', 'descriptiveKeywords'],
   checked: true
 }, {
-  name: 'CSW Name',
-  fields: ['belongingRecords.serviceName', 'serviceName'],
-  checked: true
-}, {
-  name: 'CSW Abstract',
+  name: 'Record Abstract',
   fields: ['dataIdentificationAbstract'],
   checked: true
 }, {
-  name: 'Layer Name',
+  name: 'Record Layer Name',
   fields: ['belongingRecords.layerName', 'layerName'],
-  checked: true
-}, {
-  name: 'Online Resource Name',
-  fields: ['belongingRecords.onlineResources.name', 'onlineResources.name'],
-  checked: true
-}, {
-  name: 'Online Resource description',
-  fields: ['belongingRecords.onlineResources.description', 'onlineResources.description'],
   checked: true
 }];
 

@@ -175,7 +175,7 @@
                     <span [ngClass]="searchResult  === selectedSearchResult ? 'selected-layer-header' : 'layer-header'" (click)="selectSearchResult(searchResult)">
                       <span class="layer-header-label" title="{{searchResult.layer.name}}">{{ searchResult.layer.name }}</span>
                       @if (searchResult.layer.id.startsWith('registry-csw:')) {
-                        <span class="csw-label search-result-button">CSW</span>
+                        <span class="csw-label search-result-button">Record</span>
                       }
                       @if (!searchResult.layer.id.startsWith('registry-csw:')) {
                         <span class="layer-label search-result-button">Featured</span>
