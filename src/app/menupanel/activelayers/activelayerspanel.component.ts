@@ -33,7 +33,7 @@ enum FilterMode {
 }
 
 @Component({
-    selector: '[appActiveLayers]',
+    selector: '[app-active-layers]',
     templateUrl: './activelayerspanel.component.html',
     styleUrls: ['../menupanel.scss', './activelayerspanel.component.scss'],
     standalone: false

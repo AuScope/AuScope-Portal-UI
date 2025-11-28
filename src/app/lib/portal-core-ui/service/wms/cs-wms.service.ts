@@ -107,11 +107,10 @@ export class CsWMSService {
       HEIGHT: Constants.TILE_SIZE,
       STYLES: param && param.styles ? param.styles : '',
     };
-
     if (param) {
       // Add in time parameter, but only if required
-      if (param.time) {
-        params['time'] = param.time;
+      if (param?.time instanceof Date) {
+        params['time'] = param.time.toISOString();
       }
       // Add in cql_filter parameter, if requested
       if (param.optionalFilters) {
@@ -163,11 +162,10 @@ export class CsWMSService {
       WIDTH: Constants.TILE_SIZE,
       HEIGHT: Constants.TILE_SIZE
     };
-
     if (param) {
       // Add in time parameter, but only if required
-      if (param.time) {
-        params['time'] = param.time;
+      if (param?.time instanceof Date) {
+        params['time'] = param.time.toISOString();
       }
       // Add in cql_filter parameter, if requested
       if (param.optionalFilters) {
@@ -445,7 +443,7 @@ export class CsWMSService {
         });
       } else {
         // Keep old function call
-        let oldCreateImage = (Resource as any)._Implementations.createImage;
+        const oldCreateImage = (Resource as any)._Implementations.createImage;
 
         // Overwrite CesiumJS 'createImage' function to allow us to do 'POST' requests via a proxy
         // If there is a 'usepost' parameter in the URL, then 'POST' via proxy else uses standard 'GET'
@@ -458,7 +456,7 @@ export class CsWMSService {
           }
           // Initiate loading WMS tiles via POST & a proxy
           (Resource as any).supportsImageBitmapOptions()
-            .then(function (supportsImageBitmap) {
+            .then(function (_supportsImageBitmap) {
               const responseType = "blob";
               const method = "POST";
               const xhrDeferred = when.defer();
@@ -534,7 +532,7 @@ export class CsWMSService {
       }
       const errorPayload = new ErrorPayload(this, layer);
 
-      wmsImagProv.errorEvent.addEventListener(errorPayload.errorEvent, errorPayload);
+      wmsImagProv.errorEvent.addEventListener((evt: any) => errorPayload.errorEvent(evt), errorPayload);
       return viewer.imageryLayers.addImageryProvider(wmsImagProv);
     }
     return null;

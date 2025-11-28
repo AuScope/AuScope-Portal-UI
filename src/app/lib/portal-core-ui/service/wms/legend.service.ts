@@ -15,7 +15,7 @@ export class LegendService {
    * @param styleUrl URL string to get legend from local server
    */
   public getLegendStyle(styleUrl: string): Observable<any> {
-    return this.http.get(this.env.portalBaseUrl + styleUrl, {responseType: 'text'}).pipe(
+    return this.http.get(this.env.portalBaseUrl + styleUrl, { responseType: 'text' }).pipe(
       tap(result => result));
   }
 }

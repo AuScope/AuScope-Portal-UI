@@ -10,7 +10,6 @@ import { environment } from '../../../environments/environment';
     standalone: false
 })
 export class LoginComponent {
-  constructor() {}
 
   // TODO: We may need to store some user site settings to local storage if not saved to DB for post-auth
 

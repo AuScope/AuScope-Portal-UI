@@ -98,7 +98,9 @@ export class PermanentLinksModalComponent implements OnInit {
           alert('Error removing state: ' + err.message);
         });
       }
-    });
+    }).catch(
+        (error) => console.error("Could not delete state", error)
+    );
   }
 
   /**
@@ -151,7 +153,7 @@ export class PermanentLinksModalComponent implements OnInit {
            this.editingState = -1;
            this.editState(stateNo);
           }
-        });
+        }).catch((error) => console.error("Could not save changes", error));
       } else {
 
         if (this.editingState !== -1) {
@@ -199,7 +201,7 @@ export class PermanentLinksModalComponent implements OnInit {
         if (result && result === 'OK') {
          this.activeModal.close();
         }
-      });
+      }).catch((error) => console.error('Could not close permlink dialog', error));
     } else {
       this.activeModal.close();
     }

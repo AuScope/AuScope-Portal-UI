@@ -1,8 +1,8 @@
 
-import {throwError as observableThrowError,  Observable } from 'rxjs';
-import {Injectable, Inject} from '@angular/core';
-import {timeoutWith, map, catchError} from 'rxjs/operators';
-import { HttpClient, HttpParams, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { throwError as observableThrowError, Observable } from 'rxjs';
+import { Injectable, Inject } from '@angular/core';
+import { timeoutWith, map, catchError } from 'rxjs/operators';
+import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 
 import { Bbox } from '../../../model/data/bbox.model';
 import { LayerModel } from '../../../model/data/layer.model';
@@ -55,13 +55,13 @@ export class DownloadWcsService {
       httpParams = httpParams.set('westBoundLongitude', bbox.westBoundLongitude.toString());
 
       httpParams = httpParams.set('outputDimensionsType', 'widthHeight');
-      
+
       // User can select any rectangular shape on screen.
       // We must make sure that the downloaded image has the same shape.
       // Calculate aspect ratio = height / width
       // NB: Assumes bbox does not cross longitude boundary
       const aspectRatio = Math.abs(bbox.southBoundLatitude - bbox.northBoundLatitude)/Math.abs(bbox.eastBoundLongitude - bbox.westBoundLongitude);
-      
+
       // Ensure downloaded image always has longest side of 'maxImageSize' pixels
       //
       // If width > height
@@ -95,7 +95,7 @@ export class DownloadWcsService {
           return response;
 	  }), catchError((error: HttpResponse<any>) => {
           return observableThrowError(error);
-        }), );
+        }),);
     } catch (e) {
       return observableThrowError(e);
     }

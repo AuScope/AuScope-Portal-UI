@@ -3,7 +3,7 @@ import { serialize } from '@thi.ng/hiccup';
 import { OptionalFilter, StyleService } from './style.service';
 
 // Add type for hiccup attributes
-type HiccupAttrs = Record<string, string | number | boolean> | null;
+type HiccupAttrs = Record<string, string | number | boolean>;
 
 interface MineralTenementStyleParams {
   ccProperty?: string;

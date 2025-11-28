@@ -238,6 +238,7 @@ export class UserStateService {
       return;
 
     const strROIs = JSON.stringify(this.roiList);
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     this.apiService.saveUserParams(this.roiKey, strROIs).subscribe(() => {});
   }
 

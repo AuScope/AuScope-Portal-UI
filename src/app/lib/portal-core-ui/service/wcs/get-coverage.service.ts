@@ -1,7 +1,7 @@
 import { SimpleXMLService } from './../../utility/simplexml.service';
 import { UtilitiesService } from './../../utility/utilities.service';
 import { Injectable, Inject } from '@angular/core';
-import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Constants } from '../../utility/constants.service';
@@ -15,19 +15,19 @@ export class GetCoverageService {
               @Inject('env') private env) { }
 
   /**
- * Test 
+ * Test
  * @Return a single <CoverageOffering> element from a WCS DescribeCoverage response.
  */
   public testParser(CoverageDescriptionTest3: any): Observable<any> {
-    let response = of(CoverageDescriptionTest3);
+    const response = of(CoverageDescriptionTest3);
     return response.pipe(map(
       (res) => {
-        let result = this.parseCoverageRes(res);
+        const result = this.parseCoverageRes(res);
         return result;
       }));
   }
   /**
-   * Retrieve the wcs record located at the WMS serviceurl endpoint 
+   * Retrieve the wcs record located at the WMS serviceurl endpoint
    * Currently only supports v1.0.0
    * @param serviceUrl URL of the WCS
    * @param coverageName name of coverage
@@ -42,7 +42,7 @@ export class GetCoverageService {
         serviceUrl = "https://" + serviceUrl;
       }
 
-      let httpParams = new HttpParams()
+      const httpParams = new HttpParams()
           .set('request', "DescribeCoverage")
           .append('version', "1.0.0")
           .append('service', "WCS")
@@ -51,7 +51,7 @@ export class GetCoverageService {
 
       // Use proxy to send 'DescribeCoverage' request
       serviceUrl = this.env.portalBaseUrl + Constants.PROXY_API;
-      return this.http.post(serviceUrl, httpParams, 
+      return this.http.post(serviceUrl, httpParams,
           { responseType: 'text' }).pipe(map(
         (response) => {
           return this.parseCoverageRes(response);
@@ -62,17 +62,17 @@ export class GetCoverageService {
       serviceUrl = UtilitiesService.setUpdateParameter(serviceUrl, 'version', "1.0.0");
       serviceUrl = UtilitiesService.setUpdateParameter(serviceUrl, 'service', "WCS");
       serviceUrl = UtilitiesService.setUpdateParameter(serviceUrl, 'coverage', coverageName);
-  
-      let httpParams = new HttpParams();
-  
+
+      const httpParams = new HttpParams();
+
       // Add in 'https:' if it is missing
       if (serviceUrl.indexOf("http") != 0) {
         serviceUrl = "https://" + serviceUrl;
       }
       return this.http.get(serviceUrl, { params: httpParams, responseType: "text" }).pipe(map(
         (response) => {
-          return this.parseCoverageRes(response);;
-        }));  
+          return this.parseCoverageRes(response);
+        }));
     }
   }
 
@@ -83,37 +83,36 @@ export class GetCoverageService {
    * @Return a single <CoverageOffering> element from a WCS DescribeCoverage response.
    */
   public parseCoverageRes(response: string) {
-    let rootNode;
-    let nodes: Node[];
-    let node: Node;
     let MAP_FORMATS;
-    rootNode = SimpleXMLService.parseStringToDOM(response);
+    const rootNode = SimpleXMLService.parseStringToDOM(response);
+    const nsResolverFn = (prefix: any) => this.nsResolver(prefix);
     MAP_FORMATS = '/wcs:CoverageDescription/wcs:CoverageOffering';
-    nodes = SimpleXMLService.evaluateXPathNodeArray(rootNode, rootNode, MAP_FORMATS, this.nsResolver);
-    node = nodes[0];
+    const nodes = SimpleXMLService.evaluateXPathNodeArray(rootNode, rootNode, MAP_FORMATS, nsResolverFn);
+    const node = nodes[0];
+
     if (!node) {
       const retVal = { data: [], msg: "", success: false };
       return retVal;
     }
     else {
-      const wcsRecElems = this.getWCSRecElems(rootNode, node, this.nsResolver);
-      const { supportedRequestCRSs, supportedResponseCRSs } = this.getSupportedReqRes(rootNode, node, this.nsResolver);
+      const wcsRecElems = this.getWCSRecElems(rootNode, node, nsResolverFn);
+      const { supportedRequestCRSs, supportedResponseCRSs } = this.getSupportedReqRes(rootNode, node, nsResolverFn);
 
       MAP_FORMATS = 'wcs:supportedFormats/wcs:formats';
-      const supportedFormats = this.getNodeArray(rootNode, node, this.nsResolver, MAP_FORMATS);
+      const supportedFormats = this.getNodeArray(rootNode, node, nsResolverFn, MAP_FORMATS);
 
       MAP_FORMATS = 'wcs:supportedInterpolations/wcs:interpolationMethod';
-      const supportedInterpolations = this.getNodeArray(rootNode, node, this.nsResolver, MAP_FORMATS);
+      const supportedInterpolations = this.getNodeArray(rootNode, node, nsResolverFn, MAP_FORMATS);
 
       MAP_FORMATS = 'wcs:supportedCRSs/wcs:nativeCRSs';
-      const nativeCRSs = this.getNodeArray(rootNode, node, this.nsResolver, MAP_FORMATS);
+      const nativeCRSs = this.getNodeArray(rootNode, node, nsResolverFn, MAP_FORMATS);
 
       MAP_FORMATS = 'wcs:domainSet/wcs:spatialDomain';
-      const spatialDomainNode = SimpleXMLService.evaluateXPathNodeArray(rootNode, node, MAP_FORMATS, this.nsResolver);
-      const spatialDomain = this.getSpatialDomain(rootNode, spatialDomainNode[0], this.nsResolver);
+      const spatialDomainNode = SimpleXMLService.evaluateXPathNodeArray(rootNode, node, MAP_FORMATS, nsResolverFn);
+      const spatialDomain = this.getSpatialDomain(rootNode, spatialDomainNode[0], nsResolverFn);
 
-      const temporalDomain = this.getTemporalDomain(rootNode, node, this.nsResolver);
-      const rangeSet = this.getRangeSet(rootNode, node, this.nsResolver);
+      const temporalDomain = this.getTemporalDomain(rootNode, node, nsResolverFn);
+      const rangeSet = this.getRangeSet(rootNode, node, nsResolverFn);
 
       const retVal = { data: [], msg: "", success: true };
       retVal.data.push({
@@ -135,7 +134,7 @@ export class GetCoverageService {
 
   /**
    * Represents the namespace context of a generic WCS response to a DescribeCoverage request.
-   * 
+   *
    * @param string namespace prefix
    * @returns URL of namespace
    */
@@ -155,7 +154,7 @@ export class GetCoverageService {
 
   /**
    * Constructs a  WCSRecord from the DescribeCoverage response
-   * 
+   *
    * @param doc DOM's Document interface
    * @param node Node class representing a part of the DescribeCoverage response
    * @param nsResolver namespace resolver function
@@ -176,7 +175,7 @@ export class GetCoverageService {
 
   /**
    * Fetches a list of <requestResponseCRSs> or a list of <requestCRSs> and <responseCRSs> from DescribeCoverage response
-   * 
+   *
    * @param doc Document interface of DescribeCoverage response
    * @param node Node class representing a part of the DescribeCoverage response
    * @param nsResolver namespace resolver function
@@ -185,8 +184,8 @@ export class GetCoverageService {
   private getSupportedReqRes(doc: Document, node: Node, nsResolver: (prefix: string) => string) {
     let MAP_FORMATS = 'wcs:supportedCRSs/wcs:requestResponseCRSs';
     let tempNodeList: Element[] = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
-    let supportedRequestCRSs = [];
-    let supportedResponseCRSs = [];
+    const supportedRequestCRSs = [];
+    const supportedResponseCRSs = [];
 
     if (tempNodeList.length > 0) {
       tempNodeList.forEach(elem => {
@@ -206,23 +205,23 @@ export class GetCoverageService {
 
   /**
    * Fetches a list of maped array from DescribeCoverage response
-   * 
+   *
    * @param doc Document interface of DescribeCoverage response
    * @param node Node class representing a part of the DescribeCoverage response
    * @param nsResolver namespace resolver function
-   * @param MAP_FORMATS 
+   * @param MAP_FORMATS
    * @returns a list of maped array
    */
   private getNodeArray(doc: Document, node: Node, nsResolver: (prefix: string) => string, MAP_FORMATS: string) {
-    let tempNodeList: Element[] = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
-    let nodeArray = [];
+    const tempNodeList: Element[] = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
+    const nodeArray = [];
     tempNodeList.forEach(elem => nodeArray.push(elem.textContent));
     return nodeArray;
   }
 
   /**
    * Parse the spatial domain (only grab gml:Envelopes and wcs:EnvelopeWithTimePeriod
-   * 
+   *
    * @param doc Document interface of DescribeCoverage response
    * @param node Node class representing a part of the DescribeCoverage response
    * @param nsResolver namespace resolver function
@@ -233,21 +232,21 @@ export class GetCoverageService {
       '| gml:Envelope ' +
       '| gml:EnvelopeWithTimePeriod';
 
-    let tempNodeList: Element[] = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
+    const tempNodeList: Element[] = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
 
-    let envelopes = [];
+    const envelopes = [];
     tempNodeList.forEach(elem => envelopes.push(this.simpleEnvelope(doc, elem, nsResolver)));
 
     MAP_FORMATS = 'gml:RectifiedGrid';
-    let gridNode = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
-    let rectifiedGrid = (gridNode != null) ? this.rectifiedGrid(doc, gridNode[0], nsResolver) : {};
+    const gridNode = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
+    const rectifiedGrid = (gridNode != null) ? this.rectifiedGrid(doc, gridNode[0], nsResolver) : {};
 
     return { envelopes, rectifiedGrid };
   }
 
   /**
    * Parse the XML in 'node' and create a 'SimpleEnvelope' object
-   * 
+   *
    * @param doc Document interface of DescribeCoverage response
    * @param node can be one of: 'wcs:Envelope' or 'gml:Envelope' or 'gml:EnvelopeWithTimePeriod'
    * @param nsResolver namespace resolver function
@@ -266,30 +265,29 @@ export class GetCoverageService {
       type: null
     };
 
-    let MAP_FORMATS = 'gml:pos';
+    const MAP_FORMATS = 'gml:pos';
 
     let tempNodeList: Element[] = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
     if (tempNodeList.length != 2) {
       console.log("does not have two gml:pos nodes");
       return retVal;
     }
-    tempNodeList[0]
-    let southWestPoints = tempNodeList[0].textContent.split(" ");
-    let northEastPoints = tempNodeList[1].textContent.split(" ");
+    const southWestPoints = tempNodeList[0].textContent.split(" ");
+    const northEastPoints = tempNodeList[1].textContent.split(" ");
     if (southWestPoints.length < 2 || northEastPoints.length < 2) {
       console.log("wcs:lonLatEnvelope gml:pos elements don't contain enough Lon/Lat pairs");
       return retVal;
     }
 
-    let eastBoundLongitude = northEastPoints[0];
-    let southBoundLatitude = southWestPoints[1];
-    let westBoundLongitude = southWestPoints[0];
-    let northBoundLatitude = northEastPoints[1];
+    const eastBoundLongitude = northEastPoints[0];
+    const southBoundLatitude = southWestPoints[1];
+    const westBoundLongitude = southWestPoints[0];
+    const northBoundLatitude = northEastPoints[1];
 
     //Get our SRS name (can be null)
-    let srsName = SimpleXMLService.evaluateXPathString(doc, node, "@srsName", nsResolver);
+    const srsName = SimpleXMLService.evaluateXPathString(doc, node, "@srsName", nsResolver);
 
-    let type = SimpleXMLService.getNodeLocalName(node);
+    const type = SimpleXMLService.getNodeLocalName(node);
     let timePositionStart;
     let timePositionEnd;
     // Parse any time position nodes if parent was "gml:EnvelopeWithTimePeriod"
@@ -317,7 +315,7 @@ export class GetCoverageService {
 
   /**
    * Creates a rectifiedGrid from a DOM node representing a gml:RectifiedGrid element
-   * 
+   *
    * @param doc Document interface of DescribeCoverage response
    * @param node can be one of: 'wcs:Envelope' or 'gml:Envelope' or 'gml:EnvelopeWithTimePeriod'
    * @param nsResolver namespace resolver function
@@ -369,7 +367,7 @@ export class GetCoverageService {
 
   /**
   * Get the temporal range (which is optional)
-  * 
+  *
   * @param doc Document interface of DescribeCoverage response
   * @param node Node class representing a part of the DescribeCoverage response
   * @param nsResolver namespace resolver function
@@ -378,13 +376,13 @@ export class GetCoverageService {
   private getTemporalDomain(doc: Document, node: Node, nsResolver: (prefix: string) => string) {
 
     let MAP_FORMATS = 'wcs:domainSet/wcs:temporalDomain';
-    let tempNode = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
-    let temporalDomain = [];
+    const tempNode = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
+    const temporalDomain = [];
     if (tempNode != null && tempNode.length > 0) {
       MAP_FORMATS = 'wcs:domainSet/wcs:temporalDomain/*';
-      let tempNodeList = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
+      const tempNodeList = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
       tempNodeList.forEach(elem => {
-        let name = SimpleXMLService.getNodeLocalName(elem);
+        const name = SimpleXMLService.getNodeLocalName(elem);
         if (name == "timePosition") {
           temporalDomain.push(this.simpleTimePosition(elem, nsResolver));
         } else if (name == "timePeriod") {
@@ -399,14 +397,14 @@ export class GetCoverageService {
 
   /**
    * Create a simplified instance of the <gml:timePosition> element from a
-   * WCS DescribeCoverage or GetCapabilities response * 
+   * WCS DescribeCoverage or GetCapabilities response *
    * @param node Node class representing a part of the DescribeCoverage response
    * @param nsResolver namespace resolver function
    * @returns Get the timePosition
    */
 
-  private simpleTimePosition(node: Node, nsResolver: (prefix: string) => string) {
-    let timePosition = Date.parse(node.textContent)
+  private simpleTimePosition(node: Node, _nsResolver: (prefix: string) => string) {
+    const timePosition = Date.parse(node.textContent)
     return {
       timePosition: timePosition,
       type: SimpleXMLService.getNodeLocalName(node)
@@ -415,19 +413,19 @@ export class GetCoverageService {
 
   /**
    * Create a simplified instance of the <gml:timePeriod> element from a
-   * WCS DescribeCoverage or GetCapabilities response * 
+   * WCS DescribeCoverage or GetCapabilities response *
    * @param doc Document interface of DescribeCoverage response
    * @param node Node class representing a part of the DescribeCoverage response
    * @param nsResolver namespace resolver function
    * @returns Get the timePeriod
    */
   private simpleTimePeriod(doc: Document, node: Node, nsResolver: (prefix: string) => string) {
-    let beginPositionNode = SimpleXMLService.evaluateXPathString(doc, node, "beginPosition", nsResolver);
-    let endPositionNode = SimpleXMLService.evaluateXPathString(doc, node, "endPosition", nsResolver);
+    const beginPositionNode = SimpleXMLService.evaluateXPathString(doc, node, "beginPosition", nsResolver);
+    const endPositionNode = SimpleXMLService.evaluateXPathString(doc, node, "endPosition", nsResolver);
 
-    let beginPosition = Date.parse(beginPositionNode);
-    let endPosition = Date.parse(endPositionNode);
-    let type = SimpleXMLService.getNodeLocalName(node);
+    const beginPosition = Date.parse(beginPositionNode);
+    const endPosition = Date.parse(endPositionNode);
+    const type = SimpleXMLService.getNodeLocalName(node);
 
     return {
       beginPosition: beginPosition,
@@ -438,7 +436,7 @@ export class GetCoverageService {
 
   /**
    * Fetches a RangeSetImpl instance from DescribeCoverage response
-   * 
+   *
    * @param doc Document interface of DescribeCoverage response
    * @param node Node class representing a part of the DescribeCoverage response
    * @param nsResolver namespace resolver function
@@ -446,26 +444,26 @@ export class GetCoverageService {
   */
   private getRangeSet(doc: Document, node: Node, nsResolver: (prefix: string) => string) {
     let MAP_FORMATS = 'wcs:rangeSet/wcs:RangeSet/wcs:description';
-    let tempNode: Element[] = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
+    const tempNode: Element[] = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
     let description;
     if (tempNode != null && tempNode.length > 0) {
       description = SimpleXMLService.evaluateXPathString(doc, node, MAP_FORMATS, nsResolver);
     }
 
     MAP_FORMATS = 'wcs:rangeSet/wcs:RangeSet/wcs:name';
-    let name = SimpleXMLService.evaluateXPathString(doc, node, MAP_FORMATS, nsResolver);
+    const name = SimpleXMLService.evaluateXPathString(doc, node, MAP_FORMATS, nsResolver);
 
     MAP_FORMATS = 'wcs:rangeSet/wcs:RangeSet/wcs:label';
-    let label = SimpleXMLService.evaluateXPathString(doc, node, MAP_FORMATS, nsResolver);
+    const label = SimpleXMLService.evaluateXPathString(doc, node, MAP_FORMATS, nsResolver);
 
-    let axisDescriptions = [];
+    const axisDescriptions = [];
     MAP_FORMATS = 'wcs:rangeSet/wcs:RangeSet/wcs:axisDescription/wcs:AxisDescription';
     let tempNodeList: Element[] = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
     tempNodeList.forEach(elem => {
       axisDescriptions.push(this.axisDescriptionImpl(doc, elem, nsResolver));
     });
 
-    let nullValues = [];
+    const nullValues = [];
     MAP_FORMATS = 'wcs:rangeSet/wcs:RangeSet/wcs:nullValues/wcs:*';
     tempNodeList = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
     tempNodeList.forEach(elem => {
@@ -483,7 +481,7 @@ export class GetCoverageService {
 
   /**
    * Fetches a simple (partial) implementation of the entire AxisDescription (Doesn't parse attributes)
-   * 
+   *
    * @param doc Document interface of DescribeCoverage response
    * @param node Node class representing a part of the DescribeCoverage response
    * @param nsResolver namespace resolver function
@@ -492,21 +490,21 @@ export class GetCoverageService {
   private axisDescriptionImpl(doc: Document, node: Node, nsResolver: (prefix: string) => string) {
 
     let MAP_FORMATS = 'wcs:description';
-    let tempNode: Element[] = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
+    const tempNode: Element[] = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
     let description: string;
     if (tempNode != null && tempNode.length > 0) {
       description = SimpleXMLService.evaluateXPathString(doc, node, MAP_FORMATS, nsResolver);
     }
 
     MAP_FORMATS = 'wcs:name';
-    let name = SimpleXMLService.evaluateXPathString(doc, node, MAP_FORMATS, nsResolver);
+    const name = SimpleXMLService.evaluateXPathString(doc, node, MAP_FORMATS, nsResolver);
 
     MAP_FORMATS = 'wcs:label';
-    let label = SimpleXMLService.evaluateXPathString(doc, node, MAP_FORMATS, nsResolver);
+    const label = SimpleXMLService.evaluateXPathString(doc, node, MAP_FORMATS, nsResolver);
 
-    let values = [];
+    const values = [];
     MAP_FORMATS = 'wcs:values/wcs:*';
-    let tempNodeList: Element[] = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
+    const tempNodeList: Element[] = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
     tempNodeList.forEach(elem => {
       values.push(this.valueEnumTypeFactory(doc, elem, nsResolver));
     });
@@ -521,14 +519,14 @@ export class GetCoverageService {
 
   /**
    * Fetches a RangeSetImpl instance from DescribeCoverage response
-   * 
+   *
    * @param doc Document interface of DescribeCoverage response
    * @param node Node class representing a part of the DescribeCoverage response
    * @param nsResolver namespace resolver function
    * @returns RangeSetImpl instance
   */
   private valueEnumTypeFactory(doc: Document, node: Node, nsResolver: (prefix: string) => string) {
-    let name = SimpleXMLService.getNodeLocalName(node);
+    const name = SimpleXMLService.getNodeLocalName(node);
     if (name == "singleValue") {
       return {
         type: name,
@@ -543,14 +541,14 @@ export class GetCoverageService {
 
   /**
    * Fetches a <wcs:interval> element from a WCS DescribeCoverage response
-   * 
+   *
    * @param doc Document interface of DescribeCoverage response
    * @param node Node class representing a part of the DescribeCoverage response
    * @param nsResolver namespace resolver function
    * @returns <wcs:interval> element
   */
   private getInterval(doc: Document, node: Node, nsResolver: (prefix: string) => string) {
-    let type = SimpleXMLService.getNodeLocalName(node);
+    const type = SimpleXMLService.getNodeLocalName(node);
 
     let MAP_FORMATS = 'wcs:min';
     let tempNode: Element[] = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);

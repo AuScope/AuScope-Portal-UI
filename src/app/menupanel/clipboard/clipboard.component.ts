@@ -4,7 +4,7 @@ import { CsMapService } from '../../lib/portal-core-ui/service/cesium-map/cs-map
 
 
 @Component({
-    selector: '[appFilterClipboard]',
+    selector: '[app-filter-clipboard]',
     templateUrl: './clipboard.component.html',
     standalone: false
 })

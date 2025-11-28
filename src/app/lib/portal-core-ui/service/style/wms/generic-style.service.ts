@@ -86,7 +86,7 @@ export class GenericStyleService {
    * @param spatialPropertyName The spatial property name to use in the BBOX filter
    * @returns Filter XML structure
    */
-  private static generateFilter(bboxJson: any, optionalFilters: any, spatialPropertyName: string): any {
+  private static generateFilter(bboxJson: any, optionalFilters: any, _spatialPropertyName: string): any {
     // Parse optional filters
     let parsedFilters: any[] = [];
     try {
@@ -108,7 +108,7 @@ export class GenericStyleService {
         bbox = bboxJson;
       }
     } catch (e) {
-      console.error('Failed to parse bounding box', e);
+      console.error('Failed to parse bounding box', bbox, e);
     }
 
     // Build filter fragments
@@ -129,7 +129,7 @@ export class GenericStyleService {
         if (Array.isArray(filter)) {
           // This is likely the layers.yaml format: [label, field, null, operator]
           if (filter.length >= 4) {
-            const [label, field, _, operator] = filter;
+            const [_label, field, _, operator] = filter;
 
             // Check if this filter has a value (added by UI)
             const arrayFilter = filter as unknown as { value?: string };
@@ -137,14 +137,14 @@ export class GenericStyleService {
               propertyFilter = this.generatePropertyFilter(field, arrayFilter.value, operator || '=');
             }
           }
-        } 
+        }
         // Handle standard object format
         else if (typeof filter === 'object') {
           // Standard filter with field and value
           if (filter.field && filter.value) {
             propertyFilter = this.generatePropertyFilter(
-              filter.field, 
-              filter.value, 
+              filter.field,
+              filter.value,
               filter.operator || '='
             );
           }

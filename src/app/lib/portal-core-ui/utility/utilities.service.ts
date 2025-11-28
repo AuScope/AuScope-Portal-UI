@@ -11,7 +11,7 @@ import proj4 from "proj4";
 import epsg from "epsg-index/all.json";
 import { EpsgEntry } from "../types/epsg";
 declare function unescape(s: string): string;
-declare var Cesium;
+declare let Cesium;
 
 /**
  * Port over from old portal-core extjs for dealing with xml in wfs
@@ -100,7 +100,7 @@ export class UtilitiesService {
      * @param options - splitArgs - {Boolean} Split comma delimited params into arrays? Default is true
      */
     public static getUrlParameters(url: string, options?: any): any {
-        const localStringContain  = function(s, c) {
+        const localStringContain = function(s, c) {
             return s.indexOf(c) !== -1;
         };
         options = options || {};
@@ -125,7 +125,7 @@ export class UtilitiesService {
                 let key = keyValue[0];
                 try {
                     key = decodeURIComponent(key);
-                } catch (err) {
+                } catch (__err: any) {
                     key = unescape(key);
                 }
 
@@ -133,7 +133,7 @@ export class UtilitiesService {
 
                 try {
                     value = decodeURIComponent(value);
-                } catch (err) {
+                } catch (__err: any) {
                     value = unescape(value);
                 }
 
@@ -205,7 +205,7 @@ export class UtilitiesService {
      * Get base from URL
      * e.g. "https://abc.bca.org/blagg?id=56&ty=78" -> "https://abc.bca.org"
      *
-     * @param url 
+     * @param url
      */
     public static getBaseUrl(url): string {
         const splitUrl = url.split('://');
@@ -227,7 +227,7 @@ export class UtilitiesService {
         for (idx in params) {
             if (params[idx].type === 'OPTIONAL.PROVIDER') {
                 containProviderFilter = true;
-                for (domain in params[idx].value ) {
+                for (domain in params[idx].value) {
                     if (params[idx].value[domain] && url.indexOf(domain) !== -1) {
                         urlMatch = true;
                     }
@@ -250,7 +250,7 @@ export class UtilitiesService {
      * @return unique count by url
      */
     public static uniqueCountOfResourceByUrl(onlineResources: { [key: string]: any; }): number {
-        const unique =  {};
+        const unique = {};
 
         for (const key in onlineResources) {
            unique[onlineResources[key].url] = true;
@@ -366,9 +366,8 @@ export class UtilitiesService {
         let string = '';
         let i = 0;
         let c = 0, c2 = 0, c3 = 0;
-        const c1 = 0;
 
-        while ( i < utftext.length ) {
+        while (i < utftext.length) {
 
             c = utftext.charCodeAt(i);
 
@@ -407,7 +406,7 @@ export class UtilitiesService {
     /**
      * This utility will collate the different type of filter into a single parameter object
      */
-    public static collateParam(layer, onlineResource, parameter) {
+    public static collateParam(layer: LayerModel, onlineResource: OnlineResourceModel, parameter: object) {
 
       let param = _.cloneDeep(parameter);
       if (!param) {
@@ -422,11 +421,11 @@ export class UtilitiesService {
         if (layer.filterCollection.hiddenParams) {
           hiddenParams = layer.filterCollection.hiddenParams;
         }
-        for (const idx in hiddenParams) {
-          if (hiddenParams[idx].type === 'MANDATORY.UIHiddenResourceAttribute') {
-            param[hiddenParams[idx].parameter] = onlineResource[hiddenParams[idx].attribute];
+        for (const hiddenParam of hiddenParams) {
+          if (hiddenParam.type === 'MANDATORY.UIHiddenResourceAttribute') {
+            param[hiddenParam.parameter] = onlineResource[hiddenParam.attribute];
           } else {
-            param[hiddenParams[idx].parameter] = hiddenParams[idx].value;
+            param[hiddenParam.parameter] = hiddenParam.value;
           }
         }
 
@@ -435,8 +434,8 @@ export class UtilitiesService {
         if (layer.filterCollection.mandatoryFilters) {
           mandatoryFilters = layer.filterCollection.mandatoryFilters;
         }
-        for (const idx in mandatoryFilters) {
-          param[mandatoryFilters[idx].parameter] = mandatoryFilters[idx].value;
+        for (const filter of mandatoryFilters) {
+          param[filter.parameter] = filter.value;
         }
       }
 
@@ -448,13 +447,13 @@ export class UtilitiesService {
       }
 
       // Set up time extents, if supplied and not already present
-      if (!param.time && layer.capabilityRecords && layer.capabilityRecords.length > 0) {
+      if (!param.time && layer.capabilityRecords?.length > 0) {
           const capRec = layer.capabilityRecords[0];
           if (capRec.isWMS && capRec.layers.length > 0) {
-              for (layer of capRec.layers) {
-                  if (layer.name === onlineResource.name && layer.timeExtent && layer.timeExtent.length > 0) {
+              for (const capRecLayer of capRec.layers) {
+                  if (capRecLayer.name === onlineResource.name && capRecLayer.timeExtent?.length > 0) {
                       // NB: Only take the first value
-                      param['time'] = layer.timeExtent[0];
+                      param['time'] = capRecLayer.timeExtent[0];
                       break;
                   }
               }
@@ -468,7 +467,7 @@ export class UtilitiesService {
      * filter object into a HttpParams
      * @param httpParam the httpParam to set the parameters
      */
-    public static convertObjectToHttpParam(httpParam: HttpParams, paramObject: Object): HttpParams {
+    public static convertObjectToHttpParam(httpParam: HttpParams, paramObject: object): HttpParams {
       // https://github.com/angular/angular/pull/18490 (this is needed to parse object into parameter
       if(paramObject && paramObject['optionalFilters']) {
         let first = true;
@@ -509,7 +508,7 @@ export class UtilitiesService {
      * @param filter The full filter
      */
     public static getPolygonFilter(filter: string) {
-        return filter.slice( filter.indexOf('<ogc:Intersects>') , filter.indexOf('</ogc:Intersects>') + '</ogc:Intersects>'.length);
+        return filter.slice(filter.indexOf('<ogc:Intersects>') , filter.indexOf('</ogc:Intersects>') + '</ogc:Intersects>'.length);
     }
 
     /**
@@ -548,15 +547,15 @@ export class UtilitiesService {
      * Return the browser type.
      */
     public static getBrowserName(): string {
-        if ((navigator.userAgent.indexOf('Opera') || navigator.userAgent.indexOf('OPR')) !== -1 ) {
+        if ((navigator.userAgent.indexOf('Opera') || navigator.userAgent.indexOf('OPR')) !== -1) {
             return 'Opera';
-        } else if (navigator.userAgent.indexOf('Chrome') !== -1 ){
+        } else if (navigator.userAgent.indexOf('Chrome') !== -1){
             return 'Chrome';
         } else if (navigator.userAgent.indexOf('Safari') !== -1){
             return 'Safari';
-        } else if (navigator.userAgent.indexOf('Firefox') !== -1 ) {
+        } else if (navigator.userAgent.indexOf('Firefox') !== -1) {
              return 'Firefox';
-        } else if (navigator.userAgent.indexOf('MSIE') !== -1 ){
+        } else if (navigator.userAgent.indexOf('MSIE') !== -1){
           return 'IE';
         } else {
            return 'unknown';
@@ -630,7 +629,7 @@ export class UtilitiesService {
    * @param epsgCode
    * @returns EPSG number or null
    */
-  private static getEPSGNum(epsgCode: string): number|null {
+  private static getEPSGNum(epsgCode: string): number {
     const match = epsgCode.match(/\d+/);
     return match ? parseInt(match[0], 10) : null;
 }
@@ -638,7 +637,7 @@ export class UtilitiesService {
 
   /**
    * Convert bbox coordinates to a desired CRS
-   * 
+   *
    * @param bbox bounding box
    * @param crs desired coord ref system e.g. 'EPSG:12345'
    * @returns Bbox
@@ -742,7 +741,7 @@ export class UtilitiesService {
       for (const record of layer.cswRecords) {
         if (record.geographicElements?.length > 0) {
           for (const geoElement of record.geographicElements) {
-            if (geoElement.type && geoElement.type === 'bbox' && 
+            if (geoElement.type && geoElement.type === 'bbox' &&
                 geoElement.northBoundLatitude && geoElement.eastBoundLongitude &&
                 geoElement.southBoundLatitude && geoElement.westBoundLongitude) {
               return true;

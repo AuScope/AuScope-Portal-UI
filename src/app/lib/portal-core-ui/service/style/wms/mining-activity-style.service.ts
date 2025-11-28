@@ -15,7 +15,7 @@ interface MiningActivityStyleParams {
 
 @Injectable()
 export class MiningActivityStyleService {
-  public static getSld(layerName: string, styleName: string, params: MiningActivityStyleParams): string {
+  public static getSld(layerName: string, styleName: string, _params: MiningActivityStyleParams): string {
     const ns = {
       sld: 'http://www.opengis.net/sld',
       ogc: 'http://www.opengis.net/ogc',

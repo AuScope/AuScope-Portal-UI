@@ -4,11 +4,11 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Registry } from 'app/menupanel/data-explorer/data-model';
 import { v4 as uuidv4 } from 'uuid';
 import { environment } from 'environments/environment';
-
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 declare let gtag: Function;
 
 @Component({
-    selector: 'add-registry-modal-window',
+    selector: 'app-add-registry-modal-window',
     templateUrl: './add-registry.modal.component.html',
     styleUrls: ['./add-registry.component.scss'],
     standalone: false

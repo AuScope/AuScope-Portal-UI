@@ -61,7 +61,7 @@ export class DataExplorerComponent implements OnInit {
 
   click$ = new Subject<string>();
 
-  searchKeywords = (text$: Observable<string>) =>
+  searchKeywords = (_text$: Observable<string>) =>
     merge(
       this.click$.pipe(filter(() => !this.typeaheadInstance.isPopupOpen()))
     ).pipe(
@@ -164,7 +164,7 @@ export class DataExplorerComponent implements OnInit {
     const starts: number[] = [];
     let registrySelected: boolean = false;
     this.availableRegistries.forEach(
-      (registry: Registry, serviceId: string) => {
+      (registry: Registry, _serviceId: string) => {
         if (registry.checked) {
           registrySelected = true;
           serviceIds.push(registry.id);
@@ -425,7 +425,7 @@ export class DataExplorerComponent implements OnInit {
     // Reset results and registry indices
     this.cswSearchResults = new Map<string, LayerModel[]>();
     this.availableRegistries.forEach(
-      (registry: Registry, serviceId: string) => {
+      (registry: Registry, _serviceId: string) => {
         registry.startIndex = 1;
         registry.prevIndices = [];
         registry.currentPage = 1;
@@ -610,6 +610,7 @@ export class DataExplorerComponent implements OnInit {
       if (registry) {
         this.availableRegistries.set(registry.id, registry);
       }
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     }, () => {});
   }
 

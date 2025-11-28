@@ -32,7 +32,9 @@ export class LoginMenuComponent {
    * Redirect to login page
    */
   login() {
-    this.router.navigate(['login']);
+    this.router.navigate(['login']).catch(
+        (navError) => console.error("Could not navigate to login page", navError)
+    );
   }
 
   /**

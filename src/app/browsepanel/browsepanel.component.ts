@@ -21,7 +21,7 @@ import { take } from 'rxjs/operators';
 })
 export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
 
-  public layerGroupColumn: {}; /* Holds the data structures for all layers and groups */
+  public layerGroupColumn: object; /* Holds the data structures for all layers and groups */
   public layerColumn: []; /* List of layers for a certain group */
   public layerColumnHeader = ""; /* Name of group is shown at the top of the layer column */
   public selectedLayer; /* Selected layer, assigned a layer object */
@@ -186,7 +186,7 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     this.selectLayer(layer);
-    
+
     this.sidebarService.setOpenState(true);
   }
 
@@ -197,7 +197,7 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
    */
   public removeLayerFromMap(layer: LayerModel): void {
     this.layerManagerService.removeLayer(layer);
-    
+
     if (this.selectedLayer === layer) {
       this.selectedLayer = null;
     }

@@ -6,7 +6,6 @@ import { PrimitiveModel } from '../../model/data/primitive.model';
 import { LayerHandlerService } from '../cswrecords/layer-handler.service';
 import { GeometryType } from '../../utility/constants.service';
 import { RenderStatusService } from '../cesium-map/renderstatus/render-status.service';
-import { CsMapObject } from '../cesium-map/cs-map-object';
 
 /**
  * Use Cesium to add layer to map. This service class adds www layer to the map
@@ -14,8 +13,7 @@ import { CsMapObject } from '../cesium-map/cs-map-object';
 @Injectable()
 export class CsWWWService {
 
-  constructor(private csMapObject: CsMapObject,
-              private layerHandlerService: LayerHandlerService,
+  constructor(private layerHandlerService: LayerHandlerService,
               private renderStatusService: RenderStatusService,
               @Inject('env') private env) {
   }
@@ -25,14 +23,14 @@ export class CsWWWService {
    * @param layer the layer where this point derived from
    * @param primitive the point primitive
    */
-  public addPoint(layer: LayerModel, cswRecord: CSWRecordModel, primitive: PrimitiveModel): void {
+  public addPoint(_layer: LayerModel, _cswRecord: CSWRecordModel, _primitive: PrimitiveModel): void {
 
     // FIXME Use cs map service & cesium to add a point
   }
 
 
-  public addPolygon(layer: LayerModel, cswRecord: CSWRecordModel, primitive: PrimitiveModel): void {
-  
+  public addPolygon(_layer: LayerModel, _cswRecord: CSWRecordModel, _primitive: PrimitiveModel): void {
+
     // FIXME Use cs map service & cesium to add a polgon
   }
 
@@ -41,7 +39,7 @@ export class CsWWWService {
    * @param layer the layer to add to the map
    * @param the www layer to be added to the map
    */
-  public addLayer(layer: LayerModel, param?: any): void {
+  public addLayer(layer: LayerModel, _param?: any): void {
     const cswRecords = this.layerHandlerService.getCSWRecord(layer);
 
     // VT: create the vector on the map if it does not exist.
@@ -55,8 +53,6 @@ export class CsWWWService {
 
     for (const cswRecord of cswRecords) {
       // VT do some filter based on the parameter here
-      const primitive = new PrimitiveModel();
-
       const geoEls = cswRecord.geographicElements;
       for (let j = 0; j < geoEls.length; j++) {
         const geoEl = geoEls[j];

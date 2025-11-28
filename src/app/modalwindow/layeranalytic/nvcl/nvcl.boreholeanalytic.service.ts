@@ -173,7 +173,7 @@ export class NVCLBoreholeAnalyticService {
   public submitNVCLAnalyticalJob(parameters: any, layer: LayerModel): Observable<any> {
     let httpParams = new HttpParams();
 
-    const wfsResources = this.layerHandlerService.getWFSResource(layer);
+    const _wfsResources = this.layerHandlerService.getWFSResource(layer);
     for (const wfsUrl of layer.wfsUrls) {
       httpParams = httpParams.append('serviceurls', wfsUrl.toString());
     }

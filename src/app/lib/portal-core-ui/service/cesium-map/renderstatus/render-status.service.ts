@@ -1,8 +1,8 @@
-import {LayerModel} from '../../../model/data/layer.model';
-import {OnlineResourceModel} from '../../../model/data/onlineresource.model';
-import {StatusMapModel} from '../../../model/data/statusmap.model';
-import {ApplicationRef, Injectable} from '@angular/core';
-import {BehaviorSubject} from 'rxjs';
+import { LayerModel } from '../../../model/data/layer.model';
+import { OnlineResourceModel } from '../../../model/data/onlineresource.model';
+import { StatusMapModel } from '../../../model/data/statusmap.model';
+import { ApplicationRef, Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
 /**
  * Service class to query for current layer loading status

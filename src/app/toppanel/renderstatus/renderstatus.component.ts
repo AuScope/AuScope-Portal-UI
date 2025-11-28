@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 
 @Component({
-    selector: 'ngbd-modal-status-report',
+    selector: 'app-ngbd-modal-status-report',
     templateUrl: './renderstatus.component.html',
     standalone: false
 })

@@ -1,11 +1,11 @@
-import {throwError as observableThrowError, Observable} from 'rxjs';
+import { throwError as observableThrowError, Observable } from 'rxjs';
 
-import {catchError, map} from 'rxjs/operators';
-import {Injectable, Inject} from '@angular/core';
+import { catchError, map } from 'rxjs/operators';
+import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders, HttpResponse } from '@angular/common/http';
-import {OnlineResourceModel} from '../../model/data/onlineresource.model';
-import {CsMapObject} from '../cesium-map/cs-map-object';
-import {UtilitiesService} from '../../utility/utilities.service';
+import { OnlineResourceModel } from '../../model/data/onlineresource.model';
+import { CsMapObject } from '../cesium-map/cs-map-object';
+import { UtilitiesService } from '../../utility/utilities.service';
 
 
 @Injectable()
@@ -29,9 +29,9 @@ export class QueryWMSService {
     }
 
     const ogcFilter = '<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:gsmlp=\"http://xmlns.geosciml.org/geosciml-portrayal/4.0\" xmlns:gml=\"http://www.opengis.net/gml\">' +
-    '<ogc:And><ogc:BBOX><ogc:PropertyName>' + geom + '</ogc:PropertyName><gml:Box srsName=\"urn:x-ogc:def:crs:EPSG:4326\">' + 
-    '<gml:coord><gml:X>' + (lon - step) + '</gml:X><gml:Y>' + (lat - step) + '</gml:Y></gml:coord>' + 
-    '<gml:coord><gml:X>' + (lon + step) + '</gml:X><gml:Y>' + (lat + step) + '</gml:Y></gml:coord>' + 
+    '<ogc:And><ogc:BBOX><ogc:PropertyName>' + geom + '</ogc:PropertyName><gml:Box srsName=\"urn:x-ogc:def:crs:EPSG:4326\">' +
+    '<gml:coord><gml:X>' + (lon - step) + '</gml:X><gml:Y>' + (lat - step) + '</gml:Y></gml:coord>' +
+    '<gml:coord><gml:X>' + (lon + step) + '</gml:X><gml:Y>' + (lat + step) + '</gml:Y></gml:coord>' +
     '</gml:Box></ogc:BBOX>' + extraFilter + '</ogc:And></ogc:Filter>';
     return ogcFilter;
   }
@@ -41,7 +41,7 @@ export class QueryWMSService {
    * @param onlineresource the WMS online resource
    * @param lon [lat,long] map coordinates of clicked on point
    * @param lat [lat,long] map coordinates of clicked on point
-   * @param extraFilter 
+   * @param extraFilter
    * @param layerId layerId
    * @return Observable the observable from the http request
    */
@@ -72,7 +72,7 @@ export class QueryWMSService {
     (error: HttpResponse<any>) => {
           return observableThrowError(error);
         }
-      ), );
+      ),);
 
   }
 
@@ -119,7 +119,7 @@ export class QueryWMSService {
     (error: HttpResponse<any>) => {
           return observableThrowError(error);
         }
-      ), );
+      ),);
   }
 
 }

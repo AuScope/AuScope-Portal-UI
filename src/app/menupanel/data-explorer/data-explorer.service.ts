@@ -117,7 +117,7 @@ export class DataExplorerService {
       const cswRecords = response['data'].records;
       const itemLayers = [];
 
-      cswRecords.forEach(function(item, i, ar) {
+      cswRecords.forEach(function(item, _i, _ar) {
         const itemLayer = new LayerModel();
         itemLayer.cswRecords = [item];
         itemLayer['expanded'] = false;
@@ -193,7 +193,7 @@ export class DataExplorerService {
       const cswRecords = response['data'].records;
       const itemLayers = [];
 
-      cswRecords.forEach(function(item, i, ar) {
+      cswRecords.forEach(function(item, _i, _ar) {
         const itemLayer = new LayerModel();
         itemLayer.cswRecords = [item];
         itemLayer['expanded'] = false;

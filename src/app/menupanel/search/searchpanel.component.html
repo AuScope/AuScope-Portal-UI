@@ -251,7 +251,7 @@
                 @for (cswRecord of selectedSearchResult.layer.cswRecords; track cswRecord; let i = $index) {
                   <div>
                     @if (selectedSearchResult) {
-                      <info-sub-panel [cswRecord]="cswRecord" [layer]="selectedSearchResult.layer" [expanded]=1></info-sub-panel>
+                      <app-info-sub-panel [cswRecord]="cswRecord" [layer]="selectedSearchResult.layer" [expanded]=1></app-info-sub-panel>
                     }
                     @if (i !== selectedSearchResult.layer.cswRecords.length - 1) {
                       <div class="break-border"></div>
@@ -267,7 +267,7 @@
 
 <!-- KML/OGC options -->
 <div class="options-panel kml-options-panel" [style.display]="showingKmlOgcOptions ? 'block' : 'none'">
-  <ul class="card-sub" appCustomPanel style="display:contents;"></ul>
+  <ul class="card-sub" app-custom-panel style="display:contents;"></ul>
 </div>
 
 </div>

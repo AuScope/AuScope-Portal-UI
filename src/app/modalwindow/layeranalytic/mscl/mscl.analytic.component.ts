@@ -54,7 +54,7 @@ export class MSCLAnalyticComponent implements OnInit {
             }
 
             // Compile lists of X and Y values; plots are vertical, Y is common to all plots
-            const xLists: { string: number[] } | {} = {};
+            const xLists: object = {};
             const yList: number[] = [];
             for (const metricEnum of this.metricList) {
                 xLists[metricEnum] = [];

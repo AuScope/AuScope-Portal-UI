@@ -4,7 +4,7 @@ import { LegendUiService } from 'app/services/legend/legend-ui.service';
 import { forkJoin, Observable } from 'rxjs';
 
 @Component({
-    selector: 'legend-modal',
+    selector: 'app-legend-modal',
     templateUrl: './legend.modal.component.html',
     styleUrls: ['./legend.modal.component.scss'],
     standalone: false

@@ -1,7 +1,7 @@
 
-import {throwError as observableThrowError } from 'rxjs';
+import { throwError as observableThrowError } from 'rxjs';
 
-import {catchError, map} from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 
@@ -29,6 +29,6 @@ export class NotificationService {
       (error: HttpResponse<any>) => {
           return observableThrowError(error);
         }
-      ), );
+      ),);
     }
 }

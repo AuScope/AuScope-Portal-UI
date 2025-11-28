@@ -1,4 +1,4 @@
-import {Directive, HostListener} from '@angular/core';
+import { Directive, HostListener } from '@angular/core';
 
 /**
  * helper directive to stop the click event from propagating upwards

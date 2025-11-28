@@ -27,8 +27,8 @@ import { NotificationService } from './service/toppanel/notification.service';
 import { CsCSWService } from './service/wcsw/cs-csw.service';
 import { DownloadWcsService } from './service/wcs/download/download-wcs.service';
 import { CsWWWService } from './service/www/cs-www.service';
-import { QueryWMSService} from './service/wms/query-wms.service';
-import { QueryWFSService} from './service/wfs/query-wfs.service';
+import { QueryWMSService } from './service/wms/query-wms.service';
+import { QueryWFSService } from './service/wfs/query-wfs.service';
 import { SldService } from './service/style/wms/sld.service';
 
 // Directives
@@ -77,8 +77,8 @@ static forRoot(env: any, conf: any): ModuleWithProviders<PortalCoreModule> {
       providers: [
         CsClipboardService,
         CsMapService,
-        {provide: 'env', useValue: env},
-        {provide: 'conf', useValue: conf}
+        { provide: 'env', useValue: env },
+        { provide: 'conf', useValue: conf }
       ],
     };
   }

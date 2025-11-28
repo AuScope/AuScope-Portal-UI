@@ -1,6 +1,3 @@
-import { UtilitiesService } from '../../lib/portal-core-ui/utility/utilities.service';
-import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
-
 export class VMFQuerierHandler {
 
   constructor(private entity: any) {}
