@@ -71,7 +71,7 @@ export class GetCoverageService {
       }
       return this.http.get(serviceUrl, { params: httpParams, responseType: "text" }).pipe(map(
         (response) => {
-          return this.parseCoverageRes(response);;
+          return this.parseCoverageRes(response);
         }));
     }
   }
