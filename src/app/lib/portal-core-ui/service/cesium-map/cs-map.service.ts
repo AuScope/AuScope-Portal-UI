@@ -84,13 +84,9 @@ export class CsMapService {
   public pickEntities(windowPosition: Cartesian2): Entity[] {
     const pickedPrimitives = this.getViewer().scene.drillPick(windowPosition);
     const result = [];
-    const hash = {};
-    for (const picked of pickedPrimitives) {
-      const entity = Cesium.defaultValue(picked.id, picked.primitive.id);
-      if (entity instanceof Cesium.Entity &&
-          !Cesium.defined(hash[entity.id])) {
-        result.push(entity);
-        hash[entity.id] = true;
+    for (const pick of pickedPrimitives) {
+      if (pick.id) {
+        result.push(pick.id);
       }
     }
     return result;
