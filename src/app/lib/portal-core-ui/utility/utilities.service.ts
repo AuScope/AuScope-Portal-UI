@@ -406,7 +406,7 @@ export class UtilitiesService {
     /**
      * This utility will collate the different type of filter into a single parameter object
      */
-    public static collateParam(layer, onlineResource, parameter) {
+    public static collateParam(layer: LayerModel, onlineResource: OnlineResourceModel, parameter: object) {
 
       let param = _.cloneDeep(parameter);
       if (!param) {
@@ -447,13 +447,13 @@ export class UtilitiesService {
       }
 
       // Set up time extents, if supplied and not already present
-      if (!param.time && layer.capabilityRecords && layer.capabilityRecords.length > 0) {
+      if (!param.time && layer.capabilityRecords?.length > 0) {
           const capRec = layer.capabilityRecords[0];
           if (capRec.isWMS && capRec.layers.length > 0) {
-              for (layer of capRec.layers) {
-                  if (layer.name === onlineResource.name && layer.timeExtent && layer.timeExtent.length > 0) {
+              for (const capRecLayer of capRec.layers) {
+                  if (capRecLayer.name === onlineResource.name && capRecLayer.timeExtent?.length > 0) {
                       // NB: Only take the first value
-                      param['time'] = layer.timeExtent[0];
+                      param['time'] = capRecLayer.timeExtent[0];
                       break;
                   }
               }

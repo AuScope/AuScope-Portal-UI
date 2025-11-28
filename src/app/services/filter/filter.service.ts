@@ -1,10 +1,20 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { LayerHandlerService } from '../../lib/portal-core-ui/service/cswrecords/layer-handler.service';
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 import { UtilitiesService } from '../../lib/portal-core-ui/utility/utilities.service';
 import { GetCapsService } from '../../lib/portal-core-ui/service/wms/get-caps.service';
+import { map } from 'rxjs/operators';
+import { ResourceType } from 'app/lib/portal-core-ui/utility/constants.service';
 
+/**
+ * Class for layer time information
+ */
+export class LayerTimes {
+    timeExtent: Date[] = []; // Array of dates representing time extent
+    currentTime: Date; // Current date within timeExtent
+    loadingTimeExtent = false; // Are the times being loaded
+}
 
 /**
  * FilterPanels can appear in the search window as well as the sidebar, this
@@ -91,39 +101,27 @@ export class FilterService {
         return existingLayerProviders;
     }
 
-    private getCapabilityRecord(layer: LayerModel): LayerModel {
-        let wmsEndpointUrl = null;
-        let layerName = null;
-        // Check if WMS capability record present
-        if (layer.capabilityRecords && layer.capabilityRecords.length > 0) {
-            return;
-        }
-        // Look for WMS endpoint in CSW records if not already found
-        if (layer.cswRecords && layer.cswRecords.length > 0) {
-            for (const cswRecord of layer.cswRecords) {
-            if (cswRecord.onlineResources) {
-                const resource = cswRecord.onlineResources.find(o => o.type.toLowerCase() === 'wms');
-                if (resource) {
-                wmsEndpointUrl = resource.url;
-                layerName = resource.name;
-                continue;
-                }
-            }
-            }
-        }
+    /**
+     * Calls OGC WMS GetCapabilities request using cswRecord URL and returns response as Observable
+     * @param layer layer model
+     * @returns Observable<null> if no data, or Observable<{getCaps response, layer name}> if successful
+     */
+    private getCapabilityRecord(layer: LayerModel): Observable<{getCaps: any, layerName: string}> {
+        const onlineResources = UtilitiesService.getLayerResources(layer, ResourceType.WMS);
+        if (onlineResources.length > 0) {
+            let wmsEndpointUrl = onlineResources[0].url;
+            const layerName = onlineResources[0].name;
 
-        // Query WMS GetCapabilities for timeExtent
-        if (wmsEndpointUrl !== null && layerName !== null) {
+            // Query WMS GetCapabilities for timeExtent
             if (wmsEndpointUrl.indexOf('?') !== -1) {
-            wmsEndpointUrl = wmsEndpointUrl.substring(0, wmsEndpointUrl.indexOf('?'));
+                wmsEndpointUrl = wmsEndpointUrl.substring(0, wmsEndpointUrl.indexOf('?'));
             }
-            this.getCapsService.getCaps(wmsEndpointUrl).subscribe(response => {
-            if (response.data && response.data.capabilityRecords.length === 1) {
-                layer.capabilityRecords = response.data.capabilityRecords;
-            }
-            });
+            // Use pipe() and map() to convert Observable<x> to Observable<{x, y}>
+            return this.getCapsService.getCaps(wmsEndpointUrl).pipe(
+                map(value => ({ getCaps: value, layerName: layerName}))
+            );
         }
-        return layer;
+        return of(null);
     }
 
     /**
@@ -154,6 +152,38 @@ export class FilterService {
     }
 
     /**
+     * Extracts layerTimes from layer, sorts them
+     * @param layer layer object that contains capability records
+     * @param layerTimes layerTimes object
+     * @param layerName OGC WMS layer name as found in GetCapabilities response
+     * @returns layerTimes object
+     */
+    private extractLayerTimes(layer: LayerModel, layerTimes: LayerTimes, layerName: string): LayerTimes {
+        // Check if WMS capability record present and time extent set
+        const layerCapRec = layer.capabilityRecords.find(c => c.serviceType.toLowerCase() === 'wms');
+        if (layerCapRec.layers?.length > 0) {
+            const responseLayers = layerCapRec.layers.filter(l => l.name === layerName);
+            if (responseLayers[0]?.timeExtent?.length > 0) {
+                // Sort layer times: newest time is first, oldest time last
+                const strDateArr = responseLayers[0].timeExtent.sort((a, b) => {
+                        return <any>new Date(b) - <any>new Date(a);
+                });
+                layerTimes.timeExtent = []
+                for (const timeExt of strDateArr) {
+                    if (typeof timeExt === 'string') {
+                        layerTimes.timeExtent.push(new Date(timeExt));
+                    }
+                }
+                // Time may have already been set from retrieving state
+                if (!layerTimes.currentTime) {
+                    layerTimes.currentTime = layerTimes.timeExtent[0];
+                }
+            }
+        }
+        return layerTimes;
+    }
+
+    /**
      * Get LayerTimes from CapabilityRecords or WMS for a given layer
      *
      * @param layer the layer
@@ -161,83 +191,46 @@ export class FilterService {
      */
     public updateLayerTimes(layer: LayerModel, layerTimes: LayerTimes) {
         let layerTimesBS: BehaviorSubject<LayerTimes> = this.layerTimes.get(layer.id);
-
         if (!layerTimesBS) {
             const layerTimes: LayerTimes = new LayerTimes();
             layerTimesBS = new BehaviorSubject(layerTimes);
             this.layerTimes.set(layer.id, layerTimesBS);
         }
 
-
-        let wmsEndpointUrl = null;
-        let layerName = null;
-
-        // Check if WMS capability record present
-        if (!(layer.capabilityRecords && layer.capabilityRecords.length > 0)) {
-            layer = this.getCapabilityRecord(layer);
-        }
-
-        // Check if WMS capability record present and time extent set
-        if (layer.capabilityRecords && layer.capabilityRecords.length > 0) {
-            const layerCapRec = layer.capabilityRecords.find(c => c.serviceType.toLowerCase() === 'wms');
-            if (layerCapRec && layerCapRec.layers.length > 0) {
-                if (layerCapRec.layers[0].timeExtent) {
-                    layerTimes.timeExtent = layerCapRec.layers[0].timeExtent;
-                    layerTimes.currentTime = layerTimes.timeExtent[0];
-                }
-            }
-        }
-        // Look for WMS endpoint in CSW records if not already found
-        if (!layerTimes.currentTime && layer.cswRecords && layer.cswRecords.length > 0) {
-            for (const cswRecord of layer.cswRecords) {
-            if (cswRecord.onlineResources) {
-                const resource = cswRecord.onlineResources.find(o => o.type.toLowerCase() === 'wms');
-                if (resource) {
-                    wmsEndpointUrl = resource.url;
-                    layerName = resource.name;
-                    continue;
-                }
-            }
-            }
-        }
-        // Query WMS GetCapabilities for timeExtent
-        if (layerTimes.timeExtent.length === 0 && wmsEndpointUrl !== null && layerName !== null) {
+        // If WMS capability record not present
+        if (!(layer.capabilityRecords?.length > 0)) {
+            // Call WMS GetCapabilites using layer info
             layerTimes.loadingTimeExtent = true;
-            if (wmsEndpointUrl.indexOf('?') !== -1) {
-                wmsEndpointUrl = wmsEndpointUrl.substring(0, wmsEndpointUrl.indexOf('?'));
-            }
-            this.getCapsService.getCaps(wmsEndpointUrl).subscribe(response => {
-            if (response.data && response.data.capabilityRecords.length === 1 && response.data.capabilityRecords[0].layers.length > 0) {
-                const responseLayers = response.data.capabilityRecords[0].layers.filter(l => l.name === layerName);
-                if (responseLayers && responseLayers.length > 0 && responseLayers[0].timeExtent) {
-                    // Sort by date (newest first)
-                    layerTimes.timeExtent = responseLayers[0].timeExtent.sort((a, b) => {
-                        return <any>new Date(b) - <any>new Date(a);
-                    });
-                    // Time may have already been set from retrieving state
-                    if (!layerTimes.currentTime) {
-                        layerTimes.currentTime = layerTimes.timeExtent[0];
+            this.getCapabilityRecord(layer).subscribe(response => {
+                if (response) {
+                    if (response.getCaps.data?.capabilityRecords.length === 1) {
+                        layer.capabilityRecords = response.getCaps.data.capabilityRecords;
                     }
                 }
-            }
-            layerTimes.loadingTimeExtent = false;
-            layerTimesBS.next(layerTimes);
-            }, () => {
-            layerTimes.loadingTimeExtent = false;
-            layerTimesBS.next(layerTimes);
+                // Extract layer times from GetCaps response
+                if (layer.capabilityRecords?.length > 0) {
+                    layerTimes = this.extractLayerTimes(layer, layerTimes, response.layerName);
+                }
+                layerTimes.loadingTimeExtent = false;
+                layerTimesBS.next(layerTimes);
+            }, () => { // If error still need to submit layerTimes
+                layerTimes.loadingTimeExtent = false;
+                layerTimesBS.next(layerTimes);
             });
+        // Layer does have capability records
         } else {
+            // Get OCG WMS layer name and extract layer times from GetCaps response
+            const onlineResources = UtilitiesService.getLayerResources(layer, ResourceType.WMS);
+            if (onlineResources.length > 0) {
+                const layerName = onlineResources[0].name;
+                if (layerName) {
+                    layerTimes = this.extractLayerTimes(layer, layerTimes, layerName);
+                }
+            }
             layerTimes.loadingTimeExtent = false;
             layerTimesBS.next(layerTimes);
         }
     }
 }
 
-/**
- * Class for layer time information
- */
-export class LayerTimes {
-    timeExtent: Date[] = []; // Array of dates representing time extent
-    currentTime: Date; // Current date within timeExtent
-    loadingTimeExtent = false; // Are the times being loaded
-}
+

@@ -107,11 +107,10 @@ export class CsWMSService {
       HEIGHT: Constants.TILE_SIZE,
       STYLES: param && param.styles ? param.styles : '',
     };
-
     if (param) {
       // Add in time parameter, but only if required
-      if (param.time) {
-        params['time'] = param.time;
+      if (param?.time instanceof Date) {
+        params['time'] = param.time.toISOString();
       }
       // Add in cql_filter parameter, if requested
       if (param.optionalFilters) {
@@ -163,11 +162,10 @@ export class CsWMSService {
       WIDTH: Constants.TILE_SIZE,
       HEIGHT: Constants.TILE_SIZE
     };
-
     if (param) {
       // Add in time parameter, but only if required
-      if (param.time) {
-        params['time'] = param.time;
+      if (param?.time instanceof Date) {
+        params['time'] = param.time.toISOString();
       }
       // Add in cql_filter parameter, if requested
       if (param.optionalFilters) {
