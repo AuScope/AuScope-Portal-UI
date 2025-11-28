@@ -118,7 +118,7 @@ export class FilterService {
             }
             // Use pipe() and map() to convert Observable<x> to Observable<{x, y}>
             return this.getCapsService.getCaps(wmsEndpointUrl).pipe(
-                map(value => ({ getCaps: value, layerName: layerName}))
+                map(value => ({ getCaps: value, layerName: layerName }))
             );
         }
         return of(null);
