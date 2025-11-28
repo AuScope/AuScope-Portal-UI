@@ -20,7 +20,7 @@ import bboxPolygon from '@turf/bbox-polygon';
 import intersect from '@turf/intersect';
 
 import * as when from 'when';
-import TileProviderError from 'cesium/Source/Core/TileProviderError';
+import { TileProviderError } from 'cesium';
 import { SldService } from '../style/wms/sld.service';
 
 export class ErrorPayload {
