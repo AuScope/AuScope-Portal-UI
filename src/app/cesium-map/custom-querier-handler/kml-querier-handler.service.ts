@@ -1,5 +1,4 @@
 import { UtilitiesService } from '../../lib/portal-core-ui/utility/utilities.service';
-import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 import { KmlFeatureData } from "cesium";
 
 

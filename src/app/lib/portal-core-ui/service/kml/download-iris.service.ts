@@ -16,7 +16,7 @@ export class DownloadIrisService {
 
     /**
    * Download a zip file of dataselect dataset by constructing a data download URL
-   * 
+   *
    * @param layer the layer to download
    * @param station station parameter for filtering
    * @param channel channel parameter for filtering
@@ -60,7 +60,7 @@ export class DownloadIrisService {
 
     /**
    * Download a zip file of station dataset by constructing a data download URL
-   * 
+   *
    * @param layer the layer to download
    * @param bbox the bounding box of the area to download
    * @param station station parameter for filtering

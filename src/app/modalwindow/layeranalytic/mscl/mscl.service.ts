@@ -275,7 +275,7 @@ export class MSCLService {
      * @param xLists lists of x-values in associative array, key is metric string
      * @return smoothed x-values in same format as 'xLists'
      */
-    private smoothOut(metricList: string[], xLists: {}, windowSize: number) {
+    private smoothOut(metricList: string[], xLists: object, windowSize: number) {
         const xLists_out = {};
         for (const metric of metricList) {
             xLists_out[metric] = this.smooth(xLists[metric], windowSize);
@@ -290,7 +290,7 @@ export class MSCLService {
      * @param metricList list of Metrics to plot
      * @returns plot layout
      */
-    public getGraphLayout(metricList: string[], xLists: {}): Partial<Layout> {
+    public getGraphLayout(metricList: string[], xLists: object): Partial<Layout> {
         const layout: Partial<Layout> = {
             hovermode: 'closest',
             grid: { rows: 1, columns: metricList.length, pattern: 'independent' },
@@ -411,7 +411,7 @@ export class MSCLService {
      * @param yList y-axis data
      * @return plotly 'Data' object containing plot data
      */
-    public getGraphTraceList(metricList: string[], xLists: {}, yList: number[]): Data[] {
+    public getGraphTraceList(metricList: string[], xLists: object, yList: number[]): Data[] {
         const traceList: Data[] = [];
         const xLists_sm = {};
         xLists_sm[SM_WINDOW_LIST[0]] = xLists;
@@ -422,7 +422,7 @@ export class MSCLService {
         // A new plot for each metric
         for (const metric of metricList) {
             // Draw lines of varying degrees of smoothing in each plot
-            const trace_sm: { string: Data } | {} = {};
+            const trace_sm: object = {};
             for (const win of SM_WINDOW_LIST) {
                 trace_sm[win] = {
                     x: xLists_sm[win][metric],

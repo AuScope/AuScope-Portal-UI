@@ -3,9 +3,9 @@ import { Injectable } from '@angular/core';
 import { Constants } from './constants.service';
 import { UtilitiesService } from './utilities.service';
 
-declare var XPath: any;
-declare var ActiveXObject: any;
-declare var window: any;
+declare let XPath: any;
+declare let ActiveXObject: any;
+declare let window: any;
 
 /**
  * Port over from old portal-core extjs for dealing with xml in wfs.
@@ -27,7 +27,7 @@ export class SimpleXMLService {
 
   /**
    * Searches and retrieves a string value
-   * 
+   *
    * @method evaluateXPathString
    * @param document Document interface
    * @param domNode Node class, defines where to start looking
@@ -135,7 +135,7 @@ export class SimpleXMLService {
     let xpathResult = null;
     try {
       xpathResult = this.evaluateXPath(document, domNode, xPath, XPathResult.UNORDERED_NODE_ITERATOR_TYPE, nsResolver);
-    } catch (err) {
+    } catch (_err: any) {
       return [];
     }
     const matchingNodes = [];
@@ -149,7 +149,7 @@ export class SimpleXMLService {
   /**
    * Utility for retrieving a W3C DOM Node 'localName' attribute across browsers.
    * The localName is the node name without any namespace prefixes
-   * 
+   *
    * @method getNodeLocalName
    * @param domNode - Node class, defines where to start looking
    * @return String - local name of the node or empty string upon error
@@ -163,7 +163,7 @@ export class SimpleXMLService {
 
   /**
    * Returns the set of classes this node belongs to as an array of strings
-   * 
+   *
    * @method getClassList
    * @param domNode - Node class, defines where to start looking
    * @return dom - the dom result
@@ -182,7 +182,7 @@ export class SimpleXMLService {
   /**
    * Figure out if domNode is a leaf or not
    * (Leaves have no nodes from XML_NODE_ELEMENT)
-   * 
+   *
    * @method isLeafNode
    * @param domNode - Node class, defines where to start looking
    * @return boolean - is leaf or not
@@ -256,7 +256,7 @@ export class SimpleXMLService {
 
   /**
    * Given a DOM node, return its text content (however the browser defines it)
-   * 
+   *
    * @method getNodeTextContent
    * @param domNode - Node class, defines where to start looking
    * @return string - text content
@@ -290,7 +290,6 @@ export class SimpleXMLService {
    * @return dom - return the result in a dom
    */
   public static parseStringToDOM(xmlString: string): Document {
-    const isIE11 = !!navigator.userAgent.match(/Trident.*rv[ :]*11\./);
     // Load our xml string into DOM
     let xmlDocument = null;
     if (window.DOMParser) {
@@ -363,7 +362,7 @@ export class SimpleXMLService {
           if (UtilitiesService.isEmpty(fieldNodes)) {
             features = featureInfoNode;
             // Skip the empty tenement feature from esri server.
-            if (featureInfoNode[0] !== null && featureInfoNode[0].outerHTML.indexOf('esri_wms=\"http://www.esri.com/wms\"') >= 0 ) {
+            if (featureInfoNode[0] !== null && featureInfoNode[0].outerHTML.indexOf('esri_wms=\"http://www.esri.com/wms\"') >= 0) {
               features = null;
             }
           } else {
@@ -404,7 +403,7 @@ export class SimpleXMLService {
         }
       }
       if (features) {
-        for (let featureNode of features) {
+        for (const featureNode of features) {
           // VT: We will try get the name either via gml:id, gml:name or fid
           let name = featureNode.getAttribute('gml:id');
           if (UtilitiesService.isEmpty(name)) {
@@ -450,7 +449,7 @@ export class SimpleXMLService {
       const sldDoc = sldParser.parseFromString(sldBody, 'text/xml');
 
       // Intersects will be inside Filters...
-      const filterNodes = sldDoc.evaluate('//ogc:Filter', sldDoc, SimpleXMLService.namespaceResolver,
+      const filterNodes = sldDoc.evaluate('//ogc:Filter', sldDoc, (prefix: string) => SimpleXMLService.namespaceResolver(prefix),
                                           XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
       for (let f = 0; f < filterNodes.snapshotLength; f++) {
         const currentFilterNode = filterNodes.snapshotItem(f);
@@ -480,7 +479,7 @@ export class SimpleXMLService {
 
     // Get non-And (Filter) nodes of parent that are not Intersects
     const childOtherNodes = sldDoc.evaluate('./*[not(self::ogc:And)]', parentNode,
-                                            SimpleXMLService.namespaceResolver, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+                                            (prefix: string) => SimpleXMLService.namespaceResolver(prefix), XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
     for (let i = 0; i < childOtherNodes.snapshotLength; i++) {
       const currentOtherNode = childOtherNodes.snapshotItem(i);
       if (currentOtherNode.nodeName !== 'ogc:Intersects') {
@@ -490,7 +489,7 @@ export class SimpleXMLService {
     }
 
     // Recurse any And nodes
-    const childAndNodes = sldDoc.evaluate('ogc:And', parentNode, SimpleXMLService.namespaceResolver,
+    const childAndNodes = sldDoc.evaluate('ogc:And', parentNode, (prefix: string) => SimpleXMLService.namespaceResolver(prefix),
                                           XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
     for (let i = 0; i < childAndNodes.snapshotLength; i++) {
       const currentAndNode = childAndNodes.snapshotItem(i);

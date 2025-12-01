@@ -429,10 +429,10 @@ export class SearchPanelComponent implements OnInit {
    *
    * @param layer LayerModel of layer
    */
-  public layerWarningMessage(layer: LayerModel): string {
+  public layerWarningMessage(_layer: LayerModel): string {
     return 'This layer cannot be displayed. For Featured Layers, please wait for the layer cache to rebuild itself. ' +
       'For Custom Layers please note that only the following online resource types can be added to the map: ' +
-      UtilitiesService.getSupportedOnlineResourceTypes();
+      UtilitiesService.getSupportedOnlineResourceTypes().join(" ");
   }
 
   /**
@@ -650,8 +650,8 @@ export class SearchPanelComponent implements OnInit {
     layer.group = 'registry-csw';
     layer.name = record.name;
     layer.description = record.description;
-    layer.useDefaultProxy = false, // Use the default proxy (getViaProxy.do) if true (custom layers)
-    layer.useProxyWhitelist = true, // Use the default proxy whitelist if true (custom layers)
+    layer.useDefaultProxy = false; // Use the default proxy (getViaProxy.do) if true (custom layers)
+    layer.useProxyWhitelist = true; // Use the default proxy whitelist if true (custom layers)
     layer.cswRecords = [record];
     return layer;
   }

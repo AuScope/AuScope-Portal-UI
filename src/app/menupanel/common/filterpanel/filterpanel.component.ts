@@ -41,8 +41,8 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
   advancedComponentService = inject(AdvancedComponentService);
 
   @Input() layer: LayerModel;
-  private providers: Array<Object>;
-  public optionalFilters: Array<Object>; // Optional filters currently rendered by this component
+  private providers: Array<object>;
+  public optionalFilters: Array<object>; // Optional filters currently rendered by this component
   public selectedFilter;
   public advancedParam = [];
   public analyticMap;
@@ -195,7 +195,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
    * @param filter the filter to test
    * @returns true if the filter contains a valid value
    */
-  private filterHasValue(filter: Object): boolean {
+  private filterHasValue(filter: object): boolean {
     let hasValue = false;
     if (filter['type'] === 'OPTIONAL.PROVIDER') {
       for (const provider in filter['value']) {
@@ -225,7 +225,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
    */
   public getUnsupportedLayerMessage(): string {
     return 'This layer cannot be displayed. Only the following online resource types can be added to the map: ' +
-      UtilitiesService.getSupportedOnlineResourceTypes();
+      UtilitiesService.getSupportedOnlineResourceTypes().join(" ")
   }
 
   /**
@@ -270,6 +270,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
       });
     } catch (error) {
       alert('Unable to getNvclFilter');
+      console.error('Unable to getNvclFilter', error);
     }
   }
 
@@ -297,11 +298,11 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
     });
   }
 
-  public getKey(options: Object): string {
+  public getKey(options: object): string {
     return UtilitiesService.getKey(options);
   }
 
-  public getValue(options: Object): string {
+  public getValue(options: object): string {
     return UtilitiesService.getValue(options);
   }
 
@@ -328,7 +329,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
    * @param filter filter object to be added to the panel
    * @param addEmpty if true, set filter value to be empty.
    */
-  public addFilter(filter, addEmpty?: boolean): void {
+  public addFilter(filter, _addEmpty?: boolean): void {
     if (filter == null) {
       return;
     }

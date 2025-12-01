@@ -58,7 +58,8 @@ export class ROIModalComponent {
         if (result && result === 'OK') {
          this.activeModal.close();
         }
-      });
+      }).catch(
+        (error) => console.error("Could not close modal", error));
     } else {
       // Save the ROI to storage.
       this.userStateService.saveROI();

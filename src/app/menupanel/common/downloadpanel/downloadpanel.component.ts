@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, Inject } from '@angular/core';
-import { ResourceType, GeometryType } from '../../../lib/portal-core-ui/utility/constants.service';
+import { ResourceType } from '../../../lib/portal-core-ui/utility/constants.service';
 import { saveAs } from 'file-saver';
 import { config } from '../../../../environments/config';
 import { environment } from '../../../../environments/environment'; //CVP
@@ -23,6 +23,7 @@ import { shareReplay } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { DownloadAuScopeCatModalComponent } from 'app/modalwindow/download-auscopecat/download-auscopecat.modal.component';
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 declare let gtag: Function;
 
 @Component({
@@ -93,7 +94,7 @@ export class DownloadPanelComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.layer.group === 'Passive Seismic' && this.layer.cswRecords[0].onlineResources[1]?.type === 'DOI') {
+    if (this.layer.group === 'Passive Seismic' && this.layer.cswRecords[0].onlineResources[1]?.type === ResourceType.DOI) {
       this.showDOIs = true;
     }
     if (this.layer) {

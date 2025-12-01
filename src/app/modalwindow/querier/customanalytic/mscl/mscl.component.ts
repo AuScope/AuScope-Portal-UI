@@ -20,7 +20,7 @@ export class MSCLComponent implements OnInit {
     @Input() featureId: string;
     @Input() doc: QuerierInfoModel;
 
-    public msclform: { startDepth: number, endDepth: number, bMetric: {}, bGroup: {} }; // Used to store form data
+    public msclform: { startDepth: number, endDepth: number, bMetric: object, bGroup: object }; // Used to store form data
     // startDepth = start depth
     // endDepth = end depth
     // bMetric = metric tickbox, dict: key is printable name, val is boolean

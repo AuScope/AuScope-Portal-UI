@@ -10,7 +10,7 @@ import { Observable, Subject } from 'rxjs';
 import { shareReplay } from 'rxjs/operators';
 
 @Component({
-    selector: 'nvcl-tsgdownload-component',
+    selector: 'app-nvcl-tsgdownload-component',
     templateUrl: './nvcl.tsgdownload.component.html',
     styles: [
         'input:invalid + span:after { content: \'✖\'; color: #f00; padding-left: 15px; }',

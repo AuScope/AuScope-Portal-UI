@@ -10,7 +10,7 @@ import { RenderStatusService } from '../cesium-map/renderstatus/render-status.se
 import { UtilitiesService } from '../../utility/utilities.service';
 
 
-declare var Cesium;
+declare let Cesium;
 
 /**
  * Use Cesium to add layer to map. This service class adds GeoJSON layer to the map
@@ -35,7 +35,7 @@ export class CsGeoJsonService {
    * @param layer the geoJson layer to add to the map
    * @param param parameters for the geoJson layer
    */
-  public addLayer(layer: LayerModel, param?: any): void {
+  public addLayer(layer: LayerModel, _param?: any): void {
     // Remove from cancelled layer list (if present)
     this.cancelledLayers = this.cancelledLayers.filter(l => l !== layer.id);
 
@@ -73,9 +73,9 @@ export class CsGeoJsonService {
       if (UtilitiesService.layerContainsResourceType(layer, ResourceType.GEOJSON)) {
         // add geoJson to map
         if (! layer.stylefn) {
-           layer.stylefn = me.styleGeoJsonEntity;
+           layer.stylefn = (entity: any) => me.styleGeoJsonEntity(entity);
         }
-        var promise;
+        let promise;
         if (layer.jsonDoc) {
           promise = Cesium.GeoJsonDataSource.load(JSON.parse(layer.jsonDoc));
         } else {
@@ -83,7 +83,7 @@ export class CsGeoJsonService {
         }
         promise
           .then(function (dataSource) {
-            viewer.dataSources.add(dataSource);      
+            viewer.dataSources.add(dataSource);
             //Get the array of entities
             for (const entity of dataSource.entities.values) {
               // Style each geoJson point
@@ -95,7 +95,7 @@ export class CsGeoJsonService {
           })
           .catch(function (error) {
             window.alert(error);
-          });      
+          });
 
       }
     }

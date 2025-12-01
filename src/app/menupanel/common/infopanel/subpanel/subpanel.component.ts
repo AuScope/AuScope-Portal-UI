@@ -6,9 +6,10 @@ import { UtilitiesService } from '../../../../lib/portal-core-ui/utility/utiliti
 import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
 import { environment } from 'environments/environment';
 import { config } from 'environments/config';
+import { ResourceType } from '../../../../lib/portal-core-ui/utility/constants.service';
 
 @Component({
-    selector: 'info-sub-panel',
+    selector: 'app-info-sub-panel',
     templateUrl: './subpanel.component.html',
     styleUrls: ['../../../menupanel.scss', './subpanel.component.scss'],
     standalone: false
@@ -85,7 +86,7 @@ export class InfoPanelSubComponent implements OnInit {
      * @returns true if OnlineResource is of type WMS, WFS, WCS or CSW
      */
     public isGetCapabilitiesType(onlineResource: OnlineResourceModel): boolean {
-        return onlineResource.type === 'WMS' || onlineResource.type === 'WFS' || onlineResource.type === 'WCS' || onlineResource.type === 'CSW';
+        return onlineResource.type === ResourceType.WMS || onlineResource.type === ResourceType.WFS || onlineResource.type === ResourceType.WCS || onlineResource.type === ResourceType.CSW;
     }
 
     /** Removes proxy from URL for display purposes
@@ -141,7 +142,7 @@ export class InfoPanelSubComponent implements OnInit {
             const isoDateStr = this.cswRecord.date.replace(" UTC", "Z");
             const pubDate = new Date(isoDateStr);
             this.publicationYear = pubDate.getFullYear().toString();
-        } catch (error) {
+        } catch (_error) {
             this.publicationYear = 'unknown';
         }
 
@@ -150,18 +151,18 @@ export class InfoPanelSubComponent implements OnInit {
         this.DOIname = '';
         let usesNCI = false;
         let foundDOI = false;
-        for (let onlineResource of this.cswRecord.onlineResources) {
+        for (const onlineResource of this.cswRecord.onlineResources) {
             // If uses NCI facilities then should include them as distributor
             if (onlineResource.url.includes('nci.org.au')) {
                 usesNCI = true;
             }
             // Prefer to use a DOI if one is found
-            if (onlineResource.type==='DOI') {
+            if (onlineResource.type === ResourceType.DOI) {
                 this.citeURL = onlineResource.url;
                 this.DOIname = onlineResource.name;
                 foundDOI = true;
             }
-            if (!foundDOI && onlineResource.type!=='Unsupported') {
+            if (!foundDOI && onlineResource.type!== ResourceType.UNSUPPORTED) {
                 if (this.isGetCapabilitiesType(onlineResource)) {
                     this.citeURL = this.onlineResourceGetCapabilitiesUrl(onlineResource);
                 } else {
@@ -221,7 +222,7 @@ export class InfoPanelSubComponent implements OnInit {
 
                 // Add default time if present
                 if (layerTimes?.currentTime) {
-                    params += '&TIME=' + layerTimes.currentTime;
+                    params += '&TIME=' + layerTimes.currentTime.toISOString();
                 }
 
                 this.wmsUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(wmsOnlineResource.url), params);
@@ -234,7 +235,7 @@ export class InfoPanelSubComponent implements OnInit {
 
     /**
      * Catch the user click and copy citation to clipboard
-     * 
+     *
      * @param event click event
      */
     public copyCite(element: HTMLElement) {
