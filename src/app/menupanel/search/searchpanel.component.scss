@@ -316,6 +316,7 @@
                       border-radius: 0.5rem;
                       padding: 0.5rem;
                       max-width: 100%;
+                      min-height: 0;
 
                       .download-layers-list {
                           max-height: calc(100vh - 560px);
