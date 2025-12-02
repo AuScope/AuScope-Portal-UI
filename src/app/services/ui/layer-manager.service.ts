@@ -10,7 +10,7 @@ import * as _ from 'lodash';
 import * as $ from 'jquery';
 import { SidebarService } from 'app/portal/sidebar.service';
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type, @typescript-eslint/ban-types
 declare let gtag: Function;
 
 /**

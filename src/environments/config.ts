@@ -414,5 +414,22 @@ export const config = {
     'igsn-ardc-sample': {
       serviceName: 'GenericStyleService',
     },
-  }
+  },
+  doesNotCacheSLDBody: [
+    "https://sarigdata.pir.sa.gov.au"
+  ],
+  insertGeoSciMLNS: [
+    {
+        url: ".sa.gov.au",
+        layerName: "gsmlp:BoreholeView",
+        layerId: "nvcl-v2-borehole",
+        gsmlpNamespace: "http://www.opengis.net/gsml/4.1/geosciml-lite"
+    },
+    {
+        url: ".sa.gov.au",
+        layerName: "gsmlp:BoreholeView",
+        layerId: "sf0-borehole-nvcl",
+        gsmlpNamespace: "http://www.opengis.net/gsml/4.1/geosciml-lite"
+    }
+  ]
 };

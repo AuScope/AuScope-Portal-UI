@@ -578,7 +578,7 @@ export class CsMapService {
             creationFunction: async function() {
               return await Cesium.BingMapsImageryProvider.fromUrl(
                 'https://dev.virtualearth.net',
-                { 
+                {
                   key: this.env.bingMapsKey,
                   mapStyle: bingMapsStyle,
                 }

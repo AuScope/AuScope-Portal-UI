@@ -1,14 +1,7 @@
-import {
-  HttpClient,
-  HttpHeaders,
-  HttpParams,
-  HttpResponse,
-} from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { OnlineResourceModel } from '../../../model/data/onlineresource.model';
-import { UtilitiesService } from '../../../utility/utilities.service';
 import { GSML41StyleService } from './gsml41-style.service';
 import { BoreholeStyleService } from './borehole-style.service';
 import { NVCLBoreholeStyleService } from './nvcl-borehole-style.service';
@@ -23,6 +16,8 @@ import { MineralTenementStyleService } from './mineral-tenement-style.service';
 import { RemanentAnomaliesAutoSearchStyleService } from './remanent-anomalies-auto-search-style.service';
 import { RemanentAnomaliesStyleService } from './remanent-anomalies-style.service';
 import { GenericStyleService } from './generic-style.service';
+import { LayerModel } from 'app/lib/portal-core-ui/model/data/layer.model';
+import { config } from '../../../../../../../src/environments/config';
 
 @Injectable()
 export class SldService {
@@ -56,16 +51,22 @@ export class SldService {
    * @return an Observable of the HTTP request
    */
   public getSldBody(
-    sldUrl: string,
-    usePost: boolean,
     onlineResource: OnlineResourceModel,
-    param?: any,
-    layerId?: string
+    param: any,
+    layer: LayerModel
   ): Observable<any> {
     // Pass through any sld_bodys already set
-    if (param && param.sld_body && param.sld_body !== '') {
+    if (param?.sld_body && param.sld_body !== '') {
       return new Observable((observer) => {
         observer.next(param.sld_body);
+        observer.complete();
+      });
+    }
+
+    // Skip out if 'styles' already defined
+    if (param.styles && param.styles !== '') {
+      return new Observable((observer) => {
+        observer.next("");
         observer.complete();
       });
     }
@@ -95,7 +96,7 @@ export class SldService {
     }
 
     // Check if layer has a style service configured
-    const styleConfig = this.config.styleServices[layerId];
+    const styleConfig = this.config.styleServices[layer.id];
     if (styleConfig) {
       return new Observable((observer) => {
         try {
@@ -104,6 +105,23 @@ export class SldService {
           if (!StyleService) {
             throw new Error(`Style service ${styleConfig.serviceName} not found`);
           }
+
+          // Some services are GeoSciML-lite v4.1 and need XML namespace adjustment
+          let url = null;
+          try {
+              url = new URL(onlineResource.url);
+          } catch (error) {
+              // skip
+          }
+          for (const entry of config.insertGeoSciMLNS) {
+            if (url?.hostname.endsWith(entry.url) && onlineResource.name === entry.layerName
+                    && layer.id === entry.layerId) {
+              param.gsmlpNamespace = entry.gsmlpNamespace;
+              break;
+            }
+          }
+          
+          // End patch
 
           // Just merge the params and pass them through
           const sldBody = StyleService.getSld(
@@ -120,47 +138,9 @@ export class SldService {
       });
     }
 
-    // If there is no SLD URL coming from config
-    if (!sldUrl) {
-      return new Observable((observer) => {
+    return new Observable((observer) => {
         observer.next(null);
         observer.complete();
-      });
-    }
-
-    let httpParams = Object.getOwnPropertyNames(param).reduce(
-      (p, key1) => p.set(key1, param[key1]),
-      new HttpParams()
-    );
-    httpParams = UtilitiesService.convertObjectToHttpParam(httpParams, param);
-    if (!usePost) {
-      return this.http
-        .get(this.env.portalBaseUrl + sldUrl, {
-          responseType: 'text',
-          params: httpParams,
-        })
-        .pipe(
-          map((response) => {
-            return response;
-          })
-        );
-    } else {
-      return this.http
-        .post(this.env.portalBaseUrl + sldUrl, httpParams.toString(), {
-          headers: new HttpHeaders().set(
-            'Content-Type',
-            'application/x-www-form-urlencoded'
-          ),
-          responseType: 'text',
-        })
-        .pipe(
-          map((response) => {
-            return response;
-          }),
-          catchError((error: HttpResponse<any>) => {
-            return throwError(error);
-          })
-        );
-    }
+    });
   }
 }

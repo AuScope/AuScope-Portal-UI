@@ -91,7 +91,7 @@ export class QueryWMSService {
    * @param bbox tile bbox
    * @return Observable the observable from the http request
    */
-  public getFeatureInfo(onlineResource: OnlineResourceModel, sldBody: string, infoFormat: string, postMethod: boolean,
+  public getFeatureInfo(onlineResource: OnlineResourceModel, styles: string, sldBody: string, infoFormat: string, postMethod: boolean,
                         lon: number, lat: number, x: number, y: number, width: number, height: number, bbox: number[]): Observable<any> {
     const formdata = new HttpParams()
       .set('serviceUrl', UtilitiesService.rmParamURL(onlineResource.url))
@@ -105,9 +105,16 @@ export class QueryWMSService {
       .set('HEIGHT', height.toString())
       .set('BBOX', bbox.join(','))
       .set('version', onlineResource.version)
-      .set('SLD_BODY', sldBody)
+      
       .set('INFO_FORMAT', infoFormat)
       .set('postMethod', String(postMethod));
+    
+    // If there is a 'styles' parameter then use that instead of 'sld_body'
+    if (styles !== '') {
+      formdata.set('STYLES', sldBody);
+    } else {
+      formdata.set('SLD_BODY', sldBody);
+    }
 
     return this.http.post(this.env.portalBaseUrl + 'wmsMarkerPopup.do', formdata.toString(), {
       headers: new HttpHeaders()

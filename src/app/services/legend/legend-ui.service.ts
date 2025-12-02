@@ -192,9 +192,8 @@ export class LegendUiService {
     const param: any = {};
     param.optionalFilters = [];
     const collatedParam = UtilitiesService.collateParam(layer, wmsOnlineResource, param);
-    const usePost = (environment.portalBaseUrl + layer.proxyStyleUrl + collatedParam.toString()).length > Constants.WMSMAXURLGET;
 
-    this.sldService.getSldBody(layer.proxyStyleUrl, usePost, wmsOnlineResource, collatedParam).subscribe(sldBody => {
+    this.sldService.getSldBody(wmsOnlineResource, collatedParam, layer).subscribe(sldBody => {
       if (sldBody) {
         const wmsOnlineResources = this.getWMSOnlineResources(layer);
         // Compile list of legend requests and/or URLs

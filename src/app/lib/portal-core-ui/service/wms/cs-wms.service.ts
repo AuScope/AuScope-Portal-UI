@@ -22,6 +22,7 @@ import intersect from '@turf/intersect';
 import * as when from 'when';
 import { TileProviderError } from 'cesium';
 import { SldService } from '../style/wms/sld.service';
+import { config } from '../../../../../../src/environments/config';
 
 export class ErrorPayload {
   constructor(
@@ -72,7 +73,7 @@ export class CsWMSService {
   /**
    * A private helper used to check if the URL is too long
    */
-  public wmsUrlTooLong(sldBody: string, layer: LayerModel): boolean {
+  private wmsUrlTooLong(sldBody: string, layer: LayerModel): boolean {
     return (
       encodeURIComponent(sldBody).length > Constants.WMSMAXURLGET ||
       this.conf.forceAddLayerViaProxy.includes(layer.id)
@@ -87,7 +88,7 @@ export class CsWMSService {
    * @param usePost true if parameters are very long and a POST request may be required
    * @param sld_body associated styling parameter sld_body
    */
-  public getWMS1_3_0param(
+  private getWMS1_3_0param(
     layer: LayerModel,
     onlineResource: OnlineResourceModel,
     param: any,
@@ -98,7 +99,7 @@ export class CsWMSService {
       // VT: if the parameter contains featureType, it mean we are targeting a different featureType e.g capdf layer
       LAYERS:
         param && param.featureType ? param.featureType : onlineResource.name,
-      TILED: true,
+      TILED: !param || !param.tiled ? false : true,
       DISPLAYOUTSIDEMAXEXTENT: true,
       FORMAT: 'image/png',
       TRANSPARENT: true,
@@ -129,8 +130,6 @@ export class CsWMSService {
       } else {
         params['sld_body'] = sld_body;
       }
-    } else {
-      params['sldUrl'] = this.getSldUrl(layer, param);
     }
     return params;
   }
@@ -143,7 +142,7 @@ export class CsWMSService {
    * @param usePost true if parameters are very long and a POST request may be required
    * @param sld_body associated styling parameter sld_body
    */
-  public getWMS1_1param(
+  private getWMS1_1param(
     layer: LayerModel,
     onlineResource: OnlineResourceModel,
     param: any,
@@ -154,13 +153,14 @@ export class CsWMSService {
       // VT: if the parameter contains featureType, it mean we are targeting a different featureType e.g capdf layer
       LAYERS:
         param && param.featureType ? param.featureType : onlineResource.name,
-      TILED: true,
+      TILED: !param || !param.tiled ? false : true,
       DISPLAYOUTSIDEMAXEXTENT: true,
       FORMAT: 'image/png',
       TRANSPARENT: true,
       VERSION: '1.1.1',
       WIDTH: Constants.TILE_SIZE,
-      HEIGHT: Constants.TILE_SIZE
+      HEIGHT: Constants.TILE_SIZE,
+      STYLES: param && param.styles ? param.styles : '',
     };
     if (param) {
       // Add in time parameter, but only if required
@@ -184,8 +184,6 @@ export class CsWMSService {
       } else {
         params['sld_body'] = sld_body;
       }
-    } else {
-      params['sldUrl'] = this.getSldUrl(layer, param);
     }
     return params;
   }
@@ -245,28 +243,6 @@ export class CsWMSService {
           })
         );
     }
-  }
-
-  /**
-   * Get the WMS style URL if proxyStyleUrl is valid
-   * @method getSldUrl
-   * @param layer - the layer we would like to retrieve the SLD for if proxyStyleUrl is defined
-   * @param param - OPTIONAL - parameter to be passed into retrieving the SLD.Used in capdf
-   * @return url - getUrl to retrieve sld
-   */
-  private getSldUrl(
-    layer: LayerModel,
-    param?: any
-  ) {
-    if (layer.proxyStyleUrl) {
-      let httpParams = Object.getOwnPropertyNames(param).reduce(
-        (p, key1) => p.set(key1, param[key1]),
-        new HttpParams()
-      );
-      httpParams = UtilitiesService.convertObjectToHttpParam(httpParams, param);
-      return '/' + layer.proxyStyleUrl + '?' + httpParams.toString();
-    }
-    return null;
   }
 
   /**
@@ -362,18 +338,58 @@ export class CsWMSService {
       }
       this.renderStatusService.register(layer, wmsOnlineResource);
       this.renderStatusService.addResource(layer, wmsOnlineResource);
+
+      // If there is 'styles' parameter 
+      if (layer?.sldParam) {
+        param['styles'] = '';
+        for (const tup of layer.sldParam) {
+            if (wmsOnlineResource.url.includes(tup[0])) {
+                param['styles'] = tup[1];
+                break;
+            }
+        }
+      }
+
+      // Does it have optional filters?
+      let hasFilt = false;
+      if (layer?.filterCollection) {
+        // Optional filters
+        for (const layerFilt of layer.filterCollection.optionalFilters) {
+          if (layerFilt.value) {
+            hasFilt = true;
+            continue;
+          }
+        }
+      }
+
+      // If has an optional filter then cannot use geoserver's predefined 'styles'
+      // Must use SLD_BODY parameter for filtering
+      if (hasFilt && param['styles'] !== '') {
+        param['styles'] = '';
+      }
+
+      param['tiled'] = true;
+      if (param['styles'] === '') {
+        // Some geoservers (e.g. S.A. do not cache SLD_BODY)
+        for (const url of config.doesNotCacheSLDBody) {
+          if (wmsOnlineResource.url.includes(url)) {
+            param['tiled'] = false;
+            break;
+          }
+        }
+      }
+
       // Collate parameters for style request
       const collatedParam = UtilitiesService.collateParam(layer, wmsOnlineResource, param);
-      // Set 'usePost' if style request parameters are too long
-      const usePost = this.wmsUrlTooLong(this.env.portalBaseUrl + layer.proxyStyleUrl + collatedParam.toString(), layer);
+
       // Perform request for style data, store subscription so we can cancel if user removes layer
       this.sldSubscriptions[layer.id].push(
-        this.sldService.getSldBody(layer.proxyStyleUrl, usePost, wmsOnlineResource, collatedParam, layer.id).subscribe(sldBody => {
-          const longResp = this.wmsUrlTooLong(sldBody, layer);
+        this.sldService.getSldBody(wmsOnlineResource, collatedParam, layer).subscribe(sldBody => {
+          const usePost = this.wmsUrlTooLong(sldBody, layer);
           // Create parameters for add layer request
           const params = wmsOnlineResource.version.startsWith('1.3')
-            ? this.getWMS1_3_0param(layer, wmsOnlineResource, collatedParam, longResp, sldBody)
-            : this.getWMS1_1param(layer, wmsOnlineResource, collatedParam, longResp, sldBody);
+            ? this.getWMS1_3_0param(layer, wmsOnlineResource, collatedParam, usePost, sldBody)
+            : this.getWMS1_1param(layer, wmsOnlineResource, collatedParam, usePost, sldBody);
 
           let lonlatextent;
           if (wmsOnlineResource.geographicElements.length > 0) {
@@ -392,7 +408,7 @@ export class CsWMSService {
           }
 
           // Perform add layer request
-          layer.csLayers.push(this.addCesiumLayer(layer, wmsOnlineResource, params, longResp, lonlatextent));
+          layer.csLayers.push(this.addCesiumLayer(layer, wmsOnlineResource, params, usePost, lonlatextent));
           layer.sldBody = sldBody;
 
           // For 1.3.0 GetFeatureInfo requests need lat,lng swapped to lng,lat if polygon filter present
