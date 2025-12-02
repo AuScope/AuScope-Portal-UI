@@ -722,7 +722,7 @@ export class CsMapComponent implements AfterViewInit {
   }
 
   /**
-   * Updates the imagerySplitPosition when the slider is moved
+   * Updates the splitPosition when the slider is moved
    * @param movement mouse event
    */
   private moveSlider = (movement) => {
@@ -739,19 +739,19 @@ export class CsMapComponent implements AfterViewInit {
     }
     const splitPosition = newSliderPosition / this.mapElement.nativeElement.offsetWidth;
     this.mapSlider.nativeElement.style.left = 100.0 * splitPosition + '%';
-    this.viewer.scene.imagerySplitPosition = splitPosition;
+    this.viewer.scene.splitPosition = splitPosition;
   }
 
   /**
    * Split map toggled on/off
-   * If on, sets imagerySplitPosition and adds handlers
+   * If on, sets splitPosition and adds handlers
    * If off, resets all active layer split directions to NONE
    */
   public toggleShowMapSplit() {
     this.csMapService.setSplitMapShown(!this.csMapService.getSplitMapShown());
     if (this.csMapService.getSplitMapShown()) {
       setTimeout(() => {
-        this.viewer.scene.imagerySplitPosition = this.mapSlider.nativeElement.offsetLeft / this.mapElement.nativeElement.offsetWidth;
+        this.viewer.scene.splitPosition = this.mapSlider.nativeElement.offsetLeft / this.mapElement.nativeElement.offsetWidth;
         const handler = new ScreenSpaceEventHandler(this.mapSlider.nativeElement);
         handler.setInputAction(() => {
           this.sliderMoveActive = true;

@@ -22,7 +22,7 @@ export class ToolbarComponent {
 
   /**
    * Split map toggled on/off
-   * If on, sets imagerySplitPosition and adds handlers
+   * If on, sets splitPosition and adds handlers
    * If off, resets all active layer split directions to NONE
    */
   public toggleShowMapSplit() {

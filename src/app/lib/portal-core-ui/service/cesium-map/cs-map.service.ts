@@ -18,7 +18,7 @@ import { Entity, ProviderViewModel, buildModuleUrl, OpenStreetMapImageryProvider
          ArcGisMapServerImageryProvider, Cartesian2, WebMercatorProjection, SplitDirection,
          Rectangle } from 'cesium';
 import { UtilitiesService } from '../../utility/utilities.service';
-import ImageryLayerCollection from 'cesium/Source/Scene/ImageryLayerCollection';
+import { ImageryLayerCollection } from 'cesium';
 import { CsGeoJsonService } from '../geojson/cs-geojson.service';
 declare let Cesium: any;
 
@@ -84,13 +84,9 @@ export class CsMapService {
   public pickEntities(windowPosition: Cartesian2): Entity[] {
     const pickedPrimitives = this.getViewer().scene.drillPick(windowPosition);
     const result = [];
-    const hash = {};
-    for (const picked of pickedPrimitives) {
-      const entity = Cesium.defaultValue(picked.id, picked.primitive.id);
-      if (entity instanceof Cesium.Entity &&
-          !Cesium.defined(hash[entity.id])) {
-        result.push(entity);
-        hash[entity.id] = true;
+    for (const pick of pickedPrimitives) {
+      if (pick.id) {
+        result.push(pick.id);
       }
     }
     return result;
@@ -575,33 +571,34 @@ export class CsMapService {
             break;
         }
         baseMapLayers.push(
-          new ProviderViewModel({
+          new Cesium.ProviderViewModel({
             name: layer.viewValue,
             iconUrl: buildModuleUrl('Widgets/Images/ImageryProviders/' + bingMapsIcon),
             tooltip: layer.tooltip,
-            creationFunction() {
-              return new BingMapsImageryProvider({
-                url: 'https://dev.virtualearth.net',
-                key: this.env.bingMapsKey,
-                mapStyle: bingMapsStyle,
-                // defaultAlpha: 1.0,
-              });
-            },
-          })
-        );
+            creationFunction: async function() {
+              return await Cesium.BingMapsImageryProvider.fromUrl(
+                'https://dev.virtualearth.net',
+                { 
+                  key: this.env.bingMapsKey,
+                  mapStyle: bingMapsStyle,
+                }
+              )
+            }
+        }));
       } else if (layer.layerType === 'ESRI') {
         const esriUrl =
           'https://services.arcgisonline.com/ArcGIS/rest/services/' + layer.value + '/MapServer';
         let esriIcon = '';
         switch (layer.value) {
           case 'World_Imagery':
-            esriIcon = 'esriWorldImagery.png';
+            esriIcon = 'ArcGisMapServiceWorldImagery.png';
             break;
           case 'NatGeo_World_Map':
-            esriIcon = 'esriNationalGeographic.png';
+            esriIcon = 'ArcGisMapServiceWorldOcean.png';
             break;
           case 'World_Street_Map':
-            esriIcon = 'esriWorldStreetMap.png';
+            // There is no ESRI street map icon image, use Bing instead
+            esriIcon = 'bingRoads.png';
             break;
           // No provided icon
           case 'World_Terrain_Base':
@@ -622,15 +619,15 @@ export class CsMapService {
             break;
         }
         baseMapLayers.push(
-          new ProviderViewModel({
+          new Cesium.ProviderViewModel({
             name: layer.viewValue,
-            iconUrl: buildModuleUrl('Widgets/Images/ImageryProviders/' + esriIcon),
+            iconUrl: Cesium.buildModuleUrl('Widgets/Images/ImageryProviders/' + esriIcon),
             tooltip: layer.tooltip,
-            creationFunction() {
-              return new ArcGisMapServerImageryProvider({
-                url: esriUrl,
-              });
-            },
+            creationFunction: async function() {
+              return await ArcGisMapServerImageryProvider.fromUrl(
+                esriUrl
+              );
+            }
           })
         );
       }
