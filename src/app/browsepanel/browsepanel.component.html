@@ -52,6 +52,13 @@
     </div>
     <!-- Layers column -->
     <div [style.display]="layerColumnHeader === '' && !panelStayOpen ? 'none' : 'block'" class="container text-left browse-menu-col">
+      <!-- 'Stay Open' check box -->
+      <div style="float: right;" class="form-check">
+        <input class="form-check-input" type="checkbox" value="" [(ngModel)]="panelStayOpen" id="flexCheckDefault">
+        <label class="form-check-label" for="flexCheckDefault">
+          Stay Open
+        </label>
+      </div>
       @if (!layerColumnHeader) {
         <a style="font-weight: bold">Layers</a>
       }
@@ -85,13 +92,6 @@
     <!-- Info column -->
     <div [style.display]="selectedLayer || panelStayOpen ? 'block' : 'none'" class="info-col">
       <a style="font-weight: bold">Information</a>
-      <!-- 'Stay Open' check box -->
-      <div style="float: right;" class="form-check">
-        <input class="form-check-input" type="checkbox" value="" [(ngModel)]="panelStayOpen" id="flexCheckDefault">
-        <label class="form-check-label" for="flexCheckDefault">
-          Stay Open
-        </label>
-      </div>
       <p></p>
       <!-- Information -->
       @if (selectedLayer) {

@@ -40,8 +40,7 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
       private sidebarService: SidebarService,
       private userStateService: UserStateService,
       private authService: AuthService
-      ) {
-  }
+      ) {}
 
   /**
    * Toggle sidebar
@@ -158,24 +157,6 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * Add layer to map
-   *
-   * @param layer the layer to add to map
-   */
-  public addLayer(layer: LayerModel): void {
-    // Fetch layer times and add layer (only take 1 or addLayer will fire every time layer times change)
-    this.filterService.getLayerTimesBS(layer.id).pipe(take(1)).subscribe(layerTimes => {
-      this.layerManagerService.addLayer(layer, [], null, layerTimes.currentTime);
-    });
-
-    // Close panel once layer is added, unless user requests it stay open
-    if (!this.panelStayOpen) {
-      this.toggleBrowsePanel(false);
-    }
-    this.sidebarService.setOpenState(true);
-  }
-
-  /**
    * Add layer to map when plus icon is clicked
    *
    * @param layer LayerModel for layer to add
@@ -187,7 +168,10 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.selectLayer(layer);
 
-    this.sidebarService.setOpenState(true);
+    // Close panel once layer is added, unless user requests it stay open
+    if (!this.panelStayOpen) {
+      this.toggleBrowsePanel(false);
+    }
   }
 
   /**
@@ -215,7 +199,6 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
       this.bShowBrowsePanel = !this.bShowBrowsePanel;
     }
   }
-
 
   /**
    * Is this layer selected?

@@ -184,7 +184,7 @@
                         <button [disabled]="!isMapSupportedLayer(searchResult.layer)" class="btn btn-sm btn-success search-result-button" type="button" title="Add layer" (click)="addLayer(searchResult.layer)"><i class="fa fa-plus-circle"></i>&nbsp;Add</button>
                       }
                       @if (isLayerAdded(searchResult.layer.id)) {
-                        <button class="btn btn-sm btn-danger search-result-button" type="button" title="Remove layer" (click)="removeLayer($event, searchResult.layer)"><i class="fa fa-trash"></i>&nbsp;Remove</button>
+                        <button class="btn btn-sm btn-danger search-result-button" type="button" title="Remove layer from map" (click)="removeLayer($event, searchResult.layer)"><i class="fa fa-trash"></i>&nbsp;Remove</button>
                       }
                       <button class="btn btn-sm btn-info search-result-button" type="button" title="Layer information" (click)="showLayerInformation($event, searchResult.layer)"><i class="fa fa-info-circle"></i>&nbsp;Info</button>
                       <button class="btn btn-sm btn-primary download-checkbox-button" type="button" title="Add to download list" [style.visibility]="isCsvDownloadable(searchResult.layer) ? 'visible' : 'hidden'">
@@ -223,8 +223,10 @@
                     <div class="download-layers-list">
                       @for (downloadLayer of mapDownloadLayers | keyvalue; track downloadLayer) {
                         <div>
-                          <button style="line-height:1.7em;height:2.2em;padding:2px 5px 0px 5px;margin-bottom:2px;" class="btn layer-header" style="align-items: baseline;">
-                            <button style="float:right;padding:2px 2px 2px 0;margin-left:0px;margin-right:8px;line-height:100%;" class="btn btn-sm btn-warning" type="button" title="Click to remove" (click)="removeDownloadLayer(downloadLayer.value.Layer)"><i class="fa fa-close" style="color:red"></i></button>
+                          <div style="line-height:1.7em;height:2.2em;padding:2px 5px 0px 5px;margin-bottom:2px;" class="btn layer-header" style="align-items: baseline;">
+                            <button style="float:right;padding:2px 2px 2px 0;margin-left:0px;margin-right:8px;line-height:100%;" class="btn btn-sm btn-danger" type="button" title="Click to remove" (click)="removeDownloadLayer(downloadLayer.value.Layer)">
+                              <i class="fa fa-close" style="color:white"></i>
+                            </button>
                             <span class="layer-header-label" title="{{downloadLayer.value.Layer.name}}">{{ downloadLayer.value.Layer.name }}</span>
                             <!--
                             @if (downloadLayer.value.Ob | async as download) {
@@ -236,7 +238,7 @@
                             }
                             <button class="btn btn-sm btn-primary download-button" type="button" title="Click to download" (click)="downloadAsCSV(downloadLayer.value.Layer)"><i class="fa fa-download"></i></button>
                             <button class="btn btn-sm btn-primary download-button" type="button" title="Download with AuScope-Cat" (click)="downloadWithAuScopeCat(downloadLayer.value.Layer)"><i class="fa fa-plug"></i></button>
-                          </button>
+                          </div>
                         </div>
                       }
                     </div>
