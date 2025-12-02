@@ -105,10 +105,10 @@ export class QueryWMSService {
       .set('HEIGHT', height.toString())
       .set('BBOX', bbox.join(','))
       .set('version', onlineResource.version)
-      
+
       .set('INFO_FORMAT', infoFormat)
       .set('postMethod', String(postMethod));
-    
+
     // If there is a 'styles' parameter then use that instead of 'sld_body'
     if (styles !== '') {
       formdata.set('STYLES', sldBody);

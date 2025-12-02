@@ -339,7 +339,7 @@ export class CsWMSService {
       this.renderStatusService.register(layer, wmsOnlineResource);
       this.renderStatusService.addResource(layer, wmsOnlineResource);
 
-      // If there is 'styles' parameter 
+      // If there is 'styles' parameter
       if (layer?.sldParam) {
         param['styles'] = '';
         for (const tup of layer.sldParam) {

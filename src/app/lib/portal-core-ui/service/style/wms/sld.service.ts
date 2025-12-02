@@ -120,7 +120,7 @@ export class SldService {
               break;
             }
           }
-          
+
           // End patch
 
           // Just merge the params and pass them through
