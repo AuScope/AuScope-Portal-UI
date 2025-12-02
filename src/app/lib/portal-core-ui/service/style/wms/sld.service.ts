@@ -110,7 +110,7 @@ export class SldService {
           let url = null;
           try {
               url = new URL(onlineResource.url);
-          } catch (error) {
+          } catch (_error) {
               // skip
           }
           for (const entry of config.insertGeoSciMLNS) {
