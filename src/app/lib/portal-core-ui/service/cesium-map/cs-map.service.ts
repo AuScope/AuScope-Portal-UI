@@ -14,7 +14,7 @@ import { CsIrisService } from '../kml/cs-iris.service';
 import { CsKMLService } from '../kml/cs-kml.service';
 import { CsVMFService } from '../vmf/cs-vmf.service';
 import { MapsManagerService, RectangleEditorObservable, EventRegistrationInput, CesiumEvent, EventResult } from '@auscope/angular-cesium';
-import { Entity, ProviderViewModel, buildModuleUrl, OpenStreetMapImageryProvider, BingMapsStyle, BingMapsImageryProvider,
+import { Entity, ProviderViewModel, buildModuleUrl, OpenStreetMapImageryProvider, BingMapsStyle,
          ArcGisMapServerImageryProvider, Cartesian2, WebMercatorProjection, SplitDirection,
          Rectangle } from 'cesium';
 import { UtilitiesService } from '../../utility/utilities.service';
@@ -578,7 +578,7 @@ export class CsMapService {
             creationFunction: async function() {
               return await Cesium.BingMapsImageryProvider.fromUrl(
                 'https://dev.virtualearth.net',
-                { 
+                {
                   key: this.env.bingMapsKey,
                   mapStyle: bingMapsStyle,
                 }

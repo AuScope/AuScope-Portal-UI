@@ -27,6 +27,7 @@ import { Observable, forkJoin, throwError } from 'rxjs';
 import { catchError, finalize, tap, timeout } from 'rxjs/operators';
 import { ToolbarComponent } from 'app/menupanel/toolbar/toolbar.component';
 import { NVCLBoreholeAnalyticService } from 'app/modalwindow/layeranalytic/nvcl/nvcl.boreholeanalytic.service';
+import { OnlineResourceModel } from 'app/lib/portal-core-ui/model/data/onlineresource.model';
 
 declare let Cesium: any;
 
@@ -435,10 +436,10 @@ export class CsMapComponent implements AfterViewInit {
     // Process list of layers clicked
     for (const maplayer of mapClickInfo.clickedLayerList) {
       for (const i of maplayer.clickCSWRecordsIndex) {
-        const cswRecord = maplayer.cswRecords[i];
+        const cswRecord: CSWRecordModel = maplayer.cswRecords[i];
 
         // Get the WMS OnlineResource, if that fails use the first in the list
-        let onlineResource = cswRecord.onlineResources?.find(or => or.type === ResourceType.WMS);
+        let onlineResource: OnlineResourceModel = cswRecord.onlineResources?.find(or => or.type === ResourceType.WMS);
         if (!onlineResource && cswRecord.onlineResources?.length > 0) {
           onlineResource = cswRecord.onlineResources[0];
         }
@@ -471,22 +472,32 @@ export class CsMapComponent implements AfterViewInit {
             if (!params) {
               continue;
             }
-            let sldBody = maplayer.sldBody;
+            // Does layer have a 'styles' parameter?
+            let styles = '';
+            if (maplayer.sldParam?.length > 0) {
+              for (const tup of maplayer.sldParam) {
+                if (onlineResource.url.includes(tup[0])) {
+                  styles = tup[1];
+                  break;
+                }
+              }
+            }
+
             let postMethod = false;
-            let infoFormat: string;
+            let sldBody = maplayer.sldBody;
             if (sldBody) {
               sldBody = SimpleXMLService.extractIntersectsFiltersFromSld(sldBody);
               postMethod = true;
             } else {
               sldBody = '';
             }
-
             // WMS 1.3.0 GetFeatureInfo requests will have had their lat,lng coords swapped to lng,lat
             if (maplayer.sldBody130) {
               sldBody = maplayer.sldBody130;
             }
 
             // Layer specific SLD_BODY, INFO_FORMAT and postMethod
+            let infoFormat: string;
             if (onlineResource.name.indexOf('ProvinceFullExtent') >= 0) {
               infoFormat = 'application/vnd.ogc.gml';
             } else {
@@ -514,7 +525,7 @@ export class CsMapComponent implements AfterViewInit {
 
             // Build GetFeatureInfo requests
             getFeatureInfoRequests.push(
-              this.queryWMSService.getFeatureInfo(onlineResource, sldBody, infoFormat, postMethod, maplayer.clickCoord[0],
+              this.queryWMSService.getFeatureInfo(onlineResource, styles, sldBody, infoFormat, postMethod, maplayer.clickCoord[0],
                 maplayer.clickCoord[1], params.x, params.y, params.width, params.height, params.bbox).pipe(
                   timeout(15000),
                   tap(result => {
