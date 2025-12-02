@@ -14,7 +14,6 @@ import { throwError as observableThrowError, Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { HttpResponse } from '@angular/common/http';
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
-import { SidebarService } from 'app/portal/sidebar.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
 
@@ -32,7 +31,6 @@ export class CustomPanelComponent {
   private renderStatusService = inject(RenderStatusService);
   private uiLayerModelService = inject(UILayerModelService);
   private kmlService = inject(KMLDocService);
-  private sidebarService = inject(SidebarService);
   private csMapService = inject(CsMapService);
   public activeModalService = inject(NgbModal);
 
@@ -573,7 +571,6 @@ export class CustomPanelComponent {
    */
   public addLayer(layer: LayerModel) {
     this.layerManagerService.addLayer(layer, [], null, null);
-    this.sidebarService.setOpenState(true);
   }
 
   /**
@@ -583,9 +580,6 @@ export class CustomPanelComponent {
    */
   public removeLayer(layer: LayerModel) {
     this.layerManagerService.removeLayer(layer);
-    if (this.csMapService.getLayerModelList()?.length === 0) {
-      this.sidebarService.setOpenState(false);
-    }
   }
 
   /**

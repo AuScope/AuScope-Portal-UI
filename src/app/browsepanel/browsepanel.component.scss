@@ -103,7 +103,12 @@
         color: grey;
         cursor: pointer;
     }
+
     .sidebar-toggle:hover {
         color: whitesmoke; /* From AuScope style guide */
+    }
+
+    .form-check-label {
+        margin-top: 1px;
     }
 }

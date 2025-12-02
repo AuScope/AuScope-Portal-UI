@@ -22,7 +22,6 @@ import { Download } from 'app/modalwindow/layeranalytic/nvcl/tsgdownload';
 import * as saveAs from 'file-saver';
 import { take } from 'rxjs/operators';
 
-import { SidebarService } from 'app/portal/sidebar.service';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { DownloadAuScopeCatModalComponent } from 'app/modalwindow/download-auscopecat/download-auscopecat.modal.component';
 
@@ -137,8 +136,7 @@ export class SearchPanelComponent implements OnInit {
   constructor(private searchService: SearchService, private csMapService: CsMapService,
               private layerHandlerService: LayerHandlerService, private layerManagerService: LayerManagerService,
               private uiLayerModelService: UILayerModelService, private renderStatusService: RenderStatusService,
-              private sidebarService: SidebarService, private modalService: NgbModal,
-              private http: HttpClient, @Inject('env') private env,
+              private modalService: NgbModal, private http: HttpClient, @Inject('env') private env,
               private ngZone: NgZone) { }
 
   ngOnInit() {
@@ -457,7 +455,6 @@ export class SearchPanelComponent implements OnInit {
     }
 
     this.layerManagerService.addLayer(layer, [], layer.filterCollection, undefined);
-    this.sidebarService.setOpenState(true);
   }
 
   /**
@@ -479,7 +476,6 @@ export class SearchPanelComponent implements OnInit {
   public removeLayer(event: any, layer: LayerModel) {
     event.stopPropagation();
     this.layerManagerService.removeLayer(layer);
-    this.sidebarService.setOpenState(false);
   }
 
   /**

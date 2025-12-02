@@ -8,6 +8,7 @@ import { UILayerModelService } from './uilayer-model.service';
 import { environment } from 'environments/environment';
 import * as _ from 'lodash';
 import * as $ from 'jquery';
+import { SidebarService } from 'app/portal/sidebar.service';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 declare let gtag: Function;
@@ -21,9 +22,8 @@ export class LayerManagerService {
   filterList = []; // an array of all active layers - object = {layer, filterState }
 
   constructor(private csMapService: CsMapService, private manageStateService: ManageStateService,
-    private uiLayerModelService: UILayerModelService,
-    private advancedComponentService: AdvancedComponentService,
-    private legendUiService: LegendUiService) {
+    private uiLayerModelService: UILayerModelService, private advancedComponentService: AdvancedComponentService,
+    private legendUiService: LegendUiService, private sidebarService: SidebarService) {
   }
 
   /**
@@ -60,7 +60,6 @@ export class LayerManagerService {
    * removes a once "Active layer" from the filterList array
    */
   removeFilters(layerId: string) {
-
     this.filterList.forEach((item, index) => {
       if (item['layer'] === layerId) this.filterList.splice(index, 1);
     });
@@ -152,6 +151,9 @@ export class LayerManagerService {
 
     // Add any advanced map components defined in refs.ts
     this.advancedComponentService.addAdvancedMapComponents(layer);
+
+    // Open sidebar if closed
+    this.sidebarService.setOpenState(true);
   }
 
   /**
@@ -170,6 +172,11 @@ export class LayerManagerService {
     // Remove any layer specific map components
     this.advancedComponentService.removeAdvancedMapComponents(layer.id);
     this.legendUiService.removeLegend(layer.id);
+
+    // Close sidebar if layer was last open
+    if (this.csMapService.getLayerModelList().length === 0) {
+      this.sidebarService.setOpenState(false);
+    }
   }
 
   /**
