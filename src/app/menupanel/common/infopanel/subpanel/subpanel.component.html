@@ -54,34 +54,36 @@
     <p>{{cswRecord.description}}</p>
 
     <!-- How to cite, APA-style -->
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <span><b>How to cite:</b></span>
-        <i class="fa fa-regular fa-copy fa-lg" title="Copy citation to clipboard" (click)="copyCite(citation)"></i>
-    </div>
-    <div #citation>
-    @if (DOIname) {
-      {{DOIname}} [Producer] {{distributor}} [Distributor]. {{citeURL}}
-    } @else {
-        <!-- If there are authors -->
-        @if (cswRecord.authors?.length > 0) {
-            @for (author of cswRecord.authors; track $index) {
-                @if ($last) {
-                  {{author}}
-                } @else {
-                  {{author}},
-                }
-            }
-        <!-- If there is a contact person and it is not an enquiries line etc. -->
-        } @else if (cswRecord.contactPerson && !regex.test(cswRecord.contactPerson)) {
-            {{cswRecord.contactPerson}}
-        <!-- Use contact org if nothing is defined -->
+    @if (citable) {
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span><b>How to cite:</b></span>
+            <i class="fa fa-regular fa-copy fa-lg" title="Copy citation to clipboard" (click)="copyCite(citation)"></i>
+        </div>
+        <div #citation>
+        @if (DOIname) {
+        {{DOIname}} [Producer] {{distributor}} [Distributor]. {{citeURL}}
         } @else {
-            {{cswRecord.contactOrg}}
-        <!-- The remainder of the citation -->
-        } ({{publicationYear}}).
-        {{cswRecord.name}} [Data set]. {{cswRecord.contactOrg}} [Producer]. {{distributor}} [Distributor]. Retrieved {{accessedDate}} from {{citeURL}}
+            <!-- If there are authors -->
+            @if (cswRecord.authors?.length > 0) {
+                @for (author of cswRecord.authors; track $index) {
+                    @if ($last) {
+                    {{author}}
+                    } @else {
+                    {{author}},
+                    }
+                }
+            <!-- If there is a contact person and it is not an enquiries line etc. -->
+            } @else if (cswRecord.contactPerson && !regex.test(cswRecord.contactPerson)) {
+                {{cswRecord.contactPerson}}
+            <!-- Use contact org if nothing is defined -->
+            } @else {
+                {{cswRecord.contactOrg}}
+            <!-- The remainder of the citation -->
+            } ({{publicationYear}}).
+            {{cswRecord.name}} [Data set]. {{cswRecord.contactOrg}} [Producer]. {{distributor}} [Distributor]. Retrieved {{accessedDate}} from {{citeURL}}
+        }
+        </div>
     }
-    </div>
 
     <!-- Organisation etc. -->
     <p><b>Contact org:</b> {{cswRecord.contactOrg}}</p>

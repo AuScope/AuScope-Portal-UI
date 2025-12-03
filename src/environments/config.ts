@@ -415,9 +415,11 @@ export const config = {
       serviceName: 'GenericStyleService',
     },
   },
+  // A workaround for OGC WMS services that do not cache 'SLD_BODY' and ignore map styling and filters
   doesNotCacheSLDBody: [
     "https://sarigdata.pir.sa.gov.au"
   ],
+  // Some layers use GeoSciML v4.1 and the XML needs to be patched
   insertGeoSciMLNS: [
     {
         url: ".sa.gov.au",
@@ -431,5 +433,9 @@ export const config = {
         layerId: "sf0-borehole-nvcl",
         gsmlpNamespace: "http://www.opengis.net/gsml/4.1/geosciml-lite"
     }
+  ],
+  // Some services do not provide enough information to create citations
+  cannotCite: [
+    "lithodat.com"
   ]
 };
