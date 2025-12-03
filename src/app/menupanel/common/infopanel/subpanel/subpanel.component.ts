@@ -42,6 +42,9 @@ export class InfoPanelSubComponent implements OnInit {
     // Saves the DOI reference
     DOIname: string;
 
+    // Citable - some layers do not provide enough information to be citable
+    citable: boolean;
+
     // A regexp to catch customer service/enquiries names
     regex: RegExp = new RegExp("enquiries|service|customer|infocentre", "i");
 
@@ -136,6 +139,7 @@ export class InfoPanelSubComponent implements OnInit {
         const monthName = today.toLocaleString('default', { month: 'long' });
         const year = today.getFullYear();
         this.accessedDate = `${dayDigit} ${monthName}, ${year},`;
+        this.citable = true;
 
         // Publication date for citation
         try {
@@ -152,6 +156,16 @@ export class InfoPanelSubComponent implements OnInit {
         let usesNCI = false;
         let foundDOI = false;
         for (const onlineResource of this.cswRecord.onlineResources) {
+            // Look for services that do not provide enough information to create a citation
+            for (const url of config.cannotCite) {
+                if (onlineResource.url.includes(url)) {
+                    this.citable = false;
+                    break;
+                }
+            }
+            if (!this.citable) {
+                break;
+            }
             // If uses NCI facilities then should include them as distributor
             if (onlineResource.url.includes('nci.org.au')) {
                 usesNCI = true;
