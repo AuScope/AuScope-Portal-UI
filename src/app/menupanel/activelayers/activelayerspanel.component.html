@@ -100,11 +100,11 @@
                 <div class="top-layer-btn-panel">
                   <!-- Add bookmark button -->
                   @if (isUserLoggedIn() && !isLayerBookmarked(layer.id)) {
-                    <button (click)="addLayerBookmark(layer.id)" type="button" class="btn btn-sm btn-info top-layer-btn" title="Bookmark Layer"><i class="fa fa-sm fa-bookmark-o"></i></button>
+                    <button (click)="addLayerBookmark(layer.id)" type="button" class="btn btn-sm btn-info top-layer-btn" title="Bookmark Layer"><i class="far fa-sm fa-bookmark"></i></button>
                   }
                   <!-- Remove bookmark button -->
                   @if (isUserLoggedIn() && isLayerBookmarked(layer.id)) {
-                    <button (click)="removeLayerBookmark(layer.id)" class="btn btn-sm btn-info top-layer-btn" title="Remove Layer Bookmark"><i class="fa fa-sm fa-bookmark"></i></button>
+                    <button (click)="removeLayerBookmark(layer.id)" class="btn btn-sm btn-info top-layer-btn" title="Remove Layer Bookmark"><i class="fas fa-sm fa-bookmark"></i></button>
                   }
                 </div>
               </div>
