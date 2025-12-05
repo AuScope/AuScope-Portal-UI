@@ -26,10 +26,17 @@
         <div class="activeLayerButtons">
           <!-- Display legend button -->
           @if (hasLegend(layer)) {
-            <button class="btn btn-primary btn-sm active-layer-btn" title="Show layer legend" [disabled]="isLegendShown(layer.id)" (click)="showLegend(layer)">Legend</button>
+            <button type="button" class="btn btn-primary btn-sm active-layer-btn" title="Show layer legend" [disabled]="isLegendShown(layer.id)" (click)="showLegend(layer)">Legend</button>
           }
           <!-- Display metadata button -->
-          <button (click)="displayRecordInformation(layer)" type="button" class="btn btn-primary btn-sm active-layer-btn" title="Show layer information" [ngClass]="{'active': getUILayerModel(layer.id)?.tabpanel.infopanel.expanded}">Metadata</button>
+          <button type="button" class="btn btn-primary btn-sm active-layer-btn" title="Show layer information" [ngClass]="{'active': getUILayerModel(layer.id)?.tabpanel.infopanel.expanded}" (click)="displayRecordInformation(layer)">Metadata</button>
+          <!-- Boomark button if logged in -->
+          @if (isUserLoggedIn() && !isLayerBookmarked(layer.id)) {
+            <button (click)="addLayerBookmark(layer.id)" type="button" class="btn btn-primary btn-sm status-btn" title="Bookmark Layer"><i class="far fa-sm fa-bookmark"></i></button>
+          }
+          @if (isUserLoggedIn() && isLayerBookmarked(layer.id)) {
+            <button (click)="removeLayerBookmark(layer.id)" type="button" class="btn btn-primary btn-sm status-btn" title="Remove Layer Bookmark"><i class="fas fa-sm fa-bookmark"></i></button>
+          }
           <!-- Display status button while loading or if errors -->
           @if (!getUILayerModel(layer.id).statusMap.getRenderComplete() || getUILayerModel(layer.id).statusMap.getContainsError()) {
             <button
@@ -96,16 +103,6 @@
                       </li>
                     }
                   </ul>
-                </div>
-                <div class="top-layer-btn-panel">
-                  <!-- Add bookmark button -->
-                  @if (isUserLoggedIn() && !isLayerBookmarked(layer.id)) {
-                    <button (click)="addLayerBookmark(layer.id)" type="button" class="btn btn-sm btn-info top-layer-btn" title="Bookmark Layer"><i class="far fa-sm fa-bookmark"></i></button>
-                  }
-                  <!-- Remove bookmark button -->
-                  @if (isUserLoggedIn() && isLayerBookmarked(layer.id)) {
-                    <button (click)="removeLayerBookmark(layer.id)" class="btn btn-sm btn-info top-layer-btn" title="Remove Layer Bookmark"><i class="fas fa-sm fa-bookmark"></i></button>
-                  }
                 </div>
               </div>
               <div id="card-tab-content" class="tab-content">

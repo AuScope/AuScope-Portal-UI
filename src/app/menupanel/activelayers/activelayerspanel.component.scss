@@ -54,31 +54,6 @@
         }
     }
 
-    .top-layer-btn-panel {
-        display: flex;
-        position: relative;
-        margin-left: auto;
-        right: 16px;
-
-        .top-layer-btn {
-            position: relative;
-            top: 16px;
-            height: fit-content;
-            margin-left: 5px;
-        }
-    }
-
-    .show-bookmark-btn {
-        position: relative;
-        top: 5px;
-    }
-
-    .bookmark-icon {
-        color: globals.$auscope-teal;
-        margin-right: 4px;
-        vertical-align: middle;
-    }
-
     .layer-card {
         left: -50px;
         width: 310px;
@@ -158,21 +133,21 @@
         border-bottom-right-radius: 0.5rem;
 
         .activeLayerButtons {
-            margin-top: 0.5rem;
-            margin-right: 0.5rem;
+            padding: 0.5rem 0.5rem 0 0.5rem;
             display: flex;
             gap: 0.5rem;
 
             .active-layer-btn {
                 flex: 1 1 0;
-                margin: 0 0 0.5rem 0.5rem;
+                margin: 0 0 0.5rem 0;
             }
 
             .status-btn {
                 flex: 0 0 auto;
                 margin-left: 0;
             }
-        }
+
+          }
 
         .activeLayerOpacity {
             display: flex;
