@@ -5,12 +5,13 @@ import { UILayerModel } from '../menupanel/common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { LayerModel } from '../lib/portal-core-ui/model/data/layer.model';
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
-import { FilterService } from 'app/services/filter/filter.service';
+import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
 import { SidebarService } from 'app/portal/sidebar.service';
 import { Subscription } from 'rxjs';
 import { UserStateService } from 'app/services/user/user-state.service';
 import { AuthService } from 'app/services/auth/auth.service';
-import { take } from 'rxjs/operators';
+import { take, filter } from 'rxjs/operators';
+import { config } from 'environments/config';
 
 
 @Component({
@@ -162,11 +163,19 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
    * @param layer LayerModel for layer to add
    */
   public addLayerToMap(layer: LayerModel): void {
-    this.filterService.getLayerTimesBS(layer.id).pipe(take(1)).subscribe(layerTimes => {
-      this.layerManagerService.addLayer(layer, [], null, layerTimes.currentTime);
-    });
-
-    this.selectLayer(layer);
+    // Query GetCapabilities for layers that need it
+    if (Array.isArray(config.queryGetCapabilitiesTimes) && config.queryGetCapabilitiesTimes.indexOf(layer.id) !== -1) {
+      this.filterService.updateLayerTimes(layer, new LayerTimes());
+      this.filterService.getLayerTimesBS(layer.id).pipe(
+        filter(lt => !!(lt && (lt.currentTime || (lt.timeExtent && lt.timeExtent.length > 0))) || lt.loadingTimeExtent === false),
+        take(1)
+      ).subscribe(layerTimes => {
+        const timeParam = layerTimes?.currentTime ?? (layerTimes?.timeExtent?.length ? layerTimes.timeExtent[0] : undefined);
+        this.layerManagerService.addLayer(layer, [], null, timeParam);
+      });
+    } else {
+      this.layerManagerService.addLayer(layer, [], null, undefined);
+    }
 
     // Close panel once layer is added, unless user requests it stay open
     if (!this.panelStayOpen) {
