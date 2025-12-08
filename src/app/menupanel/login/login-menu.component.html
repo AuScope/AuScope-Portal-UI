@@ -3,22 +3,22 @@
     <div>
       <button mat-button [matMenuTriggerFor]="loginMenu" class="user-menu" title="Log in">
         <div class="user-login-button">
-          <div class="user-login-button-label"><i class="fa fa-2x fa-user"></i>&nbsp;&nbsp;{{ user.fullName }}</div>
+          <div class="user-login-button-label"><i class="fa fa-2x fa-user menu-icon"></i>{{ user.fullName }}</div>
           <i class="fa fa-caret-down" style="margin-left:5px;"></i>
         </div>
       </button>
       <mat-menu #loginMenu="matMenu" style="margin-top:12px;">
         @if (userHasROI()) {
-          <h5 mat-menu-item (click)="manageROI()"><img src="extension/svg/polygon.svg" class="svg-purple-colour" fill="#000000" width="24" height="24" style="color:#7E7CAA">
-            <span style="color:#7E7CAA">&nbsp;&nbsp;Manage Region Of Interest</span>
+          <h5 mat-menu-item class="menu-link" (click)="manageROI()"><img src="extension/svg/polygon.svg" width="24" height="24">
+            <span class>Manage Region Of Interest</span>
           </h5>
         }
         @if (userHasStates()) {
-          <h5 mat-menu-item (click)="manageStates()">
-            <span style="color:#7E7CAA"><i class="ti-link"></i>&nbsp;&nbsp;Manage Permanent Links</span>
+          <h5 mat-menu-item class="menu-link" (click)="manageStates()">
+            <span><i class="ti-link"></i>Manage Permanent Links</span>
           </h5>
         }
-        <h5 mat-menu-item (click)="logOut()"><span style="color:#7E7CAA"><i class="fa fa-power-off"></i>&nbsp;&nbsp;Log Out</span></h5>
+        <h5 mat-menu-item class="menu-link" (click)="logOut()"><span><i class="fa fa-power-off menu-icon"></i>Log Out</span></h5>
       </mat-menu>
     </div>
   }
@@ -26,7 +26,7 @@
     <div>
       <button mat-button class="user-name" title="Log In" (click)="login()">
         <div class="user-login-button">
-          <div class="user-login-button-label"><i class="fa fa-2x fa-users"></i>&nbsp;&nbsp;Log In</div>
+          <div class="user-login-button-label"><i class="fa fa-2x fa-users menu-icon"></i>Log In</div>
         </div>
       </button>
     </div>
