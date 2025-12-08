@@ -4,32 +4,18 @@
 }
 
 .user-menu {
-    color: globals.$text-colour;
 
     .user-login-button {
         display: flex;
         align-items: baseline;
     }
+    .user-login-button:hover {
+      color: white;
+    }
     .user-login-button-label {
         display: flex;
         align-items: center;
     }
-}
-
-.user-button {
-    color: #d8d9d7;
-}
-
-.user-button:hover {
-    color: white;
-}
-
-.user-menu:hover {
-    color: globals.$text-highlight-colour;
-}
-
-.svg-purple-colour {
-    filter: invert(56%) sepia(17%) saturate(758%) hue-rotate(204deg) brightness(87%) contrast(86%);
 }
 
 ::ng-deep {

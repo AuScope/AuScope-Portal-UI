@@ -24,7 +24,7 @@
             <div class="input-group-append">
               @if (linkForm.controls['link'].value !== '') {
                 <button for="link" class="btn btn-primary" title="Copy to Clipboard" ngxClipboard [cbContent]="linkForm.controls['link'].value" type="button">
-                  <i class="fa fa-files-o"></i>
+                  <i class="far fa-copy"></i>
                 </button>
               }
             </div>
