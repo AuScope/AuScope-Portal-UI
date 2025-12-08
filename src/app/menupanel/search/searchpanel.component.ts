@@ -17,13 +17,16 @@ import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
 
+import { config } from '../../../environments/config';
+
 import { HttpClient, HttpHeaders, HttpParams, HttpUrlEncodingCodec } from '@angular/common/http';
 import { Download } from 'app/modalwindow/layeranalytic/nvcl/tsgdownload';
 import * as saveAs from 'file-saver';
-import { take } from 'rxjs/operators';
+import { filter, take } from 'rxjs/operators';
 
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { DownloadAuScopeCatModalComponent } from 'app/modalwindow/download-auscopecat/download-auscopecat.modal.component';
+import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
 
 // Search fields
 const SEARCH_FIELDS = [{
@@ -136,8 +139,8 @@ export class SearchPanelComponent implements OnInit {
   constructor(private searchService: SearchService, private csMapService: CsMapService,
               private layerHandlerService: LayerHandlerService, private layerManagerService: LayerManagerService,
               private uiLayerModelService: UILayerModelService, private renderStatusService: RenderStatusService,
-              private modalService: NgbModal, private http: HttpClient, @Inject('env') private env,
-              private ngZone: NgZone) { }
+              private filterService: FilterService, private modalService: NgbModal,
+              private http: HttpClient, @Inject('env') private env, private ngZone: NgZone) { }
 
   ngOnInit() {
     // Populate search results with all layers by default
@@ -454,7 +457,19 @@ export class SearchPanelComponent implements OnInit {
       this.uiLayerModelService.setUILayerModel(layer.id, uiLayerModel);
     }
 
-    this.layerManagerService.addLayer(layer, [], layer.filterCollection, undefined);
+    // Query GetCapabilities for layers that need it
+    if (Array.isArray(config.queryGetCapabilitiesTimes) && config.queryGetCapabilitiesTimes.indexOf(layer.id) !== -1) {
+      this.filterService.updateLayerTimes(layer, new LayerTimes());
+      this.filterService.getLayerTimesBS(layer.id).pipe(
+        filter(lt => !!(lt && (lt.currentTime || (lt.timeExtent && lt.timeExtent.length > 0))) || lt.loadingTimeExtent === false),
+        take(1)
+      ).subscribe(layerTimes => {
+        const timeParam = layerTimes?.currentTime ?? (layerTimes?.timeExtent?.length ? layerTimes.timeExtent[0] : undefined);
+        this.layerManagerService.addLayer(layer, [], null, timeParam);
+      });
+    } else {
+      this.layerManagerService.addLayer(layer, [], layer.filterCollection, undefined);
+    }
   }
 
   /**

@@ -201,6 +201,8 @@ export class FilterService {
         if (!(layer.capabilityRecords?.length > 0)) {
             // Call WMS GetCapabilites using layer info
             layerTimes.loadingTimeExtent = true;
+            // Notify subscribers that loading has started
+            layerTimesBS.next(layerTimes);
             this.getCapabilityRecord(layer).subscribe(response => {
                 if (response) {
                     if (response.getCaps.data?.capabilityRecords.length === 1) {
