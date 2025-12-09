@@ -576,6 +576,11 @@ export class CsMapComponent implements AfterViewInit {
     for (const onlineResource of cswRecord.onlineResources) {
       html += '<p><a style="color: #000000" target="_blank" href="' + onlineResource.url + '">' + (onlineResource.name ? onlineResource.name : 'Web resource link') + '</a></p>';
     }
+    if (cswRecord.datasetURIs?.length > 0) {
+        for (const datasetUri of cswRecord.datasetURIs) {
+            html += '<p><a style="color: #000000" target="_blank" href="' + datasetUri + '">Dataset URI</a></p>';
+        }
+    }
     html += '</div></div>';
     return html;
   }

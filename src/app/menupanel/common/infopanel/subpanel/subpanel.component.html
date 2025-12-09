@@ -108,6 +108,13 @@
         <p><b>Info URL: </b><a style="color: blue; text-decoration: underline;" target="_blank" href="{{cswRecord.recordInfoUrl}}">Link to Geonetwork Record</a></p>
     }
 
+    <!-- Dataset URI -->
+    @if (cswRecord?.datasetURIs?.length > 0) {
+        @for (datasetUri of cswRecord?.datasetURIs; track $index) {
+            <p><b>Dataset URI: </b><a style="color: blue; text-decoration: underline;" target="_blank" href="{{datasetUri}}">{{datasetUri}}</a></p>
+        }
+    }
+
     <!-- Download URLs etc. -->
     <div>
     @for (onlineResource of cswRecord.onlineResources; track $index) {

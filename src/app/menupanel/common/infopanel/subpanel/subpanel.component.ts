@@ -151,10 +151,19 @@ export class InfoPanelSubComponent implements OnInit {
         }
 
         // Citation URL
-        this.citeURL = this.cswRecord.recordInfoUrl;
+        let foundCiteURL = false;
+        if (this.cswRecord.datasetURIs?.length > 0) {
+            this.citeURL = this.cswRecord.datasetURIs[0];
+            foundCiteURL = true;
+        } else {
+            // Citation using catalogue URL is a second best solution
+            this.citeURL = this.cswRecord.recordInfoUrl;
+
+        }
         this.DOIname = '';
         let usesNCI = false;
         let foundDOI = false;
+
         for (const onlineResource of this.cswRecord.onlineResources) {
             // Look for services that do not provide enough information to create a citation
             for (const url of config.cannotCite) {
@@ -175,8 +184,9 @@ export class InfoPanelSubComponent implements OnInit {
                 this.citeURL = onlineResource.url;
                 this.DOIname = onlineResource.name;
                 foundDOI = true;
+                foundCiteURL = true;
             }
-            if (!foundDOI && onlineResource.type!== ResourceType.UNSUPPORTED) {
+            if (!foundDOI && !foundCiteURL && onlineResource.type!== ResourceType.UNSUPPORTED) {
                 if (this.isGetCapabilitiesType(onlineResource)) {
                     this.citeURL = this.onlineResourceGetCapabilitiesUrl(onlineResource);
                 } else {
