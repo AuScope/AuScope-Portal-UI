@@ -22,17 +22,39 @@ enum ServiceProviderType {
  */
 @Injectable()
 export class MineralTenementStyleService {
+
   private static readonly TENEMENT_COLOUR_MAP = {
     // TenementType colors
     'exploration': '#0000FF',
     'prospecting': '#00FFFF',
     'miscellaneous': '#00FF00',
     'mining': '#FFFF00',
-    'licence': '#FF0000',
-    // TenementStatus colors
+    'licence': '#FF0050',
+    /* TenementStatus colours
+    NSW: "Granted" "Application"
+    Vic: "Current" "Renewal" "Application" "Proposal"
+    NT: "Application" "Grant" "Issued" "Reduction Retained" "Renew Retained" "Revised Application" "Ceased"
+    Tas: "Pending Renewal" "Granted" "Application" "Pending Surrender" "Pending Partial Surrender" "Exploration Release Area"
+    WA: "LIVE" "PENDING" 
+    */
     'LIVE': '#0000FF',
-    'CURRENT': '#00FF00',
-    'PENDING': '#FF0000',
+    'CURRENT': '#30FF50',
+    'PENDING': '#FF0050',
+    'APPLICATION': '#E05040',
+    'PROPOSAL': '#E09000',
+    'RENEWAL': '#C0C000',
+    'GRANT':"#00F0F0",
+    'ISSUED': '#30FF00',
+    'CEASED': '#8000EE',
+    'GRANTED': "#00F0F0",
+    'REDUCTION RETAINED': "#0080FF",
+    'RENEW RETAINED': "#C0C000",
+    'REVISED APPLICATION': "#888888",
+    'PENDING RENEWAL': "#C0C000",
+    'PENDING SURRENDER': "#8000EE",
+    'PENDING PARTIAL SURRENDER': "#A000AA",
+    'EXPORATION RELEASE AREA': "#8888FF",
+
     // Default color
     'MineralTenement': '#0000FF'
   };
@@ -97,7 +119,10 @@ export class MineralTenementStyleService {
         rules.push(...this.createRulePair(type, config, optionalFilters));
       });
     } else if (ccProperty === 'TenementStatus') {
-      ['LIVE', 'CURRENT', 'PENDING'].forEach(status => {
+      ['LIVE', 'CURRENT', 'PENDING','APPLICATION','PROPOSAL',
+       'RENEWAL','GRANT','ISSUED','CEASED','GRANTED','REDUCTION RETAINED',
+       'RENEW RETAINED','REVISED APPLICATION','PENDING RENEWAL',
+        'PENDING SURRENDER','PENDING PARTIAL SURRENDER','EXPORATION RELEASE AREA'].forEach(status => {
         rules.push(...this.createRulePair(status, config, optionalFilters));
       });
     } else {
@@ -220,7 +245,10 @@ export class MineralTenementStyleService {
   }
 
   private static isTenementStatus(value: string): boolean {
-    return ['LIVE', 'CURRENT', 'PENDING'].includes(value);
+    return ['LIVE', 'CURRENT', 'PENDING','APPLICATION',
+    'PROPOSAL','RENEWAL','GRANT','ISSUED','CEASED','GRANTED','REDUCTION RETAINED',
+    'RENEW RETAINED','REVISED APPLICATION','PENDING RENEWAL',
+    'PENDING SURRENDER','PENDING PARTIAL SURRENDER','EXPORATION RELEASE AREA'].includes(value);
   }
 
   private static getProviderType(serviceUrl?: string): ServiceProviderType {
