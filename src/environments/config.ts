@@ -434,8 +434,9 @@ export const config = {
         gsmlpNamespace: "http://www.opengis.net/gsml/4.1/geosciml-lite"
     }
   ],
-  // Some services do not provide enough information to create citations
+  // Some services do not provide enough information to create citations or do not need it
   cannotCite: [
-    "lithodat.com"
+    "lithodat.com",
+    "insargrace.geoanalytics.csiro.au"
   ]
 };

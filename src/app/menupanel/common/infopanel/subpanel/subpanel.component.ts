@@ -28,7 +28,7 @@ export class InfoPanelSubComponent implements OnInit {
     legendLoaded = false;
 
     // Publication year, if available
-    publicationYear: string;
+    publicationYear: string = "NaN";
 
     // URL used in the citation
     citeURL: string;
@@ -131,8 +131,10 @@ export class InfoPanelSubComponent implements OnInit {
         return path;
     }
 
-    ngOnInit(): void {
-
+    /**
+     * Assemble data fields for citation
+     */
+    private processCitation(): void {
         // Accessed date for citation
         const today = new Date();
         const dayDigit = String(today.getDate());
@@ -147,7 +149,12 @@ export class InfoPanelSubComponent implements OnInit {
             const pubDate = new Date(isoDateStr);
             this.publicationYear = pubDate.getFullYear().toString();
         } catch (_error) {
-            this.publicationYear = 'unknown';
+            this.publicationYear = 'NaN';
+        }
+        // If cannot get publication year then do not cite
+        if (this.publicationYear == 'NaN') {
+            this.citable = false;
+            return;
         }
 
         // Citation URL
@@ -169,11 +176,8 @@ export class InfoPanelSubComponent implements OnInit {
             for (const url of config.cannotCite) {
                 if (onlineResource.url.includes(url)) {
                     this.citable = false;
-                    break;
+                    return;
                 }
-            }
-            if (!this.citable) {
-                break;
             }
             // If uses NCI facilities then should include them as distributor
             if (onlineResource.url.includes('nci.org.au')) {
@@ -200,6 +204,12 @@ export class InfoPanelSubComponent implements OnInit {
         if (usesNCI) {
             this.distributor += " & NCI Australia https://nci.org.au";
         }
+    }
+
+    ngOnInit(): void {
+
+        // Assemble data fields for citation
+        this.processCitation();
 
         // Update layer times for this layer if required
         if (config.queryGetCapabilitiesTimes.indexOf(this.layer.id) > -1) {
