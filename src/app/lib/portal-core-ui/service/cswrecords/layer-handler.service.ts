@@ -211,7 +211,7 @@ export class LayerHandlerService {
     cswRec.contactOrg = '';
     cswRec.contactPerson = '';
     cswRec.funderOrg = '';
-    cswRec.datasetURIs = {};
+    cswRec.datasetURIs = [];
     cswRec.date = '';
     cswRec.description = '';
     cswRec.descriptiveKeywords = {};
@@ -246,7 +246,7 @@ export class LayerHandlerService {
     cswRec.contactOrg = '';
     cswRec.contactPerson = '';
     cswRec.funderOrg = '';
-    cswRec.datasetURIs = {};
+    cswRec.datasetURIs = [];
     cswRec.date = '';
     cswRec.description = '';
     cswRec.descriptiveKeywords = {};
@@ -280,7 +280,7 @@ export class LayerHandlerService {
     cswRec.contactOrg = '';
     cswRec.contactPerson = '';
     cswRec.funderOrg = '';
-    cswRec.datasetURIs = {};
+    cswRec.datasetURIs = [];
     cswRec.date = '';
     cswRec.description = '';
     cswRec.descriptiveKeywords = {};
