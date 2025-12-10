@@ -35,7 +35,7 @@ export class MineralTenementStyleService {
     Vic: "Current" "Renewal" "Application" "Proposal"
     NT: "Application" "Grant" "Issued" "Reduction Retained" "Renew Retained" "Revised Application" "Ceased"
     Tas: "Pending Renewal" "Granted" "Application" "Pending Surrender" "Pending Partial Surrender" "Exploration Release Area"
-    WA: "LIVE" "PENDING" 
+    WA: "LIVE" "PENDING"
     */
     'LIVE': '#0000FF',
     'CURRENT': '#30FF50',
