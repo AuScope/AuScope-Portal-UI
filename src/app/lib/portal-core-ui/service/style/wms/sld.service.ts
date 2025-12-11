@@ -120,7 +120,13 @@ export class SldService {
               break;
             }
           }
-
+          for (const entry of config.insertERLNS) {
+            if (url?.hostname.endsWith(entry.url) && onlineResource.name === entry.layerName
+                    && layer.id === entry.layerId) {
+              param.erlNamespace = entry.erlNamespace;
+              break;
+            }
+          }
           // End patch
 
           // Just merge the params and pass them through
