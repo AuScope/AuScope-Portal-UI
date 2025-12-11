@@ -443,7 +443,7 @@ export const config = {
     },
     {
         url: ".mrt.tas.gov.au",
-        layerName: "erl:mineraloccurrenceview",
+        layerName: "erl:MineralOccurrenceView",
         layerId: "erl-mineraloccurrenceview",
         erlNamespace: "http://xmlns.earthresourceml.org/earthresourceml-lite/1.0"
     }
