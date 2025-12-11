@@ -434,6 +434,20 @@ export const config = {
         gsmlpNamespace: "http://www.opengis.net/gsml/4.1/geosciml-lite"
     }
   ],
+  insertERLNS: [
+    { 
+        url: ".mrt.tas.gov.au",
+        layerName: "erl:CommodityResourceView",  
+        layerId: "erl-commodityresourceview",
+        erlNamespace: "http://xmlns.earthresourceml.org/earthresourceml-lite/1.0"
+    },
+    { 
+        url: ".mrt.tas.gov.au",
+        layerName: "erl:mineraloccurrenceview",  
+        layerId: "erl-mineraloccurrenceview",
+        erlNamespace: "http://xmlns.earthresourceml.org/earthresourceml-lite/1.0"
+    }    
+  ],
   // Some services do not provide enough information to create citations or do not need it
   cannotCite: [
     "lithodat.com",

@@ -20,12 +20,18 @@ export class ErlMineralOccurrenceStyleService {
    * @returns SLD XML as a string
    */
   public static getSld(layerName: string, styleName: string, params: ErlMineralOccurrenceStyleParams): string {
+
+    const styleParams = {
+        erlNamespace:
+          params?.erlNamespace ||'http://xmlns.earthresourceml.org/earthresourceml-lite/2.0'
+      };
+
     const ns = {
       sld: 'http://www.opengis.net/sld',
       ogc: 'http://www.opengis.net/ogc',
       gml: 'http://www.opengis.net/gml',
       gsml: 'urn:cgi:xmlns:CGI:GeoSciML:2.0',
-      erl: 'http://xmlns.earthresourceml.org/earthresourceml-lite/1.0', // Use ERL 1.0 to match backend
+      erl: styleParams.erlNamespace, //'http://xmlns.earthresourceml.org/earthresourceml-lite/2.0', // Use ERL 1.0 to match backend
       xlink: 'http://www.w3.org/1999/xlink',
       ows: 'http://www.opengis.net/ows',
       xsi: 'http://www.w3.org/2001/XMLSchema-instance'
