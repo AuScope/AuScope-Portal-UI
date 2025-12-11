@@ -23,7 +23,7 @@ export class ErlCommodityStyleService {
     const styleParams = {
         erlNamespace:
           params?.erlNamespace ||'http://xmlns.earthresourceml.org/earthresourceml-lite/2.0'
-      };    
+      };
     const ns = {
       sld: 'http://www.opengis.net/sld',
       ogc: 'http://www.opengis.net/ogc',

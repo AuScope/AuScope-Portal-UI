@@ -435,18 +435,18 @@ export const config = {
     }
   ],
   insertERLNS: [
-    { 
+    {
         url: ".mrt.tas.gov.au",
-        layerName: "erl:CommodityResourceView",  
+        layerName: "erl:CommodityResourceView",
         layerId: "erl-commodityresourceview",
         erlNamespace: "http://xmlns.earthresourceml.org/earthresourceml-lite/1.0"
     },
-    { 
+    {
         url: ".mrt.tas.gov.au",
-        layerName: "erl:mineraloccurrenceview",  
+        layerName: "erl:mineraloccurrenceview",
         layerId: "erl-mineraloccurrenceview",
         erlNamespace: "http://xmlns.earthresourceml.org/earthresourceml-lite/1.0"
-    }    
+    }
   ],
   // Some services do not provide enough information to create citations or do not need it
   cannotCite: [
