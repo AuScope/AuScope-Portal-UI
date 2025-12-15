@@ -12,7 +12,9 @@ import {
 declare const __karma__: any;
 
 // Prevent Karma from running prematurely.
-__karma__.loaded = function () {};
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+__karma__.loaded = function () {
+};
 
 // First, initialize the Angular testing environment.
 getTestBed().initTestEnvironment(

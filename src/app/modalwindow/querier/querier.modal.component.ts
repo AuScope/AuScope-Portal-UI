@@ -2,7 +2,10 @@
 import { ApplicationRef, ChangeDetectorRef, Component, Inject, OnInit, ElementRef, ViewChild, AfterViewInit, Renderer2 } from '@angular/core';
 import { config } from '../../../environments/config';
 import { ref } from '../../../environments/ref';
-import { CsClipboardService, GMLParserService, Polygon, QuerierInfoModel } from '@auscope/portal-core-ui';
+import { CsClipboardService } from '../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
+import { GMLParserService } from '../../lib/portal-core-ui/utility/gmlparser.service';
+import { Polygon } from '../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
+import { QuerierInfoModel } from '../../lib/portal-core-ui/model/data/querierinfo.model';
 import { NVCLService } from './customanalytic/nvcl/nvcl.service';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { FlatTreeControl } from '@angular/cdk/tree';
@@ -46,7 +49,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   public uniqueLayerNames: string[] = [];
   public selectLayerNameFilter = 'ALL';
   public analyticMap;
-  public tab: {};
+  public tab: object;
   public bToClipboard = false;
   public hasMsclAnalytics = false; // Display 'Analytics' tab to analyse GML observation
   public selectedNode: string;
@@ -60,6 +63,8 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   public selectedToolTip = '';
   public imScDoButtonsEnabled = false; // Image-Scalar-Download buttons used by NVCL boreholes layer
   public analyticEnabled = false;
+  public copyFeedbackMessage = '';
+  public showCopyFeedbackToast = false;
 
   public scalarPriorityOrder: string[] = ['Grp1 dTSAS+', 'Grp2 dTSAS+', 'Grp3 dTSAS+', 'Grp1 uTSAS+', 'Grp2 uTSAS+', 'Grp3 uTSAS+', 'Grp1 sTSAS+', 'Grp2 sTSAS+',
     'Grp3 sTSAS+', 'Grp1 dTSAS', 'Grp2 dTSAS', 'Grp3 dTSAS', 'Grp1 uTSAS', 'Grp2 uTSAS', 'Grp3 uTSAS', 'Grp1 SWIR-CLS', 'Grp2 SWIR-CLS', 'Grp3 SWIR-CLS', 'Grp1 sTSAS',
@@ -136,11 +141,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     const parentElement = this.childElement.nativeElement.parentElement.parentElement;
     //const parentElement2 = this.childElement.nativeElement.parentElement;
-
     //const left = this.screenWidth
-
-    const left = window.innerWidth;
-    const height = window.innerHeight
     this.renderer.setStyle(parentElement, 'resize', 'both');
     this.renderer.setStyle(parentElement, 'overflow', 'auto');
     //this.renderer.setStyle(parentElement, 'top', '10px');
@@ -185,13 +186,13 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     this.modalService.onHide.subscribe(reason => {
       /* modal close event has cascaded down; most lieley from the MSCL popup modal or the legend */
 
-      if (!(reason == "backdrop-click")) {  // check - image > scalar > legend
+      if (!(reason == "backdrop-click")) { // check - image > scalar > legend
         if (!reason.initialState) { // check - scl chart
           this.modalVisible = false;
         }
       }
     });
-    this.modalService.onShow.subscribe(reason => {
+    this.modalService.onShow.subscribe(() => {
       this.modalVisible = true;
     });
 
@@ -255,7 +256,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
 
   /**
    * Set HTML to be displayed in popup window
-   * 
+   *
    * @param key key used to select HTML to display
    */
   public setHTML(key) {
@@ -272,14 +273,14 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
 
   /**
    * Set WFS feature data to be displayed in popup window
-   * 
+   *
    * @param doc XML document
    * @param i index of this XML docment in list of XML documents
    */
   public setWFS(doc, i) {
-    // Clear the HTML display  
+    // Clear the HTML display
     this.currentHTML = "";
-    // Set up, convert the XML and display in popup 
+    // Set up, convert the XML and display in popup
     this.updateDropDownButtonText(doc);
     this.currentIndex = i;
     this.currentDoc = doc;
@@ -295,20 +296,20 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
 
 /**
  * sets the button/tab active in the dynamic component nvcl.modal.component.html
- * 
- * @param evt 
- * @param tabName 
+ *
+ * @param evt
+ * @param tabName
  */
   public openTab(evt, tabName) {
-    var i, tabcontent, tablinks;
+    let i;
     if (this.imScDoButtonsEnabled) { this.analytic_tab = true; }
 
     // set all the "tabs" to display:none - ie hidden
-    tabcontent = document.getElementsByClassName("tabcontent");
+    const tabcontent = document.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
-      tabcontent[i].style.display = "none";
+      (tabcontent[i] as HTMLElement).style.display = "none";
     }
-    tablinks = document.getElementsByClassName("tablinks");
+    const tablinks = document.getElementsByClassName("tablinks");
     for (i = 0; i < tablinks.length; i++) {
       tablinks[i].className = tablinks[i].className.replace(" active", "");
     }
@@ -335,27 +336,27 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     for (let i = 0; i < this.docs.length; i++) {
       const doc = new DOMParser().parseFromString(this.docs[i].raw, 'text/xml');
       if (doc.getElementsByTagName('gml:name').length != 0) {
-        for (const html in doc.getElementsByTagName('gml:name')) {
-          if (!objExp.test(doc.getElementsByTagName('gml:name')[html].innerHTML)) {
-            htmldata.push(doc.getElementsByTagName('gml:name')[html].innerHTML)
+        for (let nameIdx = 0; nameIdx < doc.getElementsByTagName('gml:name').length; nameIdx++) {
+          if (!objExp.test(doc.getElementsByTagName('gml:name')[nameIdx].innerHTML)) {
+            htmldata.push(doc.getElementsByTagName('gml:name')[nameIdx].innerHTML)
           }
         }
       } else if (doc.getElementsByTagName('gml:NAME').length != 0) {
-        for (const html in doc.getElementsByTagName('gml:NAME')) {
-          if (!objExp.test(doc.getElementsByTagName('gml:NAME')[html].innerHTML)) {
-            htmldata.push(doc.getElementsByTagName('gml:NAME')[html].innerHTML)
+        for (let nameIdx = 0; nameIdx < doc.getElementsByTagName('gml:NAME').length; nameIdx++) {
+          if (!objExp.test(doc.getElementsByTagName('gml:NAME')[nameIdx].innerHTML)) {
+            htmldata.push(doc.getElementsByTagName('gml:NAME')[nameIdx].innerHTML)
           }
         }
       } else if (doc.getElementsByTagName('gsmlp:name').length != 0) {
-        for (const html in doc.getElementsByTagName('gsmlp:name')) {
-          if (!objExp.test(doc.getElementsByTagName('gsmlp:name')[html].innerHTML)) {
-            htmldata.push(doc.getElementsByTagName('gsmlp:name')[html].innerHTML)
+        for (let nameIdx = 0; nameIdx < doc.getElementsByTagName('gsmlp:name').length; nameIdx++) {
+          if (!objExp.test(doc.getElementsByTagName('gsmlp:name')[nameIdx].innerHTML)) {
+            htmldata.push(doc.getElementsByTagName('gsmlp:name')[nameIdx].innerHTML)
           }
         }
       } else if (doc.getElementsByTagName('null:name').length != 0) {
-        for (const html in doc.getElementsByTagName('null:name')) {
-          if (!objExp.test(doc.getElementsByTagName('null:name')[html].innerHTML)) {
-            htmldata.push(doc.getElementsByTagName('null:name')[html].innerHTML)
+        for (let nameIdx = 0; nameIdx < doc.getElementsByTagName('null:name').length; nameIdx++) {
+          if (!objExp.test(doc.getElementsByTagName('null:name')[nameIdx].innerHTML)) {
+            htmldata.push(doc.getElementsByTagName('null:name')[nameIdx].innerHTML)
           }
         }
       }
@@ -620,8 +621,8 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
 
       Object.keys(result.BoreholeView).forEach((key) => {
         const value = result.BoreholeView[key];
-        var listKey = key.toString();
-        var listValue = value.toString();
+        const listKey = key.toString();
+        const listValue = value.toString();
         this.list.push({ [listKey]: listValue });
       })
 
@@ -635,7 +636,6 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   }
 
   public updateDropDownButtonText(doc) {
-    const d = document.getElementById("dropdownMenuFeature");
     this.selectedFeature = '';
     if (doc.node_name) {
       this.selectedFeature = doc.node_name;
@@ -663,17 +663,17 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   }
 
   private getAbbr(layerName: string, splitChar: string): string {
-    var abbr = "";
+    let abbr = "";
 
-    var s = layerName.split(splitChar);
+    const s = layerName.split(splitChar);
 
-    for (let i = 0; i < s.length; i++) {
-      var c: string;
+    for (const i of s) {
+      let c: string;
 
-      if (this.isAlpha(s[i])) {
-        c = Array.from(s[i])[0];
+      if (this.isAlpha(i)) {
+        c = Array.from(i)[0];
       } else {
-        c = s[i];
+        c = i;
       }
       abbr = abbr + c;
     }
@@ -682,7 +682,142 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   }
 
   private isAlpha(str) {
-    let regex = /^[a-zA-Z]+$/;
+    const regex = /^[a-zA-Z]+$/;
     return regex.test(str);
+  }
+
+  /**
+   * Download feature information as a simple flattened CSV
+   */
+  public downloadFeatureCSV() {
+    if (!this.currentDoc) {
+      return;
+    }
+
+    const csvContent = this.generateSimpleCSV();
+    const filename = `feature_${this.selectedLayer}_${this.selectedFeature}.csv`;
+    this.downloadCSVFile(csvContent, filename);
+  }
+
+  /**
+   * Generate simple flattened CSV with all feature data
+   */
+  private generateSimpleCSV(): string {
+    const csvRows: string[] = [];
+
+    // CSV Header
+    csvRows.push('Field,Value');
+
+    // Add basic information
+    csvRows.push(`Layer,${this.escapeCSV(this.selectedLayer)}`);
+    csvRows.push(`Feature,${this.escapeCSV(this.selectedFeature)}`);
+
+    // Add properties from HTML table
+    if (this.currentDoc.transformed) {
+      const tableData = this.extractTableDataForCSV();
+      tableData.forEach(item => {
+        csvRows.push(`${this.escapeCSV(item.key)},${this.escapeCSV(item.value)}`);
+      });
+    }
+
+    // Add XML tree data (flattened)
+    if (this.flatTreeDataSource[this.currentDoc.key]) {
+      const treeData = this.flatTreeDataSource[this.currentDoc.key].data;
+      this.addTreeDataToCSV(treeData, csvRows);
+    }
+
+    return csvRows.join('\n');
+  }
+
+  /**
+   * Extract table data for CSV (flattened key-value pairs)
+   */
+  private extractTableDataForCSV(): Array<{key: string, value: string}> {
+    const data: Array<{key: string, value: string}> = [];
+
+    if (this.currentDoc.transformed) {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = this.currentDoc.transformed;
+
+      // Remove style and script tags
+      const styleTags = tempDiv.querySelectorAll('style, script');
+      styleTags.forEach(tag => tag.remove());
+
+      const table = tempDiv.querySelector('table');
+      if (table) {
+        const rows = table.querySelectorAll('tr');
+
+        rows.forEach(row => {
+          const cells = row.querySelectorAll('td, th');
+          if (cells.length >= 2) {
+            const key = cells[0].textContent?.trim();
+            const value = cells[1].textContent?.trim();
+
+            if (key && value && key !== value &&
+                !key.includes('SafeValue') &&
+                !value.includes('SafeValue') &&
+                !key.includes('body {') &&
+                !value.includes('font-family')) {
+
+              data.push({ key, value });
+            }
+          }
+        });
+      }
+    }
+
+    return data;
+  }
+
+  /**
+   * Add tree data to CSV (flattened with simple naming)
+   */
+  private addTreeDataToCSV(nodes: any[], csvRows: string[], level: number = 0): void {
+    nodes.forEach(node => {
+      if (node.filename) {
+        // Use just the filename, no prefixes or paths
+        const fieldName = node.filename;
+        const value = node.type && !node.type.toString().startsWith('<') ? node.type : '';
+
+        csvRows.push(`${this.escapeCSV(fieldName)},${this.escapeCSV(value)}`);
+
+        if (node.children && node.children.length > 0) {
+          this.addTreeDataToCSV(node.children, csvRows, level + 1);
+        }
+      }
+    });
+  }
+
+  /**
+   * Escape CSV values (handle commas, quotes, newlines)
+   */
+  private escapeCSV(value: string): string {
+    if (!value) return '';
+
+    // If value contains comma, quote, or newline, wrap in quotes and escape internal quotes
+    if (value.includes(',') || value.includes('"') || value.includes('\n') || value.includes('\r')) {
+      return `"${value.replace(/"/g, '""')}"`;
+    }
+
+    return value;
+  }
+
+  /**
+   * Download CSV file
+   */
+  private downloadCSVFile(csvContent: string, filename: string): void {
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
   }
 }

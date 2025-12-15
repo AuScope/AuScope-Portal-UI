@@ -1,12 +1,16 @@
 import { Injectable } from '@angular/core';
-import { CsMapService, LayerModel, ManageStateService } from '@auscope/portal-core-ui';
+import { CsMapService } from '../../lib/portal-core-ui/service/cesium-map/cs-map.service';
+import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
+import { ManageStateService } from '../../lib/portal-core-ui/service/permanentlink/manage-state.service';
 import { AdvancedComponentService } from './advanced-component.service';
 import { LegendUiService } from '../legend/legend-ui.service';
 import { UILayerModelService } from './uilayer-model.service';
 import { environment } from 'environments/environment';
 import * as _ from 'lodash';
 import * as $ from 'jquery';
+import { SidebarService } from 'app/portal/sidebar.service';
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 declare let gtag: Function;
 
 /**
@@ -18,9 +22,8 @@ export class LayerManagerService {
   filterList = []; // an array of all active layers - object = {layer, filterState }
 
   constructor(private csMapService: CsMapService, private manageStateService: ManageStateService,
-    private uiLayerModelService: UILayerModelService,
-    private advancedComponentService: AdvancedComponentService,
-    private legendUiService: LegendUiService) {
+    private uiLayerModelService: UILayerModelService, private advancedComponentService: AdvancedComponentService,
+    private legendUiService: LegendUiService, private sidebarService: SidebarService) {
   }
 
   /**
@@ -44,8 +47,8 @@ export class LayerManagerService {
    */
   setFilters(layerId: string, filterState: boolean): void {
     const objIndex = this.filterList.findIndex(obj => obj.layer == layerId);
-    if (objIndex >= 0) { 
-      this.filterList[objIndex].hasFilters = filterState; 
+    if (objIndex >= 0) {
+      this.filterList[objIndex].hasFilters = filterState;
     } else {
       this.filterList.push({ layer: layerId, hasFilters: filterState });
     }
@@ -53,11 +56,10 @@ export class LayerManagerService {
   }
 
   /**
-   * 
+   *
    * removes a once "Active layer" from the filterList array
    */
   removeFilters(layerId: string) {
-
     this.filterList.forEach((item, index) => {
       if (item['layer'] === layerId) this.filterList.splice(index, 1);
     });
@@ -68,18 +70,18 @@ export class LayerManagerService {
    *  - adds the layer to the Cesium map
    *  - updates the map state service
    *  - sets up the optional and mandatory filters
-   * 
+   *
    *
    * @param layer LayerModel object
    * @param optionalFilters layer's optional filters that have been selected already
-   * @param layerFilterCollection the layer's filter collection, 
+   * @param layerFilterCollection the layer's filter collection,
    *         i.e. mandatory filters and optional filters that can be selected
    * @param layerTime time range to display
    *
    * TODO: FilterPanel is only place bounding box filter can currently be set, better to shift flag to FilterService
    * and apply here when it's needed to adding from SearchPanel etc. will apply filter as well
    */
-  public addLayer(layer: LayerModel, optionalFilters: Array<Object>, layerFilterCollection: any, layerTime: Date) {
+  public addLayer(layer: LayerModel, optionalFilters: Array<object>, layerFilterCollection: any, layerTime: Date) {
     if (environment.googleAnalyticsKey && typeof gtag === 'function') {
       gtag('event', 'Addlayer', {
         event_category: 'Addlayer',
@@ -115,7 +117,7 @@ export class LayerManagerService {
     this.legendUiService.removeLegend(layer.id);
 
     // Transfer mandatory filters from the 'layerFilterCollection' input to the 'layer' object
-    if (layer?.filterCollection?.mandatoryFilters && 
+    if (layer?.filterCollection?.mandatoryFilters &&
         layerFilterCollection?.mandatoryFilters) {
       for (const layerFilt of layer.filterCollection.mandatoryFilters) {
         for (const mandFilt of layerFilterCollection.mandatoryFilters) {
@@ -149,6 +151,9 @@ export class LayerManagerService {
 
     // Add any advanced map components defined in refs.ts
     this.advancedComponentService.addAdvancedMapComponents(layer);
+
+    // Open sidebar if closed
+    this.sidebarService.setOpenState(true);
   }
 
   /**
@@ -167,6 +172,11 @@ export class LayerManagerService {
     // Remove any layer specific map components
     this.advancedComponentService.removeAdvancedMapComponents(layer.id);
     this.legendUiService.removeLegend(layer.id);
+
+    // Close sidebar if layer was last open
+    if (this.csMapService.getLayerModelList().length === 0) {
+      this.sidebarService.setOpenState(false);
+    }
   }
 
   /**
@@ -175,7 +185,7 @@ export class LayerManagerService {
    * @param filter the filter to test
    * @returns true if the filter contains a valid value
    */
-  private filterHasValue(filter: Object): boolean {
+  private filterHasValue(filter: object): boolean {
     let hasValue = false;
     if (filter['type'] === 'OPTIONAL.PROVIDER') {
       for (const provider in filter['value']) {

@@ -3,10 +3,16 @@ import { QuerierModalComponent } from '../modalwindow/querier/querier.modal.comp
 import { AfterViewInit, Component, ElementRef, NgZone, ViewChild, ViewContainerRef } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ViewerConfiguration } from '@auscope/angular-cesium';
-import {
-  CsMapService, CSWRecordModel, GMLParserService, LayerModel, ManageStateService,
-  QueryWMSService, SimpleXMLService, UtilitiesService, CsMapObject, ResourceType
-} from '@auscope/portal-core-ui';
+import { CsMapService } from '../lib/portal-core-ui/service/cesium-map/cs-map.service';
+import { CSWRecordModel } from '../lib/portal-core-ui/model/data/cswrecord.model';
+import { GMLParserService } from '../lib/portal-core-ui/utility/gmlparser.service';
+import { LayerModel } from '../lib/portal-core-ui/model/data/layer.model';
+import { ManageStateService } from '../lib/portal-core-ui/service/permanentlink/manage-state.service';
+import { QueryWMSService } from '../lib/portal-core-ui/service/wms/query-wms.service';
+import { SimpleXMLService } from '../lib/portal-core-ui/utility/simplexml.service';
+import { UtilitiesService } from '../lib/portal-core-ui/utility/utilities.service';
+import { CsMapObject } from '../lib/portal-core-ui/service/cesium-map/cs-map-object';
+import { ResourceType } from '../lib/portal-core-ui/utility/constants.service';
 import {
   Cartesian3, MapMode2D, Math, ScreenSpaceEventHandler, SceneMode, ScreenSpaceEventType, Rectangle, SplitDirection,
   Cartesian2, WebMapServiceImageryProvider, WebMercatorProjection, Cartographic, GeographicProjection
@@ -21,27 +27,32 @@ import { Observable, forkJoin, throwError } from 'rxjs';
 import { catchError, finalize, tap, timeout } from 'rxjs/operators';
 import { ToolbarComponent } from 'app/menupanel/toolbar/toolbar.component';
 import { NVCLBoreholeAnalyticService } from 'app/modalwindow/layeranalytic/nvcl/nvcl.boreholeanalytic.service';
+import { OnlineResourceModel } from 'app/lib/portal-core-ui/model/data/onlineresource.model';
 
-declare var Cesium: any;
+declare let Cesium: any;
 
 @Component({
     selector: 'app-cs-map',
     template: `
     <div #mapElement id="map" class="h-100 w-100" (mouseout)="mouseLongitude=undefined;mouseLatitude=undefined;">
       <ac-map>
-          <app-browse-menu></app-browse-menu>
-          <app-toolbar (splitToggleEvent)="toggleShowMapSplit()"></app-toolbar>
-          <div #mapSlider id="mapSlider" *ngIf="getSplitMapShown()">
+        <app-browse-menu></app-browse-menu>
+        <app-toolbar (splitToggleEvent)="toggleShowMapSplit()"></app-toolbar>
+        @if (getSplitMapShown()) {
+          <div #mapSlider id="mapSlider">
             <div class="slider-grabber">
               <div class="slider-grabber-inner"></div>
             </div>
           </div>
-          <div class="mouse-coordinates" *ngIf="mouseLongitude !== undefined && mouseLatitude !== undefined">
-              Longitude:&nbsp;{{ mouseLongitude }},&nbsp;Latitude:&nbsp;{{ mouseLatitude }}
+        }
+        @if (mouseLongitude !== undefined && mouseLatitude !== undefined) {
+          <div class="mouse-coordinates">
+            Longitude:&nbsp;{{ mouseLongitude }},&nbsp;Latitude:&nbsp;{{ mouseLatitude }}
           </div>
-          <div class="advancedmapcomponent">
-              <ng-template #advancedmapcomponents></ng-template>
-          </div>
+        }
+        <div class="advancedmapcomponent">
+          <ng-template #advancedmapcomponents></ng-template>
+        </div>
       </ac-map>
     </div>
     `,
@@ -81,7 +92,7 @@ export class CsMapComponent implements AfterViewInit {
   constructor(private csMapObject: CsMapObject, private csMapService: CsMapService, private modalService: BsModalService,
     private queryWMSService: QueryWMSService, private gmlParserService: GMLParserService,
     private manageStateService: ManageStateService, private advancedMapComponentService: AdvancedComponentService,
-    private userStateService: UserStateService,  private nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService,
+    private userStateService: UserStateService, private nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService,
     private viewerConf: ViewerConfiguration, private ngZone: NgZone) {
     this.csMapService.getClickedLayerListBS().subscribe((mapClickInfo) => {
       this.handleLayerClick(mapClickInfo);
@@ -185,13 +196,12 @@ export class CsMapComponent implements AfterViewInit {
     // This code is used to display the map for nvclanid job's urlLink
     const nvclanid = UtilitiesService.getUrlParameterByName('nvclanid');
     if (nvclanid) {
-      const me = this;
       this.nvclBoreholeAnalyticService.getNVCLGeoJson(nvclanid).subscribe(results => {
         if (typeof results === 'object') {
           window.alert('This analytical job could not be found!\n the nvclanid = ' + nvclanid);
         } else {
           const jsonData = results;
-          me.nvclBoreholeAnalyticService.addGeoJsonLayer(nvclanid,jsonData);
+          this.nvclBoreholeAnalyticService.addGeoJsonLayer(nvclanid,jsonData);
         }
       });
     }
@@ -402,11 +412,11 @@ export class CsMapComponent implements AfterViewInit {
     // Build list of GetFeatureInfo requests
     const getFeatureInfoRequests: Observable<any>[] = [];
     // Total number of features returned from GetFeatureInfo requests
-    let numberOfFeatures = 0;
+    let _numberOfFeatures = 0;
 
     // get the list of optional filter - providers
     // we will use this to filter calls to the backend i.e. wmsMarkerPopup.do
-    let optProviderList = [];
+    const optProviderList = [];
     for (const maplayer of mapClickInfo.clickedLayerList) {
       if (maplayer?.filterCollection?.optionalFilters) {
         for (const optFil of maplayer.filterCollection.optionalFilters) {
@@ -426,27 +436,27 @@ export class CsMapComponent implements AfterViewInit {
     // Process list of layers clicked
     for (const maplayer of mapClickInfo.clickedLayerList) {
       for (const i of maplayer.clickCSWRecordsIndex) {
-        const cswRecord = maplayer.cswRecords[i];
+        const cswRecord: CSWRecordModel = maplayer.cswRecords[i];
 
         // Get the WMS OnlineResource, if that fails use the first in the list
-        let onlineResource = cswRecord.onlineResources?.find(or => or.type === ResourceType.WMS);
+        let onlineResource: OnlineResourceModel = cswRecord.onlineResources?.find(or => or.type === ResourceType.WMS);
         if (!onlineResource && cswRecord.onlineResources?.length > 0) {
           onlineResource = cswRecord.onlineResources[0];
         }
 
         let optProviderFound = false;
         if (onlineResource) {
-          // iterate through optional Filters to see if the provider "matches" the onlineResource.url  
+          // iterate through optional Filters to see if the provider "matches" the onlineResource.url
           for (const optPro of optProviderList) {
-            if (onlineResource.url.includes(optPro) ) {
+            if (onlineResource.url.includes(optPro)) {
               optProviderFound = true;
             }
           }
         }
-          
+
         // this is the case of no provider set, i.e. all Australia
         if (optProviderList.length === 0) {
-          optProviderFound = true; 
+          optProviderFound = true;
         }
         if (optProviderFound) {
           if (!UtilitiesService.getLayerHasSupportedOnlineResourceType(maplayer) && UtilitiesService.layerContainsBboxGeographicElement(maplayer)) {
@@ -462,22 +472,32 @@ export class CsMapComponent implements AfterViewInit {
             if (!params) {
               continue;
             }
-            let sldBody = maplayer.sldBody;
+            // Does layer have a 'styles' parameter?
+            let styles = '';
+            if (maplayer.sldParam?.length > 0) {
+              for (const tup of maplayer.sldParam) {
+                if (onlineResource.url.includes(tup[0])) {
+                  styles = tup[1];
+                  break;
+                }
+              }
+            }
+
             let postMethod = false;
-            let infoFormat: string;
+            let sldBody = maplayer.sldBody;
             if (sldBody) {
               sldBody = SimpleXMLService.extractIntersectsFiltersFromSld(sldBody);
               postMethod = true;
             } else {
               sldBody = '';
             }
-
             // WMS 1.3.0 GetFeatureInfo requests will have had their lat,lng coords swapped to lng,lat
             if (maplayer.sldBody130) {
               sldBody = maplayer.sldBody130;
             }
 
             // Layer specific SLD_BODY, INFO_FORMAT and postMethod
+            let infoFormat: string;
             if (onlineResource.name.indexOf('ProvinceFullExtent') >= 0) {
               infoFormat = 'application/vnd.ogc.gml';
             } else {
@@ -515,7 +535,7 @@ export class CsMapComponent implements AfterViewInit {
 
             // Build GetFeatureInfo requests
             getFeatureInfoRequests.push(
-              this.queryWMSService.getFeatureInfo(onlineResource, sldBody, infoFormat, postMethod, maplayer.clickCoord[0],
+              this.queryWMSService.getFeatureInfo(onlineResource, styles, sldBody, infoFormat, postMethod, maplayer.clickCoord[0],
                 maplayer.clickCoord[1], params.x, params.y, params.width, params.height, params.bbox).pipe(
                   timeout(15000),
                   tap(result => {
@@ -523,7 +543,7 @@ export class CsMapComponent implements AfterViewInit {
                     const feature = { onlineResource: onlineResource, layer: maplayer };
                     const numberOfLayerFeatures = this.setModal(maplayer.id, result, feature, mapClickInfo.clickCoord);
                     if (numberOfLayerFeatures > 0) {
-                      numberOfFeatures += numberOfLayerFeatures;
+                      _numberOfFeatures += numberOfLayerFeatures;
                     }
                   }), catchError((error) => {
                     return throwError(error);
@@ -566,6 +586,11 @@ export class CsMapComponent implements AfterViewInit {
     for (const onlineResource of cswRecord.onlineResources) {
       html += '<p><a style="color: #000000" target="_blank" href="' + onlineResource.url + '">' + (onlineResource.name ? onlineResource.name : 'Web resource link') + '</a></p>';
     }
+    if (cswRecord.datasetURIs?.length > 0) {
+        for (const datasetUri of cswRecord.datasetURIs) {
+            html += '<p><a style="color: #000000" target="_blank" href="' + datasetUri + '">Dataset URI</a></p>';
+        }
+    }
     html += '</div></div>';
     return html;
   }
@@ -575,7 +600,7 @@ export class CsMapComponent implements AfterViewInit {
    * Display the querier modal on map click
    * @param clickCoord map click coordinates
    */
-  private displayModal(clickCoord: { x: number, y: number, z: number } | null) {
+  private displayModal(_clickCoord: { x: number, y: number, z: number }) {
     if (!this.modalDisplayed) {
       this.bsModalRef = this.modalService.show(QuerierModalComponent, { class : 'modal-lg modal-dialog-scrollable modal-dialog-centered' });
       this.modalDisplayed = true;
@@ -647,7 +672,8 @@ export class CsMapComponent implements AfterViewInit {
           }
         }
       }
-    } catch (err) {
+    } catch (err: any) {
+      console.error("Could not parse JSON", err);
       return [];
     }
     return treeCollections;
@@ -662,7 +688,7 @@ export class CsMapComponent implements AfterViewInit {
    * @param clickCoord map click coordinates
    * @param gmlid a optional filter to only display the gmlId specified
    */
-  private setModal(layerId: string, result: string, feature: any, clickCoord: { x: number, y: number, z: number } | null, gmlid?: string) {
+  private setModal(layerId: string, result: string, feature: any, clickCoord: { x: number, y: number, z: number }, gmlid?: string) {
     let treeCollections = [];
 
     // Some layers return JSON
@@ -722,7 +748,7 @@ export class CsMapComponent implements AfterViewInit {
   }
 
   /**
-   * Updates the imagerySplitPosition when the slider is moved
+   * Updates the splitPosition when the slider is moved
    * @param movement mouse event
    */
   private moveSlider = (movement) => {
@@ -739,19 +765,19 @@ export class CsMapComponent implements AfterViewInit {
     }
     const splitPosition = newSliderPosition / this.mapElement.nativeElement.offsetWidth;
     this.mapSlider.nativeElement.style.left = 100.0 * splitPosition + '%';
-    this.viewer.scene.imagerySplitPosition = splitPosition;
+    this.viewer.scene.splitPosition = splitPosition;
   }
 
   /**
    * Split map toggled on/off
-   * If on, sets imagerySplitPosition and adds handlers
+   * If on, sets splitPosition and adds handlers
    * If off, resets all active layer split directions to NONE
    */
   public toggleShowMapSplit() {
     this.csMapService.setSplitMapShown(!this.csMapService.getSplitMapShown());
     if (this.csMapService.getSplitMapShown()) {
       setTimeout(() => {
-        this.viewer.scene.imagerySplitPosition = this.mapSlider.nativeElement.offsetLeft / this.mapElement.nativeElement.offsetWidth;
+        this.viewer.scene.splitPosition = this.mapSlider.nativeElement.offsetLeft / this.mapElement.nativeElement.offsetWidth;
         const handler = new ScreenSpaceEventHandler(this.mapSlider.nativeElement);
         handler.setInputAction(() => {
           this.sliderMoveActive = true;

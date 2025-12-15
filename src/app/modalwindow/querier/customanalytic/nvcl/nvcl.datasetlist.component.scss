@@ -23,3 +23,16 @@
     display: inline-flex;
     align-items: center;
 }
+
+/* Ensure NVCL image buttons are always visible, Legend had a habit of disappearing */
+#nvcl-dataset .modal-card-size .btn,
+#nvcl-dataset .modal-card-size button {
+    background-color: #007bff !important;
+    color: #fff !important;
+    border-color: #0069d9 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    z-index: 1000 !important;
+}

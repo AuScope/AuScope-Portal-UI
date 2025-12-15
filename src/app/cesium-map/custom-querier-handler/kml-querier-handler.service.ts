@@ -1,4 +1,4 @@
-import { UtilitiesService, LayerModel } from "@auscope/portal-core-ui";
+import { UtilitiesService } from '../../lib/portal-core-ui/utility/utilities.service';
 import { KmlFeatureData } from "cesium";
 
 
@@ -8,15 +8,15 @@ export class KMLQuerierHandler {
 
   /**
    * Creates an HTML string using a feature's KMLFeatureData
-   * 
-   * @returns HTML string 
+   *
+   * @returns HTML string
    */
   public getHTML(): string {
     const extendedData = this.entity['kml']['extendedData'];
     let html = '<div class="row"><div class="col-md-3">Name</div><div class="col-md-9">' + this.entity['name'] + '</div></div><hr>';
     for (const attr in extendedData) {
       if (extendedData.hasOwnProperty(attr)) {
-        const data =  extendedData[attr];
+        const data = extendedData[attr];
         let displayName = attr
         if (data.hasOwnProperty('displayName') && !UtilitiesService.isEmpty(data['displayName'])) {
           displayName = data['displayName'];
@@ -32,11 +32,11 @@ export class KMLQuerierHandler {
 
   /**
    * Fetches a feature's name
-   * 
+   *
    * @returns feature name string
    */
   public getFeatureName(): string {
     return this.entity['name'];
   }
-  
+
 }

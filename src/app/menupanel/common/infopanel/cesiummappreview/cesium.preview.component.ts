@@ -1,4 +1,5 @@
-import { CsMapService, CSWRecordModel } from '@auscope/portal-core-ui';
+import { CsMapService } from '../../../../lib/portal-core-ui/service/cesium-map/cs-map.service';
+import { CSWRecordModel } from '../../../../lib/portal-core-ui/model/data/cswrecord.model';
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ViewerConfiguration } from '@auscope/angular-cesium';
 import { CsMapComponent } from 'app/cesium-map/csmap.component';
@@ -73,7 +74,7 @@ export class CesiumMapPreviewComponent {
      * @param name the name of the bbox
      * @param coords an array of lon/lat coords [west, south, east, north]
      */
-    addBbox(record: CSWRecordModel, coords: number[]) {
+    addBbox(record: CSWRecordModel, coords: number[]): void {
         // Adjust overall bounding box values
         if (!this.minWest || coords[0] < this.minWest) {
             this.minWest = coords[0];
@@ -126,7 +127,7 @@ export class CesiumMapPreviewComponent {
     /**
      * Determine the min/max bounds of the added bboxes and fit view to these
      */
-    fitMap() {
+    fitMap(): void {
         let fitPolygon = this.AUS_POLYGON;
 
         if (this.minWest === this.maxEast) {
@@ -145,7 +146,7 @@ export class CesiumMapPreviewComponent {
         }
 
         if (this.minWest && this.minWest !== -180 && this.maxEast && this.maxEast !== 180 &&
-            this.minSouth && this.minSouth !== -90 && this.maxNorth && this.maxNorth !== 90 ) {
+            this.minSouth && this.minSouth !== -90 && this.maxNorth && this.maxNorth !== 90) {
             fitPolygon = new PolygonHierarchy(Cartesian3.fromDegreesArray([
                 this.minWest, this.minSouth,
                 this.maxEast, this.minSouth,
@@ -165,7 +166,9 @@ export class CesiumMapPreviewComponent {
         const bboxEntity = this.viewer.entities.getById('temp-bbox');
         this.viewer.zoomTo(bboxEntity).then(() => {
             this.viewer.entities.removeById('temp-bbox');
-        });
+        }).catch(
+            (error) => console.error("Could not zoom to box", error)
+        );
     }
 
     /**
@@ -174,7 +177,7 @@ export class CesiumMapPreviewComponent {
      * @param id the ID of the CSW record associated with the bbox
      * @param state if true will highlight bounding box, else will unhighlight it
      */
-    setBBoxHighlight(id: string, state: boolean) {
+    setBBoxHighlight(id: string, state: boolean): void {
         const entity = this.viewer.entities.getById(id);
         // No entity will be returned for world coverage layers as no bbox is shown
         if (entity) {

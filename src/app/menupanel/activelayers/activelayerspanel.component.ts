@@ -1,6 +1,12 @@
-import { Component, Input, ViewChildren, QueryList, AfterViewInit, ChangeDetectorRef } from '@angular/core';
-import { CsMapService, LayerModel, ResourceType, UtilitiesService } from '@auscope/portal-core-ui';
-import { ManageStateService, LayerHandlerService, CsClipboardService } from '@auscope/portal-core-ui';
+import { Component, Input, ViewChildren, QueryList, AfterViewInit, inject } from '@angular/core';
+import { CsMapService } from '../../lib/portal-core-ui/service/cesium-map/cs-map.service';
+import { ResourceType } from '../../lib/portal-core-ui/utility/constants.service';
+import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
+import { UtilitiesService } from '../../lib/portal-core-ui/utility/utilities.service';
+import { ManageStateService } from '../../lib/portal-core-ui/service/permanentlink/manage-state.service';
+import { LayerHandlerService } from '../../lib/portal-core-ui/service/cswrecords/layer-handler.service';
+import { CsClipboardService } from '../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
+import { ref } from "../../../environments/ref";
 import { SplitDirection } from 'cesium';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
@@ -27,13 +33,24 @@ enum FilterMode {
 }
 
 @Component({
-    selector: '[appActiveLayers]',
+    selector: '[app-active-layers]',
     templateUrl: './activelayerspanel.component.html',
     styleUrls: ['../menupanel.scss', './activelayerspanel.component.scss'],
     standalone: false
 })
 export class ActiveLayersPanelComponent implements AfterViewInit {
-  bsModalRef: BsModalRef;
+  csMapService = inject(CsMapService);
+  uiLayerModelService = inject(UILayerModelService);
+  layerManagerService = inject(LayerManagerService);
+  legendUiService = inject(LegendUiService);
+  modalService = inject(BsModalService);
+  layerHandlerService = inject(LayerHandlerService);
+  csClipboardService = inject(CsClipboardService);
+  userStateService = inject(UserStateService);
+  manageStateService = inject(ManageStateService);
+  authService = inject(AuthService);
+  activeModalService = inject(NgbModal);
+  bsModalRef = inject(BsModalRef);
 
   @ViewChildren(FilterPanelComponent) filterComponents: QueryList<FilterPanelComponent>;
   @ViewChildren(DownloadPanelComponent) downloadComponents: QueryList<DownloadPanelComponent>;
@@ -50,12 +67,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
   showingOnlyBookmarkedLayers = false;
   isSidebarOpen = false;
 
-  constructor(private csMapService: CsMapService,
-    private uiLayerModelService: UILayerModelService, private layerManagerService: LayerManagerService,
-    private legendUiService: LegendUiService, private modalService: BsModalService,
-    private layerHandlerService: LayerHandlerService, private csClipboardService: CsClipboardService,
-    private userStateService: UserStateService, private manageStateService: ManageStateService,
-    private authService: AuthService, private activeModalService: NgbModal, private ref: ChangeDetectorRef) {
+  constructor() {
     this.csClipboardService.filterLayersBS.subscribe(filterLayers => {
       this.areLayersPolygonFiltered = filterLayers;
     });
@@ -124,13 +136,13 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
 
   /**
    * check if a layer has filters - used to hide the tab "Layer Styling"
-   * 
+   *
    * @param layerId
    * @returns boolean
    */
   public hasFilters(layerId: string): boolean {
 
-    let filterState = this.layerManagerService.getFilters(layerId);
+    const filterState = this.layerManagerService.getFilters(layerId);
     /*
     // if the layer has no filters then set it to display the download tab
     if (this.getUILayerModel(layerId)) {
@@ -144,6 +156,15 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
     */
 
     return filterState;
+  }
+
+  /**
+   * Check if a layer has advanced filter components
+   * @param layerId the ID of the layer
+   * @returns true if layer has advanced filter components, false otherwise
+   */
+  public hasAdvancedFilters(layerId: string): boolean {
+    return Object.prototype.hasOwnProperty.call(ref.advancedFilter, layerId);
   }
 
   /**
@@ -177,7 +198,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
           setTimeout(() => {
             const layerFilterPanel: FilterPanelComponent = this.filterComponents.find(fc => fc.layer.id === layerId);
             if (layerFilterPanel) {
-              // Update filter values, times and map opacity 
+              // Update filter values, times and map opacity
               layerFilterPanel.addLayerFromState(layerStateObj[layerId]);
               // Set opacity slider to correct position
               const uiLayerModel = this.uiLayerModelService.getUILayerModel(layerId);
@@ -381,7 +402,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
 
   /**
    * Makes a filter or download tab panel visible
-   * 
+   *
    * @param layerId layer id string
    * @param panelType panel type string, either 'filterpanel' or 'downloadpanel'
    */
@@ -463,7 +484,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
 
   /**
    * Returns true if any layer in a layer group is active
-   * 
+   *
    * @param layerGroupValue - an instance of this.layerGroups[key].value
    */
   public isLayerGroupActive(layerGroupValue): boolean {
@@ -515,7 +536,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
 
   /**
    * Returns true iff filter panel is visible
-   * 
+   *
    * @param layerId layer id
    * @returns true iff filter panel is visible
    */
@@ -528,7 +549,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
 
   /**
    * Returns true iff download panel is visible
-   * 
+   *
    * @param layerId layer id
    * @returns true iff download panel is visible
    */

@@ -4,7 +4,7 @@ import { tsgdownload, Download } from './tsgdownload'
 import { Observable, Subject } from 'rxjs'
 import { SAVER, Saver } from './saver.provider'
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class TSGDownloadService {
   public downloadOneCompletBS:Subject<string> = null;
   constructor(private http: HttpClient, @Inject(SAVER) private save: Saver) {

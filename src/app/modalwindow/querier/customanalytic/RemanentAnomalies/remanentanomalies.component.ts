@@ -1,9 +1,9 @@
-import { LayerModel } from '@auscope/portal-core-ui';
-import { OnlineResourceModel } from '@auscope/portal-core-ui';
+import { LayerModel } from '../../../../lib/portal-core-ui/model/data/layer.model';
+import { OnlineResourceModel } from '../../../../lib/portal-core-ui/model/data/onlineresource.model';
 import { Component, Input, AfterViewInit } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { QuerierInfoModel } from '@auscope/portal-core-ui';
-import { UtilitiesService } from '@auscope/portal-core-ui';
+import { QuerierInfoModel } from '../../../../lib/portal-core-ui/model/data/querierinfo.model';
+import { UtilitiesService } from '../../../../lib/portal-core-ui/utility/utilities.service';
 import { RemanentAnomaliesService } from './remanentanomalies.service';
 
 
@@ -30,7 +30,7 @@ export class RemanentAnomaliesComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     // the timeout fixes the - NG0100: ExpressionChangedAfterItHasBeenCheckedError error
-    // data fetching is asynchronous anyway, you can postpone it to be called in next 
+    // data fetching is asynchronous anyway, you can postpone it to be called in next
     // macrotask (after ngAfterViewInit is finished) with a help of setTimeout with 0 time delay
     setTimeout(() => {
       const docValue = this.doc.value;

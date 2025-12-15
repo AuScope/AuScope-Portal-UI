@@ -1,10 +1,9 @@
 
 import { enableProdMode } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { Ion } from 'cesium';
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
-import { ContextService, ContextConfig, CONTEXT_CONFIG } from "@csiro-geoanalytics/ng";
+import { ContextService } from "@csiro-geoanalytics/ng";
 
 ContextService.load()
 	.then(context => {
@@ -16,7 +15,7 @@ ContextService.load()
 		if (environment.production) {
 			enableProdMode();
 		  }
-		  
+
 		  if (environment.googleAnalyticsKey) {
 			const gtagscript = document.createElement('script');
 			gtagscript.src = 'https://www.googletagmanager.com/gtag/js?id=' + environment.googleAnalyticsKey;
@@ -34,10 +33,12 @@ ContextService.load()
 
 
 
-declare var require;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+declare let require;
 
-// This access token is taken from the "angular-cesium" website - you can replace it with your own one
-Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2YTY1NDYzYS01YzgxLTQ2MGUtODBiYy0zODRmY2MwOGY4MDIiLCJpZCI6MjA1LCJpYXQiOjE1MDQ3MjQ1Njh9.rKgXUKAfFiiSAm_b9T8bpsDVdj0YyZeqGxNpzLlhxpk';
+// If required, Cesium access token can be set here
+// Ion.defaultAccessToken =
+
 window['CESIUM_BASE_URL'] = '/assets/cesium/';
 
 /*

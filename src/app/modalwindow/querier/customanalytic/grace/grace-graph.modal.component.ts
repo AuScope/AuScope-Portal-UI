@@ -1,5 +1,5 @@
 import { Component, AfterViewInit, ChangeDetectorRef } from '@angular/core';
-import { CsMapObject } from '@auscope/portal-core-ui';
+import { CsMapObject } from '../../../../lib/portal-core-ui/service/cesium-map/cs-map-object';
 import { Subscription } from 'rxjs';
 import { GraceService } from '../../../../services/wcustom/grace/grace.service';
 import { saveAs } from 'file-saver';
@@ -61,7 +61,7 @@ export class GraceGraphModalComponent implements AfterViewInit {
         },
         config: {
             displaylogo: false,
-            displayModeBar: true,   // client requested buttons always visible
+            displayModeBar: true, // client requested buttons always visible
             modeBarButtonsToAdd: [{
                 name: 'Download JSON data',
                 icon: Plotly.Icons.disk,
@@ -119,7 +119,7 @@ export class GraceGraphModalComponent implements AfterViewInit {
                     this.plotGraph(title, data.response);
                     this.queryStatus = this.QueryStatus.loaded;
                 }
-            }, error => {
+            }, () => {
                 this.queryStatus = this.QueryStatus.error;
                 this.changeDetectorRef.detectChanges();
             });
@@ -138,7 +138,7 @@ export class GraceGraphModalComponent implements AfterViewInit {
                     this.queryStatus = this.QueryStatus.loaded;
                     this.changeDetectorRef.detectChanges();
                 }
-            }, error => {
+            }, () => {
                 this.queryStatus = this.QueryStatus.error;
                 this.changeDetectorRef.detectChanges();
             });
@@ -189,7 +189,7 @@ export class GraceGraphModalComponent implements AfterViewInit {
      * Download graph data to local device
      */
     public downloadData() {
-        const blob = new Blob([JSON.stringify(this.queriedData)], {type: 'text/plain;charset=utf-8'});
+        const blob = new Blob([JSON.stringify(this.queriedData)], { type: 'text/plain;charset=utf-8' });
         saveAs(blob, 'mascon_data.json');
     }
 

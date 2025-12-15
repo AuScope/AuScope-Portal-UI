@@ -13,18 +13,16 @@ import { Component, EventEmitter, Output } from '@angular/core';
     standalone: false
 })
 export class ToolbarComponent {
-  
+
   @Output() splitToggleEvent = new EventEmitter();
 
-  constructor() {}
-  
   public toggleToolbar() {
     this.splitToggleEvent.emit(true);
   }
 
   /**
    * Split map toggled on/off
-   * If on, sets imagerySplitPosition and adds handlers
+   * If on, sets splitPosition and adds handlers
    * If off, resets all active layer split directions to NONE
    */
   public toggleShowMapSplit() {

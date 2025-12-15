@@ -1,5 +1,5 @@
 import { Directive } from '@angular/core';
-import { LayerModel } from '@auscope/portal-core-ui';
+import { LayerModel } from '../../../../lib/portal-core-ui/model/data/layer.model';
 
 
 /**
@@ -24,7 +24,7 @@ import { LayerModel } from '@auscope/portal-core-ui';
    * Sets the advanced parameters.
    *
    * Note that this method will be called when the state is loaded so if there's any special processing
-   * required then overwrite this in the sub-class, call super.setAdvancedParams(...) and add any 
+   * required then overwrite this in the sub-class, call super.setAdvancedParams(...) and add any
    * necessary code.
    *
    * @param params the advanced parameters

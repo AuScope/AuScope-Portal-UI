@@ -1,4 +1,4 @@
-import { LayerModel } from "@auscope/portal-core-ui";
+import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 import { KmlFeatureData } from "cesium";
 
 
@@ -8,8 +8,8 @@ export class IrisQuerierHandler {
 
   /**
    * Creates an HTML string using a feature's KMLFeatureData and CSW records info
-   * 
-   * @returns HTML string 
+   *
+   * @returns HTML string
    */
   public getHTML(): string {
     const extendedData = this.entity['kml']['extendedData'];
@@ -33,11 +33,11 @@ export class IrisQuerierHandler {
 
   /**
    * Fetches a feature's name
-   * 
+   *
    * @returns feature name string
    */
   public getFeatureName(): string {
     return this.entity['name'];
   }
-  
+
 }

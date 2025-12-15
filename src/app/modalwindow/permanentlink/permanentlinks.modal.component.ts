@@ -28,7 +28,7 @@ export class PermanentLinksModalComponent implements OnInit {
   statesForm: UntypedFormGroup;
   statesFormArray: UntypedFormArray;
 
-  editingState: number = -1;  // Keep track of state being edited (-1 = none)
+  editingState: number = -1; // Keep track of state being edited (-1 = none)
 
   constructor(private formBuilder: UntypedFormBuilder, private modalService: NgbModal, public activeModal: NgbActiveModal,
               private userStateService: UserStateService, private datePipe: DatePipe) {}
@@ -64,12 +64,12 @@ export class PermanentLinksModalComponent implements OnInit {
     const linkUrl = environment.hostUrl + '?state=' + state.id;
     return this.formBuilder.group({
       id: state.id,
-      name: [{value: state.name, disabled: true}, Validators.required],
-      description: [{value: state.description, disabled: true}],
-      date: [{value: this.datePipe.transform(state.creationDate, 'medium'), disabled: true}],
+      name: [{ value: state.name, disabled: true }, Validators.required.bind(Validators)],
+      description: [{ value: state.description, disabled: true }],
+      date: [{ value: this.datePipe.transform(state.creationDate, 'medium'), disabled: true }],
       state: state.jsonState,
-      isPublic: [{value: state.isPublic, disabled: true}, Validators.required],
-      link: [{value: linkUrl, disabled: true}]
+      isPublic: [{ value: state.isPublic, disabled: true }, Validators.required.bind(Validators)],
+      link: [{ value: linkUrl, disabled: true }]
     });
   }
 
@@ -98,7 +98,9 @@ export class PermanentLinksModalComponent implements OnInit {
           alert('Error removing state: ' + err.message);
         });
       }
-    });
+    }).catch(
+        (error) => console.error("Could not delete state", error)
+    );
   }
 
   /**
@@ -131,10 +133,10 @@ export class PermanentLinksModalComponent implements OnInit {
   /**
    * Enable a state for editing
    *
-   * @param stateNo 
+   * @param stateNo
    */
   editState(stateNo: number) {
-    if (stateNo !== this.editingState ) {
+    if (stateNo !== this.editingState) {
 
       if (this.editingState !== -1 && this.statesFormArray.controls[this.editingState].dirty) {
         const modalRef = this.modalService.open(ConfirmModalComponent, {
@@ -151,7 +153,7 @@ export class PermanentLinksModalComponent implements OnInit {
            this.editingState = -1;
            this.editState(stateNo);
           }
-        });
+        }).catch((error) => console.error("Could not save changes", error));
       } else {
 
         if (this.editingState !== -1) {
@@ -199,7 +201,7 @@ export class PermanentLinksModalComponent implements OnInit {
         if (result && result === 'OK') {
          this.activeModal.close();
         }
-      });
+      }).catch((error) => console.error('Could not close permlink dialog', error));
     } else {
       this.activeModal.close();
     }

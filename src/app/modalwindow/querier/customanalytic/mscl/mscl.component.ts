@@ -1,5 +1,7 @@
 import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
-import { LayerModel, OnlineResourceModel, QuerierInfoModel } from '@auscope/portal-core-ui';
+import { LayerModel } from '../../../../lib/portal-core-ui/model/data/layer.model';
+import { OnlineResourceModel } from '../../../../lib/portal-core-ui/model/data/onlineresource.model';
+import { QuerierInfoModel } from '../../../../lib/portal-core-ui/model/data/querierinfo.model';
 import { MSCLService } from '../../../layeranalytic/mscl/mscl.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { MSCLAnalyticComponent } from '../../../layeranalytic/mscl/mscl.analytic.component';
@@ -18,13 +20,13 @@ export class MSCLComponent implements OnInit {
     @Input() featureId: string;
     @Input() doc: QuerierInfoModel;
 
-    public msclform: { startDepth: number, endDepth: number, bMetric: {}, bGroup: {} }; // Used to store form data
+    public msclform: { startDepth: number, endDepth: number, bMetric: object, bGroup: object }; // Used to store form data
     // startDepth = start depth
     // endDepth = end depth
     // bMetric = metric tickbox, dict: key is printable name, val is boolean
     // bGroup = group metric tickbox, dict: key is printable name, val is boolean
 
-    public metricPNameList: string[];  // Printable list of all selectable metrics
+    public metricPNameList: string[]; // Printable list of all selectable metrics
     public metricGroupList: string[]; // List of selectable group names
     public modalDisplayed = false; // Is modal dialogue displayed?
     public allTicked = false; // Are all tickboxes ticked?
@@ -92,7 +94,7 @@ export class MSCLComponent implements OnInit {
 
     /**
      * Set all metric tickboxes within a group
-     * 
+     *
      * @param group group name
      */
     public toggle_grp_chkbox(group: string) {

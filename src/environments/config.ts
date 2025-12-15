@@ -41,7 +41,7 @@ export const config = {
   // 'maxImageSize' is a limit on the the lagrest side of the downloaded image/dataset
   // For ESRI MapServers set 'maxImageSize' to 1024
   // For GSKY set 'maxImageSize' to 4096
-  // 
+  //
   // (Set 'downloadAreaMaxSize' to Number.MAX_SAFE_INTEGER to disable area download limits)
   wcsSupportedLayer: {
     'regolith-depth-layer': {
@@ -414,5 +414,43 @@ export const config = {
     'igsn-ardc-sample': {
       serviceName: 'GenericStyleService',
     },
-  }
+  },
+  // A workaround for OGC WMS services that do not cache 'SLD_BODY' and ignore map styling and filters
+  doesNotCacheSLDBody: [
+    "https://sarigdata.pir.sa.gov.au"
+  ],
+  // Some layers use GeoSciML v4.1 and the XML needs to be patched
+  insertGeoSciMLNS: [
+    {
+        url: ".sa.gov.au",
+        layerName: "gsmlp:BoreholeView",
+        layerId: "nvcl-v2-borehole",
+        gsmlpNamespace: "http://www.opengis.net/gsml/4.1/geosciml-lite"
+    },
+    {
+        url: ".sa.gov.au",
+        layerName: "gsmlp:BoreholeView",
+        layerId: "sf0-borehole-nvcl",
+        gsmlpNamespace: "http://www.opengis.net/gsml/4.1/geosciml-lite"
+    }
+  ],
+  insertERLNS: [
+    {
+        url: ".mrt.tas.gov.au",
+        layerName: "erl:CommodityResourceView",
+        layerId: "erl-commodityresourceview",
+        erlNamespace: "http://xmlns.earthresourceml.org/earthresourceml-lite/1.0"
+    },
+    {
+        url: ".mrt.tas.gov.au",
+        layerName: "erl:MineralOccurrenceView",
+        layerId: "erl-mineraloccurrenceview",
+        erlNamespace: "http://xmlns.earthresourceml.org/earthresourceml-lite/1.0"
+    }
+  ],
+  // Some services do not provide enough information to create citations or do not need it
+  cannotCite: [
+    "lithodat.com",
+    "insargrace.geoanalytics.csiro.au"
+  ]
 };

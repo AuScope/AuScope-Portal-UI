@@ -1,11 +1,15 @@
 import { Component, Inject, Input, OnInit } from '@angular/core';
-import { CSWRecordModel, LayerModel, OnlineResourceModel, UtilitiesService } from '@auscope/portal-core-ui';
+import { CSWRecordModel } from '../../../../lib/portal-core-ui/model/data/cswrecord.model';
+import { LayerModel } from '../../../../lib/portal-core-ui/model/data/layer.model';
+import { OnlineResourceModel } from '../../../../lib/portal-core-ui/model/data/onlineresource.model';
+import { UtilitiesService } from '../../../../lib/portal-core-ui/utility/utilities.service';
 import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
 import { environment } from 'environments/environment';
 import { config } from 'environments/config';
+import { ResourceType } from '../../../../lib/portal-core-ui/utility/constants.service';
 
 @Component({
-    selector: 'info-sub-panel',
+    selector: 'app-info-sub-panel',
     templateUrl: './subpanel.component.html',
     styleUrls: ['../../../menupanel.scss', './subpanel.component.scss'],
     standalone: false
@@ -22,6 +26,27 @@ export class InfoPanelSubComponent implements OnInit {
     // Have preview/legend loaded
     wmsLoaded = false;
     legendLoaded = false;
+
+    // Publication year, if available
+    publicationYear: string = "NaN";
+
+    // URL used in the citation
+    citeURL: string;
+
+    // Accessed date in citation
+    accessedDate: string;
+
+    // Distributors in citation
+    distributor: string
+
+    // Saves the DOI reference
+    DOIname: string;
+
+    // Citable - some layers do not provide enough information to be citable
+    citable: boolean;
+
+    // A regexp to catch customer service/enquiries names
+    regex: RegExp = new RegExp("enquiries|service|customer|infocentre", "i");
 
     constructor(@Inject('env') private env, private filterService: FilterService) {}
 
@@ -64,14 +89,14 @@ export class InfoPanelSubComponent implements OnInit {
      * @returns true if OnlineResource is of type WMS, WFS, WCS or CSW
      */
     public isGetCapabilitiesType(onlineResource: OnlineResourceModel): boolean {
-        return onlineResource.type === 'WMS' || onlineResource.type === 'WFS' || onlineResource.type === 'WCS' || onlineResource.type === 'CSW';
+        return onlineResource.type === ResourceType.WMS || onlineResource.type === ResourceType.WFS || onlineResource.type === ResourceType.WCS || onlineResource.type === ResourceType.CSW;
     }
 
     /** Removes proxy from URL for display purposes
-     * 
+     *
      * e.g. "http://localhost:8080/getViaProxy.do?url=https://raw.githubusercontent.com/CesiumGS/cesium/main/Apps/SampleData/kml/bikeRide.kml"
      * get converted to "https://raw.githubusercontent.com/CesiumGS/cesium/main/Apps/SampleData/kml/bikeRide.kml"
-     * 
+     *
      * @param url URL which may be prepended with a reference to the proxy
      * @returns URL without the proxy part
      */
@@ -106,7 +131,86 @@ export class InfoPanelSubComponent implements OnInit {
         return path;
     }
 
+    /**
+     * Assemble data fields for citation
+     */
+    private processCitation(): void {
+        // Accessed date for citation
+        const today = new Date();
+        const dayDigit = String(today.getDate());
+        const monthName = today.toLocaleString('default', { month: 'long' });
+        const year = today.getFullYear();
+        this.accessedDate = `${dayDigit} ${monthName}, ${year},`;
+        this.citable = true;
+
+        // Publication date for citation
+        try {
+            const isoDateStr = this.cswRecord.date.replace(" UTC", "Z");
+            const pubDate = new Date(isoDateStr);
+            this.publicationYear = pubDate.getFullYear().toString();
+        } catch (_error) {
+            this.publicationYear = 'NaN';
+        }
+        // If cannot get publication year then do not cite
+        if (this.publicationYear == 'NaN') {
+            this.citable = false;
+            return;
+        }
+
+        // Citation URL
+        let foundCiteURL = false;
+        if (this.cswRecord.datasetURIs?.length > 0) {
+            this.citeURL = this.cswRecord.datasetURIs[0];
+            foundCiteURL = true;
+        } else {
+            // Citation using catalogue URL is a second best solution
+            this.citeURL = this.cswRecord.recordInfoUrl;
+
+        }
+        this.DOIname = '';
+        let usesNCI = false;
+        let foundDOI = false;
+
+        for (const onlineResource of this.cswRecord.onlineResources) {
+            // Look for services that do not provide enough information to create a citation
+            for (const url of config.cannotCite) {
+                if (onlineResource.url.includes(url)) {
+                    this.citable = false;
+                    return;
+                }
+            }
+            // If uses NCI facilities then should include them as distributor
+            if (onlineResource.url.includes('nci.org.au')) {
+                usesNCI = true;
+            }
+            // Prefer to use a DOI if one is found
+            if (onlineResource.type === ResourceType.DOI) {
+                this.citeURL = onlineResource.url;
+                this.DOIname = onlineResource.name;
+                foundDOI = true;
+                foundCiteURL = true;
+            }
+            if (!foundDOI && !foundCiteURL && onlineResource.type!== ResourceType.UNSUPPORTED) {
+                if (this.isGetCapabilitiesType(onlineResource)) {
+                    this.citeURL = this.onlineResourceGetCapabilitiesUrl(onlineResource);
+                } else {
+                    this.citeURL = this.removeProxy(onlineResource.url);
+                }
+            }
+        }
+
+        // Distributor in citation
+        this.distributor = "AuScope Discovery Portal http://hdl.handle.net/102.100.100/483116";
+        if (usesNCI) {
+            this.distributor += " & NCI Australia https://nci.org.au";
+        }
+    }
+
     ngOnInit(): void {
+
+        // Assemble data fields for citation
+        this.processCitation();
+
         // Update layer times for this layer if required
         if (config.queryGetCapabilitiesTimes.indexOf(this.layer.id) > -1) {
             this.filterService.updateLayerTimes(this.layer, new LayerTimes());
@@ -117,14 +221,14 @@ export class InfoPanelSubComponent implements OnInit {
         this.filterService.getLayerTimesBS(this.layer.id).subscribe(layerTimes => {
             const wmsOnlineResource = this.cswRecord.onlineResources.find(r => r.type.toLowerCase() === 'wms');
             if (wmsOnlineResource) {
-                const params = 'SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png&HEIGHT=25&BGCOLOR=0xFFFFFF'
-                    + '&LAYER=' + wmsOnlineResource.name + '&LAYERS=' + wmsOnlineResource.name + '&WIDTH=188&SCALE=1000000'
+               const params = 'SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png'
+                    + '&LAYER=' + wmsOnlineResource.name + '&LAYERS=' + wmsOnlineResource.name
                     + '&LEGEND_OPTIONS=forceLabels:on;minSymbolSize:16';
                 this.legendUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(wmsOnlineResource.url), params);
             } else if (this.layer.legendImg && this.layer.legendImg !== '') {
                 this.legendUrl = this.env.portalBaseUrl + 'legend/' + this.layer.legendImg;
             }
-            
+
             // Gather up BBOX coordinates to calculate the centre and envelope. Use a copy of coords so they don't stay modified for the main map
             const bbox = { ...this.cswRecord.geographicElements[0] };
 
@@ -152,22 +256,34 @@ export class InfoPanelSubComponent implements OnInit {
 
                 // Add default time if present
                 if (layerTimes?.currentTime) {
-                    params += '&TIME=' + layerTimes.currentTime;
+                    params += '&TIME=' + layerTimes.currentTime.toISOString();
                 }
 
                 this.wmsUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(wmsOnlineResource.url), params);
-                this.outlineUrl = "https://research-community.geoanalytics.csiro.au/geoserver/auscope/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&LAYERS=auscope%3AStates-and-Territories&TRANSPARENT=TRUE&SRS=EPSG:4326&FORMAT=image%2Fpng&BBOX="+ 
+                this.outlineUrl = "https://research-community.geoanalytics.csiro.au/geoserver/auscope/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&LAYERS=auscope%3AStates-and-Territories&TRANSPARENT=TRUE&SRS=EPSG:4326&FORMAT=image%2Fpng&BBOX="+
                                 + bbox.westBoundLongitude + ',' + bbox.southBoundLatitude
                                 + ',' + bbox.eastBoundLongitude + ',' + bbox.northBoundLatitude + "&WIDTH=400&HEIGHT=400";
-            }            
+            }
         });
+    }
+
+    /**
+     * Catch the user click and copy citation to clipboard
+     *
+     * @param event click event
+     */
+    public copyCite(element: HTMLElement) {
+        const text = element.innerText;
+        navigator.clipboard.writeText(text)
+          .then(() => alert("Copied to clipboard"))
+          .catch(err => console.error("Failed to copy:", err));
     }
 
     /**
      * WMS or Legend image has finished loading
      * @param event the image load event
      */
-    public imageLoad(event: Event) {
+    public onImgLoad(event: Event) {
         if ((event.target as HTMLImageElement).id === 'wmsImg' && !this.wmsLoaded) {
             this.wmsLoaded = true;
         } else if ((event.target as HTMLImageElement).id === 'legendImg' && !this.legendLoaded) {
@@ -201,7 +317,7 @@ export class InfoPanelSubComponent implements OnInit {
             this.legendUrl = environment.portalBaseUrl + 'getViaProxy.do?usewhitelist=false&usepostafterproxy=true&url=' + this.legendUrl;
             (event.target as HTMLImageElement).src = this.legendUrl;
         } else {
-            (event.target as HTMLImageElement).parentElement.style.display = 'none';
+            (event.target as HTMLImageElement).parentElement.parentElement.style.display = 'none';
         }
     }
 

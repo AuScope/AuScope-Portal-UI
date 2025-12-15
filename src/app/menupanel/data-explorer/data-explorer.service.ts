@@ -1,9 +1,9 @@
-import { throwError as observableThrowError,  Observable, BehaviorSubject } from 'rxjs';
+import { throwError as observableThrowError, Observable, BehaviorSubject } from 'rxjs';
 
 import { map, catchError } from 'rxjs/operators';
 
 import { environment } from '../../../environments/environment';
-import { LayerModel } from '@auscope/portal-core-ui';
+import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Registry } from './data-model';
@@ -54,7 +54,7 @@ export class DataExplorerService {
       }
     }), catchError((error: HttpResponse<any>) => {
       return observableThrowError(error);
-    }), );
+    }),);
   }
 
   /**
@@ -117,7 +117,7 @@ export class DataExplorerService {
       const cswRecords = response['data'].records;
       const itemLayers = [];
 
-      cswRecords.forEach(function(item, i, ar) {
+      cswRecords.forEach(function(item, _i, _ar) {
         const itemLayer = new LayerModel();
         itemLayer.cswRecords = [item];
         itemLayer['expanded'] = false;
@@ -193,7 +193,7 @@ export class DataExplorerService {
       const cswRecords = response['data'].records;
       const itemLayers = [];
 
-      cswRecords.forEach(function(item, i, ar) {
+      cswRecords.forEach(function(item, _i, _ar) {
         const itemLayer = new LayerModel();
         itemLayer.cswRecords = [item];
         itemLayer['expanded'] = false;

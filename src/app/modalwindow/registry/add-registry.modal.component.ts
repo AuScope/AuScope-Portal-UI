@@ -4,11 +4,11 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Registry } from 'app/menupanel/data-explorer/data-model';
 import { v4 as uuidv4 } from 'uuid';
 import { environment } from 'environments/environment';
-
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 declare let gtag: Function;
 
 @Component({
-    selector: 'add-registry-modal-window',
+    selector: 'app-add-registry-modal-window',
     templateUrl: './add-registry.modal.component.html',
     styleUrls: ['./add-registry.component.scss'],
     standalone: false
@@ -21,9 +21,9 @@ export class AddRegistryModalComponent implements OnInit, AfterViewInit {
 
   // Service form
   registryForm: FormGroup = new FormGroup({
-    name: new FormControl('', [ Validators.required ]),
-    serviceUrl: new FormControl('', [ Validators.required ]),
-    recordUrl: new FormControl({value: '', disabled: true}, [ Validators.required ]),
+    name: new FormControl('', [ Validators.required.bind(Validators) ]),
+    serviceUrl: new FormControl('', [ Validators.required.bind(Validators) ]),
+    recordUrl: new FormControl({ value: '', disabled: true }, [ Validators.required.bind(Validators) ]),
     overrideRecordUrl: new FormControl(false)
   });
 
@@ -37,7 +37,7 @@ export class AddRegistryModalComponent implements OnInit, AfterViewInit {
     this.registryForm.get('serviceUrl').valueChanges.subscribe(url => {
       if (this.registryForm.get('overrideRecordUrl').value === false) {
         url = this.constructRecordInfoUrl(url);
-        this.registryForm.patchValue({recordUrl: url});
+        this.registryForm.patchValue({ recordUrl: url });
       }
     });
     // Enable/disable record URL, attempt to build record URL if disabled
@@ -88,7 +88,7 @@ export class AddRegistryModalComponent implements OnInit, AfterViewInit {
    */
   saveRegistry() {
     if (environment.googleAnalyticsKey && typeof gtag === 'function') {
-      gtag('event', 'AddCustomRegistry',  {
+      gtag('event', 'AddCustomRegistry', {
         event_category: 'AddCustomRegistry',
         event_action: 'AddCustomRegistry:' + this.registryForm.get('serviceUrl').value
       });

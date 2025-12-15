@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { RectangleEditorObservable } from '@auscope/angular-cesium';
-import { Bbox, CsMapService, UtilitiesService } from '@auscope/portal-core-ui';
+import { CsMapService } from '../../lib/portal-core-ui/service/cesium-map/cs-map.service';
+import { Bbox } from '../../lib/portal-core-ui/model/data/bbox.model';
+import { UtilitiesService } from '../../lib/portal-core-ui/utility/utilities.service';
 import { config } from '../../../environments/config';
 
 /**
@@ -29,10 +31,9 @@ export class BoundsService {
    */
   public drawBounds(layerId: string): void {
     setTimeout(() => this._drawingStarted.next(true), 0);
-    const me = this;
     this.boundsObservable = this.csMapService.drawBound();
     this.boundsObservable.subscribe((vector) => {
-      me._drawingStarted.next(false);
+      this._drawingStarted.next(false);
       if (!vector.points) {
         // drawing hasn't started
         return;
@@ -41,7 +42,7 @@ export class BoundsService {
         || vector.points[0].getPosition().x === vector.points[1].getPosition().x
         || vector.points[0].getPosition().y === vector.points[1].getPosition().y) {
         // drawing hasn't finished
-        me._drawingStarted.next(true);
+        this._drawingStarted.next(true);
         return;
       }
       const points = vector.points;
@@ -56,21 +57,21 @@ export class BoundsService {
           alert('The area size you have selected of ' + area + 'm2 exceed the limited size of ' +
             config.wcsSupportedLayer[layerId].downloadAreaMaxSize + 'm2. Due to the size of the dataset' +
             ' we have to limit the download area');
-          me._bbox.next(null);
+          this._bbox.next(null);
           return;
         }
       }
       // Reproject to EPSG:4326
-      me._bbox.next(UtilitiesService.reprojectToWGS84(points));
+      this._bbox.next(UtilitiesService.reprojectToWGS84(points));
 
-      me._drawingStarted.next(false);
+      this._drawingStarted.next(false);
     });
   }
 
   /**
    * Clear the bounding box object from the map
    */
-  clearBounds() {
+  clearBounds(): void {
     this._bbox.next(null);
     if (this.boundsObservable) {
       this.boundsObservable.dispose();

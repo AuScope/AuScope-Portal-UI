@@ -1,45 +1,54 @@
 <!-- BEGIN navbar -->
 <div id="header" class="navbar fixed-top">
-    <!-- BEGIN navbar-header -->
-    <div class="navbar-header">
-        <span class="navbar-brand">
-            <img id="org-logo" src="extension/img/auscope_single-colour-1.png">
-            <span style="margin-left:0.5rem;"><b>Au</b>Scope Discovery Portal</span>
-        </span>
-    </div>
-    <!-- END navbar-header -->
+  <!-- BEGIN navbar-header -->
+  <div class="navbar-header">
+    <span class="navbar-brand">
+      <img id="org-logo" src="extension/img/auscope_single-colour-1.png">
+      <span style="margin-left:0.5rem;"><b>Au</b>Scope Discovery Portal</span>
+    </span>
+  </div>
+  <!-- END navbar-header -->
 
-    <!-- login dropdown menu -->
-    <li class="dropdown" app-login-menu></li>
+  <!-- login dropdown menu -->
+  <li class="dropdown" app-login-menu></li>
 
-    <!-- help dropdown menu -->
-    <li class="dropdown" app-help-menu></li>
+  <!-- AuScope Tools link -->
+  <li>
+    <button mat-button class="auscope-tools-btn" (click)="openAppStore()" title="Browse other AuScope tools">
+      <em class="fa fa-lg fa-th"></em>&nbsp;&nbsp;AuScope Tools
+    </button>
+  </li>
+
+  <!-- help dropdown menu -->
+  <li class="dropdown" app-help-menu></li>
 </div>
 <!-- END navbar -->
 
 <!-- BEGIN sidebar -->
 <nav id="sidebar" class="sidebar slimscroll sidebar-collapse show" [ngClass]="{'sidebar-show': isSidebarOpen, 'sidebar-close': !isSidebarOpen}"  style="overflow: auto;" >
-    <!-- BEGIN Active Layers -->
-    <h5 class="mb-1">
-        <label style="font-size: larger;" id="activeLayersLink" for="activeLayersBtn" class="mb-4" title="Layers added to map">
-            <i class="ti-layers-alt"></i>
-            Active Layers
-        </label>
-        <div appActiveLayers></div>
-    </h5>
-    <button *ngIf="isSidebarOpen" (click)="toggleSidebar()" class="close-sidebar-btn">
-        <i class="fa fa-times" aria-hidden="true"></i>
+  <!-- BEGIN Active Layers -->
+  <h5 class="mb-1">
+    <label style="font-size: larger;" id="activeLayersLink" for="activeLayersBtn" class="mb-2" title="Layers added to map">
+      <i class="ti-layers-alt"></i>
+      Active Layers
+    </label>
+    <div app-active-layers></div>
+  </h5>
+  @if (isSidebarOpen) {
+    <button mat-flat-button title="Close active layers panel" (click)="toggleSidebar()" class="close-sidebar-btn" color="warn">
+      <i class="fa fa-times close-sidebar-icon" aria-hidden="true"></i>
     </button>
-    <!-- END Active Layers -->
+  }
+  <!-- END Active Layers -->
 </nav>
 <!-- END sidebar -->
 
 <!-- BEGIN #map-area -->
 <div id="map-area" class="map-area" [ngClass]="{'sidebar-open': isSidebarOpen}">
-    <!-- BEGIN map-area-csmap -->
-    <div class="map-area-csmap">
-        <app-cs-map class="h-100 w-100"></app-cs-map>
-        <app-search-panel></app-search-panel>
-    </div>
-    <!-- END map-area-csmap -->
+  <!-- BEGIN map-area-csmap -->
+  <div class="map-area-csmap">
+    <app-cs-map class="h-100 w-100"></app-cs-map>
+    <app-search-panel></app-search-panel>
+  </div>
+  <!-- END map-area-csmap -->
 </div>

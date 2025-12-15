@@ -1,7 +1,15 @@
-import { CsClipboardService, CsMapService, CsWMSService, FilterPanelService, GeometryType, LayerHandlerService,
-         LayerModel, LayerStatusService, Polygon, UtilitiesService, ResourceType, 
-         CsCSWService} from '@auscope/portal-core-ui';
-import { ApplicationRef, Component, Inject, Input, OnInit, AfterViewInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { CsClipboardService } from '../../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
+import { ResourceType, GeometryType } from '../../../lib/portal-core-ui/utility/constants.service';
+import { CsMapService } from '../../../lib/portal-core-ui/service/cesium-map/cs-map.service';
+import { CsWMSService } from '../../../lib/portal-core-ui/service/wms/cs-wms.service';
+import { FilterPanelService } from '../../../lib/portal-core-ui/service/filterpanel/filterpanel-service';
+import { LayerHandlerService } from '../../../lib/portal-core-ui/service/cswrecords/layer-handler.service';
+import { LayerModel } from '../../../lib/portal-core-ui/model/data/layer.model';
+import { LayerStatusService } from '../../../lib/portal-core-ui/utility/layerstatus.service';
+import { Polygon } from '../../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
+import { UtilitiesService } from '../../../lib/portal-core-ui/utility/utilities.service';
+import { CsCSWService } from '../../../lib/portal-core-ui/service/wcsw/cs-csw.service';
+import { ApplicationRef, Component, Inject, Input, OnInit, AfterViewInit, ViewChild, ViewContainerRef, OnChanges, SimpleChanges, inject } from '@angular/core';
 import * as _ from 'lodash';
 import { config } from '../../../../environments/config';
 import { ref } from '../../../../environments/ref';
@@ -18,10 +26,23 @@ import { LayerManagerService } from 'app/services/ui/layer-manager.service';
     styleUrls: ['./filterpanel.component.scss', '../../menupanel.scss'],
     standalone: false
 })
-export class FilterPanelComponent implements OnInit, AfterViewInit {
+export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
+  csMapService = inject(CsMapService);
+  layerHandlerService = inject(LayerHandlerService);
+  layerManagerService = inject(LayerManagerService);
+  filterService = inject(FilterService);
+  filterPanelService = inject(FilterPanelService);
+  modalService = inject(BsModalService);
+  csClipboardService = inject(CsClipboardService);
+  csWMSService = inject(CsWMSService);
+  csCSWService = inject(CsCSWService);
+  layerStatus = inject(LayerStatusService);
+  appRef = inject(ApplicationRef);
+  advancedComponentService = inject(AdvancedComponentService);
+
   @Input() layer: LayerModel;
-  private providers: Array<Object>;
-  public optionalFilters: Array<Object>; // Optional filters currently rendered by this component
+  private providers: Array<object>;
+  public optionalFilters: Array<object>; // Optional filters currently rendered by this component
   public selectedFilter;
   public advancedParam = [];
   public analyticMap;
@@ -35,19 +56,7 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
   @ViewChild('advancedFilterComponents', { static: true, read: ViewContainerRef }) advancedFilterComponents: ViewContainerRef;
 
 
-  constructor(private csMapService: CsMapService,
-    private layerHandlerService: LayerHandlerService,
-    private layerManagerService: LayerManagerService,
-    private filterService: FilterService,
-    private filterPanelService: FilterPanelService,
-    private modalService: BsModalService,
-    private csClipboardService: CsClipboardService,
-    private csWMSService: CsWMSService,
-    private csCSWService: CsCSWService,
-    public layerStatus: LayerStatusService,
-    private appRef: ApplicationRef,
-    private advancedComponentService: AdvancedComponentService,
-    @Inject('conf') private conf) {
+  constructor(@Inject('conf') private conf) {
     this.providers = [];
     this.optionalFilters = [];
     this.analyticMap = ref.layeranalytic;
@@ -95,7 +104,15 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
 
     // Add any layer specific advanced filter components
     this.advancedComponentService.addAdvancedFilterComponents(this.layer, this.advancedFilterComponents);
+  }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    // Will fire when a layer is added and remove all existing panel filters
+    if (changes.layer && changes.layer.currentValue) {
+        setTimeout(() => {
+            this.refreshFilter();
+        }, 0);
+    }
   }
 
   /**
@@ -120,7 +137,6 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
    * @param layerState layer state is JSON
    */
   public addLayerFromState(layerState: any) {
-
     // Populate layer times if necessary
     if (config.queryGetCapabilitiesTimes.indexOf(this.layer.id) > -1) {
       this.filterService.updateLayerTimes(this.layer, this.layerTimes);
@@ -134,7 +150,7 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
       this.advancedComponentService.getAdvancedFilterComponentForLayer(this.layer.id).setAdvancedParams(layerState.advancedFilter);
     }
     // Merge state filters with optional filters
-    this.optionalFilters = this.optionalFilters.map( optFilt => {
+    this.optionalFilters = this.optionalFilters.map(optFilt => {
         const filt = layerState.optionalFilters.find((filt) => filt.label === optFilt['label']);
         if (filt) {
           return filt;
@@ -147,7 +163,7 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
         if (optFilter['value'] && optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
           const geometry = optFilter['value'];
           const swappedGeometry = this.csClipboardService.swapGeometry(geometry);
-          const strToday=new Date(); 
+          const strToday=new Date();
           const dt= new Date(strToday).toISOString();
           const name = 'Polygon-' + dt.slice(0,dt.lastIndexOf('.'));
           const newPolygon:Polygon = {
@@ -166,9 +182,9 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
 
       // Set opacity of the layer on the map
       if (UtilitiesService.layerContainsResourceType(this.layer, ResourceType.WMS)) {
-        this.csWMSService.setLayerOpacity(this.layer, layerState.opacity / 100.0 );
+        this.csWMSService.setLayerOpacity(this.layer, layerState.opacity / 100.0);
       } else if (UtilitiesService.layerContainsBboxGeographicElement(this.layer)) {
-        this.csCSWService.setLayerOpacity(this.layer, layerState.opacity / 100.0 );
+        this.csCSWService.setLayerOpacity(this.layer, layerState.opacity / 100.0);
       }
     }, 500);
   }
@@ -179,7 +195,7 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
    * @param filter the filter to test
    * @returns true if the filter contains a valid value
    */
-  private filterHasValue(filter: Object): boolean {
+  private filterHasValue(filter: object): boolean {
     let hasValue = false;
     if (filter['type'] === 'OPTIONAL.PROVIDER') {
       for (const provider in filter['value']) {
@@ -209,7 +225,7 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
    */
   public getUnsupportedLayerMessage(): string {
     return 'This layer cannot be displayed. Only the following online resource types can be added to the map: ' +
-      UtilitiesService.getSupportedOnlineResourceTypes();
+      UtilitiesService.getSupportedOnlineResourceTypes().join(" ")
   }
 
   /**
@@ -254,6 +270,7 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
       });
     } catch (error) {
       alert('Unable to getNvclFilter');
+      console.error('Unable to getNvclFilter', error);
     }
   }
 
@@ -281,11 +298,11 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
     });
   }
 
-  public getKey(options: Object): string {
+  public getKey(options: object): string {
     return UtilitiesService.getKey(options);
   }
 
-  public getValue(options: Object): string {
+  public getValue(options: object): string {
     return UtilitiesService.getValue(options);
   }
 
@@ -295,8 +312,8 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
 
   /**
    * Update the filter service with a new filter or remove one
-   * 
-   * @param filter filter 
+   *
+   * @param filter filter
    * @param filterAdded boolean, if 'true' will add, if 'false' remove
    */
   private updateFilter(filter: any, filterAdded: boolean) {
@@ -312,7 +329,7 @@ export class FilterPanelComponent implements OnInit, AfterViewInit {
    * @param filter filter object to be added to the panel
    * @param addEmpty if true, set filter value to be empty.
    */
-  public addFilter(filter, addEmpty?: boolean): void {
+  public addFilter(filter, _addEmpty?: boolean): void {
     if (filter == null) {
       return;
     }

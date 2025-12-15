@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
-import { CsClipboardService, CsMapService } from '@auscope/portal-core-ui';
+import { CsClipboardService } from '../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
+import { CsMapService } from '../../lib/portal-core-ui/service/cesium-map/cs-map.service';
 
 
 @Component({
-    selector: '[appFilterClipboard]',
+    selector: '[app-filter-clipboard]',
     templateUrl: './clipboard.component.html',
     standalone: false
 })

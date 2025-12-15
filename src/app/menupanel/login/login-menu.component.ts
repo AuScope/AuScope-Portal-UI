@@ -7,11 +7,11 @@ import { User } from 'app/models/user.model';
 import { AuthService } from 'app/services/auth/auth.service';
 import { UserStateService } from '../../services/user/user-state.service';
 import { ROIModalComponent } from 'app/modalwindow/roi/roi.modal.component';
-import { CsClipboardService } from '@auscope/portal-core-ui';
+import { CsClipboardService } from '../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
 @Component({
     selector: '[app-login-menu]',
     templateUrl: './login-menu.component.html',
-    styleUrls: ['./login-menu.component.scss'],
+    styleUrls: ['./login-menu.component.scss', '../../toppanel/help-menu/help-menu.component.scss'],
     standalone: false
 })
 export class LoginMenuComponent {
@@ -32,7 +32,9 @@ export class LoginMenuComponent {
    * Redirect to login page
    */
   login() {
-    this.router.navigate(['login']);
+    this.router.navigate(['login']).catch(
+        (navError) => console.error("Could not navigate to login page", navError)
+    );
   }
 
   /**
@@ -43,7 +45,7 @@ export class LoginMenuComponent {
   }
   /**
    * Manage user's ROI list
-   */  
+   */
   manageROI() {
     this.modalService.open(ROIModalComponent, {
       size: 'sm',

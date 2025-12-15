@@ -1,8 +1,7 @@
-import { LayerModel } from '@auscope/portal-core-ui';
-import { ManageStateService } from '@auscope/portal-core-ui';
+import { LayerModel } from '../../../lib/portal-core-ui/model/data/layer.model';
 import { Component, Input, AfterViewInit, OnInit, AfterContentChecked } from '@angular/core';
 import { LayerAnalyticInterface } from '../layer.analytic.interface';
-import { DownloadWfsService } from '@auscope/portal-core-ui';
+import { DownloadWfsService } from '../../../lib/portal-core-ui/service/wfs/download/download-wfs.service';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { NVCLBoreholeAnalyticService } from './nvcl.boreholeanalytic.service';
 import { TSGDownloadService } from './tsgdownload.service';
@@ -11,7 +10,7 @@ import { Observable, Subject } from 'rxjs';
 import { shareReplay } from 'rxjs/operators';
 
 @Component({
-    selector: 'nvcl-tsgdownload-component',
+    selector: 'app-nvcl-tsgdownload-component',
     templateUrl: './nvcl.tsgdownload.component.html',
     styles: [
         'input:invalid + span:after { content: \'✖\'; color: #f00; padding-left: 15px; }',
@@ -38,7 +37,7 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
   public urlsArray =[];
   public download1$: Observable<Download>;
 
-  constructor( public activeModal: NgbActiveModal, private manageStateService: ManageStateService, private downloadWfsService: DownloadWfsService , private nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService, private tsgDownloadService: TSGDownloadService,
+  constructor(public activeModal: NgbActiveModal, private downloadWfsService: DownloadWfsService , private nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService, private tsgDownloadService: TSGDownloadService,
     ) {
     this.tsgform = {};
     //this.tsgform.email = '';
@@ -47,7 +46,7 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
     }
     this.tsgform.ogcFilter = '';
     this.downloadMsg = "Download";
-    this.isDownloading = false;  
+    this.isDownloading = false;
   }
   /**
    * Start to sync TSGFiles download one by one.
@@ -67,9 +66,9 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
       (message) => {
         if (message.startsWith('downloadOne')) {
           if(me.completed<me.total){
-            let url = me.urlsArray[me.completed];
-            let filename = url.substring(url.lastIndexOf('/')+1);
-            me.download1$ = me.tsgDownloadService.download(url, filename ).pipe(shareReplay(1));
+            const url = me.urlsArray[me.completed];
+            const filename = url.substring(url.lastIndexOf('/')+1);
+            me.download1$ = me.tsgDownloadService.download(url, filename).pipe(shareReplay(1));
             console.log('downloadOne:' + filename);
             me.download1$.subscribe(value => {
               if (value.state.startsWith('DONE')) {
@@ -98,7 +97,7 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
     this.downloadWfsService.tsgDownloadBS = new Subject<string>();
     this.downloadWfsService.tsgDownloadBS.subscribe(
         (message) => {
-          let progressData =  message.split(',');
+          const progressData = message.split(',');
           if ('completed'.match(progressData[0])) {
             this.isDownloading = false;
             this.downloadMsg = "Download";
@@ -113,7 +112,7 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
   ngAfterContentChecked(): void{
     if (this.urlsArray) {
       this.total = this.urlsArray.length;
-    }      
+    }
   }
   /**
    * Initialise UI
@@ -126,7 +125,7 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
     };
   }
 
-  public getCompletePercentage(): String{
+  public getCompletePercentage(): string{
     if (Math.floor(this.completed / this.total * 100) > 100) {
       this.completePercentage = '100%';
     } else {

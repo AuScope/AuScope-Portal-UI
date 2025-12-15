@@ -1,11 +1,10 @@
 import { saveAs } from 'file-saver';
-import { LayerModel } from '@auscope/portal-core-ui';
+import { LayerModel } from '../../../lib/portal-core-ui/model/data/layer.model';
 import { NVCLBoreholeAnalyticService } from './nvcl.boreholeanalytic.service';
-import { Component, Input, AfterViewInit, OnInit, ViewChild} from '@angular/core';
+import { Component, Input, AfterViewInit, OnInit, ViewChild } from '@angular/core';
 import { UserStateService } from 'app/services/user/user-state.service';
 import { LayerAnalyticInterface } from '../layer.analytic.interface';
 import { NgForm } from '@angular/forms';
-import { environment } from 'environments/environment';
 
 
 @Component({
@@ -45,7 +44,7 @@ export class NVCLBoreholeAnalyticComponent
     checkprocess: false
   };
 
-  constructor( public nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService, private userStateService: UserStateService ) {
+  constructor(public nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService, private userStateService: UserStateService) {
     this.nvclform = {};
   }
 
@@ -166,12 +165,11 @@ export class NVCLBoreholeAnalyticComponent
         this.currentStatus = response;
 
         this.nvclBoreholeAnalyticService.setUserEmail(this.nvclform.email);
-        for (const i in this.currentStatus) {
+        for (const i of this.currentStatus) {
           this.nvclBoreholeAnalyticService
-            .getNVCLJobPublishStatus(this.currentStatus[i].jobid)
+            .getNVCLJobPublishStatus(i.jobid)
             .subscribe(response => {
-              this.currentStatus[i].published =
-                response === 'true' ? true : false;
+              i.published = response === 'true' ? true : false;
             });
         }
       });
@@ -183,15 +181,14 @@ export class NVCLBoreholeAnalyticComponent
     status.published = !published;
     this.nvclBoreholeAnalyticService
       .publishNvclJob(jobid, !published)
-      .subscribe(response => {
+      .subscribe(() => {
         // console.log('jobid=' + jobid + ' publishStatus=' + response);
       });
   }
   public viewOnMap(jobid: string) {
-    const me = this;
     this.nvclBoreholeAnalyticService.getNVCLGeoJson(jobid).subscribe(results => {
       const jsonData = results;
-      me.nvclBoreholeAnalyticService.addGeoJsonLayer(jobid,jsonData);
+      this.nvclBoreholeAnalyticService.addGeoJsonLayer(jobid,jsonData);
     });
   }
   public nvclDownload(jobid: string) {

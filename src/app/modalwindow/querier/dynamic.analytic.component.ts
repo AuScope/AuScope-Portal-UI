@@ -1,9 +1,9 @@
-import { LayerModel } from '@auscope/portal-core-ui';
-import { OnlineResourceModel } from '@auscope/portal-core-ui';
+import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
+import { OnlineResourceModel } from '../../lib/portal-core-ui/model/data/onlineresource.model';
 import { NVCLDatasetListComponent } from './customanalytic/nvcl/nvcl.datasetlist.component';
-import { Component, Input, ViewChild, ViewContainerRef, ChangeDetectorRef } from '@angular/core';
-import {ref} from '../../../environments/ref';
-import { QuerierInfoModel } from '@auscope/portal-core-ui';
+import { Component, Input, ViewChild, ViewContainerRef, ChangeDetectorRef, OnChanges } from '@angular/core';
+import { ref } from '../../../environments/ref';
+import { QuerierInfoModel } from '../../lib/portal-core-ui/model/data/querierinfo.model';
 import { RemanentAnomaliesComponent } from './customanalytic/RemanentAnomalies/remanentanomalies.component';
 import { TIMAComponent } from './customanalytic/tima/tima.component';
 import { MSCLComponent } from './customanalytic/mscl/mscl.component';
@@ -15,7 +15,7 @@ import { MSCLComponent } from './customanalytic/mscl/mscl.component';
 })
 
 
-export class DynamicAnalyticComponent {
+export class DynamicAnalyticComponent implements OnChanges {
   @Input() layer: LayerModel;
   @Input() onlineResource: OnlineResourceModel;
   @Input() featureId: string;

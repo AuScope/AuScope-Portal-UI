@@ -1,5 +1,3 @@
-import { UtilitiesService, LayerModel } from "@auscope/portal-core-ui";
-
 export class GeoJsonQuerierHandler {
 
   constructor(private entity: any) {}

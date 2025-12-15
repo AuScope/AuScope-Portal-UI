@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { Layout, Data } from 'plotly.js-dist-min';
-import { SimpleXMLService } from '@auscope/portal-core-ui';
+import { SimpleXMLService } from '../../../lib/portal-core-ui/utility/simplexml.service';
 
 // Elements detectable via XRF
 const XRFElem = ['Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn', 'As', 'Se', 'Rb', 'Sr', 'Y', 'Zr', 'Nb', 'Mo',
@@ -13,7 +13,7 @@ const XRFElem = ['Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn', 'As', 'Se'
 
 // Wavelengths detectable via Spectrophotometer
 const ReflectWavelength = [ '400', '410',	'420',	'430',	'440',	'450',	'460',	'470',	'480',
-                        	'490',	'500',	'510',	'520',	'530',	'540',	'550',	'560',	'570',	'580',	
+                        	'490',	'500',	'510',	'520',	'530',	'540',	'550',	'560',	'570',	'580',
                             '590', '600',	'610',	'620',	'630',	'640',	'650',	'660',	'670',	'680',	'690',	'700'];
 
 // This is a list of string enums. These are many of the dislayable metrics for MSCL data, others are added programmatically
@@ -27,7 +27,7 @@ export enum Metric { diameter = "diameter",
             magSuscLoopDC = "magSuscLoopDC",
             impedance = "impedance",
             naturalGamma = "naturalGamma",
-            naturalGammaK  = "naturalGammaK",
+            naturalGammaK = "naturalGammaK",
             naturalGammaU = "naturalGammaU",
             naturalGammaTh = "naturalGammaTh",
             resistivity = "resistivity",
@@ -58,34 +58,34 @@ interface Info {
 }
 
 // A map from a string enum to the 'Info' object
-let metricMap: Map<string, Info> = new Map( [
-    [ Metric.diameter, { pname: 'Diameter', group: '', desc: 'Diameter', units: '', feat_elem: 'diameter'}],
-    [ Metric.pWaveVel, { pname: 'P-Wave Vel.', group: 'P-Wave', desc: 'P-Wave Velocity', units: 'm/s', feat_elem: 'p_wave_velocity'}],
-    [ Metric.pWaveAmp, { pname: 'P-Wave Amp.', group: 'P-Wave', desc: 'P-Wave Amplitude', units: '', feat_elem: 'p_wave_amplitude'}],
-    [ Metric.density,  { pname: 'Density', group: '', desc: 'Density', units: '', feat_elem: 'density'} ],
-    [ Metric.specificGravity, { pname: 'Specific Gravity', group: '', desc: 'Specfic Gravity', units: '', feat_elem: 'specific_gravity'} ],
-    [ Metric.magSuscPoint, { pname: 'Mag. Susc. Point', group: '', desc: 'Magnetic Susceptibility Point', units: 'SI x 10^-5', feat_elem: 'magnetic_susc_point'}  ],
-    [ Metric.magSuscLoopVC, { pname: 'Mag. Susc. LoopVC', group: '', desc: 'Magnetic Susceptibility Loop Volume Corrected', units: 'SI x 10^-5', feat_elem: 'magnetic_susceptibility'}  ],
-    [ Metric.magSuscLoopDC, { pname: 'Mag. Susc. LoopDC', group: '', desc: 'Magnetic Susceptibility Loop Density Corrected', units: 'SI x 10^-5', feat_elem: 'magnetic_susc_loop_dc'}  ],
-    [ Metric.impedance,  { pname: 'Impedance', group: '', desc: 'Impedance', units: '', feat_elem: 'impedance'} ],
-    [ Metric.naturalGamma,  { pname: 'Natural Gamma', group: '', desc: 'Natural Gamma Total Count', units: 'cps', feat_elem: 'natural_gamma' } ],
-    [ Metric.naturalGammaK,  { pname: 'Natural Gamma K', group: '', desc: 'Natural Gamma Potassium', units: '%', feat_elem: 'natural_gamma_k' } ],
-    [ Metric.naturalGammaU,  { pname: 'Natural Gamma U', group: '', desc: 'Natural Gamma Uranium', units: 'ppm', feat_elem: 'natural_gamma_u' } ],
-    [ Metric.naturalGammaTh,  { pname: 'Natural Gamma Th', group: '', desc: 'Natural Gamma Thorium', units: 'ppm', feat_elem: 'natural_gamma_th' } ],
-    [ Metric.resistivity,   { pname: 'Resistivity', group: '', desc: 'Resistivity', units: 'Ohm.m', feat_elem: 'resistivity' } ],
-    [ Metric.fracPorosity, { pname: 'Frac. Porosity', group: '', desc: 'Fractional Porosity', units:'', feat_elem: 'frac_porosity'}],
-    [ Metric.temperature, { pname: 'Temperature', group: '', desc: 'Temperature', units: '°C', feat_elem: 'temperature'}],
-    [ Metric.munsell, { pname: 'Munsell Val.', group: 'Spectrophot', desc: 'Spectrophotometer Munsell Value', units: '', feat_elem: 'sp_munsell'}],
-    [ Metric.cieColourL, { pname: 'CIE Colour L*', group: 'Spectrophot', desc: 'Spectrophotometer Colour L*', units: '', feat_elem: 'sp_cie_colour_l'}],
-    [ Metric.cieColourA, { pname: 'CIE Colour a*', group: 'Spectrophot', desc: 'Spectrophotometer Colour a*', units: '', feat_elem: 'sp_cie_colour_a'}],
-    [ Metric.cieColourB, { pname: 'CIE Colour b*', group: 'Spectrophot', desc: 'Spectrophotometer Colour b*', units: '', feat_elem: 'sp_cie_colour_b'}],
-    [ Metric.cieColourX, { pname: 'CIE Colour X', group: 'Spectrophot', desc: 'Spectrophotometer Colour X', units: '', feat_elem: 'sp_cie_colour_x'}],
-    [ Metric.cieColourY, { pname: 'CIE Colour Y', group: 'Spectrophot', desc: 'Spectrophotometer Colour Y', units: '', feat_elem: 'sp_cie_colour_y'}],
-    [ Metric.cieColourZ, { pname: 'CIE Colour Z', group: 'Spectrophot', desc: 'Spectrophotometer Colour Z', units: '', feat_elem: 'sp_cie_colour_z'}],
-    [ Metric.reflectRed, { pname: 'Reflect. Red', group: 'Spectrophot', desc: 'Spectrophotometer Reflectance Red (595 - 700)', units: '', feat_elem: 'sp_refl_red'}],
-    [ Metric.reflectRed, { pname: 'Reflect. Green', group: 'Spectrophot', desc: 'Spectrophotometer Reflectance Green (515 - 595)', units: '', feat_elem: 'sp_refl_green'}],
-    [ Metric.reflectRed, { pname: 'Reflect. Blue', group: 'Spectrophot', desc: 'Spectrophotometer Reflectance Blue (400 - 515)', units: '', feat_elem: 'sp_refl_blue'}],
-    [ Metric.unknown, { pname: 'Unknown', group: '', desc: 'Unrecognised metric', units: '', feat_elem: ''}]
+const metricMap: Map<string, Info> = new Map([
+    [ Metric.diameter, { pname: 'Diameter', group: '', desc: 'Diameter', units: '', feat_elem: 'diameter' }],
+    [ Metric.pWaveVel, { pname: 'P-Wave Vel.', group: 'P-Wave', desc: 'P-Wave Velocity', units: 'm/s', feat_elem: 'p_wave_velocity' }],
+    [ Metric.pWaveAmp, { pname: 'P-Wave Amp.', group: 'P-Wave', desc: 'P-Wave Amplitude', units: '', feat_elem: 'p_wave_amplitude' }],
+    [ Metric.density, { pname: 'Density', group: '', desc: 'Density', units: '', feat_elem: 'density' } ],
+    [ Metric.specificGravity, { pname: 'Specific Gravity', group: '', desc: 'Specfic Gravity', units: '', feat_elem: 'specific_gravity' } ],
+    [ Metric.magSuscPoint, { pname: 'Mag. Susc. Point', group: '', desc: 'Magnetic Susceptibility Point', units: 'SI x 10^-5', feat_elem: 'magnetic_susc_point' } ],
+    [ Metric.magSuscLoopVC, { pname: 'Mag. Susc. LoopVC', group: '', desc: 'Magnetic Susceptibility Loop Volume Corrected', units: 'SI x 10^-5', feat_elem: 'magnetic_susceptibility' } ],
+    [ Metric.magSuscLoopDC, { pname: 'Mag. Susc. LoopDC', group: '', desc: 'Magnetic Susceptibility Loop Density Corrected', units: 'SI x 10^-5', feat_elem: 'magnetic_susc_loop_dc' } ],
+    [ Metric.impedance, { pname: 'Impedance', group: '', desc: 'Impedance', units: '', feat_elem: 'impedance' } ],
+    [ Metric.naturalGamma, { pname: 'Natural Gamma', group: '', desc: 'Natural Gamma Total Count', units: 'cps', feat_elem: 'natural_gamma' } ],
+    [ Metric.naturalGammaK, { pname: 'Natural Gamma K', group: '', desc: 'Natural Gamma Potassium', units: '%', feat_elem: 'natural_gamma_k' } ],
+    [ Metric.naturalGammaU, { pname: 'Natural Gamma U', group: '', desc: 'Natural Gamma Uranium', units: 'ppm', feat_elem: 'natural_gamma_u' } ],
+    [ Metric.naturalGammaTh, { pname: 'Natural Gamma Th', group: '', desc: 'Natural Gamma Thorium', units: 'ppm', feat_elem: 'natural_gamma_th' } ],
+    [ Metric.resistivity, { pname: 'Resistivity', group: '', desc: 'Resistivity', units: 'Ohm.m', feat_elem: 'resistivity' } ],
+    [ Metric.fracPorosity, { pname: 'Frac. Porosity', group: '', desc: 'Fractional Porosity', units:'', feat_elem: 'frac_porosity' }],
+    [ Metric.temperature, { pname: 'Temperature', group: '', desc: 'Temperature', units: '°C', feat_elem: 'temperature' }],
+    [ Metric.munsell, { pname: 'Munsell Val.', group: 'Spectrophot', desc: 'Spectrophotometer Munsell Value', units: '', feat_elem: 'sp_munsell' }],
+    [ Metric.cieColourL, { pname: 'CIE Colour L*', group: 'Spectrophot', desc: 'Spectrophotometer Colour L*', units: '', feat_elem: 'sp_cie_colour_l' }],
+    [ Metric.cieColourA, { pname: 'CIE Colour a*', group: 'Spectrophot', desc: 'Spectrophotometer Colour a*', units: '', feat_elem: 'sp_cie_colour_a' }],
+    [ Metric.cieColourB, { pname: 'CIE Colour b*', group: 'Spectrophot', desc: 'Spectrophotometer Colour b*', units: '', feat_elem: 'sp_cie_colour_b' }],
+    [ Metric.cieColourX, { pname: 'CIE Colour X', group: 'Spectrophot', desc: 'Spectrophotometer Colour X', units: '', feat_elem: 'sp_cie_colour_x' }],
+    [ Metric.cieColourY, { pname: 'CIE Colour Y', group: 'Spectrophot', desc: 'Spectrophotometer Colour Y', units: '', feat_elem: 'sp_cie_colour_y' }],
+    [ Metric.cieColourZ, { pname: 'CIE Colour Z', group: 'Spectrophot', desc: 'Spectrophotometer Colour Z', units: '', feat_elem: 'sp_cie_colour_z' }],
+    [ Metric.reflectRed, { pname: 'Reflect. Red', group: 'Spectrophot', desc: 'Spectrophotometer Reflectance Red (595 - 700)', units: '', feat_elem: 'sp_refl_red' }],
+    [ Metric.reflectRed, { pname: 'Reflect. Green', group: 'Spectrophot', desc: 'Spectrophotometer Reflectance Green (515 - 595)', units: '', feat_elem: 'sp_refl_green' }],
+    [ Metric.reflectRed, { pname: 'Reflect. Blue', group: 'Spectrophot', desc: 'Spectrophotometer Reflectance Blue (400 - 515)', units: '', feat_elem: 'sp_refl_blue' }],
+    [ Metric.unknown, { pname: 'Unknown', group: '', desc: 'Unrecognised metric', units: '', feat_elem: '' }]
 ])
 
 // Smoothing window list - list of smoothing windows applied to smooth out graph lines
@@ -100,43 +100,43 @@ export class MSCLService {
     constructor(private http: HttpClient) {
 
         // Setup the map with the numerous XRF elements
-        for (let elem of XRFElem) {
+        for (const elem of XRFElem) {
             metricMap.set("XRF_" + elem, { pname: 'XRF ' + elem,
                                         group: 'XRF',
                                         desc: 'XRF measurement of ' + elem,
                                         units: '',
-                                        feat_elem: 'xrf_' + elem});
+                                        feat_elem: 'xrf_' + elem });
             metricMap.set("XRF_" + elem + "_Error", { pname: 'XRF ' + elem + ' Error',
                                         group: 'XRF',
                                         desc: 'XRF measurement of ' + elem + ' Error',
                                         units: '',
-                                        feat_elem: 'xrf_' + elem + '_error'});
+                                        feat_elem: 'xrf_' + elem + '_error' });
         }
 
         // Setup the map with the spectrophotometer reflectance wavelengths
-        for (let w of ReflectWavelength) {
+        for (const w of ReflectWavelength) {
             metricMap.set("Reflect_" + w, { pname: 'Reflect. '+ w,
                                             group: 'Spectrophot',
                                             desc: 'Spectrophotometer Reflectance at wavelength ' + w + 'nm',
                                             units: 'nm',
-                                            feat_elem: 'sp_refl_' + w});
+                                            feat_elem: 'sp_refl_' + w });
         }
     }
 
 
     /**
-     * Returns a complete list of printable metric name if no parameter supplied 
+     * Returns a complete list of printable metric name if no parameter supplied
      * or converts a list of feature element names to printable names
-     * 
+     *
      * @featList optional list of features to convert to printable names
      * @returns a list of printable metric names for MSCL data service
      */
     public getMetricPNameList(featList?: string[]): string[] {
-        let retList = [];
+        const retList = [];
         if (featList) {
             // Convert feature name list to a list of names and group names
-            for (let featElem of featList) {
-                for (let mm of metricMap.values()) {
+            for (const featElem of featList) {
+                for (const mm of metricMap.values()) {
                     if (mm.feat_elem === featElem.replace(/ /g, '_')) {
                         if (!retList.includes(mm.pname)) {
                             retList.push(mm.pname);
@@ -146,7 +146,7 @@ export class MSCLService {
             }
         } else {
             // Return full list of names and group names
-            for (let mm of metricMap.values()) {
+            for (const mm of metricMap.values()) {
                 if (mm.group === '') {
                     retList.push(mm.pname);
                 } else if (!retList.includes(mm.group)) {
@@ -160,12 +160,12 @@ export class MSCLService {
 
     /**
      * Returns true if the input string is a metric group name
-     * 
+     *
      * @param name
      * @returns True or false
      */
     public isMetricGroup(name: string) {
-        for (let mm of metricMap.values()) {
+        for (const mm of metricMap.values()) {
             if (mm.group === name) {
                 return true;
             }
@@ -176,14 +176,14 @@ export class MSCLService {
 
     /**
      * Gets a list of 'Info' attributes for a group
-     * 
+     *
      * @param groupName group name string
      * @param attr requested 'Info' attribute
      * @returns list of WFS feature element names
      */
     public getInfoAttrsForGrp(groupName: string, attr: string): string[] {
-        let retList = [];
-        for (let mm of metricMap.values()) {
+        const retList = [];
+        for (const mm of metricMap.values()) {
             if (mm.group === groupName) {
                 retList.push(mm[attr]);
             }
@@ -194,12 +194,12 @@ export class MSCLService {
 
     /**
      * Converts WFS feature attribute from string to Metric
-     * 
+     *
      * @param featAttr  WFS feature representation of a metric, e.g. 'p_wave_amplitude'
      * @returns Metric representation of apiString
      */
     public toMetricEnum(featAttr: string): string {
-        for (let m of metricMap.keys()) {
+        for (const m of metricMap.keys()) {
             if (metricMap.get(m).feat_elem === featAttr) {
                 return m;
             }
@@ -209,12 +209,12 @@ export class MSCLService {
 
     /**
      * Given a printable metric name returns its group name, returns '' if not found
-     * 
+     *
      * @param pName printable metric name
      * @returns group name
      */
     public pNameToGroup(pName: string): string {
-        for (let mm of metricMap.values()) {
+        for (const mm of metricMap.values()) {
             if (mm.pname == pName) {
                 return mm.group;
             }
@@ -225,13 +225,13 @@ export class MSCLService {
 
     /**
      * Converts from printable metric name to Info member string
-     * 
+     *
      * @param metricPName Printable name of metric to be converted
      * @param attr 'Info' attribute to be retrieved
      * @returns string representation of metric
      */
     public getMetricInfoAttr(metricPName: string, attr: string): string {
-        for (let info of metricMap.values()) {
+        for (const info of metricMap.values()) {
             if (info.pname === metricPName) {
                 return info[attr];
             }
@@ -242,7 +242,7 @@ export class MSCLService {
 
     /**
      * Smooths an array of numbers to a particular window size
-     * 
+     *
      * @param arr array of numbers
      * @param windowSize integer representing smoothing window size
      * @returns array of smoothed numbers
@@ -270,12 +270,12 @@ export class MSCLService {
 
     /**
      * Smooth out x-values
-     * 
+     *
      * @param metricList list of metrics
      * @param xLists lists of x-values in associative array, key is metric string
      * @return smoothed x-values in same format as 'xLists'
      */
-    private smoothOut(metricList: string[], xLists: {}, windowSize: number) {
+    private smoothOut(metricList: string[], xLists: object, windowSize: number) {
         const xLists_out = {};
         for (const metric of metricList) {
             xLists_out[metric] = this.smooth(xLists[metric], windowSize);
@@ -286,17 +286,17 @@ export class MSCLService {
 
     /**
      * Creates layout for several plots in one area
-     * 
+     *
      * @param metricList list of Metrics to plot
      * @returns plot layout
      */
-    public getGraphLayout(metricList: string[], xLists: {}): Partial<Layout> {
+    public getGraphLayout(metricList: string[], xLists: object): Partial<Layout> {
         const layout: Partial<Layout> = {
             hovermode: 'closest',
-            grid: {rows: 1, columns: metricList.length, pattern: 'independent'},
+            grid: { rows: 1, columns: metricList.length, pattern: 'independent' },
             sliders: [
                 // This slider is used for toggling between lines and markers
-                { steps: [], pad: {l: 0, t: 0}, len: 0.1, currentvalue: {
+                { steps: [], pad: { l: 0, t: 0 }, len: 0.1, currentvalue: {
                     xanchor: 'left',
                     prefix: 'style: ',
                     font: {
@@ -309,7 +309,7 @@ export class MSCLService {
                   }
                 },
                 // This slider is used for smoothing
-                { steps: [], pad: {l: 120, t: 0 }, len: 0.45, currentvalue: {
+                { steps: [], pad: { l: 120, t: 0 }, len: 0.45, currentvalue: {
                     xanchor: 'left',
                     prefix: 'smoothing: ',
                     font: {
@@ -328,15 +328,15 @@ export class MSCLService {
         let idx = 0;
         for (const metric of metricList) {
             // Natural gamma always has points instead of lines
-            if (metric !== Metric.naturalGamma) {
+            if (metric as Metric !== Metric.naturalGamma) {
                 for (let i = 0; i < SM_WINDOW_LIST.length; i++) {
                     lineIndexList.push(idx + i);
                 }
             }
             idx += SM_WINDOW_LIST.length;
         }
-        layout['sliders'][0]['steps'].push({ label: 'lines', method: 'restyle', args: [{'mode': 'lines'}, lineIndexList] });
-        layout['sliders'][0]['steps'].push({ label: 'markers', method: 'restyle', args: [{'mode': 'markers', 'marker': MARKER_SZ }] });
+        layout['sliders'][0]['steps'].push({ label: 'lines', method: 'restyle', args: [{ 'mode': 'lines' }, lineIndexList] });
+        layout['sliders'][0]['steps'].push({ label: 'markers', method: 'restyle', args: [{ 'mode': 'markers', 'marker': MARKER_SZ }] });
 
         // Make the slider steps for the plot line smoothing
         // Set up a 'visibleList' to only show one smoothed line at a time
@@ -379,7 +379,7 @@ export class MSCLService {
                 showline: true,
                 ticks: 'outside'
             };
-            switch (metric) {
+            switch (metric as Metric) {
                 // Logarithmic x-axis for these
                 case Metric.magSuscPoint:
                 case Metric.resistivity:
@@ -394,7 +394,7 @@ export class MSCLService {
 
     /**
      * Find the max and min values of array of numbers
-     * 
+     *
      * @param xList array of numbers
      * @returns min and max values as two element array [min, max]
      */
@@ -405,13 +405,13 @@ export class MSCLService {
 
     /**
      * Create plot data for plotly graphs
-     * 
+     *
      * @param metricList list of metrics to create plot data
      * @param xLists list of x-axis data
      * @param yList y-axis data
      * @return plotly 'Data' object containing plot data
      */
-    public getGraphTraceList(metricList: string[], xLists: {}, yList: number[]): Data[] {
+    public getGraphTraceList(metricList: string[], xLists: object, yList: number[]): Data[] {
         const traceList: Data[] = [];
         const xLists_sm = {};
         xLists_sm[SM_WINDOW_LIST[0]] = xLists;
@@ -422,7 +422,7 @@ export class MSCLService {
         // A new plot for each metric
         for (const metric of metricList) {
             // Draw lines of varying degrees of smoothing in each plot
-            const trace_sm: { string: Data } | {} = {};
+            const trace_sm: object = {};
             for (const win of SM_WINDOW_LIST) {
                 trace_sm[win] = {
                     x: xLists_sm[win][metric],
@@ -440,7 +440,7 @@ export class MSCLService {
                     trace_sm[win]['visible'] = true;
                 }
                 // Natural gamma has points instead of lines
-                if (metric === Metric.naturalGamma) {
+                if (metric as Metric === Metric.naturalGamma) {
                     trace_sm[win]['mode'] = 'markers';
                     trace_sm[win]['marker'] = MARKER_SZ;
                 }
@@ -511,14 +511,14 @@ export class MSCLService {
       /**
        * Parses an XML WFS response to find the set of metric types available
        * Applies only to GeoSciML v4.1
-       * 
+       *
        * @param xmlStr WFS response
        * @returns a list of strings or empty list if not found
       */
       public findMetricTypes(xmlStr: string): any[] {
         const rootNode = SimpleXMLService.parseStringToDOM(xmlStr);
         const METRICS = '//gsmlbh:specification/om:OM_Observation/om:result/swe:Quantity/swe:label';
-        const nodeList = SimpleXMLService.evaluateXPathNodeArray(rootNode, rootNode, METRICS, this.nsResolver);
+        const nodeList = SimpleXMLService.evaluateXPathNodeArray(rootNode, rootNode, METRICS, this.nsResolver.bind(this));
         const metricVals = [];
         for (const node of nodeList) {
             metricVals.push(node.textContent);
@@ -531,7 +531,7 @@ export class MSCLService {
 
     /**
      * Contacts the MSCL data service and retrieves plot data
-     * 
+     *
      * @param serviceUrl the URL for the MSCL service
      * @param boreholeHeaderId borehole identifier
      * @param startDepth retrieve plot data starting at this depth
@@ -556,7 +556,7 @@ export class MSCLService {
             // If user requested a group name, append all members of group
             } else if (this.isMetricGroup(metric)) {
                 const gMetricList = this.getInfoAttrsForGrp(metric, 'feat_elem');
-                for (let gMet of gMetricList) {
+                for (const gMet of gMetricList) {
                     const cleanMetric = (useGMLObs) ? gMet.replace('_',' '): gMet;
                     httpParams = httpParams.append('observationsToReturn', cleanMetric);
                 }
@@ -580,7 +580,7 @@ export class MSCLService {
             (error: HttpResponse<any>) => {
                 return observableThrowError(error);
             }
-        ), );
+        ),);
     }
 
 }

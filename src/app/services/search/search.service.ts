@@ -18,7 +18,7 @@ export class SearchService {
    * @param query the query text
    * @returns a list of completion suggestion strings
    */
-  public suggestTerm(query: string) {
+  public suggestTerm(query: string): Observable<string[]> {
     return this.apiService.suggestTerms(query);
   }
 

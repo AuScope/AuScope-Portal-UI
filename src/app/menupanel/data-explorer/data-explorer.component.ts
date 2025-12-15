@@ -1,18 +1,21 @@
 import { DataExplorerService } from "./data-explorer.service";
 import { Observable, Subject, merge } from "rxjs";
-import { Component, OnInit, ViewChild, ElementRef} from "@angular/core";
-import { filter, debounceTime, distinctUntilChanged,  map} from "rxjs/operators";
-import { Bbox, CsMapService, LayerModel,  UtilitiesService} from "@auscope/portal-core-ui";
+import { Component, OnInit, ViewChild, ElementRef } from "@angular/core";
+import { filter, debounceTime, distinctUntilChanged, map } from "rxjs/operators";
+import { CsMapService } from '../../lib/portal-core-ui/service/cesium-map/cs-map.service';
+import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
+import { UtilitiesService } from '../../lib/portal-core-ui/utility/utilities.service';
 import { NgbModal, NgbTypeahead } from "@ng-bootstrap/ng-bootstrap";
 import { UILayerModelService } from "app/services/ui/uilayer-model.service";
-import { RenderStatusService } from "@auscope/portal-core-ui";
+import { RenderStatusService } from '../../lib/portal-core-ui/service/cesium-map/renderstatus/render-status.service';
 import { Registry } from "./data-model";
 import { RectangleEditorObservable } from "@auscope/angular-cesium";
 import { UILayerModel } from "../common/model/ui/uilayer.model";
 import { AddRegistryModalComponent } from "app/modalwindow/registry/add-registry.modal.component";
+import { Bbox } from '../../lib/portal-core-ui/model/data/bbox.model';
 
 @Component({
-    selector: "[appDataExplorer]",
+    selector: "[app-data-explorer]",
     templateUrl: "./data-explorer.component.html",
     styleUrls: ["../menupanel.scss", "./data-explorer.component.scss"],
     providers: [DataExplorerService],
@@ -29,7 +32,7 @@ export class DataExplorerComponent implements OnInit {
 
   // Search results
   cswSearchResults: Map<string, LayerModel[]> = new Map<string, LayerModel[]>();
-  searchConducted = false;  // Has a search has been conducted?
+  searchConducted = false; // Has a search has been conducted?
   layerOpacities: Map<string, number> = new Map<string, number>();
 
   // Collapsable menus
@@ -58,7 +61,7 @@ export class DataExplorerComponent implements OnInit {
 
   click$ = new Subject<string>();
 
-  searchKeywords = (text$: Observable<string>) =>
+  searchKeywords = (_text$: Observable<string>) =>
     merge(
       this.click$.pipe(filter(() => !this.typeaheadInstance.isPopupOpen()))
     ).pipe(
@@ -157,11 +160,11 @@ export class DataExplorerComponent implements OnInit {
     this.searchConducted = true;
 
     // Available registries and start
-    let serviceIds: string[] = [];
-    let starts: number[] = [];
+    const serviceIds: string[] = [];
+    const starts: number[] = [];
     let registrySelected: boolean = false;
     this.availableRegistries.forEach(
-      (registry: Registry, serviceId: string) => {
+      (registry: Registry, _serviceId: string) => {
         if (registry.checked) {
           registrySelected = true;
           serviceIds.push(registry.id);
@@ -175,10 +178,10 @@ export class DataExplorerComponent implements OnInit {
       return;
     }
 
-    let fields: string[] = [];
-    let values: string[] = [];
-    let types: string[] = [];
-    let comparisons: string[] = [];
+    const fields: string[] = [];
+    const values: string[] = [];
+    const types: string[] = [];
+    const comparisons: string[] = [];
 
     // Any text search
     if (this.anyTextValue) {
@@ -191,7 +194,7 @@ export class DataExplorerComponent implements OnInit {
     // Spatial bounds
     if (this.bbox != null) {
       fields.push("bbox");
-      let boundsStr =
+      const boundsStr =
         '{"northBoundLatitude":' +
         this.bbox.northBoundLatitude +
         ',"southBoundLatitude":' +
@@ -232,8 +235,8 @@ export class DataExplorerComponent implements OnInit {
       fields.push("dateto");
       // For some reason getMilliseconds doesn't work on these Date objects,
       // so parse from string
-      let fromDate = Date.parse(this.dateFrom.toString());
-      let toDate = Date.parse(this.dateTo.toString());
+      const fromDate = Date.parse(this.dateFrom.toString());
+      const toDate = Date.parse(this.dateTo.toString());
       values.push(fromDate.toString());
       values.push(toDate.toString());
       types.push("date");
@@ -262,7 +265,7 @@ export class DataExplorerComponent implements OnInit {
             }
             for (const item of response["itemLayers"]) {
               const uiLayerModel = new UILayerModel(item.id, 100, this.renderStatusService.getStatusBSubject(item));
-              this.uiLayerModelService.setUILayerModel(item.id, uiLayerModel);                  
+              this.uiLayerModelService.setUILayerModel(item.id, uiLayerModel);
             }
             response["itemLayers"].useDefaultProxy = true;
             response["itemLayers"].useProxyWhitelist = false;
@@ -288,10 +291,10 @@ export class DataExplorerComponent implements OnInit {
   public facetedSearchSingleRegistry(registry: Registry): void {
     this.searchConducted = true;
 
-    let fields: string[] = [];
-    let values: string[] = [];
-    let types: string[] = [];
-    let comparisons: string[] = [];
+    const fields: string[] = [];
+    const values: string[] = [];
+    const types: string[] = [];
+    const comparisons: string[] = [];
 
     // Any text search
     if (this.anyTextValue) {
@@ -304,7 +307,7 @@ export class DataExplorerComponent implements OnInit {
     // Spatial bounds
     if (this.bbox != null) {
       fields.push("bbox");
-      let boundsStr =
+      const boundsStr =
         '{"northBoundLatitude":' +
         this.bbox.northBoundLatitude +
         ',"southBoundLatitude":' +
@@ -366,7 +369,7 @@ export class DataExplorerComponent implements OnInit {
 
       for (const item of response["itemLayers"]) {
         const uiLayerModel = new UILayerModel(item.id, 100, this.renderStatusService.getStatusBSubject(item));
-        this.uiLayerModelService.setUILayerModel(item.id, uiLayerModel);                  
+        this.uiLayerModelService.setUILayerModel(item.id, uiLayerModel);
       }
 
       response["itemLayers"].useDefaultProxy = true;
@@ -422,7 +425,7 @@ export class DataExplorerComponent implements OnInit {
     // Reset results and registry indices
     this.cswSearchResults = new Map<string, LayerModel[]>();
     this.availableRegistries.forEach(
-      (registry: Registry, serviceId: string) => {
+      (registry: Registry, _serviceId: string) => {
         registry.startIndex = 1;
         registry.prevIndices = [];
         registry.currentPage = 1;
@@ -469,7 +472,6 @@ export class DataExplorerComponent implements OnInit {
    */
   public drawBound(): void {
 
-    const me = this;
     this.rectangleObservable = this.csMapService.drawBound();
     this.rectangleObservable.subscribe((vector) => {
       if (!vector.points) {
@@ -485,8 +487,8 @@ export class DataExplorerComponent implements OnInit {
         return;
       }
       //EPSG:4326
-      me.bbox = UtilitiesService.reprojectToWGS84(vector.points);
-      this.updateSpatialBoundsText(me.bbox);
+      this.bbox = UtilitiesService.reprojectToWGS84(vector.points);
+      this.updateSpatialBoundsText(this.bbox);
       this.resetFacetedSearch();
     });
   }
@@ -499,10 +501,10 @@ export class DataExplorerComponent implements OnInit {
     if (bbox == null) {
       this.clearBound();
     } else {
-      let w = bbox.northBoundLatitude.toFixed(4);
-      let n = bbox.southBoundLatitude.toFixed(4);
-      let s = bbox.eastBoundLongitude.toFixed(4);
-      let e = bbox.westBoundLongitude.toFixed(4);
+      const w = bbox.northBoundLatitude.toFixed(4);
+      const n = bbox.southBoundLatitude.toFixed(4);
+      const s = bbox.eastBoundLongitude.toFixed(4);
+      const e = bbox.westBoundLongitude.toFixed(4);
 
       this.spatialBoundsText = w + ", " + n + " to " + s + ", " + e;
     }
@@ -608,6 +610,7 @@ export class DataExplorerComponent implements OnInit {
       if (registry) {
         this.availableRegistries.set(registry.id, registry);
       }
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     }, () => {});
   }
 

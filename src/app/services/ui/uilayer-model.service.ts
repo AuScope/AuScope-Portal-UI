@@ -10,26 +10,26 @@ export class UILayerModelService {
    */
   private uiLayerModels = new Map<string, UILayerModel>();
 
-  public getUILayerModel(layerId: string) {
+  public getUILayerModel(layerId: string): UILayerModel {
     return this.uiLayerModels.get(layerId);
   }
 
-  public setUILayerModel(layerId: string, uiLayerModel: UILayerModel) {
+  public setUILayerModel(layerId: string, uiLayerModel: UILayerModel): void {
     this.uiLayerModels.set(layerId, uiLayerModel);
   }
 
-  public removeUILayerModel(layerId: string) {
+  public removeUILayerModel(layerId: string): void {
     this.uiLayerModels.delete(layerId);
   }
-  
+
   /**
    * Check whether layer has been added to the map
    *
    * @param layerId ID of the layer
    * @returns true if layer has been added to the map, false otherwise
    */
-  isLayerAdded(layerId: string) {
-    return this.getUILayerModel(layerId) && this.getUILayerModel(layerId).statusMap.getRenderStarted();
+  isLayerAdded(layerId: string): boolean {
+    return this.uiLayerModels.has(layerId) && this.getUILayerModel(layerId).statusMap.getRenderStarted();
   }
-  
+
 }

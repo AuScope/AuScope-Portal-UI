@@ -3,6 +3,7 @@
   height: 100%;
   overflow-y: visible;
   display: block;
+  cursor: move;
 }
 
 /*
@@ -147,4 +148,43 @@
   margin: 15px;
   font-size: x-large;
   text-align: center;
+}
+
+// Download CSV button specific styling - use same colors as other buttons
+.btnFeature[title="Download Feature Information as CSV"] {
+  // Remove custom colors to inherit the default btn-primary styling
+  .fa-download {
+    margin-right: 5px;
+  }
+}
+// Copy feedback toast styling - use same color as primary buttons
+.copy-feedback-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #007bff;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  font-size: 14px;
+  font-weight: 500;
+  animation: slideInRight 0.3s ease-out;
+  
+  .fa-check-circle {
+    margin-right: 8px;
+    color: #fff;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }

@@ -5,7 +5,8 @@ module.exports = {
       Buffer: false,
       http: false,
       https: false,
-      zlib: false
+      zlib: false,
+      url: false
     },
   },
   cache: false,

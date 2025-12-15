@@ -11,7 +11,7 @@ import { UserStateService } from '../user/user-state.service';
  * "canActivate [AuthGuard]" to the route deinfintion).
  */
 @Injectable()
-export class AuthGuard  {
+export class AuthGuard {
 
   constructor(private router: Router,
               private authService: AuthService,
@@ -22,17 +22,19 @@ export class AuthGuard  {
     return this.checkLogin(url);
   }
 
-  checkLogin(url: string): Observable<boolean> | boolean {
+  checkLogin(_url: string): Observable<boolean> | boolean {
     if (this.authService.isLoggedIn) {
         return this.userStateService.user.pipe(map(
-          // Later we can use 'user' to check T&C's etc. if necessary
-          user => {
+          // Later we can use returned user to check T&C's etc. if necessary
+          () => {
             return true;
           }
         ));
     }
     // Navigate to the login page
-    this.router.navigate(['/login']);
+    this.router.navigate(['/login']).catch(
+        (navError) => console.error("Could not navigate to login page", navError)
+    );
     return false;
   }
 

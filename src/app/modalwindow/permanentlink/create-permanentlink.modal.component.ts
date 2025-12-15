@@ -24,10 +24,10 @@ export class CreatePermanentLinkModalComponent implements OnInit {
 
   ngOnInit() {
     this.linkForm = this.formBuilder.group({
-      name: ['', Validators.required],
+      name: ['', Validators.required.bind(Validators)],
       description: [''],
       isPublic: [true],
-      link: [{value: '', disabled: true}]
+      link: [{ value: '', disabled: true }]
     });
     this.errorOccurred = false;
   }

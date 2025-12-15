@@ -1,5 +1,5 @@
 import { ComponentFactoryResolver, ComponentRef, Injectable, ViewContainerRef } from '@angular/core';
-import { LayerModel } from '@auscope/portal-core-ui';
+import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 import { AdvancedMapComponent } from 'app/cesium-map/advanced/advanced-map.component';
 import { AdvancedFilterDirective } from 'app/menupanel/common/filterpanel/advance/advanced-filter.directive';
 import { ref } from '../../../environments/ref';
@@ -30,7 +30,7 @@ export class AdvancedComponentService {
    *
    * @param layer the layer the component is associated with
    */
-   public addAdvancedMapComponents(layer: LayerModel) {
+   public addAdvancedMapComponents(layer: LayerModel): void {
     if (ref.advancedMapComponent && layer.id in ref.advancedMapComponent) {
       // Remove any existing components (addLayer may be called again to change style so removeLayer may not have been called)
       this.removeAdvancedMapComponents(layer.id);
@@ -52,7 +52,7 @@ export class AdvancedComponentService {
    * @param layer layer to add
    * @param layerFilterPanelViewContainerRef the view container ref for the filter panel
    */
-   public addAdvancedFilterComponents(layer: LayerModel, layerFilterPanelViewContainerRef: ViewContainerRef) {
+   public addAdvancedFilterComponents(layer: LayerModel, layerFilterPanelViewContainerRef: ViewContainerRef): void {
     if (ref.advancedFilter && layer.id in ref.advancedFilter) {
       const componentFactory = this.componentFactoryResolver.resolveComponentFactory<AdvancedFilterDirective>(ref.advancedFilter[layer.id]);
       const componentRef: ComponentRef<AdvancedFilterDirective> = layerFilterPanelViewContainerRef.createComponent<AdvancedFilterDirective>(componentFactory);
@@ -66,7 +66,7 @@ export class AdvancedComponentService {
    *
    * @param layerId the ID of the layer being removed from the map advanced component list
    */
-  public removeAdvancedMapComponents(layerId: string) {
+  public removeAdvancedMapComponents(layerId: string): void {
     if (this.mapComponents.has(layerId)) {
       for (const comp of this.mapComponents.get(layerId)) {
         comp.destroy();

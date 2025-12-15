@@ -1,0 +1,26 @@
+<div class="modal-header">
+  <h4>Download via AuScope-Cat</h4><button class="btn btn-sm btn-outline pull-right" aria-label="Close" (click)="closeDialog()"><i class="fa fa-times"></i></button>
+</div>
+<div class="modal-body">
+  <span>
+    Data discoverable on the AuScope Portal can be downloaded programatically via the
+    <strong>AuScope-Cat</strong> Python library.
+  </span><br>
+  <span>
+    <a href="https://pypi.org/project/auscopecat" target="_blank" rel="noopener noreferrer">Click here</a> to view detailed documentation.
+  </span>
+  <div class="code-wrapper">
+    <div class="python-code">
+      <pre><code class="language-python">{{ code }}</code></pre>
+    </div>
+    <div class="copy-sidebar">
+      <button class="btn btn-sm btn-outline-secondary copy-btn" (click)="copyCode()">Copy</button>
+      @if (codeCopied) {
+        <span class="copy-feedback">Copied!</span>
+      }
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="closeDialog()">Close</button>
+</div>

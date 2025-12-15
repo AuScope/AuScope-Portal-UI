@@ -1,4 +1,5 @@
-import { CSWRecordModel, LayerModel } from "@auscope/portal-core-ui";
+import { CSWRecordModel } from '../lib/portal-core-ui/model/data/cswrecord.model';
+import { LayerModel } from '../lib/portal-core-ui/model/data/layer.model';
 
 export interface KnownLayerAndRecords {
 

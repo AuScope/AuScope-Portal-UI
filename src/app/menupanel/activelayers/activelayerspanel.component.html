@@ -1,103 +1,131 @@
-<div style="padding: 0.5rem;" class="select-layers-message" *ngIf="getActiveLayers().length===0">
+@if (getActiveLayers().length===0) {
+  <div style="padding: 0.5rem;" class="select-layers-message">
     Click "Browse" on map to add layers
-</div>
-
+  </div>
+}
 <div class="activeLayersBoundary" cdkDropList (cdkDropListDropped)="layerDropped($event)">
-    <div class="activeLayerItem" *ngFor="let layer of getActiveLayers(); let j = index" cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".activeLayersBoundary" [cdkDragDisabled]="getActiveLayers().length <= 1">
-        <!-- Active layer info column -->
-        <div class="activeLayerContent">
-            <div class="activeLayerTitleBar" cdkDragHandle>
-                <!-- Grabber in first column if more than one layer -->
-                <div class="btn btn-sm btn-primary activeLayerGrabber" *ngIf="getActiveLayers().length > 1">
-                    <i style="margin-left: 0;" class="ti-exchange-vertical" title="Drag to reorder"></i>
-                </div>
-                <!-- Title, loader spinner and delete button -->
-                <div class="activeLayerTitle" title="{{ layer.name }}">{{ layer.name }}</div>
-                <span style="margin-left: auto;" *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="project-percentage hasEvent light-blue">
-                    <i *ngIf="!getUILayerModel(layer.id).statusMap.getRenderComplete()" class="fa fa-spin fa-spinner"></i>
-                    <i *ngIf="getUILayerModel(layer.id).statusMap.getContainsError()" class="fa fa-warning text-warning"></i>
-                </span>
-                <i style="margin-left: auto;" *ngIf="getUILayerModel(layer.id).statusMap.getRenderStarted()" class="fa fa-trash red layerLoadClickable" (click)="removeLayer(layer);$event.stopPropagation()"></i>
-            </div>
-            <!-- Opacity, legend and status buttons -->
-            <div class="activeLayerOpacityLegendStatusBar">
-                <div style="font-size: small;">Opacity {{ getUILayerModel(layer.id).opacity }}%&nbsp;</div>
-                <!-- Opacity slider -->
-                <mat-slider [disabled] = "!showOpacitySlider(layer)" class="opacity-slider" min="0" max="100" (input)="layerOpacityChangeValue($event, layer)">
-                    <input matSliderThumb
-                        [(ngModel)]="getUILayerModel(layer.id).opacity">
-                </mat-slider>
-                <div style="display: flex;">
-                    <!-- Display legend button -->
-                    <button class="btn btn-primary btn-sm legend" *ngIf="hasLegend(layer)" [disabled]="isLegendShown(layer.id)" (click)="showLegend(layer)">Legend</button>
-                    <!-- Display status button -->
-                    <button class="btn btn-primary btn-sm status" (click)="openStatusReport(getUILayerModel(layer.id)); $event.stopPropagation();">Status</button>
-                    <!-- Display info button -->
-                    <button (click)="displayRecordInformation(layer)" type="button" class="btn btn-primary btn-sm info" title="Information" [ngClass]="{'active': getUILayerModel(layer.id)?.tabpanel.infopanel.expanded}">Info</button>
-                </div>
-            </div>
-            <!-- Map split controls -->
-            <div class="split-panel" *ngIf="getShowSplitMapButtons(layer)" (click)="$event.stopPropagation()">
-                Split Direction&nbsp;
-                <div *ngIf="getApplicableSplitLayer(layer)" class="split-button-panel">
-                    <button [className]="getLayerSplitDirection(layer.id) === 'left' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'left')">Left</button>
-                    <button [className]="getLayerSplitDirection(layer.id) === 'none' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'none')">Both</button>
-                    <button [className]="getLayerSplitDirection(layer.id) === 'right' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'right')">Right</button>
-                </div>
-                <div *ngIf="!getApplicableSplitLayer(layer)" class="split-button-panel">
-                    <button class="btn btn-split btn-primary" [disabled]="true">Layer not supported</button>
-                </div>
-            </div>
-            <!-- Filter panel -->
-            <div class="activeLayerFilterPanel"> <!--  this div seems unnecessary, but remove it and drag breaks (more) -->
-                <div style="position: inherit;" class="card  card-with-tabs layer-card">
-                    <div class="rh_info_wrap">
-                        <div class="active-header">
-                            <ul id="card-tab">
-                                <!-- Layer Styling tab -->
-                                <li *ngIf="hasFilters(layer.id)" (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': !getUILayerModel(layer.id)?.tabpanel.downloadpanel.expanded}" class="tab-item">
-                                    <a>
-                                        <span class="d-none tab-link d-sm-inline">Layer Styling</span>
-                                    </a>
-                                </li>
-                                <!-- Layer Download tab -->
-                                <li *ngIf="isMapSupportedLayer(layer) && isDownloadSupportedLayer(layer)" (click)="selectTabPanel(layer.id,'downloadpanel')" [ngClass]="{'active': !hasFilters(layer.id) || getUILayerModel(layer.id)?.tabpanel.downloadpanel.expanded}" class="tab-item">
-                                    <a>
-                                        <span class="d-none tab-link d-sm-inline ml-2" >Download</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="top-layer-btn-panel">
-                            <!-- Add bookmark button -->
-                            <button *ngIf="isUserLoggedIn() && !isLayerBookmarked(layer.id)" (click)="addLayerBookmark(layer.id)" type="button" class="btn btn-sm btn-info top-layer-btn" title="Bookmark Layer"><i class="fa fa-sm fa-bookmark-o"></i></button>
-                            <!-- Remove bookmark button -->
-                            <button *ngIf="isUserLoggedIn() && isLayerBookmarked(layer.id)" (click)="removeLayerBookmark(layer.id)" class="btn btn-sm btn-info top-layer-btn" title="Remove Layer Bookmark"><i class="fa fa-sm fa-bookmark"></i></button>
-                            <!-- Info button  -->
-                            <!-- <button (click)="displayRecordInformation(layer)" type="button" class="btn-info" title="Information" [ngClass]="{'active': getUILayerModel(layer.id)?.tabpanel.filterpanel.expanded}">Info</button> -->
-                            <!--
-                            <div class="rh_info">	
-                                <button (click)="displayRecordInformation(layer)" type="button" class="btn-info" title="Information" [ngClass]="{'active': getUILayerModel(layer.id)?.tabpanel.infopanel.expanded}">Info</button>
-                            </div>
-                        -->
-                        </div>
-                    </div>
-                    <div id="card-tab-content" class="tab-content">
-                        <!-- Panel for layer styling -->
-                        <div class="tab-pane fade" [ngClass]="{'show active': getUILayerModel(layer.id)?.tabpanel.filterpanel.expanded}">
-                            <app-filter-panel *ngIf="getUILayerModel(layer.id)?.tabpanel.filterpanel.expanded" [layer]=layer></app-filter-panel>
-                        </div>
-                        <!-- Panel for layer download -->
-                        <div class="tab-pane fade" [ngClass]="{'show active': !hasFilters(layer.id) || getUILayerModel(layer.id)?.tabpanel.downloadpanel.expanded}">
-                            <app-download-panel *ngIf="!hasFilters(layer.id) || getUILayerModel(layer.id)?.tabpanel.downloadpanel.expanded" [layer]=layer></app-download-panel>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="activeLayerDragMessagePanel">
-                Drag layer to change layer order.
-            </div>
-            <hr *ngIf="j < getActiveLayers().length - 1" class="nav-divider active-divider">
+  @for (layer of getActiveLayers(); track layer; let j = $index) {
+    <div class="activeLayerItem" cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".activeLayersBoundary" [cdkDragDisabled]="getActiveLayers().length <= 1">
+      <!-- Active layer title, grabber and delete button -->
+      <div class="activeLayerTitleBar" cdkDragHandle>
+        <!-- Grabber in first column if more than one layer -->
+        @if (getActiveLayers().length > 1) {
+          <div class="activeLayerGrabber">
+            <i style="margin-left: 0;" class="ti-exchange-vertical" title="Drag to reorder"></i>
+          </div>
+        }
+        <!-- Title -->
+        <div class="activeLayerTitle" title="{{ layer.name }}">{{ layer.name }}</div>
+        <!-- Delete button -->
+        @if (getUILayerModel(layer.id).statusMap.getRenderStarted()) {
+          <button mat-flat-button title="Remove layer" color="warn" class="delete-button" (click)="removeLayer(layer);$event.stopPropagation()"><i class="fa fa-trash layer-delete-icon"></i></button>
+        }
+      </div>
+      <!-- Active layer info column -->
+      <div class="activeLayerContent">
+        <div class="activeLayerButtons">
+          <!-- Display legend button -->
+          @if (hasLegend(layer)) {
+            <button type="button" class="btn btn-primary btn-sm active-layer-btn" title="Show layer legend" [disabled]="isLegendShown(layer.id)" (click)="showLegend(layer)">Legend</button>
+          }
+          <!-- Display metadata button -->
+          <button type="button" class="btn btn-primary btn-sm active-layer-btn" title="Show layer information" [ngClass]="{'active': getUILayerModel(layer.id)?.tabpanel.infopanel.expanded}" (click)="displayRecordInformation(layer)">Metadata</button>
+          <!-- Boomark button if logged in -->
+          @if (isUserLoggedIn() && !isLayerBookmarked(layer.id)) {
+            <button (click)="addLayerBookmark(layer.id)" type="button" class="btn btn-primary btn-sm status-btn" title="Bookmark Layer"><i class="far fa-sm fa-bookmark"></i></button>
+          }
+          @if (isUserLoggedIn() && isLayerBookmarked(layer.id)) {
+            <button (click)="removeLayerBookmark(layer.id)" type="button" class="btn btn-primary btn-sm status-btn" title="Remove Layer Bookmark"><i class="fas fa-sm fa-bookmark"></i></button>
+          }
+          <!-- Display status button while loading or if errors -->
+          @if (!getUILayerModel(layer.id).statusMap.getRenderComplete() || getUILayerModel(layer.id).statusMap.getContainsError()) {
+            <button
+              class="btn btn-primary btn-sm active-layer-btn status-btn"
+              title="Show layer status report"
+              (click)="openStatusReport(getUILayerModel(layer.id)); $event.stopPropagation();">
+              @if (!getUILayerModel(layer.id).statusMap.getRenderComplete()) {
+                <i class="fa fa-spin fa-spinner"></i>
+              }
+              @if (getUILayerModel(layer.id).statusMap.getContainsError()) {
+                <i class="fa fa-warning text-warning"></i>
+              }
+            </button>
+          }
         </div>
+        <!-- Opacity slider -->
+        <div class="activeLayerOpacity">
+          <div style="font-size: small;">Opacity {{ getUILayerModel(layer.id).opacity }}%&nbsp;</div>
+          <!-- Opacity slider -->
+          <mat-slider [disabled] = "!showOpacitySlider(layer)" class="opacity-slider" min="0" max="100" (input)="layerOpacityChangeValue($event, layer)">
+            <input matSliderThumb
+              [(ngModel)]="getUILayerModel(layer.id).opacity">
+          </mat-slider>
+        </div>
+        <!-- Map split controls -->
+        @if (getShowSplitMapButtons(layer)) {
+          <div class="split-panel" (click)="$event.stopPropagation()">
+            Split Direction&nbsp;
+            @if (getApplicableSplitLayer(layer)) {
+              <div class="split-button-panel">
+                <button [className]="getLayerSplitDirection(layer.id) === 'left' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'left')">Left</button>
+                <button [className]="getLayerSplitDirection(layer.id) === 'none' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'none')">Both</button>
+                <button [className]="getLayerSplitDirection(layer.id) === 'right' ? 'btn btn-split btn-primary' : 'btn btn-split btn-warning'" (click)="setLayerSplitDirection($event, layer, 'right')">Right</button>
+              </div>
+            }
+            @if (!getApplicableSplitLayer(layer)) {
+              <div class="split-button-panel">
+                <button class="btn btn-split btn-primary" [disabled]="true">Layer not supported</button>
+              </div>
+            }
+          </div>
+        }
+        <!-- Filter panel -->
+        @if (hasFilters(layer.id) || hasAdvancedFilters(layer.id) || isDownloadSupportedLayer(layer)) {
+          <div class="activeLayerFilterPanel"> <!--  this div seems unnecessary, but remove it and drag breaks (more) -->
+            <div style="position: inherit;" class="card card-with-tabs layer-card filter-card">
+              <div class="rh_info_wrap">
+                <div class="active-header">
+                  <ul id="card-tab">
+                    <!-- Layer Styling tab -->
+                    @if (hasFilters(layer.id)) {
+                      <li (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': !getUILayerModel(layer.id)?.tabpanel.downloadpanel.expanded}" class="tab-item">
+                        <a>
+                          <span class="d-none tab-link d-sm-inline">Layer Styling</span>
+                        </a>
+                      </li>
+                    }
+                    <!-- Layer Download tab -->
+                    @if (isMapSupportedLayer(layer) && isDownloadSupportedLayer(layer)) {
+                      <li (click)="selectTabPanel(layer.id,'downloadpanel')" [ngClass]="{'active': !hasFilters(layer.id) || getUILayerModel(layer.id)?.tabpanel.downloadpanel.expanded}" class="tab-item">
+                        <a>
+                          <span class="d-none tab-link d-sm-inline ml-2" >Download</span>
+                        </a>
+                      </li>
+                    }
+                  </ul>
+                </div>
+              </div>
+              <div id="card-tab-content" class="tab-content">
+                <!-- Panel for layer styling -->
+                <div class="tab-pane fade" [ngClass]="{'show active': getUILayerModel(layer.id)?.tabpanel.filterpanel.expanded}">
+                  @if (getUILayerModel(layer.id)?.tabpanel.filterpanel.expanded) {
+                    <app-filter-panel [layer]=layer></app-filter-panel>
+                  }
+                </div>
+                <!-- Panel for layer download -->
+                <div class="tab-pane fade" [ngClass]="{'show active': !hasFilters(layer.id) || getUILayerModel(layer.id)?.tabpanel.downloadpanel.expanded}">
+                  @if (!hasFilters(layer.id) || getUILayerModel(layer.id)?.tabpanel.downloadpanel.expanded) {
+                    <app-download-panel [layer]=layer></app-download-panel>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+        <div class="activeLayerDragMessagePanel">
+          Drag layer to change layer order.
+        </div>
+      </div>
     </div>
+  }
 </div>

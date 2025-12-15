@@ -1,5 +1,12 @@
+.legend-modal {
+  padding: 5px;
+  background-color: #fff;
+  opacity: 0.8;
+}
+
 .legend-title-panel {
   display:flex;
+  cursor: move;
 
   .legend-title {
     width: 100%;

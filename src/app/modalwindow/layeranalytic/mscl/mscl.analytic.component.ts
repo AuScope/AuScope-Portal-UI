@@ -12,15 +12,15 @@ export class MSCLAnalyticComponent implements OnInit {
 
     // Data inserted at modal dialogue creation point
     startDepth: number; // Start depth for plotting
-    endDepth: number;  // End depth for plotting
-    featureId: string;  // Identifier of the borehole
-    metricList: string[];  // List of metric enums to plot
-    closeGraphModal: () => null;  // Function to call when the modal dialogue must be closed
+    endDepth: number; // End depth for plotting
+    featureId: string; // Identifier of the borehole
+    metricList: string[]; // List of metric enums to plot
+    closeGraphModal: () => null; // Function to call when the modal dialogue must be closed
     usesGMLObs: boolean; // Response has values nested within GeoSciML observations
     serviceUrl: string; // URL of MSCL service
     processingData = false;
 
-    @ViewChild('error_display', { static: true }) public error_display: ElementRef;  // Area used to display error messages
+    @ViewChild('error_display', { static: true }) public error_display: ElementRef; // Area used to display error messages
 
     public graphInput = {
         data: {},
@@ -52,9 +52,9 @@ export class MSCLAnalyticComponent implements OnInit {
                 this.createModalMessage(error_display, 'Error retrieving MSCL data - bad response from service');
                 return;
             }
-            
+
             // Compile lists of X and Y values; plots are vertical, Y is common to all plots
-            const xLists: { string: number[] } | {} = {};
+            const xLists: object = {};
             const yList: number[] = [];
             for (const metricEnum of this.metricList) {
                 xLists[metricEnum] = [];
@@ -89,9 +89,9 @@ export class MSCLAnalyticComponent implements OnInit {
 
     /**
      * Insert a message into modal dialogue in place of a graph. Used for error conditions.
-     * 
+     *
      * @param element: reference to <div> where message will appear
-     * @param message: message string 
+     * @param message: message string
      */
     private createModalMessage(element: ElementRef, message: string) {
         const d2 = this.renderer.createElement('div');

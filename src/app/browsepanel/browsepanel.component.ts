@@ -1,15 +1,17 @@
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
-import { LayerHandlerService, RenderStatusService } from '@auscope/portal-core-ui';
+import { LayerHandlerService } from '../lib/portal-core-ui/service/cswrecords/layer-handler.service';
+import { RenderStatusService } from '../lib/portal-core-ui/service/cesium-map/renderstatus/render-status.service';
 import { UILayerModel } from '../menupanel/common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
-import { LayerModel } from '@auscope/portal-core-ui'
+import { LayerModel } from '../lib/portal-core-ui/model/data/layer.model';
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
-import { FilterService } from 'app/services/filter/filter.service';
+import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
 import { SidebarService } from 'app/portal/sidebar.service';
 import { Subscription } from 'rxjs';
 import { UserStateService } from 'app/services/user/user-state.service';
 import { AuthService } from 'app/services/auth/auth.service';
-import { take } from 'rxjs/operators';
+import { take, filter } from 'rxjs/operators';
+import { config } from 'environments/config';
 
 
 @Component({
@@ -20,7 +22,7 @@ import { take } from 'rxjs/operators';
 })
 export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
 
-  public layerGroupColumn: {}; /* Holds the data structures for all layers and groups */
+  public layerGroupColumn: object; /* Holds the data structures for all layers and groups */
   public layerColumn: []; /* List of layers for a certain group */
   public layerColumnHeader = ""; /* Name of group is shown at the top of the layer column */
   public selectedLayer; /* Selected layer, assigned a layer object */
@@ -39,8 +41,7 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
       private sidebarService: SidebarService,
       private userStateService: UserStateService,
       private authService: AuthService
-      ) {
-  }
+      ) {}
 
   /**
    * Toggle sidebar
@@ -137,7 +138,7 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
 
   /**
    * Select a group
-   * 
+   *
    * @param layerGroup group
    */
   public selectGroup(layerGroup): void {
@@ -148,36 +149,57 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * Select a layer 
-   * 
-   * @param layer layer 
+   * Select a layer
+   *
+   * @param layer layer
    */
   public selectLayer(layer) {
     this.selectedLayer = layer;
   }
 
   /**
-   * Add layer to map
-   * 
-   * @param layer the layer to add to map
+   * Add layer to map when plus icon is clicked
+   *
+   * @param layer LayerModel for layer to add
    */
-  public addLayer(layer: LayerModel): void {
-    // Fetch layer times and add layer (only take 1 or addLayer will fire every time layer times change)
-    this.filterService.getLayerTimesBS(layer.id).pipe(take(1)).subscribe(layerTimes => {
-      this.layerManagerService.addLayer(layer, [], null, layerTimes.currentTime);
-    });
+  public addLayerToMap(layer: LayerModel): void {
+    // Query GetCapabilities for layers that need it
+    if (Array.isArray(config.queryGetCapabilitiesTimes) && config.queryGetCapabilitiesTimes.indexOf(layer.id) !== -1) {
+      this.filterService.updateLayerTimes(layer, new LayerTimes());
+      this.filterService.getLayerTimesBS(layer.id).pipe(
+        filter(lt => !!(lt && (lt.currentTime || (lt.timeExtent && lt.timeExtent.length > 0))) || lt.loadingTimeExtent === false),
+        take(1)
+      ).subscribe(layerTimes => {
+        const timeParam = layerTimes?.currentTime ?? (layerTimes?.timeExtent?.length ? layerTimes.timeExtent[0] : undefined);
+        this.layerManagerService.addLayer(layer, [], null, timeParam);
+      });
+    } else {
+      this.layerManagerService.addLayer(layer, [], null, undefined);
+    }
 
     // Close panel once layer is added, unless user requests it stay open
     if (!this.panelStayOpen) {
       this.toggleBrowsePanel(false);
     }
-    this.sidebarService.setOpenState(true);
+  }
+
+  /**
+   * Remove layer from map when trash icon is clicked
+   *
+   * @param layer LayerModel for layer to remove
+   */
+  public removeLayerFromMap(layer: LayerModel): void {
+    this.layerManagerService.removeLayer(layer);
+
+    if (this.selectedLayer === layer) {
+      this.selectedLayer = null;
+    }
   }
 
   /**
    * Opens and closes browse panel
-   * 
-   * @param open if true will open panel if false will close panel if missing will toggle 
+   *
+   * @param open if true will open panel if false will close panel if missing will toggle
    */
   public toggleBrowsePanel(open?: boolean) {
     if (open !== undefined) {
@@ -185,17 +207,26 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       this.bShowBrowsePanel = !this.bShowBrowsePanel;
     }
-  } 
-  
+  }
 
   /**
    * Is this layer selected?
-   * 
+   *
    * @param layer LayerModel for layer
    * @returns t@returns true if this layer is selected
    */
   public isLayerSelected(layer: any) {
     return this.selectedLayer === layer;
+  }
+
+  /**
+   * Is this layer added to the map?
+   *
+   * @param layer LayerModel for layer
+   * @returns true if this layer has been added to the map
+   */
+  public isLayerAdded(layer: any) {
+    return this.uiLayerModelService.isLayerAdded(layer.id);
   }
 
   /**

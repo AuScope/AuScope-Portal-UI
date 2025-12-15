@@ -1,245 +1,303 @@
 <!-- Modal for querier-->
 <div class="modal-header">
-	<h1 class="page-header">
-		Borehole <small>analytics</small>
-	</h1>
+  <h1 class="page-header" cdkDrag cdkDragRootElement=".modal-content" cdkDragHandle>
+    Borehole <small>analytics</small>
+  </h1>
 </div>
 <div class="modal-body">
-	<div class="card card-default">
-		<!-- END card-header -->
-		<!-- BEGIN card-body -->
-		<div class="card-header">
-			<h4 class="card-title">{{layer.name}}</h4>
-		</div>
-		<div class="card-body">
-		<form #f="ngForm">
-			<div class="alert alert-secondary">
-        National Virtual Core Library analytics are run remotely and may take some time to complete. By entering an email and a job name you can come back to this form later to collect your results.
-      </div>
-      <div class="">
-	      <div class="form-group form-group-md row justify-content-start">
-				  <label class="col-md-2">Email:</label>
-				  <div class="col-md-6">
-						<input type="text" class="form-control form-control-sm" [(ngModel)]="nvclform.email" name="email" ngModel #email="ngModel" required pattern="([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$">
-						<span class="validity" *ngIf="!email.valid && email.touched"></span>
-				  </div>
-				</div>
-				<div class="form-group form-group-md row justify-content-start">
-				    <label class="col-md-2">Job Name:</label>
-				    <div class="col-md-6">
-						  <input id="jobName" type="text" class="form-control form-control-sm"  [(ngModel)]="nvclform.jobName" name="jobName" required minlength="1" ngModel #jobName="ngModel" >
-						  <span class="validity" *ngIf="!jobName.valid && jobName.touched"></span>
-				    </div>
-				</div>
-			</div>
+  <div class="card card-default">
+    <!-- END card-header -->
+    <!-- BEGIN card-body -->
+    <div class="card-header">
+      <h4 class="card-title">{{layer.name}}</h4>
+    </div>
+    <div class="card-body">
+      <form #f="ngForm">
+        <div class="alert alert-secondary">
+          National Virtual Core Library analytics are run remotely and may take some time to complete. By entering an email and a job name you can come back to this form later to collect your results.
+        </div>
+        <div class="">
+          <div class="form-group form-group-md row justify-content-start">
+            <label class="col-md-2">Email:</label>
+            <div class="col-md-6">
+              <input type="text" class="form-control form-control-sm" [(ngModel)]="nvclform.email" name="email" ngModel #email="ngModel" required pattern="([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$">
+              @if (!email.valid && email.touched) {
+                <span class="validity"></span>
+              }
+            </div>
+          </div>
+          <div class="form-group form-group-md row justify-content-start">
+            <label class="col-md-2">Job Name:</label>
+            <div class="col-md-6">
+              <input id="jobName" type="text" class="form-control form-control-sm"  [(ngModel)]="nvclform.jobName" name="jobName" required minlength="1" ngModel #jobName="ngModel" >
+              @if (!jobName.valid && jobName.touched) {
+                <span class="validity"></span>
+              }
+            </div>
+          </div>
+        </div>
 
-			<div class="card card-default card-with-tabs" cdkDrag cdkDragRootElement=".modal-content" #childElement cdkDragBoundary="body">
-				<!-- BEGIN card-header -->
-				<div class="card-header">
-					<ul class="nav nav-tabs float-right">
-						<li (click)="UItabpanel.algorithm = true;UItabpanel.checkprocess=false;" [ngClass]="{'active':UItabpanel.algorithm}"><a href="#nvcl-boreholeanalytic-tabpanel-algorithm" data-toggle="tab"><i class="fa fa-sliders"></i> <span class="d-none d-md-inline"> Algorithms</span></a></li>
-						<li (click)="UItabpanel.algorithm = false;UItabpanel.checkprocess=true;checkStatus()" [ngClass]="{'active':UItabpanel.checkprocess}"><a href="#nvcl-boreholeanalytic-tabpanel-checkprocess" data-toggle="tab"><i class="fa fa-tasks"></i> <span class="d-none d-md-inline"> Check process</span></a></li>
-					</ul>
-					<h4 class="card-title">Borehole Analytics</h4>
-				</div>
-				<!-- END card-header -->
-				<!-- BEGIN tab-content -->
-				<div id="card-tab-content" class="tab-content">
-					<!-- BEGIN tab-pane -->
-					<div class="tab-pane fade" [ngClass]="{'active show': UItabpanel.algorithm}" id="nvcl-boreholeanalytic-tabpanel-algorithm">
-						<div class="alert alert-secondary">
-			                Please select a classification algorithm to filter boreholes against.
-							<div class="form-group form-group-md">
-								<div id="nvcl-boreholeanalytic-algor-radio">
-									<input type="radio" name="ExistingAlgorithm" id="ExistingAlgorithm" [value]="true" [(ngModel)]="isExistingAlgorithm" style="margin-left: 5px"> <label  for = "existA" >Existing Algorithm&nbsp;</label>
-									<input type="radio" name="NewAlgorithm" id="NewAlgorithm" [value]="false" [(ngModel)]="isExistingAlgorithm" style="margin-left: 5px"> <label  for = "newA">New Alogrithm</label>
-								</div>
-							</div>
-			      </div>
-						<fieldset *ngIf="!isExistingAlgorithm" class="show-fieldset-borders-whitebg mb-3">
-							<legend><h6>New Algorithm</h6></legend>
-								<div class="form">
-									<div class="form-group form-group-md row">
-										<label class="col-md-3">Name:</label>
-										<div class="col-md-8">
-											<select class="form-control form-control-sm" [(ngModel)]="nvclform.tsgAlgName" (change) = "changeTSGAlgorithm()" name="tsgAlgName" required ngModel #tsgAlgName="ngModel" >>
-												<option value="User Supplied Algorithm">User Supplied Algorithm</option>
-												<option *ngFor="let x of tSGAlgorithmNames" [value]="x">{{x}}</option>
-											</select>
-											<span class="validity" *ngIf="!tsgAlgName.valid && tsgAlgName.touched"></span>
-										</div>
-								  </div>
-								<div class="form-group form-group-md row" *ngIf="nvclform.tsgAlgName">
-							    <label class="col-md-3">Algorithm:</label>
-								  <div class="col-md-8">
-										<textarea (mousedown)="$event.stopPropagation();" rows="12" cols="50" [(ngModel)]="nvclform.tsgAlgorithm" name="tsgAlogrithm" required></textarea>
-										<span class="validity"></span>
-							    </div>
-								</div>
-							</div>
-					  </fieldset>
+        <div class="card card-default card-with-tabs">
+          <!-- BEGIN card-header -->
+          <div class="card-header">
+            <ul class="nav nav-tabs float-right">
+              <li (click)="UItabpanel.algorithm = true;UItabpanel.checkprocess=false;" [ngClass]="{'active':UItabpanel.algorithm}"><a href="#nvcl-boreholeanalytic-tabpanel-algorithm" data-toggle="tab"><i class="fa fa-sliders"></i> <span class="d-none d-md-inline"> Algorithms</span></a></li>
+              <li (click)="UItabpanel.algorithm = false;UItabpanel.checkprocess=true;checkStatus()" [ngClass]="{'active':UItabpanel.checkprocess}"><a href="#nvcl-boreholeanalytic-tabpanel-checkprocess" data-toggle="tab"><i class="fa fa-tasks"></i> <span class="d-none d-md-inline"> Check process</span></a></li>
+            </ul>
+            <h4 class="card-title">Borehole Analytics</h4>
+          </div>
+          <!-- END card-header -->
+          <!-- BEGIN tab-content -->
+          <div id="card-tab-content" class="tab-content">
+            <!-- BEGIN tab-pane -->
+            <div class="tab-pane fade" [ngClass]="{'active show': UItabpanel.algorithm}" id="nvcl-boreholeanalytic-tabpanel-algorithm">
+              <div class="alert alert-secondary">
+                Please select a classification algorithm to filter boreholes against.
+                <div class="form-group form-group-md">
+                  <div id="nvcl-boreholeanalytic-algor-radio">
+                    <input type="radio" name="ExistingAlgorithm" id="ExistingAlgorithm" [value]="true" [(ngModel)]="isExistingAlgorithm" style="margin-left: 5px"> <label  for = "existA" >Existing Algorithm&nbsp;</label>
+                    <input type="radio" name="NewAlgorithm" id="NewAlgorithm" [value]="false" [(ngModel)]="isExistingAlgorithm" style="margin-left: 5px"> <label  for = "newA">New Alogrithm</label>
+                  </div>
+                </div>
+              </div>
+              @if (!isExistingAlgorithm) {
+                <fieldset class="show-fieldset-borders-whitebg mb-3">
+                  <legend><h6>New Algorithm</h6></legend>
+                  <div class="form">
+                    <div class="form-group form-group-md row">
+                      <label class="col-md-3">Name:</label>
+                      <div class="col-md-8">
+                        <select class="form-control form-control-sm" [(ngModel)]="nvclform.tsgAlgName" (change) = "changeTSGAlgorithm()" name="tsgAlgName" required ngModel #tsgAlgName="ngModel" >>
+                          <option value="User Supplied Algorithm">User Supplied Algorithm</option>
+                          @for (x of tSGAlgorithmNames; track x) {
+                            <option [value]="x">{{x}}</option>
+                          }
+                        </select>
+                        @if (!tsgAlgName.valid && tsgAlgName.touched) {
+                          <span class="validity"></span>
+                        }
+                      </div>
+                    </div>
+                    @if (nvclform.tsgAlgName) {
+                      <div class="form-group form-group-md row">
+                        <label class="col-md-3">Algorithm:</label>
+                        <div class="col-md-8">
+                          <textarea (mousedown)="$event.stopPropagation();" rows="12" cols="50" [(ngModel)]="nvclform.tsgAlgorithm" name="tsgAlogrithm" required></textarea>
+                          <span class="validity"></span>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </fieldset>
+              }
 
-						<fieldset *ngIf="isExistingAlgorithm" class="show-fieldset-borders-whitebg mb-3">
-						<legend><h6>Existing Algorithm</h6></legend>
-			        		<div class="form-group form-group-md row">
-							    <label class="col-md-3">Algorithm Output</label>
-							    <div class="col-md-8">
-							    	<select class="form-control form-control-sm" [(ngModel)]="selectedAlgorithm" (change) = "changeAlgorithm()" name="selectedAlgorithm" ngModel #selectedAlgorithmE="ngModel" required>
-										<option value="nsa">Non Standard Algorithm</option>
-										<option *ngFor="let algorithm of algorithms" [ngValue]="algorithm">{{algorithm.outputName}}</option>
-									</select>
-									<span class="validity" *ngIf="!selectedAlgorithmE.valid && selectedAlgorithmE.touched"></span>
-							    </div>
-							</div>
-							<div *ngIf="selectedAlgorithm && selectedAlgorithm!=='nsa'" class="form-group form-group-md row">
-							    <label class="col-md-3">Version</label>
-							    <div class="col-md-8">
-									<ng-select [items] = "ngSelectiveOptions" [multiple]="true" bindLabel="label" bindValue="value" ngDefaultControl [(ngModel)]="nvclform.algorithmOutputIds" (ngModelChange)="onVersionChange($event)" name="algorithmOutputIds" ngModel #algorithmOutputIds="ngModel" aria-required="true"></ng-select>
-									<span class="validity" *ngIf="!algorithmOutputIds.valid && algorithmOutputIds.touched"></span>
-							    </div>
-							</div>
-							<div *ngIf="classifications && selectedAlgorithm!=='nsa'" class="form-group form-group-md row">
-							    <label class="col-md-3">Classification</label>
-							    <div class="col-md-8">
-							    	<select class="form-control form-control-sm" [(ngModel)]="nvclform.classification" name="classification" ngModel #classificationE="ngModel" required>
-										<option *ngFor="let classification of classifications">{{classification.classText}}</option>
-									</select>
-									<span class="validity" *ngIf="!classificationE.valid && classificationE.touched"></span>
-							    </div>
-							</div>
-							<div *ngIf="selectedAlgorithm ==='nsa'" class="form-group form-group-md row">
-								<label class="col-md-3">Log Name:</label>
-								<div class="col-md-8">
-									<input type="text" class="form-control form-control-sm" [(ngModel)]="nvclform.logName" name="logName" required ngModel #jobName="ngModel" >
-									<span class="validity" *ngIf="!nvclform.logName.valid && nvclform.logName.touched"></span>
-								</div>
-							</div>
-							<div *ngIf="selectedAlgorithm ==='nsa'" class="form-group form-group-md row" >
-								<label class="col-md-3">Classification:</label>
-								<div class="col-md-8">
-									<input type="text" class="form-control form-control-sm" [(ngModel)]="nvclform.classification" name="classification" required ngModel #classification="ngModel" >
-									<span class="validity" *ngIf="!classification.valid && classification.touched"></span>
-								</div>
-							</div>
-					    </fieldset>
+              @if (isExistingAlgorithm) {
+                <fieldset class="show-fieldset-borders-whitebg mb-3">
+                  <legend><h6>Existing Algorithm</h6></legend>
+                  <div class="form-group form-group-md row">
+                    <label class="col-md-3">Algorithm Output</label>
+                    <div class="col-md-8">
+                      <select class="form-control form-control-sm" [(ngModel)]="selectedAlgorithm" (change) = "changeAlgorithm()" name="selectedAlgorithm" ngModel #selectedAlgorithmE="ngModel" required>
+                        <option value="nsa">Non Standard Algorithm</option>
+                        @for (algorithm of algorithms; track algorithm) {
+                          <option [ngValue]="algorithm">{{algorithm.outputName}}</option>
+                        }
+                      </select>
+                      @if (!selectedAlgorithmE.valid && selectedAlgorithmE.touched) {
+                        <span class="validity"></span>
+                      }
+                    </div>
+                  </div>
+                  @if (selectedAlgorithm && selectedAlgorithm!=='nsa') {
+                    <div class="form-group form-group-md row">
+                      <label class="col-md-3">Version</label>
+                      <div class="col-md-8">
+                        <ng-select [items] = "ngSelectiveOptions" [multiple]="true" bindLabel="label" bindValue="value" ngDefaultControl [(ngModel)]="nvclform.algorithmOutputIds" (ngModelChange)="onVersionChange($event)" name="algorithmOutputIds" ngModel #algorithmOutputIds="ngModel" aria-required="true"></ng-select>
+                        @if (!algorithmOutputIds.valid && algorithmOutputIds.touched) {
+                          <span class="validity"></span>
+                        }
+                      </div>
+                    </div>
+                  }
+                  @if (classifications && selectedAlgorithm!=='nsa') {
+                    <div class="form-group form-group-md row">
+                      <label class="col-md-3">Classification</label>
+                      <div class="col-md-8">
+                        <select class="form-control form-control-sm" [(ngModel)]="nvclform.classification" name="classification" ngModel #classificationE="ngModel" required>
+                          @for (classification of classifications; track classification) {
+                            <option>{{classification.classText}}</option>
+                          }
+                        </select>
+                        @if (!classificationE.valid && classificationE.touched) {
+                          <span class="validity"></span>
+                        }
+                      </div>
+                    </div>
+                  }
+                  @if (selectedAlgorithm ==='nsa') {
+                    <div class="form-group form-group-md row">
+                      <label class="col-md-3">Log Name:</label>
+                      <div class="col-md-8">
+                        <input type="text" class="form-control form-control-sm" [(ngModel)]="nvclform.logName" name="logName" required ngModel #jobName="ngModel" >
+                        @if (!nvclform.logName.valid && nvclform.logName.touched) {
+                          <span class="validity"></span>
+                        }
+                      </div>
+                    </div>
+                  }
+                  @if (selectedAlgorithm ==='nsa') {
+                    <div class="form-group form-group-md row" >
+                      <label class="col-md-3">Classification:</label>
+                      <div class="col-md-8">
+                        <input type="text" class="form-control form-control-sm" [(ngModel)]="nvclform.classification" name="classification" required ngModel #classification="ngModel" >
+                        @if (!classification.valid && classification.touched) {
+                          <span class="validity"></span>
+                        }
+                      </div>
+                    </div>
+                  }
+                </fieldset>
+              }
 
-						<fieldset class="show-fieldset-borders-whitebg">
-				        	<legend><h6>Filter<span class="d-none d-md-block">Parameters</span></h6></legend>
-							<div class="alert alert-secondary">
-								Please select a borehole depth range and value (compared against the above algorithm) to filter NVCL boreholes.
-							</div>
-			        		<div class="form-row justify-content-start mb-4">
-							    <label for="roi-from" class="col-md-3">Region of interest:</label>
-								<div class="col-md-3 input-group input-group-sm">
-									<input id="roi-from" type="number" class="form-control"  [(ngModel)]="nvclform.startDepth" name="startDepth" ngModel #startDepth="ngModel"  required min="0" max="9999">
-									<div class="input-group-append">
-                                         <span class="input-group-text">metres</span>
-                                    </div>
-									<span class="validity" *ngIf="!startDepth.valid && startDepth.touched"></span>
-								</div>
-								<label for="roi-to" class="col-md-1">to</label>
-								<div class="col-md-3 input-group input-group-sm">
-									<input id="roi-to" type="number" class="form-control"  [(ngModel)]="nvclform.endDepth" name="endDepth" ngModel #endDepth="ngModel" required min="0" max="9999"  >
-									<div class="input-group-append">
-                                         <span class="input-group-text">metres</span>
-                                    </div>
-									<span class="validity" *ngIf="!endDepth.valid && endDepth.touched"></span>
-								</div>
-							</div>
-							<div class="form-row justify-content-start mb-4">
-							    <label class="col-md-2">Operator:</label>
-							    <div class="col-md-2">
-							    	<select class="form-control form-control-sm" [(ngModel)]="nvclform.operator" name="operator" required ngModel #operator="ngModel">
-										<option value="lt">&lt;</option>
-										<option value="gt">&gt;</option>
-										<option value="eq">=</option>
-									</select>
-									<span class="validity"  *ngIf="!endDepth.valid && endDepth.touched"></span>
-							    </div>
-							    <label class="col-md-1">Value:</label>
-							    <div class="col-md-2">
-									<input type="number" class="form-control form-control-sm"  [(ngModel)]="nvclform.value" name="value" required min="0" ngModel #value="ngModel">
-									<span class="validity" *ngIf="!value.valid && value.touched"></span>
-							    </div>
-							    <label class="col-md-1">Units:</label>
-							    <div class="col-md-2">
-							    	<select class="form-control form-control-sm" [(ngModel)]="nvclform.units" name="units" required ngModel #units="ngModel">
-										<option value="count">count</option>
-										<option value="pct">%</option>
-									</select>
-									<span class="validity" *ngIf="!units.valid && units.touched"></span>
-							    </div>
-							</div>
-							<div class="form-row justify-content-start mb-4">
-							    <label for="eval-span" class="col-md-3">Evaluated over a span of:</label>
-							    <div class="col-md-3 input-group input-group-sm">
-							    	<input id="eval-span" type="number" class="form-control" [(ngModel)]="nvclform.span" name="span" required min="0" max="9999" ngModel #span="ngModel">
-									<div class="input-group-append">
-										 <span class="input-group-text">metres</span>
-									</div>
-									<span class="validity" *ngIf="!span.valid && span.touched"></span>
-							    </div>
-							</div>
-							<div class="form-row">
-								<div class="checkbox col-md-6">
-									<input id="apply-nvcl-filter" type="checkbox" [(ngModel)]="bApplyNvclFilter" name="bApplyNvclFilter" />
-									<label for="apply-nvcl-filter"  title="Tick it, if you want to limit the searching boreholes with the filter of Update Layer Button. Untick it, if you want to search all NVCL boreholes."> Apply Nvcl filters </label>
-								</div>
-							</div>
-					    </fieldset>
+              <fieldset class="show-fieldset-borders-whitebg">
+                <legend><h6>Filter<span class="d-none d-md-block">Parameters</span></h6></legend>
+                <div class="alert alert-secondary">
+                  Please select a borehole depth range and value (compared against the above algorithm) to filter NVCL boreholes.
+                </div>
+                <div class="form-row justify-content-start mb-4">
+                  <label for="roi-from" class="col-md-3">Region of interest:</label>
+                  <div class="col-md-3 input-group input-group-sm">
+                    <input id="roi-from" type="number" class="form-control"  [(ngModel)]="nvclform.startDepth" name="startDepth" ngModel #startDepth="ngModel"  required min="0" max="9999">
+                    <div class="input-group-append">
+                      <span class="input-group-text">metres</span>
+                    </div>
+                    @if (!startDepth.valid && startDepth.touched) {
+                      <span class="validity"></span>
+                    }
+                  </div>
+                  <label for="roi-to" class="col-md-1">to</label>
+                  <div class="col-md-3 input-group input-group-sm">
+                    <input id="roi-to" type="number" class="form-control"  [(ngModel)]="nvclform.endDepth" name="endDepth" ngModel #endDepth="ngModel" required min="0" max="9999"  >
+                    <div class="input-group-append">
+                      <span class="input-group-text">metres</span>
+                    </div>
+                    @if (!endDepth.valid && endDepth.touched) {
+                      <span class="validity"></span>
+                    }
+                  </div>
+                </div>
+                <div class="form-row justify-content-start mb-4">
+                  <label class="col-md-2">Operator:</label>
+                  <div class="col-md-2">
+                    <select class="form-control form-control-sm" [(ngModel)]="nvclform.operator" name="operator" required ngModel #operator="ngModel">
+                      <option value="lt">&lt;</option>
+                      <option value="gt">&gt;</option>
+                      <option value="eq">=</option>
+                    </select>
+                    @if (!endDepth.valid && endDepth.touched) {
+                      <span class="validity" ></span>
+                    }
+                  </div>
+                  <label class="col-md-1">Value:</label>
+                  <div class="col-md-2">
+                    <input type="number" class="form-control form-control-sm"  [(ngModel)]="nvclform.value" name="value" required min="0" ngModel #value="ngModel">
+                    @if (!value.valid && value.touched) {
+                      <span class="validity"></span>
+                    }
+                  </div>
+                  <label class="col-md-1">Units:</label>
+                  <div class="col-md-2">
+                    <select class="form-control form-control-sm" [(ngModel)]="nvclform.units" name="units" required ngModel #units="ngModel">
+                      <option value="count">count</option>
+                      <option value="pct">%</option>
+                    </select>
+                    @if (!units.valid && units.touched) {
+                      <span class="validity"></span>
+                    }
+                  </div>
+                </div>
+                <div class="form-row justify-content-start mb-4">
+                  <label for="eval-span" class="col-md-3">Evaluated over a span of:</label>
+                  <div class="col-md-3 input-group input-group-sm">
+                    <input id="eval-span" type="number" class="form-control" [(ngModel)]="nvclform.span" name="span" required min="0" max="9999" ngModel #span="ngModel">
+                    <div class="input-group-append">
+                      <span class="input-group-text">metres</span>
+                    </div>
+                    @if (!span.valid && span.touched) {
+                      <span class="validity"></span>
+                    }
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="checkbox col-md-6">
+                    <input id="apply-nvcl-filter" type="checkbox" [(ngModel)]="bApplyNvclFilter" name="bApplyNvclFilter" />
+                    <label for="apply-nvcl-filter"  title="Tick it, if you want to limit the searching boreholes with the filter of Update Layer Button. Untick it, if you want to search all NVCL boreholes."> Apply Nvcl filters </label>
+                  </div>
+                </div>
+              </fieldset>
 
-						<div class="float-left">
-							<button class="btn btn-primary" (click) = "onSubmit()" [disabled]="!f.valid">Submit</button>
-						</div>
-					</div>
-					<!-- END tab-pane -->
-					<!-- BEGIN tab-pane -->
-					<div  class="tab-pane fade" [ngClass]="{'active show':UItabpanel.checkprocess}" id="nvcl-boreholeanalytic-tabpanel-checkprocess">
-						<div class="table-responsive">
-							<table class="table">
-								<thead>
-									<tr>
-										<th>Name</th>
-										<th>Published</th>
-										<th>Submitted</th>
-										<th>Status</th>
-										<th>Type</th>
-										<th style="width:1%">ACTIONS</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr *ngFor = "let status of currentStatus">
-										<td>{{status.jobDescription}}</td>
-										<td>
-											<label class="custom-control custom-checkbox">
-												<input type="checkbox" class="custom-control-input"  [checked]="status.published" (change)="changePublish(status)" >
-												<span class="custom-control-indicator"></span>
-											</label>
-										</td>
-										<td>{{status.jmstimestamp}}</td>
-										<td>{{status.status}}</td>
-										<td>{{status.requestType}}</td>
-										<td *ngIf="status.status==='Success'" class="btn-col" style="white-space: nowrap">
-											<a class="btn btn-purple btn-xs" title="View this job on the map." (click) = "viewOnMap(status.jobid)"><i class="ti-map-alt"></i></a>
-											<a class="btn btn-light btn-xs" title="Download this job result." (click)="nvclDownload(status.jobid)"><i class="ti-download"></i></a>
-											<a class="btn btn-light btn-xs" title="Download the TSGMod data." (click)="nvclDownloadData(status.jobid)" [style.visibility]="status.requestType !=='ANALYTICAL' ? 'visible' : 'hidden'"><i class="ti-zip"></i></a>
-										</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-						<div class="float-left">
-							<button *ngIf="currentStatus.length===0" (click) = "checkStatus()" class="btn btn-primary" [disabled]="!nvclform.email" >Check status</button>
-							<button *ngIf="currentStatus.length>0" (click) = "checkStatus()" class="btn btn-primary"  [disabled]="!nvclform.email">Refresh</button>
-							<p *ngIf="!nvclform.email" class="text-danger small">Make sure you have entered a valid email address</p>
-						</div>
-					</div>
-					<!-- END tab-pane -->
-				</div>
-				<!-- END tab-content -->
-			</div>
-		</form>
-		</div>
-	</div>
-	<!-- END card-body -->
+              <div class="float-left">
+                <button class="btn btn-primary" (click) = "onSubmit()" [disabled]="!f.valid">Submit</button>
+              </div>
+            </div>
+            <!-- END tab-pane -->
+            <!-- BEGIN tab-pane -->
+            <div  class="tab-pane fade" [ngClass]="{'active show':UItabpanel.checkprocess}" id="nvcl-boreholeanalytic-tabpanel-checkprocess">
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Published</th>
+                      <th>Submitted</th>
+                      <th>Status</th>
+                      <th>Type</th>
+                      <th style="width:1%">ACTIONS</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (status of currentStatus; track status) {
+                      <tr>
+                        <td>{{status.jobDescription}}</td>
+                        <td>
+                          <label class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input"  [checked]="status.published" (change)="changePublish(status)" >
+                            <span class="custom-control-indicator"></span>
+                          </label>
+                        </td>
+                        <td>{{status.jmstimestamp}}</td>
+                        <td>{{status.status}}</td>
+                        <td>{{status.requestType}}</td>
+                        @if (status.status==='Success') {
+                          <td class="btn-col" style="white-space: nowrap">
+                            <a class="btn btn-purple btn-xs" title="View this job on the map." (click) = "viewOnMap(status.jobid)"><i class="ti-map-alt"></i></a>
+                            <a class="btn btn-light btn-xs" title="Download this job result." (click)="nvclDownload(status.jobid)"><i class="ti-download"></i></a>
+                            <a class="btn btn-light btn-xs" title="Download the TSGMod data." (click)="nvclDownloadData(status.jobid)" [style.visibility]="status.requestType !=='ANALYTICAL' ? 'visible' : 'hidden'"><i class="ti-zip"></i></a>
+                          </td>
+                        }
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+              <div class="float-left">
+                @if (currentStatus.length===0) {
+                  <button (click) = "checkStatus()" class="btn btn-primary" [disabled]="!nvclform.email" >Check status</button>
+                }
+                @if (currentStatus.length>0) {
+                  <button (click) = "checkStatus()" class="btn btn-primary"  [disabled]="!nvclform.email">Refresh</button>
+                }
+                @if (!nvclform.email) {
+                  <p class="text-danger small">Make sure you have entered a valid email address</p>
+                }
+              </div>
+            </div>
+            <!-- END tab-pane -->
+          </div>
+          <!-- END tab-content -->
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- END card-body -->
 </div>

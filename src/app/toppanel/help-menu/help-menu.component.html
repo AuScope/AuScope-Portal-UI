@@ -1,38 +1,59 @@
-<button mat-button [matMenuTriggerFor]="helpMenu" class="help-menu" title="Help and information">
-    <em class="fa fa-2x fa-info-circle"></em>
-    <em class="fa fa-caret-down" style="margin-left:5px;"></em>
+<button mat-button [matMenuTriggerFor]="helpMenu" title="Help and information">
+    <i class="fa fa-2x fa-info-circle" aria-hidden="true"></i>
+    <i class="fa fa-caret-down" style="margin-left:5px;" aria-hidden="true"></i>
 </button>
 <mat-menu #helpMenu="matMenu" style="margin-top: 12px;">
     <!-- About us -->
     <h5 mat-menu-item>
-        <a href="https://www.auscope.org.au/" target="href:blank">
-            <em class="ti-home menu-icon"></em>
-            <span>&nbsp;About</span>
+        <a class="menu-link" href="https://www.auscope.org.au/" target="href:blank">
+            <i class="ti-home menu-icon" aria-hidden="true"></i>
+            <span>About</span>
         </a>
     </h5>
     <!-- User Guide -->
     <h5 mat-menu-item>
-        <a href="https://github.com/AuScope/AuScope-Portal-UI/raw/master/docs/AuScopeUserGuide.pdf" target="href:blank">
-            <em class="ti-info-alt menu-icon"></em>
-            <span>&nbsp;User Guide</span>
+        <a class="menu-link" href="https://github.com/AuScope/AuScope-Portal-UI/raw/master/docs/AuScopeUserGuide.pdf" target="href:blank">
+            <i class="ti-info-alt menu-icon" aria-hidden="true"></i>
+            <span>User Guide</span>
         </a>
     </h5>
     <!-- Contact us -->
     <h5 mat-menu-item>
-        <a href="mailto:cg-admin@csiro.au?Subject=Auscope-portal" target="href:blank">
-            <em class="ti-email menu-icon"></em>
-            <span>&nbsp;Contact us</span>
+        <a class="menu-link" href="mailto:cg-admin@csiro.au?Subject=Auscope-portal" target="href:blank">
+            <i class="ti-email menu-icon" aria-hidden="true"></i>
+            <span>Contact us</span>
         </a>
     </h5>
     <!-- Cite us -->
     <h5 mat-menu-item>
-        <a href="http://hdl.handle.net/102.100.100/483116?index=1" target="href:blank">
-            <em class="ti-pencil menu-icon"></em>
-            <span>&nbsp;Cite us</span>
+        <a class="menu-link" href="http://hdl.handle.net/102.100.100/483116?index=1" target="href:blank">
+            <i class="ti-pencil menu-icon" aria-hidden="true"></i>
+            <span>Cite us</span>
+        </a>
+    </h5>
+    <!-- AuScope-Cat -->
+    <h5 mat-menu-item>
+        <a class="menu-link" href="https://auscope.github.io/AuScope-Cat" target="href:blank">
+            <i class="fa fa-plug menu-icon" aria-hidden="true"></i>
+            <div class="menu-text">
+                <span class="menu-title">AuScope-Cat</span>
+                <span class="menu-subtext">Access data using a Python API</span>
+            </div>
+        </a>
+    </h5>
+    <!-- App Store -->
+    <h5 mat-menu-item>
+        <a class="menu-link" href="https://avre.auscope.org.au" target="href:blank">
+            <i class="fa fa-th menu-icon" aria-hidden="true"></i>
+            <div class="menu-text">
+                <span class="menu-title">AuScope Tools</span>
+                <span class="menu-subtext">Browse other AuScope applications,</span>
+                <span class="menu-subtext">software and models</span>
+            </div>
         </a>
     </h5>
     <!-- Portal release version and link to disclaimer -->
     <h5 mat-menu-item>
-        <li appPortalDetailsPanel></li>
+        <li app-portal-details-panel></li>
     </h5>
 </mat-menu>

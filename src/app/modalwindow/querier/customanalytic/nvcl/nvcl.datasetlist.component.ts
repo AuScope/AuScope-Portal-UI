@@ -1,6 +1,6 @@
-import { RickshawService } from '@auscope/portal-core-ui';
-import { LayerModel } from '@auscope/portal-core-ui';
-import { OnlineResourceModel } from '@auscope/portal-core-ui';
+import { RickshawService } from '../../../../lib/portal-core-ui/widget/chart/rickshaw/rickshaw.service';
+import { LayerModel } from '../../../../lib/portal-core-ui/model/data/layer.model';
+import { OnlineResourceModel } from '../../../../lib/portal-core-ui/model/data/onlineresource.model';
 import { NVCLService } from './nvcl.service';
 import { Component, Input, OnInit, ApplicationRef } from '@angular/core';
 import { HttpParams } from '@angular/common/http';
@@ -8,7 +8,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { saveAs } from 'file-saver';
 import { NVCLBoreholeAnalyticService } from '../../../layeranalytic/nvcl/nvcl.boreholeanalytic.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
-import { UtilitiesService } from '@auscope/portal-core-ui';
+import { UtilitiesService } from '../../../../lib/portal-core-ui/utility/utilities.service';
 
 export interface DialogData {
   scalarClasses: any[];
@@ -19,7 +19,7 @@ export interface DialogData {
     selector: 'app-nvcl-datasetlist-component',
     templateUrl: './nvcl.datasetlist.component.html',
     providers: [RickshawService, NVCLBoreholeAnalyticService],
-    styleUrls: ['../../../../../../node_modules/@auscope/portal-core-ui/src/lib/widget/chart/rickshaw/rickshaw.service.scss', '../../../modalwindow.scss', './nvcl.datasetlist.component.scss'],
+    styleUrls: ['./rickshaw.service.scss', '../../../modalwindow.scss', './nvcl.datasetlist.component.scss'],
     standalone: false
 })
 export class NVCLDatasetListComponent implements OnInit {
@@ -114,7 +114,7 @@ export class NVCLDatasetListComponent implements OnInit {
         this._getNVCLImage(this.onlineResource.url, nvclDataset.datasetId, null);
         this._getNVCLScalar(this.onlineResource.url, nvclDataset.datasetId);
         this.isCachedTSGFileAvailable(nvclDataset);
-        this.nvclDatasets.push(nvclDataset); 
+        this.nvclDatasets.push(nvclDataset);
       }
       if (result.length === 0) {
         this.nvclService.setAnalytic(false);
@@ -134,7 +134,7 @@ export class NVCLDatasetListComponent implements OnInit {
    * @param event the event that triggered this method
    * @param nvclDatasetId the ID of the dataset for which images have been loaded
    */
-  setImagesLoaded(event: any, nvclDatasetId: string) {
+  setImagesLoaded(event: any, nvclDatasetId: string): void {
     // Chrome will fire this event when added to DOM, ignore that
     if (event.target.src !== '') {
       this.imagesLoaded.push(nvclDatasetId);
@@ -168,7 +168,7 @@ export class NVCLDatasetListComponent implements OnInit {
       });
   }
 
-  public changeScalarSelection(datasetid) {
+  public changeScalarSelection(datasetid: string) {
     this._getNVCLImage(this.onlineResource.url, datasetid, this.selectedScalar);
   }
 
@@ -382,7 +382,7 @@ export class NVCLDatasetListComponent implements OnInit {
     this.nvclService.getNVCL2_0_JSONDataBinned(this.onlineResource.url, [this.selectedScalar]).
       subscribe(response => {
         if ('success' in response && response.success === true && response.data.length > 0) {
-          const this_ptr = this;
+          const me = this;
           const metricColours: any = {};
           let minval = 999999999;
           let maxval = -999999999;
@@ -393,7 +393,7 @@ export class NVCLDatasetListComponent implements OnInit {
             ['stringValues', 'numericValues'].forEach(dataType => {
               if (bv.hasOwnProperty(dataType) && bv[dataType].length > 0) {
                 // Find the log name for our log id, this will be our 'metric_name'
-                const metric_name = this_ptr.datasetScalars[datasetId].filter(x => x.logId === bv.logId)[0].logName;
+                const metric_name = me.datasetScalars[datasetId].filter(x => x.logId === bv.logId)[0].logName;
                 if (metric_name.length > 0) {
                   bv[dataType].forEach(function (val) {
 
@@ -402,7 +402,7 @@ export class NVCLDatasetListComponent implements OnInit {
                       const key = val.classText;
                       // Use the supplied colour for each metric
                       if (!(key in metricColours)) {
-                        metricColours[key] = this_ptr._colourConvert(val.colour);
+                        metricColours[key] = me._colourConvert(val.colour);
                       }
                       hasData = true;
                     } else if (dataType === 'numericValues') {
@@ -417,7 +417,7 @@ export class NVCLDatasetListComponent implements OnInit {
                   }); // for each
                   if (dataType === 'numericValues') {
                     for (let j = 0; j < 9; j++) {
-                      metricColours[(minval + (maxval - minval) * (j / 8)).toLocaleString()] = this_ptr._colourConvert(this_ptr.linPal[256 * (8 - j) / 8]);
+                      metricColours[(minval + (maxval - minval) * (j / 8)).toLocaleString()] = me._colourConvert(me.linPal[256 * (8 - j) / 8]);
                     }
                     metricColours.sort();
                   }
@@ -428,7 +428,7 @@ export class NVCLDatasetListComponent implements OnInit {
 
           if (hasData) {
             //this.modalRef = this.modalService.show(NVCLDatasetListDialogComponent, {class: 'modal-sm modal-dialog-centered'});
-            this.modalRef = this.modalService.show(NVCLDatasetListDialogComponent, {class: 'modal-sm'}); 
+            this.modalRef = this.modalService.show(NVCLDatasetListDialogComponent, { class: 'modal-sm' });
             this.modalRef.content.scalarClasses = metricColours;
             this.appRef.tick(); // required to make legend modal display the scalarClasses; otherwise required a click to trigger
           }
