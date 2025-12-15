@@ -522,6 +522,16 @@ export class CsMapComponent implements AfterViewInit {
             if (onlineResource.description.indexOf('Onshore Seismic Surveys') >= 0) {
               infoFormat = 'text/xml';
             }
+            // Patch for South Australian GeoSciML-lite v4.1
+            let url = null;
+            try {
+                url = new URL(onlineResource.url);
+            } catch (error) {
+                // skip
+            }
+            if (url?.hostname.endsWith('.sa.gov.au') && onlineResource.name === 'gsmlp:BoreholeView') {
+              sldBody = sldBody.replace('xmlns:gsmlp="http://xmlns.geosciml.org/geosciml-portrayal/4.0"','xmlns:gsmlp="http://www.opengis.net/gsml/4.1/geosciml-lite"');
+            }
 
             // Build GetFeatureInfo requests
             getFeatureInfoRequests.push(
