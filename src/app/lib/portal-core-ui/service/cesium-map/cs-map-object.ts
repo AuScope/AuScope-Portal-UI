@@ -1,6 +1,6 @@
 import { RenderStatusService } from './renderstatus/render-status.service';
 import { UtilitiesService } from '../../utility/utilities.service';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { EditActions, MapsManagerService, PolygonEditorObservable, PolygonEditUpdate, PolygonsEditorService,
          RectangleEditorObservable, RectanglesEditorService } from '@auscope/angular-cesium';
@@ -16,6 +16,11 @@ declare let Cesium;
  */
 @Injectable()
 export class CsMapObject {
+  private renderStatusService = inject(RenderStatusService);
+  private rectangleEditor = inject(RectanglesEditorService);
+  private polygonsCesiumEditor = inject(PolygonsEditorService);
+  private mapsManagerService = inject(MapsManagerService);
+
 
   private groupLayer: object;
   private clickHandlerList: ((p: any) => void)[] = [];
@@ -23,8 +28,7 @@ export class CsMapObject {
   private polygonEditable$: PolygonEditorObservable;
   public isDrawingPolygonBS = new BehaviorSubject<boolean>(false);
 
-  constructor(private renderStatusService: RenderStatusService, private rectangleEditor: RectanglesEditorService,
-              private polygonsCesiumEditor: PolygonsEditorService, private mapsManagerService: MapsManagerService) {
+  constructor() {
     this.groupLayer = {};
   }
 

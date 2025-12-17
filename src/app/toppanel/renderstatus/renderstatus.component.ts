@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 
 @Component({
@@ -9,12 +9,11 @@ import { BsModalRef } from 'ngx-bootstrap/modal';
 
 
 export class NgbdModalStatusReportComponent {
+  bsModalRef = inject(BsModalRef);
+
 
 
   public resourceMap = {};
-
-
-  constructor(public bsModalRef: BsModalRef) {}
 
 
 }

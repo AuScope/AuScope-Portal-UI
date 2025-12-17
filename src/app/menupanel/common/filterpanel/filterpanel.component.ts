@@ -9,7 +9,7 @@ import { LayerStatusService } from '../../../lib/portal-core-ui/utility/layersta
 import { Polygon } from '../../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
 import { UtilitiesService } from '../../../lib/portal-core-ui/utility/utilities.service';
 import { CsCSWService } from '../../../lib/portal-core-ui/service/wcsw/cs-csw.service';
-import { ApplicationRef, Component, Inject, Input, OnInit, AfterViewInit, ViewChild, ViewContainerRef, OnChanges, SimpleChanges, inject } from '@angular/core';
+import { ApplicationRef, Component, Input, OnInit, AfterViewInit, ViewChild, ViewContainerRef, OnChanges, SimpleChanges, inject } from '@angular/core';
 import * as _ from 'lodash';
 import { config } from '../../../../environments/config';
 import { ref } from '../../../../environments/ref';
@@ -27,6 +27,8 @@ import { LayerManagerService } from 'app/services/ui/layer-manager.service';
     standalone: false
 })
 export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
+  private conf = inject<any>('conf' as any);
+
   csMapService = inject(CsMapService);
   layerHandlerService = inject(LayerHandlerService);
   layerManagerService = inject(LayerManagerService);
@@ -56,7 +58,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
   @ViewChild('advancedFilterComponents', { static: true, read: ViewContainerRef }) advancedFilterComponents: ViewContainerRef;
 
 
-  constructor(@Inject('conf') private conf) {
+  constructor() {
     this.providers = [];
     this.optionalFilters = [];
     this.analyticMap = ref.layeranalytic;

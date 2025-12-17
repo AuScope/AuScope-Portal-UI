@@ -1,5 +1,5 @@
 import { CSWRecordModel } from '../../model/data/cswrecord.model';
-import { Injectable, Inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { point } from '@turf/helpers';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
@@ -27,6 +27,18 @@ declare let Cesium: any;
  */
 @Injectable()
 export class CsMapService {
+  private csWMSService = inject(CsWMSService);
+  private csMapObject = inject(CsMapObject);
+  private manageStateService = inject(ManageStateService);
+  private csCSWService = inject(CsCSWService);
+  private csIrisService = inject(CsIrisService);
+  private csKMLService = inject(CsKMLService);
+  private mapsManagerService = inject(MapsManagerService);
+  private csVMFService = inject(CsVMFService);
+  private csGeoJsonService = inject(CsGeoJsonService);
+  private env = inject<any>('env' as any);
+  private conf = inject<any>('conf' as any);
+
 
   // VT: a storage to keep track of the layers that have been added to the map. This is use to handle click events.
   private layerModelList: Array<LayerModel> = new Array<LayerModel>();
@@ -39,12 +51,7 @@ export class CsMapService {
   // If the split map pane is visible or not
   private splitMapShown = false;
 
-  constructor(private csWMSService: CsWMSService,
-              private csMapObject: CsMapObject, private manageStateService: ManageStateService,
-              private csCSWService: CsCSWService, private csIrisService: CsIrisService,
-              private csKMLService: CsKMLService, private mapsManagerService: MapsManagerService,
-              private csVMFService: CsVMFService, private csGeoJsonService: CsGeoJsonService,
-              @Inject('env') private env, @Inject('conf') private conf) {
+  constructor() {
     this.csMapObject.registerClickHandler(this.mapClickHandler.bind(this));
     this.addLayerSubject = new Subject<LayerModel>();
   }

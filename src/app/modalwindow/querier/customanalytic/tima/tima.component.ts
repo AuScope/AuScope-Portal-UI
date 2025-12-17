@@ -1,6 +1,6 @@
 import { LayerModel } from '../../../../lib/portal-core-ui/model/data/layer.model';
 import { OnlineResourceModel } from '../../../../lib/portal-core-ui/model/data/onlineresource.model';
-import { Component, Input, AfterViewInit } from '@angular/core';
+import { Component, Input, AfterViewInit, inject } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { QuerierInfoModel } from '../../../../lib/portal-core-ui/model/data/querierinfo.model';
 import { TIMAService } from './tima.service';
@@ -13,6 +13,9 @@ import { TIMAService } from './tima.service';
     standalone: false
 })
 export class TIMAComponent implements AfterViewInit {
+  timaService = inject(TIMAService);
+  domSanitizer = inject(DomSanitizer);
+
 
   @Input() layer: LayerModel;
   @Input() onlineResource: OnlineResourceModel;
@@ -29,8 +32,6 @@ export class TIMAComponent implements AfterViewInit {
     domain: ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8',
       '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080', '#ffffff', '#000000']
   };
-
-  constructor(public timaService: TIMAService, public domSanitizer: DomSanitizer) { }
 
 
   ngAfterViewInit(): void {

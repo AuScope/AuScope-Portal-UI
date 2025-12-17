@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -12,10 +12,10 @@ import { UserStateService } from '../user/user-state.service';
  */
 @Injectable()
 export class AuthGuard {
+  private router = inject(Router);
+  private authService = inject(AuthService);
+  private userStateService = inject(UserStateService);
 
-  constructor(private router: Router,
-              private authService: AuthService,
-              private userStateService: UserStateService) {}
 
   canActivate(router: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
     const url: string = state.url;

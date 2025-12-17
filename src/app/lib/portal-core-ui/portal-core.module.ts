@@ -1,4 +1,4 @@
-import { NgModule, Optional, SkipSelf, ModuleWithProviders } from '@angular/core';
+import { NgModule, ModuleWithProviders, inject } from '@angular/core';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
@@ -83,7 +83,9 @@ static forRoot(env: any, conf: any): ModuleWithProviders<PortalCoreModule> {
     };
   }
 
-  constructor(@Optional() @SkipSelf() parentModule: PortalCoreModule) {
+  constructor() {
+    const parentModule = inject(PortalCoreModule, { optional: true, skipSelf: true });
+
     if (parentModule) {
       throw new Error(
         'CoreModule is already loaded. Import it in the AppModule only');

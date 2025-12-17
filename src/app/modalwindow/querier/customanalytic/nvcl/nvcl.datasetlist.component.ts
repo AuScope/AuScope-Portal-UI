@@ -2,7 +2,7 @@ import { RickshawService } from '../../../../lib/portal-core-ui/widget/chart/ric
 import { LayerModel } from '../../../../lib/portal-core-ui/model/data/layer.model';
 import { OnlineResourceModel } from '../../../../lib/portal-core-ui/model/data/onlineresource.model';
 import { NVCLService } from './nvcl.service';
-import { Component, Input, OnInit, ApplicationRef } from '@angular/core';
+import { Component, Input, OnInit, ApplicationRef, inject } from '@angular/core';
 import { HttpParams } from '@angular/common/http';
 import { DomSanitizer } from '@angular/platform-browser';
 import { saveAs } from 'file-saver';
@@ -23,6 +23,14 @@ export interface DialogData {
     standalone: false
 })
 export class NVCLDatasetListComponent implements OnInit {
+  nvclService = inject(NVCLService);
+  domSanitizer = inject(DomSanitizer);
+  private rickshawService = inject(RickshawService);
+  private appRef = inject(ApplicationRef);
+  nvclBoreholeAnalyticService = inject(NVCLBoreholeAnalyticService);
+  private modalRef = inject(BsModalRef);
+  private modalService = inject(BsModalService);
+
 
   @Input() layer: LayerModel;
   @Input() onlineResource: OnlineResourceModel;
@@ -84,14 +92,6 @@ export class NVCLDatasetListComponent implements OnInit {
   public jobList: any[] = [];
   public currentStatus = [];
   public checkingTSG = false;
-
-  constructor(public nvclService: NVCLService,
-    public domSanitizer: DomSanitizer,
-    private rickshawService: RickshawService,
-    private appRef: ApplicationRef,
-    public nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService,
-    private modalRef: BsModalRef, private modalService: BsModalService) {
-  }
 
   ngOnInit(): void {
     if (!(this.featureId)) {
@@ -445,9 +445,9 @@ export class NVCLDatasetListComponent implements OnInit {
     standalone: false
 })
 export class NVCLDatasetListDialogComponent {
+  modalRef = inject(BsModalRef);
+
 
   scalarClasses: any;
-
-  constructor(public modalRef: BsModalRef) {}
 
 }

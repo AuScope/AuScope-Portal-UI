@@ -3,7 +3,7 @@ import { throwError as observableThrowError, Observable } from 'rxjs';
 
 import { catchError, map } from 'rxjs/operators';
 
-import { Injectable, Inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { LayerModel } from '../../model/data/layer.model';
 import { OnlineResourceModel } from '../../model/data/onlineresource.model';
 import { PrimitiveModel } from '../../model/data/primitive.model';
@@ -19,16 +19,13 @@ import { RenderStatusService } from '../cesium-map/renderstatus/render-status.se
  */
 @Injectable()
 export class CsWFSService {
+  private layerHandlerService = inject(LayerHandlerService);
+  private csMapObject = inject(CsMapObject);
+  private http = inject(HttpClient);
+  private gmlParserService = inject(GMLParserService);
+  private renderStatusService = inject(RenderStatusService);
+  private env = inject<any>('env' as any);
 
-  //private map: olMap;
-
-  constructor(private layerHandlerService: LayerHandlerService,
-                  private csMapObject: CsMapObject,
-                  private http: HttpClient,
-                  private gmlParserService: GMLParserService,
-                  private renderStatusService: RenderStatusService, @Inject('env') private env) {
-    //this.map = this.csMapObject.getMap();
-  }
 
   /**
    * A get feature request

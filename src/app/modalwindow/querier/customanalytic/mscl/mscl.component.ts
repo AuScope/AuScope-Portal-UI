@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectorRef, inject } from '@angular/core';
 import { LayerModel } from '../../../../lib/portal-core-ui/model/data/layer.model';
 import { OnlineResourceModel } from '../../../../lib/portal-core-ui/model/data/onlineresource.model';
 import { QuerierInfoModel } from '../../../../lib/portal-core-ui/model/data/querierinfo.model';
@@ -14,6 +14,10 @@ import { MSCLAnalyticComponent } from '../../../layeranalytic/mscl/mscl.analytic
     standalone: false
 })
 export class MSCLComponent implements OnInit {
+    msclService = inject(MSCLService);
+    private modalService = inject(BsModalService);
+    private changeDetectorRef = inject(ChangeDetectorRef);
+
 
     @Input() layer: LayerModel;
     @Input() onlineResource: OnlineResourceModel;
@@ -35,7 +39,7 @@ export class MSCLComponent implements OnInit {
     private usesGMLObs = false; // Response has values nested within GeoSciML observations
     private bsModalRef: BsModalRef;
 
-    constructor(public msclService: MSCLService, private modalService: BsModalService, private changeDetectorRef: ChangeDetectorRef) {
+    constructor() {
         this.msclform = { startDepth: 0.0, endDepth: 2000.0, bMetric: {}, bGroup: {} };
         this.metricPNameList = [];
         this.metricGroupList = [];

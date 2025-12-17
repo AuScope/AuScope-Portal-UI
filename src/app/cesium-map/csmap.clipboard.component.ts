@@ -2,7 +2,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { CsClipboardService } from '../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
 import { DownloadWfsService } from '../lib/portal-core-ui/service/wfs/download/download-wfs.service';
 import { Polygon } from '../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { isNumber } from '@turf/helpers';
 import { saveAs } from 'file-saver';
 import { UserStateService } from 'app/services/user/user-state.service';
@@ -26,6 +26,10 @@ import { UserStateService } from 'app/services/user/user-state.service';
 })
 
 export class CsMapClipboardComponent implements OnInit {
+  private csClipboardService = inject(CsClipboardService);
+  private userStateService = inject(UserStateService);
+  private downloadWfsService = inject(DownloadWfsService);
+
   buttonText = 'clipboard';
   polygonBBox: Polygon;
   bShowClipboard: boolean;
@@ -36,7 +40,7 @@ export class CsMapClipboardComponent implements OnInit {
 
 
 
-  constructor(private csClipboardService: CsClipboardService, private userStateService: UserStateService, private downloadWfsService: DownloadWfsService) {
+  constructor() {
     this.polygonBBox = null;
     this.isFilterLayerShown = false;
     this.csClipboardService.filterLayersBS.subscribe(filterLayerStatus => {

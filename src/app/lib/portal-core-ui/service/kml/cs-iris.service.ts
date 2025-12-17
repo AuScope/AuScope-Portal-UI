@@ -3,7 +3,7 @@ import { throwError as observableThrowError, Observable } from 'rxjs';
 
 import { catchError, map } from 'rxjs/operators';
 
-import { Injectable, Inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { LayerModel } from '../../model/data/layer.model';
 import { LayerHandlerService } from '../cswrecords/layer-handler.service';
@@ -20,6 +20,12 @@ declare let Cesium;
  */
 @Injectable()
 export class CsIrisService {
+  private layerHandlerService = inject(LayerHandlerService);
+  private http = inject(HttpClient);
+  private renderStatusService = inject(RenderStatusService);
+  private mapsManagerService = inject(MapsManagerService);
+  private env = inject<any>('env' as any);
+
 
   public irisLayers: {
     layerId: string;
@@ -50,14 +56,6 @@ export class CsIrisService {
       { layerId: 'seismology-banda', maxDist: 3000000.0, color: Cesium.Color.MEDIUMPURPLE },
       { layerId: 'seismology-asr', maxDist: 8000000.0, color: Cesium.Color.BLUE },
       { layerId: 'seismology-marla-line', maxDist: 3000000.0, color: Cesium.Color.ORCHID },];
-
-
-  constructor(private layerHandlerService: LayerHandlerService,
-    private http: HttpClient,
-    private renderStatusService: RenderStatusService,
-    private mapsManagerService: MapsManagerService,
-    @Inject('env') private env) {
-  }
 
   /**
    * Retrieves station details including the channel information from the IRIS service

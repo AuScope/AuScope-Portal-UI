@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, OnInit } from '@angular/core';
+import { Component, Input, ViewChild, OnInit, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { CSWRecordModel } from '../../lib/portal-core-ui/model/data/cswrecord.model';
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
@@ -13,14 +13,15 @@ import { CesiumMapPreviewComponent } from '../common/infopanel/cesiummappreview/
     standalone: false
 })
 export class RecordModalComponent implements OnInit {
+  layerStatus = inject(LayerStatusService);
+  activeModal = inject(NgbActiveModal);
+
   @Input() cswRecords: CSWRecordModel[];
   @Input() layer: LayerModel;
   @ViewChild(CesiumMapPreviewComponent, { static: true })
   private previewMap: CesiumMapPreviewComponent;
 
   featureArr: any = [];
-
-  constructor(public layerStatus: LayerStatusService, public activeModal: NgbActiveModal) { }
 
   ngOnInit() {
     // Gather up BBOX coordinates to calculate the envelope

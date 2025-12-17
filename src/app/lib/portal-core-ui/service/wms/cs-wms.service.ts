@@ -1,7 +1,7 @@
 import { throwError as observableThrowError, Observable, Subscription } from 'rxjs';
 
 import { catchError, map } from 'rxjs/operators';
-import { Injectable, Inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { LayerModel } from '../../model/data/layer.model';
 import { OnlineResourceModel } from '../../model/data/onlineresource.model';
 import { LayerHandlerService } from '../cswrecords/layer-handler.service';
@@ -46,6 +46,16 @@ export class ErrorPayload {
  */
 @Injectable()
 export class CsWMSService {
+  private layerHandlerService = inject(LayerHandlerService);
+  private http = inject(HttpClient);
+  private renderStatusService = inject(RenderStatusService);
+  private mapsManagerService = inject(MapsManagerService);
+  private layerStatusService = inject(LayerStatusService);
+  private deviceService = inject(DeviceDetectorService);
+  private sldService = inject(SldService);
+  private env = inject<any>('env' as any);
+  private conf = inject<any>('conf' as any);
+
 
   private map: AcMapComponent;
 
@@ -53,17 +63,7 @@ export class CsWMSService {
   // Keep track of any getSldBdy subscriptions that can continue to run and add layers after a layer is removed
   private sldSubscriptions: Map<string, Subscription[]> = new Map<string, Subscription[]>();
 
-  constructor(
-    private layerHandlerService: LayerHandlerService,
-    private http: HttpClient,
-    private renderStatusService: RenderStatusService,
-    private mapsManagerService: MapsManagerService,
-    private layerStatusService: LayerStatusService,
-    private deviceService: DeviceDetectorService,
-    private sldService: SldService,
-    @Inject('env') private env,
-    @Inject('conf') private conf
-  ) {
+  constructor() {
     this.map = this.mapsManagerService.getMap();
   }
 

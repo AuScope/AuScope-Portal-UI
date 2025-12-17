@@ -1,4 +1,4 @@
-import { Component, Input, ViewContainerRef, OnInit } from "@angular/core";
+import { Component, Input, ViewContainerRef, OnInit, inject } from "@angular/core";
 import { CSWRecordModel } from '../../lib/portal-core-ui/model/data/cswrecord.model';
 import { CsMapService } from '../../lib/portal-core-ui/service/cesium-map/cs-map.service';
 import { UtilitiesService } from '../../lib/portal-core-ui/utility/utilities.service';
@@ -16,6 +16,12 @@ import { DataExplorerService } from "../data-explorer/data-explorer.service";
     standalone: false
 })
 export class DataExplorerRecordComponent implements OnInit {
+  private dataExplorerService = inject(DataExplorerService);
+  csMapService = inject(CsMapService);
+  private layerManagerService = inject(LayerManagerService);
+  private userStateService = inject(UserStateService);
+  modalService = inject(NgbModal);
+
   recordButtons: ViewContainerRef;
 
   @Input() registries: any = [];
@@ -24,13 +30,7 @@ export class DataExplorerRecordComponent implements OnInit {
 
   public optionalFilters: Array<object>;
 
-  constructor(
-    private dataExplorerService: DataExplorerService,
-    public csMapService: CsMapService,
-    private layerManagerService: LayerManagerService,
-    private userStateService: UserStateService,
-    public modalService: NgbModal
-  ) {
+  constructor() {
     this.optionalFilters = [];
   }
 

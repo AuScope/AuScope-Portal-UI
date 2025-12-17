@@ -1,5 +1,5 @@
 
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 
@@ -12,13 +12,10 @@ import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 })
 
 export class LayerAnalyticModalComponent {
+  bsModalRef = inject(BsModalRef);
+
   public analyticMap;
   public layer: LayerModel;
-
-
-  constructor(public bsModalRef: BsModalRef) {
-
-  }
 
 
 }

@@ -1,6 +1,6 @@
 import { DataExplorerService } from "./data-explorer.service";
 import { Observable, Subject, merge } from "rxjs";
-import { Component, OnInit, ViewChild, ElementRef } from "@angular/core";
+import { Component, OnInit, ViewChild, ElementRef, inject } from "@angular/core";
 import { filter, debounceTime, distinctUntilChanged, map } from "rxjs/operators";
 import { CsMapService } from '../../lib/portal-core-ui/service/cesium-map/cs-map.service';
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
@@ -22,6 +22,12 @@ import { Bbox } from '../../lib/portal-core-ui/model/data/bbox.model';
     standalone: false
 })
 export class DataExplorerComponent implements OnInit {
+  private csMapService = inject(CsMapService);
+  private dataExplorerService = inject(DataExplorerService);
+  private renderStatusService = inject(RenderStatusService);
+  private uiLayerModelService = inject(UILayerModelService);
+  private modalService = inject(NgbModal);
+
   bbox: Bbox;
   public cswRegistries = [];
 
@@ -76,14 +82,6 @@ export class DataExplorerComponent implements OnInit {
         ).slice(0, 10)
       )
     );
-
-  constructor(
-    private csMapService: CsMapService,
-    private dataExplorerService: DataExplorerService,
-    private renderStatusService: RenderStatusService,
-    private uiLayerModelService: UILayerModelService,
-    private modalService: NgbModal
-  ) { }
 
   ngOnInit() {
     this.currentYear = new Date().getFullYear();

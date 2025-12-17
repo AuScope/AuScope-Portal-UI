@@ -5,7 +5,7 @@ import { Bbox } from '../../../model/data/bbox.model';
 import { LayerModel } from '../../../model/data/layer.model';
 import { LayerHandlerService } from '../../cswrecords/layer-handler.service';
 import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
-import { Injectable, Inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import * as $ from 'jquery';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
@@ -17,13 +17,12 @@ declare let gtag: Function;
 // @dynamic
 @Injectable()
 export class DownloadWfsService {
+  private layerHandlerService = inject(LayerHandlerService);
+  private http = inject(HttpClient);
+  private env = inject<any>('env' as any);
+
   public tsgDownloadBS: Subject<string> = null;
   public tsgDownloadStartBS:Subject<string> = null;
-
-
-  constructor(private layerHandlerService: LayerHandlerService, private http: HttpClient, @Inject('env') private env) {
-
-  }
 
   /**
    * Calls AuScope API to download datasets and bundle them up into a blob object

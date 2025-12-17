@@ -1,6 +1,6 @@
 
 import { throwError as observableThrowError, Observable } from 'rxjs';
-import { Inject, Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 
@@ -21,18 +21,17 @@ declare let Cesium;
  */
 @Injectable()
 export class CsVMFService {
+  private layerHandlerService = inject(LayerHandlerService);
+  private http = inject(HttpClient);
+  private renderStatusService = inject(RenderStatusService);
+  private mapsManagerService = inject(MapsManagerService);
+  private env = inject<any>('env' as any);
+
 
   // List of VMF layers that have been cancelled
   private cancelledLayers: Array<string> = [];
   // Number of VMF resources added for a given layer
   private numberOfResourcesAdded: Map<string, number> = new Map<string, number>();
-
-  constructor(private layerHandlerService: LayerHandlerService,
-    private http: HttpClient,
-    private renderStatusService: RenderStatusService,
-    private mapsManagerService: MapsManagerService,
-    @Inject('env') private env) {
-  }
 
   /**
    * Downloads geojson that is cropped to polygon

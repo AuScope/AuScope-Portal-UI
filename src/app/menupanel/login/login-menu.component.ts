@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PermanentLinksModalComponent } from 'app/modalwindow/permanentlink/permanentlinks.modal.component';
@@ -15,11 +15,17 @@ import { CsClipboardService } from '../../lib/portal-core-ui/service/cesium-map/
     standalone: false
 })
 export class LoginMenuComponent {
+  private router = inject(Router);
+  private authService = inject(AuthService);
+  private userStateService = inject(UserStateService);
+  private csClipboardService = inject(CsClipboardService);
+  private modalService = inject(NgbModal);
+
 
   user: User;
   states: PermanentLink[];
 
-  constructor(private router: Router, private authService: AuthService, private userStateService: UserStateService, private csClipboardService: CsClipboardService, private modalService: NgbModal) {
+  constructor() {
     this.userStateService.user.subscribe(user => {
       this.user = user;
     });

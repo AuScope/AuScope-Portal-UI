@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Inject } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { ResourceType } from '../../../lib/portal-core-ui/utility/constants.service';
 import { saveAs } from 'file-saver';
 import { config } from '../../../../environments/config';
@@ -33,6 +33,18 @@ declare let gtag: Function;
     standalone: false
 })
 export class DownloadPanelComponent implements OnInit {
+  private cdRef = inject(ChangeDetectorRef);
+  private layerHandlerService = inject(LayerHandlerService);
+  private downloadWfsService = inject(DownloadWfsService);
+  private downloadWcsService = inject(DownloadWcsService);
+  private downloadIrisService = inject(DownloadIrisService);
+  private csClipboardService = inject(CsClipboardService);
+  private boundsService = inject(BoundsService);
+  private csIrisService = inject(CsIrisService);
+  activeModalService = inject(NgbModal);
+  private nvclService = inject(NVCLService);
+  private conf = inject<any>('conf' as any);
+
   [x: string]: any;
   @Input() layer: LayerModel;
 
@@ -78,12 +90,7 @@ export class DownloadPanelComponent implements OnInit {
 
   private bsModalRef = null;
 
-  constructor(private cdRef: ChangeDetectorRef, private layerHandlerService: LayerHandlerService,
-      private downloadWfsService: DownloadWfsService, private downloadWcsService: DownloadWcsService,
-      private downloadIrisService: DownloadIrisService, private csClipboardService: CsClipboardService,
-      private boundsService: BoundsService, private csIrisService: CsIrisService,
-      public activeModalService: NgbModal, private nvclService: NVCLService,
-      @Inject('conf') private conf) {
+  constructor() {
     this.isNvclLayer = false;
     this.isTsgDownloadAvailable = false;
     this.bbox = null;

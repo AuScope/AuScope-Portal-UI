@@ -1,4 +1,4 @@
-import { Component, Input, } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 /**
@@ -11,12 +11,12 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
     standalone: false
 })
 export class ConfirmModalComponent {
+  activeModal = inject(NgbActiveModal);
+
 
   @Input() title: string;
   @Input() modalContent: string;
   @Input() confirmButtonText: string;
   @Input() cancelButtonText: string;
-
-  constructor(public activeModal: NgbActiveModal) {}
 
 }

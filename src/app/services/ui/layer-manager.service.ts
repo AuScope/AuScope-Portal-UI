@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { CsMapService } from '../../lib/portal-core-ui/service/cesium-map/cs-map.service';
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 import { ManageStateService } from '../../lib/portal-core-ui/service/permanentlink/manage-state.service';
@@ -18,13 +18,15 @@ declare let gtag: Function;
  */
 @Injectable()
 export class LayerManagerService {
+  private csMapService = inject(CsMapService);
+  private manageStateService = inject(ManageStateService);
+  private uiLayerModelService = inject(UILayerModelService);
+  private advancedComponentService = inject(AdvancedComponentService);
+  private legendUiService = inject(LegendUiService);
+  private sidebarService = inject(SidebarService);
+
 
   filterList = []; // an array of all active layers - object = {layer, filterState }
-
-  constructor(private csMapService: CsMapService, private manageStateService: ManageStateService,
-    private uiLayerModelService: UILayerModelService, private advancedComponentService: AdvancedComponentService,
-    private legendUiService: LegendUiService, private sidebarService: SidebarService) {
-  }
 
   /**
    * returns a boolean for whether a layer has filters; from the array filerList

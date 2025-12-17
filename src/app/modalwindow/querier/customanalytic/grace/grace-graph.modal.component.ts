@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { Component, AfterViewInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CsMapObject } from '../../../../lib/portal-core-ui/service/cesium-map/cs-map-object';
 import { Subscription } from 'rxjs';
 import { GraceService } from '../../../../services/wcustom/grace/grace.service';
@@ -17,6 +17,11 @@ import * as Plotly from 'plotly.js-dist-min';
     standalone: false
 })
 export class GraceGraphModalComponent implements AfterViewInit {
+    private graceService = inject(GraceService);
+    private csMapObject = inject(CsMapObject);
+    modalRef = inject(BsModalRef);
+    private changeDetectorRef = inject(ChangeDetectorRef);
+
 
     QueryStatus = {
         querying: 0,
@@ -74,8 +79,6 @@ export class GraceGraphModalComponent implements AfterViewInit {
             ]
         }
     };
-
-    constructor(private graceService: GraceService, private csMapObject: CsMapObject, public modalRef: BsModalRef, private changeDetectorRef: ChangeDetectorRef) {}
 
     ngAfterViewInit() {
         // Cesium draw event is a bit slow, give dialog some time for content to be set
