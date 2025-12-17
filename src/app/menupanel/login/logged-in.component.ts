@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 
 import { AuthService } from '../../services/auth/auth.service';
 
@@ -9,8 +9,8 @@ import { AuthService } from '../../services/auth/auth.service';
     standalone: false
 })
 export class LoggedInComponent implements OnInit {
+  private authService = inject(AuthService);
 
-  constructor(private authService: AuthService) {}
 
   ngOnInit() {
     // Inform the auth service

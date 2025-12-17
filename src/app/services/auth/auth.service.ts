@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { UserStateService } from '../user/user-state.service';
@@ -7,12 +7,14 @@ import { User } from 'app/models/user.model';
 
 @Injectable()
 export class AuthService {
+  private userStateService = inject(UserStateService);
+  private router = inject(Router);
+  private http = inject(HttpClient);
+
 
   user: User;
 
-  constructor(private userStateService: UserStateService,
-              private router: Router,
-              private http: HttpClient) {
+  constructor() {
     this.userStateService.user.subscribe(user => {
       this.user = user;
     });

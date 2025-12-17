@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, ElementRef, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { Component, ElementRef, OnInit, QueryList, ViewChildren, inject } from '@angular/core';
 import { AbstractControl, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PermanentLink } from 'app/models/permanentlink.model';
@@ -18,6 +18,12 @@ import { ConfirmModalComponent } from '../confirm/confirm.modal.component';
     standalone: false
 })
 export class PermanentLinksModalComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private modalService = inject(NgbModal);
+  activeModal = inject(NgbActiveModal);
+  private userStateService = inject(UserStateService);
+  private datePipe = inject(DatePipe);
+
 
   private userStates: PermanentLink[];
   private userId: string;
@@ -29,9 +35,6 @@ export class PermanentLinksModalComponent implements OnInit {
   statesFormArray: UntypedFormArray;
 
   editingState: number = -1; // Keep track of state being edited (-1 = none)
-
-  constructor(private formBuilder: UntypedFormBuilder, private modalService: NgbModal, public activeModal: NgbActiveModal,
-              private userStateService: UserStateService, private datePipe: DatePipe) {}
 
   ngOnInit() {
     this.userStateService.user.subscribe(user => {

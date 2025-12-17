@@ -1,5 +1,5 @@
 import { timer } from 'rxjs';
-import { Injectable, Inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CSWRecordModel } from '../model/data/cswrecord.model';
 import { OnlineResourceModel } from '../model/data/onlineresource.model';
@@ -10,12 +10,12 @@ import { OnlineResourceModel } from '../model/data/onlineresource.model';
  */
 @Injectable()
 export class LayerStatusService {
+  private http = inject(HttpClient);
+  private env = inject<any>('env' as any);
+
   // synchronised layer id to failing hosts from getKnownLayers in the backend queried from stackdriver
   private layerStatusMap: Map<string, string[]>;
-  constructor(
-    private http: HttpClient,
-    @Inject('env') private env
-  ) {
+  constructor() {
     this.layerStatusMap = new Map<string, string[]>();
     this.updateLayerStatus();
   }

@@ -2,7 +2,7 @@
 import { throwError as observableThrowError } from 'rxjs';
 
 import { catchError, map } from 'rxjs/operators';
-import { Injectable, Inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 
 /**
@@ -10,9 +10,9 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
  */
 @Injectable()
 export class NotificationService {
-  constructor(private http: HttpClient, @Inject('env') private env) {
+  private http = inject(HttpClient);
+  private env = inject<any>('env' as any);
 
-  }
   /**
    * gets the notification from twitter
    * @return a observable that contains the twitter notification

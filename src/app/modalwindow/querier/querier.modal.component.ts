@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/member-ordering */
-import { ApplicationRef, ChangeDetectorRef, Component, Inject, OnInit, ElementRef, ViewChild, AfterViewInit, Renderer2 } from '@angular/core';
+import { ApplicationRef, ChangeDetectorRef, Component, OnInit, ElementRef, ViewChild, AfterViewInit, Renderer2, inject } from '@angular/core';
 import { config } from '../../../environments/config';
 import { ref } from '../../../environments/ref';
 import { CsClipboardService } from '../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
@@ -39,6 +39,21 @@ interface FlatNode {
     standalone: false
 })
 export class QuerierModalComponent implements OnInit, AfterViewInit {
+  nvclService = inject(NVCLService);
+  bsModalRef = inject(BsModalRef);
+  csClipboardService = inject(CsClipboardService);
+  private gmlParserService = inject(GMLParserService);
+  private http = inject(HttpClient);
+  private env = inject<any>('env' as any);
+  private sanitizer = inject(DomSanitizer);
+  nvclBoreholeAnalyticService = inject(NVCLBoreholeAnalyticService);
+  private changeDetectorRef = inject(ChangeDetectorRef);
+  private appRef = inject(ApplicationRef);
+  private msclService = inject(MSCLService);
+  private renderer = inject(Renderer2);
+  private modalService = inject(BsModalService);
+  dialog = inject(MatDialog);
+
   [x: string]: any;
   @ViewChild('childElement', { static: false }) childElement: ElementRef;
   public downloading: boolean;
@@ -125,13 +140,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   public isScalarLoaded = false;
   public modalVisible = true;
 
-  constructor(public nvclService: NVCLService, public bsModalRef: BsModalRef, public csClipboardService: CsClipboardService,
-    private gmlParserService: GMLParserService,
-    private http: HttpClient, @Inject('env') private env, private sanitizer: DomSanitizer,
-    public nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService,
-    private changeDetectorRef: ChangeDetectorRef, private appRef: ApplicationRef,
-    private msclService: MSCLService, private renderer: Renderer2,
-    private modalService: BsModalService, public dialog: MatDialog) {
+  constructor() {
     this.analyticMap = ref.analytic;
     this.flagNVCLAnalytic = false;
     this.initialScalarLoad = true;

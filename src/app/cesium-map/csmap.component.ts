@@ -1,6 +1,6 @@
 import { config } from '../../environments/config';
 import { QuerierModalComponent } from '../modalwindow/querier/querier.modal.component';
-import { AfterViewInit, Component, ElementRef, NgZone, ViewChild, ViewContainerRef } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, NgZone, ViewChild, ViewContainerRef, inject } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ViewerConfiguration } from '@auscope/angular-cesium';
 import { CsMapService } from '../lib/portal-core-ui/service/cesium-map/cs-map.service';
@@ -64,6 +64,18 @@ declare let Cesium: any;
 })
 
 export class CsMapComponent implements AfterViewInit {
+  private csMapObject = inject(CsMapObject);
+  private csMapService = inject(CsMapService);
+  private modalService = inject(BsModalService);
+  private queryWMSService = inject(QueryWMSService);
+  private gmlParserService = inject(GMLParserService);
+  private manageStateService = inject(ManageStateService);
+  private advancedMapComponentService = inject(AdvancedComponentService);
+  private userStateService = inject(UserStateService);
+  private nvclBoreholeAnalyticService = inject(NVCLBoreholeAnalyticService);
+  private viewerConf = inject(ViewerConfiguration);
+  private ngZone = inject(NgZone);
+
 
   public static AUSTRALIA = Rectangle.fromDegrees(114.591, -45.837, 148.97, -5.73);
 
@@ -89,11 +101,7 @@ export class CsMapComponent implements AfterViewInit {
   private bsModalRef: BsModalRef;
   private modalDisplayed = false;
 
-  constructor(private csMapObject: CsMapObject, private csMapService: CsMapService, private modalService: BsModalService,
-    private queryWMSService: QueryWMSService, private gmlParserService: GMLParserService,
-    private manageStateService: ManageStateService, private advancedMapComponentService: AdvancedComponentService,
-    private userStateService: UserStateService, private nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService,
-    private viewerConf: ViewerConfiguration, private ngZone: NgZone) {
+  constructor() {
     this.csMapService.getClickedLayerListBS().subscribe((mapClickInfo) => {
       this.handleLayerClick(mapClickInfo);
     });
@@ -526,7 +534,7 @@ export class CsMapComponent implements AfterViewInit {
             let url = null;
             try {
                 url = new URL(onlineResource.url);
-            } catch (error) {
+            } catch (_error) {
                 // skip
             }
             if (url?.hostname.endsWith('.sa.gov.au') && onlineResource.name === 'gsmlp:BoreholeView') {

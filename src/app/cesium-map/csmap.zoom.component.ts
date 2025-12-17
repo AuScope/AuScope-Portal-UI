@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation, inject } from '@angular/core';
 import { CameraService, CesiumService, ZoomToRectangleService } from '@auscope/angular-cesium';
 import { CsMapComponent } from './csmap.component';
 
@@ -12,14 +12,16 @@ import { CsMapComponent } from './csmap.component';
     standalone: false
 })
 export class CsMapZoomComponent {
+  private cameraService = inject(CameraService);
+  private zoomToRectangleService = inject(ZoomToRectangleService);
+
   // amount to zoom in/out by. 10x the default camera zoom
   zoomAmount = 1000000;
 
-  constructor(
-    private cameraService: CameraService,
-    cesiumService: CesiumService,
-    private zoomToRectangleService: ZoomToRectangleService,
-  ) {
+  constructor() {
+    const cameraService = this.cameraService;
+    const cesiumService = inject(CesiumService);
+
     this.zoomToRectangleService.init(cesiumService, cameraService);
   }
 

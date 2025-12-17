@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { CsMapObject } from '../../../../../lib/portal-core-ui/service/cesium-map/cs-map-object';
 import { CsMapService } from '../../../../../lib/portal-core-ui/service/cesium-map/cs-map.service';
@@ -15,17 +15,17 @@ import { GraceStyleSettings } from 'app/modalwindow/querier/customanalytic/grace
 
 })
   export class GraceAdvancedFilterComponent extends AdvancedFilterDirective implements OnInit {
+    private csMapObject = inject<CsMapObject>(CsMapObject);
+    private csMapService = inject<CsMapService>(CsMapService);
+    private graceService = inject(GraceService);
+    private formBuilder = inject(UntypedFormBuilder);
+    private modalService = inject(BsModalService);
+
 
     timeSeriesGraphModalRef?: BsModalRef;
 
     DECIMAL_REGEX = '^-?\\d*\.{0,1}\\d+$';
     styleGroup: UntypedFormGroup;
-
-
-    constructor(@Inject(CsMapObject)private csMapObject: CsMapObject, @Inject(CsMapService)private csMapService: CsMapService,
-                private graceService: GraceService, private formBuilder: UntypedFormBuilder, private modalService: BsModalService) {
-        super();
-    }
 
     ngOnInit() {
         // Construct form current GRACE style

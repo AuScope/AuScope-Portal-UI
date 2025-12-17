@@ -1,4 +1,4 @@
-import { Directive, ElementRef, HostListener } from '@angular/core';
+import { Directive, ElementRef, HostListener, inject } from '@angular/core';
 
 /** This directive adds a spinner image to the background of an <img> tag.
  The spinner will disappear once the image is loaded or an error occurs.
@@ -9,10 +9,14 @@ import { Directive, ElementRef, HostListener } from '@angular/core';
     standalone: false
 })
 export class ImgLoadingDirective {
+    private el = inject(ElementRef);
+
     /**
       * Gets called at the start, adds a spinner to the loading image
       */
-    constructor(private el: ElementRef) {
+    constructor() {
+        const el = this.el;
+
         el.nativeElement.setAttribute('style', 'background: transparent url(extension/images/ajax-loader.gif) no-repeat scroll center');
     }
 

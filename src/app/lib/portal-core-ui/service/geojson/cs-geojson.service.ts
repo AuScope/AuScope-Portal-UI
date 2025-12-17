@@ -1,5 +1,5 @@
 
-import { Inject, Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { OnlineResourceModel } from '../../model/data/onlineresource.model';
 import { LayerModel } from '../../model/data/layer.model';
@@ -17,18 +17,17 @@ declare let Cesium;
  */
 @Injectable()
 export class CsGeoJsonService {
+  private layerHandlerService = inject(LayerHandlerService);
+  private http = inject(HttpClient);
+  private renderStatusService = inject(RenderStatusService);
+  private mapsManagerService = inject(MapsManagerService);
+  private env = inject<any>('env' as any);
+
 
   // List of geoJson layers that have been cancelled
   private cancelledLayers: Array<string> = [];
   // Number of geoJson resources added for a given layer
   private numberOfResourcesAdded: Map<string, number> = new Map<string, number>();
-
-  constructor(private layerHandlerService: LayerHandlerService,
-    private http: HttpClient,
-    private renderStatusService: RenderStatusService,
-    private mapsManagerService: MapsManagerService,
-    @Inject('env') private env) {
-  }
 
   /**
    * Add the geoJson layer

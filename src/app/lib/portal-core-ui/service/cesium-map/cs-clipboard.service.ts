@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { CsMapObject } from './cs-map-object';
 import { GeometryType } from '../../utility/constants.service';
@@ -12,6 +12,9 @@ import { UtilitiesService } from '../../utility/utilities.service';
  */
 @Injectable()
 export class CsClipboardService {
+  private csMapObject = inject(CsMapObject);
+  private mapsManagerService = inject(MapsManagerService);
+
   public polygonBBox: Polygon;
   public polygonsBS: BehaviorSubject<Polygon>;
 
@@ -23,7 +26,7 @@ export class CsClipboardService {
 
   public isDrawingPolygonBS: BehaviorSubject<boolean>;
 
-  constructor(private csMapObject: CsMapObject, private mapsManagerService: MapsManagerService) {
+  constructor() {
     this.polygonBBox = null;
     this.polygonsBS = new BehaviorSubject<Polygon>(this.polygonBBox);
     this.polygonsBS.next(this.polygonBBox);

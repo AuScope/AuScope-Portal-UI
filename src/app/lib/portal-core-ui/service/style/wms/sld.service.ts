@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { OnlineResourceModel } from '../../../model/data/onlineresource.model';
 import { GSML41StyleService } from './gsml41-style.service';
@@ -21,6 +21,10 @@ import { config } from '../../../../../../../src/environments/config';
 
 @Injectable()
 export class SldService {
+  private http = inject(HttpClient);
+  private env = inject<any>('env' as any);
+  private config = inject<any>('conf' as any);
+
   private styleServiceMap = {
     'BoreholeStyleService': BoreholeStyleService,
     'NVCLBoreholeStyleService': NVCLBoreholeStyleService,
@@ -36,12 +40,6 @@ export class SldService {
     'RemanentAnomaliesAutoSearchStyleService': RemanentAnomaliesAutoSearchStyleService,
     'GenericStyleService': GenericStyleService
   };
-
-  constructor(
-    private http: HttpClient,
-    @Inject('env') private env,
-    @Inject('conf') private config
-  ) {}
 
   /**
    * Get the SLD from the URL

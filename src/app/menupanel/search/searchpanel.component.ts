@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, Inject, NgZone, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, NgZone, OnInit, ViewChild, inject } from '@angular/core';
 import { RectangleEditorObservable } from '@auscope/angular-cesium';
 
 import { CSWRecordModel } from '../../lib/portal-core-ui/model/data/cswrecord.model';
@@ -82,6 +82,18 @@ const OGC_SERVICES = [
     standalone: false
 })
 export class SearchPanelComponent implements OnInit {
+  private searchService = inject(SearchService);
+  private csMapService = inject(CsMapService);
+  private layerHandlerService = inject(LayerHandlerService);
+  private layerManagerService = inject(LayerManagerService);
+  private uiLayerModelService = inject(UILayerModelService);
+  private renderStatusService = inject(RenderStatusService);
+  private filterService = inject(FilterService);
+  private modalService = inject(NgbModal);
+  private http = inject(HttpClient);
+  private env = inject<any>('env' as any);
+  private ngZone = inject(NgZone);
+
 
   RESULTS_PER_PAGE = 10;
 
@@ -135,12 +147,6 @@ export class SearchPanelComponent implements OnInit {
   suggesterSubscription: Subscription;
   suggestedTerms: string[] = [];
   highlightedSuggestionIndex = -1;
-
-  constructor(private searchService: SearchService, private csMapService: CsMapService,
-              private layerHandlerService: LayerHandlerService, private layerManagerService: LayerManagerService,
-              private uiLayerModelService: UILayerModelService, private renderStatusService: RenderStatusService,
-              private filterService: FilterService, private modalService: NgbModal,
-              private http: HttpClient, @Inject('env') private env, private ngZone: NgZone) { }
 
   ngOnInit() {
     // Populate search results with all layers by default

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { UserStateService } from './services/user/user-state.service';
 /**
  * Top level application component, holds the router outlet
@@ -13,8 +13,10 @@ import { UserStateService } from './services/user/user-state.service';
 })
 
 export class AppComponent {
+  private userStateService = inject(UserStateService);
 
-  constructor(private userStateService: UserStateService) {
+
+  constructor() {
     this.userStateService.updateUser();
   }
 

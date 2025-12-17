@@ -1,7 +1,7 @@
 
 import { throwError as observableThrowError, Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { Layout, Data } from 'plotly.js-dist-min';
@@ -96,8 +96,10 @@ const MARKER_SZ = { size: 2 };
 
 @Injectable()
 export class MSCLService {
+    private http = inject(HttpClient);
 
-    constructor(private http: HttpClient) {
+
+    constructor() {
 
         // Setup the map with the numerous XRF elements
         for (const elem of XRFElem) {

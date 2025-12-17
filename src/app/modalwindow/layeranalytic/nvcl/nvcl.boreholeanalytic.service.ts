@@ -5,7 +5,7 @@ import { catchError, map } from 'rxjs/operators';
 import { LayerModel } from '../../../lib/portal-core-ui/model/data/layer.model';
 import { RenderStatusService } from '../../../lib/portal-core-ui/service/cesium-map/renderstatus/render-status.service';
 import { LayerHandlerService } from '../../../lib/portal-core-ui/service/cswrecords/layer-handler.service';
-import { Injectable, Inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { config } from '../../../../environments/config';
@@ -19,15 +19,13 @@ declare let Cesium;
 
 @Injectable()
 export class NVCLBoreholeAnalyticService {
+  private http = inject(HttpClient);
+  private layerHandlerService = inject(LayerHandlerService);
+  private layerManagerService = inject(LayerManagerService);
+  private renderStatusService = inject(RenderStatusService);
+  private uiLayerModelService = inject(UILayerModelService);
+  private storage = inject<StorageService>(LOCAL_STORAGE);
 
-
-  constructor(private http: HttpClient,
-    private layerHandlerService: LayerHandlerService,
-    private layerManagerService: LayerManagerService,
-    private renderStatusService: RenderStatusService,
-    private uiLayerModelService: UILayerModelService,
-    @Inject(LOCAL_STORAGE) private storage: StorageService) {
-  }
 
   private styleNVCLAnalyticalGeoJsonEntity(entity) {
     let dotColor = Cesium.Color.YELLOW;

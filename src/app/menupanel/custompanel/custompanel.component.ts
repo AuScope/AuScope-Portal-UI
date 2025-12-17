@@ -1,4 +1,4 @@
-import { Component, Output, Inject, EventEmitter, inject } from '@angular/core';
+import { Component, Output, EventEmitter, inject } from '@angular/core';
 import { LayerHandlerService } from '../../lib/portal-core-ui/service/cswrecords/layer-handler.service';
 import { ResourceType } from '../../lib/portal-core-ui/utility/constants.service';
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
@@ -25,6 +25,8 @@ import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
     standalone: false
 })
 export class CustomPanelComponent {
+  private env = inject<any>('env' as any);
+
   private http = inject(HttpClient);
   private layerHandlerService = inject(LayerHandlerService);
   private layerManagerService = inject(LayerManagerService);
@@ -51,7 +53,7 @@ export class CustomPanelComponent {
 
   @Output() expanded: EventEmitter<any> = new EventEmitter();
 
-  constructor(@Inject('env') private env) {
+  constructor() {
     this.loading = false;
     this.statusMsg = 'Enter your OGC WMS service endpoint</br>e.g. "https://server.gov.au/service/wms"</br>or KML/KMZ/GeoJSON URL and hit <i class="fa fa-search"></i>.';
   }

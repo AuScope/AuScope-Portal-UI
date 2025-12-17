@@ -4,13 +4,15 @@ import { map, catchError } from 'rxjs/operators';
 
 import { environment } from '../../../environments/environment';
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Registry } from './data-model';
 
 
 @Injectable()
 export class DataExplorerService {
+  private http = inject(HttpClient);
+
 
   static RESULTS_PER_PAGE: number = 35;
 
@@ -20,8 +22,6 @@ export class DataExplorerService {
 
   private _registries: BehaviorSubject<Registry[]> = new BehaviorSubject([]);
   public readonly registries: Observable<Registry[]> = this._registries.asObservable();
-
-  constructor(private http: HttpClient) { }
 
   /*
   public getFilteredCSWKeywords(cswServiceId: string): Observable<any> {

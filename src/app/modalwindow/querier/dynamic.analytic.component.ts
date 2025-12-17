@@ -1,7 +1,7 @@
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 import { OnlineResourceModel } from '../../lib/portal-core-ui/model/data/onlineresource.model';
 import { NVCLDatasetListComponent } from './customanalytic/nvcl/nvcl.datasetlist.component';
-import { Component, Input, ViewChild, ViewContainerRef, ChangeDetectorRef, OnChanges } from '@angular/core';
+import { Component, Input, ViewChild, ViewContainerRef, ChangeDetectorRef, OnChanges, inject } from '@angular/core';
 import { ref } from '../../../environments/ref';
 import { QuerierInfoModel } from '../../lib/portal-core-ui/model/data/querierinfo.model';
 import { RemanentAnomaliesComponent } from './customanalytic/RemanentAnomalies/remanentanomalies.component';
@@ -16,6 +16,8 @@ import { MSCLComponent } from './customanalytic/mscl/mscl.component';
 
 
 export class DynamicAnalyticComponent implements OnChanges {
+  private changeDetectorRef = inject(ChangeDetectorRef);
+
   @Input() layer: LayerModel;
   @Input() onlineResource: OnlineResourceModel;
   @Input() featureId: string;
@@ -23,9 +25,6 @@ export class DynamicAnalyticComponent implements OnChanges {
   private _load: boolean;
   @ViewChild('dynamicContentAnalyticPlaceholder', { read: ViewContainerRef, static: true })
   dynamicAnalyticHost: ViewContainerRef;
-
-
-  constructor(private changeDetectorRef: ChangeDetectorRef) { }
 
   @Input()
   set load(load: boolean) {

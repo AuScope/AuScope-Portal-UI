@@ -1,5 +1,5 @@
 import { LayerModel } from '../../../lib/portal-core-ui/model/data/layer.model';
-import { Component, Input, AfterViewInit, OnInit, AfterContentChecked } from '@angular/core';
+import { Component, Input, AfterViewInit, OnInit, AfterContentChecked, inject } from '@angular/core';
 import { LayerAnalyticInterface } from '../layer.analytic.interface';
 import { DownloadWfsService } from '../../../lib/portal-core-ui/service/wfs/download/download-wfs.service';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -25,6 +25,11 @@ import { shareReplay } from 'rxjs/operators';
     standalone: false
 })
 export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewInit, OnInit, LayerAnalyticInterface {
+  activeModal = inject(NgbActiveModal);
+  private downloadWfsService = inject(DownloadWfsService);
+  private nvclBoreholeAnalyticService = inject(NVCLBoreholeAnalyticService);
+  private tsgDownloadService = inject(TSGDownloadService);
+
   @Input() layer: LayerModel;
   public tsgform;
   public ngSelectiveConfig = {};
@@ -37,8 +42,7 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
   public urlsArray =[];
   public download1$: Observable<Download>;
 
-  constructor(public activeModal: NgbActiveModal, private downloadWfsService: DownloadWfsService , private nvclBoreholeAnalyticService: NVCLBoreholeAnalyticService, private tsgDownloadService: TSGDownloadService,
-    ) {
+  constructor() {
     this.tsgform = {};
     //this.tsgform.email = '';
     if (this.nvclBoreholeAnalyticService.hasSavedEmail()) {
