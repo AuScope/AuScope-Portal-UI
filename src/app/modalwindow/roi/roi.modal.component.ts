@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { UntypedFormArray, UntypedFormBuilder } from '@angular/forms';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmModalComponent } from '../confirm/confirm.modal.component';
@@ -19,12 +19,15 @@ import { User } from 'app/models/user.model';
 
 
 export class ROIModalComponent {
+  csClipboardService = inject(CsClipboardService);
+  userStateService = inject(UserStateService);
+  private formBuilder = inject(UntypedFormBuilder);
+  private modalService = inject(NgbModal);
+  activeModal = inject(NgbActiveModal);
+
   public user: User;
   roiFormArray: UntypedFormArray;
   editingROI: number = -1; // Keep track of ROI being edited (-1 = none)
-  constructor(public csClipboardService: CsClipboardService, public userStateService: UserStateService, private formBuilder: UntypedFormBuilder, private modalService: NgbModal, public activeModal: NgbActiveModal) {
-
-  }
   /**
    * Delete a ROI from user's ROI lists
    * @param roi Polygon

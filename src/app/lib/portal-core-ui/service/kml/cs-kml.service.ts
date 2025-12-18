@@ -1,6 +1,6 @@
 
 import { throwError as observableThrowError, Observable } from 'rxjs';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 
@@ -22,18 +22,17 @@ declare let Cesium;
  */
 @Injectable()
 export class CsKMLService {
+  private layerHandlerService = inject(LayerHandlerService);
+  private http = inject(HttpClient);
+  private renderStatusService = inject(RenderStatusService);
+  private mapsManagerService = inject(MapsManagerService);
+  private kmlService = inject(KMLDocService);
+
 
   // List of KML layers that have been cancelled
   private cancelledLayers: Array<string> = [];
   // Number of KML resources added for a given layer
   private numberOfResourcesAdded: Map<string, number> = new Map<string, number>();
-
-  constructor(private layerHandlerService: LayerHandlerService,
-    private http: HttpClient,
-    private renderStatusService: RenderStatusService,
-    private mapsManagerService: MapsManagerService,
-    private kmlService: KMLDocService) {
-  }
 
   /**
    * Downloads KML, cleans it

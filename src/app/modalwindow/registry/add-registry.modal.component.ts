@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Registry } from 'app/menupanel/data-explorer/data-model';
@@ -14,6 +14,8 @@ declare let gtag: Function;
     standalone: false
 })
 export class AddRegistryModalComponent implements OnInit, AfterViewInit {
+  activeModal = inject(NgbActiveModal);
+
 
   @ViewChild('nameField') nameField: ElementRef;
 
@@ -26,8 +28,6 @@ export class AddRegistryModalComponent implements OnInit, AfterViewInit {
     recordUrl: new FormControl({ value: '', disabled: true }, [ Validators.required.bind(Validators) ]),
     overrideRecordUrl: new FormControl(false)
   });
-
-  constructor(public activeModal: NgbActiveModal) {}
 
   /**
    * Used to set default service type

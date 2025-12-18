@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { UserStateService } from 'app/services/user/user-state.service';
 import { User } from 'app/models/user.model';
@@ -12,12 +12,15 @@ import { CreatePermanentLinkModalComponent } from 'app/modalwindow/permanentlink
     standalone: false
 })
 export class PermanentLinkComponent {
+  private userStateService = inject(UserStateService);
+  private modalService = inject(NgbModal);
+
   public bShowDialog = false;
   public user: User;
   public permanentlink = "";
   public shorteningMode = false;
 
-  constructor(private userStateService: UserStateService, private modalService: NgbModal) {
+  constructor() {
     this.userStateService.user.subscribe(user => {
       this.user = user;
     });

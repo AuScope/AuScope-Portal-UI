@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef, inject } from '@angular/core';
 import { CSWRecordModel } from '../../../lib/portal-core-ui/model/data/cswrecord.model';
 import { LayerModel } from '../../../lib/portal-core-ui/model/data/layer.model';
 import { LayerStatusService } from '../../../lib/portal-core-ui/utility/layerstatus.service';
@@ -14,12 +14,12 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 })
 
 export class InfoPanelComponent {
+    activeModal = inject(NgbActiveModal);
+    layerStatus = inject(LayerStatusService);
+
     @Input() cswRecords: CSWRecordModel[];
     @Input() layer: LayerModel;
     @Input() expanded: boolean;
     @ViewChild('subPanelElement') subPanelElement: ElementRef;
-
-    constructor(public activeModal: NgbActiveModal, public layerStatus: LayerStatusService) {
-    }
 
 }

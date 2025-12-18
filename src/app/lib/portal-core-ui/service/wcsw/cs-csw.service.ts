@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { LayerModel } from '../../model/data/layer.model';
 import { OnlineResourceModel } from '../../model/data/onlineresource.model';
 import { LayerHandlerService } from '../cswrecords/layer-handler.service';
@@ -22,6 +22,10 @@ const LABEL_BACKGROUND_COLOUR = Color.BLACK;
  */
 @Injectable()
 export class CsCSWService {
+  private layerHandlerService = inject(LayerHandlerService);
+  private renderStatusService = inject(RenderStatusService);
+  private mapsManagerService = inject(MapsManagerService);
+
 
   // VT in the event we cannot find a suitable renderer, we default to csw. we need to store the layers that have been rendered
   // so that the querier will be able to know which layer have been rendered as csw
@@ -29,12 +33,6 @@ export class CsCSWService {
 
   private map: AcMapComponent = null;
   private viewer: any = null;
-
-
-  constructor(private layerHandlerService: LayerHandlerService,
-                  private renderStatusService: RenderStatusService,
-                  private mapsManagerService: MapsManagerService) {
-  }
 
 
   /**

@@ -1,4 +1,4 @@
-import { Component, Inject, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { CSWRecordModel } from '../../../../lib/portal-core-ui/model/data/cswrecord.model';
 import { LayerModel } from '../../../../lib/portal-core-ui/model/data/layer.model';
 import { OnlineResourceModel } from '../../../../lib/portal-core-ui/model/data/onlineresource.model';
@@ -15,6 +15,9 @@ import { ResourceType } from '../../../../lib/portal-core-ui/utility/constants.s
     standalone: false
 })
 export class InfoPanelSubComponent implements OnInit {
+    private env = inject<any>('env' as any);
+    private filterService = inject(FilterService);
+
     @Input() cswRecord: CSWRecordModel;
     @Input() layer: LayerModel;
     @Input() expanded: boolean;
@@ -47,8 +50,6 @@ export class InfoPanelSubComponent implements OnInit {
 
     // A regexp to catch customer service/enquiries names
     regex: RegExp = new RegExp("enquiries|service|customer|infocentre", "i");
-
-    constructor(@Inject('env') private env, private filterService: FilterService) {}
 
     /**
      * Remove unwanted strings from metadata constraints fields

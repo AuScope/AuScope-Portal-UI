@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, Renderer2, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Renderer2, ChangeDetectorRef, inject } from '@angular/core';
 import { MSCLService } from './mscl.service';
 
 @Component({
@@ -9,6 +9,10 @@ import { MSCLService } from './mscl.service';
     standalone: false
 })
 export class MSCLAnalyticComponent implements OnInit {
+    msclService = inject(MSCLService);
+    private renderer = inject(Renderer2);
+    private changeDetectorRef = inject(ChangeDetectorRef);
+
 
     // Data inserted at modal dialogue creation point
     startDepth: number; // Start depth for plotting
@@ -29,13 +33,6 @@ export class MSCLAnalyticComponent implements OnInit {
             displaylogo: false
         }
     };
-
-    /**
-     * Create this class and initialize all metric list
-     * @param msclService service used to retrieve MCSL data
-     */
-    constructor(public msclService: MSCLService, private renderer: Renderer2, private changeDetectorRef: ChangeDetectorRef) {
-    }
 
     /**
      * Draws the plots

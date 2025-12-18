@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { LayerHandlerService } from '../../lib/portal-core-ui/service/cswrecords/layer-handler.service';
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
@@ -22,6 +22,9 @@ export class LayerTimes {
  */
 @Injectable()
 export class FilterService {
+    private layerHandlerService = inject(LayerHandlerService);
+    private getCapsService = inject(GetCapsService);
+
 
     // Collection of filters (filterCollection) for a given layer
     private layerFilterCollections: Map<string, BehaviorSubject<any>> = new Map<string, BehaviorSubject<any>>();
@@ -29,9 +32,6 @@ export class FilterService {
     private layerProviders: Map<string, BehaviorSubject<Array<object>>> = new Map<string, BehaviorSubject<Array<object>>>();
     // Layer times retrieved from GetCaps
     private layerTimes: Map<string, BehaviorSubject<LayerTimes>> = new Map<string, BehaviorSubject<LayerTimes>>();
-
-
-    constructor(private layerHandlerService: LayerHandlerService, private getCapsService: GetCapsService) {}
 
     /**
      * Register a filter collection for a layer

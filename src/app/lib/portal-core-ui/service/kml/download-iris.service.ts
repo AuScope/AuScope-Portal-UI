@@ -2,7 +2,7 @@ import { throwError as observableThrowError, Observable } from 'rxjs';
 import { Bbox } from '../../model/data/bbox.model';
 import { LayerModel } from '../../model/data/layer.model';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Injectable, Inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 
 /**
  * Service to download IRIS data
@@ -10,9 +10,9 @@ import { Injectable, Inject } from '@angular/core';
 // @dynamic
 @Injectable()
 export class DownloadIrisService {
+    private http = inject(HttpClient);
+    private env = inject<any>('env' as any);
 
-    constructor(private http: HttpClient, @Inject('env') private env) {
-    }
 
     /**
    * Download a zip file of dataselect dataset by constructing a data download URL

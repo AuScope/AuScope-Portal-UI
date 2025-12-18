@@ -1,6 +1,6 @@
 import { LayerModel } from '../../../../lib/portal-core-ui/model/data/layer.model';
 import { OnlineResourceModel } from '../../../../lib/portal-core-ui/model/data/onlineresource.model';
-import { Component, Input, AfterViewInit } from '@angular/core';
+import { Component, Input, AfterViewInit, inject } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { QuerierInfoModel } from '../../../../lib/portal-core-ui/model/data/querierinfo.model';
 import { UtilitiesService } from '../../../../lib/portal-core-ui/utility/utilities.service';
@@ -14,6 +14,9 @@ import { RemanentAnomaliesService } from './remanentanomalies.service';
     standalone: false
 })
 export class RemanentAnomaliesComponent implements AfterViewInit {
+  remanentAnomaliesService = inject(RemanentAnomaliesService);
+  domSanitizer = inject(DomSanitizer);
+
 
   @Input() layer: LayerModel;
   @Input() onlineResource: OnlineResourceModel;
@@ -24,8 +27,6 @@ export class RemanentAnomaliesComponent implements AfterViewInit {
   public baseUrl: string;
   public hasModel: boolean;
   public hasAnalyses: boolean;
-
-  constructor(public remanentAnomaliesService: RemanentAnomaliesService, public domSanitizer: DomSanitizer) { }
 
 
   ngAfterViewInit(): void {

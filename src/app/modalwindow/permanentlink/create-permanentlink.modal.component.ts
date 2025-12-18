@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { UserStateService } from 'app/services/user/user-state.service';
@@ -14,13 +14,15 @@ import { environment } from '../../../environments/environment';
     standalone: false
 })
 export class CreatePermanentLinkModalComponent implements OnInit {
+  private userStateService = inject(UserStateService);
+  private formBuilder = inject(UntypedFormBuilder);
+  activeModal = inject(NgbActiveModal);
+
 
   linkForm: UntypedFormGroup;
   dialogMessage: string;
   savingState = false;
   errorOccurred: boolean;
-
-  constructor(private userStateService: UserStateService, private formBuilder: UntypedFormBuilder, public activeModal: NgbActiveModal) {}
 
   ngOnInit() {
     this.linkForm = this.formBuilder.group({

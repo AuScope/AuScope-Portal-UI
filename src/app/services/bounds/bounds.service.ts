@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { RectangleEditorObservable } from '@auscope/angular-cesium';
 import { CsMapService } from '../../lib/portal-core-ui/service/cesium-map/cs-map.service';
@@ -12,6 +12,8 @@ import { config } from '../../../environments/config';
  */
 @Injectable()
 export class BoundsService {
+  private csMapService = inject(CsMapService);
+
 
   // Bounds on map as drawn by user
   private boundsObservable: RectangleEditorObservable;
@@ -23,8 +25,6 @@ export class BoundsService {
   // Keep track of drawing in progress
   private _drawingStarted: BehaviorSubject<boolean> = new BehaviorSubject(false);
   public readonly drawingStarted: Observable<boolean> = this._drawingStarted.asObservable();
-
-  constructor(private csMapService: CsMapService) {}
 
   /**
    * Draw a bounding box on the map, primarily for downloads

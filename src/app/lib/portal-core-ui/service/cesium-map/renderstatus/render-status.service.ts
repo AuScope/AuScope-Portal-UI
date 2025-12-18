@@ -1,7 +1,7 @@
 import { LayerModel } from '../../../model/data/layer.model';
 import { OnlineResourceModel } from '../../../model/data/onlineresource.model';
 import { StatusMapModel } from '../../../model/data/statusmap.model';
-import { ApplicationRef, Injectable } from '@angular/core';
+import { ApplicationRef, Injectable, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 /**
@@ -9,10 +9,12 @@ import { BehaviorSubject } from 'rxjs';
  */
 @Injectable()
 export class RenderStatusService {
+  private appRef = inject(ApplicationRef);
+
 
   private statusmaps: Map<string, StatusMapModel>;
 
-  constructor(private appRef: ApplicationRef) {
+  constructor() {
     this.statusmaps = new Map<string, StatusMapModel>();
   }
 

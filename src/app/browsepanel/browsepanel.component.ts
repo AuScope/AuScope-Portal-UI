@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, inject } from '@angular/core';
 import { LayerHandlerService } from '../lib/portal-core-ui/service/cswrecords/layer-handler.service';
 import { RenderStatusService } from '../lib/portal-core-ui/service/cesium-map/renderstatus/render-status.service';
 import { UILayerModel } from '../menupanel/common/model/ui/uilayer.model';
@@ -21,6 +21,15 @@ import { config } from 'environments/config';
     standalone: false
 })
 export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
+  private layerHandlerService = inject(LayerHandlerService);
+  private layerManagerService = inject(LayerManagerService);
+  private renderStatusService = inject(RenderStatusService);
+  private uiLayerModelService = inject(UILayerModelService);
+  private filterService = inject(FilterService);
+  private sidebarService = inject(SidebarService);
+  private userStateService = inject(UserStateService);
+  private authService = inject(AuthService);
+
 
   public layerGroupColumn: object; /* Holds the data structures for all layers and groups */
   public layerColumn: []; /* List of layers for a certain group */
@@ -32,16 +41,6 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
   public sidebarSubscription: Subscription;
   public layerBookmarked = {}; /* Object stores which layers are bookmarked. key is layer id, value is boolean */
   public showOnlyBookmarked = false; /* When true only bookmarked layers are shown in the browse menu */
-
-  constructor(private layerHandlerService: LayerHandlerService,
-      private layerManagerService: LayerManagerService,
-      private renderStatusService: RenderStatusService,
-      private uiLayerModelService: UILayerModelService,
-      private filterService: FilterService,
-      private sidebarService: SidebarService,
-      private userStateService: UserStateService,
-      private authService: AuthService
-      ) {}
 
   /**
    * Toggle sidebar

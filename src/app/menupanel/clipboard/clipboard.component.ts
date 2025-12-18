@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CsClipboardService } from '../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
 import { CsMapService } from '../../lib/portal-core-ui/service/cesium-map/cs-map.service';
 
@@ -10,10 +10,13 @@ import { CsMapService } from '../../lib/portal-core-ui/service/cesium-map/cs-map
 })
 
 export class ClipboardComponent {
+  private CsClipboardService = inject(CsClipboardService);
+  private csMapService = inject(CsMapService);
+
 
   public isClipboardShown;
 
-  constructor(private CsClipboardService: CsClipboardService, private csMapService: CsMapService) {
+  constructor() {
     this.isClipboardShown = false;
     this.CsClipboardService.clipboardBS.subscribe(clipboardStatus => {
       this.isClipboardShown = clipboardStatus;

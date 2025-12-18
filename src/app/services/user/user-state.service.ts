@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Bookmark } from 'app/models/bookmark.model';
 import { PermanentLink } from 'app/models/permanentlink.model';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
@@ -16,6 +16,11 @@ import { UILayerModelService } from '../ui/uilayer-model.service';
 
 @Injectable()
 export class UserStateService {
+  private apiService = inject(AuscopeApiService);
+  private manageStateService = inject(ManageStateService);
+  private csMapService = inject(CsMapService);
+  private uiLayerModelService = inject(UILayerModelService);
+
 
   // User
   private _user: BehaviorSubject<User> = new BehaviorSubject(null);
@@ -32,8 +37,6 @@ export class UserStateService {
   //ROI for User
   public roiList:Polygon[] = [];
   public roiKey = '';
-
-  constructor(private apiService: AuscopeApiService, private manageStateService: ManageStateService, private csMapService: CsMapService, private uiLayerModelService: UILayerModelService) {}
 
   /**
    * Get the currently logged in user (if one is logged in)

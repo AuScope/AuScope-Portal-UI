@@ -1,6 +1,6 @@
 import { SimpleXMLService } from './../../utility/simplexml.service';
 import { UtilitiesService } from './../../utility/utilities.service';
-import { Injectable, Inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -10,9 +10,9 @@ import { Constants } from '../../utility/constants.service';
   providedIn: 'root'
 })
 export class GetCoverageService {
+  private http = inject(HttpClient);
+  private env = inject<any>('env' as any);
 
-  constructor(private http: HttpClient,
-              @Inject('env') private env) { }
 
   /**
  * Test
