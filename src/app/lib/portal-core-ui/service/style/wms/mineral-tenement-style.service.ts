@@ -26,7 +26,7 @@ export class MineralTenementStyleService {
   private static readonly TENEMENT_COLOUR_MAP = {
     // TenementType colors
     /*
-    NT: 'Exploration Licence (EL)', 'Extractive Mineral Permit (EMP)', 'Mineral Lease (ML)', 
+    NT: 'Exploration Licence (EL)', 'Extractive Mineral Permit (EMP)', 'Mineral Lease (ML)',
         'Mineral Authority (MA)', 'Exploration Licence in Retention (ELR)', 'Mineral Lease (Northern) (MLN)',
         'Extractive Mineral Exploration Licence (EMEL)', 'Access Authority (AA)', 'Reserve Land (RL)',
         'Fossicking Area (s.131) (FA)', 'Mineral Lease (Central) (MLC)', 'Authorised Holdings (Central) (HLDC)',
@@ -260,7 +260,7 @@ export class MineralTenementStyleService {
 
   /**
    * Create OGC filter XML
-   * 
+   *
    * tenementLiteral - the string to be used as filter
    */
   private static createFilter(tenementLiteral: string, config: any, optionalFilters?: OptionalFilter[] | string): any {
@@ -293,7 +293,7 @@ export class MineralTenementStyleService {
     } else {
         typeFilter = ['ogc:PropertyIsEqualTo', null,
             ['ogc:PropertyName', null, propertyName],
-            ['ogc:Literal', null,  tenementLiteral ]
+            ['ogc:Literal', null, tenementLiteral ]
         ];
     }
 
