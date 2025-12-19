@@ -449,7 +449,8 @@ export class CsWMSService {
       // Set up WMS service
       // If it is ArcGIS do not use proxy as ArcGIS does not work with POST requests
       if (UtilitiesService.layerIsArcGIS(layer) || UtilitiesService.resourceIsArcGIS(wmsOnlineResource) || (!usePost && !layer.useDefaultProxy)) {
-        if (UtilitiesService.layerIsArcGIS(layer) || UtilitiesService.resourceIsArcGIS(wmsOnlineResource)) {
+        if ((UtilitiesService.layerIsArcGIS(layer) || UtilitiesService.resourceIsArcGIS(wmsOnlineResource)) &&
+            (params.sld_body)) {
             // For ArcGIS 'styles' parameter must match name in SLD_BODY
             params.styles = wmsOnlineResource.name;
             // Add a 'BGCOLOR' parameter to the request. This avoids ESRI's overpowering
