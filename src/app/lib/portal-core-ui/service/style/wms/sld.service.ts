@@ -125,6 +125,8 @@ export class SldService {
               break;
             }
           }
+          param.serviceUrl = onlineResource.url;
+
           // End patch
 
           // Just merge the params and pass them through

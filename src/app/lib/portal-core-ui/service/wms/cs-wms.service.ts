@@ -449,6 +449,16 @@ export class CsWMSService {
       // Set up WMS service
       // If it is ArcGIS do not use proxy as ArcGIS does not work with POST requests
       if (UtilitiesService.layerIsArcGIS(layer) || UtilitiesService.resourceIsArcGIS(wmsOnlineResource) || (!usePost && !layer.useDefaultProxy)) {
+        if ((UtilitiesService.layerIsArcGIS(layer) || UtilitiesService.resourceIsArcGIS(wmsOnlineResource)) &&
+            (params.sld_body)) {
+            // For ArcGIS 'styles' parameter must match name in SLD_BODY
+            params.styles = wmsOnlineResource.name;
+            // Add a 'BGCOLOR' parameter to the request. This avoids ESRI's overpowering
+            // white background and untidy way it spills out over the polygon boundary.
+            // Also the colours should more closely match that of geoserver
+            params.bgcolor = '0x909090';
+        }
+
         // NB: ArcGisMapServerImageryProvider does not allow additional parameters for ArcGIS, i.e. no styling
         // So we use a normal GET request & WebMapServiceImageryProvider instead
         wmsImagProv = new WebMapServiceImageryProvider({
