@@ -20,7 +20,7 @@ import { Entity, ProviderViewModel, buildModuleUrl, OpenStreetMapImageryProvider
 import { UtilitiesService } from '../../utility/utilities.service';
 import { ImageryLayerCollection } from 'cesium';
 import { CsGeoJsonService } from '../geojson/cs-geojson.service';
-declare let Cesium: any;
+import * as Cesium from 'cesium';
 
 /**
  * Wrapper class to provide all things related to the drawing of polygons and bounding boxes in CesiumJS
@@ -65,6 +65,10 @@ export class CsMapService {
     mapEventManager.register(eventRegistration).subscribe((result) => {
       this.mapClickHandler(result);
     });
+    // Initialize basemap error handling
+    setTimeout(() => {
+      this.initializeBasemapLayers();
+    }, 500);
   }
 
   /**
@@ -122,15 +126,15 @@ export class CsMapService {
       const cartographic = ellipsoid.cartesianToCartographic(cartesian);
       let lon = Cesium.Math.toDegrees(cartographic.longitude);
       let lat = Cesium.Math.toDegrees(cartographic.latitude);
-      if (!Number(lat) || !Number(lon)) {
+      if (!Number.isFinite(lon) || !Number.isFinite(lat)) {
         return;
       }
+      const lonRounded = Math.round(lon * 1e5) / 1e5;
+      const latRounded = Math.round(lat * 1e5) / 1e5;
 
-      lon = Number.parseFloat(lon).toFixed(5);
-      lat = Number.parseFloat(lat).toFixed(5);
       const clickCoord = new WebMercatorProjection().project(cartographic);
       // Create a GeoJSON point
-      const clickPoint = point([lon, lat]);
+      const clickPoint = point([lonRounded, latRounded]);
       // Compile a list of clicked on layers
       const clickedLayerList: LayerModel[] = [];
 
@@ -540,6 +544,57 @@ export class CsMapService {
   }
 
   /**
+   * Switch to fallback provider for base layers
+   */
+  private switchToFallbackProvider() {
+    const viewer = this.getViewer();
+    const vm = viewer.baseLayerPicker?.viewModel;
+
+    // Remove all imagery layers to stop the broken provider from trying to load
+    viewer.imageryLayers.removeAll();
+
+    // Switch to National Map directly using fromUrl
+    ArcGisMapServerImageryProvider.fromUrl(
+      'https://services.ga.gov.au/gis/rest/services/NationalBaseMap/MapServer'
+    ).then((provider) => {
+      viewer.imageryLayers.addImageryProvider(provider);
+      console.log('Switched to National Map fallback');
+    }).catch((error) => {
+      console.error('Failed to load National Map fallback:', error);
+      // Last resort is OSM
+      const osmProvider = new OpenStreetMapImageryProvider({
+        url: 'https://tile.openstreetmap.org/'
+      });
+      viewer.imageryLayers.addImageryProvider(osmProvider);
+      console.log('Switched to OSM fallback');
+    });
+  }
+
+  /**
+   * Initialize the basemap layers with error handling
+   */
+  public initializeBasemapLayers() {
+    const baseLayer = this.getViewer().imageryLayers.get(0);
+    if (!baseLayer || !baseLayer.imageryProvider) {
+      return;
+    }
+
+    const onError = () => {
+      console.warn('Basemap error detected — switching to fallback.');
+      this.switchToFallbackProvider();
+    };
+
+    baseLayer.imageryProvider.errorEvent.addEventListener(onError);
+
+    const onLayerAdded = (layer: Cesium.ImageryLayer, index: number) => {
+      if (layer.imageryProvider) {
+        layer.imageryProvider.errorEvent.addEventListener(onError);
+      }
+    };
+    this.getViewer().imageryLayers.layerAdded.addEventListener(onLayerAdded);
+  }
+
+  /**
    * Create a list of base maps from the environment file
    */
   public createBaseMapLayers(): any[] {
@@ -556,6 +611,19 @@ export class CsMapService {
                 url: 'https://tile.openstreetmap.org/',
               });
             },
+          })
+        );
+      } else if (layer.layerType === 'GA') {
+        baseMapLayers.push(
+          new ProviderViewModel({
+            name: layer.viewValue,
+            iconUrl: 'extension/images/ImageryProviders/nationalMap.png',
+            tooltip: layer.tooltip,
+            creationFunction: async function() {
+              return await ArcGisMapServerImageryProvider.fromUrl(
+                'https://services.ga.gov.au/gis/rest/services/NationalBaseMap/MapServer'
+              );
+            }
           })
         );
       } else if (layer.layerType === 'Bing' && this.env.hasOwnProperty('bingMapsKey') &&
