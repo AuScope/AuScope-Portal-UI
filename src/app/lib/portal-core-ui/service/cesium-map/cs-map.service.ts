@@ -682,7 +682,7 @@ export class CsMapService {
         }));
       } else if (layer.layerType === 'ESRI') {
         const esriUrl =
-          'https://services.arcgisonline.com/ArcGIS/pest/services/' + layer.value + '/MapServer';
+          'https://services.arcgisonline.com/ArcGIS/rest/services/' + layer.value + '/MapServer';
         let esriIcon = '';
         switch (layer.value) {
           case 'World_Imagery':
