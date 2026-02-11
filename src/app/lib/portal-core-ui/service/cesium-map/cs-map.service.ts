@@ -66,9 +66,7 @@ export class CsMapService {
       this.mapClickHandler(result);
     });
     // Initialize basemap error handling
-    setTimeout(() => {
-      this.initializeBasemapLayers();
-    }, 500);
+    this.initializeBasemapLayers();
   }
 
   /**
@@ -574,24 +572,29 @@ export class CsMapService {
    * Initialize the basemap layers with error handling
    */
   public initializeBasemapLayers() {
-    const baseLayer = this.getViewer().imageryLayers.get(0);
-    if (!baseLayer || !baseLayer.imageryProvider) {
-      return;
-    }
-
     const onError = () => {
-      console.warn('Basemap error detected — switching to fallback.');
+      console.warn('Basemap (index 0) error detected - switching to fallback.');
       this.switchToFallbackProvider();
     };
-
-    baseLayer.imageryProvider.errorEvent.addEventListener(onError);
-
-    const onLayerAdded = (layer: Cesium.ImageryLayer, index: number) => {
-      if (layer.imageryProvider) {
-        layer.imageryProvider.errorEvent.addEventListener(onError);
+    if (this.getViewer().imageryLayers.length > 0) {
+      this.getViewer().imageryLayers.get(0)?.imageryProvider?.errorEvent?.addEventListener(onError);
+    }
+    this.getViewer().imageryLayers.layerAdded.addEventListener((layer: Cesium.ImageryLayer, index: number) => {
+      if (index === 0) {
+        layer?.imageryProvider?.errorEvent?.addEventListener(onError);
       }
-    };
-    this.getViewer().imageryLayers.layerAdded.addEventListener(onLayerAdded);
+    });
+    this.getViewer().imageryLayers.layerRemoved.addEventListener((_layer, index) => {
+      if (index === 0 && this.getViewer().imageryLayers.length === 0) {
+        this.switchToFallbackProvider();
+      }
+    });
+    setTimeout(() => {
+      if (this.getViewer().imageryLayers.length === 0) {
+        console.warn('No imagery after wait - switching to fallback.');
+        this.switchToFallbackProvider();
+      }
+    }, 1800);
   }
 
   /**
@@ -607,9 +610,14 @@ export class CsMapService {
             iconUrl: buildModuleUrl('Widgets/Images/ImageryProviders/openStreetMap.png'),
             tooltip: layer.tooltip,
             creationFunction() {
-              return new OpenStreetMapImageryProvider({
-                url: 'https://tile.openstreetmap.org/',
-              });
+              try {
+                return new OpenStreetMapImageryProvider({
+                  url: 'https://tile.openstreetmap.org/',
+                });
+              } catch(err) {
+                console.error('Failed to create OSM imagery provider:', err);
+                return ArcGisMapServerImageryProvider.fromUrl('https://services.ga.gov.au/gis/rest/services/NationalBaseMap/MapServer');
+              }
             },
           })
         );
@@ -619,10 +627,17 @@ export class CsMapService {
             name: layer.viewValue,
             iconUrl: 'extension/images/ImageryProviders/nationalMap.png',
             tooltip: layer.tooltip,
-            creationFunction: async function() {
-              return await ArcGisMapServerImageryProvider.fromUrl(
-                'https://services.ga.gov.au/gis/rest/services/NationalBaseMap/MapServer'
-              );
+            creationFunction: async () => {
+              try {
+                return await ArcGisMapServerImageryProvider.fromUrl(
+                  'https://services.ga.gov.au/gis/rest/services/NationalBaseMap/MapServer'
+                );
+              } catch(err) {
+                console.error('Failed to create National Map imagery provider:', err);
+                return new OpenStreetMapImageryProvider({
+                  url: 'https://tile.openstreetmap.org/',
+                });
+              }
             }
           })
         );
@@ -650,19 +665,24 @@ export class CsMapService {
             name: layer.viewValue,
             iconUrl: buildModuleUrl('Widgets/Images/ImageryProviders/' + bingMapsIcon),
             tooltip: layer.tooltip,
-            creationFunction: async function() {
-              return await Cesium.BingMapsImageryProvider.fromUrl(
-                'https://dev.virtualearth.net',
-                {
-                  key: this.env.bingMapsKey,
-                  mapStyle: bingMapsStyle,
-                }
-              )
+            creationFunction: async () => {
+              try {
+                return await Cesium.BingMapsImageryProvider.fromUrl(
+                  'https://dev.virtualearth.net',
+                  {
+                    key: this.env.bingMapsKey,
+                    mapStyle: bingMapsStyle,
+                  }
+                )
+              } catch(err) {
+                console.error('Failed to create Bing imagery provider:', err);
+                return ArcGisMapServerImageryProvider.fromUrl('https://services.ga.gov.au/gis/rest/services/NationalBaseMap/MapServer');
+              }
             }
         }));
       } else if (layer.layerType === 'ESRI') {
         const esriUrl =
-          'https://services.arcgisonline.com/ArcGIS/rest/services/' + layer.value + '/MapServer';
+          'https://services.arcgisonline.com/ArcGIS/pest/services/' + layer.value + '/MapServer';
         let esriIcon = '';
         switch (layer.value) {
           case 'World_Imagery':
@@ -698,10 +718,13 @@ export class CsMapService {
             name: layer.viewValue,
             iconUrl: Cesium.buildModuleUrl('Widgets/Images/ImageryProviders/' + esriIcon),
             tooltip: layer.tooltip,
-            creationFunction: async function() {
-              return await ArcGisMapServerImageryProvider.fromUrl(
-                esriUrl
-              );
+            creationFunction: async () => {
+              try {
+                return await ArcGisMapServerImageryProvider.fromUrl(esriUrl);
+              } catch (err) {
+                console.error('Failed to create ESRI imagery provider:', err);
+                return ArcGisMapServerImageryProvider.fromUrl('https://services.ga.gov.au/gis/rest/services/NationalBaseMap/MapServer');
+              }
             }
           })
         );
