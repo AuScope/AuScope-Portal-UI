@@ -122,8 +122,8 @@ export class CsMapService {
       const ellipsoid = viewer.scene.globe.ellipsoid;
       const cartesian = viewer.camera.pickEllipsoid(mousePosition, ellipsoid);
       const cartographic = ellipsoid.cartesianToCartographic(cartesian);
-      let lon = Cesium.Math.toDegrees(cartographic.longitude);
-      let lat = Cesium.Math.toDegrees(cartographic.latitude);
+      const lon = Cesium.Math.toDegrees(cartographic.longitude);
+      const lat = Cesium.Math.toDegrees(cartographic.latitude);
       if (!Number.isFinite(lon) || !Number.isFinite(lat)) {
         return;
       }
@@ -546,7 +546,6 @@ export class CsMapService {
    */
   private switchToFallbackProvider() {
     const viewer = this.getViewer();
-    const vm = viewer.baseLayerPicker?.viewModel;
 
     // Remove all imagery layers to stop the broken provider from trying to load
     viewer.imageryLayers.removeAll();
@@ -583,7 +582,10 @@ export class CsMapService {
         new Promise<T>((resolve, reject) => {
           const t = setTimeout(() => reject(new Error('tile probe timeout')), timeoutMs);
           p.then(v => { clearTimeout(t); resolve(v); })
-            .catch(e => { clearTimeout(t); reject(e); });
+            .catch(e => {
+              clearTimeout(t);
+              reject(e instanceof Error ? e : new Error(String(e)));
+            });
         });
 
       // Some providers may throw synchronously if level/coords invalid – wrap each call
@@ -643,7 +645,7 @@ export class CsMapService {
 
       if (provider.ready) {
         // Already ready – probe on next tick
-        setTimeout(onReady, 0);
+        setTimeout(() => void onReady(), 0);
       } else if (provider.readyPromise && typeof provider.readyPromise.then === 'function') {
         provider.readyPromise.then(onReady).catch(() => bailToFallback());
       } else {
