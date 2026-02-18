@@ -196,7 +196,7 @@ export class DownloadWfsService {
    * @param polygonFilter WFS filter parameter
    * @param bZip download as a zip file
    */
-  public downloadCSV(layer: LayerModel, bbox: Bbox, polygonFilter: string, bZip: boolean): Observable<any> {
+  public downloadCSV(layer: LayerModel, bbox: Bbox, polygonFilter: string): Observable<any> {
     return new Observable<any>(observer => {
       try {
         const wfsResources = this.layerHandlerService.getWFSResource(layer);
@@ -204,7 +204,7 @@ export class DownloadWfsService {
           gtag('event', 'CSVDownload', { 'event_category': 'CSVDownload', 'event_action': layer.id });
         }
         for (let i = 0; i < wfsResources.length; i++) {
-          let filterParameters = {
+          const filterParameters = {
             request: 'GetFeature',
             service: 'WFS',
             typeName: wfsResources[i].name,
@@ -219,7 +219,7 @@ export class DownloadWfsService {
           }
           const serviceUrl = wfsResources[i].url;
           const httpParams = new HttpParams({ fromObject: filterParameters });
-          let filename = `${serviceUrl}${filterParameters.typeName}.csv`.replace(/:|\/|\\/g, '-');
+          const filename = `${serviceUrl}${filterParameters.typeName}.csv`.replace(/:|\/|\\/g, '-');
 
           this.http.get(serviceUrl, {
             params: httpParams,
@@ -228,6 +228,7 @@ export class DownloadWfsService {
           }).subscribe({
             next: response => {
               const blob = new Blob([response], { type: 'application/csv' });
+              saveAs(blob, filename);
               console.log(`File downloaded for ${filterParameters.typeName}`);
               if (i === wfsResources.length - 1) {
                 observer.next(wfsResources.length); // Emit the number of CSV files downloaded

@@ -221,7 +221,7 @@ export class DownloadPanelComponent implements OnInit {
     /**
    * Construct a cql_filter from polygon 
    *
-   * @param layerId 
+   * @param layerId the layerId
    * @param polygon the polygon
    * @returns a string representation of the cql_filter
    */
@@ -244,7 +244,7 @@ export class DownloadPanelComponent implements OnInit {
       geom = 'the_geom';
     }
 
-    let cql =  'INTERSECTS('+ geom +', POLYGON((' + polygon.coords + ')))' 
+    let cql = 'INTERSECTS('+ geom +', POLYGON((' + polygon.coords + ')))'
     if (layerId === 'nvcl-v2-borehole') {
       cql += ' and nvclCollection =true';
     }
@@ -549,7 +549,7 @@ export class DownloadPanelComponent implements OnInit {
     // Standard WFS feature download as a CSV
     } else {
       this.downloadStarted = true;
-      observableResponse = this.downloadWfsService.downloadCSV(this.layer, this.bbox, null, true);
+      observableResponse = this.downloadWfsService.downloadCSV(this.layer, this.bbox, null);
     }
 
     // Kick off the download process and save zip file in browser
@@ -709,7 +709,7 @@ export class DownloadPanelComponent implements OnInit {
     let observableResponse = null;
     // fetch polygon filter
     this.download4PolygonKMLStarted = true;
-    observableResponse = this.downloadWfsService.downloadCSV(this.layer, null, downloadPolygonFilter, false);
+    observableResponse = this.downloadWfsService.downloadCSV(this.layer, null, downloadPolygonFilter);
 
     // Kick off the download process and save zip file in browser
     observableResponse.subscribe(csv => {
@@ -809,7 +809,7 @@ export class DownloadPanelComponent implements OnInit {
 
       // Download WFS features as CSV files
     } else {
-      observableResponse = this.downloadWfsService.downloadCSV(this.layer, null, this.polygonCQLFilter, true);
+      observableResponse = this.downloadWfsService.downloadCSV(this.layer, null, this.polygonCQLFilter);
     }
 
     // Kick off the download process and save zip file in browser
