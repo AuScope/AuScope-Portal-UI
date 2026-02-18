@@ -569,32 +569,113 @@ export class CsMapService {
   }
 
   /**
-   * Initialize the basemap layers with error handling
+   * Initialize the basemap layers with error handling.
+   * - If the provider can't fetch metadata (readyPromise rejects) -> fallback
+   * - If provider is "ready" but fails to return any level-0 tile quickly -> fallback
+   * - After the first tile succeeds, ignore later tile errors.
    */
   public initializeBasemapLayers() {
-    const onError = () => {
-      console.warn('Basemap (index 0) error detected - switching to fallback.');
-      this.switchToFallbackProvider();
+    const viewer = this.getViewer();
+
+    // Try to confirm at least one level-0 tile quickly
+    const probeFirstTile = async (provider: any, timeoutMs = 1500): Promise<boolean> => {
+      const withTimeout = <T>(p: Promise<T>) =>
+        new Promise<T>((resolve, reject) => {
+          const t = setTimeout(() => reject(new Error('tile probe timeout')), timeoutMs);
+          p.then(v => { clearTimeout(t); resolve(v); })
+            .catch(e => { clearTimeout(t); reject(e); });
+        });
+
+      // Some providers may throw synchronously if level/coords invalid – wrap each call
+      const probes: Promise<any>[] = [];
+      try { probes.push(withTimeout(provider.requestImage(0, 0, 0))); } catch { }
+      try { probes.push(withTimeout(provider.requestImage(1, 0, 0))); } catch { }
+      if (probes.length === 0) return false;
+
+      const results = await Promise.allSettled(probes);
+      // Succeed only if any probe fulfilled with a renderable image
+      return results.some(r => {
+        if (r.status !== 'fulfilled' || !r.value) return false;
+        const img: any = (r as any).value;
+        if (typeof HTMLImageElement !== 'undefined' && img instanceof HTMLImageElement) {
+          return (img.naturalWidth ?? 0) > 0 && (img.naturalHeight ?? 0) > 0;
+        }
+        if (typeof img?.width === 'number' && typeof img?.height === 'number') {
+          return img.width > 0 && img.height > 0; // ImageBitmap/Canvas-like
+        }
+        return true;
+      });
     };
-    if (this.getViewer().imageryLayers.length > 0) {
-      this.getViewer().imageryLayers.get(0)?.imageryProvider?.errorEvent?.addEventListener(onError);
+
+    // Attach init-only guard to a base layer provider
+    const attachInitGuard = (layer: Cesium.ImageryLayer | undefined) => {
+      const provider: any = layer?.imageryProvider;
+      if (!provider) return;
+
+      let firstTileConfirmed = false;
+
+      const bailToFallback = () => {
+        if (firstTileConfirmed) return;
+        try { provider.errorEvent?.removeEventListener(onError); } catch { }
+        this.switchToFallbackProvider();
+      };
+
+      const onError = (_err: any) => {
+        // Before first tile success, treat errors as init failure
+        if (!firstTileConfirmed) bailToFallback();
+      };
+
+      provider.errorEvent?.addEventListener(onError);
+
+      const onReady = async () => {
+        try {
+          const ok = await probeFirstTile(provider, 1200);
+          if (ok) {
+            firstTileConfirmed = true;
+            try { provider.errorEvent?.removeEventListener(onError); } catch { }
+          } else {
+            bailToFallback();
+          }
+        } catch {
+          bailToFallback();
+        }
+      };
+
+      if (provider.ready) {
+        // Already ready – probe on next tick
+        setTimeout(onReady, 0);
+      } else if (provider.readyPromise && typeof provider.readyPromise.then === 'function') {
+        provider.readyPromise.then(onReady).catch(() => bailToFallback());
+      } else {
+        // No readiness signal – treat as failure
+        bailToFallback();
+      }
+    };
+
+    // Existing base layer at startup
+    if (viewer.imageryLayers.length > 0) {
+      const base0 = viewer.imageryLayers.get(0);
+      attachInitGuard(base0);
     }
-    this.getViewer().imageryLayers.layerAdded.addEventListener((layer: Cesium.ImageryLayer, index: number) => {
+
+    // When a new layer is added at index 0, attach the guard
+    viewer.imageryLayers.layerAdded.addEventListener((layer: Cesium.ImageryLayer, index: number) => {
+      if (index === 0) attachInitGuard(layer);
+    });
+
+    // If base layer is removed and nothing replaces it shortly, fail to fallback
+    viewer.imageryLayers.layerRemoved.addEventListener((_layer, index) => {
       if (index === 0) {
-        layer?.imageryProvider?.errorEvent?.addEventListener(onError);
+        setTimeout(() => {
+          if (viewer.imageryLayers.length === 0) this.switchToFallbackProvider();
+        }, 0);
       }
     });
-    this.getViewer().imageryLayers.layerRemoved.addEventListener((_layer, index) => {
-      if (index === 0 && this.getViewer().imageryLayers.length === 0) {
-        this.switchToFallbackProvider();
-      }
-    });
+
+    // If nothing shows up at startup fall back
     setTimeout(() => {
-      if (this.getViewer().imageryLayers.length === 0) {
-        console.warn('No imagery after wait - switching to fallback.');
-        this.switchToFallbackProvider();
-      }
-    }, 1800);
+      if (viewer.imageryLayers.length === 0) this.switchToFallbackProvider();
+    }, 1500);
   }
 
   /**
