@@ -51,6 +51,7 @@ export class DownloadPanelComponent implements OnInit {
   bbox: Bbox;
   polygonBbox: Bbox;
   polygonFilter: any;
+  polygonCQLFilter: string;
   drawBoundsStarted: boolean;
   drawPolygonStarted: boolean;
   downloadStarted: boolean;
@@ -174,10 +175,12 @@ export class DownloadPanelComponent implements OnInit {
           if (polygon && polygon.coordinates) {
             this.bbox = null; // Clear this in case user has drawn poly from clipboard panel
             this.polygonFilter = this.createPolygonFilterFromPolygon(polygon);
+            this.polygonCQLFilter = this.createCqlFilterFromPolygon(this.layer.id, polygon);
             this.polygonBbox = this.getBboxFromPolygon(polygon);
           } else {
             this.polygonFilter = null;
             this.polygonBbox = null;
+            this.polygonCQLFilter = null;
           }
       });
       //reset first this.downloadWfsService.tsgDownloadStartBS
@@ -215,6 +218,38 @@ export class DownloadPanelComponent implements OnInit {
            polygon.coordinates + '</ogc:Intersects></ogc:Filter>';
   }
 
+    /**
+   * Construct a cql_filter from polygon 
+   *
+   * @param layerId 
+   * @param polygon the polygon
+   * @returns a string representation of the cql_filter
+   */
+  private createCqlFilterFromPolygon(layerId: string, polygon: Polygon): string {
+    if (config.polygonSupportedLayer.indexOf(this.layer.id) === -1) {
+      return null;
+    }
+    let geom = 'gsmlp:shape';
+    if (layerId === 'nvcl-v2-borehole') {
+      geom = 'gsmlp:shape';
+    } else if (layerId === 'tima-geosample'){
+      geom = 'gml:location';
+    } else if (layerId === 'tima-shrimp-geosample') {
+      geom = 'Shape';
+    } else if (layerId === 'mineral-tenements') {
+      geom = 'mt:shape';
+    } else if (layerId === 'erl-mineview' || layerId === 'erl-mineraloccurrenceview' || layerId === 'erl-commodityresourceview') {
+      geom = 'erl:shape';
+    } else if (layerId === 'geological-provinces') {
+      geom = 'the_geom';
+    }
+
+    let cql =  'INTERSECTS('+ geom +', POLYGON((' + polygon.coords + ')))' 
+    if (layerId === 'nvcl-v2-borehole') {
+      cql += ' and nvclCollection =true';
+    }
+    return cql;
+  }
   /**
    * Construct a polygon filter string from bounding box
    *
@@ -774,14 +809,13 @@ export class DownloadPanelComponent implements OnInit {
 
       // Download WFS features as CSV files
     } else {
-      observableResponse = this.downloadWfsService.downloadCSV(this.layer, null, this.polygonFilter, true);
+      observableResponse = this.downloadWfsService.downloadCSV(this.layer, null, this.polygonCQLFilter, true);
     }
 
     // Kick off the download process and save zip file in browser
     observableResponse.subscribe(value => {
       this.download4pStarted = false;
-      const blob = new Blob([value], { type: 'application/zip' });
-      saveAs(blob, 'download.zip');
+      console.log('download4Polygon: value: ' + value);
     }, err => {
       this.download4pStarted = false;
       if (UtilitiesService.isEmpty(err.message)) {
