@@ -1,4 +1,5 @@
 import { throwError as observableThrowError, Observable, ReplaySubject, Subject } from 'rxjs';
+import { saveAs } from 'file-saver';
 
 import { catchError, map, timeoutWith, mergeMap } from 'rxjs/operators';
 import { Bbox } from '../../../model/data/bbox.model';
@@ -195,56 +196,55 @@ export class DownloadWfsService {
    * @param polygonFilter WFS filter parameter
    * @param bZip download as a zip file
    */
-  public downloadCSV(layer: LayerModel, bbox: Bbox, polygonFilter: string, bZip: boolean): Observable<any> {
+  public downloadCSV(layer: LayerModel, bbox: Bbox, polygonFilter: string): Observable<any> {
+    return new Observable<any>(observer => {
+      try {
+        const wfsResources = this.layerHandlerService.getWFSResource(layer);
+        if (this.env.googleAnalyticsKey && typeof gtag === 'function') {
+          gtag('event', 'CSVDownload', { 'event_category': 'CSVDownload', 'event_action': layer.id });
+        }
+        for (let i = 0; i < wfsResources.length; i++) {
+          const filterParameters = {
+            request: 'GetFeature',
+            service: 'WFS',
+            typeName: wfsResources[i].name,
+            count: 10000,
+            outputFormat: 'csv'
+          };
 
-    try {
-      const wfsResources = this.layerHandlerService.getWFSResource(layer);
-      if (this.env.googleAnalyticsKey && typeof gtag === 'function') {
-        gtag('event', 'CSVDownload', { 'event_category': 'CSVDownload', 'event_action': layer.id });
-      }
-      let downloadUrl = 'getAllFeaturesInCSV.do';
-      if (layer.proxyDownloadUrl && layer.proxyDownloadUrl.length > 0) {
-        downloadUrl = layer.proxyDownloadUrl;
-      } else if (layer.proxyUrl && layer.proxyUrl.length > 0) {
-        downloadUrl = layer.proxyUrl;
-      }
+          if (bbox != null) {
+            filterParameters['bbox'] = JSON.stringify(bbox);
+          } else if (polygonFilter != null) {
+            filterParameters['cql_filter'] = polygonFilter;
+          }
+          const serviceUrl = wfsResources[i].url;
+          const httpParams = new HttpParams({ fromObject: filterParameters });
+          const filename = `${serviceUrl}${filterParameters.typeName}.csv`.replace(/:|\/|\\/g, '-');
 
-      let httpParams = new HttpParams();
-      httpParams = httpParams.set('outputFormat', 'csv');
-
-      for (let i = 0; i < wfsResources.length; i++) {
-        const filterParameters = {
-          serviceUrl: wfsResources[i].url,
-          typeName: wfsResources[i].name,
-          maxFeatures: 10000,
-          outputFormat: 'csv',
-          bbox: bbox ? JSON.stringify(bbox) : '',
-          filter: polygonFilter
-        };
-        const serviceUrl = this.env.portalBaseUrl + downloadUrl + '?';
-        httpParams = httpParams.append('serviceUrls', serviceUrl + $.param(filterParameters));
+          this.http.get(serviceUrl, {
+            params: httpParams,
+            headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
+            responseType: 'text'
+          }).subscribe({
+            next: response => {
+              const blob = new Blob([response], { type: 'application/csv' });
+              saveAs(blob, filename);
+              console.log(`File downloaded for ${filterParameters.typeName}`);
+              if (i === wfsResources.length - 1) {
+                observer.next(wfsResources.length); // Emit the number of CSV files downloaded
+                observer.complete();
+              }
+            },
+            error: err => {
+              console.log(`Error downloading file for: ${filename}`);
+              observer.error(err);
+            }
+          });
+        }
+      } catch (error) {
+        console.log('Error in downloadCSV:', error);
+        observer.error(error);
       }
-      let downloadObserver;
-      if (bZip) {
-        downloadObserver = this.http.post(this.env.portalBaseUrl + 'downloadGMLAsZip.do', httpParams.toString(), {
-          headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
-          responseType: 'blob'
-        });
-      } else {
-        downloadObserver = this.http.post(this.env.portalBaseUrl + 'downloadNvclCSV.do', httpParams.toString(), {
-          headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
-          responseType: 'text'
-        });
-      }
-      return downloadObserver.pipe(timeoutWith(360000, observableThrowError(new Error('Request have timeout out after 6 minutes'))),
-        map((response) => { // download file
-          return response;
-        }), catchError((error: HttpResponse<any>) => {
-          return observableThrowError(error);
-        }),);
-    } catch (e) {
-      return observableThrowError(e);
-    }
-
+    });
   }
 }

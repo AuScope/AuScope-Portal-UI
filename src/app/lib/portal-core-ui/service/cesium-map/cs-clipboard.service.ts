@@ -132,6 +132,27 @@ export class CsClipboardService {
           '</gml:MultiPolygon>';
   }
 
+    /**
+   * Method for construct a polygon Coords for CQL_FILTER.
+   * @param coords string
+   * @returns the string of Coords.
+   */
+  public getCoordsCQL(coords: string): any {
+    //From "-16.080639378668753,123.68659475258697 -16.591723191661163,125.22946326724333 -16.93093329861339,123.65804186002703 -16.080639378668753,123.68659475258697"
+    //To "-16.080639378668753 123.68659475258697, -16.591723191661163 125.22946326724333, -16.93093329861339 123.65804186002703, -16.080639378668753 123.68659475258697"
+    const coordsList = coords.split(' ');
+    const coordsListLatLng = [];
+    for (let i = 0; i<coordsList.length; i++) {
+      const coord = coordsList[i].split(',');
+      const lat = parseFloat(coord[0]).toFixed(3);
+      const lng = parseFloat(coord[1]).toFixed(3);
+      if (isNumber(lng) && isNumber(lat)) {
+        coordsListLatLng.push(lat.toString() + ' ' + lng.toString());
+    }
+    }
+    return coordsListLatLng.join(',');
+  }
+
   /**
    * Method for rendering a polygon on cesium map.
    * @param coordsArray array of coords
@@ -154,7 +175,8 @@ export class CsClipboardService {
         name: name,
         srs: 'EPSG:4326',
         geometryType: GeometryType.POLYGON,
-        coordinates: this.getGeometry(coords)
+        coordinates: this.getGeometry(coords),
+        coords: this.getCoordsCQL(coords)
       };
       this.polygonBBox = newPolygon;
       this.polygonsBS.next(this.polygonBBox);
@@ -306,5 +328,6 @@ export interface Polygon {
   srs: string;
   geometryType: GeometryType;
   coordinates: string;
+  coords?: string; // for cql filter, in 'lat,lng lat,lng...' format
   raw?: string;
 }
