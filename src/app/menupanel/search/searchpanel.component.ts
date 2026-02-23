@@ -698,11 +698,11 @@ export class SearchPanelComponent implements OnInit {
 
     const selectedSearchFields: string[] = [];
     for (const sField of this.searchFields.filter(f => f.checked === true)) {
-
       for (const field of sField.fields) {
         selectedSearchFields.push(field);
       }
     }
+    selectedSearchFields.push('searchKeywords');
 
     // OGC services if selected
     const selectedServices: string[] = [];
