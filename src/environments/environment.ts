@@ -18,7 +18,8 @@ export const environment = {
   authBaseUrl: 'http://localhost:8080/api/',
   hostUrl: 'http://localhost:4200',
   nVCLAnalyticalUrl: 'https://nvclanalytics.azurewebsites.net/NVCLAnalyticalServices/',
-  googleAnalyticsKey: null,
+  rudderStackWriteKey: null,  // RudderStack write key
+  rudderStackDataPlaneUrl: null,  // RudderStack data plane URL
   bingMapsKey: '',
   baseMapLayers: [
     { value: 'World_Imagery', viewValue: 'ESRI World Imagery', tooltip: 'ESRI World Imagery', layerType: 'ESRI' },

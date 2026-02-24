@@ -24,7 +24,7 @@ import { Subject } from 'rxjs';
 import { DownloadAuScopeCatModalComponent } from 'app/modalwindow/download-auscopecat/download-auscopecat.modal.component';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-declare let gtag: Function;
+declare let rudderanalytics: any;
 
 @Component({
     selector: 'app-download-panel',
@@ -734,12 +734,12 @@ export class DownloadPanelComponent implements OnInit {
       this.bsModalRef.componentInstance.urlsArray = urlsArray;
       this.bsModalRef.componentInstance.BulkDownloadTsgFiles();
       /**
-       * do not "log" the "email" to "Google Analytics" - as this is an ethics issue
+       * do not "log" the "email" to "RudderStack" - as this is an ethics issue
        *
-       * console.log("environment.googleAnalyticsKey: "+environment.googleAnalyticsKey);
+       * console.log("environment.rudderStackWriteKey: "+environment.rudderStackWriteKey);
        */
-      if (environment.googleAnalyticsKey && typeof gtag === "function") {
-        gtag('event', 'TSGDownload', {
+      if (environment.rudderStackWriteKey && typeof rudderanalytics !== "undefined") {
+        rudderanalytics.track('TSGDownload', {
           event_category: 'TSGBulkDownload',
           event_action: '[' + total + ' of ' + urlsArray.length + ']' + urls
           //event_label: me.tsgDownloadEmail
