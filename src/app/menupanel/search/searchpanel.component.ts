@@ -18,6 +18,7 @@ import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
 
 import { config } from '../../../environments/config';
+import { environment } from '../../../environments/environment';
 
 import { HttpClient, HttpHeaders, HttpParams, HttpUrlEncodingCodec } from '@angular/common/http';
 import { Download } from 'app/modalwindow/layeranalytic/nvcl/tsgdownload';
@@ -74,6 +75,9 @@ const OGC_SERVICES = [
     fields: ['OGC:WWW', 'WWW:LINK-1.0-http--link'],
     checked: true
   }]
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+declare let rudderanalytics: any;
 
 @Component({
     selector: 'app-search-panel',
@@ -726,6 +730,14 @@ export class SearchPanelComponent implements OnInit {
       southBounds = this.bbox.southBoundLatitude;
     }
 
+    // Track search event
+    if (environment.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
+      rudderanalytics.track('search', {
+        query: this.queryText,
+        search_fields: this.searchFields.filter(f => f.checked).flatMap(f => f.fields)
+      });
+    }
+
     // Search CSW records
     this.searchService.searchCSWRecords(this.queryText, selectedSearchFields, null, null, selectedServices,
         this.boundsRelationship.toLowerCase(), westBounds, eastBounds,
@@ -751,6 +763,15 @@ export class SearchPanelComponent implements OnInit {
         }
         this.searching = false;
         this.showingAllLayers = false;
+
+        if (this.searchResults.length === 0) {
+          if (environment.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
+            rudderanalytics.track('search_zero_results', {
+              query: this.queryText,
+              search_fields: this.searchFields.filter(f => f.checked).flatMap(f => f.fields)
+            });
+          }
+        }
 
         // Select first result
         if (this.searchResults.length > 0) {
