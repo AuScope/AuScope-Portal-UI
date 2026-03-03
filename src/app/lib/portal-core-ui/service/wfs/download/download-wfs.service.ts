@@ -60,7 +60,7 @@ export class DownloadWfsService {
     try {
       const wfsResources = this.layerHandlerService.getWFSResource(layer);
       if (this.env.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
-        rudderanalytics.track('DatasetDownload', { 'event_category': 'DatasetDownload', 'event_action': layer.id });
+        rudderanalytics.track('dataset_download_started', { layer_id: layer.id, download_type: 'dataset_url' });
       }
       omitGsmlpShapeProperty = omitGsmlpShapeProperty !== undefined ? omitGsmlpShapeProperty : false;
       let httpParams = new HttpParams();
@@ -119,7 +119,7 @@ export class DownloadWfsService {
       try {
         const wfsResources = this.layerHandlerService.getWFSResource(layer);
         if (this.env.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
-          rudderanalytics.track('CSVDownload', { 'event_category': 'CSVDownload', 'event_action': layer.id });
+          rudderanalytics.track('dataset_download_started', { layer_id: layer.id, download_type: 'tsg' });
         }
         let downloadUrl = 'getAllFeaturesInCSV.do';
         if (layer.proxyDownloadUrl && layer.proxyDownloadUrl.length > 0) {
@@ -200,7 +200,7 @@ export class DownloadWfsService {
     try {
       const wfsResources = this.layerHandlerService.getWFSResource(layer);
       if (this.env.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
-        rudderanalytics.track('CSVDownload', { 'event_category': 'CSVDownload', 'event_action': layer.id });
+        rudderanalytics.track('dataset_download_started', { layer_id: layer.id, download_type: 'csv' });
       }
       let downloadUrl = 'getAllFeaturesInCSV.do';
       if (layer.proxyDownloadUrl && layer.proxyDownloadUrl.length > 0) {

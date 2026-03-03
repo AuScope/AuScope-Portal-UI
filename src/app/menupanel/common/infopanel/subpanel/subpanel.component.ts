@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges, inject } from '@angular/core';
 import { CSWRecordModel } from '../../../../lib/portal-core-ui/model/data/cswrecord.model';
 import { LayerModel } from '../../../../lib/portal-core-ui/model/data/layer.model';
 import { OnlineResourceModel } from '../../../../lib/portal-core-ui/model/data/onlineresource.model';
@@ -8,13 +8,16 @@ import { environment } from 'environments/environment';
 import { config } from 'environments/config';
 import { ResourceType } from '../../../../lib/portal-core-ui/utility/constants.service';
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+declare let rudderanalytics: any;
+
 @Component({
     selector: 'app-info-sub-panel',
     templateUrl: './subpanel.component.html',
     styleUrls: ['../../../menupanel.scss', './subpanel.component.scss'],
     standalone: false
 })
-export class InfoPanelSubComponent implements OnInit {
+export class InfoPanelSubComponent implements OnInit, OnChanges {
     private env = inject<any>('env' as any);
     private filterService = inject(FilterService);
 
@@ -204,6 +207,19 @@ export class InfoPanelSubComponent implements OnInit {
         this.distributor = "AuScope Discovery Portal http://hdl.handle.net/102.100.100/483116";
         if (usesNCI) {
             this.distributor += " & NCI Australia https://nci.org.au";
+        }
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['expanded']?.currentValue === true) {
+            if (environment.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
+                rudderanalytics.track('layer_preview', {
+                    layer_id: this.layer?.id,
+                    layer_name: this.layer?.name,
+                    category: this.layer?.group || 'unknown',
+                    has_doi: !!this.DOIname
+                });
+            }
         }
     }
 
