@@ -13,6 +13,7 @@ import { RenderStatusService } from './service/cesium-map/renderstatus/render-st
 import { ManageStateService } from './service/permanentlink/manage-state.service';
 import { DownloadWfsService } from './service/wfs/download/download-wfs.service';
 import { CsWMSService } from './service/wms/cs-wms.service';
+import { CsWMTSService } from './service/wmts/cs-wmts.service';
 import { CsWFSService } from './service/wfs/cs-wfs.service';
 import { CsIrisService } from './service/kml/cs-iris.service';
 import { CsKMLService } from './service/kml/cs-kml.service';
@@ -44,6 +45,7 @@ import { PolygonsEditorService } from '@auscope/angular-cesium';
         BrowserModule, FormsModule], imports: [BrowserModule,
         FormsModule], providers: [LayerHandlerService,
         CsWMSService,
+        CsWMTSService,
         CsIrisService,
         CsKMLService,
         CsVMFService,
@@ -77,6 +79,7 @@ static forRoot(env: any, conf: any): ModuleWithProviders<PortalCoreModule> {
       providers: [
         CsClipboardService,
         CsMapService,
+        CsWMTSService,
         { provide: 'env', useValue: env },
         { provide: 'conf', useValue: conf }
       ],

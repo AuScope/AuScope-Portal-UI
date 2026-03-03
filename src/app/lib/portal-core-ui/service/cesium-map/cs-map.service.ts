@@ -9,6 +9,7 @@ import { ManageStateService } from '../permanentlink/manage-state.service';
 import { CsCSWService } from '../wcsw/cs-csw.service';
 import { CsMapObject } from './cs-map-object';
 import { CsWMSService } from '../wms/cs-wms.service';
+import { CsWMTSService } from '../wmts/cs-wmts.service';
 import { ResourceType } from '../../utility/constants.service';
 import { CsIrisService } from '../kml/cs-iris.service';
 import { CsKMLService } from '../kml/cs-kml.service';
@@ -28,6 +29,7 @@ declare let Cesium: any;
 @Injectable()
 export class CsMapService {
   private csWMSService = inject(CsWMSService);
+  private csWMTSService = inject(CsWMTSService);
   private csMapObject = inject(CsMapObject);
   private manageStateService = inject(ManageStateService);
   private csCSWService = inject(CsCSWService);
@@ -137,6 +139,7 @@ export class CsMapService {
       // tslint:disable-next-line:forin
       for (const layerModel of this.layerModelList) {
         if (!UtilitiesService.layerContainsResourceType(layerModel, ResourceType.WMS) &&
+            !UtilitiesService.layerContainsResourceType(layerModel, ResourceType.WMTS) &&
             !UtilitiesService.layerContainsResourceType(layerModel, ResourceType.WWW) &&
             !UtilitiesService.layerContainsBboxGeographicElement(layerModel)) {
           continue;
@@ -256,7 +259,11 @@ export class CsMapService {
       this.removeLayer(layer);
     }
     // Add layer depending on type
-    if (UtilitiesService.layerContainsResourceType(layer, ResourceType.WMS)) {
+    if (UtilitiesService.layerContainsResourceType(layer, ResourceType.WMTS)) {
+      // Add a WMTS layer to map
+      this.csWMTSService.addLayer(layer, param);
+      this.cacheLayerModelList(layer);
+    } else if (UtilitiesService.layerContainsResourceType(layer, ResourceType.WMS)) {
       // Add a WMS layer to map
       this.csWMSService.addLayer(layer, param);
       this.cacheLayerModelList(layer);
@@ -380,7 +387,9 @@ export class CsMapService {
   public removeLayer(layer: LayerModel): void {
     this.csMapObject.removeLayerById(layer.id);
     this.manageStateService.removeLayer(layer.id);
-    if (UtilitiesService.layerContainsResourceType(layer, ResourceType.WMS)) {
+    if (UtilitiesService.layerContainsResourceType(layer, ResourceType.WMTS)) {
+      this.csWMTSService.rmLayer(layer);
+    } else if (UtilitiesService.layerContainsResourceType(layer, ResourceType.WMS)) {
       this.csWMSService.rmLayer(layer);
     } else if (UtilitiesService.layerContainsResourceType(layer, ResourceType.IRIS)) {
       this.csIrisService.rmLayer(layer);
@@ -450,7 +459,9 @@ export class CsMapService {
    */
   public setLayerOpacity(layer: LayerModel, opacity: number) {
     if (this.layerExists(layer.id)) {
-      if (UtilitiesService.layerContainsResourceType(layer, ResourceType.WMS)) {
+      if (UtilitiesService.layerContainsResourceType(layer, ResourceType.WMTS)) {
+        this.csWMTSService.setLayerOpacity(layer, opacity);
+      } else if (UtilitiesService.layerContainsResourceType(layer, ResourceType.WMS)) {
         this.csWMSService.setLayerOpacity(layer, opacity);
       } else if (UtilitiesService.layerContainsBboxGeographicElement(layer)) {
         this.csCSWService.setLayerOpacity(layer, opacity);
@@ -467,7 +478,8 @@ export class CsMapService {
    */
   public layerHasOpacity(layer: LayerModel): boolean {
     if (this.layerExists(layer.id)) {
-      if (UtilitiesService.layerContainsResourceType(layer, ResourceType.WMS) ||
+      if (UtilitiesService.layerContainsResourceType(layer, ResourceType.WMTS) ||
+          UtilitiesService.layerContainsResourceType(layer, ResourceType.WMS) ||
           UtilitiesService.layerContainsBboxGeographicElement(layer)) {
         return true;
       }

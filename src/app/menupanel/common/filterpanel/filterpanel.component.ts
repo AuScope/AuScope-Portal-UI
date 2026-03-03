@@ -2,6 +2,7 @@ import { CsClipboardService } from '../../../lib/portal-core-ui/service/cesium-m
 import { ResourceType, GeometryType } from '../../../lib/portal-core-ui/utility/constants.service';
 import { CsMapService } from '../../../lib/portal-core-ui/service/cesium-map/cs-map.service';
 import { CsWMSService } from '../../../lib/portal-core-ui/service/wms/cs-wms.service';
+import { CsWMTSService } from '../../../lib/portal-core-ui/service/wmts/cs-wmts.service';
 import { FilterPanelService } from '../../../lib/portal-core-ui/service/filterpanel/filterpanel-service';
 import { LayerHandlerService } from '../../../lib/portal-core-ui/service/cswrecords/layer-handler.service';
 import { LayerModel } from '../../../lib/portal-core-ui/model/data/layer.model';
@@ -37,6 +38,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
   modalService = inject(BsModalService);
   csClipboardService = inject(CsClipboardService);
   csWMSService = inject(CsWMSService);
+  csWMTSService = inject(CsWMTSService);
   csCSWService = inject(CsCSWService);
   layerStatus = inject(LayerStatusService);
   appRef = inject(ApplicationRef);
@@ -183,7 +185,9 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
       this.layerManagerService.addLayer(this.layer, this.optionalFilters, this.layerFilterCollection, this.layerTimes.currentTime);
 
       // Set opacity of the layer on the map
-      if (UtilitiesService.layerContainsResourceType(this.layer, ResourceType.WMS)) {
+      if (UtilitiesService.layerContainsResourceType(this.layer, ResourceType.WMTS)) {
+        this.csWMTSService.setLayerOpacity(this.layer, layerState.opacity / 100.0);
+      } else if (UtilitiesService.layerContainsResourceType(this.layer, ResourceType.WMS)) {
         this.csWMSService.setLayerOpacity(this.layer, layerState.opacity / 100.0);
       } else if (UtilitiesService.layerContainsBboxGeographicElement(this.layer)) {
         this.csCSWService.setLayerOpacity(this.layer, layerState.opacity / 100.0);
