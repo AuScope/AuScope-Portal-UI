@@ -692,6 +692,62 @@ export class CsMapComponent implements AfterViewInit {
 
 
   /**
+   * Extract a representative lon/lat coordinate from a GML feature XML node.
+   * Tries gml:pos (point), gml:posList (line/polygon, first pair),
+   * and gml:coordinates (GML 2.x) in that order.
+   * Returns null if no coordinate can be found.
+   */
+  private extractFeatureCoordinate(valueNode: any): { lon: number, lat: number } | null {
+    if (!valueNode?.getElementsByTagNameNS) return null;
+
+    // Try gml:pos (point geometry)
+    const posNodes = valueNode.getElementsByTagNameNS('*', 'pos');
+    for (let i = 0; i < posNodes.length; i++) {
+      const parts = posNodes[i].textContent.trim().split(/\s+/);
+      if (parts.length >= 2) {
+        const a = parseFloat(parts[0]), b = parseFloat(parts[1]);
+        if (!isNaN(a) && !isNaN(b)) {
+          // urn:x-ogc:def:crs:EPSG and epsg.xml#XXXX use lat/lon order — swap to lon/lat
+          const srs = posNodes[i].parentElement?.getAttribute('srsName') || '';
+          if (srs.indexOf('urn:x-ogc:def:crs:EPSG') >= 0 || srs.indexOf('http://www.opengis.net/gml/srs/epsg.xml#') >= 0) {
+            return { lon: b, lat: a };
+          }
+          return { lon: a, lat: b };
+        }
+      }
+    }
+
+    // Try gml:posList (line/polygon — take first coordinate pair)
+    const posListNodes = valueNode.getElementsByTagNameNS('*', 'posList');
+    if (posListNodes.length > 0) {
+      const parts = posListNodes[0].textContent.trim().split(/\s+/);
+      if (parts.length >= 2) {
+        const a = parseFloat(parts[0]), b = parseFloat(parts[1]);
+        if (!isNaN(a) && !isNaN(b)) {
+          const srs = posListNodes[0].parentElement?.getAttribute('srsName') || '';
+          if (srs.indexOf('urn:x-ogc:def:crs:EPSG') >= 0 || srs.indexOf('http://www.opengis.net/gml/srs/epsg.xml#') >= 0) {
+            return { lon: b, lat: a };
+          }
+          return { lon: a, lat: b };
+        }
+      }
+    }
+
+    // Try gml:coordinates (GML 2.x, "lon,lat" comma-separated tuples)
+    const coordNodes = valueNode.getElementsByTagNameNS('*', 'coordinates');
+    if (coordNodes.length > 0) {
+      const firstTuple = coordNodes[0].textContent.trim().split(/\s+/)[0];
+      const parts = firstTuple.split(',');
+      if (parts.length >= 2) {
+        const lon = parseFloat(parts[0]), lat = parseFloat(parts[1]);
+        if (!isNaN(lon) && !isNaN(lat)) return { lon, lat };
+      }
+    }
+
+    return null;
+  }
+
+  /**
    * Set the modal dialog with the layers that have been clicked on
    * @param layerId the ID of the layer
    * @param result response string
@@ -708,6 +764,18 @@ export class CsMapComponent implements AfterViewInit {
     } else {
       treeCollections = SimpleXMLService.parseTreeCollection(this.gmlParserService.getRootNode(result), feature);
     }
+
+    // AUS-4445 Sort features by distance to click point so the closest is always first
+    treeCollections.sort((a, b) => {
+      const coordA = this.extractFeatureCoordinate(a.value);
+      const coordB = this.extractFeatureCoordinate(b.value);
+      if (!coordA && !coordB) return 0;
+      if (!coordA) return 1;
+      if (!coordB) return -1;
+      const distA = (coordA.lon - clickCoord.x) * (coordA.lon - clickCoord.x) + (coordA.lat - clickCoord.y) * (coordA.lat - clickCoord.y);
+      const distB = (coordB.lon - clickCoord.x) * (coordB.lon - clickCoord.x) + (coordB.lat - clickCoord.y) * (coordB.lat - clickCoord.y);
+      return distA - distB;
+    });
 
     let featureCount = 0;
     for (const treeCollection of treeCollections) {
