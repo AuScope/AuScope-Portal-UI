@@ -6,7 +6,3 @@
 #   npx browserslist
 
 > 1% and last 2 versions
-Firefox ESR
-not dead
-not ie > 1
-not op_mini all
