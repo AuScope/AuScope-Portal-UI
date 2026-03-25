@@ -22,6 +22,7 @@ export class LayerModel {
   relatedRecords: any;
   singleTile: boolean;
   legendImg?: string;
+  previewImg?: string;
   iconUrl: string;
   filterCollection: any;
   stackdriverFailingHosts: string[];

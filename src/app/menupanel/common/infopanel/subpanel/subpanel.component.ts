@@ -191,7 +191,7 @@ export class InfoPanelSubComponent implements OnInit {
                 foundDOI = true;
                 foundCiteURL = true;
             }
-            if (!foundDOI && !foundCiteURL && onlineResource.type!== ResourceType.UNSUPPORTED) {
+            if (!foundDOI && !foundCiteURL && onlineResource.type !== ResourceType.UNSUPPORTED) {
                 if (this.isGetCapabilitiesType(onlineResource)) {
                     this.citeURL = this.onlineResourceGetCapabilitiesUrl(onlineResource);
                 } else {
@@ -221,14 +221,20 @@ export class InfoPanelSubComponent implements OnInit {
         // the WMS urls after the times have been loaded
         this.filterService.getLayerTimesBS(this.layer.id).subscribe(layerTimes => {
             const wmsOnlineResource = this.cswRecord.onlineResources.find(r => r.type.toLowerCase() === 'wms');
+            //if (!this.layer.previewImg) {
             if (wmsOnlineResource) {
-               const params = 'SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png'
+                const params = 'SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png'
                     + '&LAYER=' + wmsOnlineResource.name + '&LAYERS=' + wmsOnlineResource.name
                     + '&LEGEND_OPTIONS=forceLabels:on;minSymbolSize:16';
                 this.legendUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(wmsOnlineResource.url), params);
             } else if (this.layer.legendImg && this.layer.legendImg !== '') {
-                this.legendUrl = this.env.portalBaseUrl + 'legend/' + this.layer.legendImg;
+                if (this.layer.legendImg.indexOf("http") != 0) {
+                    this.legendUrl = this.env.portalBaseUrl + 'legend/' + this.layer.legendImg;
+                } else {
+                    this.legendUrl = this.layer.legendImg;
+                }
             }
+            //}
 
             // Gather up BBOX coordinates to calculate the centre and envelope. Use a copy of coords so they don't stay modified for the main map
             const bbox = { ...this.cswRecord.geographicElements[0] };
@@ -260,10 +266,20 @@ export class InfoPanelSubComponent implements OnInit {
                     params += '&TIME=' + layerTimes.currentTime.toISOString();
                 }
 
-                this.wmsUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(wmsOnlineResource.url), params);
-                this.outlineUrl = "https://research-community.geoanalytics.csiro.au/geoserver/auscope/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&LAYERS=auscope%3AStates-and-Territories&TRANSPARENT=TRUE&SRS=EPSG:4326&FORMAT=image%2Fpng&BBOX="+
-                                + bbox.westBoundLongitude + ',' + bbox.southBoundLatitude
-                                + ',' + bbox.eastBoundLongitude + ',' + bbox.northBoundLatitude + "&WIDTH=400&HEIGHT=400";
+                if (this.layer.previewImg) {
+                    // either the preview is the image url (http) or user the "/preview" api endpoint     
+                    if (this.layer.previewImg.indexOf("http") != 0) {
+                        this.wmsUrl = environment.portalBaseUrl + 'preview/' + this.layer.previewImg;
+                    } else {
+                        this.wmsUrl = this.layer.previewImg;
+                    }
+                    this.outlineUrl = "";
+                } else {
+                    this.wmsUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(wmsOnlineResource.url), params);
+                    this.outlineUrl = "https://research-community.geoanalytics.csiro.au/geoserver/auscope/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&LAYERS=auscope%3AStates-and-Territories&TRANSPARENT=TRUE&SRS=EPSG:4326&FORMAT=image%2Fpng&BBOX=" +
+                        + bbox.westBoundLongitude + ',' + bbox.southBoundLatitude
+                        + ',' + bbox.eastBoundLongitude + ',' + bbox.northBoundLatitude + "&WIDTH=400&HEIGHT=400";
+                }
             }
         });
     }
@@ -276,8 +292,8 @@ export class InfoPanelSubComponent implements OnInit {
     public copyCite(element: HTMLElement) {
         const text = element.innerText;
         navigator.clipboard.writeText(text)
-          .then(() => alert("Copied to clipboard"))
-          .catch(err => console.error("Failed to copy:", err));
+            .then(() => alert("Copied to clipboard"))
+            .catch(err => console.error("Failed to copy:", err));
     }
 
     /**
