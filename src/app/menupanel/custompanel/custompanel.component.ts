@@ -10,19 +10,18 @@ import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import * as JSZip from 'jszip';
 import { HttpClient } from '@angular/common/http';
-import { throwError as observableThrowError, Observable } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { throwError as observableThrowError, Observable, forkJoin, of, throwError } from 'rxjs';
+import { catchError, finalize, map, mergeMap, switchMap } from 'rxjs/operators';
 import { HttpResponse } from '@angular/common/http';
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
 
-
 @Component({
-    selector: '[app-custom-panel]',
-    templateUrl: './custompanel.component.html',
-    styleUrls: ['../menupanel.scss', './custompanel.component.scss'],
-    standalone: false
+  selector: '[app-custom-panel]',
+  templateUrl: './custompanel.component.html',
+  styleUrls: ['../menupanel.scss', './custompanel.component.scss'],
+  standalone: false
 })
 export class CustomPanelComponent {
   private env = inject<any>('env' as any);
@@ -110,12 +109,21 @@ export class CustomPanelComponent {
 
           // Remove unwanted characters and inject proxy for embedded URLs
           if (typeof kmlTxt === "string") {
-            const kmlStr = this.kmlService.cleanKML(kmlTxt);
-            const parser = new DOMParser();
-            let kmlDoc = parser.parseFromString(kmlStr, "text/xml");
-            kmlDoc = this.parseExtendedData(kmlDoc);
-
-            this.setupLayer(this, layerName, kmlDoc, proxyUrl, ResourceType.KML, "URL");
+            var kmlStr;
+            this.kmlService.cleanKML(kmlTxt, this.env.portalBaseUrl).subscribe({
+              next: (value: string) => {
+                // This code runs when a value is emitted
+                kmlStr = value;
+                const parser = new DOMParser();
+                let kmlDoc = parser.parseFromString(kmlStr, "text/xml");
+                kmlDoc = this.parseExtendedData(kmlDoc);
+                this.setupLayer(this, layerName, kmlDoc, proxyUrl, ResourceType.KML, "URL");
+              },
+              error: (err: any) => console.error('[custompanel]onFileSelected(getRemoteBlob)Error:', err),
+              complete: () => {
+                                //console.log('[custompanel]onFileSelected(getRemoteBlob)Observable complete')
+                              }
+            });
           }
           this.loading = false;
         });
@@ -452,7 +460,7 @@ export class CustomPanelComponent {
    * @param sourceType URL or File
    */
   public setupLayer(me: this, name: string, sourceData: any, proxyUrl: string, docType: ResourceType, sourceType: string) {
-    let layerRec: LayerModel= null;
+    let layerRec: LayerModel = null;
     // Make a layer model object
     if (docType == ResourceType.GEOJSON) {
       layerRec = me.layerHandlerService.makeCustomGEOJSONLayerRecord(name, proxyUrl, sourceData);
@@ -549,15 +557,33 @@ export class CustomPanelComponent {
         });
       } else {
         const reader = new FileReader();
+
+        // Initiate reading the KML file as text, result will be a string
+        reader.readAsText(file);
+
         // When file has been read this function is called
         reader.onload = () => {
           if (typeof reader.result === "string") {
             // Remove unwanted characters and inject proxy for embedded URLs
-            const kmlStr = this.kmlService.cleanKML(reader.result);
-            const parser = new DOMParser();
-            let kmlDoc = parser.parseFromString(kmlStr, "text/xml");
-            kmlDoc = this.parseExtendedData(kmlDoc);
-            this.setupLayer(this, file.name, kmlDoc, "", ResourceType.KML, "FILE");
+            
+            var kmlTxt = reader.result;
+
+            this.kmlService.cleanKML(kmlTxt, this.env.portalBaseUrl).subscribe({
+              next: (value: string) => {
+                // This code runs when a value is emitted
+                kmlTxt = value;
+                const parser = new DOMParser();
+                let kmlDoc = parser.parseFromString(kmlTxt, "text/xml");
+                kmlDoc = this.parseExtendedData(kmlDoc);
+                this.setupLayer(this, file.name, kmlDoc, "", ResourceType.KML, "FILE");
+                // todo: loadImage
+              },
+              error: (err: any) => console.error('[custompanel]onFileSelected()Error:', err),
+              complete: () => { 
+                                //console.log('[custompanel]onFileSelected()Observable complete');
+                              }
+            });
+
           }
         };
         // Initiate reading the KML file as text, result will be a string

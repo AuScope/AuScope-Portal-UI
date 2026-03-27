@@ -1,17 +1,18 @@
 
 import { throwError as observableThrowError, Observable } from 'rxjs';
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 
 import { OnlineResourceModel } from '../../model/data/onlineresource.model';
 import { LayerModel } from '../../model/data/layer.model';
 import { LayerHandlerService } from '../cswrecords/layer-handler.service';
 import { MapsManagerService } from '@auscope/angular-cesium';
-import { ResourceType } from '../../utility/constants.service';
+import { Constants, ResourceType } from '../../utility/constants.service';
 import { RenderStatusService } from '../cesium-map/renderstatus/render-status.service';
 import { KMLDocService } from './kml.service';
 import { UtilitiesService } from '../../utility/utilities.service';
+import { DefaultProxy, Rectangle, Resource } from 'cesium';
 
 // NB: Cannot use "import { XXX, YYY, ZZZ, Color } from 'cesium';" - it prevents initialising ContextLimits.js properly
 // which causes a 'DeveloperError' when trying to draw the KML
@@ -27,12 +28,15 @@ export class CsKMLService {
   private renderStatusService = inject(RenderStatusService);
   private mapsManagerService = inject(MapsManagerService);
   private kmlService = inject(KMLDocService);
-
+  private env = inject<any>('env' as any);
 
   // List of KML layers that have been cancelled
   private cancelledLayers: Array<string> = [];
   // Number of KML resources added for a given layer
   private numberOfResourcesAdded: Map<string, number> = new Map<string, number>();
+
+  private overlayDoc: Node; // used to make a temporary copy of <GroundOverlay> for restoring to layer.kmlDoc 
+
 
   /**
    * Downloads KML, cleans it
@@ -43,13 +47,33 @@ export class CsKMLService {
   private getKMLFeature(url: string): Observable<any> {
     return this.http.get(url, { responseType: 'text' }).pipe(map((kmlTxt: string) => {
       // Remove unwanted characters and inject proxy for embedded URLs
-      return this.kmlService.cleanKML(kmlTxt);
-    }), catchError(
-      (error: HttpResponse<any>) => {
-        return observableThrowError(error);
-      }
-    ));
+      return this.kmlService.cleanKML(kmlTxt, this.env.portalBaseUrl).subscribe(response => {
+        return response;
+      })
+    }))
   }
+
+
+  /**
+   * removes the <GroundOverlay> element from the kml document
+   *
+   * @param kmlResource KML resource to be fetched
+   * @returns updated kml document and saves the removed nodes to overlayDoc
+   */
+
+
+  private removeOverlay(kmlDoc: Document): Document {
+    let gos = kmlDoc.querySelectorAll("GroundOverlay");
+    if (gos) {
+      gos.forEach(go => {
+        // backup <GroundOverlay> and restore after the kml source is loaded 
+        this.overlayDoc = go.cloneNode(true);
+        go.remove();
+      });
+    }
+    return kmlDoc;
+  }
+
 
   /**
    * Add the KML layer
@@ -95,12 +119,78 @@ export class CsKMLService {
       // note: KML and KMZ, loaded either from a local file or url now have
       // a layer.kmlDoc entry - so some of the following code is redundant
       if (layer.kmlDoc) {
+
+        var iconObject = this.getIcon(layer.kmlDoc);
+        // TODO: remove <GroundOverlay> from the kml before the source is loaded!!
+        //       elements still to handle: name, description, rotation
+        let overlayRect;
+        let kmlDoc = layer.kmlDoc;
+        if (iconObject.rectangle) {
+          overlayRect = Rectangle.fromDegrees(iconObject.rectangle.west, iconObject.rectangle.south, iconObject.rectangle.east, iconObject.rectangle.north);
+          // remove <GroundOverlay> from KML
+          kmlDoc = this.removeOverlay(layer.kmlDoc);
+        }
+
         source.load(layer.kmlDoc).then(dataSource => {
           if (this.cancelledLayers.indexOf(layer.id) === -1) {
+
             viewer.dataSources.add(dataSource).then(dataSrc => {
-              layer.csLayers.push(dataSrc);
-              this.incrementLayersAdded(layer, 1);
-            });
+              layer.csLayers.push(dataSrc); // TODO: should this be removed??
+              if (!iconObject.url) {
+                this.incrementLayersAdded(layer, 1);
+                var placemarkObject = this.getPlacemark(layer.kmlDoc);
+                var placemarkRect = Rectangle.fromDegrees(placemarkObject.rectangle.west, placemarkObject.rectangle.south, placemarkObject.rectangle.east, placemarkObject.rectangle.north);
+                setTimeout(() => {
+                  viewer.camera.flyTo({ destination: placemarkRect });
+                }, 100);
+              } else {
+                this.incrementLayersAdded(layer, 2);
+
+                const layers = viewer.scene.imageryLayers;
+                // Use the proxy
+                const proxyUrl = this.env.portalBaseUrl + Constants.PROXY_API + "?usewhitelist=false&url=" + iconObject.url;
+
+                // create a short url
+                const body = {
+                  "url": proxyUrl
+                }
+                try {
+                  this.http.post(this.env.portalBaseUrl + "shorturl", body, {
+                    headers: new HttpHeaders().set('Content-Type', 'application/json')
+                  }).subscribe(res => {
+                    var shortenedUrl = res["data"]["url"];
+
+                    const overlayProvider = new Cesium.SingleTileImageryProvider({
+                      url: shortenedUrl,
+                      layers: layer.name,
+                      rectangle: overlayRect,
+                      credit: "credit for the data source",
+                    });
+
+                    overlayProvider.errorEvent.addEventListener(function (tileProviderError) {
+                      console.error('*** An error occurred in SingleTileImageryProvider:');
+                      console.error('*** Message: ' + tileProviderError.message);
+                      console.error('*** Error Code: ' + tileProviderError.error);
+                      console.error('Error at level : ' + tileProviderError.level);
+                    });
+
+                    setTimeout(() => {
+                      viewer.camera.flyTo({ destination: overlayRect });
+                    }, 100);
+
+                    layer.kmlDoc.querySelector("Folder").appendChild(this.overlayDoc);
+                    var newLayer = viewer.imageryLayers.addImageryProvider(overlayProvider);
+                    layer.csLayers.push(newLayer);
+
+                  }), catchError((error: HttpResponse<any>) => {
+                    return observableThrowError(error);
+                  });
+
+                } catch (e) {
+                  return observableThrowError(e);
+                }
+              }
+            })
           }
         });
       } else {
@@ -177,7 +267,9 @@ export class CsKMLService {
     const viewer = this.getViewer();
     for (const dataSrc of layer.csLayers) {
       viewer.dataSources.remove(dataSrc);
+      viewer.imageryLayers.remove(dataSrc);
     }
+    viewer.imageryLayers.remove(layer);
     layer.csLayers = [];
     this.renderStatusService.resetLayer(layer.id);
   }
@@ -189,4 +281,71 @@ export class CsKMLService {
     return this.mapsManagerService.getMap().getCesiumViewer();
   }
 
+  /**
+   * gets the icon from the KML if the url is http...
+   *
+   * @param kmlResource KML resource to be fetched
+   * @returns icon object (url and rectangle coords)
+   */
+
+  private getIcon(kmlDoc: Document): any {
+    let result = {};
+    let gos = kmlDoc.querySelectorAll("GroundOverlay");
+    if (gos) {
+      gos.forEach(go => {
+        let iconEntity = go.querySelector("Icon");
+        let iconURL = iconEntity.querySelector('href').textContent;
+        if (iconURL.toLowerCase().startsWith("http")) {
+          let rectEntity = go.querySelector("LatLonBox");
+          let north = rectEntity.querySelector('north').textContent;
+          let south = rectEntity.querySelector('south').textContent;
+          let east = rectEntity.querySelector('east').textContent;
+          let west = rectEntity.querySelector('west').textContent;
+          result = { url: iconURL, rectangle: { north: north, south: south, east: east, west: west } };
+        }
+      });
+    }
+    return result;
+  }
+
+  /**
+   * gets the icon from the KML if the url is http...
+   *
+   * @param kmlResource KML resource to be fetched
+   * @returns icon object (url and bounds of all placemarks coords)
+   */
+
+  private getPlacemark(kmlDoc: Document): any {
+    let result = {};
+    let pms = kmlDoc.querySelectorAll("Placemark");
+    var pts = [];
+    var maxLon: number = 0.0, minLon: number = 180.0, maxLat: number = -90.0, minLat: number = 0.0;
+    if (pms) {
+      pms.forEach(pm => {
+        let lookatEntity = pm.querySelector("LookAt");
+        if (lookatEntity) {
+          let lon = lookatEntity.querySelector('longitude').textContent;
+          let lat = lookatEntity.querySelector('latitude').textContent;
+
+          pts.push({ "lat": lat, "lon": lon });
+        }
+      })
+      if (pts.length === 1) {
+        maxLat = Number(pts[0].lat) + Number(0.05);
+        minLat = Number(pts[0].lat) - Number(0.05);
+        maxLon = Number(pts[0].lon) + Number(0.05);
+        minLon = Number(pts[0].lon) - Number(0.05);
+      } else {
+        pts.forEach((pt) => {
+          if (pt.lat > maxLat) { maxLat = pt.lat; }
+          if (pt.lat < minLat) { minLat = pt.lat; }
+          if (pt.lon > maxLon) { maxLon = pt.lon; }
+          if (pt.lon < minLon) { minLon = pt.lon; }
+        })
+      }
+
+      result = { rectangle: { north: maxLat, south: minLat, east: maxLon, west: minLon } };
+    }
+    return result;
+  }
 }
