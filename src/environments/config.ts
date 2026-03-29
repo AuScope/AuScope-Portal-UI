@@ -417,7 +417,8 @@ export const config = {
   },
   // A workaround for OGC WMS services that do not cache 'SLD_BODY' and ignore map styling and filters
   doesNotCacheSLDBody: [
-    "https://sarigdata.pir.sa.gov.au"
+    "https://sarigdata.pir.sa.gov.au",
+    "https://gs.geoscience.nsw.gov.au"
   ],
   // Some layers use GeoSciML v4.1 and the XML needs to be patched
   insertGeoSciMLNS: [
