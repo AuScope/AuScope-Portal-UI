@@ -1,12 +1,15 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject } from '@angular/core';
 import { CSWRecordModel } from '../../../../lib/portal-core-ui/model/data/cswrecord.model';
 import { LayerModel } from '../../../../lib/portal-core-ui/model/data/layer.model';
 import { OnlineResourceModel } from '../../../../lib/portal-core-ui/model/data/onlineresource.model';
 import { UtilitiesService } from '../../../../lib/portal-core-ui/utility/utilities.service';
 import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
+import { LayerManagerService } from 'app/services/ui/layer-manager.service';
+import { LayerHandlerService } from 'app/lib/portal-core-ui/service/cswrecords/layer-handler.service';
 import { environment } from 'environments/environment';
 import { config } from 'environments/config';
 import { ResourceType } from '../../../../lib/portal-core-ui/utility/constants.service';
+import { take } from 'rxjs/operators';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 declare let rudderanalytics: any;
@@ -20,10 +23,13 @@ declare let rudderanalytics: any;
 export class InfoPanelSubComponent implements OnInit, OnChanges {
     private env = inject<any>('env' as any);
     private filterService = inject(FilterService);
+    private layerManagerService = inject(LayerManagerService);
+    private layerHandlerService = inject(LayerHandlerService);
 
     @Input() cswRecord: CSWRecordModel;
     @Input() layer: LayerModel;
     @Input() expanded: boolean;
+    @Output() layerAdded = new EventEmitter<void>();
 
     // These store the URL of the WMS preview, outline of Australia and legend
     wmsUrl: string;
@@ -133,6 +139,84 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
             }
         }
         return path;
+    }
+
+    /**
+     * Add this layer for all providers with defaut filters.
+     */
+    public addLayerForRecord(): void {
+        const optionalFilters = [];
+        const providerFilter = this.buildProviderFilterForRecord();
+        if (providerFilter) {
+            optionalFilters.push(providerFilter);
+            this.applyOptionalFiltersToLayerFilterCollection(optionalFilters);
+        }
+
+        const layerTimes = this.filterService.getLayerTimesBS(this.layer.id).getValue();
+        this.layerManagerService.addLayer(this.layer, optionalFilters, this.layer.filterCollection, layerTimes?.currentTime);
+        this.layerAdded.emit();
+    }
+
+    /**
+     * Add selected optional filters into the layer filter collection so they appear in FilterPanel
+     */
+    private applyOptionalFiltersToLayerFilterCollection(optionalFilters: any[]): void {
+        const layerOptionalFilters = this.layer?.filterCollection?.optionalFilters;
+        if (!layerOptionalFilters || layerOptionalFilters.length === 0) {
+            return;
+        }
+
+        for (const selectedFilter of optionalFilters) {
+            const existingFilter = layerOptionalFilters.find(filter => filter.label === selectedFilter.label);
+            if (existingFilter) {
+                existingFilter.value = selectedFilter.value;
+                existingFilter.added = true;
+            }
+        }
+
+        // Ensure there is a registered filter collection before updating it
+        this.filterService.registerLayerFilterCollection(this.layer.id, this.layer.filterCollection)
+            .pipe(take(1))
+            .subscribe(() => {
+                this.filterService.updateLayerFilterCollection(this.layer.id, this.layer.filterCollection);
+            });
+    }
+
+    /**
+     * Build an OPTIONAL.PROVIDER filter selecting only the provider for this record
+     */
+    private buildProviderFilterForRecord(): any {
+        const providerFilterTemplate = this.layer?.filterCollection?.optionalFilters?.find(
+            filter => filter.type === 'OPTIONAL.PROVIDER'
+        );
+        if (!providerFilterTemplate) {
+            return null;
+        }
+
+        const onlineResources = this.layerHandlerService.getOnlineResourcesFromCSW(this.cswRecord);
+        const firstResourceWithUrl = onlineResources.find(resource => !!resource?.url);
+        if (!firstResourceWithUrl) {
+            return null;
+        }
+
+        const providerDomain = UtilitiesService.getUrlDomain(firstResourceWithUrl.url);
+        if (!providerDomain) {
+            return null;
+        }
+
+        const providerValue = {};
+        if (providerFilterTemplate.value) {
+            for (const providerKey in providerFilterTemplate.value) {
+                providerValue[providerKey] = false;
+            }
+        }
+        providerValue[providerDomain] = true;
+
+        return {
+            ...providerFilterTemplate,
+            added: true,
+            value: providerValue
+        };
     }
 
     /**
