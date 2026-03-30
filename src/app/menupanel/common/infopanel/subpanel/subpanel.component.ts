@@ -29,6 +29,7 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
     @Input() cswRecord: CSWRecordModel;
     @Input() layer: LayerModel;
     @Input() expanded: boolean;
+    @Input() showRecordAddButton = true;
     @Output() layerAdded = new EventEmitter<void>();
 
     // These store the URL of the WMS preview, outline of Australia and legend
