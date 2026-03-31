@@ -384,7 +384,8 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   allLayersLoaded() {
     this.onDataChange();
     this.downloading = false;
-    if (this.docs.length === 1 && this.htmls.length === 0) {
+    if (this.docs.length >= 1 && this.htmls.length === 0) {
+      // AUS-4445 Always display the closest feature (first in sorted list) by default
       this.setWFS(this.docs[0], 0);
       this.openTab(event, 'wfs')
     } else if (this.htmls.length === 1 && this.docs.length === 0) {

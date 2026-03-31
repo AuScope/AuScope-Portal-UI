@@ -691,6 +691,93 @@ export class CsMapComponent implements AfterViewInit {
   }
 
 
+  private getNodeText(node: any): string {
+    return node?.textContent?.trim?.() || '';
+  }
+
+  private getNodeSrsName(node: any): string {
+    let current = node;
+    while (current?.getAttribute) {
+      const srsName = current.getAttribute('srsName');
+      if (srsName) {
+        return srsName;
+      }
+      current = current.parentElement;
+    }
+    return '';
+  }
+
+  private projectFeatureCoordinate(a: number, b: number, srsName: string): { x: number, y: number } | null {
+    const normalizedSrsName = (srsName || '').toLowerCase();
+    const usesLatLonOrder = normalizedSrsName.indexOf('urn:x-ogc:def:crs:epsg') >= 0 ||
+      normalizedSrsName.indexOf('http://www.opengis.net/gml/srs/epsg.xml#') >= 0;
+
+    let lon = usesLatLonOrder ? b : a;
+    let lat = usesLatLonOrder ? a : b;
+
+    if (normalizedSrsName.indexOf('3857') >= 0 ||
+        normalizedSrsName.indexOf('900913') >= 0 ||
+        normalizedSrsName.indexOf('102100') >= 0) {
+      return { x: lon, y: lat };
+    }
+
+    // Most clicked WMS features are returned in geographic coordinates.
+    if (globalThis.Math.abs(lon) <= 180 && globalThis.Math.abs(lat) <= 90) {
+      const projected = new WebMercatorProjection().project(Cartographic.fromDegrees(lon, lat));
+      return { x: projected.x, y: projected.y };
+    }
+
+    return { x: lon, y: lat };
+  }
+
+  /**
+   * Extract a representative feature coordinate in the same projected CRS as clickCoord.
+   * Tries gml:pos (point), gml:posList (line/polygon, first pair),
+   * and gml:coordinates (GML 2.x) in that order.
+   */
+  private extractFeatureCoordinate(valueNode: any): { x: number, y: number } | null {
+    if (!valueNode?.getElementsByTagNameNS) return null;
+
+    const posNodes = valueNode.getElementsByTagNameNS('*', 'pos');
+    for (let i = 0; i < posNodes.length; i++) {
+      const parts = this.getNodeText(posNodes[i]).split(/\s+/);
+      if (parts.length >= 2) {
+        const a = parseFloat(parts[0]);
+        const b = parseFloat(parts[1]);
+        if (!isNaN(a) && !isNaN(b)) {
+          return this.projectFeatureCoordinate(a, b, this.getNodeSrsName(posNodes[i]));
+        }
+      }
+    }
+
+    const posListNodes = valueNode.getElementsByTagNameNS('*', 'posList');
+    if (posListNodes.length > 0) {
+      const parts = this.getNodeText(posListNodes[0]).split(/\s+/);
+      if (parts.length >= 2) {
+        const a = parseFloat(parts[0]);
+        const b = parseFloat(parts[1]);
+        if (!isNaN(a) && !isNaN(b)) {
+          return this.projectFeatureCoordinate(a, b, this.getNodeSrsName(posListNodes[0]));
+        }
+      }
+    }
+
+    const coordNodes = valueNode.getElementsByTagNameNS('*', 'coordinates');
+    if (coordNodes.length > 0) {
+      const firstTuple = this.getNodeText(coordNodes[0]).split(/\s+/)[0];
+      const parts = firstTuple.split(',');
+      if (parts.length >= 2) {
+        const a = parseFloat(parts[0]);
+        const b = parseFloat(parts[1]);
+        if (!isNaN(a) && !isNaN(b)) {
+          return this.projectFeatureCoordinate(a, b, this.getNodeSrsName(coordNodes[0]));
+        }
+      }
+    }
+
+    return null;
+  }
+
   /**
    * Set the modal dialog with the layers that have been clicked on
    * @param layerId the ID of the layer
@@ -699,7 +786,7 @@ export class CsMapComponent implements AfterViewInit {
    * @param clickCoord map click coordinates
    * @param gmlid a optional filter to only display the gmlId specified
    */
-  private setModal(layerId: string, result: string, feature: any, clickCoord: { x: number, y: number, z: number }, gmlid?: string) {
+  private setModal(layerId: string, result: string, feature: any, clickCoord: { x: number, y: number, z: number } | null, gmlid?: string) {
     let treeCollections = [];
 
     // Some layers return JSON
@@ -707,6 +794,21 @@ export class CsMapComponent implements AfterViewInit {
       treeCollections = this.parseJSONResponse(result, feature);
     } else {
       treeCollections = SimpleXMLService.parseTreeCollection(this.gmlParserService.getRootNode(result), feature);
+    }
+
+    if (clickCoord) {
+      // AUS-4445 Sort features by distance to click point so the closest is always first.
+      // clickCoord is WebMercator, so feature coordinates must be projected before comparison.
+      treeCollections.sort((a, b) => {
+        const coordA = this.extractFeatureCoordinate(a.value);
+        const coordB = this.extractFeatureCoordinate(b.value);
+        if (!coordA && !coordB) return 0;
+        if (!coordA) return 1;
+        if (!coordB) return -1;
+        const distA = (coordA.x - clickCoord.x) * (coordA.x - clickCoord.x) + (coordA.y - clickCoord.y) * (coordA.y - clickCoord.y);
+        const distB = (coordB.x - clickCoord.x) * (coordB.x - clickCoord.x) + (coordB.y - clickCoord.y) * (coordB.y - clickCoord.y);
+        return distA - distB;
+      });
     }
 
     let featureCount = 0;
