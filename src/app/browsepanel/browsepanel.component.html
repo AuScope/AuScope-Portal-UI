@@ -72,8 +72,11 @@
             <div class="col">
               <a>
                 <span class="truncate-layer" [ngClass]="{'enbolden': isLayerSelected(layer)}" title="{{layer.name}}" (click)="selectLayer(layer)">
-                  @if (!isLayerAdded(layer)) {
+                  @if (!isLayerAdded(layer) && (isCSW(layer))) {
                     <i class="fa fa-plus-circle" style="margin-right: 8px; color: #28a745;" title="Click to add layer" (click)="addLayerToMap(layer); $event.stopPropagation()"></i>
+                  }
+                  @if (!isLayerAdded(layer) && (!isCSW(layer))) {
+                    <i class="fa fa-ban" style="margin-right: 8px; color: #dc3545;"></i>
                   }
                   @if (isLayerAdded(layer)) {
                     <i class="fa fa-trash" style="margin-right: 8px; color: #dc3545;" title="Click to remove layer" (click)="removeLayerFromMap(layer); $event.stopPropagation()"></i>
@@ -90,7 +93,7 @@
       }
     </div>
     <!-- Info column -->
-    <div [style.display]="selectedLayer || panelStayOpen ? 'block' : 'none'" class="info-col">
+    <div [style.display]="(selectedLayer && isCSW(selectedLayer)) || panelStayOpen ? 'block' : 'none'" class="info-col">
       <a style="font-weight: bold">Information</a>
       <p></p>
       <!-- Information -->
