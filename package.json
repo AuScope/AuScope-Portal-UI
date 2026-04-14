@@ -66,7 +66,6 @@
     "json-string-mapper": "^1.0.0",
     "lodash": "^4.17.21",
     "lzma": "^2.3.2",
-    "ng-tiny-url": "^1.0.2",
     "ngx-bootstrap": "^20.0.0",
     "ngx-clipboard": "~15.1.0",
     "ngx-colors": "3.1.0",
