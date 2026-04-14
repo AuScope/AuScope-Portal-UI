@@ -9,7 +9,7 @@ import { Injectable, inject } from '@angular/core';
 import * as $ from 'jquery';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-declare let gtag: Function;
+declare let rudderanalytics: any;
 
 /**
  * Service to download WFS data
@@ -59,8 +59,8 @@ export class DownloadWfsService {
                             omitGsmlpShapeProperty: boolean): Observable<any> {
     try {
       const wfsResources = this.layerHandlerService.getWFSResource(layer);
-      if (this.env.googleAnalyticsKey && typeof gtag === 'function') {
-        gtag('event', 'DatasetDownload', { 'event_category': 'DatasetDownload', 'event_action': layer.id });
+      if (this.env.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
+        rudderanalytics.track('dataset_download_started', { layer_id: layer.id, download_type: 'dataset_url' });
       }
       omitGsmlpShapeProperty = omitGsmlpShapeProperty !== undefined ? omitGsmlpShapeProperty : false;
       let httpParams = new HttpParams();
@@ -118,8 +118,8 @@ export class DownloadWfsService {
   public downloadTsgFileUrls(layer: LayerModel, bbox: Bbox, email: string, polygonFilter: string): Observable<any> {
       try {
         const wfsResources = this.layerHandlerService.getWFSResource(layer);
-        if (this.env.googleAnalyticsKey && typeof gtag === 'function') {
-          gtag('event', 'CSVDownload', { 'event_category': 'CSVDownload', 'event_action': layer.id });
+        if (this.env.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
+          rudderanalytics.track('dataset_download_started', { layer_id: layer.id, download_type: 'tsg' });
         }
         let downloadUrl = 'getAllFeaturesInCSV.do';
         if (layer.proxyDownloadUrl && layer.proxyDownloadUrl.length > 0) {
@@ -199,8 +199,8 @@ export class DownloadWfsService {
 
     try {
       const wfsResources = this.layerHandlerService.getWFSResource(layer);
-      if (this.env.googleAnalyticsKey && typeof gtag === 'function') {
-        gtag('event', 'CSVDownload', { 'event_category': 'CSVDownload', 'event_action': layer.id });
+      if (this.env.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
+        rudderanalytics.track('dataset_download_started', { layer_id: layer.id, download_type: 'csv' });
       }
       let downloadUrl = 'getAllFeaturesInCSV.do';
       if (layer.proxyDownloadUrl && layer.proxyDownloadUrl.length > 0) {

@@ -5,7 +5,7 @@ import { Registry } from 'app/menupanel/data-explorer/data-model';
 import { v4 as uuidv4 } from 'uuid';
 import { environment } from 'environments/environment';
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-declare let gtag: Function;
+declare let rudderanalytics: any;
 
 @Component({
     selector: 'app-add-registry-modal-window',
@@ -87,8 +87,8 @@ export class AddRegistryModalComponent implements OnInit, AfterViewInit {
    * Add registry to registry list
    */
   saveRegistry() {
-    if (environment.googleAnalyticsKey && typeof gtag === 'function') {
-      gtag('event', 'AddCustomRegistry', {
+    if (environment.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
+      rudderanalytics.track('AddCustomRegistry', {
         event_category: 'AddCustomRegistry',
         event_action: 'AddCustomRegistry:' + this.registryForm.get('serviceUrl').value
       });

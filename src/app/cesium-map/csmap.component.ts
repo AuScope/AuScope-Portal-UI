@@ -1,4 +1,5 @@
 import { config } from '../../environments/config';
+import { environment } from '../../environments/environment';
 import { QuerierModalComponent } from '../modalwindow/querier/querier.modal.component';
 import { AfterViewInit, Component, ElementRef, NgZone, ViewChild, ViewContainerRef, inject } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
@@ -30,6 +31,8 @@ import { NVCLBoreholeAnalyticService } from 'app/modalwindow/layeranalytic/nvcl/
 import { OnlineResourceModel } from 'app/lib/portal-core-ui/model/data/onlineresource.model';
 
 declare let Cesium: any;
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+declare let rudderanalytics: any;
 
 @Component({
     selector: 'app-cs-map',
@@ -768,6 +771,17 @@ export class CsMapComponent implements AfterViewInit {
 
     if (featureCount > 0) {
       this.bsModalRef.content.onDataChange();
+      if (environment.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
+        rudderanalytics.track('feature_info_view', {
+          layer_id: feature.layer?.id,
+          layer_name: feature.layer?.name,
+          coordinates: {
+            lat: clickCoord?.y,
+            lon: clickCoord?.x
+          },
+          feature_type: treeCollections.length > 0 ? treeCollections[0].key : 'unknown'
+        });
+      }
     }
     return featureCount;
   }

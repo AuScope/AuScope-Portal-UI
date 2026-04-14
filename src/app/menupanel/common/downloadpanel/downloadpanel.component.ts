@@ -24,7 +24,7 @@ import { Subject } from 'rxjs';
 import { DownloadAuScopeCatModalComponent } from 'app/modalwindow/download-auscopecat/download-auscopecat.modal.component';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-declare let gtag: Function;
+declare let rudderanalytics: any;
 
 @Component({
     selector: 'app-download-panel',
@@ -527,6 +527,14 @@ export class DownloadPanelComponent implements OnInit {
       }
       const blob = new Blob([value.body ? value.body : value], { type: 'application/zip' });
       saveAs(blob, 'download.zip');
+      if (environment.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
+        rudderanalytics.track('dataset_download_completed', {
+          layer_id: this.layer.id,
+          layer_name: this.layer.name,
+          download_type: 'wfs',
+          file_size: blob.size
+        });
+      }
     }, err => {
       this.downloadStarted = false;
       // No error message
@@ -654,6 +662,14 @@ export class DownloadPanelComponent implements OnInit {
 
     const blob = new Blob([kmlPlaceMarkBHarray.join('\n')], { type: "text/plain;charset=utf-8" });
     saveAs(blob, "AuScope-Portal-BHPolygon.kml");
+    if (environment.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
+      rudderanalytics.track('dataset_download_completed', {
+        layer_id: this.layer.id,
+        layer_name: this.layer.name,
+        download_type: 'kml',
+        file_size: blob.size
+      });
+    }
   }
 
   /**
@@ -734,15 +750,14 @@ export class DownloadPanelComponent implements OnInit {
       this.bsModalRef.componentInstance.urlsArray = urlsArray;
       this.bsModalRef.componentInstance.BulkDownloadTsgFiles();
       /**
-       * do not "log" the "email" to "Google Analytics" - as this is an ethics issue
+       * do not "log" the "email" to "RudderStack" - as this is an ethics issue
        *
-       * console.log("environment.googleAnalyticsKey: "+environment.googleAnalyticsKey);
+       * console.log("environment.rudderStackWriteKey: "+environment.rudderStackWriteKey);
        */
-      if (environment.googleAnalyticsKey && typeof gtag === "function") {
-        gtag('event', 'TSGDownload', {
-          event_category: 'TSGBulkDownload',
-          event_action: '[' + total + ' of ' + urlsArray.length + ']' + urls
-          //event_label: me.tsgDownloadEmail
+      if (environment.rudderStackWriteKey && typeof rudderanalytics !== "undefined") {
+        rudderanalytics.track('dataset_download_started', {
+          layer_id: this.layer.id,
+          download_type: 'tsg'
         });
       }
     }, err => {
@@ -782,6 +797,14 @@ export class DownloadPanelComponent implements OnInit {
       this.download4pStarted = false;
       const blob = new Blob([value], { type: 'application/zip' });
       saveAs(blob, 'download.zip');
+      if (environment.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
+        rudderanalytics.track('dataset_download_completed', {
+          layer_id: this.layer.id,
+          layer_name: this.layer.name,
+          download_type: 'wfs',
+          file_size: blob.size
+        });
+      }
     }, err => {
       this.download4pStarted = false;
       if (UtilitiesService.isEmpty(err.message)) {

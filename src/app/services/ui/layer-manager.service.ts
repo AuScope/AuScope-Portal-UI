@@ -11,7 +11,7 @@ import * as $ from 'jquery';
 import { SidebarService } from 'app/portal/sidebar.service';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-declare let gtag: Function;
+declare let rudderanalytics: any;
 
 /**
  * Class for managing the addition and removal of map layers.
@@ -84,8 +84,8 @@ export class LayerManagerService {
    * and apply here when it's needed to adding from SearchPanel etc. will apply filter as well
    */
   public addLayer(layer: LayerModel, optionalFilters: Array<object>, layerFilterCollection: any, layerTime: Date) {
-    if (environment.googleAnalyticsKey && typeof gtag === 'function') {
-      gtag('event', 'Addlayer', {
+    if (environment.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
+      rudderanalytics.track('Addlayer', {
         event_category: 'Addlayer',
         event_action: 'AddLayer:' + layer.id
       });
