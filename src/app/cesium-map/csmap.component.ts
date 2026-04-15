@@ -339,6 +339,34 @@ export class CsMapComponent implements AfterViewInit {
   }
 
   /**
+   * check for kml GroundOverlay and make appropriate html for modal display
+   * @param mapClickInfo object with map click information
+   * @returns html for display in the modal
+   */
+  private kmlGroundOverlay(mapClickInfo) : string {
+
+    let html = "";
+
+    let layerList = mapClickInfo.clickedLayerList
+    if (layerList[0].kmlDoc) {
+      let go = layerList[0].kmlDoc.querySelector("GroundOverlay");
+      if (go) {
+        // make an entity? = [name, description]
+        let name = go.querySelector('name').textContent;
+        let description = go.querySelector('description').textContent;
+
+        // const handler = new KMLQuerierHandler(entity);
+        html = '<div class="row"><div class="col-md-3">Name</div><div class="col-md-9">' + layerList[0].name + '</div></div><hr>';
+        html += '<div class="row"><div class="col-md-3">' + "name" + '</div><div class="col-md-9">' + name + '</div></div>';
+        html += '<div class="row"><div class="col-md-3">' + "description" + '</div><div class="col-md-9">' + description + '</div></div>';
+        html += '</div></div>';
+
+      }
+    }
+    return html;
+  }
+
+  /**
    * Handles the map click event
    * @param mapClickInfo object with map click information
    */
@@ -350,8 +378,17 @@ export class CsMapComponent implements AfterViewInit {
       return;
     }
 
-    // Process lists of entities
     this.modalDisplayed = false;
+
+    // check if its a kml ground overlay
+    if (mapClickInfo.clickedEntityList == 0) {
+      let layerList = mapClickInfo.clickedLayerList
+      const html = this.kmlGroundOverlay(mapClickInfo);
+      this.displayModal(mapClickInfo.clickCoord);
+      this.setModalHTML(html, layerList[0].name + ": " + "Ground Overlay", layerList[0], this.bsModalRef);
+    }
+
+    // Process lists of entities
     for (const entity of mapClickInfo.clickedEntityList) {
       // TODO: Ignore polygon filter entities here or in portal-core-ui
       const layer: LayerModel = this.csMapService.getLayerForEntity(entity);
@@ -362,8 +399,8 @@ export class CsMapComponent implements AfterViewInit {
           const handler = new IrisQuerierHandler(layer, entity);
           this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.bsModalRef);
           // KML/KMZ layers
-        } else if ((layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.KML))) ||
-          (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.KMZ)))) {
+        } else if ((layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.KML))) ||  
+          (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.KMZ)))) { 
           this.displayModal(mapClickInfo.clickCoord);
           const handler = new KMLQuerierHandler(entity);
           this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.bsModalRef);
@@ -495,16 +532,17 @@ export class CsMapComponent implements AfterViewInit {
             }
 
             let postMethod = false;
-            let sldBody = maplayer.sldBody;
+            const sldBodyKey = `${UtilitiesService.rmParamURL(onlineResource.url)}|${onlineResource.name}`;
+            let sldBody = maplayer.sldBodyByResource?.[sldBodyKey] || maplayer.sldBody;
             if (sldBody) {
-              sldBody = SimpleXMLService.extractIntersectsFiltersFromSld(sldBody);
               postMethod = true;
             } else {
               sldBody = '';
             }
             // WMS 1.3.0 GetFeatureInfo requests will have had their lat,lng coords swapped to lng,lat
-            if (maplayer.sldBody130) {
-              sldBody = maplayer.sldBody130;
+            const sldBody130 = maplayer.sldBody130ByResource?.[sldBodyKey] || maplayer.sldBody130;
+            if (sldBody130) {
+              sldBody = sldBody130;
             }
 
             // Layer specific SLD_BODY, INFO_FORMAT and postMethod

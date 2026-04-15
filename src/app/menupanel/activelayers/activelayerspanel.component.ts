@@ -518,6 +518,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
       });
       modelRef.componentInstance.cswRecords = layer.cswRecords;
       modelRef.componentInstance.layer = layer;
+      modelRef.componentInstance.showRecordAddButton = false;
     }
   }
 

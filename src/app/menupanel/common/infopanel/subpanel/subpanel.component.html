@@ -1,5 +1,12 @@
 <!-- Title -->
-<p><b style="font-size:large;">{{cswRecord.name}}</b></p>
+<div class="subpanel-title-row">
+    <p style="margin-bottom:0;"><b style="font-size:large;">{{cswRecord.name}}</b></p>
+    @if (showRecordAddButton) {
+    <button class="btn btn-sm btn-success" type="button" title="Click to add this resource only" (click)="addLayerForRecord()">
+        <i class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp;Add
+    </button>
+    }
+</div>
 
 <!-- Preview -->
 @if (wmsUrl!==undefined) {
@@ -7,9 +14,11 @@
     <b>WMS Preview:</b>
     <div style="position:relative; height:200px; margin:0.5rem 0;">
         <!-- Place images one on top of the other -->
+        @if (outlineUrl.length > 0) {
         <div style="display:inline-block; position:absolute; top:0px; left:50px; opacity: 50%;">
             <img id="outlineImg" [src]="outlineUrl" (error)="onPreviewImgError($event)" height="200" width="200"/>
         </div>
+        }
         <div style="display:inline-block; position:absolute; top:0px; left:50px; opacity:50%;">
             <img id="wmsImg"
                 [src]="wmsUrl"
