@@ -1,5 +1,12 @@
 <!-- Title -->
-<p><b style="font-size:large;">{{cswRecord.name}}</b></p>
+<div class="subpanel-title-row">
+    <p style="margin-bottom:0;"><b style="font-size:large;">{{cswRecord.name}}</b></p>
+    @if (showRecordAddButton) {
+    <button class="btn btn-sm btn-success" type="button" title="Click to add this resource only" (click)="addLayerForRecord()">
+        <i class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp;Add
+    </button>
+    }
+</div>
 
 <!-- Preview -->
 @if (wmsUrl!==undefined) {

@@ -20,6 +20,7 @@ export class InfoPanelComponent {
     @Input() cswRecords: CSWRecordModel[];
     @Input() layer: LayerModel;
     @Input() expanded: boolean;
+    @Input() showRecordAddButton = true;
     @ViewChild('subPanelElement') subPanelElement: ElementRef;
 
 }

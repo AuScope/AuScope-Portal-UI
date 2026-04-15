@@ -112,7 +112,10 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
     // Will fire when a layer is added and remove all existing panel filters
     if (changes.layer && changes.layer.currentValue) {
         setTimeout(() => {
-            this.refreshFilter();
+            const hasPreselectedOptionalFilters = !!this.layer?.filterCollection?.optionalFilters?.some(f => f.added === true);
+            if (!hasPreselectedOptionalFilters) {
+              this.refreshFilter();
+            }
         }, 0);
     }
   }

@@ -183,6 +183,15 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
+   * Handle layer added from info subpanel.
+   */
+  public onSubpanelAdd(): void {
+    if (!this.panelStayOpen) {
+      this.toggleBrowsePanel(false);
+    }
+  }
+
+  /**
    * Remove layer from map when trash icon is clicked
    *
    * @param layer LayerModel for layer to remove
