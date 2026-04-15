@@ -532,16 +532,17 @@ export class CsMapComponent implements AfterViewInit {
             }
 
             let postMethod = false;
-            let sldBody = maplayer.sldBody;
+            const sldBodyKey = `${UtilitiesService.rmParamURL(onlineResource.url)}|${onlineResource.name}`;
+            let sldBody = maplayer.sldBodyByResource?.[sldBodyKey] || maplayer.sldBody;
             if (sldBody) {
-              sldBody = SimpleXMLService.extractIntersectsFiltersFromSld(sldBody);
               postMethod = true;
             } else {
               sldBody = '';
             }
             // WMS 1.3.0 GetFeatureInfo requests will have had their lat,lng coords swapped to lng,lat
-            if (maplayer.sldBody130) {
-              sldBody = maplayer.sldBody130;
+            const sldBody130 = maplayer.sldBody130ByResource?.[sldBodyKey] || maplayer.sldBody130;
+            if (sldBody130) {
+              sldBody = sldBody130;
             }
 
             // Layer specific SLD_BODY, INFO_FORMAT and postMethod

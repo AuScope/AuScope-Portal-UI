@@ -280,24 +280,21 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
    * Draw a polygon layer to map
    */
   public onApplyClipboardBBox(): void {
-
-    this.csClipboardService.polygonsBS.subscribe(polygon => {
-      if (polygon !== null && this.bApplyClipboardBBox) {
-        if (!UtilitiesService.isEmpty(polygon)) {
-          for (const optFilter of this.optionalFilters) {
-            if (optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
-              optFilter['value'] = polygon.coordinates;
-            }
-          }
-        }
-      } else {
-        for (const optFilter of this.optionalFilters) {
-          if (optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
-            optFilter['value'] = null;
-          }
+    const polygon = this.csClipboardService.polygonsBS.getValue();
+    if (polygon !== null && this.bApplyClipboardBBox && !UtilitiesService.isEmpty(polygon)) {
+      for (const optFilter of this.optionalFilters) {
+        if (optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
+          optFilter['value'] = polygon.coordinates;
         }
       }
-    });
+      return;
+    }
+
+    for (const optFilter of this.optionalFilters) {
+      if (optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
+        optFilter['value'] = null;
+      }
+    }
   }
 
   public getKey(options: object): string {
@@ -364,6 +361,10 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
     // For polygon filter make clipboard visible on map
     if (filter.type === 'OPTIONAL.POLYGONBBOX') {
       this.csClipboardService.toggleClipboard(true);
+      const polygon = this.csClipboardService.polygonsBS.getValue();
+      if (polygon && !UtilitiesService.isEmpty(polygon)) {
+        filter.value = polygon.coordinates;
+      }
     }
     // Initialise multiselect boolean filter's radio button
     if (filter.type === 'OPTIONAL.DROPDOWNSELECTLIST' && filter.multiSelect) {

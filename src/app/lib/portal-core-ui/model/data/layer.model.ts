@@ -30,6 +30,8 @@ export class LayerModel {
   wfsUrls: string[];
   sldBody: string; // SLD_BODY for 1.1.1 GetMap/GetFeatureInfo requests
   sldBody130?: string; // SLD_BODY FOR 1.3.0 GetMap/GetFeatureInfo requests
+  sldBodyByResource?: { [key: string]: string }; // Resource-specific SLD_BODY keyed by serviceUrl|layerName
+  sldBody130ByResource?: { [key: string]: string }; // Resource-specific 1.3.0 SLD_BODY keyed by serviceUrl|layerName
   sldParam: string[2][]; // Optional "SLD" parameter that can be passed instead of SLD_BODY
   clickCSWRecordsIndex: number[];
   clickPixel: any;
