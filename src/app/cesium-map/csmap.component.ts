@@ -24,7 +24,7 @@ import { AdvancedComponentService } from 'app/services/ui/advanced-component.ser
 import { UserStateService } from 'app/services/user/user-state.service';
 import { VMFQuerierHandler } from './custom-querier-handler/vmf-querier-handler.service';
 import { GeoJsonQuerierHandler } from './custom-querier-handler/geojson-querier-handler.service'
-import { Observable, forkJoin, throwError, of } from 'rxjs';
+import { Observable, forkJoin, of } from 'rxjs';
 import { catchError, finalize, tap, timeout } from 'rxjs/operators';
 import { ToolbarComponent } from 'app/menupanel/toolbar/toolbar.component';
 import { NVCLBoreholeAnalyticService } from 'app/modalwindow/layeranalytic/nvcl/nvcl.boreholeanalytic.service';
