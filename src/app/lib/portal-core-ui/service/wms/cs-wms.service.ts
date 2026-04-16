@@ -417,14 +417,19 @@ export class CsWMSService {
           layer.sldBodyByResource[sldBodyKey] = sldBody;
 
           // For 1.3.0 GetFeatureInfo requests need lat,lng swapped to lng,lat if polygon filter present
-          if (wmsOnlineResource.version === '1.3.0' && collatedParam.optionalFilters.find(f => f.type === 'OPTIONAL.POLYGONBBOX')) {
-            layer.sldBody130 = this.reverseSldBodyPolygonFilterCoordinates(sldBody);
-            if (!layer.sldBody130ByResource) {
-              layer.sldBody130ByResource = {};
+          if (wmsOnlineResource.version === '1.3.0') {
+            if (collatedParam.optionalFilters.find(f => f.type === 'OPTIONAL.POLYGONBBOX')) {
+              layer.sldBody130 = this.reverseSldBodyPolygonFilterCoordinates(sldBody);
+              if (!layer.sldBody130ByResource) {
+                layer.sldBody130ByResource = {};
+              }
+              layer.sldBody130ByResource[sldBodyKey] = layer.sldBody130;
+            } else {
+              layer.sldBody130 = '';
+              if (layer.sldBody130ByResource && layer.sldBody130ByResource[sldBodyKey]) {
+                delete layer.sldBody130ByResource[sldBodyKey];
+              }
             }
-            layer.sldBody130ByResource[sldBodyKey] = layer.sldBody130;
-          } else if (layer.sldBody130ByResource && layer.sldBody130ByResource[sldBodyKey]) {
-            delete layer.sldBody130ByResource[sldBodyKey];
           }
         }));
     }
