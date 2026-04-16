@@ -382,7 +382,7 @@ export class CsMapComponent implements AfterViewInit {
 
     // check if its a kml ground overlay
     if (mapClickInfo.clickedEntityList == 0) {
-      let layerList = mapClickInfo.clickedLayerList
+      const layerList = mapClickInfo.clickedLayerList
       const html = this.kmlGroundOverlay(mapClickInfo);
       this.displayModal(mapClickInfo.clickCoord);
       // Only add HTML if it's not empty
@@ -603,7 +603,7 @@ export class CsMapComponent implements AfterViewInit {
                     if (numberOfLayerFeatures > 0) {
                       _numberOfFeatures += numberOfLayerFeatures;
                     }
-                  }), catchError((error) => {
+                  }), catchError(() => {
                     return of(null);
                   })
                 )
@@ -620,7 +620,7 @@ export class CsMapComponent implements AfterViewInit {
           this.bsModalRef.content.downloading = false;
           this.bsModalRef.content.allLayersLoaded();
         })
-      ).subscribe(() => {});
+      ).subscribe();
     } else {
       this.bsModalRef.content.downloading = false;
       this.bsModalRef.content.allLayersLoaded();
