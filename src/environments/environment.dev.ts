@@ -18,8 +18,8 @@ export const environment = {
   authBaseUrl: 'https://auportal-dev.geoanalytics.group/api/',
   hostUrl: 'https://auportal-dev.geoanalytics.group',
   nVCLAnalyticalUrl: 'https://nvclanalytics.azurewebsites.net/NVCLAnalyticalServices/',
-  rudderStackWriteKey: null,  // RudderStack write key
-  rudderStackDataPlaneUrl: null,  // RudderStack data plane URL
+  rudderStackWriteKey: null, // RudderStack write key
+  rudderStackDataPlaneUrl: null, // RudderStack data plane URL
   bingMapsKey: 'Bing_Maps_Key',
   baseMapLayers: [
     { value: 'World_Imagery', viewValue: 'ESRI World Imagery', tooltip: 'ESRI World Imagery', layerType: 'ESRI' },

@@ -347,13 +347,13 @@ export class CsMapComponent implements AfterViewInit {
 
     let html = "";
 
-    let layerList = mapClickInfo.clickedLayerList
+    const layerList = mapClickInfo.clickedLayerList
     if (layerList[0].kmlDoc) {
-      let go = layerList[0].kmlDoc.querySelector("GroundOverlay");
+      const go = layerList[0].kmlDoc.querySelector("GroundOverlay");
       if (go) {
         // make an entity? = [name, description]
-        let name = go.querySelector('name').textContent;
-        let description = go.querySelector('description').textContent;
+        const name = go.querySelector('name').textContent;
+        const description = go.querySelector('description').textContent;
 
         // const handler = new KMLQuerierHandler(entity);
         html = '<div class="row"><div class="col-md-3">Name</div><div class="col-md-9">' + layerList[0].name + '</div></div><hr>';
@@ -401,8 +401,8 @@ export class CsMapComponent implements AfterViewInit {
           const handler = new IrisQuerierHandler(layer, entity);
           this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.bsModalRef);
           // KML/KMZ layers
-        } else if ((layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.KML))) ||  
-          (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.KMZ)))) { 
+        } else if ((layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.KML))) ||
+          (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.KMZ)))) {
           this.displayModal(mapClickInfo.clickCoord);
           const handler = new KMLQuerierHandler(entity);
           this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.bsModalRef);
