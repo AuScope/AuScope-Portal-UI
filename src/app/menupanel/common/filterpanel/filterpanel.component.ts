@@ -389,10 +389,29 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
         if (filter['multiSelect']) {
           filter['boolOp'] = 'OR';
         }
+      } else if (filter['type'] === 'OPTIONAL.PROVIDER') {
+        if (filter['value']) {
+          for (const provider in filter['value']) {
+            if (Object.prototype.hasOwnProperty.call(filter['value'], provider)) {
+              filter['value'][provider] = false;
+            }
+          }
+        }
+      } else if (filter['type'] === 'OPTIONAL.POLYGONBBOX') {
+        filter['value'] = null;
+        this.csClipboardService.clearClipboard();
+      } else {
+        filter['value'] = null;
       }
       this.updateFilter(filter, false);
     }
+    this.optionalFilters = [];
     this.selectedFilter = {};
+
+    // Re-add layer as no more filters
+    if (this.layer) {
+      this.addLayer(this.layer);
+    }
   }
 
   /**
