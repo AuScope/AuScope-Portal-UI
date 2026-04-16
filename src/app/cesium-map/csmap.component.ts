@@ -384,8 +384,10 @@ export class CsMapComponent implements AfterViewInit {
     if (mapClickInfo.clickedEntityList == 0) {
       let layerList = mapClickInfo.clickedLayerList
       const html = this.kmlGroundOverlay(mapClickInfo);
-      this.displayModal(mapClickInfo.clickCoord);
-      this.setModalHTML(html, layerList[0].name + ": " + "Ground Overlay", layerList[0], this.bsModalRef);
+      if (html.length > 0) {
+        this.displayModal(mapClickInfo.clickCoord);
+        this.setModalHTML(html, layerList[0].name + ": " + "Ground Overlay", layerList[0], this.bsModalRef);
+      }
     }
 
     // Process lists of entities
