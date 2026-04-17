@@ -217,13 +217,6 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     return this.nvclService.isNVCL(layer);
   }
 
-  private isIterable(obj) {
-    if (obj == null) {
-      return false;
-    }
-    return typeof obj[Symbol.iterator] === 'function';
-  }
-
   /**
    * Returns true if this supports open in new window
    *
@@ -382,8 +375,10 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
    * if it is the only one in the list
    */
   allLayersLoaded() {
-    this.onDataChange();
     this.downloading = false;
+    // Force immediate change detection to show the no-results message if needed
+    this.changeDetectorRef.detectChanges();
+    this.onDataChange();
     if (this.docs.length === 1 && this.htmls.length === 0) {
       this.setWFS(this.docs[0], 0);
       this.openTab(event, 'wfs')

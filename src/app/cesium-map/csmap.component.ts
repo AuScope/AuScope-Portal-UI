@@ -24,7 +24,7 @@ import { AdvancedComponentService } from 'app/services/ui/advanced-component.ser
 import { UserStateService } from 'app/services/user/user-state.service';
 import { VMFQuerierHandler } from './custom-querier-handler/vmf-querier-handler.service';
 import { GeoJsonQuerierHandler } from './custom-querier-handler/geojson-querier-handler.service'
-import { Observable, forkJoin, throwError } from 'rxjs';
+import { Observable, forkJoin, of } from 'rxjs';
 import { catchError, finalize, tap, timeout } from 'rxjs/operators';
 import { ToolbarComponent } from 'app/menupanel/toolbar/toolbar.component';
 import { NVCLBoreholeAnalyticService } from 'app/modalwindow/layeranalytic/nvcl/nvcl.boreholeanalytic.service';
@@ -382,10 +382,11 @@ export class CsMapComponent implements AfterViewInit {
 
     // check if its a kml ground overlay
     if (mapClickInfo.clickedEntityList == 0) {
-      let layerList = mapClickInfo.clickedLayerList
+      const layerList = mapClickInfo.clickedLayerList
       const html = this.kmlGroundOverlay(mapClickInfo);
-      if (html.length > 0) {
-        this.displayModal(mapClickInfo.clickCoord);
+      this.displayModal(mapClickInfo.clickCoord);
+      // Only add HTML if it's not empty
+      if (html && html.trim().length > 0) {
         this.setModalHTML(html, layerList[0].name + ": " + "Ground Overlay", layerList[0], this.bsModalRef);
       }
     }
@@ -535,14 +536,20 @@ export class CsMapComponent implements AfterViewInit {
 
             let postMethod = false;
             const sldBodyKey = `${UtilitiesService.rmParamURL(onlineResource.url)}|${onlineResource.name}`;
-            let sldBody = maplayer.sldBodyByResource?.[sldBodyKey] || maplayer.sldBody;
+            let sldBody = maplayer.sldBodyByResource?.[sldBodyKey];
+            if (sldBody === undefined) {
+              sldBody = maplayer.sldBody;
+            }
             if (sldBody) {
               postMethod = true;
             } else {
               sldBody = '';
             }
             // WMS 1.3.0 GetFeatureInfo requests will have had their lat,lng coords swapped to lng,lat
-            const sldBody130 = maplayer.sldBody130ByResource?.[sldBodyKey] || maplayer.sldBody130;
+            let sldBody130 = maplayer.sldBody130ByResource?.[sldBodyKey];
+            if (sldBody130 === undefined) {
+              sldBody130 = maplayer.sldBody130;
+            }
             if (sldBody130) {
               sldBody = sldBody130;
             }
@@ -596,8 +603,8 @@ export class CsMapComponent implements AfterViewInit {
                     if (numberOfLayerFeatures > 0) {
                       _numberOfFeatures += numberOfLayerFeatures;
                     }
-                  }), catchError((error) => {
-                    return throwError(error);
+                  }), catchError(() => {
+                    return of(null);
                   })
                 )
             );
@@ -615,6 +622,7 @@ export class CsMapComponent implements AfterViewInit {
         })
       ).subscribe();
     } else {
+      this.bsModalRef.content.downloading = false;
       this.bsModalRef.content.allLayersLoaded();
     }
 
@@ -656,6 +664,12 @@ export class CsMapComponent implements AfterViewInit {
       this.bsModalRef = this.modalService.show(QuerierModalComponent, { class : 'modal-lg modal-dialog-scrollable modal-dialog-centered' });
       this.modalDisplayed = true;
       this.bsModalRef.content.downloading = true;
+      // Clear any previous data from the modal
+      this.bsModalRef.content.docs = [];
+      this.bsModalRef.content.htmls = [];
+      this.bsModalRef.content.uniqueLayerNames = [];
+      this.bsModalRef.content.currentDoc = null;
+      this.bsModalRef.content.currentHTML = '';
       /*
       if (clickCoord) {
         const vector = this.csMapService.drawDot(clickCoord);

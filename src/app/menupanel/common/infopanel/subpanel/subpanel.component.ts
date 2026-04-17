@@ -368,7 +368,7 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
                 }
 
                 if (this.layer.previewImg) {
-                    // either the preview is the image url (http) or user the "/preview" api endpoint     
+                    // either the preview is the image url (http) or user the "/preview" api endpoint
                     if (this.layer.previewImg.indexOf("http") != 0) {
                         this.wmsUrl = environment.portalBaseUrl + 'preview/' + this.layer.previewImg;
                     } else {
