@@ -71,10 +71,13 @@
           @if (!showOnlyBookmarked || checkLayerBookmarked(layer.id)) {
             <div class="col">
               <a class="layer-item-wrapper">
-                @if (!isLayerAdded(layer)) {
+                @if (!isLayerAdded(layer) && (isCSW(layer))) {
                   <button class="btn btn-sm btn-success layer-row-action-button" style="margin-right: 8px;" title="Click to add layer" (click)="addLayerToMap(layer); $event.stopPropagation()">
                     <i class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp;Add
                   </button>
+                }
+                @if (!isLayerAdded(layer) && (!isCSW(layer))) {
+                  <i class="fa fa-ban" style="margin-right: 8px; color: #dc3545;"></i>
                 }
                 @if (isLayerAdded(layer)) {
                   <button class="btn btn-sm btn-danger layer-row-action-button" style="margin-right: 8px;" title="Click to remove layer" (click)="removeLayerFromMap(layer); $event.stopPropagation()">
@@ -82,6 +85,7 @@
                   </button>
                 }
                 <span class="truncate-layer" [ngClass]="{'enbolden': isLayerSelected(layer)}" title="{{layer.name}}" (click)="selectLayer(layer)">
+
                   @if (checkLayerBookmarked(layer.id)) {
                     <i class="ti-bookmark-alt bookmark-icon" title="This layer is bookmarked"></i>
                   }
@@ -94,7 +98,7 @@
       }
     </div>
     <!-- Info column -->
-    <div [style.display]="selectedLayer || panelStayOpen ? 'block' : 'none'" class="info-col">
+    <div [style.display]="(selectedLayer && isCSW(selectedLayer)) || panelStayOpen ? 'block' : 'none'" class="info-col">
       <div class="info-header-row">
         <a class="info-title">Information</a>
         @if (selectedLayer?.cswRecords?.length > 1) {
