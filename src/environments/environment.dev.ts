@@ -33,6 +33,7 @@ export const environment = {
     { value: 'AerialWithLabels', viewValue: 'Bing Aerial With Labels', tooltip: 'Bing Maps Aerial with Labels', layerType: 'Bing' },
     { value: 'Natural_Earth_II', viewValue: 'Natural Earth II',
       tooltip: 'Natural Earth II, darkened for contrast.\nhttp://www.naturalearthdata.com/', layerType: 'NEII' },
+    { value: '', viewValue: 'National Map', tooltip: 'Australia National Map', layerType: 'GA' }
   ],
   grace: {
     hostUrl: 'https://insargrace.geoanalytics.csiro.au:/grace/grace'
