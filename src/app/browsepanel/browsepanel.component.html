@@ -71,25 +71,19 @@
           @if (!showOnlyBookmarked || checkLayerBookmarked(layer.id)) {
             <div class="col">
               <a class="layer-item-wrapper">
-                @if (!isLayerAdded(layer)) {
-                  <button class="btn btn-sm btn-success layer-row-action-button" style="margin-right: 8px;" title="Click to add layer" (click)="addLayerToMap(layer); $event.stopPropagation()">
-                    <i class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp;Add
-                  </button>
-                }
-                @if (isLayerAdded(layer)) {
-                  <button class="btn btn-sm btn-danger layer-row-action-button" style="margin-right: 8px;" title="Click to remove layer" (click)="removeLayerFromMap(layer); $event.stopPropagation()">
-                    <i class="fa fa-trash" aria-hidden="true"></i>&nbsp;Remove
-                  </button>
-                }
                 <span class="truncate-layer" [ngClass]="{'enbolden': isLayerSelected(layer)}" title="{{layer.name}}" (click)="selectLayer(layer)">
                   @if (!isLayerAdded(layer) && (isCSW(layer))) {
-                    <i class="fa fa-plus-circle" style="margin-right: 8px; color: #28a745;" title="Click to add layer" (click)="addLayerToMap(layer); $event.stopPropagation()"></i>
+                    <button class="btn btn-sm btn-success layer-row-action-button" style="margin-right: 8px;" title="Click to add layer" (click)="addLayerToMap(layer); $event.stopPropagation()">
+                      <i class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp;Add
+                    </button>
                   }
                   @if (!isLayerAdded(layer) && (!isCSW(layer))) {
                     <i class="fa fa-ban" style="margin-right: 8px; color: #dc3545;"></i>
                   }
                   @if (isLayerAdded(layer)) {
-                    <i class="fa fa-trash" style="margin-right: 8px; color: #dc3545;" title="Click to remove layer" (click)="removeLayerFromMap(layer); $event.stopPropagation()"></i>
+                    <button class="btn btn-sm btn-danger layer-row-action-button" style="margin-right: 8px;" title="Click to remove layer" (click)="removeLayerFromMap(layer); $event.stopPropagation()">
+                      <i class="fa fa-trash" aria-hidden="true"></i>&nbsp;Remove
+                    </button>
                   }
                   @if (checkLayerBookmarked(layer.id)) {
                     <i class="ti-bookmark-alt bookmark-icon" title="This layer is bookmarked"></i>
