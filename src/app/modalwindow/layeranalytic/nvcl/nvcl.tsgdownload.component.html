@@ -7,7 +7,7 @@
     <!-- BEGIN card-body -->
     <div class="card-body">
       <form #f="ngForm">
-        <div class="alert alert-danger alert-dismissible">{{tsgDownloadServiceMsg}}</div>
+        <div class="alert alert-danger alert-dismissible">{{data.tsgDownloadServiceMsg}}</div>
 
         <div class="alert alert-danger alert-dismissible">
           TSG Files download are run remotely and may take some time to complete. Please do not click ,close or refresh the browser while downloading. Otherwise you might lost your data.
@@ -48,5 +48,5 @@
   <!-- END card-body -->
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-light" (click)="activeModal.dismiss('Cross click')">Close</button>
+  <button type="button" class="btn btn-light" (click)="dialogRef.close('Cross click')">Close</button>
 </div>

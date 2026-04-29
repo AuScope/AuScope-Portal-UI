@@ -10,8 +10,6 @@ import { ref } from "../../../environments/ref";
 import { SplitDirection } from 'cesium';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
-import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
-import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
 import { LegendUiService } from 'app/services/legend/legend-ui.service';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
@@ -23,7 +21,8 @@ import { DownloadPanelComponent } from '../common/downloadpanel/downloadpanel.co
 import { Bookmark } from 'app/models/bookmark.model';
 import { config } from '../../../environments/config';
 import { AuthService } from 'app/services/auth/auth.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { MatDialog } from '@angular/material/dialog';
+import { NgbdModalStatusReportComponent } from 'app/toppanel/renderstatus/renderstatus.component';
 
 // Filter modes available in the dropdown layer filter selector
 enum FilterMode {
@@ -43,14 +42,12 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
   uiLayerModelService = inject(UILayerModelService);
   layerManagerService = inject(LayerManagerService);
   legendUiService = inject(LegendUiService);
-  modalService = inject(BsModalService);
   layerHandlerService = inject(LayerHandlerService);
   csClipboardService = inject(CsClipboardService);
   userStateService = inject(UserStateService);
   manageStateService = inject(ManageStateService);
   authService = inject(AuthService);
-  activeModalService = inject(NgbModal);
-  bsModalRef = inject(BsModalRef);
+  dialog = inject(MatDialog);
 
   @ViewChildren(FilterPanelComponent) filterComponents: QueryList<FilterPanelComponent>;
   @ViewChildren(DownloadPanelComponent) downloadComponents: QueryList<DownloadPanelComponent>;
@@ -334,9 +331,12 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
    * Open the modal that display the status of the render
    */
   public openStatusReport(uiLayerModel: UILayerModel) {
-    this.bsModalRef = this.modalService.show(NgbdModalStatusReportComponent, { class: 'modal-lg' });
+   const dialogRef = this.dialog.open(NgbdModalStatusReportComponent, {
+      width: '800px',
+      maxWidth: '800px'
+    });
     uiLayerModel.statusMap.getStatusBSubject().subscribe((value) => {
-      this.bsModalRef.content.resourceMap = value.resourceMap;
+      dialogRef.componentInstance.resourceMap = value.resourceMap;
     });
   }
 
@@ -511,14 +511,11 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
     */
   public displayRecordInformation(layer: any) {
     if (layer) {
-      const modelRef = this.activeModalService.open(InfoPanelComponent, {
-        size: "lg",
-        backdrop: false,
-        scrollable: true
+      this.dialog.open(InfoPanelComponent, {
+        width: '1000px',
+        maxWidth: '1000px',
+        data: { cswRecords: layer.cswRecords, layer: layer, showRecordAddButton: false }
       });
-      modelRef.componentInstance.cswRecords = layer.cswRecords;
-      modelRef.componentInstance.layer = layer;
-      modelRef.componentInstance.showRecordAddButton = false;
     }
   }
 

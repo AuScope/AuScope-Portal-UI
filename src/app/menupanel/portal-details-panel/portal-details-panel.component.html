@@ -1,4 +1,4 @@
 <div>
   <span class="portal-version">Auscope Portal  {{currentVersion+devSuffix}}</span><br>
-  <a class="disclaimer-link" (click)="OpenDisclaimerModal()">Disclaimer</a>
+  <a class="disclaimer-link" (click)="openDisclaimerModal(); $event.stopPropagation()">Disclaimer</a>
 </div>

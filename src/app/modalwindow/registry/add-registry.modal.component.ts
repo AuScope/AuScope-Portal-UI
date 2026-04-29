@@ -1,9 +1,8 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { Registry } from 'app/menupanel/data-explorer/data-model';
 import { v4 as uuidv4 } from 'uuid';
 import { environment } from 'environments/environment';
+import { MatDialogRef } from '@angular/material/dialog';
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 declare let rudderanalytics: any;
 
@@ -14,8 +13,7 @@ declare let rudderanalytics: any;
     standalone: false
 })
 export class AddRegistryModalComponent implements OnInit, AfterViewInit {
-  activeModal = inject(NgbActiveModal);
-
+  dialogRef = inject(MatDialogRef<AddRegistryModalComponent>);
 
   @ViewChild('nameField') nameField: ElementRef;
 
@@ -107,7 +105,7 @@ export class AddRegistryModalComponent implements OnInit, AfterViewInit {
       searching: false,
       currentPage: 1
     }
-    this.activeModal.close(registry);
+    this.dialogRef.close(registry);
   }
 
   /**
@@ -119,4 +117,20 @@ export class AddRegistryModalComponent implements OnInit, AfterViewInit {
     }
   }
 
+}
+
+/* Registry information used in faceted search and for book marks*/
+export interface Registry {
+    title: string; // Title for display
+    id: string; // Identifier
+    serviceUrl: string; // URL for service calls
+    recordUrl: string; // URL for record calls
+    type: string; // OGC service provider type (Default, GeoServer, PyCSW, ArcGIS)
+    checked?: boolean; // Is registry checked in UI
+    startIndex?: number; // Current start index for search
+    prevIndices?: number[]; // Previous start indices for search
+    recordsMatched?: number; // Total number of records matched
+    currentPage?: number; // Current page of search records
+    searching?: boolean; // Is a faceted search in progress?
+    searchError?: string; // Faceted search error result for registry
 }

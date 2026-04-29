@@ -126,9 +126,13 @@
 
       <!-- Download options for bounds, polygon or all (if irisDownloadListOption) -->
       @if (downloadButtonEnabled()) {
-        <div class="d-inline-block" ngbDropdown>
-          <button type="button" class="btn btn-primary btn-xs" title="Download data" ngbDropdownToggle
-            [disabled]="drawBoundsStarted || downloadStarted || download4pStarted || download4PolygonKMLStarted">
+        <button
+            type="button"
+            class="btn btn-primary btn-xs"
+            title="Download data" 
+            [disabled]="drawBoundsStarted || downloadStarted || download4pStarted || download4PolygonKMLStarted"
+            [matMenuTriggerFor]="downloadDropdownMenu"
+        >
             @if (downloadStarted || download4pStarted || download4PolygonKMLStarted) {
               <i class="fa fa-spinner fa-spin fa-fw"></i>
             }
@@ -136,27 +140,26 @@
               <i class="fa fa-cloud-download"></i>
               }&nbsp;Download
             </button>
-            <div ngbDropdownMenu>
+            <mat-menu #downloadDropdownMenu="matMenu">
               <!-- Note: If you add or modify conditions here, be sure to update the downloadButtonEnabled() method -->
               @if (bbox || irisDownloadListOption) {
-                <button title="Download data" (click)="download()" ngbDropdownItem>Download Data</button>
+                <button mat-menu-item title="Download data" (click)="download()">Download Data</button>
               }
               @if (polygonFilter && isPolygonSupportedLayer) {
-                <button title="Download data" (click)="download4Polygon()" ngbDropdownItem>Download Data</button>
+                <button mat-menu-item title="Download data" (click)="download4Polygon()">Download Data</button>
               }
               @if ((bbox || polygonFilter) && isWCSDownloadSupported) {
-                <button title="Download as KML. GoogleMap's maximum KML size is 5M!" (click)="download4PolygonKML()" ngbDropdownItem>Download KML</button>
+                <button mat-menu-item title="Download as KML. GoogleMap's maximum KML size is 5M!" (click)="download4PolygonKML()">Download KML</button>
               }
               @if (isTsgDownloadAvailable) {
-                <button title="Download TSG files" (click)="popupTSGDownload()" ngbDropdownItem>Download TSG Files</button>
+                <button mat-menu-item title="Download TSG files" (click)="popupTSGDownload()">Download TSG Files</button>
               }
               @if (bbox || (polygonFilter && isPolygonSupportedLayer)) {
                 <hr class="menu-hr">
-                <button (click)="downloadWithAuScopeCat()" ngbDropdownItem>Download with AuScope-Cat&nbsp;<i class="fa fa-plug menu-icon"></i></button>
+                <button mat-menu-item (click)="downloadWithAuScopeCat()">Download with AuScope-Cat&nbsp;<i class="fa fa-plug menu-icon"></i></button>
               }
-            </div>
-          </div>
-        }
+            </mat-menu>
+          }
 
         @if (showDOIs) {
           <p class="small text-danger ng-star-inserted">
@@ -249,20 +252,19 @@
             @if (!bbox) {
               <button type="button" title="Draw bounding box"
                 class="btn btn-primary btn-xs" [disabled]="downloadStarted || drawBoundsStarted" (click)="drawBounds()"><i class="fa fa-edit"></i>&nbsp;Draw Bounds</button>
+            }
+            @if (bbox) {
+              <button type="button" title="Remove bounds"
+                class="btn btn-danger btn-xs" [disabled]="downloadStarted" (click)="clearBounds()"><i class="fa fa-refresh"></i>&nbsp;Clear Bounds</button>
+            }
+            <button type="button" class="btn btn-primary btn-xs" style="margin-left:auto;width:9rem;" [disabled]="!bbox || downloadStarted" title="Download data for bounding box" (click)="download()">
+              @if (downloadStarted) {
+                <i class="fa fa-spinner fa-spin fa-fw"></i>
               }
-              @if (bbox) {
-                <button type="button" title="Remove bounds"
-                  class="btn btn-danger btn-xs" [disabled]="downloadStarted" (click)="clearBounds()"><i class="fa fa-refresh"></i>&nbsp;Clear Bounds</button>
-                }
-                <button type="button" class="btn btn-primary btn-xs" style="margin-left:auto;width:9rem;" [disabled]="!bbox || downloadStarted" title="Download data for bounding box" (click)="download()">
-                  @if (downloadStarted) {
-                    <i class="fa fa-spinner fa-spin fa-fw"></i>
-                    }@if (!downloadStarted) {
-                    <i class="fa fa-cloud-download"></i>
-                    }&nbsp;Download
-                  </button>
-                </div>
-
-              </div>
-
-            </div>
+              @if (!downloadStarted) {
+                <i class="fa fa-cloud-download"></i>
+              }&nbsp;Download
+            </button>
+          </div>
+        </div>
+      </div>

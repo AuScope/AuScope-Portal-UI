@@ -14,10 +14,10 @@ import * as _ from 'lodash';
 import { config } from '../../../../environments/config';
 import { ref } from '../../../../environments/ref';
 import { LayerAnalyticModalComponent } from '../../../modalwindow/layeranalytic/layer.analytic.modal.component';
-import { BsModalService } from 'ngx-bootstrap/modal';
 import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
 import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
+import { MatDialog } from '@angular/material/dialog';
 
 
 @Component({
@@ -34,7 +34,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
   layerManagerService = inject(LayerManagerService);
   filterService = inject(FilterService);
   filterPanelService = inject(FilterPanelService);
-  modalService = inject(BsModalService);
+  dialog = inject(MatDialog);
   csClipboardService = inject(CsClipboardService);
   csWMSService = inject(CsWMSService);
   csCSWService = inject(CsCSWService);
@@ -422,10 +422,14 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
    */
   public processLayerAnalytic(layer: LayerModel) {
     this.getNvclFilter(layer);
-    const bsModalRef = this.modalService.show(LayerAnalyticModalComponent, {
-      class: 'modal-lg'
+    this.dialog.open(LayerAnalyticModalComponent, {
+      width: '800px',
+      maxWidth: '800px',
+      height: '80vh',
+      data: {
+        layer: layer
+      }
     });
-    bsModalRef.content.layer = layer;
   }
 
   /**

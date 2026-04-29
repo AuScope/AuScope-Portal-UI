@@ -158,12 +158,6 @@
                 margin-right: 4px;
             }
 
-            .advanced-options-panel {
-                padding-left: 5px;
-                padding-right: 5px;
-                min-width: max-content;
-            }
-
             .spatial-options-panel {
                 width: 240px;
             }
@@ -344,24 +338,50 @@
             margin-bottom: 2px;
         }
     }
-
-    .pagination {
-        overflow: hidden;
-        margin-bottom: -17px; // too much default room underneath this component
-
-        button {
-            margin: 0px 4px 0px 0px;
-        }
-
-        // Mis-match of ng-bootstrap and bootstrap versions will show " (current)" next to current page number without this
-        ::ng-deep .visually-hidden {
-            display: none;
-        }
-    }
 }
 
 input:disabled {
     background-color: #e9ecef;
     cursor: not-allowed;
     opacity: 0.65;
-}  
+}
+
+
+.advanced-options-panel {
+    padding-left: 5px;
+    padding-right: 5px;
+    min-width: max-content;
+}
+
+
+
+:host ::ng-deep .mat-mdc-text-field-wrapper {
+  background-color: white;
+}
+
+:host ::ng-deep .search-panel {
+  .mat-mdc-button,
+  .mat-mdc-raised-button,
+  .mat-mdc-outlined-button,
+  .mat-mdc-unelevated-button {
+    min-height: auto;
+    padding: 4px 8px;
+    font-size: 20px;
+    line-height: 1.2;
+  }
+}
+
+:host ::ng-deep .search-panel {
+
+  .mat-mdc-icon-button {
+    width: 32px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    min-width: 32px !important;
+    line-height: 32px !important;
+  }
+
+  .mat-mdc-button-base {
+    min-height: auto !important;
+  }
+}
