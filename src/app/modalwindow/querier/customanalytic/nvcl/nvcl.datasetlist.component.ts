@@ -429,7 +429,7 @@ export class NVCLDatasetListComponent implements OnInit {
 
           if (hasData) {
             this.dialog.open(NVCLDatasetListDialogComponent,
-              { 
+              {
                 data: {
                   scalarClasses: metricColours
                 }

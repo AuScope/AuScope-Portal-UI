@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { MSCLService } from '../../../layeranalytic/mscl/mscl.service';
 import { MSCLAnalyticComponent } from '../../../layeranalytic/mscl/mscl.analytic.component';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';

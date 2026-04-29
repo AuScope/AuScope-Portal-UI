@@ -66,7 +66,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   public currentIndex = 0;
   public jsonDoc;
   public list = [];
-  
+
   public selectedFeature = 'Feature';
   public currentFeature = 'Feature';
   public selectedLayer = 'Layer';

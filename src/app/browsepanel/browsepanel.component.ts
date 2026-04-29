@@ -258,16 +258,16 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
      * refer to the code: searchpanel.component -> search()
     */
 
-    let queryText = "\""+layer.name+"\"";
-    let selectedSearchFields: string[] = ['knownLayerNames', 'serviceName', 'descriptiveKeywords', 'dataIdentificationAbstract', 'layerName'];
-    let boundsRelationship = 'Intersects';
+    const queryText = "\""+layer.name+"\"";
+    const selectedSearchFields: string[] = ['knownLayerNames', 'serviceName', 'descriptiveKeywords', 'dataIdentificationAbstract', 'layerName'];
+    const boundsRelationship = 'Intersects';
 
     const selectedServices: string[] = []; // no OGC services
 
-    let westBounds: number = undefined;
-    let eastBounds: number = undefined;
-    let northBounds: number = undefined;
-    let southBounds: number = undefined;
+    const westBounds: number = undefined;
+    const eastBounds: number = undefined;
+    const northBounds: number = undefined;
+    const southBounds: number = undefined;
 
     // Search CSW records
     this.searchService.searchCSWRecords(queryText, selectedSearchFields, null, null, selectedServices,
