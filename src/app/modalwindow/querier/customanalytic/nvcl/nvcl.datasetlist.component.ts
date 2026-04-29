@@ -1,14 +1,12 @@
 import { RickshawService } from '../../../../lib/portal-core-ui/widget/chart/rickshaw/rickshaw.service';
-import { LayerModel } from '../../../../lib/portal-core-ui/model/data/layer.model';
-import { OnlineResourceModel } from '../../../../lib/portal-core-ui/model/data/onlineresource.model';
 import { NVCLService } from './nvcl.service';
-import { Component, Input, OnInit, ApplicationRef, inject } from '@angular/core';
+import { Component, OnInit, ApplicationRef, inject } from '@angular/core';
 import { HttpParams } from '@angular/common/http';
 import { DomSanitizer } from '@angular/platform-browser';
 import { saveAs } from 'file-saver';
 import { NVCLBoreholeAnalyticService } from '../../../layeranalytic/nvcl/nvcl.boreholeanalytic.service';
-import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { UtilitiesService } from '../../../../lib/portal-core-ui/utility/utilities.service';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 export interface DialogData {
   scalarClasses: any[];
@@ -28,13 +26,16 @@ export class NVCLDatasetListComponent implements OnInit {
   private rickshawService = inject(RickshawService);
   private appRef = inject(ApplicationRef);
   nvclBoreholeAnalyticService = inject(NVCLBoreholeAnalyticService);
-  private modalRef = inject(BsModalRef);
-  private modalService = inject(BsModalService);
+  private dialog = inject(MatDialog);
 
+  /**
+   * Input data
+   *   layer: LayerModel;
+   *   onlineResource: OnlineResourceModel;
+   *   featureId: string;
+   */
+  public data = inject(MAT_DIALOG_DATA);
 
-  @Input() layer: LayerModel;
-  @Input() onlineResource: OnlineResourceModel;
-  @Input() featureId: string;
   public nvclDatasets: any[] = [];
   public collapse: any[] = [];
   public datasetImages: any[] = [];
@@ -94,14 +95,14 @@ export class NVCLDatasetListComponent implements OnInit {
   public checkingTSG = false;
 
   ngOnInit(): void {
-    if (!(this.featureId)) {
+    if (!(this.data.featureId)) {
       return;
     };
-    if (!(this.onlineResource.url)) {
+    if (!(this.data.onlineResource.url)) {
       return;
     }
 
-    this.nvclService.getNVCLDatasets(this.onlineResource.url, this.featureId).subscribe(result => {
+    this.nvclService.getNVCLDatasets(this.data.onlineResource.url, this.data.featureId).subscribe(result => {
       for (const nvclDataset of result) {
         this.nvclService.setScalarLoaded(false);
         nvclDataset.image = true;
@@ -111,8 +112,8 @@ export class NVCLDatasetListComponent implements OnInit {
         if (this.nvclBoreholeAnalyticService.hasSavedEmail()) {
           this.downloadEmail = this.nvclBoreholeAnalyticService.getUserEmail();
         }
-        this._getNVCLImage(this.onlineResource.url, nvclDataset.datasetId, null);
-        this._getNVCLScalar(this.onlineResource.url, nvclDataset.datasetId);
+        this._getNVCLImage(this.data.onlineResource.url, nvclDataset.datasetId, null);
+        this._getNVCLScalar(this.data.onlineResource.url, nvclDataset.datasetId);
         this.isCachedTSGFileAvailable(nvclDataset);
         this.nvclDatasets.push(nvclDataset);
       }
@@ -123,8 +124,8 @@ export class NVCLDatasetListComponent implements OnInit {
       }
     });
 
-    this.nvclService.getNVCL2_0_TsgJobsByBoreholeId(this.featureId).subscribe(result => {
-      this.jobList[this.featureId] = result;
+    this.nvclService.getNVCL2_0_TsgJobsByBoreholeId(this.data.featureId).subscribe(result => {
+      this.jobList[this.data.featureId] = result;
     });
   }
 
@@ -154,7 +155,7 @@ export class NVCLDatasetListComponent implements OnInit {
   public drawGraph(logIds: Array<string>, logNames: Array<string>) {
     this.processingGraph = true;
     this.appRef.tick();
-    this.nvclService.getNVCL2_0_JSONDataBinned(this.onlineResource.url, logIds).
+    this.nvclService.getNVCL2_0_JSONDataBinned(this.data.onlineResource.url, logIds).
       subscribe(response => {
         if (response.success) {
           this.rickshawService.drawNVCLDataGraph(response.data, logIds, logNames);
@@ -169,12 +170,12 @@ export class NVCLDatasetListComponent implements OnInit {
   }
 
   public changeScalarSelection(datasetid: string) {
-    this._getNVCLImage(this.onlineResource.url, datasetid, this.selectedScalar);
+    this._getNVCLImage(this.data.onlineResource.url, datasetid, this.selectedScalar);
   }
 
   public drawGraphJob(jobIds: Array<string>) {
     this.processingGraph = true;
-    this.nvclService.getNVCL2_0_JobsScalarBinned(this.featureId, jobIds).
+    this.nvclService.getNVCL2_0_JobsScalarBinned(this.data.featureId, jobIds).
       subscribe(response => {
         if (response.success) {
           this.rickshawService.drawNVCLJobsGraph(response, {}, jobIds, jobIds);
@@ -229,7 +230,7 @@ export class NVCLDatasetListComponent implements OnInit {
           if (scalarid != null) {
             httpParams = httpParams.append('scalarids', scalarid);
           }
-          this.datasetImages[datasetId].push(this.nvclService.getNVCLDataServiceUrl(this.onlineResource.url) + 'mosaic.html?' + httpParams.toString());
+          this.datasetImages[datasetId].push(this.nvclService.getNVCLDataServiceUrl(this.data.onlineResource.url) + 'mosaic.html?' + httpParams.toString());
         }
       }
     });
@@ -258,7 +259,7 @@ export class NVCLDatasetListComponent implements OnInit {
         const jobIds = [];
         const jobNames = [];
 
-        for (const ijob of this.jobList[this.featureId]) {
+        for (const ijob of this.jobList[this.data.featureId]) {
           if (ijob.value) {
             jobIds.push(ijob.jobId);
             jobNames.push(ijob.jobName)
@@ -300,7 +301,7 @@ export class NVCLDatasetListComponent implements OnInit {
   }
 
   public isCachedTSGFileAvailable(dataset: any) {
-    this.nvclService.getTSGCachedDownloadUrl(this.onlineResource.url, dataset.datasetName).
+    this.nvclService.getTSGCachedDownloadUrl(this.data.onlineResource.url, dataset.datasetName).
       subscribe(url => {
         dataset.TSGCacheDownloadurl = url;
       },
@@ -322,7 +323,7 @@ export class NVCLDatasetListComponent implements OnInit {
     if (logIds.length <= 0) {
       alert('No logs selected');
     }
-    this.nvclService.getNVCL2_0_CSVDownload(this.onlineResource.url, logIds).
+    this.nvclService.getNVCL2_0_CSVDownload(this.data.onlineResource.url, logIds).
       subscribe(response => {
         const blob = new Blob([response], { type: 'application/csv' });
         saveAs(blob, datasetId + '.csv');
@@ -335,7 +336,7 @@ export class NVCLDatasetListComponent implements OnInit {
       return;
     }
     this.downloadingTSG = true;
-    this.nvclService.getNVCLTSGDownload(this.onlineResource.url, datasetId, this.downloadEmail).
+    this.nvclService.getNVCLTSGDownload(this.data.onlineResource.url, datasetId, this.downloadEmail).
       subscribe(response => {
         this.downloadResponse = response;
         this.downloadingTSG = false;
@@ -351,7 +352,7 @@ export class NVCLDatasetListComponent implements OnInit {
       return;
     }
     this.checkingTSG = true;
-    this.nvclService.getNVCLTSGDownloadStatus(this.onlineResource.url, this.downloadEmail).
+    this.nvclService.getNVCLTSGDownloadStatus(this.data.onlineResource.url, this.downloadEmail).
       subscribe(response => {
         this.downloadResponse = response;
         this.checkingTSG = false;
@@ -379,7 +380,7 @@ export class NVCLDatasetListComponent implements OnInit {
   public openLegend(datasetId: string) {
     if (this.selectedScalar === null)
       return;
-    this.nvclService.getNVCL2_0_JSONDataBinned(this.onlineResource.url, [this.selectedScalar]).
+    this.nvclService.getNVCL2_0_JSONDataBinned(this.data.onlineResource.url, [this.selectedScalar]).
       subscribe(response => {
         if ('success' in response && response.success === true && response.data.length > 0) {
           const me = this;
@@ -427,9 +428,12 @@ export class NVCLDatasetListComponent implements OnInit {
           } // for
 
           if (hasData) {
-            //this.modalRef = this.modalService.show(NVCLDatasetListDialogComponent, {class: 'modal-sm modal-dialog-centered'});
-            this.modalRef = this.modalService.show(NVCLDatasetListDialogComponent, { class: 'modal-sm' });
-            this.modalRef.content.scalarClasses = metricColours;
+            this.dialog.open(NVCLDatasetListDialogComponent,
+              { 
+                data: {
+                  scalarClasses: metricColours
+                }
+              });
             this.appRef.tick(); // required to make legend modal display the scalarClasses; otherwise required a click to trigger
           }
         } else {
@@ -445,8 +449,7 @@ export class NVCLDatasetListComponent implements OnInit {
     standalone: false
 })
 export class NVCLDatasetListDialogComponent {
-  modalRef = inject(BsModalRef);
-
+  modalRef = inject(MatDialogRef<NVCLDatasetListDialogComponent>);
 
   scalarClasses: any;
 

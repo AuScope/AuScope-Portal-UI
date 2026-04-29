@@ -1,8 +1,6 @@
-import { Component, Input, ViewChild, ElementRef, inject } from '@angular/core';
-import { CSWRecordModel } from '../../../lib/portal-core-ui/model/data/cswrecord.model';
-import { LayerModel } from '../../../lib/portal-core-ui/model/data/layer.model';
+import { Component, ViewChild, ElementRef, inject } from '@angular/core';
 import { LayerStatusService } from '../../../lib/portal-core-ui/utility/layerstatus.service';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 
 @Component({
@@ -14,13 +12,17 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 })
 
 export class InfoPanelComponent {
-    activeModal = inject(NgbActiveModal);
+    dialogRef = inject(MatDialogRef<InfoPanelComponent>);
+    /**
+     * Input data:
+     *   cswRecords: CSWRecordModel[];
+      *  layer: LayerModel;
+      *  expanded: boolean;
+      *  showRecordAddButton = true;
+     */
+    data = inject(MAT_DIALOG_DATA);
     layerStatus = inject(LayerStatusService);
 
-    @Input() cswRecords: CSWRecordModel[];
-    @Input() layer: LayerModel;
-    @Input() expanded: boolean;
-    @Input() showRecordAddButton = true;
     @ViewChild('subPanelElement') subPanelElement: ElementRef;
 
 }

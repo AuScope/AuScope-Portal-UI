@@ -1,6 +1,17 @@
+::ng-deep .mat-mdc-dialog-container .mat-mdc-dialog-content {
+  padding: 0;
+  margin-top: 1rem;
+}
+
+.feature-info {
+  padding: 1rem;
+  overflow-x: clip;
+}
+
 .modal-header {
   border-width: 0;
   height: 100%;
+  padding: 0;
   overflow-y: visible;
   display: block;
   cursor: move;
@@ -17,7 +28,6 @@
 }
   */
 .modal-body {
-  margin-left: 15px;
   overflow-y: auto;
 }
 
@@ -100,13 +110,12 @@
 }
 
 #middleContainer {
-  width: 100%;
+  margin-left: auto;
   display: flex;
   justify-content: flex-end;
 }
 
 #startContainer {
-  width: 320px;
   display: flex;
   justify-content: flex-start;
 }
@@ -132,6 +141,7 @@
   position: absolute;
   top: 0;
   right: 5px;
+  margin-right: 5px;
 }
 
 .alertHeading {

@@ -1,9 +1,8 @@
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit, inject } from '@angular/core';
 import { ResourceType } from '../../../lib/portal-core-ui/utility/constants.service';
 import { saveAs } from 'file-saver';
 import { config } from '../../../../environments/config';
 import { environment } from '../../../../environments/environment'; //CVP
-import { ChangeDetectorRef } from '@angular/core';
 import { DownloadWcsService } from '../../../lib/portal-core-ui/service/wcs/download/download-wcs.service';
 import { DownloadWfsService } from '../../../lib/portal-core-ui/service/wfs/download/download-wfs.service';
 import { CsClipboardService } from '../../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
@@ -16,12 +15,12 @@ import { Polygon } from '../../../lib/portal-core-ui/service/cesium-map/cs-clipb
 import { Bbox } from '../../../lib/portal-core-ui/model/data/bbox.model';
 import { NVCLTSGDownloadComponent } from 'app/modalwindow/layeranalytic/nvcl/nvcl.tsgdownload.component';
 import { isNumber } from '@turf/helpers';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { BoundsService } from 'app/services/bounds/bounds.service';
 import { NVCLService } from '../../../modalwindow/querier/customanalytic/nvcl/nvcl.service';
 import { shareReplay } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { DownloadAuScopeCatModalComponent } from 'app/modalwindow/download-auscopecat/download-auscopecat.modal.component';
+import { MatDialog } from '@angular/material/dialog';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 declare let rudderanalytics: any;
@@ -41,7 +40,7 @@ export class DownloadPanelComponent implements OnInit {
   private csClipboardService = inject(CsClipboardService);
   private boundsService = inject(BoundsService);
   private csIrisService = inject(CsIrisService);
-  activeModalService = inject(NgbModal);
+  private dialog = inject(MatDialog);
   private nvclService = inject(NVCLService);
   private conf = inject<any>('conf' as any);
 
@@ -88,7 +87,7 @@ export class DownloadPanelComponent implements OnInit {
   public SELECT_DEFAULT_CHANNEL = "Choose a channel";
   public SELECT_ALL_CHANNEL = "All channels";
 
-  private bsModalRef = null;
+  private dialogRef = null;
 
   constructor() {
     this.isNvclLayer = false;
@@ -711,12 +710,13 @@ export class DownloadPanelComponent implements OnInit {
       return;
     }
 
-    this.bsModalRef = this.activeModalService.open(NVCLTSGDownloadComponent, {
-      size: 'lg',
-      backdrop: false
-      });
-    this.bsModalRef.componentInstance.layer = this.layer;
-    this.bsModalRef.componentInstance.tsgDownloadServiceMsg = this.tsgDownloadServiceMsg;
+    this.dialogRef = this.dialog.open(NVCLTSGDownloadComponent, {
+      width: '1000px',
+      data: {
+        layer: this.layer,
+        tsgDownloadServiceMsg: this.tsgDownloadServiceMsg
+      }
+    });
   }
 
   /**
@@ -747,8 +747,8 @@ export class DownloadPanelComponent implements OnInit {
         this.downloadWfsService.tsgDownloadBS.next('completed,completed');
         return;
       }
-      this.bsModalRef.componentInstance.urlsArray = urlsArray;
-      this.bsModalRef.componentInstance.BulkDownloadTsgFiles();
+      this.dialogRef.componentInstance.urlsArray = urlsArray;
+      this.dialogRef.componentInstance.BulkDownloadTsgFiles();
       /**
        * do not "log" the "email" to "RudderStack" - as this is an ethics issue
        *
@@ -855,15 +855,16 @@ export class DownloadPanelComponent implements OnInit {
   }
 
   public downloadWithAuScopeCat(): void {
-    this.bsModalRef = this.activeModalService.open(DownloadAuScopeCatModalComponent, {
-        size: 'lg',
-        backdrop: false
+    this.dialogRef = this.activeModalService.open(DownloadAuScopeCatModalComponent, {
+        size: '800px',
+        data: {
+          layer: this.layer,
+          bbox: this.bbox,
+          polygonFilter: this.polygonFilter
+          // If we want to download TSG data later
+          // isTsgLayer: this.isTsgDownloadAvailable;
+        }
       });
-    this.bsModalRef.componentInstance.layer = this.layer;
-    this.bsModalRef.componentInstance.bbox = this.bbox;
-    this.bsModalRef.componentInstance.polygon = this.polygonFilter;
-    // If we want to download TSG data later
-    // this.bsModalRef.componentInstance.isTsgLayer = this.isTsgDownloadAvailable;
   }
 
 }

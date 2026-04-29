@@ -2,7 +2,6 @@ import { config } from '../../environments/config';
 import { environment } from '../../environments/environment';
 import { QuerierModalComponent } from '../modalwindow/querier/querier.modal.component';
 import { AfterViewInit, Component, ElementRef, NgZone, ViewChild, ViewContainerRef, inject } from '@angular/core';
-import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ViewerConfiguration } from '@auscope/angular-cesium';
 import { CsMapService } from '../lib/portal-core-ui/service/cesium-map/cs-map.service';
 import { CSWRecordModel } from '../lib/portal-core-ui/model/data/cswrecord.model';
@@ -29,6 +28,7 @@ import { catchError, finalize, tap, timeout } from 'rxjs/operators';
 import { ToolbarComponent } from 'app/menupanel/toolbar/toolbar.component';
 import { NVCLBoreholeAnalyticService } from 'app/modalwindow/layeranalytic/nvcl/nvcl.boreholeanalytic.service';
 import { OnlineResourceModel } from 'app/lib/portal-core-ui/model/data/onlineresource.model';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 declare let Cesium: any;
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
@@ -69,7 +69,7 @@ declare let rudderanalytics: any;
 export class CsMapComponent implements AfterViewInit {
   private csMapObject = inject(CsMapObject);
   private csMapService = inject(CsMapService);
-  private modalService = inject(BsModalService);
+  private dialog = inject(MatDialog);
   private queryWMSService = inject(QueryWMSService);
   private gmlParserService = inject(GMLParserService);
   private manageStateService = inject(ManageStateService);
@@ -101,7 +101,7 @@ export class CsMapComponent implements AfterViewInit {
 
   sliderMoveActive = false;
 
-  private bsModalRef: BsModalRef;
+  private dialogRef: MatDialogRef<QuerierModalComponent>;
   private modalDisplayed = false;
 
   constructor() {
@@ -387,7 +387,7 @@ export class CsMapComponent implements AfterViewInit {
       this.displayModal(mapClickInfo.clickCoord);
       // Only add HTML if it's not empty
       if (html && html.trim().length > 0) {
-        this.setModalHTML(html, layerList[0].name + ": " + "Ground Overlay", layerList[0], this.bsModalRef);
+        this.setModalHTML(html, layerList[0].name + ": " + "Ground Overlay", layerList[0], this.dialogRef);
       }
     }
 
@@ -400,22 +400,22 @@ export class CsMapComponent implements AfterViewInit {
         if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.IRIS))) {
           this.displayModal(mapClickInfo.clickCoord);
           const handler = new IrisQuerierHandler(layer, entity);
-          this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.bsModalRef);
+          this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.dialogRef);
           // KML/KMZ layers
         } else if ((layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.KML))) ||
           (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.KMZ)))) {
           this.displayModal(mapClickInfo.clickCoord);
           const handler = new KMLQuerierHandler(entity);
-          this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.bsModalRef);
+          this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.dialogRef);
           // KML/KMZ layers
         } else if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.VMF))) {
           this.displayModal(mapClickInfo.clickCoord);
           const handler = new VMFQuerierHandler(entity);
-          this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.bsModalRef);
+          this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.dialogRef);
         } else if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.GEOJSON))) {
           this.displayModal(mapClickInfo.clickCoord);
           const handler = new GeoJsonQuerierHandler(entity);
-          this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.bsModalRef);
+          this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.dialogRef);
         }
       }
       // TODO: Remove commented code, kept for yet to be re-implemented entity types
@@ -513,7 +513,7 @@ export class CsMapComponent implements AfterViewInit {
           if (!UtilitiesService.getLayerHasSupportedOnlineResourceType(maplayer) && UtilitiesService.layerContainsBboxGeographicElement(maplayer)) {
             // Display CSW record info
             this.displayModal(mapClickInfo.clickCoord);
-            this.setModalHTML(this.parseCSWtoHTML(cswRecord), cswRecord.name, maplayer, this.bsModalRef);
+            this.setModalHTML(this.parseCSWtoHTML(cswRecord), cswRecord.name, maplayer, this.dialogRef);
             continue;
           }
 
@@ -617,13 +617,13 @@ export class CsMapComponent implements AfterViewInit {
       // All requests completed, add zoom message to modal if no results were found
       forkJoin(getFeatureInfoRequests).pipe(
         finalize(() => {
-          this.bsModalRef.content.downloading = false;
-          this.bsModalRef.content.allLayersLoaded();
+          this.dialogRef.componentInstance.data.downloading = false;
+          this.dialogRef.componentInstance.allLayersLoaded();
         })
       ).subscribe();
     } else {
-      this.bsModalRef.content.downloading = false;
-      this.bsModalRef.content.allLayersLoaded();
+      this.dialogRef.componentInstance.data.downloading = false;
+      this.dialogRef.componentInstance.allLayersLoaded();
     }
 
   }
@@ -661,19 +661,24 @@ export class CsMapComponent implements AfterViewInit {
    */
   private displayModal(_clickCoord: { x: number, y: number, z: number }) {
     if (!this.modalDisplayed) {
-      this.bsModalRef = this.modalService.show(QuerierModalComponent, { class : 'modal-lg modal-dialog-scrollable modal-dialog-centered' });
+      this.dialogRef = this.dialog.open(QuerierModalComponent, {
+        width : '800px',
+        maxWidth : '800px',
+        //panelClass: 'querier-dialog-panel',
+        data: {
+            downloading: true,
+            docs: [],
+            htmls: [],
+            uniqueLayerNames: [],
+            currentDoc: null,
+            currentHTML: '',
+        }
+      });
       this.modalDisplayed = true;
-      this.bsModalRef.content.downloading = true;
-      // Clear any previous data from the modal
-      this.bsModalRef.content.docs = [];
-      this.bsModalRef.content.htmls = [];
-      this.bsModalRef.content.uniqueLayerNames = [];
-      this.bsModalRef.content.currentDoc = null;
-      this.bsModalRef.content.currentHTML = '';
       /*
       if (clickCoord) {
         const vector = this.csMapService.drawDot(clickCoord);
-        this.modalService.onHide.subscribe(reason => {
+        this.dialogRef.afterClosed().subscribe(reason => {
           if (vector)  {
             this.csMapService.removeVector(vector);          }
         })
@@ -687,8 +692,8 @@ export class CsMapComponent implements AfterViewInit {
    * Hide the querier modal
    */
   private hideModal() {
-    if (this.bsModalRef) {
-      this.bsModalRef.hide();
+    if (this.dialogRef) {
+      this.dialogRef.close();
     }
   }
 
@@ -780,14 +785,14 @@ export class CsMapComponent implements AfterViewInit {
         continue;
       }
 
-      this.bsModalRef.content.docs.push(treeCollection);
-      if (this.bsModalRef.content.uniqueLayerNames.indexOf(feature.layer.name) === -1) {
-        this.bsModalRef.content.uniqueLayerNames.push(feature.layer.name);
+      this.dialogRef.componentInstance.data.docs.push(treeCollection);
+      if (this.dialogRef.componentInstance.data.uniqueLayerNames.indexOf(feature.layer.name) === -1) {
+        this.dialogRef.componentInstance.data.uniqueLayerNames.push(feature.layer.name);
       }
     }
 
     if (featureCount > 0) {
-      this.bsModalRef.content.onDataChange();
+      this.dialogRef.componentInstance.onDataChange();
       if (environment.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
         rudderanalytics.track('feature_info_view', {
           layer_id: feature.layer?.id,
@@ -811,16 +816,16 @@ export class CsMapComponent implements AfterViewInit {
    * @param feature map feature object
    * @param bsModalRef modal dialog reference
    */
-  private setModalHTML(html: string, key: any, layer: LayerModel, bsModalRef: BsModalRef) {
-    bsModalRef.content.htmls.push({
+  private setModalHTML(html: string, key: any, layer: LayerModel, dialogRef: MatDialogRef<QuerierModalComponent>) {
+    dialogRef.componentInstance.data.htmls.push({
       key: key,
       layer: layer,
       value: html
     });
-    if (bsModalRef.content.uniqueLayerNames.indexOf(layer.name) === -1) {
-      bsModalRef.content.uniqueLayerNames.push(layer.name)
+    if (dialogRef.componentInstance.data.uniqueLayerNames.indexOf(layer.name) === -1) {
+      dialogRef.componentInstance.data.uniqueLayerNames.push(layer.name)
     }
-    this.bsModalRef.content.onDataChange();
+    this.dialogRef.componentInstance.onDataChange();
   }
 
   /**

@@ -5,7 +5,6 @@ import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 import { RenderStatusService } from '../../lib/portal-core-ui/service/cesium-map/renderstatus/render-status.service';
 import { KMLDocService } from '../../lib/portal-core-ui/service/kml/kml.service';
 import { Constants } from '../../lib/portal-core-ui/utility/constants.service';
-import { CsMapService } from '../../lib/portal-core-ui/service/cesium-map/cs-map.service';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import * as JSZip from 'jszip';
@@ -14,8 +13,8 @@ import { throwError as observableThrowError, Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { HttpResponse } from '@angular/common/http';
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
+import { MatDialog } from '@angular/material/dialog';
 
 
 @Component({
@@ -33,8 +32,7 @@ export class CustomPanelComponent {
   private renderStatusService = inject(RenderStatusService);
   private uiLayerModelService = inject(UILayerModelService);
   private kmlService = inject(KMLDocService);
-  private csMapService = inject(CsMapService);
-  public activeModalService = inject(NgbModal);
+  private dialog = inject(MatDialog);
 
   // URL that the user types in
   searchUrl: string;
@@ -591,12 +589,15 @@ export class CustomPanelComponent {
    */
   public displayRecordInfo(layer: LayerModel) {
     if (layer) {
-      const modelRef = this.activeModalService.open(InfoPanelComponent, {
-        size: "lg",
-        backdrop: false
+      this.dialog.open(InfoPanelComponent, {
+        width: '1000px',
+        maxWidth: '1000px',
+        maxHeight: '90vh',
+        data: {
+          cswRecords: layer.cswRecords,
+          layer: layer
+        }
       });
-      modelRef.componentInstance.cswRecords = layer.cswRecords;
-      modelRef.componentInstance.layer = layer;
     }
   }
 

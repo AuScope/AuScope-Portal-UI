@@ -1,10 +1,7 @@
 import { Component, OnInit, Input, ChangeDetectorRef, inject } from '@angular/core';
-import { LayerModel } from '../../../../lib/portal-core-ui/model/data/layer.model';
-import { OnlineResourceModel } from '../../../../lib/portal-core-ui/model/data/onlineresource.model';
-import { QuerierInfoModel } from '../../../../lib/portal-core-ui/model/data/querierinfo.model';
 import { MSCLService } from '../../../layeranalytic/mscl/mscl.service';
-import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { MSCLAnalyticComponent } from '../../../layeranalytic/mscl/mscl.analytic.component';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
     selector: 'app-mscl',
@@ -15,20 +12,19 @@ import { MSCLAnalyticComponent } from '../../../layeranalytic/mscl/mscl.analytic
 })
 export class MSCLComponent implements OnInit {
     msclService = inject(MSCLService);
-    private modalService = inject(BsModalService);
     private changeDetectorRef = inject(ChangeDetectorRef);
-
-
-    @Input() layer: LayerModel;
-    @Input() onlineResource: OnlineResourceModel;
-    @Input() featureId: string;
-    @Input() doc: QuerierInfoModel;
+    private dialog = inject(MatDialog);
+    private dialogRef: MatDialogRef<MSCLAnalyticComponent>;
+    /**
+     * Input data:
+     *   layer: LayerModel;
+     *   onlineResource: OnlineResourceModel;
+     *   featureId: string;
+     *   doc: QuerierInfoModel;
+     */
+    public data = inject(MAT_DIALOG_DATA);
 
     public msclform: { startDepth: number, endDepth: number, bMetric: object, bGroup: object }; // Used to store form data
-    // startDepth = start depth
-    // endDepth = end depth
-    // bMetric = metric tickbox, dict: key is printable name, val is boolean
-    // bGroup = group metric tickbox, dict: key is printable name, val is boolean
 
     public metricPNameList: string[]; // Printable list of all selectable metrics
     public metricGroupList: string[]; // List of selectable group names
@@ -37,7 +33,6 @@ export class MSCLComponent implements OnInit {
     public showSelectMetricError: boolean; // Show error if no metrics chosen when Draw Graph is pressed
 
     private usesGMLObs = false; // Response has values nested within GeoSciML observations
-    private bsModalRef: BsModalRef;
 
     constructor() {
         this.msclform = { startDepth: 0.0, endDepth: 2000.0, bMetric: {}, bGroup: {} };
@@ -57,11 +52,11 @@ export class MSCLComponent implements OnInit {
         // The members of the list take the form of XML element names  e.g. p_wave_velocity
         let metricList = [];
         // Find out if values are nested within GeoSciML observations
-        this.usesGMLObs = this.msclService.usesGMLObs(this.doc.raw);
+        this.usesGMLObs = this.msclService.usesGMLObs(this.data.doc.raw);
         if (this.usesGMLObs) {
-            metricList = this.msclService.findMetricTypes(this.doc.raw);
+            metricList = this.msclService.findMetricTypes(this.data.doc.raw);
         } else {
-            const searchResult = /<gsmlp:datasetProperties>[a-z_,]*<\/gsmlp:datasetProperties>/.exec(this.doc.raw);
+            const searchResult = /<gsmlp:datasetProperties>[a-z_,]*<\/gsmlp:datasetProperties>/.exec(this.data.doc.raw);
             if (searchResult) {
                 const metricsStr = searchResult.toString();
                 // Remove tags at ends and convert to a list
@@ -123,17 +118,16 @@ export class MSCLComponent implements OnInit {
         } else if (this.modalDisplayed === false) {
             this.showSelectMetricError = false;
             // Create the dialogue with relevant input parameters
-            this.bsModalRef = this.modalService.show(MSCLAnalyticComponent, {
-                class: 'modal-xl',
-                ignoreBackdropClick: true,
-                keyboard: false,
-                initialState: {
+            this.dialogRef = this.dialog.open(MSCLAnalyticComponent, {
+                width: '1000px',
+                maxWidth: '1000px',
+                data: {
                     'startDepth': this.msclform.startDepth,
                     'endDepth': this.msclform.endDepth,
                     'metricList': selecMetricList,
-                    'featureId': this.featureId,
+                    'featureId': this.data.featureId,
                     'closeGraphModal': this.closeGraphModal.bind(this),
-                    'serviceUrl': this.onlineResource.url,
+                    'serviceUrl': this.data.onlineResource.url,
                     'usesGMLObs': this.usesGMLObs,
                 }
             });
@@ -147,7 +141,7 @@ export class MSCLComponent implements OnInit {
      */
     public closeGraphModal() {
         if (this.modalDisplayed) {
-            this.bsModalRef.hide();
+            this.dialogRef.close();
             this.modalDisplayed = false;
         }
     }
