@@ -1,13 +1,12 @@
 import { Clipboard } from '@angular/cdk/clipboard';
 
-import { Component, inject, Input, OnInit } from '@angular/core';
-import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
+import { Component, inject, OnInit } from '@angular/core';
 import { OnlineResourceModel } from '../../lib/portal-core-ui/model/data/onlineresource.model';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import bboxPolygon from '@turf/bbox-polygon';
 import { Feature } from '@turf/helpers';
 import intersect from '@turf/intersect';
 import { Polygon } from 'geojson';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 
 type LatLon = [number, number];
 
@@ -18,31 +17,28 @@ type LatLon = [number, number];
     selector: 'app-download-auscopecat-modal',
     templateUrl: './download-auscopecat.modal.component.html',
     styleUrls: ['./download-auscopecat.modal.component.scss'],
-    imports: [],
+    imports: [ MatDialogModule],
     standalone: true
 })
 export class DownloadAuScopeCatModalComponent implements OnInit {
 
-    @Input() layer: LayerModel;
-    @Input() bbox: any;
-    @Input() polygon: any;
-
+    data = inject(MAT_DIALOG_DATA); // Input data: { layer: LayerModel, bbox?: BBox, polygon?: string }
     code: string; // Code block output
     codeCopied: boolean = false; // Flag for code having been copied
     private clipboard = inject(Clipboard); // clipboard for coying code
-    private activeModal = inject(NgbActiveModal);
+    private dialogRef = inject(MatDialogRef<DownloadAuScopeCatModalComponent>); // dialog ref for closing modal
 
     /**
      * Create auscopecat library code string
      */
     ngOnInit(): void {
-        if (!this.layer) {
+        if (!this.data.layer) {
             this.code = '# No layer provided for download.';
             return;
         }
 
         // WFS resources
-        const wfsResources = this.layer.cswRecords
+        const wfsResources = this.data.layer.cswRecords
             .flatMap(r => r.onlineResources ?? [])
             .filter(r => r.type.toLowerCase() === 'wfs');
 
@@ -106,7 +102,7 @@ export class DownloadAuScopeCatModalComponent implements OnInit {
      * @returns a string representing the download api call
      */
     private buildDownloadCall(resource: OnlineResourceModel, index: number): string {
-        const bboxOrPolygon = this.bbox ? 'bbox=bbox' : 'polygon=polygon';
+        const bboxOrPolygon = this.data.bbox ? 'bbox=bbox' : 'polygon=polygon';
         return [
             'download_resource = SimpleNamespace(',
             `  url = "${resource.url}",`,
@@ -128,9 +124,9 @@ export class DownloadAuScopeCatModalComponent implements OnInit {
         pythonHeader: string;
     } {
         // User defined bbox
-        if (this.bbox) {
+        if (this.data.bbox) {
             const { northBoundLatitude: n, eastBoundLongitude: e,
-                southBoundLatitude: s, westBoundLongitude: w } = this.bbox;
+                southBoundLatitude: s, westBoundLongitude: w } = this.data.bbox;
 
             const header = [
                 'bbox = {',
@@ -148,10 +144,10 @@ export class DownloadAuScopeCatModalComponent implements OnInit {
         }
 
         // User defined polygon
-        if (this.polygon) {
+        if (this.data.polygon) {
             let coords: LatLon[];
             try {
-                coords = this.parseGmlCoords(this.polygon);
+                coords = this.parseGmlCoords(this.data.polygon);
             } catch {
                 throw new Error('Error parsing polygon coordinates.');
             }
@@ -260,6 +256,6 @@ export class DownloadAuScopeCatModalComponent implements OnInit {
      * Close dialog
      */
     closeDialog() {
-        this.activeModal.close();
+        this.dialogRef.close();
     }
 }

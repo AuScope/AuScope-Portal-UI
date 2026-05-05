@@ -1,5 +1,5 @@
-import { Component, Input, inject } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { Component, inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 /**
  * Reusable confirmation dialog class
@@ -11,12 +11,14 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
     standalone: false
 })
 export class ConfirmModalComponent {
-  activeModal = inject(NgbActiveModal);
-
-
-  @Input() title: string;
-  @Input() modalContent: string;
-  @Input() confirmButtonText: string;
-  @Input() cancelButtonText: string;
+  dialogRef = inject(MatDialogRef<ConfirmModalComponent>);
+  /**
+   * Input data:
+   *   title: string;
+   *   modalContent: string;
+   *   confirmButtonText: string;
+  *    cancelButtonText: string;
+   */
+  data = inject(MAT_DIALOG_DATA);
 
 }

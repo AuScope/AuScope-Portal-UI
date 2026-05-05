@@ -1,5 +1,5 @@
 <div class="modal-header">
-  <h4>Create Permanent Link</h4><button class="btn btn-sm btn-outline pull-right" aria-label="Close" (click)="activeModal.close()"><i class="fa fa-times"></i></button>
+  <h4>Create Permanent Link</h4><button class="btn btn-sm btn-outline pull-right" aria-label="Close" (click)="dialogRef.close()"><i class="fa fa-times"></i></button>
 </div>
 <div class="modal-body">
   <form [formGroup]="linkForm" (ngSubmit)="savePermanentLink()" class="text-left">

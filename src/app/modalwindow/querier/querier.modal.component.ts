@@ -7,7 +7,6 @@ import { GMLParserService } from '../../lib/portal-core-ui/utility/gmlparser.ser
 import { Polygon } from '../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
 import { QuerierInfoModel } from '../../lib/portal-core-ui/model/data/querierinfo.model';
 import { NVCLService } from './customanalytic/nvcl/nvcl.service';
-import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
@@ -16,7 +15,7 @@ import * as X2JS from 'x2js';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MSCLService } from '../layeranalytic/mscl/mscl.service';
 import { NVCLBoreholeAnalyticService } from '../layeranalytic/nvcl/nvcl.boreholeanalytic.service';
-import { MatDialog } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 export class FileNode {
   children: FileNode[];
@@ -40,7 +39,6 @@ interface FlatNode {
 })
 export class QuerierModalComponent implements OnInit, AfterViewInit {
   nvclService = inject(NVCLService);
-  bsModalRef = inject(BsModalRef);
   csClipboardService = inject(CsClipboardService);
   private gmlParserService = inject(GMLParserService);
   private http = inject(HttpClient);
@@ -51,17 +49,14 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   private appRef = inject(ApplicationRef);
   private msclService = inject(MSCLService);
   private renderer = inject(Renderer2);
-  private modalService = inject(BsModalService);
   dialog = inject(MatDialog);
+  dialogRef = inject(MatDialogRef<QuerierModalComponent>);
+  data = inject(MAT_DIALOG_DATA);
 
   [x: string]: any;
   @ViewChild('childElement', { static: false }) childElement: ElementRef;
-  public downloading: boolean;
+
   public transformingToHtml: Map<string, boolean> = new Map<string, boolean>();
-  public docs: QuerierInfoModel[] = [];
-  public htmls: QuerierInfoModel[] = [];
-  public currentHTML = ''; // HTML displayed in popup window for those layers that use it
-  public uniqueLayerNames: string[] = [];
   public selectLayerNameFilter = 'ALL';
   public analyticMap;
   public tab: object;
@@ -71,7 +66,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   public currentIndex = 0;
   public jsonDoc;
   public list = [];
-  public currentDoc: any;
+
   public selectedFeature = 'Feature';
   public currentFeature = 'Feature';
   public selectedLayer = 'Layer';
@@ -189,19 +184,19 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
 
     /*
     the following are needed to prevent an "artifact" showing when the active layers panel is showing
-    and then slides out of the way - i.e. the header of the modal for Feature Informatio displays at
+    and then slides out of the way - i.e. the header of the modal for Feature Information displays at
     the bottom of the layers panel
     */
-    this.modalService.onHide.subscribe(reason => {
+    this.dialogRef.backdropClick().subscribe(() => {
+      this.modalVisible = false;
+    });
+    this.dialogRef.afterClosed().subscribe(result => {
       /* modal close event has cascaded down; most lieley from the MSCL popup modal or the legend */
-
-      if (!(reason == "backdrop-click")) { // check - image > scalar > legend
-        if (!reason.initialState) { // check - scl chart
-          this.modalVisible = false;
-        }
+      if (result?.source !== "backdrop") { // check - image > scalar > legend
+        this.modalVisible = false;
       }
     });
-    this.modalService.onShow.subscribe(() => {
+    this.dialogRef.afterOpened().subscribe(() => {
       this.modalVisible = true;
     });
 
@@ -263,11 +258,11 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
    */
   public setHTML(key) {
     // Clear the WFS XML display
-    this.currentDoc = null;
+    this.data.currentDoc = null;
     // Search for our HTML to display
-    for (const html of this.htmls) {
+    for (const html of this.data.htmls) {
       if (html.key == key) {
-        this.currentHTML = html.value;
+        this.data.currentHTML = html.value;
         return;
       }
     }
@@ -281,14 +276,14 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
    */
   public setWFS(doc, i) {
     // Clear the HTML display
-    this.currentHTML = "";
+    this.data.currentHTML = "";
     // Set up, convert the XML and display in popup
     this.updateDropDownButtonText(doc);
     this.currentIndex = i;
-    this.currentDoc = doc;
-    this.currentDoc.analytic = false;
-    this.currentDoc.home = true;
-    this.transformToHtml(this.currentDoc, i);
+    this.data.currentDoc = doc;
+    this.data.currentDoc.analytic = false;
+    this.data.currentDoc.home = true;
+    this.transformToHtml(this.data.currentDoc, i);
 
     if (this.analyticEnabled) {
         //this.analytic_tab = true;
@@ -335,8 +330,8 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     const htmldata = []
     const Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
     const objExp = new RegExp(Expression);
-    for (let i = 0; i < this.docs.length; i++) {
-      const doc = new DOMParser().parseFromString(this.docs[i].raw, 'text/xml');
+    for (let i = 0; i < this.data.docs.length; i++) {
+      const doc = new DOMParser().parseFromString(this.data.docs[i].raw, 'text/xml');
       if (doc.getElementsByTagName('gml:name').length != 0) {
         for (let nameIdx = 0; nameIdx < doc.getElementsByTagName('gml:name').length; nameIdx++) {
           if (!objExp.test(doc.getElementsByTagName('gml:name')[nameIdx].innerHTML)) {
@@ -362,7 +357,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
           }
         }
       }
-      this.docs[i]['node_name'] = htmldata[i]
+      this.data.docs[i]['node_name'] = htmldata[i]
     }
 
     setTimeout(() => {
@@ -375,15 +370,15 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
    * if it is the only one in the list
    */
   allLayersLoaded() {
-    this.downloading = false;
+    this.data.downloading = false;
     // Force immediate change detection to show the no-results message if needed
     this.changeDetectorRef.detectChanges();
     this.onDataChange();
-    if (this.docs.length === 1 && this.htmls.length === 0) {
-      this.setWFS(this.docs[0], 0);
+    if (this.data.docs.length === 1 && this.data.htmls.length === 0) {
+      this.setWFS(this.data.docs[0], 0);
       this.openTab(event, 'wfs')
-    } else if (this.htmls.length === 1 && this.docs.length === 0) {
-      this.setHTML(this.htmls[0].key);
+    } else if (this.data.htmls.length === 1 && this.data.docs.length === 0) {
+      this.setHTML(this.data.htmls[0].key);
     }
   }
 
@@ -694,7 +689,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
    * Download feature information as a simple flattened CSV
    */
   public downloadFeatureCSV() {
-    if (!this.currentDoc) {
+    if (!this.data.currentDoc) {
       return;
     }
 
@@ -717,7 +712,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     csvRows.push(`Feature,${this.escapeCSV(this.selectedFeature)}`);
 
     // Add properties from HTML table
-    if (this.currentDoc.transformed) {
+    if (this.data.currentDoc.transformed) {
       const tableData = this.extractTableDataForCSV();
       tableData.forEach(item => {
         csvRows.push(`${this.escapeCSV(item.key)},${this.escapeCSV(item.value)}`);
@@ -725,8 +720,8 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     }
 
     // Add XML tree data (flattened)
-    if (this.flatTreeDataSource[this.currentDoc.key]) {
-      const treeData = this.flatTreeDataSource[this.currentDoc.key].data;
+    if (this.flatTreeDataSource[this.data.currentDoc.key]) {
+      const treeData = this.flatTreeDataSource[this.data.currentDoc.key].data;
       this.addTreeDataToCSV(treeData, csvRows);
     }
 
@@ -739,9 +734,9 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   private extractTableDataForCSV(): Array<{key: string, value: string}> {
     const data: Array<{key: string, value: string}> = [];
 
-    if (this.currentDoc.transformed) {
+    if (this.data.currentDoc.transformed) {
       const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = this.currentDoc.transformed;
+      tempDiv.innerHTML = this.data.currentDoc.transformed;
 
       // Remove style and script tags
       const styleTags = tempDiv.querySelectorAll('style, script');

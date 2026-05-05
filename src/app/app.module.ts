@@ -1,12 +1,8 @@
 import { environment } from '../environments/environment';
 import { config } from '../environments/config';
 import { NgModule } from '@angular/core';
-import { ModalModule } from 'ngx-bootstrap/modal';
 import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
-
-// Cesium icons
-import { MatTooltipModule } from '@angular/material/tooltip';
 
 // Components
 import { AppComponent } from './app.component';
@@ -43,18 +39,20 @@ import { AngularCesiumModule, AngularCesiumWidgetsModule } from '@auscope/angula
 import { QuerierModalComponent } from './modalwindow/querier/querier.modal.component';
 import { ClipboardModule } from 'ngx-clipboard';
 
-
-
-
 import { NgSelectModule } from '@ng-select/ng-select';
 
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
-import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSliderModule } from '@angular/material/slider';
+import { MatInputModule } from '@angular/material/input';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatSliderModule } from '@angular/material/slider';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTreeModule } from '@angular/material/tree';
+
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { CdkTableModule } from '@angular/cdk/table';
 
@@ -67,7 +65,6 @@ import { PortalCorePipesModule } from './lib/portal-core-ui/uiutilities/portal-c
 
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { MSCLComponent } from './modalwindow/querier/customanalytic/mscl/mscl.component';
 import { MSCLAnalyticComponent } from './modalwindow/layeranalytic/mscl/mscl.analytic.component';
 import { MSCLService } from './modalwindow/layeranalytic/mscl/mscl.service';
@@ -100,9 +97,6 @@ import { LayerManagerService } from './services/ui/layer-manager.service';
 import * as PlotlyJS from 'plotly.js-dist-min';
 import { PlotlyModule } from 'angular-plotly.js';
 
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { DataExplorerComponent } from './menupanel/data-explorer/data-explorer.component';
-import { DataExplorerdRecordModule } from './menupanel/data-explorer-record/data-explorer-record.modules';
 import { RecordModalComponent } from './menupanel/record-modal/record-modal.component';
 import { NVCLService } from './modalwindow/querier/customanalytic/nvcl/nvcl.service';
 import { NVCLTSGDownloadComponent } from './modalwindow/layeranalytic/nvcl/nvcl.tsgdownload.component';
@@ -170,7 +164,6 @@ PlotlyModule.plotlyjs = PlotlyJS;
         MSCLComponent,
         MSCLAnalyticComponent,
         HelpMenuComponent,
-        DataExplorerComponent,
         RecordModalComponent,
         LegendModalComponent,
         PermanentLinksModalComponent,
@@ -193,29 +186,28 @@ PlotlyModule.plotlyjs = PlotlyJS;
         AppRoutingModule,
         PortalCorePipesModule,
         ClipboardModule,
-        ModalModule.forRoot(),
         NgSelectModule,
         CdkTableModule,
-        MatTreeModule,
-        MatIconModule,
+        MatAutocompleteModule,
         MatButtonModule,
-        MatDialogModule,
-        MatMenuModule,
-        MatProgressBarModule,
         MatCardModule,
+        MatDialogModule,
+        MatIconModule,
+        MatInputModule,
+        MatMenuModule,
+        MatPaginatorModule,
+        MatProgressBarModule,
         MatRadioModule,
         MatSliderModule,
         MatTooltipModule,
+        MatTreeModule,
         NgxChartsModule,
         NgxColorsModule,
         BrowserAnimationsModule,
-        BsDropdownModule.forRoot(),
         CommonModule,
         PlotlyModule,
-        DataExplorerdRecordModule,
         AngularCesiumModule.forRoot(),
         AngularCesiumWidgetsModule,
-        NgbModule,
         FormsModule,
         ReactiveFormsModule,
         BrowserModule,

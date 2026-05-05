@@ -69,6 +69,3 @@ import 'zone.js'; // Included with Angular CLI.
 
 // Add global to window, assigning the value of window itself.
 (window as any).global = window;
-
-// Some ng-bootstrap classes need this
-import '@angular/localize/init';

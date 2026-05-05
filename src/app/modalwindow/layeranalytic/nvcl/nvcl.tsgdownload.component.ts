@@ -1,13 +1,11 @@
-import { LayerModel } from '../../../lib/portal-core-ui/model/data/layer.model';
-import { Component, Input, AfterViewInit, OnInit, AfterContentChecked, inject } from '@angular/core';
-import { LayerAnalyticInterface } from '../layer.analytic.interface';
+import { Component, AfterViewInit, OnInit, AfterContentChecked, inject } from '@angular/core';
 import { DownloadWfsService } from '../../../lib/portal-core-ui/service/wfs/download/download-wfs.service';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { NVCLBoreholeAnalyticService } from './nvcl.boreholeanalytic.service';
 import { TSGDownloadService } from './tsgdownload.service';
 import { Download } from './tsgdownload';
 import { Observable, Subject } from 'rxjs';
 import { shareReplay } from 'rxjs/operators';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
     selector: 'app-nvcl-tsgdownload-component',
@@ -24,19 +22,18 @@ import { shareReplay } from 'rxjs/operators';
     providers: [NVCLBoreholeAnalyticService],
     standalone: false
 })
-export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewInit, OnInit, LayerAnalyticInterface {
-  activeModal = inject(NgbActiveModal);
+export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewInit, OnInit {
   private downloadWfsService = inject(DownloadWfsService);
   private nvclBoreholeAnalyticService = inject(NVCLBoreholeAnalyticService);
   private tsgDownloadService = inject(TSGDownloadService);
 
-  @Input() layer: LayerModel;
+  public data = inject(MAT_DIALOG_DATA);
+  public dialogRef = inject(MatDialogRef<NVCLTSGDownloadComponent>);
   public tsgform;
   public ngSelectiveConfig = {};
   public total = 0;
   public completed = 0;
   public completePercentage: string;
-  public tsgDownloadServiceMsg: string;
   public downloadMsg = "Download";
   public isDownloading = false;
   public urlsArray =[];
@@ -52,6 +49,7 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
     this.downloadMsg = "Download";
     this.isDownloading = false;
   }
+
   /**
    * Start to sync TSGFiles download one by one.
    * use downloadOneCompletBS message to sync the downloading progress one by one.
@@ -147,6 +145,5 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
     this.downloadMsg = "Downloading...";
     this.nvclBoreholeAnalyticService.setUserEmail(this.tsgform.email);
   }
-
 
 }

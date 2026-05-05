@@ -1,17 +1,24 @@
 <div class="grace-advancedfilter">
     <div class="row">
         <!-- Time series graphs -->
-        <div ngbDropdown>
-            <button style="margin-left:0px;" class="btn btn-sm btn-primary" type="button" [disabled]="!layerAdded()" ngbDropdownToggle><em class="fa fa-chart-line"></em>&nbsp;Time Series</button>
-            <div ngbDropdownMenu>
-                <button ngbDropdownItem (click)="selectGraceDataPoint()">
-                    <em class="fa fa-map-marker"></em>&nbsp;Select Mascon Point
-                </button>
-                <button ngbDropdownItem (click)="selectGraceDataPolygon()">
-                    <em class="fa fa-edit"></em>&nbsp;Select Mascon Region
-                </button>
-            </div>
-        </div>
+      <button
+          type="button"
+          class="btn btn-sm btn-primary"
+          [disabled]="!layerAdded()"
+          [matMenuTriggerFor]="timeSeriesMenu">
+          <em class="fa fa-chart-line"></em>&nbsp;Time Series
+      </button>
+      <mat-menu #timeSeriesMenu="matMenu">
+        <button mat-menu-item (click)="selectGraceDataPoint()">
+          <em class="fa fa-map-marker"></em>&nbsp;
+          Select Mascon Point
+        </button>
+
+        <button mat-menu-item (click)="selectGraceDataPolygon()">
+          <em class="fa fa-edit"></em>&nbsp;
+          Select Mascon Region
+        </button>
+      </mat-menu>
     </div>
     <div class="row">
         <div class="style-form">

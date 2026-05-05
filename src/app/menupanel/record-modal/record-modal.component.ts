@@ -1,5 +1,5 @@
 import { Component, Input, ViewChild, OnInit, inject } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { MatDialogRef } from '@angular/material/dialog';
 import { CSWRecordModel } from '../../lib/portal-core-ui/model/data/cswrecord.model';
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 import { LayerStatusService } from '../../lib/portal-core-ui/utility/layerstatus.service';
@@ -14,7 +14,7 @@ import { CesiumMapPreviewComponent } from '../common/infopanel/cesiummappreview/
 })
 export class RecordModalComponent implements OnInit {
   layerStatus = inject(LayerStatusService);
-  activeModal = inject(NgbActiveModal);
+  dialogRef = inject(MatDialogRef<RecordModalComponent>);
 
   @Input() cswRecords: CSWRecordModel[];
   @Input() layer: LayerModel;
