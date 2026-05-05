@@ -10,10 +10,7 @@ import { LayerHandlerService } from '../cswrecords/layer-handler.service';
 import { MapsManagerService } from '@auscope/angular-cesium';
 import { ResourceType } from '../../utility/constants.service';
 import { RenderStatusService } from '../cesium-map/renderstatus/render-status.service';
-
-// NB: Cannot use "import { XXX, YYY, ZZZ, Color } from 'cesium';" - it prevents initialising ContextLimits.js properly
-// which causes a 'DeveloperError' when trying to draw the KML
-declare let Cesium;
+import { Cartesian2, Color, DistanceDisplayCondition, HeightReference, HorizontalOrigin, KmlDataSource, LabelGraphics, LabelStyle, NearFarScalar, PointGraphics } from 'cesium';
 
 /**
  * Use Cesium to add layer to map. This service class adds IRIS layer to the map
@@ -32,30 +29,30 @@ export class CsIrisService {
     maxDist: number;
     color: any;
   }[] = [
-      { layerId: 'seismology-in-schools-site', maxDist: 8000000.0, color: Cesium.Color.PURPLE },
-      { layerId: 'seismology-skippy', maxDist: 8000000.0, color: Cesium.Color.AQUAMARINE },
-      { layerId: 'seismology-kimba97', maxDist: 3000000.0, color: Cesium.Color.BROWN },
-      { layerId: 'seismology-kimba98', maxDist: 3000000.0, color: Cesium.Color.CADETBLUE },
-      { layerId: 'seismology-wacraton', maxDist: 3000000.0, color: Cesium.Color.CHARTREUSE },
-      { layerId: 'seismology-seal', maxDist: 1500000.0, color: Cesium.Color.CORAL },
-      { layerId: 'seismology-seal2', maxDist: 1500000.0, color: Cesium.Color.CORNFLOWERBLUE },
-      { layerId: 'seismology-seal3', maxDist: 1500000.0, color: Cesium.Color.DARKCYAN },
-      { layerId: 'seismology-capral', maxDist: 3000000.0, color: Cesium.Color.DARKMAGENTA },
-      { layerId: 'seismology-soc', maxDist: 3000000.0, color: Cesium.Color.DARKORANGE },
-      { layerId: 'seismology-gawler', maxDist: 1500000.0, color: Cesium.Color.DARKORCHID },
-      { layerId: 'seismology-bilby', maxDist: 3000000.0, color: Cesium.Color.THISTLE },
-      { layerId: 'seismology-curnamona', maxDist: 1500000.0, color: Cesium.Color.DARKSALMON },
-      { layerId: 'seismology-minq', maxDist: 3000000.0, color: Cesium.Color.DARKSEAGREEN },
-      { layerId: 'seismology-eal1', maxDist: 1500000.0, color: Cesium.Color.DEEPPINK },
-      { layerId: 'seismology-eal2', maxDist: 1500000.0, color: Cesium.Color.DIMGRAY },
-      { layerId: 'seismology-eal3', maxDist: 1500000.0, color: Cesium.Color.GOLDENROD },
-      { layerId: 'seismology-bass', maxDist: 3000000.0, color: Cesium.Color.GREENYELLOW },
-      { layerId: 'seismology-sqeal', maxDist: 1500000.0, color: Cesium.Color.HOTPINK },
-      { layerId: 'seismology-aq3', maxDist: 1500000.0, color: Cesium.Color.LIGHTBLUE },
-      { layerId: 'seismology-aqt', maxDist: 1500000.0, color: Cesium.Color.BURLYWOOD },
-      { layerId: 'seismology-banda', maxDist: 3000000.0, color: Cesium.Color.MEDIUMPURPLE },
-      { layerId: 'seismology-asr', maxDist: 8000000.0, color: Cesium.Color.BLUE },
-      { layerId: 'seismology-marla-line', maxDist: 3000000.0, color: Cesium.Color.ORCHID },];
+      { layerId: 'seismology-in-schools-site', maxDist: 8000000.0, color: Color.PURPLE },
+      { layerId: 'seismology-skippy', maxDist: 8000000.0, color: Color.AQUAMARINE },
+      { layerId: 'seismology-kimba97', maxDist: 3000000.0, color: Color.BROWN },
+      { layerId: 'seismology-kimba98', maxDist: 3000000.0, color: Color.CADETBLUE },
+      { layerId: 'seismology-wacraton', maxDist: 3000000.0, color: Color.CHARTREUSE },
+      { layerId: 'seismology-seal', maxDist: 1500000.0, color: Color.CORAL },
+      { layerId: 'seismology-seal2', maxDist: 1500000.0, color: Color.CORNFLOWERBLUE },
+      { layerId: 'seismology-seal3', maxDist: 1500000.0, color: Color.DARKCYAN },
+      { layerId: 'seismology-capral', maxDist: 3000000.0, color: Color.DARKMAGENTA },
+      { layerId: 'seismology-soc', maxDist: 3000000.0, color: Color.DARKORANGE },
+      { layerId: 'seismology-gawler', maxDist: 1500000.0, color: Color.DARKORCHID },
+      { layerId: 'seismology-bilby', maxDist: 3000000.0, color: Color.THISTLE },
+      { layerId: 'seismology-curnamona', maxDist: 1500000.0, color: Color.DARKSALMON },
+      { layerId: 'seismology-minq', maxDist: 3000000.0, color: Color.DARKSEAGREEN },
+      { layerId: 'seismology-eal1', maxDist: 1500000.0, color: Color.DEEPPINK },
+      { layerId: 'seismology-eal2', maxDist: 1500000.0, color: Color.DIMGRAY },
+      { layerId: 'seismology-eal3', maxDist: 1500000.0, color: Color.GOLDENROD },
+      { layerId: 'seismology-bass', maxDist: 3000000.0, color: Color.GREENYELLOW },
+      { layerId: 'seismology-sqeal', maxDist: 1500000.0, color: Color.HOTPINK },
+      { layerId: 'seismology-aq3', maxDist: 1500000.0, color: Color.LIGHTBLUE },
+      { layerId: 'seismology-aqt', maxDist: 1500000.0, color: Color.BURLYWOOD },
+      { layerId: 'seismology-banda', maxDist: 3000000.0, color: Color.MEDIUMPURPLE },
+      { layerId: 'seismology-asr', maxDist: 8000000.0, color: Color.BLUE },
+      { layerId: 'seismology-marla-line', maxDist: 3000000.0, color: Color.ORCHID },];
 
   /**
    * Retrieves station details including the channel information from the IRIS service
@@ -189,27 +186,27 @@ export class CsIrisService {
   private styleIrisEntity(entity) {
     if (entity.name) {
       // Style label for each point
-      entity.label = new Cesium.LabelGraphics({
+      entity.label = new LabelGraphics({
         text: entity.name,
         showBackground: false,
-        fillColor: Cesium.Color.BLACK,
+        fillColor: Color.BLACK,
         font: '12px roboto,sans-serif',
-        style: Cesium.LabelStyle.FILL,
-        pixelOffset: new Cesium.Cartesian2(9, -2),
-        horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
-        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(1.0, entity.maxDist),
+        style: LabelStyle.FILL,
+        pixelOffset: new Cartesian2(9, -2),
+        horizontalOrigin: HorizontalOrigin.LEFT,
+        distanceDisplayCondition: new DistanceDisplayCondition(1.0, entity.maxDist),
         disableDepthTestDistance: Number.POSITIVE_INFINITY
       });
       // Style point in purple
-      entity.point = new Cesium.PointGraphics({
+      entity.point = new PointGraphics({
         color: entity.color,
-        outlineColor: Cesium.Color.WHITE,
+        outlineColor: Color.WHITE,
         outlineWidth: 2,
         pixelSize: 8,
         disableDepthTestDistance: Number.POSITIVE_INFINITY,
-        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(1.0, 8000000.0),
-        heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
-        scaleByDistance: new Cesium.NearFarScalar(1.5e2, 0.35, 1.5e7, 0.35),
+        distanceDisplayCondition: new DistanceDisplayCondition(1.0, 8000000.0),
+        heightReference: HeightReference.RELATIVE_TO_GROUND,
+        scaleByDistance: new NearFarScalar(1.5e2, 0.35, 1.5e7, 0.35),
       });
       // Don't display a billboard
       // entity.billboard = null;
@@ -243,13 +240,13 @@ export class CsIrisService {
         };
         const stylefn = (entity: any) => me.styleIrisEntity(entity);
         // Create data source
-        const source = new Cesium.KmlDataSource(options);
+        const source = new KmlDataSource(options);
 
         // Load KML
         const selectedLayer = this.irisLayers.find(l => l.layerId === layer.id);
         source.load(dom).then(function (dataSource) {
           for (const entity of dataSource.entities.values) {
-            entity['color'] = selectedLayer ? selectedLayer.color : Cesium.Color.CRIMSON;
+            entity['color'] = selectedLayer ? selectedLayer.color : Color.CRIMSON;
             entity['maxDist'] = selectedLayer ? selectedLayer.maxDist : 8000000.0;
             // Style each KML point
             stylefn(entity);

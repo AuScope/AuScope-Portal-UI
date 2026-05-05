@@ -10,8 +10,8 @@ import { LayerModel } from '../model/data/layer.model';
 import proj4 from "proj4";
 import epsg from "epsg-index/all.json";
 import { EpsgEntry } from "../types/epsg";
+import { Ellipsoid } from 'cesium';
 declare function unescape(s: string): string;
-declare let Cesium;
 
 /**
  * Port over from old portal-core extjs for dealing with xml in wfs
@@ -523,8 +523,8 @@ export class UtilitiesService {
         const point2 = points[1].getPosition();
 
         // reproject to WGS84
-        const reprojectedPoint1 = Cesium.Ellipsoid.WGS84.cartesianToCartographic(point1);
-        const reprojectedPoint2 = Cesium.Ellipsoid.WGS84.cartesianToCartographic(point2);
+        const reprojectedPoint1 = Ellipsoid.WGS84.cartesianToCartographic(point1);
+        const reprojectedPoint2 = Ellipsoid.WGS84.cartesianToCartographic(point2);
         // convert radians to degrees
         if (reprojectedPoint1.longitude > reprojectedPoint2.longitude) {
             bbox.eastBoundLongitude = reprojectedPoint1.longitude * 180 / Math.PI;

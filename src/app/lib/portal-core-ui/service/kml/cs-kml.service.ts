@@ -12,10 +12,7 @@ import { ResourceType } from '../../utility/constants.service';
 import { RenderStatusService } from '../cesium-map/renderstatus/render-status.service';
 import { KMLDocService } from './kml.service';
 import { UtilitiesService } from '../../utility/utilities.service';
-
-// NB: Cannot use "import { XXX, YYY, ZZZ, Color } from 'cesium';" - it prevents initialising ContextLimits.js properly
-// which causes a 'DeveloperError' when trying to draw the KML
-declare let Cesium;
+import { KmlDataSource } from 'cesium';
 
 /**
  * Use Cesium to add layer to map. This service class adds KML layer to the map
@@ -60,7 +57,7 @@ export class CsKMLService {
     // Remove from cancelled layer list (if present)
     this.cancelledLayers = this.cancelledLayers.filter(l => l !== layer.id);
 
-    let kmlOnlineResources: OnlineResourceModel[];
+    let kmlOnlineResources: OnlineResourceModel[] = [];
 
     if (UtilitiesService.layerContainsResourceType(layer, ResourceType.KML)) {
       kmlOnlineResources = this.layerHandlerService.getOnlineResources(layer, ResourceType.KML);
@@ -82,7 +79,7 @@ export class CsKMLService {
       this.renderStatusService.addResource(layer, onlineResource);
 
       // Create data source
-      const source = new Cesium.KmlDataSource(options);
+      const source = new KmlDataSource(options);
       // Add an event to tell us when loading is finished
       source.loadingEvent.addEventListener((evt, isLoading: boolean) => {
         if (!isLoading) {
@@ -97,7 +94,7 @@ export class CsKMLService {
       if (layer.kmlDoc) {
         source.load(layer.kmlDoc).then(dataSource => {
           if (this.cancelledLayers.indexOf(layer.id) === -1) {
-            viewer.dataSources.add(dataSource).then(dataSrc => {
+            viewer.dataSources.add(dataSource).then((dataSrc: any) => {
               layer.csLayers.push(dataSrc);
               this.incrementLayersAdded(layer, 1);
             });
@@ -111,7 +108,7 @@ export class CsKMLService {
         if (UtilitiesService.layerContainsResourceType(layer, ResourceType.KMZ)) {
           // add KMZ to map
           source.load(onlineResource.url).then(dataSource => {
-            viewer.dataSources.add(dataSource).then(dataSrc => {
+            viewer.dataSources.add(dataSource).then((dataSrc: any) => {
               layer.csLayers.push(dataSrc);
               this.incrementLayersAdded(layer, kmlOnlineResources.length);
             });
@@ -124,7 +121,7 @@ export class CsKMLService {
             const doc = parser.parseFromString(response, 'text/xml');
             source.load(doc).then(dataSource => {
               if (this.cancelledLayers.indexOf(layer.id) === -1) {
-                viewer.dataSources.add(dataSource).then(dataSrc => {
+                viewer.dataSources.add(dataSource).then((dataSrc: any) => {
                   layer.csLayers.push(dataSrc);
                   this.incrementLayersAdded(layer, kmlOnlineResources.length);
                 });
@@ -149,6 +146,9 @@ export class CsKMLService {
    * @param totalLayers total number of layers for LayerModel
    */
   private incrementLayersAdded(layer: LayerModel, totalLayers: number) {
+    if (!this.numberOfResourcesAdded.get(layer.id)) {
+      this.numberOfResourcesAdded.set(layer.id, 0);
+    }
     this.numberOfResourcesAdded.set(layer.id, this.numberOfResourcesAdded.get(layer.id) + 1);
     if (this.numberOfResourcesAdded.get(layer.id) === totalLayers) {
       this.cancelledLayers = this.cancelledLayers.filter(l => l !== layer.id);

@@ -4,12 +4,10 @@ import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { EditActions, MapsManagerService, PolygonEditorObservable, PolygonEditUpdate, PolygonsEditorService,
          RectangleEditorObservable, RectanglesEditorService } from '@auscope/angular-cesium';
-import { Camera, Cartesian2, Cartesian3, Color, ColorMaterialProperty, Ellipsoid, SceneMode, ScreenSpaceEventHandler,
+import { Camera, Cartesian2, Cartesian3, Color, ColorMaterialProperty, Ellipsoid, Math as CesiumMath, SceneMode, ScreenSpaceEventHandler,
          ScreenSpaceEventType, WebMercatorProjection } from 'cesium';
 import { LayerModel } from '../../model/data/layer.model';
 import { MapState } from '../../model/data/mapstate.model';
-
-declare let Cesium;
 
 /**
  * A wrapper around the cesium object for use in the portal.
@@ -106,14 +104,14 @@ export class CsMapObject {
     const viewer = this.mapsManagerService.getMap().getCesiumViewer();
     const width = viewer.canvas.width;
     const height = viewer.canvas.height;
-    const posWS = viewer.camera.pickEllipsoid(new Cesium.Cartesian2(1, height), Cesium.Ellipsoid.WGS84);
-    const posEN = viewer.camera.pickEllipsoid(new Cesium.Cartesian2(width, 1), Cesium.Ellipsoid.WGS84);
+    const posWS = viewer.camera.pickEllipsoid(new Cartesian2(1, height), Ellipsoid.WGS84);
+    const posEN = viewer.camera.pickEllipsoid(new Cartesian2(width, 1), Ellipsoid.WGS84);
     let distPerPixel = 0.01; // 1.11km
     if (posWS != null && posEN != null) {
       const cartographicWS = viewer.scene.globe.ellipsoid.cartesianToCartographic(posWS);
       const cartographicEN = viewer.scene.globe.ellipsoid.cartesianToCartographic(posEN);
-      const latDiff = Math.abs(Cesium.Math.toDegrees(cartographicWS.latitude) - Cesium.Math.toDegrees(cartographicEN.latitude)) ;
-      const lonDiff = Math.abs(Cesium.Math.toDegrees(cartographicWS.longitude) - Cesium.Math.toDegrees(cartographicEN.longitude)) ;
+      const latDiff = Math.abs(CesiumMath.toDegrees(cartographicWS.latitude) - CesiumMath.toDegrees(cartographicEN.latitude)) ;
+      const lonDiff = Math.abs(CesiumMath.toDegrees(cartographicWS.longitude) - CesiumMath.toDegrees(cartographicEN.longitude)) ;
       const latPerPixel = latDiff / height;
       const lonPerPixel = lonDiff / width;
       distPerPixel = (latPerPixel > lonPerPixel) ? latPerPixel : lonPerPixel;
@@ -130,8 +128,8 @@ export class CsMapObject {
     const viewer = this.mapsManagerService.getMap().getCesiumViewer();
     const width = viewer.canvas.width;
     const height = viewer.canvas.height;
-    const posWS = viewer.camera.pickEllipsoid(new Cesium.Cartesian2(1, height), Cesium.Ellipsoid.WGS84);
-    const posEN = viewer.camera.pickEllipsoid(new Cesium.Cartesian2(width, 1), Cesium.Ellipsoid.WGS84);
+    const posWS = viewer.camera.pickEllipsoid(new Cartesian2(1, height), Ellipsoid.WGS84);
+    const posEN = viewer.camera.pickEllipsoid(new Cartesian2(width, 1), Ellipsoid.WGS84);
 
     if (posWS != null && posEN != null) {
       const cartographicWS = viewer.scene.globe.ellipsoid.cartesianToCartographic(posWS);
@@ -181,7 +179,7 @@ export class CsMapObject {
     if (this.polygonEditable$) {
       this.clearPolygon();
     }
-    const polygon = Cesium.Cartesian3.fromDegreesArray(coordsArray); // [-115.0, 37.0, -107.0, 33.0]);
+    const polygon = Cartesian3.fromDegreesArray(coordsArray); // [-115.0, 37.0, -107.0, 33.0]);
     this.polygonEditable$ = this.polygonsCesiumEditor.edit(polygon);
     this.polygonEditable$.disable();
     this.isDrawingPolygonBS.next(false);
@@ -285,8 +283,8 @@ export class CsMapObject {
       const ellipsoid = viewer.scene.globe.ellipsoid;
       const cartesian = viewer.camera.pickEllipsoid(mousePosition, ellipsoid);
       const cartographic = ellipsoid.cartesianToCartographic(cartesian);
-      const lon = Cesium.Math.toDegrees(cartographic.longitude);
-      const lat = Cesium.Math.toDegrees(cartographic.latitude);
+      const lon = CesiumMath.toDegrees(cartographic.longitude);
+      const lat = CesiumMath.toDegrees(cartographic.latitude);
       element.style.cursor = 'default';
       handler.destroy();
       const point: Point = {

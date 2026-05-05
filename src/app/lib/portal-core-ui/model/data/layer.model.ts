@@ -47,4 +47,7 @@ export class LayerModel {
   minScaleDenominator?: number; // MinScaleDenominator (from GetCapabilities)
   maxScaleDenominator?: number; // MaxScaleDenominator (from GetCapabilities)
   stylefn?: any; //style function for GeoJson layer
+  apikey: string = ""; // API type for custom layers (e.g. "VMF", "GeoJSON")
+  maps: string = ""; // Maps to query for custom layers (e.g. "territories" for VMF)
+  geojson: any; // GeoJSON data for custom layers (e.g. VMF)
 }
