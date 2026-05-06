@@ -327,7 +327,7 @@ export class CsWMSService {
     const wmsOnlineResources = this.layerHandlerService.getWMSResource(layer);
 
     for (const wmsOnlineResource of wmsOnlineResources) {
-      if (UtilitiesService.filterProviderSkip(param.optionalFilters, wmsOnlineResource.url)) {
+      if (UtilitiesService.filterProviderSkip(param.optionalFilters, wmsOnlineResource.url, layer.id)) {
         this.renderStatusService.skip(layer, wmsOnlineResource);
         continue;
       }
@@ -611,4 +611,3 @@ MyDefaultProxy.prototype.getURL = function (resource) {
   const prefix = this.proxy.indexOf('?') === -1 ? '?' : '';
   return this.proxy + prefix + resource;
 };
-
