@@ -53,7 +53,7 @@ export class CsKMLService {
    * @param layer the KML layer to add to the map
    * @param param parameters for the KML layer
    */
-  public async addLayer(layer: LayerModel, _param?: any): Promise<void> {
+  public addLayer(layer: LayerModel, _param?: any) {
     // Remove from cancelled layer list (if present)
     this.cancelledLayers = this.cancelledLayers.filter(l => l !== layer.id);
 
@@ -92,9 +92,9 @@ export class CsKMLService {
       // note: KML and KMZ, loaded either from a local file or url now have
       // a layer.kmlDoc entry - so some of the following code is redundant
       if (layer.kmlDoc) {
-        await source.load(layer.kmlDoc).then(dataSource => {
+        void source.load(layer.kmlDoc).then(dataSource => {
           if (this.cancelledLayers.indexOf(layer.id) === -1) {
-            viewer.dataSources.add(dataSource).then((dataSrc: any) => {
+            void viewer.dataSources.add(dataSource).then((dataSrc: any) => {
               layer.csLayers.push(dataSrc);
               this.incrementLayersAdded(layer, 1);
             });
@@ -107,8 +107,8 @@ export class CsKMLService {
 
         if (UtilitiesService.layerContainsResourceType(layer, ResourceType.KMZ)) {
           // add KMZ to map
-          await source.load(onlineResource.url).then(dataSource => {
-            viewer.dataSources.add(dataSource).then((dataSrc: any) => {
+          void source.load(onlineResource.url).then(dataSource => {
+            void viewer.dataSources.add(dataSource).then((dataSrc: any) => {
               layer.csLayers.push(dataSrc);
               this.incrementLayersAdded(layer, kmlOnlineResources.length);
             });
@@ -116,12 +116,12 @@ export class CsKMLService {
 
         } else {
           // Add KML to map
-          this.getKMLFeature(onlineResource.url).subscribe(async response => {
+          this.getKMLFeature(onlineResource.url).subscribe(response => {
             const parser = new DOMParser();
             const doc = parser.parseFromString(response, 'text/xml');
-            await source.load(doc).then(dataSource => {
+            void source.load(doc).then(dataSource => {
               if (this.cancelledLayers.indexOf(layer.id) === -1) {
-                viewer.dataSources.add(dataSource).then((dataSrc: any) => {
+                void viewer.dataSources.add(dataSource).then((dataSrc: any) => {
                   layer.csLayers.push(dataSrc);
                   this.incrementLayersAdded(layer, kmlOnlineResources.length);
                 });

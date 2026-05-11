@@ -228,7 +228,7 @@ export class CsIrisService {
       this.renderStatusService.addResource(layer, onlineResource);
 
       // Get KML from the proxy/conversion service
-      this.getKMLFeature(layer).subscribe(async response => {
+      this.getKMLFeature(layer).subscribe(response => {
         const parser = new DOMParser();
         const dom = parser.parseFromString(response, "application/xml");
 
@@ -244,7 +244,7 @@ export class CsIrisService {
 
         // Load KML
         const selectedLayer = this.irisLayers.find(l => l.layerId === layer.id);
-        await source.load(dom).then(function (dataSource) {
+        void source.load(dom).then(function (dataSource) {
           for (const entity of dataSource.entities.values) {
             entity['color'] = selectedLayer ? selectedLayer.color : Color.CRIMSON;
             entity['maxDist'] = selectedLayer ? selectedLayer.maxDist : 8000000.0;
@@ -255,10 +255,12 @@ export class CsIrisService {
           viewer.dataSources.add(dataSource).then(dataSrc => {
             layer.csLayers.push(dataSrc);
           });
+        }).then(() => {
+          // Tell UI that we have completed updating the map
+          me.renderStatusService.updateComplete(layer, onlineResource);
+        }).catch(() => {
+          me.renderStatusService.updateComplete(layer, onlineResource, true);
         });
-
-        // Tell UI that we have completed updating the map
-        me.renderStatusService.updateComplete(layer, onlineResource);
       },
         _err => {
           me.renderStatusService.updateComplete(layer, onlineResource, true);
