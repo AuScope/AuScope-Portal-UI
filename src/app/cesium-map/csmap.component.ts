@@ -30,7 +30,6 @@ import { NVCLBoreholeAnalyticService } from 'app/modalwindow/layeranalytic/nvcl/
 import { OnlineResourceModel } from 'app/lib/portal-core-ui/model/data/onlineresource.model';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
-declare let Cesium: any;
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 declare let rudderanalytics: any;
 
@@ -134,10 +133,10 @@ export class CsMapComponent implements AfterViewInit {
       if (!scene.pickPositionSupported) {
         window.alert('This browser does not support pickPosition.');
       }
-      const handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+      const handler = new ScreenSpaceEventHandler(scene.canvas);
       handler.setInputAction((movement) => {
         this.csMapObject.processClick(movement);
-      }, Cesium.ScreenSpaceEventType.LEFT_UP);
+      }, ScreenSpaceEventType.LEFT_UP);
 
       // Speed up map loading by disabling the loading of ancestor tiles
       viewer.scene.globe.preloadAncestors = false;
@@ -152,15 +151,15 @@ export class CsMapComponent implements AfterViewInit {
         this.ngZone.run(() => {
           if (cartesian) {
             const cartographic = ellipsoid.cartesianToCartographic(cartesian);
-            this.mouseLongitude = Cesium.Math.toDegrees(cartographic.longitude).toFixed(5);
-            this.mouseLatitude = Cesium.Math.toDegrees(cartographic.latitude).toFixed(5);
+            this.mouseLongitude = Math.toDegrees(cartographic.longitude).toFixed(5);
+            this.mouseLatitude = Math.toDegrees(cartographic.latitude).toFixed(5);
             //const elev = viewer.scene.globe.getHeight(cartographic); // In case we need 3D
           } else {
             this.mouseLongitude = undefined;
             this.mouseLatitude = undefined;
           }
         });
-      }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+      }, ScreenSpaceEventType.MOUSE_MOVE);
 
       // Look at Australia
       viewer.camera.setView({
@@ -314,8 +313,8 @@ export class CsMapComponent implements AfterViewInit {
       // Convert radians to degrees
       const longitudeLatitudeProjectedScratch = new Cartesian3();
       if (provider.tilingScheme.projection instanceof GeographicProjection) {
-        longitudeLatitudeProjectedScratch.x = Cesium.Math.toDegrees(clickCartographic.longitude);
-        longitudeLatitudeProjectedScratch.y = Cesium.Math.toDegrees(clickCartographic.latitude);
+        longitudeLatitudeProjectedScratch.x = Math.toDegrees(clickCartographic.longitude);
+        longitudeLatitudeProjectedScratch.y = Math.toDegrees(clickCartographic.latitude);
       } else {
         console.error('error:csmap: Cannot project');
         continue
