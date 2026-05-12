@@ -218,7 +218,7 @@ export class UtilitiesService {
      * @param params - filter parameter
      * @param url - the url of the resource we are matching
      */
-    public static filterProviderSkip(params: any, url: string): boolean {
+    public static filterProviderSkip(params: any, url: string, layerId?: string): boolean {
         let containProviderFilter = false;
         let urlMatch = false;
         let idx;
@@ -235,12 +235,88 @@ export class UtilitiesService {
             }
         }
 
+        if (layerId && this.hasUnsupportedProviderFilters(layerId, url, params)) {
+            return true;
+        }
+
         if (containProviderFilter && !urlMatch) {
             return true;
         } else {
             return false;
         }
 
+    }
+
+    private static getErlProviderFilterOverrides(layerId: string, url: string): any {
+        const providerOverrides = config.erlProviderFilterOverrides?.[layerId];
+        if (!providerOverrides?.length || !url) {
+            return null;
+        }
+
+        const matchingOverride = providerOverrides.find(entry => url.includes(entry.url));
+        return matchingOverride?.filterOverrides || null;
+    }
+
+    private static filterHasSelectedValue(filter: any): boolean {
+        if (!filter || filter.type === 'OPTIONAL.PROVIDER') {
+            return false;
+        }
+
+        if (Array.isArray(filter.value)) {
+            return filter.value.length > 0;
+        }
+
+        return filter.value !== null && filter.value !== undefined && filter.value !== '';
+    }
+
+    private static hasUnsupportedProviderFilters(layerId: string, url: string, optionalFilters: any[]): boolean {
+        const providerOverrides = this.getErlProviderFilterOverrides(layerId, url);
+        if (!providerOverrides || !optionalFilters?.length) {
+            return false;
+        }
+
+        return optionalFilters.some(filter => {
+            if (!this.filterHasSelectedValue(filter) || !filter.label) {
+                return false;
+            }
+
+            const override = providerOverrides[filter.label];
+            return override?.enabled === false;
+        });
+    }
+
+    private static applyProviderFilterOverrides(layer: LayerModel, onlineResource: OnlineResourceModel, optionalFilters: any[]): any[] {
+        if (!optionalFilters?.length) {
+            return optionalFilters;
+        }
+
+        const providerOverrides = this.getErlProviderFilterOverrides(layer?.id, onlineResource?.url);
+        if (!providerOverrides) {
+            return optionalFilters;
+        }
+
+        return optionalFilters.reduce((filters, filter) => {
+            if (!filter?.label) {
+                filters.push(filter);
+                return filters;
+            }
+
+            const override = providerOverrides[filter.label];
+            if (override?.enabled === false) {
+                return filters;
+            }
+
+            if (override?.xpath) {
+                filters.push({
+                    ...filter,
+                    xpath: override.xpath
+                });
+                return filters;
+            }
+
+            filters.push(filter);
+            return filters;
+        }, []);
     }
 
     /**
@@ -445,6 +521,8 @@ export class UtilitiesService {
           break;
         }
       }
+
+      param.optionalFilters = this.applyProviderFilterOverrides(layer, onlineResource, param.optionalFilters);
 
       // Set up time extents, if supplied and not already present
       if (!param.time && layer.capabilityRecords?.length > 0) {
