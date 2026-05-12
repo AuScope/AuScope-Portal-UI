@@ -11,6 +11,7 @@ import proj4 from "proj4";
 import epsg from "epsg-index/all.json";
 import { EpsgEntry } from "../types/epsg";
 import { Ellipsoid } from 'cesium';
+import { config } from '../../../../environments/config';
 declare function unescape(s: string): string;
 
 /**
