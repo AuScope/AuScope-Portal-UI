@@ -398,7 +398,8 @@ export class GetCapsService {
         childRecords: [],
         date: '',
         minScale: null,
-        maxScale: null
+        maxScale: null,
+        layerSRS: layerSRS
       });
 
       // Only add one GetCapabilities object
