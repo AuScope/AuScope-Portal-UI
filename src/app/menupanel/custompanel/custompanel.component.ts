@@ -567,12 +567,52 @@ export class CustomPanelComponent {
   }
 
   /**
+   * check the coordinate referen system for the layer, if present it will be in the cswRecords[0]
+   * CRS:1 in Web Map Service (WMS) is a non-geospatial, cartesian coordinate reference system defined
+   * in WMS 1.3.0, used for displaying imagery without real-world geographic coordinates. It works in 
+   * pixel-space, often with the y-axis pointing down, mapping 1 unit to 1 pixel, and is ideal for plotting
+   * non-georeferenced images.
+   * 
+   * if found then the layer is a non-earth image, which is currently not supported
+  */
+  private isImage(layer:  LayerModel) : boolean {
+    let imageLayer : boolean = false;
+
+    if (layer.cswRecords[0].layerSRS.length > 0) {
+        layer.cswRecords[0].layerSRS.forEach((srs) => {
+          if (srs.toLowerCase() === "crs:1") {
+            imageLayer = true;
+          }
+        });
+    } else {
+      if (layer.capabilityRecords[0].layerSRS.toLowerCase() === "crs:1") {
+            imageLayer = true;
+      }
+    }
+    return imageLayer;
+  }
+
+  /**
    * Add a KML layer to the map
    *
    * @param layer the KML LayerModel
    */
   public addLayer(layer: LayerModel) {
-    this.layerManagerService.addLayer(layer, [], null, null);
+    let imageLayer : boolean = false;
+
+    if (layer.cswRecords[0] && layer.cswRecords[0].layerSRS && layer.cswRecords[0].layerSRS.length > 0) {
+        layer.cswRecords[0].layerSRS.forEach((srs) => {
+          if (srs.toLowerCase() === "crs:1") {
+            imageLayer = true;
+          }
+        });
+    }
+    if (!imageLayer) {
+      if (layer.cswRecords[0] && layer.cswRecords[0].layerSRS) {
+        layer.capabilityRecords[0].layerSRS = layer.cswRecords[0].layerSRS;
+      }
+      this.layerManagerService.addLayer(layer, [], null, null);
+    }
   }
 
   /**

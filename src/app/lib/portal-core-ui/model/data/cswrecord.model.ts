@@ -29,4 +29,5 @@ export class CSWRecordModel {
   expanded = false;
   temporalExtent?: TemporalExtentModel;
   knownLayerIds?: string[];
+  layerSRS: string[];
 }
