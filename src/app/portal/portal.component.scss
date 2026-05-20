@@ -1,11 +1,23 @@
 @use "../globals";
 @use "../../styles.scss";
 
-.auscope-tools-btn {
-    color: white;
-    transition: color 0.2s;
+#header {
+  --mat-button-text-label-text-color: white;
+  transition: color 0.2s;
 }
 
-.auscope-tools-btn:hover, .auscope-tools-btn:active, .auscope-tools-btn:focus {
-    color: white;
+#header .mdc-button,
+#header .mdc-icon-button {
+  position: relative;
+  z-index: 1;
+}
+
+#header .mdc-button__state-layer,
+#header .mdc-icon-button__state-layer {
+  z-index: -1;
+}
+
+.auscope-tools-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
 }

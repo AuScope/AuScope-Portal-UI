@@ -1,8 +1,6 @@
 
 import { Component, inject } from '@angular/core';
-import { BsModalRef } from 'ngx-bootstrap/modal';
-import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
-
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 
 @Component({
@@ -12,10 +10,9 @@ import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 })
 
 export class LayerAnalyticModalComponent {
-  bsModalRef = inject(BsModalRef);
+  dialogRef = inject(MatDialogRef<LayerAnalyticModalComponent>);
+  data = inject(MAT_DIALOG_DATA);
 
   public analyticMap;
-  public layer: LayerModel;
-
 
 }

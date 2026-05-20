@@ -1,6 +1,6 @@
 <div class="modal-header" style="background: #EEE">
   <h5 class="modal-title" id="exampleModalLongTitle">CSW Record Information</h5>
-  <button type="button" class="close" (click)="activeModal.dismiss('Cross click')" aria-label="Close">
+  <button type="button" class="close" (click)="dialogRef.close('Cross click')" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
@@ -63,5 +63,5 @@
   </div>
 
   <div class="modal-footer">
-    <button type="button" class="btn btn-light" (click)="activeModal.dismiss('Cross click')">Close</button>
+    <button type="button" class="btn btn-light" (click)="dialogRef.close('Cross click')">Close</button>
   </div>

@@ -449,6 +449,60 @@ export const config = {
         erlNamespace: "http://xmlns.earthresourceml.org/earthresourceml-lite/1.0"
     }
   ],
+  // Some ERL providers expose different filter field names or do not support
+  // all configured filters for a shared known layer.
+  erlProviderFilterOverrides: {
+    'erl-commodityresourceview': [
+      {
+        url: 'services.ga.gov.au',
+        filterOverrides: {
+          'Commodity': {
+            xpath: 'erl:commodity_uri'
+          },
+          'JORC Category': {
+            enabled: false
+          }
+        }
+      },
+      {
+        url: 'gs.geoscience.nsw.gov.au',
+        filterOverrides: {
+          'Mine Name': {
+            xpath: 'erl:mineralOccurrenceName'
+          },
+          'JORC Category': {
+            enabled: false
+          }
+        }
+      }
+    ],
+    'erl-mineraloccurrenceview': [
+      {
+        url: 'services.ga.gov.au',
+        filterOverrides: {
+          'Geologic Timescale': {
+            enabled: false
+          }
+        }
+      },
+      {
+        url: 'gs.geoscience.nsw.gov.au',
+        filterOverrides: {
+          'Geologic Timescale': {
+            enabled: false
+          }
+        }
+      },
+      {
+        url: 'sarigdata.pir.sa.gov.au',
+        filterOverrides: {
+          'Geologic Timescale': {
+            enabled: false
+          }
+        }
+      }
+    ]
+  },
   // Some services do not provide enough information to create citations or do not need it
   cannotCite: [
     "lithodat.com",

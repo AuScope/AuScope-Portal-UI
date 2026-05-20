@@ -20,7 +20,7 @@ import { Entity, ProviderViewModel, buildModuleUrl, OpenStreetMapImageryProvider
 import { UtilitiesService } from '../../utility/utilities.service';
 import { ImageryLayerCollection } from 'cesium';
 import { CsGeoJsonService } from '../geojson/cs-geojson.service';
-declare let Cesium: any;
+import * as Cesium from 'cesium';
 
 /**
  * Wrapper class to provide all things related to the drawing of polygons and bounding boxes in CesiumJS
@@ -65,6 +65,8 @@ export class CsMapService {
     mapEventManager.register(eventRegistration).subscribe((result) => {
       this.mapClickHandler(result);
     });
+    // Initialize basemap error handling
+    this.initializeBasemapLayers();
   }
 
   /**
@@ -120,17 +122,17 @@ export class CsMapService {
       const ellipsoid = viewer.scene.globe.ellipsoid;
       const cartesian = viewer.camera.pickEllipsoid(mousePosition, ellipsoid);
       const cartographic = ellipsoid.cartesianToCartographic(cartesian);
-      let lon = Cesium.Math.toDegrees(cartographic.longitude);
-      let lat = Cesium.Math.toDegrees(cartographic.latitude);
-      if (!Number(lat) || !Number(lon)) {
+      const lon = Cesium.Math.toDegrees(cartographic.longitude);
+      const lat = Cesium.Math.toDegrees(cartographic.latitude);
+      if (!Number.isFinite(lon) || !Number.isFinite(lat)) {
         return;
       }
+      const lonRounded = Math.round(lon * 1e5) / 1e5;
+      const latRounded = Math.round(lat * 1e5) / 1e5;
 
-      lon = Number.parseFloat(lon).toFixed(5);
-      lat = Number.parseFloat(lat).toFixed(5);
       const clickCoord = new WebMercatorProjection().project(cartographic);
       // Create a GeoJSON point
-      const clickPoint = point([lon, lat]);
+      const clickPoint = point([lonRounded, latRounded]);
       // Compile a list of clicked on layers
       const clickedLayerList: LayerModel[] = [];
 
@@ -540,6 +542,145 @@ export class CsMapService {
   }
 
   /**
+   * Switch to fallback provider for base layers
+   */
+  private switchToFallbackProvider() {
+    const viewer = this.getViewer();
+
+    // Remove all imagery layers to stop the broken provider from trying to load
+    viewer.imageryLayers.removeAll();
+
+    // Switch to National Map directly using fromUrl
+    ArcGisMapServerImageryProvider.fromUrl(
+      'https://services.ga.gov.au/gis/rest/services/NationalBaseMap/MapServer'
+    ).then((provider) => {
+      viewer.imageryLayers.addImageryProvider(provider);
+      console.log('Switched to National Map fallback');
+    }).catch((error) => {
+      console.error('Failed to load National Map fallback:', error);
+      // Last resort is OSM
+      const osmProvider = new OpenStreetMapImageryProvider({
+        url: 'https://tile.openstreetmap.org/'
+      });
+      viewer.imageryLayers.addImageryProvider(osmProvider);
+      console.log('Switched to OSM fallback');
+    });
+  }
+
+  /**
+   * Initialize the basemap layers with error handling.
+   * - If the provider can't fetch metadata (readyPromise rejects) -> fallback
+   * - If provider is "ready" but fails to return any level-0 tile quickly -> fallback
+   * - After the first tile succeeds, ignore later tile errors.
+   */
+  public initializeBasemapLayers() {
+    const viewer = this.getViewer();
+
+    // Try to confirm at least one level-0 tile quickly
+    const probeFirstTile = async (provider: any, timeoutMs = 1500): Promise<boolean> => {
+      const withTimeout = <T>(p: Promise<T>) =>
+        new Promise<T>((resolve, reject) => {
+          const t = setTimeout(() => reject(new Error('tile probe timeout')), timeoutMs);
+          p.then(v => { clearTimeout(t); resolve(v); })
+            .catch(e => {
+              clearTimeout(t);
+              reject(e instanceof Error ? e : new Error(String(e)));
+            });
+        });
+
+      // Some providers may throw synchronously if level/coords invalid – wrap each call
+      const probes: Promise<any>[] = [];
+      try { probes.push(withTimeout(provider.requestImage(0, 0, 0))); } catch { }
+      try { probes.push(withTimeout(provider.requestImage(1, 0, 0))); } catch { }
+      if (probes.length === 0) return false;
+
+      const results = await Promise.allSettled(probes);
+      // Succeed only if any probe fulfilled with a renderable image
+      return results.some(r => {
+        if (r.status !== 'fulfilled' || !r.value) return false;
+        const img: any = (r as any).value;
+        if (typeof HTMLImageElement !== 'undefined' && img instanceof HTMLImageElement) {
+          return (img.naturalWidth ?? 0) > 0 && (img.naturalHeight ?? 0) > 0;
+        }
+        if (typeof img?.width === 'number' && typeof img?.height === 'number') {
+          return img.width > 0 && img.height > 0; // ImageBitmap/Canvas-like
+        }
+        return true;
+      });
+    };
+
+    // Attach init-only guard to a base layer provider
+    const attachInitGuard = (layer: Cesium.ImageryLayer | undefined) => {
+      const provider: any = layer?.imageryProvider;
+      if (!provider) return;
+
+      let firstTileConfirmed = false;
+
+      const bailToFallback = () => {
+        if (firstTileConfirmed) return;
+        try { provider.errorEvent?.removeEventListener(onError); } catch { }
+        this.switchToFallbackProvider();
+      };
+
+      const onError = (_err: any) => {
+        // Before first tile success, treat errors as init failure
+        if (!firstTileConfirmed) bailToFallback();
+      };
+
+      provider.errorEvent?.addEventListener(onError);
+
+      const onReady = async () => {
+        try {
+          const ok = await probeFirstTile(provider, 1200);
+          if (ok) {
+            firstTileConfirmed = true;
+            try { provider.errorEvent?.removeEventListener(onError); } catch { }
+          } else {
+            bailToFallback();
+          }
+        } catch {
+          bailToFallback();
+        }
+      };
+
+      if (provider.ready) {
+        // Already ready – probe on next tick
+        setTimeout(() => void onReady(), 0);
+      } else if (provider.readyPromise && typeof provider.readyPromise.then === 'function') {
+        provider.readyPromise.then(onReady).catch(() => bailToFallback());
+      } else {
+        // No readiness signal – treat as failure
+        bailToFallback();
+      }
+    };
+
+    // Existing base layer at startup
+    if (viewer.imageryLayers.length > 0) {
+      const base0 = viewer.imageryLayers.get(0);
+      attachInitGuard(base0);
+    }
+
+    // When a new layer is added at index 0, attach the guard
+    viewer.imageryLayers.layerAdded.addEventListener((layer: Cesium.ImageryLayer, index: number) => {
+      if (index === 0) attachInitGuard(layer);
+    });
+
+    // If base layer is removed and nothing replaces it shortly, fail to fallback
+    viewer.imageryLayers.layerRemoved.addEventListener((_layer, index) => {
+      if (index === 0) {
+        setTimeout(() => {
+          if (viewer.imageryLayers.length === 0) this.switchToFallbackProvider();
+        }, 0);
+      }
+    });
+
+    // If nothing shows up at startup fall back
+    setTimeout(() => {
+      if (viewer.imageryLayers.length === 0) this.switchToFallbackProvider();
+    }, 1500);
+  }
+
+  /**
    * Create a list of base maps from the environment file
    */
   public createBaseMapLayers(): any[] {
@@ -552,10 +693,35 @@ export class CsMapService {
             iconUrl: buildModuleUrl('Widgets/Images/ImageryProviders/openStreetMap.png'),
             tooltip: layer.tooltip,
             creationFunction() {
-              return new OpenStreetMapImageryProvider({
-                url: 'https://tile.openstreetmap.org/',
-              });
+              try {
+                return new OpenStreetMapImageryProvider({
+                  url: 'https://tile.openstreetmap.org/',
+                });
+              } catch(err) {
+                console.error('Failed to create OSM imagery provider:', err);
+                return ArcGisMapServerImageryProvider.fromUrl('https://services.ga.gov.au/gis/rest/services/NationalBaseMap/MapServer');
+              }
             },
+          })
+        );
+      } else if (layer.layerType === 'GA') {
+        baseMapLayers.push(
+          new ProviderViewModel({
+            name: layer.viewValue,
+            iconUrl: 'extension/images/ImageryProviders/nationalMap.png',
+            tooltip: layer.tooltip,
+            creationFunction: async () => {
+              try {
+                return await ArcGisMapServerImageryProvider.fromUrl(
+                  'https://services.ga.gov.au/gis/rest/services/NationalBaseMap/MapServer'
+                );
+              } catch(err) {
+                console.error('Failed to create National Map imagery provider:', err);
+                return new OpenStreetMapImageryProvider({
+                  url: 'https://tile.openstreetmap.org/',
+                });
+              }
+            }
           })
         );
       } else if (layer.layerType === 'Bing' && this.env.hasOwnProperty('bingMapsKey') &&
@@ -582,14 +748,19 @@ export class CsMapService {
             name: layer.viewValue,
             iconUrl: buildModuleUrl('Widgets/Images/ImageryProviders/' + bingMapsIcon),
             tooltip: layer.tooltip,
-            creationFunction: async function() {
-              return await Cesium.BingMapsImageryProvider.fromUrl(
-                'https://dev.virtualearth.net',
-                {
-                  key: this.env.bingMapsKey,
-                  mapStyle: bingMapsStyle,
-                }
-              )
+            creationFunction: async () => {
+              try {
+                return await Cesium.BingMapsImageryProvider.fromUrl(
+                  'https://dev.virtualearth.net',
+                  {
+                    key: this.env.bingMapsKey,
+                    mapStyle: bingMapsStyle,
+                  }
+                )
+              } catch(err) {
+                console.error('Failed to create Bing imagery provider:', err);
+                return ArcGisMapServerImageryProvider.fromUrl('https://services.ga.gov.au/gis/rest/services/NationalBaseMap/MapServer');
+              }
             }
         }));
       } else if (layer.layerType === 'ESRI') {
@@ -630,10 +801,13 @@ export class CsMapService {
             name: layer.viewValue,
             iconUrl: Cesium.buildModuleUrl('Widgets/Images/ImageryProviders/' + esriIcon),
             tooltip: layer.tooltip,
-            creationFunction: async function() {
-              return await ArcGisMapServerImageryProvider.fromUrl(
-                esriUrl
-              );
+            creationFunction: async () => {
+              try {
+                return await ArcGisMapServerImageryProvider.fromUrl(esriUrl);
+              } catch (err) {
+                console.error('Failed to create ESRI imagery provider:', err);
+                return ArcGisMapServerImageryProvider.fromUrl('https://services.ga.gov.au/gis/rest/services/NationalBaseMap/MapServer');
+              }
             }
           })
         );

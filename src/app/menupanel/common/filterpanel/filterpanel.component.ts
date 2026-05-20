@@ -14,10 +14,10 @@ import * as _ from 'lodash';
 import { config } from '../../../../environments/config';
 import { ref } from '../../../../environments/ref';
 import { LayerAnalyticModalComponent } from '../../../modalwindow/layeranalytic/layer.analytic.modal.component';
-import { BsModalService } from 'ngx-bootstrap/modal';
 import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
 import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
+import { MatDialog } from '@angular/material/dialog';
 
 
 @Component({
@@ -34,7 +34,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
   layerManagerService = inject(LayerManagerService);
   filterService = inject(FilterService);
   filterPanelService = inject(FilterPanelService);
-  modalService = inject(BsModalService);
+  dialog = inject(MatDialog);
   csClipboardService = inject(CsClipboardService);
   csWMSService = inject(CsWMSService);
   csCSWService = inject(CsCSWService);
@@ -112,7 +112,10 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
     // Will fire when a layer is added and remove all existing panel filters
     if (changes.layer && changes.layer.currentValue) {
         setTimeout(() => {
-            this.refreshFilter();
+            const hasPreselectedOptionalFilters = !!this.layer?.filterCollection?.optionalFilters?.some(f => f.added === true);
+            if (!hasPreselectedOptionalFilters) {
+              this.refreshFilter();
+            }
         }, 0);
     }
   }
@@ -280,24 +283,21 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
    * Draw a polygon layer to map
    */
   public onApplyClipboardBBox(): void {
-
-    this.csClipboardService.polygonsBS.subscribe(polygon => {
-      if (polygon !== null && this.bApplyClipboardBBox) {
-        if (!UtilitiesService.isEmpty(polygon)) {
-          for (const optFilter of this.optionalFilters) {
-            if (optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
-              optFilter['value'] = polygon.coordinates;
-            }
-          }
-        }
-      } else {
-        for (const optFilter of this.optionalFilters) {
-          if (optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
-            optFilter['value'] = null;
-          }
+    const polygon = this.csClipboardService.polygonsBS.getValue();
+    if (polygon !== null && this.bApplyClipboardBBox && !UtilitiesService.isEmpty(polygon)) {
+      for (const optFilter of this.optionalFilters) {
+        if (optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
+          optFilter['value'] = polygon.coordinates;
         }
       }
-    });
+      return;
+    }
+
+    for (const optFilter of this.optionalFilters) {
+      if (optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
+        optFilter['value'] = null;
+      }
+    }
   }
 
   public getKey(options: object): string {
@@ -364,6 +364,10 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
     // For polygon filter make clipboard visible on map
     if (filter.type === 'OPTIONAL.POLYGONBBOX') {
       this.csClipboardService.toggleClipboard(true);
+      const polygon = this.csClipboardService.polygonsBS.getValue();
+      if (polygon && !UtilitiesService.isEmpty(polygon)) {
+        filter.value = polygon.coordinates;
+      }
     }
     // Initialise multiselect boolean filter's radio button
     if (filter.type === 'OPTIONAL.DROPDOWNSELECTLIST' && filter.multiSelect) {
@@ -388,10 +392,29 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
         if (filter['multiSelect']) {
           filter['boolOp'] = 'OR';
         }
+      } else if (filter['type'] === 'OPTIONAL.PROVIDER') {
+        if (filter['value']) {
+          for (const provider in filter['value']) {
+            if (Object.prototype.hasOwnProperty.call(filter['value'], provider)) {
+              filter['value'][provider] = false;
+            }
+          }
+        }
+      } else if (filter['type'] === 'OPTIONAL.POLYGONBBOX') {
+        filter['value'] = null;
+        this.csClipboardService.clearClipboard();
+      } else {
+        filter['value'] = null;
       }
       this.updateFilter(filter, false);
     }
+    this.optionalFilters = [];
     this.selectedFilter = {};
+
+    // Re-add layer as no more filters
+    if (this.layer) {
+      this.addLayer(this.layer);
+    }
   }
 
   /**
@@ -399,10 +422,14 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
    */
   public processLayerAnalytic(layer: LayerModel) {
     this.getNvclFilter(layer);
-    const bsModalRef = this.modalService.show(LayerAnalyticModalComponent, {
-      class: 'modal-lg'
+    this.dialog.open(LayerAnalyticModalComponent, {
+      width: '800px',
+      maxWidth: '800px',
+      height: '80vh',
+      data: {
+        layer: layer
+      }
     });
-    bsModalRef.content.layer = layer;
   }
 
   /**

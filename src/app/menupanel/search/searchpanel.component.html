@@ -17,24 +17,51 @@
         }
       </button>
     </div>
-    <div class="search-dropdown" ngbDropdown #suggesterDropdown="ngbDropdown">
+
+    <div class="search-dropdown">
       <!-- Search text field -->
-      <div>
-        <input type="text" class="form-control" #queryinput placeholder="Enter search term here..." [(ngModel)]="queryText" (keyup)="onKeyUp($event)" (keydown)="onKeyDown($event)" [disabled]="searching">
-        <!-- Clear query text button -->
-        @if (!searching && queryText && queryText !== '') {
-          <button class="clear-query-button" type="button" title="Clear search" (click)="clearQueryText()">&times;</button>
+      <div class="search-input-wrapper">
+        <input
+          matInput
+          type="text"
+          class="form-control search-input"
+          #queryinput
+          placeholder="Enter search term here..."
+          [(ngModel)]="queryText"
+          (keyup)="onKeyUp($event)"
+          (keydown)="onKeyDown($event)"
+          [disabled]="searching"
+          [matAutocomplete]="auto"
+        />
+        @if (!searching && queryText) {
+          <button
+            type="button"
+            class="btn clear-query-button"
+            (click)="clearQueryText()">
+            &times;
+          </button>
         }
       </div>
       <!-- Suggester -->
-      <div ngbDropdownMenu>
+      <mat-autocomplete
+        #auto="matAutocomplete"
+        (optionSelected)="suggestedTermSelected($event.option.value)">
+
         @for (term of suggestedTerms; track term; let i = $index) {
-          <div>
-            <button type="button" class="btn suggestion-button" (click)="suggestedTermSelected(term)" (mouseover)="highlightedSuggestionIndex=i" [ngStyle]="{'background-color': i !== highlightedSuggestionIndex ? 'white' : 'lightgray'}"> {{ term }} </button>
-          </div>
+          <mat-option
+            [value]="term"
+            (mouseenter)="highlightedSuggestionIndex = i"
+            [ngStyle]="{
+              'background-color':
+                i !== highlightedSuggestionIndex ? 'white' : 'lightgray'
+            }">
+            {{ term }}
+          </mat-option>
         }
-      </div>
+      </mat-autocomplete>
     </div>
+
+
     <div class="input-group-append">
       <!-- Search button -->
       @if (!searching) {
@@ -87,9 +114,9 @@
     <div class="options-panel">
       <div class="options-dropdowns">
         <!-- Search fields -->
-        <div ngbDropdown>
-          <button class="btn btn-sm btn-secondary" type="button" ngbDropdownToggle>{{ getSearchFieldTitle() }}</button>
-          <div ngbDropdownMenu class="advanced-options-panel">
+        <button class="btn btn-sm btn-secondary" type="button" [matMenuTriggerFor]="searchFieldsMenu">{{ getSearchFieldTitle() }}</button>
+        <mat-menu #searchFieldsMenu="matMenu">
+          <div class="advanced-options-panel" (click)="$event.stopPropagation()">
             <input type="checkbox" class="options-checkbox" [(ngModel)]="allSearchField.checked" (change)="allSearchFieldChange()">&nbsp;All
             @for (field of searchFields; track field) {
               <div>
@@ -97,11 +124,11 @@
               </div>
             }
           </div>
-        </div>
+        </mat-menu>
         <!-- Services -->
-        <div ngbDropdown>
-          <button class="btn btn-sm btn-secondary" type="button" ngbDropdownToggle>{{ getServicesTitle() }}</button>
-          <div ngbDropdownMenu class="advanced-options-panel">
+        <button class="btn btn-sm btn-secondary" type="button" [matMenuTriggerFor]="servicesMenu">{{ getServicesTitle() }}</button>
+        <mat-menu #servicesMenu="matMenu">
+          <div class="advanced-options-panel" (click)="$event.stopPropagation()">
             <input type="checkbox" class="options-checkbox" [(ngModel)]="allOGCServices.checked" (change)="allOGCServicesChange()">&nbsp;All
             @for (service of ogcServices; track service) {
               <div>
@@ -109,20 +136,20 @@
               </div>
             }
           </div>
-        </div>
+        </mat-menu>
         <!-- Spatial bounds -->
-        <div ngbDropdown #spatialOptionsDropdown="ngbDropdown">
-          <button class="btn btn-sm btn-secondary" type="button" ngbDropdownToggle>{{ getSpatialBoundsTitle() }}</button>
-          <div ngbDropdownMenu class="advanced-options-panel spatial-options-panel">
+        <button class="btn btn-sm btn-secondary" type="button" [matMenuTriggerFor]="spatialBoundsMenu">{{ getSpatialBoundsTitle() }}</button>
+        <mat-menu #spatialBoundsMenu="matMenu">
+          <div class="advanced-options-panel spatial-options-panel" (click)="$event.stopPropagation()">
             <input type="checkbox" class="options-checkbox" title="Toggle bounds restriction" [(ngModel)]="restrictBounds"><label><strong>Restrict Spatial Bounds</strong></label>
             <div style="display:flex;">
               <button type="button" class="btn btn-sm btn-primary" title="Draw bounds on map" (click)="drawBounds()">Draw Bounds</button>
               <button type="button" class="btn btn-sm btn-primary" title="Clear bounds from map" (click)="clearBounds()" [disabled]="!bbox">Clear Bounds</button>
             </div>
             <div>
-              <div ngbDropdown>
-                <button class="btn btn-sm btn-primary" type="button" title="How layers relate to bounds" ngbDropdownToggle>Relationship: {{ boundsRelationship }}</button>
-                <div ngbDropdownMenu style="padding:10px;">
+              <button class="btn btn-sm btn-primary" type="button" title="How layers relate to bounds" [matMenuTriggerFor]="boundsRelationshipMenu">Relationship: {{ boundsRelationship }}</button>
+              <mat-menu #boundsRelationshipMenu="matMenu">
+                <div style="padding:10px;" (click)="$event.stopPropagation()">
                   <input type="radio" id="intersects-relation" name="relationship-radio" value="Intersects" [(ngModel)]="boundsRelationship">
                   <label for="intersects-relation">&nbsp;Intersects</label><br>
                   <input type="radio" id="contains-relation" name="relationship-radio" value="Contains" [(ngModel)]="boundsRelationship">
@@ -130,8 +157,8 @@
                   <input type="radio" id="within-relation" name="relationship-radio" value="Within" [(ngModel)]="boundsRelationship">
                   <label for="within-relation">&nbsp;Within</label><br>
                 </div>
+              </mat-menu>
               </div>
-            </div>
             @if (bbox) {
               <div class="container">
                 <div class="row">
@@ -144,7 +171,7 @@
               </div>
             }
           </div>
-        </div>
+        </mat-menu>
         <!-- Reset advanced search options button -->
         <button style="margin-left:auto;margin-right:6px;" class="btn btn-sm btn-secondary" (click)="resetAdvancedSearch()"><i class="fa fa-ban"></i>&nbsp;Reset All</button>
       </div>
@@ -195,18 +222,13 @@
                   </div>
                 }
               </div>
-              @if (searchResults.length > resultsPerPage) {
-                <div class="pagination">
-                  <ngb-pagination [collectionSize]="searchResults.length" [(page)]="currentPage" [maxSize]="5" [pageSize]="resultsPerPage" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>
-                </div>
-              }
-              <!-- Pagination if more than one page of search results -->
-              @if (searchResults.length > RESULTS_PER_PAGE) {
-                <div class="pagination">
-                  <ngb-pagination [collectionSize]="searchResults.length" [(page)]="currentPage" [maxSize]="5" [pageSize]="RESULTS_PER_PAGE" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>
-                </div>
-              }
-
+              <mat-paginator
+                *ngIf="searchResults.length > RESULTS_PER_PAGE"
+                [length]="totalSearchHits"
+                [pageSize]="RESULTS_PER_PAGE"
+                [pageSizeOptions]="[10, 20, 50]"
+                (page)="onPageChange($event)">
+              </mat-paginator>
               <!-- Downloads -->
               @if (mapDownloadLayers.size > 0 && showingResultsPanel && !searching) {
                 <div class="downloads-panel">

@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
-import { BsModalService } from 'ngx-bootstrap/modal';
 import { DisclaimerModalComponent } from '../../modalwindow/disclaimer/disclaimer.modal.component';
 import { environment } from '../../../environments/environment';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
     selector: '[app-portal-details-panel]',
@@ -10,13 +10,15 @@ import { environment } from '../../../environments/environment';
     standalone: false
 })
 export class PortalDetailsPanelComponent {
-  private modalService = inject(BsModalService);
+  private dialog = inject(MatDialog);
 
   currentVersion : string = environment.appVersion;
   devSuffix: string = (environment.production!=true)? " Development version" : "";
 
-  OpenDisclaimerModal(): void {
-    this.modalService.show(DisclaimerModalComponent);
+  openDisclaimerModal(): void {
+    this.dialog.open(DisclaimerModalComponent, {
+      width: '600px'
+    });
   }
 
 }
