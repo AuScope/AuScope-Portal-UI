@@ -323,9 +323,8 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
         // the WMS urls after the times have been loaded
         this.filterService.getLayerTimesBS(this.layer.id).subscribe(layerTimes => {
             const wmsOnlineResource = this.cswRecord.onlineResources.find(r => r.type.toLowerCase() === 'wms');
-            //if (!this.layer.previewImg) {
-            if (wmsOnlineResource) {
-                const params = 'SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png'
+            if ((wmsOnlineResource) && (this.cswRecord.legendSupport)){
+               const params = 'SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png'
                     + '&LAYER=' + wmsOnlineResource.name + '&LAYERS=' + wmsOnlineResource.name
                     + '&LEGEND_OPTIONS=forceLabels:on;minSymbolSize:16';
                 this.legendUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(wmsOnlineResource.url), params);
@@ -357,7 +356,7 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
             }
 
             // Gather up lists of information URLs
-            if (wmsOnlineResource) {
+            if ((wmsOnlineResource) && (this.cswRecord.legendSupport)){
                 let params = 'SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&STYLES=&FORMAT=image/png&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&LAYERS='
                     + encodeURIComponent(wmsOnlineResource.name) + '&SRS=EPSG:4326&BBOX=' + bbox.westBoundLongitude + ',' + bbox.southBoundLatitude
                     + ',' + bbox.eastBoundLongitude + ',' + bbox.northBoundLatitude

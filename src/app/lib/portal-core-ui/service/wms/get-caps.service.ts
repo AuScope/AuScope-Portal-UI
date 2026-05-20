@@ -32,6 +32,8 @@ export class GetCapsService {
         return "http://standards.iso.org/iso/19115/-3/cit/1.0";
       case 'gco':
         return "http://standards.iso.org/iso/19115/-3/gco/1.0";
+      case 'xmlns':
+        return "http://www.opengis.net/wms";
     }
     return "http://www.opengis.net/wms";
   }
@@ -58,8 +60,45 @@ export class GetCapsService {
     if (serviceTitle.includes('GSKY')) {
       return "NCI:GSKY";
     }
+
+    // the second line of the capabilities document for ERDS APOLLO WMS is:
+    // <!--  ERDAS APOLLO Essentials 2015  -->
+    const COMMENT_APOLLO = "normalize-space(//comment()[1])";
+    const schemaApollo = SimpleXMLService.evaluateXPathString(doc, doc, COMMENT_APOLLO, nsResolver);
+    if (schemaApollo.includes("ERDAS APOLLO Essentials 2015")) {
+      return "ERDAS";
+    }
+
     return "OSGeo:GeoServer";
   }
+
+  /**
+   * Function used to detect if the WMS server supports a Legend
+   *
+   * @param doc Document interface of GetCapabilities response
+   * @param nsResolver namespace resolver function
+   * @returns applicationProfile boolean
+   */
+  private isLegendSupported(doc: Document, nsResolver: (prefix: string) => string): boolean {
+    let legendFound: boolean = false;
+
+    const LEGEND_TEXT = "//xsi:WMS_Capabilities/xsi:Capability/xsi:Request/*"; 
+    const nodes = SimpleXMLService.evaluateXPathNodeArray(doc, doc, LEGEND_TEXT, nsResolver);
+    
+    nodes.forEach(node => {
+      const name = SimpleXMLService.getNodeLocalName(node);
+      if (name.toLowerCase().startsWith("GetLegendGraphic")) {
+        legendFound = true;
+      }
+    });
+    
+    const LEGEND_URL_TEXT = "/xsi:WMS_Capabilities/xsi:Capability[1]/xsi:Layer[1]/xsi:Layer[1]/xsi:Style[1]/xsi:LegendURL[1]";
+    const nodesUrl = SimpleXMLService.evaluateXPathNodeArray(doc, doc, LEGEND_URL_TEXT, nsResolver);
+    if (nodesUrl.length > 0) { legendFound = true; }
+
+    return legendFound;
+  }
+
 
   /**
    * Extracts online resources from GetCapabilities response
@@ -349,6 +388,7 @@ export class GetCapsService {
     const rootLayers: Element[] = SimpleXMLService.evaluateXPathNodeArray(rootNode, rootNode, ROOT_LAYERS, nsResolverFn);
     const mapFormats = this.getMapFormats(rootNode, rootNode, nsResolverFn);
     const applicationProfile = this.findApplicationProfile(rootNode, nsResolverFn);
+    const legendSupport = this.isLegendSupported(rootNode, nsResolverFn);
     const accessConstraints = this.findAccessConstraints(rootNode, nsResolverFn);
 
     const retVal = { data: { cswRecords: [], capabilityRecords: [], invalidLayerCount: 0 }, msg: '', success: true, serviceUrl: '' };
@@ -399,7 +439,8 @@ export class GetCapsService {
         date: '',
         minScale: null,
         maxScale: null,
-        layerSRS: layerSRS
+        layerSRS: layerSRS,
+        legendSupport: legendSupport
       });
 
       // Only add one GetCapabilities object
