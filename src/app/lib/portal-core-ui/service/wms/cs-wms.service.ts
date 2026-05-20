@@ -543,8 +543,14 @@ export class CsWMSService {
         };
         /* End of 'createImage' overwrite */
 
-        // Create a resource which uses our custom proxy
-        const proxyUrl = me.env.portalBaseUrl + Constants.PROXY_API + '?usewhitelist=' + (layer.useProxyWhitelist ? 'true' : 'false') + '&url=';
+        // Create a resource which uses our custom proxy; if ERDAS APOLLO WMS (i.e.NT)
+        let erdasParam: string  = "";
+        if (UtilitiesService.resourceIsERDAS(wmsOnlineResource)) {
+          erdasParam = "&erdas=true";
+          params.version = "1.1.1";
+          params.srs = "EPSG:4326";
+        }
+        const proxyUrl = me.env.portalBaseUrl + Constants.PROXY_API + '?usewhitelist=' + (layer.useProxyWhitelist ? 'true' : 'false') + erdasParam + '&url=';
         const res = new Resource({ url: url, proxy: new MyDefaultProxy(proxyUrl) });
 
         // Force Resource to use 'POST' and our proxy

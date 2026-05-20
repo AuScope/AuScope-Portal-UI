@@ -521,6 +521,12 @@ export class CsMapComponent implements AfterViewInit {
               postMethod = false;
             }
 
+            if (UtilitiesService.resourceIsERDAS(onlineResource)) {
+              infoFormat = 'image/png';
+              sldBody = '';
+              postMethod = false;
+            }
+
             // GSKY and some Loop3D layers require JSON response
             if (config.wmsGetFeatureJSON.indexOf(maplayer.id) !== -1) {
               infoFormat = 'application/json';

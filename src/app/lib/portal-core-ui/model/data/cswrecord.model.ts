@@ -30,4 +30,5 @@ export class CSWRecordModel {
   temporalExtent?: TemporalExtentModel;
   knownLayerIds?: string[];
   layerSRS: string[];
+  legendSupport : boolean;
 }

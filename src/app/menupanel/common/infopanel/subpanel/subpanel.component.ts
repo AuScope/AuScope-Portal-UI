@@ -237,7 +237,7 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
         // the WMS urls after the times have been loaded
         this.filterService.getLayerTimesBS(this.layer.id).subscribe(layerTimes => {
             const wmsOnlineResource = this.cswRecord.onlineResources.find(r => r.type.toLowerCase() === 'wms');
-            if (wmsOnlineResource) {
+            if ((wmsOnlineResource) && (this.cswRecord.legendSupport)){
                const params = 'SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png'
                     + '&LAYER=' + wmsOnlineResource.name + '&LAYERS=' + wmsOnlineResource.name
                     + '&LEGEND_OPTIONS=forceLabels:on;minSymbolSize:16';
