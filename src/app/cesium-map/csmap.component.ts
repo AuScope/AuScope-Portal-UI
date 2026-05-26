@@ -348,13 +348,13 @@ export class CsMapComponent implements AfterViewInit {
 
     let html = "";
 
-    let layerList = mapClickInfo.clickedLayerList
+    const layerList = mapClickInfo.clickedLayerList
     if (layerList[0].kmlDoc) {
-      let go = layerList[0].kmlDoc.querySelector("GroundOverlay");
+      const go = layerList[0].kmlDoc.querySelector("GroundOverlay");
       if (go) {
         // make an entity? = [name, description]
-        let name = go.querySelector('name').textContent;
-        let description = go.querySelector('description').textContent;
+        const name = go.querySelector('name').textContent;
+        const description = go.querySelector('description').textContent;
 
         // const handler = new KMLQuerierHandler(entity);
         html = '<div class="row"><div class="col-md-3">Name</div><div class="col-md-9">' + layerList[0].name + '</div></div><hr>';
