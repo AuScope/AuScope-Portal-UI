@@ -350,7 +350,7 @@ export class CsMapComponent implements AfterViewInit {
 
     const layerList = mapClickInfo.clickedLayerList
     if (layerList[0].kmlDoc) {
-      const go = layerList[0].kmlDoc.querySelector("GroundOverlay");
+      const go = layerList[0]?.kmlDoc?.querySelector("GroundOverlay");
       if (go) {
         // make an entity? = [name, description]
         const name = go.querySelector('name').textContent;
