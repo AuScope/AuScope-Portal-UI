@@ -18,8 +18,8 @@ export class GetCapsService {
    * @param string namespace prefix
    * @returns URL of namespace
    */
-   private nsResolver(prefix: string) {
-    switch(prefix) {
+  private nsResolver(prefix: string) {
+    switch (prefix) {
       case 'xsi':
         return "http://www.opengis.net/wms";
       case 'xlink':
@@ -65,8 +65,11 @@ export class GetCapsService {
     // <!--  ERDAS APOLLO Essentials 2015  -->
     const COMMENT_APOLLO = "normalize-space(//comment()[1])";
     const schemaApollo = SimpleXMLService.evaluateXPathString(doc, doc, COMMENT_APOLLO, nsResolver);
+    if (schemaApollo.includes("ERDAS APOLLO Core 2022")) {
+      return "ERDAS_TAS";
+    }
     if (schemaApollo.includes("ERDAS APOLLO Essentials 2015")) {
-      return "ERDAS";
+      return "ERDAS_NT";
     }
 
     return "OSGeo:GeoServer";
@@ -82,17 +85,16 @@ export class GetCapsService {
   private isLegendSupported(doc: Document, nsResolver: (prefix: string) => string): boolean {
     let legendFound: boolean = false;
 
-    const LEGEND_TEXT = "//xsi:WMS_Capabilities/xsi:Capability/xsi:Request/*"; 
+    const LEGEND_TEXT = "//xsi:WMS_Capabilities/xsi:Capability/xsi:Request/*";
     const nodes = SimpleXMLService.evaluateXPathNodeArray(doc, doc, LEGEND_TEXT, nsResolver);
-    
     nodes.forEach(node => {
       const name = SimpleXMLService.getNodeLocalName(node);
       if (name.toLowerCase().startsWith("GetLegendGraphic")) {
         legendFound = true;
       }
     });
-    
-    const LEGEND_URL_TEXT = "/xsi:WMS_Capabilities/xsi:Capability[1]/xsi:Layer[1]/xsi:Layer[1]/xsi:Style[1]/xsi:LegendURL[1]";
+
+    const LEGEND_URL_TEXT = "//xsi:LegendURL";
     const nodesUrl = SimpleXMLService.evaluateXPathNodeArray(doc, doc, LEGEND_URL_TEXT, nsResolver);
     if (nodesUrl.length > 0) { legendFound = true; }
 
@@ -167,7 +169,7 @@ export class GetCapsService {
           geoElems[xpath] = flt;
         }
       }
-    } else if(node.parentNode && node.parentNode.nodeName === 'Layer') {
+    } else if (node.parentNode && node.parentNode.nodeName === 'Layer') {
       return this.getGeoElems(doc, node.parentNode, nsResolver);
     }
     return geoElems;
@@ -186,7 +188,7 @@ export class GetCapsService {
     const mapFormats = [];
     const mapFormatElems: Element[] = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
     for (const elem of mapFormatElems) {
-        mapFormats.push(elem.textContent);
+      mapFormats.push(elem.textContent);
     }
     return mapFormats;
   }
@@ -235,7 +237,7 @@ export class GetCapsService {
     };
     const cswRecElems = {};
     for (const xpath of Object.keys(CSW_REC)) {
-        cswRecElems[xpath] = SimpleXMLService.evaluateXPathString(doc, node, CSW_REC[xpath], nsResolver);
+      cswRecElems[xpath] = SimpleXMLService.evaluateXPathString(doc, node, CSW_REC[xpath], nsResolver);
     }
     return cswRecElems;
   }
@@ -274,7 +276,7 @@ export class GetCapsService {
    * @param nsResolver namespace resolver function
    * @returns AccessConstraints string
    */
-    private findAccessConstraints(doc: Document, nsResolver: (prefix: string) => string): string[] {
+  private findAccessConstraints(doc: Document, nsResolver: (prefix: string) => string): string[] {
     const mapFormats = "string(/xsi:WMS_Capabilities/xsi:Service/xsi:AccessConstraints)";
     const accessConstraints = [];
     accessConstraints.push(SimpleXMLService.evaluateXPathString(doc, doc, mapFormats, nsResolver));
@@ -300,11 +302,26 @@ export class GetCapsService {
    * @param doc the root Document for the GetCapabilities response
    * @param node the layer Node
    * @param nsResolver namespace resolver function
-   * @returns the legend URL for th elayer
+   * @returns the legend URL for the layer
    */
   private getLegendUrl(doc: Document, node: Node, nsResolver: (prefix: string) => string): string {
-    const LEGEND_URL = "./xsi:LegendURL/xsi:OnlineResource/@*[local-name()='href']";
-    return SimpleXMLService.evaluateXPathString(doc, node, LEGEND_URL, nsResolver);
+    let legendUrl = "";
+
+    const styleNodes = SimpleXMLService.getMatchingChildNodes(node, null, "Style");
+    if (styleNodes.length > 0) {
+      const legendNodes = SimpleXMLService.getMatchingChildNodes(styleNodes[0], null, "LegendURL"); 
+      if (legendNodes.length > 0) {
+        const resourceNodes = SimpleXMLService.getMatchingChildNodes(legendNodes[0], null, "OnlineResource");
+        if (resourceNodes.length > 0) { 
+          const hrefNodes = SimpleXMLService.getMatchingAttributes(resourceNodes[0], null, "href");
+          if (hrefNodes.length > 0) { 
+            legendUrl = hrefNodes[0].nodeValue;
+          }
+        }
+      }
+    }
+
+    return legendUrl;
   }
 
   /**
@@ -429,8 +446,8 @@ export class GetCapsService {
         adminArea: cswRecElems['adminArea'],
         contactOrg: cswRecElems['contactOrg'],
         contactPerson: cswRecElems['contactPerson'],
-        onlineResources: [ onlineResElems ],
-        geographicElements: [ geoElems ],
+        onlineResources: [onlineResElems],
+        geographicElements: [geoElems],
         descriptiveKeywords: [],
         datasetURIs: [],
         constraints: [],
@@ -457,21 +474,21 @@ export class GetCapsService {
           layerSRS: layerSRS,
           mapFormats: mapFormats,
           applicationProfile: applicationProfile,
-          accessConstraints:accessConstraints
+          accessConstraints: accessConstraints
         }];
       }
 
       // Add layers within our GetCapabilities object
       retVal.data.capabilityRecords[0].layers.push({
-          name: onlineResElems['name'],
-          title: onlineResElems['description'],
-          abstract: cswRecElems['description'],
-          metadataUrl: metadataUrl,
-          legendUrl: legendUrl,
-          timeExtent: timeExtent,
-          bbox: geoElems,
-          minScaleDenominator: minScaleDenominator,
-          maxScaleDenominator: maxScaleDenominator
+        name: onlineResElems['name'],
+        title: onlineResElems['description'],
+        abstract: cswRecElems['description'],
+        metadataUrl: metadataUrl,
+        legendUrl: legendUrl,
+        timeExtent: timeExtent,
+        bbox: geoElems,
+        minScaleDenominator: minScaleDenominator,
+        maxScaleDenominator: maxScaleDenominator
       });
     }
     return retVal;
@@ -565,9 +582,9 @@ export class GetCapsService {
             map(response => {
               return this.getLayersFromGetCapabilities(response);
             }), catchError(
-                (error: HttpResponse<any>) => {
-                  return observableThrowError(error);
-                })
+              (error: HttpResponse<any>) => {
+                return observableThrowError(error);
+              })
           );
 
         } else {
