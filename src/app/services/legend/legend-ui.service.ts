@@ -203,7 +203,6 @@ export class LegendUiService {
             // requests, so create lists of GET URLs and POST requests to throw everything at the wall and see what sticks.
 
             // Assemble params, including 'GetLegend' params
-            console.log("*getSLdBody(getLegendHttpParams).resource.url=",resource.url);
             const httpParams = this.getLegendHttpParams(this.trimUrl(resource.url), wmsOnlineResource.name, collatedParam, sldBody);
             // Make a POST request with proxy
             const proxyUrl = this.env.portalBaseUrl + Constants.PROXY_API;
@@ -245,7 +244,21 @@ export class LegendUiService {
             return of(undefined);
           })
         );
-        this.displayLegendDialog(layer.id, layer.name, [getRequest, postRequest]);
+
+        // Create a GET request, using the LegendURL
+        let getRequestLegendUrl: Observable<any>;
+        layer.capabilityRecords[0].layers.forEach(l => {
+          if (l.name.startsWith(layer.id)) {
+            const requestLegendUrl = l.legendUrl;
+            getRequestLegendUrl = this.http.get(requestLegendUrl, { responseType: 'blob' }).pipe(
+              catchError(() => {
+                return of(undefined);
+              })
+            );
+          }          
+        });
+
+        this.displayLegendDialog(layer.id, layer.name, [getRequest, postRequest, getRequestLegendUrl]);
       }
     });
   }
