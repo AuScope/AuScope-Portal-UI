@@ -21,7 +21,7 @@ jobs:
       - name: Create context.json
         run: |
           mkdir -p src/contexts
-          echo '{"portalBaseUrl":"${{ vars.AZURE_PORTAL_API_URL_DEV }}","hostUrl":"${{ vars.AZURE_PORTAL_URL_DEV }}","authBaseUrl":"${{ vars.AZURE_PORTAL_URL_DEV }}/api/","portalProxyUrl":"${{ vars.AZURE_PORTAL_URL_DEV }}/api/"}' > src/contexts/context.json
+          echo -n '{"portalBaseUrl":"${{ vars.AZURE_PORTAL_API_URL_DEV }}","hostUrl":"${{ vars.AZURE_PORTAL_URL_DEV }}","authBaseUrl":"${{ vars.AZURE_PORTAL_URL_DEV }}/api/","portalProxyUrl":"${{ vars.AZURE_PORTAL_URL_DEV }}/api/"}' > src/contexts/context.json
       - uses: jsdaniell/create-json@v1.2.3
         with:
           name: "context-old.json"
@@ -29,7 +29,7 @@ jobs:
           dir: 'src/contexts/'
       - name: Compare context files
         run: |
-          if ! diff -Z src/contexts/context.json src/contexts/context-old.json; then
+          if ! diff src/contexts/context.json src/contexts/context-old.json; then
             echo "::error::Files are different!"
             exit 1
           fi
