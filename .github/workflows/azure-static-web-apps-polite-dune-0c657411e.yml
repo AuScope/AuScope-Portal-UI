@@ -29,7 +29,7 @@ jobs:
           dir: 'src/contexts/'
       - name: Compare context files
         run: |
-          if !diff src/contexts/context.json src/contexts/context-old.json; then
+          if ! diff src/contexts/context.json src/contexts/context-old.json; then
             echo "::error::Files are different!"
             exit 1
           fi
