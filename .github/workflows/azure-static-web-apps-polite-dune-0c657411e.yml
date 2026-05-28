@@ -18,11 +18,29 @@ jobs:
       - uses: actions/checkout@v6
         with:
           submodules: true
+      - name: Create context.json
+        run: |
+          mkdir -p src/contexts
+          cat > src/contexts/context.json << 'EOF'
+          {
+            "portalBaseUrl": "${{ vars.AZURE_PORTAL_API_URL_DEV }}",
+            "hostUrl": "${{ vars.AZURE_PORTAL_URL_DEV }}",
+            "authBaseUrl": "${{ vars.AZURE_PORTAL_URL_DEV }}/api/",
+            "portalProxyUrl": "${{ vars.AZURE_PORTAL_URL_DEV }}/api/"
+          }
+          EOF
       - uses: jsdaniell/create-json@v1.2.3
         with:
-          name: "context.json"
+          name: "context-old.json"
           json: '{"portalBaseUrl":"${{ vars.AZURE_PORTAL_API_URL_DEV }}","hostUrl":"${{ vars.AZURE_PORTAL_URL_DEV }}","authBaseUrl":"${{ vars.AZURE_PORTAL_URL_DEV }}/api/","portalProxyUrl": "${{ vars.AZURE_PORTAL_URL_DEV }}/api/"}'
           dir: 'src/contexts/'
+      - name: Compare context files
+        run: |
+          if ! cmp -s src/contexts/context.json src/contexts/context-old.json; then
+            echo "::error::Files are different!"
+            diff src/contexts/context.json src/contexts/context-old.json
+            exit 1
+          fi
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
