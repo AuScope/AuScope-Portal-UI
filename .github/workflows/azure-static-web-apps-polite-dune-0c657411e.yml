@@ -29,7 +29,7 @@ jobs:
           dir: 'src/contexts/'
       - name: Compare context files
         run: |
-          if ! cmp -s src/contexts/context.json src/contexts/context-old.json; then
+          if ! ! diff -q --strip-trailing-cr src/contexts/context.json src/contexts/context-old.json; then
             echo "::error::Files are different!"
             diff src/contexts/context.json src/contexts/context-old.json
             exit 1
