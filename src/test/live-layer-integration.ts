@@ -442,7 +442,7 @@ async function main(): Promise<void> {
   console.log(DIVIDER);
 
   void testedLayerIds; // suppress unused variable warning
-  void hasFailed;     // suppress unused variable warning
+  void hasFailed; // suppress unused variable warning
 
   if (totalFailed === 0) {
     console.log(`${GREEN}${BOLD}Result: PASSED${RESET}\n`);
