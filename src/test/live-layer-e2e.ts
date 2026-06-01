@@ -5,7 +5,8 @@
  *
  * Uses Playwright (headless Chromium) to open the AuScope Portal website, navigate
  * the Browse panel, click "Add" for every WMS layer discovered via getKnownLayers.do,
- * and verify the layer appears in the Active Layers sidebar.
+ * verify the layer appears in the Active Layers sidebar, and verify that the layer
+ * tiles finish loading on the map without errors.
  *
  * Run with:
  *   ts-node --skip-project src/test/live-layer-e2e.ts [options]
@@ -153,8 +154,9 @@ function formatResult(r: E2EResult): string {
 
 /**
  * Opens a fresh browser context, navigates to the portal, clicks Browse,
- * selects the layer's group, clicks the layer's "Add" button, and verifies
- * the layer appears in the Active Layers sidebar.
+ * selects the layer's group, clicks the layer's "Add" button, verifies
+ * the layer appears in the Active Layers sidebar, and verifies that the
+ * layer tiles finish loading on the map without errors.
  */
 async function testLayerViaUI(
   browser: Browser,
@@ -226,6 +228,55 @@ async function testLayerViaUI(
       layer.name,
       { timeout: timeoutMs },
     );
+
+    // 8. Verify the layer was loaded on the map.
+    //    The Active Layers panel exposes render state via two DOM signals:
+    //      • .delete-button   — shown only after renderStarted=true (tile requests sent)
+    //      • .fa-spin.fa-spinner — shown while renderComplete=false (tiles still loading)
+    //      • .fa-warning.text-warning — shown if a map loading error occurred
+
+    // 8a. Wait for render to start (delete button appears → renderStarted=true)
+    await page.waitForFunction(
+      (name: string) => {
+        const items = Array.from((document as Document).querySelectorAll('.activeLayerItem'));
+        const layerItem = items.find(el =>
+          el.querySelector('.activeLayerTitle')?.textContent?.trim() === name
+        );
+        return !!layerItem?.querySelector('button.delete-button');
+      },
+      layer.name,
+      { timeout: timeoutMs },
+    );
+
+    // 8b. Wait for render to complete (spinner disappears → renderComplete=true)
+    await page.waitForFunction(
+      (name: string) => {
+        const items = Array.from((document as Document).querySelectorAll('.activeLayerItem'));
+        const layerItem = items.find(el =>
+          el.querySelector('.activeLayerTitle')?.textContent?.trim() === name
+        );
+        if (!layerItem) return false;
+        return !layerItem.querySelector('.fa-spin.fa-spinner');
+      },
+      layer.name,
+      { timeout: timeoutMs },
+    );
+
+    // 8c. Assert no map loading error was reported
+    const hasMapError = await page.evaluate(
+      (name: string) => {
+        const items = Array.from((document as Document).querySelectorAll('.activeLayerItem'));
+        const layerItem = items.find(el =>
+          el.querySelector('.activeLayerTitle')?.textContent?.trim() === name
+        );
+        return !!layerItem?.querySelector('.fa-warning.text-warning');
+      },
+      layer.name,
+    );
+
+    if (hasMapError) {
+      throw new Error('Layer appeared in Active Layers but reported a map loading error');
+    }
 
     return {
       layerId:    layer.id,
