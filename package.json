@@ -36,7 +36,7 @@
     "@angular/platform-server": "^20.3.18",
     "@angular/router": "^20.3.18",
     "@auscope/angular-cesium": "^20.4.0",
-    "@auscope/angular2parse": "^20.0.2",
+    "@auscope/angular2parse": "^20.3.0",
     "@csiro-geoanalytics/ng": "^2.5.0",
     "@csiro-geoanalytics/utils-rxjs": "^2.0.1",
     "@fortawesome/fontawesome-free": "^7.1.0",
