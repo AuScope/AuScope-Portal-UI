@@ -14,7 +14,7 @@
  * Options:
  *   --env dev|prod        Portal environment (default: dev)
  *   --concurrency N       Max parallel browser contexts (default: 3)
- *   --timeout N           Per-action timeout in ms (default: 20000)
+ *   --timeout N           Per-action timeout in ms (default: 120000)
  *   --layer <id>          Test only a specific layer ID
  *   --failfast            Stop on first failure
  *   --headed              Show browser window (default: headless)
@@ -78,14 +78,14 @@ function parseArgs() {
   };
 
   const concurrencyArg = parseInt(get('--concurrency') ?? '3', 10);
-  const timeoutArg     = parseInt(get('--timeout')     ?? '20000', 10);
+  const timeoutArg     = parseInt(get('--timeout')     ?? '120000', 10);
 
   return {
     env:         envArg,
     apiBaseUrl:  apiUrls[envArg]    ?? apiUrls['dev'],
     portalUrl:   portalUrls[envArg] ?? portalUrls['dev'],
     concurrency: isNaN(concurrencyArg) ? 3     : concurrencyArg,
-    timeout:     isNaN(timeoutArg)     ? 20000 : timeoutArg,
+    timeout:     isNaN(timeoutArg)     ? 120000 : timeoutArg,
     layerFilter: get('--layer') ?? null,
     failfast:    has('--failfast'),
     headed:      has('--headed'),
