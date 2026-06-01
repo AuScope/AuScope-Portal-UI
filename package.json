@@ -12,7 +12,9 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "docs": "npm run typedoc -- --options typedoc.json --out ./src/app/portal-core-ui/docs --exclude '**/*.spec.ts' ./app/portal-core-ui",
-    "typedoc": "typedoc"
+    "typedoc": "typedoc",
+    "test:live": "ts-node --skipProject --compiler-options '{\"module\":\"CommonJS\",\"moduleResolution\":\"node\",\"target\":\"ES2022\",\"lib\":[\"ES2022\"],\"skipLibCheck\":true}' src/test/live-layer-integration.ts",
+    "test:live:prod": "ts-node --skipProject --compiler-options '{\"module\":\"CommonJS\",\"moduleResolution\":\"node\",\"target\":\"ES2022\",\"lib\":[\"ES2022\"],\"skipLibCheck\":true}' src/test/live-layer-integration.ts --env prod"
   },
   "engines": {
     "node": ">=18.0.0"
