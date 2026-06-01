@@ -22,7 +22,7 @@
 
 import { chromium, BrowserContext, Browser } from 'playwright';
 
-// ─── Types ─────────────────────────────────────────────────────────────────
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface OnlineResource {
   type: string;
@@ -51,21 +51,21 @@ interface E2EResult {
   errorMessage?: string;
 }
 
-// ─── ANSI colours ──────────────────────────────────────────────────────────
+// ─── ANSI colours ─────────────────────────────────────────────────────────────
 
-const GREEN  = '\x1b[32m';
-const RED    = '\x1b[31m';
+const GREEN = '\x1b[32m';
+const RED = '\x1b[31m';
 const YELLOW = '\x1b[33m';
-const CYAN   = '\x1b[36m';
-const BOLD   = '\x1b[1m';
-const RESET  = '\x1b[0m';
+const CYAN = '\x1b[36m';
+const BOLD = '\x1b[1m';
+const RESET = '\x1b[0m';
 
 // ─── CLI argument parsing ──────────────────────────────────────────────────
 
 function parseArgs() {
   const args = process.argv.slice(2);
-  const get  = (flag: string): string | undefined => { const i = args.indexOf(flag); return i !== -1 ? args[i + 1] : undefined; };
-  const has  = (flag: string): boolean => args.includes(flag);
+  const get = (flag: string): string | undefined => { const i = args.indexOf(flag); return i !== -1 ? args[i + 1] : undefined; };
+  const has = (flag: string): boolean => args.includes(flag);
 
   const envArg = (get('--env') ?? 'dev') as 'dev' | 'prod';
   const apiUrls: Record<string, string> = {
@@ -78,17 +78,17 @@ function parseArgs() {
   };
 
   const concurrencyArg = parseInt(get('--concurrency') ?? '3', 10);
-  const timeoutArg     = parseInt(get('--timeout')     ?? '900000', 10);
+  const timeoutArg = parseInt(get('--timeout') ?? '900000', 10);
 
   return {
-    env:         envArg,
-    apiBaseUrl:  apiUrls[envArg]    ?? apiUrls['dev'],
-    portalUrl:   portalUrls[envArg] ?? portalUrls['dev'],
-    concurrency: isNaN(concurrencyArg) ? 3     : concurrencyArg,
-    timeout:     isNaN(timeoutArg)     ? 900000 : timeoutArg,
+    env: envArg,
+    apiBaseUrl: apiUrls[envArg] ?? apiUrls['dev'],
+    portalUrl: portalUrls[envArg] ?? portalUrls['dev'],
+    concurrency: isNaN(concurrencyArg) ? 3 : concurrencyArg,
+    timeout: isNaN(timeoutArg) ? 900000 : timeoutArg,
     layerFilter: get('--layer') ?? null,
-    failfast:    has('--failfast'),
-    headed:      has('--headed'),
+    failfast: has('--failfast'),
+    headed: has('--headed'),
   };
 }
 
@@ -119,12 +119,12 @@ function createSemaphore(limit: number) {
 
   function release() {
     active--;
-    if (queue.length > 0) { active++; (queue.shift()!)(); }
+    if (queue.length > 0) { active++; queue.shift()?.(); }
   }
 
   return async function acquire<T>(task: () => Promise<T>): Promise<T> {
     return new Promise<T>((resolve, reject) => {
-      const run = () => task().then(v => { release(); resolve(v); }, e => { release(); reject(e); });
+      const run = (): void => { void task().then(v => { release(); resolve(v); }, e => { release(); reject(e instanceof Error ? e : new Error(String(e))); }); };
       if (active < limit) { active++; run(); } else { queue.push(run); }
     });
   };
@@ -133,19 +133,19 @@ function createSemaphore(limit: number) {
 // ─── Formatting helpers ────────────────────────────────────────────────────
 
 function pad(s: string, len: number): string { return s.length >= len ? s.slice(0, len) : s + ' '.repeat(len - s.length); }
-function trunc(s: string, len: number): string { return s.length > len ? s.slice(0, len - 1) + '…' : s; }
+function trunc(s: string, len: number): string { return s.length > len ? s.slice(0, len - 1) + '\u2026' : s; }
 
-const DIVIDER = '─'.repeat(90);
+const DIVIDER = '\u2500'.repeat(90);
 
 function formatResult(r: E2EResult): string {
   const icon =
-    r.outcome === 'PASS' ? `${GREEN}✅${RESET}` :
-    r.outcome === 'FAIL' ? `${RED}❌${RESET}`   :
-                           `${YELLOW}⏭ ${RESET}`;
-  const id    = trunc(r.layerId,   30);
-  const name  = trunc(r.layerName, 30);
-  const group = trunc(r.group,     24);
-  const time  = r.durationMs > 0 ? `${r.durationMs}ms` : '';
+    r.outcome === 'PASS' ? `${GREEN}\u2705${RESET}` :
+    r.outcome === 'FAIL' ? `${RED}\u274c${RESET}` :
+                           `${YELLOW}\u23ed ${RESET}`;
+  const id = trunc(r.layerId, 30);
+  const name = trunc(r.layerName, 30);
+  const group = trunc(r.group, 24);
+  const time = r.durationMs > 0 ? `${r.durationMs}ms` : '';
   const extra = r.errorMessage ? `  ${RED}${r.errorMessage}${RESET}` : '';
   return `  ${icon} ${pad(id, 30)}  ${pad(name, 30)}  ${pad(group, 24)}  ${time}${extra}`;
 }
@@ -222,8 +222,8 @@ async function testLayerViaUI(
     //    The sidebar contains .activeLayerTitle elements with the layer name
     await page.waitForFunction(
       (name: string) => {
-        const titles = Array.from((document as Document).querySelectorAll('.activeLayerTitle'));
-        return titles.some(el => (el as Element).textContent?.trim() === name);
+        const titles = Array.from(document.querySelectorAll('.activeLayerTitle'));
+        return titles.some(el => el.textContent?.trim() === name);
       },
       layer.name,
       { timeout: timeoutMs },
@@ -231,14 +231,14 @@ async function testLayerViaUI(
 
     // 8. Verify the layer was loaded on the map.
     //    The Active Layers panel exposes render state via two DOM signals:
-    //      • .delete-button   — shown only after renderStarted=true (tile requests sent)
-    //      • .fa-spin.fa-spinner — shown while renderComplete=false (tiles still loading)
-    //      • .fa-warning.text-warning — shown if a map loading error occurred
+    //      \u2022 .delete-button   \u2014 shown only after renderStarted=true (tile requests sent)
+    //      \u2022 .fa-spin.fa-spinner \u2014 shown while renderComplete=false (tiles still loading)
+    //      \u2022 .fa-warning.text-warning \u2014 shown if a map loading error occurred
 
-    // 8a. Wait for render to start (delete button appears → renderStarted=true)
+    // 8a. Wait for render to start (delete button appears \u2192 renderStarted=true)
     await page.waitForFunction(
       (name: string) => {
-        const items = Array.from((document as Document).querySelectorAll('.activeLayerItem'));
+        const items = Array.from(document.querySelectorAll('.activeLayerItem'));
         const layerItem = items.find(el =>
           el.querySelector('.activeLayerTitle')?.textContent?.trim() === name
         );
@@ -248,10 +248,10 @@ async function testLayerViaUI(
       { timeout: timeoutMs },
     );
 
-    // 8b. Wait for render to complete (spinner disappears → renderComplete=true)
+    // 8b. Wait for render to complete (spinner disappears \u2192 renderComplete=true)
     await page.waitForFunction(
       (name: string) => {
-        const items = Array.from((document as Document).querySelectorAll('.activeLayerItem'));
+        const items = Array.from(document.querySelectorAll('.activeLayerItem'));
         const layerItem = items.find(el =>
           el.querySelector('.activeLayerTitle')?.textContent?.trim() === name
         );
@@ -265,7 +265,7 @@ async function testLayerViaUI(
     // 8c. Assert no map loading error was reported
     const hasMapError = await page.evaluate(
       (name: string) => {
-        const items = Array.from((document as Document).querySelectorAll('.activeLayerItem'));
+        const items = Array.from(document.querySelectorAll('.activeLayerItem'));
         const layerItem = items.find(el =>
           el.querySelector('.activeLayerTitle')?.textContent?.trim() === name
         );
@@ -301,13 +301,13 @@ async function testLayerViaUI(
   }
 }
 
-// ─── Main ──────────────────────────────────────────────────────────────────
+// ─── Main ─────────────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
   const opts = parseArgs();
   const overallStart = Date.now();
 
-  console.log(`\n${BOLD}AuScope Portal — Live Layer E2E Browser Test${RESET}`);
+  console.log(`\n${BOLD}AuScope Portal \u2014 Live Layer E2E Browser Test${RESET}`);
   console.log(`Environment : ${CYAN}${opts.env}${RESET}  (${opts.portalUrl})`);
   console.log(`Concurrency : ${opts.concurrency}    Timeout: ${opts.timeout}ms`);
   if (opts.layerFilter) console.log(`Layer filter: ${opts.layerFilter}`);
@@ -322,7 +322,7 @@ async function main(): Promise<void> {
     layers = resp.data ?? [];
     console.log(`${GREEN}${layers.length} layers found${RESET}`);
   } catch (err: any) {
-    console.error(`${RED}FAILED — ${err.message ?? String(err)}${RESET}`);
+    console.error(`${RED}FAILED \u2014 ${err.message ?? String(err)}${RESET}`);
     process.exit(1);
   }
 
@@ -343,7 +343,7 @@ async function main(): Promise<void> {
   );
   const skippedCount = layers.length - wmsLayers.length;
 
-  console.log(`WMS layers to test: ${wmsLayers.length}  (${skippedCount} layers have no WMS resources — skipped)\n`);
+  console.log(`WMS layers to test: ${wmsLayers.length}  (${skippedCount} layers have no WMS resources \u2014 skipped)\n`);
 
   if (wmsLayers.length === 0) {
     console.log(`${YELLOW}Nothing to test.${RESET}`);
@@ -360,8 +360,8 @@ async function main(): Promise<void> {
 
   // 6. Run tests with concurrency
   const results: E2EResult[] = [];
-  let failCount   = 0;
-  let earlyExit   = false;
+  let failCount = 0;
+  let earlyExit = false;
 
   const acquire = createSemaphore(opts.concurrency);
 
@@ -391,8 +391,8 @@ async function main(): Promise<void> {
 
   // 7. Summary
   const totalElapsed = ((Date.now() - overallStart) / 1000).toFixed(1);
-  const passCount    = results.filter(r => r.outcome === 'PASS').length;
-  const skipCount    = results.filter(r => r.outcome === 'SKIP').length;
+  const passCount = results.filter(r => r.outcome === 'PASS').length;
+  const skipCount = results.filter(r => r.outcome === 'SKIP').length;
 
   console.log(DIVIDER);
   console.log(`${BOLD}SUMMARY${RESET}`);

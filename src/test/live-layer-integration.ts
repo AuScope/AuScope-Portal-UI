@@ -16,7 +16,7 @@
  *   --failfast            Stop on first failure
  */
 
-// ─── Types ─────────────────────────────────────────────────────────────────
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface OnlineResource {
   type: string;
@@ -47,14 +47,14 @@ interface TestResult {
   errorMessage?: string;
 }
 
-// ─── ANSI colours ──────────────────────────────────────────────────────────
+// ─── ANSI colours ─────────────────────────────────────────────────────────────
 
-const GREEN  = '\x1b[32m';
-const RED    = '\x1b[31m';
+const GREEN = '\x1b[32m';
+const RED = '\x1b[31m';
 const YELLOW = '\x1b[33m';
-const CYAN   = '\x1b[36m';
-const BOLD   = '\x1b[1m';
-const RESET  = '\x1b[0m';
+const CYAN = '\x1b[36m';
+const BOLD = '\x1b[1m';
+const RESET = '\x1b[0m';
 
 // ─── CLI argument parsing ──────────────────────────────────────────────────
 
@@ -82,17 +82,17 @@ function parseArgs(): {
   const baseUrl = envUrls[envArg] ?? envUrls['dev'];
 
   const concurrencyArg = parseInt(get('--concurrency') ?? '5', 10);
-  const timeoutArg     = parseInt(get('--timeout')     ?? '15000', 10);
-  const typeArg        = (get('--type') ?? 'all') as 'wms' | 'wfs' | 'all';
-  const layerFilter    = get('--layer') ?? null;
-  const failfast       = has('--failfast');
+  const timeoutArg = parseInt(get('--timeout') ?? '15000', 10);
+  const typeArg = (get('--type') ?? 'all') as 'wms' | 'wfs' | 'all';
+  const layerFilter = get('--layer') ?? null;
+  const failfast = has('--failfast');
 
   return {
     env: envArg,
     baseUrl,
-    concurrency: isNaN(concurrencyArg) ? 5     : concurrencyArg,
-    timeout:     isNaN(timeoutArg)     ? 15000 : timeoutArg,
-    type:        typeArg,
+    concurrency: isNaN(concurrencyArg) ? 5 : concurrencyArg,
+    timeout: isNaN(timeoutArg) ? 15000 : timeoutArg,
+    type: typeArg,
     layerFilter,
     failfast,
   };
@@ -200,9 +200,9 @@ function createSemaphore(limit: number) {
   function release() {
     active--;
     if (queue.length > 0) {
-      const next = queue.shift()!;
+      const next = queue.shift();
       active++;
-      next();
+      next?.();
     }
   }
 
@@ -211,7 +211,7 @@ function createSemaphore(limit: number) {
       const run = () => {
         task().then(
           (v) => { release(); resolve(v); },
-          (e) => { release(); reject(e); },
+          (e) => { release(); reject(e instanceof Error ? e : new Error(String(e))); },
         );
       };
       if (active < limit) {
@@ -231,35 +231,35 @@ function pad(s: string, len: number): string {
 }
 
 function truncate(s: string, len: number): string {
-  return s.length > len ? s.slice(0, len - 1) + '…' : s;
+  return s.length > len ? s.slice(0, len - 1) + '\u2026' : s;
 }
 
 function formatResult(r: TestResult): string {
   const icon =
-    r.outcome === 'PASS' ? `${GREEN}✅${RESET}` :
-    r.outcome === 'FAIL' ? `${RED}❌${RESET}`   :
-                           `${YELLOW}⏭ ${RESET}`;
+    r.outcome === 'PASS' ? `${GREEN}\u2705${RESET}` :
+    r.outcome === 'FAIL' ? `${RED}\u274c${RESET}` :
+                           `${YELLOW}\u23ed ${RESET}`;
 
-  const layerId   = truncate(r.layerId,   32);
+  const layerId = truncate(r.layerId, 32);
   const layerName = truncate(r.layerName, 26);
-  const svcType   = pad(r.serviceType === '' ? '-' : r.serviceType, 5);
-  const url       = r.url ? truncate(r.url, 36) : '(no WMS/WFS)';
-  const status    = String(r.httpStatus === 0 ? 'SKIP' : r.httpStatus);
-  const time      = r.responseTimeMs > 0 ? `${r.responseTimeMs}ms` : '';
-  const extra     = r.errorMessage ? `  ${RED}${r.errorMessage}${RESET}` : '';
+  const svcType = pad(r.serviceType === '' ? '-' : r.serviceType, 5);
+  const url = r.url ? truncate(r.url, 36) : '(no WMS/WFS)';
+  const status = String(r.httpStatus === 0 ? 'SKIP' : r.httpStatus);
+  const time = r.responseTimeMs > 0 ? `${r.responseTimeMs}ms` : '';
+  const extra = r.errorMessage ? `  ${RED}${r.errorMessage}${RESET}` : '';
 
   return `  ${icon} ${pad(layerId, 32)}  ${pad(layerName, 26)}  ${svcType}  ${pad(url, 36)}  ${pad(status, 10)}  ${time}${extra}`;
 }
 
-const DIVIDER = '─'.repeat(100);
+const DIVIDER = '\u2500'.repeat(100);
 
-// ─── Main ──────────────────────────────────────────────────────────────────
+// ─── Main ─────────────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
   const opts = parseArgs();
   const startTime = Date.now();
 
-  console.log(`\n${BOLD}AuScope Portal — Live Layer Integration Test${RESET}`);
+  console.log(`\n${BOLD}AuScope Portal \u2014 Live Layer Integration Test${RESET}`);
   console.log(`Environment : ${CYAN}${opts.env}${RESET}  (${opts.baseUrl})`);
   console.log(`Concurrency : ${opts.concurrency}    Timeout: ${opts.timeout}ms   Filter: ${opts.type}`);
   if (opts.layerFilter) console.log(`Layer filter: ${opts.layerFilter}`);
@@ -273,14 +273,14 @@ async function main(): Promise<void> {
   try {
     const { status, body } = await fetchWithTimeout(knownLayersUrl, opts.timeout);
     if (status !== 200) {
-      console.error(`${RED}FAILED — HTTP ${status}${RESET}`);
+      console.error(`${RED}FAILED \u2014 HTTP ${status}${RESET}`);
       process.exit(1);
     }
     const parsed = JSON.parse(body) as { data: Layer[] };
     layers = parsed.data ?? [];
     console.log(`${GREEN}${layers.length} layers found${RESET}`);
   } catch (err: any) {
-    console.error(`${RED}FAILED — ${err.message ?? String(err)}${RESET}`);
+    console.error(`${RED}FAILED \u2014 ${err.message ?? String(err)}${RESET}`);
     process.exit(1);
   }
 
@@ -417,18 +417,18 @@ async function main(): Promise<void> {
   // 7. Print summary
   const totalElapsed = ((Date.now() - startTime) / 1000).toFixed(1);
 
-  const wmsResults  = results.filter((r) => r.serviceType === 'WMS' && r.outcome !== 'SKIP');
-  const wfsResults  = results.filter((r) => r.serviceType === 'WFS' && r.outcome !== 'SKIP');
-  const wmsPass     = wmsResults.filter((r) => r.outcome === 'PASS').length;
-  const wmsFail     = wmsResults.filter((r) => r.outcome === 'FAIL').length;
-  const wfsPass     = wfsResults.filter((r) => r.outcome === 'PASS').length;
-  const wfsFail     = wfsResults.filter((r) => r.outcome === 'FAIL').length;
+  const wmsResults = results.filter((r) => r.serviceType === 'WMS' && r.outcome !== 'SKIP');
+  const wfsResults = results.filter((r) => r.serviceType === 'WFS' && r.outcome !== 'SKIP');
+  const wmsPass = wmsResults.filter((r) => r.outcome === 'PASS').length;
+  const wmsFail = wmsResults.filter((r) => r.outcome === 'FAIL').length;
+  const wfsPass = wfsResults.filter((r) => r.outcome === 'PASS').length;
+  const wfsFail = wfsResults.filter((r) => r.outcome === 'FAIL').length;
   const totalFailed = wmsFail + wfsFail;
 
   // Count distinct layers that were actually tested (not skipped)
   const testedLayerIds = new Set(results.filter((r) => r.outcome !== 'SKIP').map((r) => r.layerId));
-  const wmsLayerIds    = new Set(wmsResults.map((r) => r.layerId));
-  const wfsLayerIds    = new Set(wfsResults.map((r) => r.layerId));
+  const wmsLayerIds = new Set(wmsResults.map((r) => r.layerId));
+  const wfsLayerIds = new Set(wfsResults.map((r) => r.layerId));
 
   console.log(DIVIDER);
   console.log(`${BOLD}SUMMARY${RESET}`);
@@ -440,6 +440,9 @@ async function main(): Promise<void> {
   console.log(`  Layers skipped (no WMS/WFS)    : ${skippedLayers.length}`);
   console.log(`  Total elapsed                  : ${totalElapsed}s`);
   console.log(DIVIDER);
+
+  void testedLayerIds; // suppress unused variable warning
+  void hasFailed;     // suppress unused variable warning
 
   if (totalFailed === 0) {
     console.log(`${GREEN}${BOLD}Result: PASSED${RESET}\n`);
