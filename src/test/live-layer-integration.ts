@@ -5,7 +5,7 @@
  *
  * Standalone Node.js script (no Angular, no third-party deps beyond ts-node).
  * Run with:
- *   ts-node --skipProject src/test/live-layer-integration.ts [options]
+ *   ts-node --skip-project src/test/live-layer-integration.ts [options]
  *
  * Options:
  *   --env dev|prod        Portal environment (default: dev)
