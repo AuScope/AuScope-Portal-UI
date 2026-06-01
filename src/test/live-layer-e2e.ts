@@ -163,7 +163,6 @@ async function testLayerViaUI(
   layer: Layer,
   portalUrl: string,
   timeoutMs: number,
-  headed: boolean,
 ): Promise<E2EResult> {
   const start = Date.now();
   let context: BrowserContext | null = null;
@@ -375,7 +374,7 @@ async function main(): Promise<void> {
           return;
         }
 
-        const r = await testLayerViaUI(browser, layer, opts.portalUrl, opts.timeout, opts.headed);
+        const r = await testLayerViaUI(browser, layer, opts.portalUrl, opts.timeout);
         results.push(r);
         console.log(formatResult(r));
 
