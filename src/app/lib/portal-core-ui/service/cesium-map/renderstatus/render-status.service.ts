@@ -67,7 +67,6 @@ export class RenderStatusService {
    */
   public updateComplete(layer: LayerModel, resource: OnlineResourceModel, error?: boolean) {
     this.statusmaps[layer.id].updateComplete(resource, error);
-    this.appRef.tick();
   }
 
   /**
