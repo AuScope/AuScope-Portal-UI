@@ -168,8 +168,13 @@ export class SearchPanelComponent implements OnInit {
   /**
    * Detect external component clicks so we can close components that need to be when this happens
    */
-  @HostListener('document:click')
-  externalClick(): void {
+  @HostListener('document:click', ['$event'])
+  externalClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    // Ignore Angular Material overlay (stop paginator from closing dropdown)
+    if (target.closest('.cdk-overlay-container')) {
+      return;
+    }
     if (!this.searchClick && !this.infoDialogOpen) {
       if (this.showingResultsPanel) {
         this.setShowingResultsPanel(false);

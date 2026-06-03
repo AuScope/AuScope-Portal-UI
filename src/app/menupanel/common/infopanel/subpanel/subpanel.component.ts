@@ -103,7 +103,8 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
         return onlineResource.type === ResourceType.WMS || onlineResource.type === ResourceType.WFS || onlineResource.type === ResourceType.WCS || onlineResource.type === ResourceType.CSW;
     }
 
-    /** Removes proxy from URL for display purposes
+    /**
+     * Removes proxy from URL for display purposes
      *
      * e.g. "http://localhost:8080/getViaProxy.do?url=https://raw.githubusercontent.com/CesiumGS/cesium/main/Apps/SampleData/kml/bikeRide.kml"
      * get converted to "https://raw.githubusercontent.com/CesiumGS/cesium/main/Apps/SampleData/kml/bikeRide.kml"
