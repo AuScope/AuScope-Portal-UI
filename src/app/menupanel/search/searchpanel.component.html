@@ -141,7 +141,7 @@
         <button class="btn btn-sm btn-secondary" type="button" [matMenuTriggerFor]="spatialBoundsMenu">{{ getSpatialBoundsTitle() }}</button>
         <mat-menu #spatialBoundsMenu="matMenu">
           <div class="advanced-options-panel spatial-options-panel" (click)="$event.stopPropagation()">
-            <input type="checkbox" class="options-checkbox" title="Toggle bounds restriction" [(ngModel)]="restrictBounds"><label><strong>Restrict Spatial Bounds</strong></label>
+            <input type="checkbox" class="options-checkbox" title="Toggle bounds restriction" [(ngModel)]="restrictBounds"><label class="spatial-bounds-label"><strong>Restrict Spatial Bounds</strong></label>
             <div style="display:flex;">
               <button type="button" class="btn btn-sm btn-primary" title="Draw bounds on map" (click)="drawBounds()">Draw Bounds</button>
               <button type="button" class="btn btn-sm btn-primary" title="Clear bounds from map" (click)="clearBounds()" [disabled]="!bbox">Clear Bounds</button>
