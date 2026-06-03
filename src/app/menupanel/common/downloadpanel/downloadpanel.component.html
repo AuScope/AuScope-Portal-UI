@@ -257,7 +257,7 @@
               <button type="button" title="Remove bounds"
                 class="btn btn-danger btn-xs" [disabled]="downloadStarted" (click)="clearBounds()"><i class="fa fa-refresh"></i>&nbsp;Clear Bounds</button>
             }
-            <button type="button" class="btn btn-primary btn-xs" style="margin-left:auto;width:9rem;" [disabled]="!bbox || downloadStarted" title="Download data for bounding box" (click)="download()">
+            <button type="button" class="btn btn-primary btn-xs" style="margin-left:0.5rem;width:9rem;" [disabled]="!bbox || downloadStarted" title="Download data for bounding box" (click)="download()">
               @if (downloadStarted) {
                 <i class="fa fa-spinner fa-spin fa-fw"></i>
               }

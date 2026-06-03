@@ -216,7 +216,7 @@
                       <button class="btn btn-sm btn-info search-result-button" type="button" title="Layer information" (click)="showLayerInformation($event, searchResult.layer)"><i class="fa fa-info-circle"></i>&nbsp;Info</button>
                       <button class="btn btn-sm btn-primary download-checkbox-button" type="button" title="Add to download list" [style.visibility]="isCsvDownloadable(searchResult.layer) ? 'visible' : 'hidden'">
                         <i class="fa fa-download download-icon"></i>
-                        <input type="checkbox" class="faChkSqr" style="vertical-align: middle;" [checked]="mapDownloadLayers.get(searchResult.layer.id)" (change)="OnChangeDownloadLayers(searchResult.layer)">
+                        <input type="checkbox" class="faChkSqr" style="vertical-align: center;" [checked]="mapDownloadLayers.get(searchResult.layer.id)" (change)="OnChangeDownloadLayers(searchResult.layer)">
                       </button>
                     </span>
                   </div>

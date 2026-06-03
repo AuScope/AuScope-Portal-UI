@@ -55,6 +55,10 @@
 
     .search-dropdown {
         flex: 1;
+
+        .search-input-wrapper {
+          position: relative;
+        }
     }
 
     .suggestion-button {
@@ -242,7 +246,6 @@
                         height: 90%;
                         width: 8.5rem;  // consistency so Add/Remove don't push the CSW/Featured labels out and break alignment
                         text-align: center;
-                        float: right;
                         padding: 2px;
                         margin-left: 8px;
                         min-height: 8px;
@@ -253,7 +256,10 @@
                         width: 3rem; // consistency so Add/Remove don't push the CSW/Featured labels out and break alignment
                         min-width: 3rem;
                         text-align: center;
-                        float: right;
+
+                        vertical-align: center;
+                        display: inline;
+                        
                         padding: 2px;
                         margin-left: 8px;
                         min-height: 8px;
