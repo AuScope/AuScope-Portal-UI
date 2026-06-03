@@ -259,7 +259,7 @@
 
                         vertical-align: center;
                         display: inline;
-                        
+
                         padding: 2px;
                         margin-left: 8px;
                         min-height: 8px;
@@ -303,7 +303,7 @@
 
                 .clear-search-results-button {
                     margin: 0px 0px 0px 20px;
-                    padding: 0px 2px 0px 0px;
+                    padding: 0px 5px 0px 0px;
                     border-radius: 2px;
                 }
 
@@ -321,6 +321,10 @@
                       .download-layers-list {
                           max-height: calc(100vh - 560px);
                           overflow-y: auto;
+
+                          .search-download-icon {
+                            translate: -1px 0;
+                          }
                       }
                   }
                 }
