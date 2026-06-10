@@ -181,9 +181,9 @@ export class CsClipboardService {
           const coordsListLngLat = [];
           const coordsListLatLng = [];
           for (let i = 0; i<coordsList.length; i++) {
-            const coord = coordsList[i].split(',');
-            const lng = parseFloat(coord[0]).toFixed(3);
-            const lat = parseFloat(coord[1]).toFixed(3);
+            const coord = coordsList[i].split(',');            
+            const lng = Math.round(parseFloat(coord[0]) * 1000) / 1000;
+            const lat = Math.round(parseFloat(coord[1]) * 1000) / 1000;
             if (isNumber(lng) && isNumber(lat)) {
               coordsListLngLat.push(lng);
               coordsListLngLat.push(lat);

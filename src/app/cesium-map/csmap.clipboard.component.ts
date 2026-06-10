@@ -1,6 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { CsClipboardService } from '../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
-import { DownloadWfsService } from '../lib/portal-core-ui/service/wfs/download/download-wfs.service';
 import { Polygon } from '../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
 import { Component, OnInit, inject } from '@angular/core';
 import { isNumber } from '@turf/helpers';
@@ -28,7 +27,6 @@ import { UserStateService } from 'app/services/user/user-state.service';
 export class CsMapClipboardComponent implements OnInit {
   private csClipboardService = inject(CsClipboardService);
   private userStateService = inject(UserStateService);
-  private downloadWfsService = inject(DownloadWfsService);
 
   buttonText = 'clipboard';
   polygonBBox: Polygon;
@@ -37,7 +35,6 @@ export class CsMapClipboardComponent implements OnInit {
   public isDrawingPolygon: boolean;
   kmlFileName = '';
   roiNameList = [];
-
 
 
   constructor() {
@@ -62,6 +59,7 @@ export class CsMapClipboardComponent implements OnInit {
         this.polygonBBox = polygonBBox;
     });
   }
+
   onRoiSave() {
     if (this.polygonBBox === null) return;
     const roiPolygon= this.polygonBBox;
@@ -73,6 +71,7 @@ export class CsMapClipboardComponent implements OnInit {
     this.userStateService.roiList.push(roiPolygon);
     this.userStateService.saveROI();
   }
+
   onKmlFileSave() {
     if (this.polygonBBox === null) return;
 
