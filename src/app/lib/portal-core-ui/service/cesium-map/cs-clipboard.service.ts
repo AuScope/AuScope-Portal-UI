@@ -211,19 +211,31 @@ export class CsClipboardService {
    * @param roi roi polygon object, contains , assumes EPSG:4326
    */
   public loadPolygonFromROI(roi) {
-    const coords = roi.coordinates;
+    let coords = roi.coordinates;
+    // If backend returned full GML/XML, extract the inner <gml:coordinates> content
+    if (typeof coords === 'string' && coords.indexOf('<gml:coordinates') !== -1) {
+      coords = this.getCoordinates(coords);
+    }
     const coordsList = coords.split(' ');
     const coordsListLngLat = [];
     for (let i = 0; i < coordsList.length; i++) {
-        const coord = coordsList[i].split(',');
-        const lng = parseFloat(coord[1]).toFixed(3);
-        const lat = parseFloat(coord[0]).toFixed(3);
-        if (isNumber(lng) && isNumber(lat)) {
-            coordsListLngLat.push(lng);
-            coordsListLngLat.push(lat);
+      const coord = coordsList[i].split(',');
+      let a = parseFloat(coord[0]);
+      let b = parseFloat(coord[1]);
+      // If the parsed latitude is out of valid range (>90) swap coords
+      if (Number.isFinite(a) && Number.isFinite(b)) {
+        if (Math.abs(b) > 90 && Math.abs(a) <= 90) {
+          const tmp = a; a = b; b = tmp;
         }
+      }
+      const lng = Math.round(a * 1000) / 1000;
+      const lat = Math.round(b * 1000) / 1000;
+      if (isNumber(lng) && isNumber(lat)) {
+        coordsListLngLat.push(lng);
+        coordsListLngLat.push(lat);
+      }
     }
-    this.renderPolygon(coordsListLngLat); //need to be [lng lat lng lat]
+    this.renderPolygon(coordsListLngLat); // need to be [lng lat lng lat]
     this.polygonBBox = roi;
     this.polygonsBS.next(this.polygonBBox);
     return;
@@ -240,8 +252,8 @@ export class CsClipboardService {
 
     const coordString = this.getCoordinates(newPolygon.coordinates);
     const coordsArray = coordString.split(' ');
-    let coords4326ListLngLat = []; //for rendering
-    let coords4326ListLatLng = []; //for polygon wms query
+    let coords4326ListLngLat = []; // for rendering
+    let coords4326ListLatLng = []; // for polygon wms query
     if (newPolygon.srs === 'EPSG:3857') {
       for (const coords of coordsArray) {
         const lonLat = coords.split(',');
@@ -264,11 +276,11 @@ export class CsClipboardService {
       return;
     }
 
-    //Simplify process might reduce 90% points.
+    // Simplify process might reduce 90% points.
     const tolerance: number = 0.05;
     const highQuality: boolean = true;
     const simplifiedCoords4326 = SimplifyAP(coords4326ListLngLat, tolerance, highQuality);
-    //
+
     coords4326ListLngLat = [];
     coords4326ListLatLng = [];
     for (let i = 0; i < simplifiedCoords4326.length; i++) {
