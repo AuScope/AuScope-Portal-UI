@@ -20,10 +20,15 @@ import { NVCLService } from '../../../modalwindow/querier/customanalytic/nvcl/nv
 import { shareReplay } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { DownloadAuScopeCatModalComponent } from 'app/modalwindow/download-auscopecat/download-auscopecat.modal.component';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 declare let rudderanalytics: any;
+
+type dsUrlLayerKey = keyof typeof config.datasetUrlSupportedLayer;
+type dsAusPassKey = keyof typeof config.datasetUrlAussPassLayer;
+type dsAusPassSrvKey = keyof typeof config.datasetUrlAussPassLayer['passive seismic']['serviceType'];
+type wcsKey = keyof typeof config.wcsSupportedLayer;
 
 @Component({
     selector: 'app-download-panel',
@@ -47,8 +52,8 @@ export class DownloadPanelComponent implements OnInit {
   [x: string]: any;
   @Input() layer: LayerModel;
 
-  bbox: Bbox;
-  polygonBbox: Bbox;
+  bbox: Bbox|null;
+  polygonBbox: Bbox|null;
   polygonFilter: any;
   drawBoundsStarted: boolean;
   drawPolygonStarted: boolean;
@@ -87,16 +92,31 @@ export class DownloadPanelComponent implements OnInit {
   public SELECT_DEFAULT_CHANNEL = "Choose a channel";
   public SELECT_ALL_CHANNEL = "All channels";
 
-  private dialogRef = null;
+  private tsgDialogRef: MatDialogRef<NVCLTSGDownloadComponent, any>|null = null;
 
   constructor() {
     this.isNvclLayer = false;
     this.isTsgDownloadAvailable = false;
+    this.isIRISDownloadSupported = false;
     this.bbox = null;
+    this.polygonBbox = null;
+    this.polygonFilter = null;
     this.drawBoundsStarted = false;
     this.downloadStarted = false;
     this.wcsDownloadForm = {};
     this.showDOIs = false;
+    this.downloadSizeLimit = 0;
+    this.tsgDownloadEmail = "";
+    this.tsgDownloadServiceMsg = "";
+    this.isWCSDownloadSupported = false;
+    this.datasetUrl = "datasetURL";
+    this.isDatasetURLSupportedLayer = false;
+    this.drawPolygonStarted = false;
+    this.download4pStarted = false;
+    this.download4PolygonKMLStarted = false;
+    this.omitGslmpShapeProperty = false;
+    this.isCsvSupportedLayer = false;
+    this.isPolygonSupportedLayer = false;
   }
 
   ngOnInit(): void {
@@ -119,31 +139,32 @@ export class DownloadPanelComponent implements OnInit {
           this.isTsgDownloadAvailable = false;
         });
       }
+
       this.isPolygonSupportedLayer = config.polygonSupportedLayer.indexOf(this.layer.id) >= 0;
       this.isCsvSupportedLayer = this.layer.supportsCsvDownloads;
-      this.isDatasetURLSupportedLayer = config.datasetUrlSupportedLayer[this.layer.id] !== undefined;
+      this.isDatasetURLSupportedLayer = config.datasetUrlSupportedLayer[<dsUrlLayerKey>this.layer.id] !== undefined;
       if (this.isDatasetURLSupportedLayer) {
-        if (config.datasetUrlSupportedLayer[this.layer.id].hasOwnProperty('datasetURL')) {
-          this.datasetUrl = config.datasetUrlSupportedLayer[this.layer.id].datasetURL;
+        if (config.datasetUrlSupportedLayer[<dsUrlLayerKey>this.layer.id].hasOwnProperty('datasetURL')) {
+          this.datasetUrl = config.datasetUrlSupportedLayer[<dsUrlLayerKey>this.layer.id].datasetURL;
         } else {
           this.datasetUrl = 'datasetURL';
         }
-        if (config.datasetUrlSupportedLayer[this.layer.id].hasOwnProperty('omitGsmlpShapeProperty')) {
-          this.omitGslmpShapeProperty = config.datasetUrlSupportedLayer[this.layer.id].omitGsmlpShapeProperty;
+        if (config.datasetUrlSupportedLayer[<dsUrlLayerKey>this.layer.id].hasOwnProperty('omitGsmlpShapeProperty')) {
+          this.omitGslmpShapeProperty = config.datasetUrlSupportedLayer[<dsUrlLayerKey>this.layer.id].omitGsmlpShapeProperty;
         }
       }
       // If it is an IRIS layer get the station information
-      if (config.datasetUrlAussPassLayer[this.layer.group?.toLowerCase()] !== undefined &&
+      if (config.datasetUrlAussPassLayer[<dsAusPassKey>this.layer.group?.toLowerCase()] !== undefined &&
           UtilitiesService.layerContainsResourceType(this.layer, ResourceType.IRIS)) {
         this.isIRISDownloadSupported = true;
         this.getIRISStationInfo();
       }
       // If layer supports WCS set download size limit
-      if (config.wcsSupportedLayer[this.layer.id]) {
+      if (config.wcsSupportedLayer[<wcsKey>this.layer.id]) {
         this.isWCSDownloadSupported = true;
         // If 'downloadAreaMaxsize' is not set to Number.MAX_SAFE_INTEGER then download limits will apply
-        if (config.wcsSupportedLayer[this.layer.id].downloadAreaMaxSize < Number.MAX_SAFE_INTEGER) {
-          this.downloadSizeLimit = config.wcsSupportedLayer[this.layer.id].downloadAreaMaxSize;
+        if (config.wcsSupportedLayer[<wcsKey>this.layer.id].downloadAreaMaxSize < Number.MAX_SAFE_INTEGER) {
+          this.downloadSizeLimit = config.wcsSupportedLayer[<wcsKey>this.layer.id].downloadAreaMaxSize;
         } else {
           this.downloadSizeLimit = 0;
         }
@@ -220,7 +241,10 @@ export class DownloadPanelComponent implements OnInit {
    * @param bbox the bounding box
    * @returns a string representation of the bounding box as a polygon filter
    */
-  private createPolygonFilterFromBbox(bbox: Bbox): string {
+  private createPolygonFilterFromBbox(bbox: Bbox|null): string {
+    if (!bbox) {
+      return '';
+    }
     const coordinates =
       bbox.northBoundLatitude + ',' + bbox.westBoundLongitude + ' ' +
       bbox.southBoundLatitude + ',' + bbox.westBoundLongitude + ' ' +
@@ -339,7 +363,7 @@ export class DownloadPanelComponent implements OnInit {
    * Runs the getIrisStationFeature request to gather information about the IRIS stations and channels
    */
   private getIRISStationInfo() {
-    const serviceTypeList = Object.keys(config.datasetUrlAussPassLayer[this.layer.group.toLowerCase()]['serviceType']);
+    const serviceTypeList = Object.keys(config.datasetUrlAussPassLayer[<dsAusPassKey>this.layer.group.toLowerCase()]['serviceType']);
     this.csIrisService.getIrisStationFeature(this.layer).subscribe(response => {
 
       const channelLst = this.getAvilChannel(response['data'][0].stationLst);
@@ -483,7 +507,7 @@ export class DownloadPanelComponent implements OnInit {
       if (this.wcsDownloadForm.timePosition) {
         timePositions = [this.wcsDownloadForm.timePosition];
       }
-      const maxImageSize = config.wcsSupportedLayer[this.layer.id].maxImageSize;
+      const maxImageSize = config.wcsSupportedLayer[<wcsKey>this.layer.id].maxImageSize;
       // Convert BBox coords to the CRS of WCS layer 'inputCrs' parameter
       const bbox = UtilitiesService.coordConvBbox(this.bbox, this.wcsDownloadForm.inputCrs);
       // Perform WCS download
@@ -513,7 +537,7 @@ export class DownloadPanelComponent implements OnInit {
     // Standard WFS feature download as a CSV
     } else {
       this.downloadStarted = true;
-      observableResponse = this.downloadWfsService.downloadCSV(this.layer, this.bbox, null, true);
+      observableResponse = this.downloadWfsService.downloadCSV(this.layer, this.bbox, '', true);
     }
 
     // Kick off the download process and save zip file in browser
@@ -674,7 +698,7 @@ export class DownloadPanelComponent implements OnInit {
   /**
    * Download the layer
    */
-  public download4PolygonKML(): string {
+  public download4PolygonKML() {
     if (this.download4PolygonKMLStarted) {
       alert('Download in progress, please wait for it to complete');
       return;
@@ -710,7 +734,7 @@ export class DownloadPanelComponent implements OnInit {
       return;
     }
 
-    this.dialogRef = this.dialog.open(NVCLTSGDownloadComponent, {
+    this.tsgDialogRef = this.dialog.open(NVCLTSGDownloadComponent, {
       width: '1000px',
       data: {
         layer: this.layer,
@@ -737,7 +761,7 @@ export class DownloadPanelComponent implements OnInit {
       let total = 0;
       let urlsArray = [];
       if (urls) {
-        urlsArray = urls.split(/\r?\n/g).filter(function(url) {
+        urlsArray = urls.split(/\r?\n/g).filter(function(url: string) {
           return url.match(/^http/g);
         });
         total = urlsArray.length;
@@ -747,8 +771,10 @@ export class DownloadPanelComponent implements OnInit {
         this.downloadWfsService.tsgDownloadBS.next('completed,completed');
         return;
       }
-      this.dialogRef.componentInstance.urlsArray = urlsArray;
-      this.dialogRef.componentInstance.BulkDownloadTsgFiles();
+      if (this.tsgDialogRef) {
+        this.tsgDialogRef.componentInstance.urlsArray = urlsArray;
+        this.tsgDialogRef.componentInstance.BulkDownloadTsgFiles();
+      }
       /**
        * do not "log" the "email" to "RudderStack" - as this is an ethics issue
        *
@@ -819,8 +845,8 @@ export class DownloadPanelComponent implements OnInit {
    * on data type change construct the associated options
    */
   public onServiceTypeChange() {
-    this.irisDownloadListOption.displayBbox = config.datasetUrlAussPassLayer[this.layer.group.toLowerCase()]['serviceType']
-          [this.irisDownloadListOption.selectedserviceType].isGeometryOptional;
+    this.irisDownloadListOption.displayBbox = config.datasetUrlAussPassLayer[<dsAusPassKey>this.layer.group.toLowerCase()]['serviceType']
+          [<dsAusPassSrvKey>this.irisDownloadListOption.selectedserviceType].isGeometryOptional;
   }
 
   /**
@@ -855,8 +881,8 @@ export class DownloadPanelComponent implements OnInit {
   }
 
   public downloadWithAuScopeCat(): void {
-    this.dialogRef = this.activeModalService.open(DownloadAuScopeCatModalComponent, {
-        size: '800px',
+    this.dialog.open(DownloadAuScopeCatModalComponent, {
+        width: '800px',
         data: {
           layer: this.layer,
           bbox: this.bbox,

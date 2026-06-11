@@ -55,7 +55,7 @@ export class DownloadWfsService {
    *                               (can cause problems with GADDS 2.0)
    * @returns Observable of response
    */
-  public downloadDatasetURL(layer: LayerModel, bbox: Bbox, filter: string, datasetURL: string,
+  public downloadDatasetURL(layer: LayerModel, bbox: Bbox|null, filter: string, datasetURL: string,
                             omitGsmlpShapeProperty: boolean): Observable<any> {
     try {
       const wfsResources = this.layerHandlerService.getWFSResource(layer);
@@ -115,7 +115,7 @@ export class DownloadWfsService {
    * @param bbox the bounding box of the area to download
    * @param polygonFilter WFS filter parameter
    */
-  public downloadTsgFileUrls(layer: LayerModel, bbox: Bbox, email: string, polygonFilter: string): Observable<any> {
+  public downloadTsgFileUrls(layer: LayerModel, bbox: Bbox|null, email: string, polygonFilter: string): Observable<any> {
       try {
         const wfsResources = this.layerHandlerService.getWFSResource(layer);
         if (this.env.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
@@ -195,7 +195,7 @@ export class DownloadWfsService {
    * @param polygonFilter WFS filter parameter
    * @param bZip download as a zip file
    */
-  public downloadCSV(layer: LayerModel, bbox: Bbox, polygonFilter: string, bZip: boolean): Observable<any> {
+  public downloadCSV(layer: LayerModel, bbox: Bbox|null, polygonFilter: string, bZip: boolean): Observable<any> {
 
     try {
       const wfsResources = this.layerHandlerService.getWFSResource(layer);

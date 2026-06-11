@@ -9,7 +9,8 @@ export const config = {
   //  omitGsmlpShapeProperty: true
   datasetUrlSupportedLayer: {
     'mscl-borehole': {
-      datasetURL: 'datasetURL'
+      datasetURL: 'datasetURL',
+      omitGsmlpShapeProperty: false
     }
   },
 

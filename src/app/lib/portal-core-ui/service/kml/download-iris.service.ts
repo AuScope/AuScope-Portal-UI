@@ -70,7 +70,7 @@ export class DownloadIrisService {
    * @param datasetURL feature name which holds the URLs to download
    * @returns Observable of response
    */
-    public downloadIRISStation(layer: LayerModel, bbox: Bbox, station: string, channel: string, startDate: string, endDate: string): Observable<any> {
+    public downloadIRISStation(layer: LayerModel, bbox: Bbox|null, station: string, channel: string, startDate: string, endDate: string): Observable<any> {
         try {
             let url = layer.cswRecords[0].onlineResources[0].url + "/fdsnws/station/1/query?";
             const querystring = new URLSearchParams({
