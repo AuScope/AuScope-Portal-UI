@@ -790,8 +790,13 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   /**
    * Escape CSV values (handle commas, quotes, newlines)
    */
-  private escapeCSV(value: string): string {
+  private escapeCSV(value: string | number): string {
     if (!value) return '';
+
+    // If it's a number return a string
+    if (typeof value === "number") {
+      return String(value);
+    }
 
     // If value contains comma, quote, or newline, wrap in quotes and escape internal quotes
     if (value.includes(',') || value.includes('"') || value.includes('\n') || value.includes('\r')) {
