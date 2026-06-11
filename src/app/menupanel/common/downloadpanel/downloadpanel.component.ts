@@ -393,8 +393,8 @@ export class DownloadPanelComponent implements OnInit {
   /**
    * Create a channel list to display in the dropdown. The list is the union of all available channels for all stations.
    */
-  private getAvilChannel(stationLst) {
-    let channelLst = [];
+  private getAvilChannel(stationLst: [ {'channelLst': [{'code': string} ]}]) {
+    let channelLst: {'code': string}[] = [];
     stationLst.forEach(station => {
       if (station.channelLst && station.channelLst.length > 0) {
         station.channelLst.forEach(channel => {
@@ -430,10 +430,12 @@ export class DownloadPanelComponent implements OnInit {
       maxLon = maxLon && Number(latLon[1]) < maxLon ? maxLon : Number(latLon[1]);
     }
     const bbox: Bbox = new Bbox();
-    bbox.southBoundLatitude = minLat;
-    bbox.northBoundLatitude = maxLat;
-    bbox.eastBoundLongitude = maxLon;
-    bbox.westBoundLongitude = minLon;
+    if (minLat && maxLat && maxLon && minLon) {
+      bbox.southBoundLatitude = minLat;
+      bbox.northBoundLatitude = maxLat;
+      bbox.eastBoundLongitude = maxLon;
+      bbox.westBoundLongitude = minLon;
+    }
     return bbox;
   }
 
@@ -503,7 +505,7 @@ export class DownloadPanelComponent implements OnInit {
       }
 
       this.downloadStarted = true;
-      let timePositions = [];
+      let timePositions: any[] = [];
       if (this.wcsDownloadForm.timePosition) {
         timePositions = [this.wcsDownloadForm.timePosition];
       }
@@ -768,7 +770,7 @@ export class DownloadPanelComponent implements OnInit {
       }
       if (!urls || total < 1) {
         alert('TSGFilesDownload: No TSGFiles was found in the area. Please draw another boundary or polygon to search.');
-        this.downloadWfsService.tsgDownloadBS.next('completed,completed');
+        this.downloadWfsService.tsgDownloadBS?.next('completed,completed');
         return;
       }
       if (this.tsgDialogRef) {

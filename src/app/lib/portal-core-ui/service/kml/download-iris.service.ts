@@ -25,7 +25,7 @@ export class DownloadIrisService {
    * @param datasetURL feature name which holds the URLs to download
    * @returns Observable of response
    */
-    public downloadIRISDataselect(layer: LayerModel, station: string, channel: string, startDate: string, endDate: string): Observable<any> {
+    public downloadIRISDataselect(layer: LayerModel, station: string, channel: string, startDate: string|null, endDate: string|null): Observable<any> {
         try {
             let url = layer.cswRecords[0].onlineResources[0].url + "/fdsnws/dataselect/1/query?";
             const querystring = new URLSearchParams({
@@ -70,7 +70,7 @@ export class DownloadIrisService {
    * @param datasetURL feature name which holds the URLs to download
    * @returns Observable of response
    */
-    public downloadIRISStation(layer: LayerModel, bbox: Bbox|null, station: string, channel: string, startDate: string, endDate: string): Observable<any> {
+    public downloadIRISStation(layer: LayerModel, bbox: Bbox|null, station: string, channel: string, startDate: string|null, endDate: string|null): Observable<any> {
         try {
             let url = layer.cswRecords[0].onlineResources[0].url + "/fdsnws/station/1/query?";
             const querystring = new URLSearchParams({
