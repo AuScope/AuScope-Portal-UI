@@ -8,7 +8,7 @@ import { LayerHandlerService } from '../../lib/portal-core-ui/service/cswrecords
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 import { RenderStatusService } from '../../lib/portal-core-ui/service/cesium-map/renderstatus/render-status.service';
 import { UtilitiesService } from '../../lib/portal-core-ui/utility/utilities.service';
-import { Constants } from '../../lib/portal-core-ui/utility/constants.service';
+import { Constants, ResourceType } from '../../lib/portal-core-ui/utility/constants.service';
 import { SearchService } from 'app/services/search/search.service';
 import { Observable, Subject, Subscription } from 'rxjs';
 
@@ -459,7 +459,9 @@ export class SearchPanelComponent implements OnInit {
    * @param layer the LayerModel
    */
   isMapSupportedLayer(layer: LayerModel): boolean {
-    return UtilitiesService.isMapSupportedLayer(layer);
+    return UtilitiesService.isMapSupportedLayer(layer)
+        && !(layer.id.startsWith("registry-csw:") &&
+             UtilitiesService.layerContainsResourceType(layer, ResourceType.IRIS));
   }
 
   /**
