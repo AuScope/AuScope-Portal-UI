@@ -342,13 +342,13 @@ export class CsMapComponent implements AfterViewInit {
    * @param mapClickInfo object with map click information
    * @returns html for display in the modal
    */
-  private kmlGroundOverlay(mapClickInfo) : string {
+  private kmlGroundOverlay(mapClickInfo: any) : string {
 
     let html = "";
 
-    const layerList = mapClickInfo.clickedLayerList
-    if (layerList[0].kmlDoc) {
-      const go = layerList[0].kmlDoc.querySelector("GroundOverlay");
+    const layerList = mapClickInfo.clickedLayerList;
+    if (layerList?.[0]?.kmlDoc) {
+      const go = layerList[0].kmlDoc.querySelector?.("GroundOverlay");
       if (go) {
         // make an entity? = [name, description]
         const name = go.querySelector('name').textContent;
