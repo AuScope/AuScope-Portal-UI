@@ -443,6 +443,12 @@ export class NVCLDatasetListComponent implements OnInit {
   }
 }
 
+// Holds mineralogical legend data for the legend dialog in "Image" view
+export interface LegendDialogData {
+  scalarClasses: Record<string, string>;
+}
+
+// Legend dialog in "Image" view
 @Component({
     selector: 'app-nvcl-datasetlist-component-dialog',
     templateUrl: 'nvcl.datasetlist.dialog.component.html',
@@ -450,7 +456,5 @@ export class NVCLDatasetListComponent implements OnInit {
 })
 export class NVCLDatasetListDialogComponent {
   modalRef = inject(MatDialogRef<NVCLDatasetListDialogComponent>);
-
-  scalarClasses: any;
-
+  data = inject<LegendDialogData>(MAT_DIALOG_DATA);
 }
