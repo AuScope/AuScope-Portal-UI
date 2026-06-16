@@ -156,7 +156,11 @@
         color: whitesmoke; /* From AuScope style guide */
     }
 
-    .form-check-label {
-        margin-top: 1px;
+    .form-check {
+      margin-left: 1rem;
+      
+      .form-check-label {
+          margin-top: 1px;
+      }
     }
 }
