@@ -1,8 +1,8 @@
 <!-- Modal for querier-->
-<div class="modal-header">
+<div class="modal-header" cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragBoundary="body">
   <h1 class="page-header">TSG Files Download</h1>
 </div>
-<div class="modal-body" cdkDrag cdkDragRootElement=".modal-content" #childElement cdkDragBoundary="body">
+<div class="modal-body" #childElement>
   <div class="card card-default">
     <!-- BEGIN card-body -->
     <div class="card-body">
