@@ -306,7 +306,26 @@ export const config = {
     'sa-rad-th',
     'sa-rad-u',
     'sa-rad-u2th',
-    'sa-rad-tc'
+    'sa-rad-tc',
+    'nsw-assay-surface',
+    'nsw-field-observations',
+    'nsw-downhole-assay-samples',
+    'nsw-geochemistry-isotope',
+    'nsw-geochemistry-hydrogeochemistry',
+    'nsw-geochemistry-drillhole',
+    'nsw-all-drillholes',
+    'nsw-hylogger-boreholes',
+    'nsw-mineral-occurrence-industry',
+    'nsw-mineral-occurrence-commodity',
+    'nsw-titles-mineral-allocation-areas',
+    'nsw-titles-applications',
+    'nsw-titles-ancilliary-mining-areas',
+    'nsw-titles-granted',
+    'nsw-titles-historic',
+    'geop-tern-radi-pota',
+    'geophysics-isostatic-bouger-gravity',
+    'geop-isos-grav-over-tmi-rtp-tilt',
+    'nsw-geological-provinces'
   ],
   // Layers that require a JSON response for WMS GetFeature requests
   wmsGetFeatureJSON: [
