@@ -1,4 +1,4 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import { Pipe, PipeTransform, inject } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 
 /**
@@ -48,7 +48,8 @@ export class QuerierFeatureSearchPipe implements PipeTransform {
     standalone: false
 })
 export class TrustResourceUrlPipe implements PipeTransform {
-  constructor(private sanitizer: DomSanitizer) {}
+  private sanitizer = inject(DomSanitizer);
+
   transform(url) {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
@@ -62,7 +63,8 @@ export class TrustResourceUrlPipe implements PipeTransform {
     standalone: false
 })
 export class TrustResourceHtmlPipe implements PipeTransform {
-  constructor(private sanitizer: DomSanitizer) {}
+  private sanitizer = inject(DomSanitizer);
+
   transform(html) {
     return this.sanitizer.bypassSecurityTrustHtml(html);
   }

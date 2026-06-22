@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 import { CsMapObject } from '../cesium-map/cs-map-object';
@@ -13,6 +13,8 @@ import { MapState } from '../../model/data/mapstate.model';
   { providedIn: 'root' } // singleton service
 )
 export class ManageStateService {
+  private csMapObject = inject(CsMapObject);
+
 
   private state: any = {};
   private permLinkMode: boolean = false; // Is true if a permanent link has been employed
@@ -20,8 +22,6 @@ export class ManageStateService {
   // Layer requires expanding
   private layerToExpandBS: BehaviorSubject<string> = new BehaviorSubject<string>(null);
   public readonly layerToExpand = this.layerToExpandBS.asObservable();
-
-  constructor(private csMapObject: CsMapObject) {}
 
   /**
    * Is the map currently displaying a permanent link?

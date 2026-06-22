@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 
 /**
  * This service class contains functions used for manipulating KML documents
@@ -7,8 +7,8 @@ import { Injectable, Inject } from '@angular/core';
   providedIn: 'root'
 })
 export class KMLDocService {
+  private env = inject<any>('env' as any);
 
-  constructor(@Inject('env') private env) { }
 
   /**
    * Clean KML text by removing illegal chars and

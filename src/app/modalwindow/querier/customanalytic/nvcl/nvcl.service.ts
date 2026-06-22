@@ -5,13 +5,17 @@ import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
 import { catchError, map, mergeMap } from 'rxjs/operators';
 import { UtilitiesService } from '../../../../lib/portal-core-ui/utility/utilities.service';
 import { DownloadWfsService } from '../../../../lib/portal-core-ui/service/wfs/download/download-wfs.service';
-import { Injectable, Inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-declare let gtag: Function;
+declare let rudderanalytics: any;
 @Injectable()
 export class NVCLService {
+  private http = inject(HttpClient);
+  private storage = inject<StorageService>(LOCAL_STORAGE);
+  private downloadWfsService = inject(DownloadWfsService);
+
 
   public isAnalytic: BehaviorSubject<boolean>; // observable used in querier to control Analytic TAB
 
@@ -46,7 +50,7 @@ export class NVCLService {
   }
 
 
-  constructor(private http: HttpClient , @Inject(LOCAL_STORAGE) private storage: StorageService, private downloadWfsService: DownloadWfsService) {
+  constructor() {
     this.isAnalytic = new BehaviorSubject<boolean>(false);
     this.isScalarLoaded = new BehaviorSubject<boolean>(false);
   }
@@ -241,14 +245,14 @@ export class NVCLService {
     httpParams = httpParams.append('datasetId', datasetId);
     httpParams = httpParams.append('tsg', 'on');
     httpParams = httpParams.append('email', downloadEmail);
-    if (environment.googleAnalyticsKey && typeof gtag === 'function') {
+    if (environment.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
       /**
-       * do not "log" the "email" to "Google Analytics" - as this is an ethics issue
+       * do not "log" the "email" to "RudderStack" - as this is an ethics issue
        *
        * console.log("getNVCLTSGDownload() serviceUrl:"+serviceUrl+",downloadEmail:"+downloadEmail+",datasetId:"+datasetId);
-       * gtag('event', 'NVCLDownload',  {'event_category': 'NVCLDownload', 'event_action': serviceUrl, 'event_label': downloadEmail, 'value': datasetId});
+       * rudderanalytics.track('NVCLDownload',  {'event_category': 'NVCLDownload', 'event_action': serviceUrl, 'event_label': downloadEmail, 'value': datasetId});
       */
-      gtag('event', 'NVCLDownload', { 'event_category': 'NVCLDownload', 'event_action': serviceUrl, 'value': datasetId });
+      rudderanalytics.track('NVCLDownload', { 'event_category': 'NVCLDownload', 'event_action': serviceUrl, 'value': datasetId });
     }
     return this.http.post(environment.portalBaseUrl + 'getNVCLTSGDownload.do', httpParams.toString(), {
       headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),

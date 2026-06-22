@@ -5,11 +5,11 @@ import { Bbox } from '../../../model/data/bbox.model';
 import { LayerModel } from '../../../model/data/layer.model';
 import { LayerHandlerService } from '../../cswrecords/layer-handler.service';
 import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
-import { Injectable, Inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import * as $ from 'jquery';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-declare let gtag: Function;
+declare let rudderanalytics: any;
 
 /**
  * Service to download WFS data
@@ -17,13 +17,12 @@ declare let gtag: Function;
 // @dynamic
 @Injectable()
 export class DownloadWfsService {
-  public tsgDownloadBS: Subject<string> = null;
-  public tsgDownloadStartBS:Subject<string> = null;
+  private layerHandlerService = inject(LayerHandlerService);
+  private http = inject(HttpClient);
+  private env = inject<any>('env' as any);
 
-
-  constructor(private layerHandlerService: LayerHandlerService, private http: HttpClient, @Inject('env') private env) {
-
-  }
+  public tsgDownloadBS: Subject<string>|null = null;
+  public tsgDownloadStartBS:Subject<string>|null = null;
 
   /**
    * Calls AuScope API to download datasets and bundle them up into a blob object
@@ -56,12 +55,12 @@ export class DownloadWfsService {
    *                               (can cause problems with GADDS 2.0)
    * @returns Observable of response
    */
-  public downloadDatasetURL(layer: LayerModel, bbox: Bbox, filter: string, datasetURL: string,
+  public downloadDatasetURL(layer: LayerModel, bbox: Bbox|null, filter: string|null, datasetURL: string,
                             omitGsmlpShapeProperty: boolean): Observable<any> {
     try {
       const wfsResources = this.layerHandlerService.getWFSResource(layer);
-      if (this.env.googleAnalyticsKey && typeof gtag === 'function') {
-        gtag('event', 'DatasetDownload', { 'event_category': 'DatasetDownload', 'event_action': layer.id });
+      if (this.env.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
+        rudderanalytics.track('dataset_download_started', { layer_id: layer.id, download_type: 'dataset_url' });
       }
       omitGsmlpShapeProperty = omitGsmlpShapeProperty !== undefined ? omitGsmlpShapeProperty : false;
       let httpParams = new HttpParams();
@@ -116,11 +115,11 @@ export class DownloadWfsService {
    * @param bbox the bounding box of the area to download
    * @param polygonFilter WFS filter parameter
    */
-  public downloadTsgFileUrls(layer: LayerModel, bbox: Bbox, email: string, polygonFilter: string): Observable<any> {
+  public downloadTsgFileUrls(layer: LayerModel, bbox: Bbox|null, email: string, polygonFilter: string|null): Observable<any> {
       try {
         const wfsResources = this.layerHandlerService.getWFSResource(layer);
-        if (this.env.googleAnalyticsKey && typeof gtag === 'function') {
-          gtag('event', 'CSVDownload', { 'event_category': 'CSVDownload', 'event_action': layer.id });
+        if (this.env.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
+          rudderanalytics.track('dataset_download_started', { layer_id: layer.id, download_type: 'tsg' });
         }
         let downloadUrl = 'getAllFeaturesInCSV.do';
         if (layer.proxyDownloadUrl && layer.proxyDownloadUrl.length > 0) {
@@ -140,7 +139,7 @@ export class DownloadWfsService {
             maxFeatures: 10000,
             outputFormat: 'csv',
             bbox: bbox ? JSON.stringify(bbox) : '',
-            filter: polygonFilter
+            filter: polygonFilter ? polygonFilter: ''
           };
           const serviceUrl = this.env.portalBaseUrl + downloadUrl + '?';
           httpParams = httpParams.append('serviceUrls', serviceUrl + $.param(filterParameters));
@@ -196,12 +195,12 @@ export class DownloadWfsService {
    * @param polygonFilter WFS filter parameter
    * @param bZip download as a zip file
    */
-  public downloadCSV(layer: LayerModel, bbox: Bbox, polygonFilter: string, bZip: boolean): Observable<any> {
+  public downloadCSV(layer: LayerModel, bbox: Bbox|null, polygonFilter: string, bZip: boolean): Observable<any> {
 
     try {
       const wfsResources = this.layerHandlerService.getWFSResource(layer);
-      if (this.env.googleAnalyticsKey && typeof gtag === 'function') {
-        gtag('event', 'CSVDownload', { 'event_category': 'CSVDownload', 'event_action': layer.id });
+      if (this.env.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
+        rudderanalytics.track('dataset_download_started', { layer_id: layer.id, download_type: 'csv' });
       }
       let downloadUrl = 'getAllFeaturesInCSV.do';
       if (layer.proxyDownloadUrl && layer.proxyDownloadUrl.length > 0) {

@@ -1,5 +1,5 @@
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
-import { Component, Input, ViewChild, ComponentFactoryResolver, ViewContainerRef, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, ViewChild, ComponentFactoryResolver, ViewContainerRef, ChangeDetectorRef, inject } from '@angular/core';
 import { ref } from '../../../environments/ref';
 import { LayerAnalyticInterface } from './layer.analytic.interface';
 
@@ -11,12 +11,12 @@ import { LayerAnalyticInterface } from './layer.analytic.interface';
 
 
 export class DynamicLayerAnalyticComponent {
+  private componentFactoryResolver = inject(ComponentFactoryResolver);
+  private changeDetectorRef = inject(ChangeDetectorRef);
+
   private _layer: LayerModel;
   @ViewChild('dynamicLayerContentAnalyticPlaceholder', { read: ViewContainerRef, static: true })
   dynamicAnalyticHost: ViewContainerRef;
-
-
-  constructor(private componentFactoryResolver: ComponentFactoryResolver, private changeDetectorRef: ChangeDetectorRef) { }
 
 
   @Input()
@@ -31,18 +31,11 @@ export class DynamicLayerAnalyticComponent {
    * dyanmically load component based on the configuration in the ref file
    */
   loadComponent() {
-
-
     const componentFactory = this.componentFactoryResolver.resolveComponentFactory(ref.layeranalytic[this._layer.id]);
-
     const viewContainerRef = this.dynamicAnalyticHost
     viewContainerRef.clear();
     const componentRef = viewContainerRef.createComponent(componentFactory);
-
     (<LayerAnalyticInterface>componentRef.instance).layer = this._layer;
-
-
-
     this.changeDetectorRef.detectChanges();
 
   }

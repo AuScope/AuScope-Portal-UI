@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Bookmark } from 'app/models/bookmark.model';
 import { PermanentLink } from 'app/models/permanentlink.model';
 import { User } from 'app/models/user.model';
@@ -26,8 +26,8 @@ function apiData<T>(response: ApiResponse<T>): Observable<T> {
 
 @Injectable({ providedIn: 'root' })
 export class AuscopeApiService {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {}
 
   private apiRequest<T>(endpoint: string, options: any = {}): Observable<T> {
     const params = options.params || {};

@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { SimpleXMLService } from '../../utility/simplexml.service';
 import { throwError as observableThrowError, Observable, of } from 'rxjs';
@@ -8,8 +8,9 @@ import { catchError, map, switchMap } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class GetCapsService {
+  private http = inject(HttpClient);
+  private env = inject<any>('env' as any);
 
-  constructor(private http: HttpClient, @Inject('env') private env) { }
 
   /**
    * Namespace resolver for version 1.3 'GetCapabilities' document

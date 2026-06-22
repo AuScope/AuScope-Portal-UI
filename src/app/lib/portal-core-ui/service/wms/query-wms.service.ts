@@ -1,7 +1,7 @@
 import { throwError as observableThrowError, Observable } from 'rxjs';
 
 import { catchError, map } from 'rxjs/operators';
-import { Injectable, Inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { OnlineResourceModel } from '../../model/data/onlineresource.model';
 import { CsMapObject } from '../cesium-map/cs-map-object';
@@ -10,9 +10,10 @@ import { UtilitiesService } from '../../utility/utilities.service';
 
 @Injectable()
 export class QueryWMSService {
+  private http = inject(HttpClient);
+  private csMapObject = inject(CsMapObject);
+  private env = inject<any>('env' as any);
 
-  constructor(private http: HttpClient, private csMapObject: CsMapObject, @Inject('env') private env) {
-  }
 
   public getFilter(lon: number, lat: number, layerId: string, extraFilter: string): string {
     const distPerPixel = this.csMapObject.getDistPerPixel();
@@ -93,7 +94,7 @@ export class QueryWMSService {
    */
   public getFeatureInfo(onlineResource: OnlineResourceModel, styles: string, sldBody: string, infoFormat: string, postMethod: boolean,
                         lon: number, lat: number, x: number, y: number, width: number, height: number, bbox: number[]): Observable<any> {
-    const formdata = new HttpParams()
+    let formdata = new HttpParams()
       .set('serviceUrl', UtilitiesService.rmParamURL(onlineResource.url))
       .set('lng', lon.toString())
       .set('lat', lat.toString())
@@ -109,11 +110,13 @@ export class QueryWMSService {
       .set('INFO_FORMAT', infoFormat)
       .set('postMethod', String(postMethod));
 
-    // If there is a 'styles' parameter then use that instead of 'sld_body'
+    // Backend supports SLD_BODY; always pass it when present so click filtering is preserved.
+    if (sldBody !== '') {
+      formdata = formdata.set('SLD_BODY', sldBody);
+    }
+    // Pass STYLES as well when available for services that still rely on named styles.
     if (styles !== '') {
-      formdata.set('STYLES', sldBody);
-    } else {
-      formdata.set('SLD_BODY', sldBody);
+      formdata = formdata.set('STYLES', styles);
     }
 
     return this.http.post(this.env.portalBaseUrl + 'wmsMarkerPopup.do', formdata.toString(), {

@@ -1,14 +1,14 @@
 import { tap } from 'rxjs/operators';
-import { Injectable, Inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 
 @Injectable()
 export class LegendService {
+  private http = inject(HttpClient);
+  private env = inject<any>('env' as any);
 
-  constructor(private http: HttpClient, @Inject('env') private env) {
-  }
 
   /**
    * Fetches legend given url

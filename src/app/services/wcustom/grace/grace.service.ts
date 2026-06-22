@@ -1,5 +1,5 @@
 import { environment } from '../../../../environments/environment';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GraceStyleSettings } from '../../../modalwindow/querier/customanalytic/grace/grace-graph.models';
@@ -10,6 +10,8 @@ import { serialize } from '@thi.ng/hiccup';
  */
 @Injectable()
 export class GraceService {
+    private http = inject(HttpClient);
+
     // Current GRACE style settings
     public currentGraceStyleSettings: GraceStyleSettings = {
         minColor: '#ff0000',
@@ -35,7 +37,7 @@ export class GraceService {
     private _graceDate: BehaviorSubject<Date> = new BehaviorSubject(new Date());
     private readonly graceDate: Observable<Date> = this._graceDate.asObservable();
 
-    constructor(private http: HttpClient) {
+    constructor() {
         this.getGraceDates().subscribe(dates => {
             this._graceDate.next(dates[0]);
         });

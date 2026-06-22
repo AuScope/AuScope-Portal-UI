@@ -1,4 +1,4 @@
-import { ComponentFactoryResolver, ComponentRef, Injectable, ViewContainerRef } from '@angular/core';
+import { ComponentFactoryResolver, ComponentRef, Injectable, ViewContainerRef, inject } from '@angular/core';
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 import { AdvancedMapComponent } from 'app/cesium-map/advanced/advanced-map.component';
 import { AdvancedFilterDirective } from 'app/menupanel/common/filterpanel/advance/advanced-filter.directive';
@@ -9,12 +9,12 @@ import { ref } from '../../../environments/ref';
  */
 @Injectable({ providedIn: 'root' })
 export class AdvancedComponentService {
+  private componentFactoryResolver = inject(ComponentFactoryResolver);
+
 
   private mapViewContainerRef: ViewContainerRef;
   private mapComponents: Map<string, ComponentRef<AdvancedMapComponent>[]> = new Map<string, ComponentRef<AdvancedMapComponent>[]>();
   private filterComponents: Map<string, ComponentRef<AdvancedFilterDirective>> = new Map<string, ComponentRef<AdvancedFilterDirective>>();
-
-  constructor(private componentFactoryResolver: ComponentFactoryResolver) {}
 
   /**
    * Set the ViewContainerRef for map widgets

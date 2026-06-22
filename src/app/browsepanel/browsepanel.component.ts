@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, inject } from '@angular/core';
 import { LayerHandlerService } from '../lib/portal-core-ui/service/cswrecords/layer-handler.service';
 import { RenderStatusService } from '../lib/portal-core-ui/service/cesium-map/renderstatus/render-status.service';
 import { UILayerModel } from '../menupanel/common/model/ui/uilayer.model';
@@ -12,6 +12,7 @@ import { UserStateService } from 'app/services/user/user-state.service';
 import { AuthService } from 'app/services/auth/auth.service';
 import { take, filter } from 'rxjs/operators';
 import { config } from 'environments/config';
+import { SearchService } from 'app/services/search/search.service';
 
 
 @Component({
@@ -21,6 +22,16 @@ import { config } from 'environments/config';
     standalone: false
 })
 export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
+  private searchService = inject(SearchService);
+  private layerHandlerService = inject(LayerHandlerService);
+  private layerManagerService = inject(LayerManagerService);
+  private renderStatusService = inject(RenderStatusService);
+  private uiLayerModelService = inject(UILayerModelService);
+  private filterService = inject(FilterService);
+  private sidebarService = inject(SidebarService);
+  private userStateService = inject(UserStateService);
+  private authService = inject(AuthService);
+
 
   public layerGroupColumn: object; /* Holds the data structures for all layers and groups */
   public layerColumn: []; /* List of layers for a certain group */
@@ -32,16 +43,6 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
   public sidebarSubscription: Subscription;
   public layerBookmarked = {}; /* Object stores which layers are bookmarked. key is layer id, value is boolean */
   public showOnlyBookmarked = false; /* When true only bookmarked layers are shown in the browse menu */
-
-  constructor(private layerHandlerService: LayerHandlerService,
-      private layerManagerService: LayerManagerService,
-      private renderStatusService: RenderStatusService,
-      private uiLayerModelService: UILayerModelService,
-      private filterService: FilterService,
-      private sidebarService: SidebarService,
-      private userStateService: UserStateService,
-      private authService: AuthService
-      ) {}
 
   /**
    * Toggle sidebar
@@ -184,6 +185,15 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
+   * Handle layer added from info subpanel.
+   */
+  public onSubpanelAdd(): void {
+    if (!this.panelStayOpen) {
+      this.toggleBrowsePanel(false);
+    }
+  }
+
+  /**
    * Remove layer from map when trash icon is clicked
    *
    * @param layer LayerModel for layer to remove
@@ -227,6 +237,53 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
    */
   public isLayerAdded(layer: any) {
     return this.uiLayerModelService.isLayerAdded(layer.id);
+  }
+
+  /**
+   * Does this layer have any CSW records?
+   *
+   * @param layer LayerModel for layer
+   * @returns true if this layer has csw records
+   */
+  public isCSW(layer: any) {
+    if (layer.cswRecords.length > 0) {
+      return true;
+    }
+
+    if (layer.cswCheck) { return false; }
+
+    layer.cswCheck = true;
+
+    /* if we don't have any csw records for the layer then check for an exact match with elastic search
+     * refer to the code: searchpanel.component -> search()
+    */
+
+    const queryText = "\""+layer.name+"\"";
+    const selectedSearchFields: string[] = ['knownLayerNames', 'serviceName', 'descriptiveKeywords', 'dataIdentificationAbstract', 'layerName'];
+    const boundsRelationship = 'Intersects';
+
+    const selectedServices: string[] = []; // no OGC services
+
+    const westBounds: number = undefined;
+    const eastBounds: number = undefined;
+    const northBounds: number = undefined;
+    const southBounds: number = undefined;
+
+    // Search CSW records
+    this.searchService.searchCSWRecords(queryText, selectedSearchFields, null, null, selectedServices,
+        boundsRelationship.toLowerCase(), westBounds, eastBounds,
+        southBounds, northBounds).subscribe(searchResponse => {
+
+        if (searchResponse.cswRecords.length > 0) {
+          layer.cswRecords.push(searchResponse.cswRecords[0]);
+          return true;
+        } else {
+          return false;
+        }
+    }, error => {
+      console.log('[searchCSWRecords.do (elastic search)]CSW search error: ' + error.error);
+    });
+
   }
 
   /**

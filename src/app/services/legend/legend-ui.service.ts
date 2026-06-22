@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable, Inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
 import { Constants } from '../../lib/portal-core-ui/utility/constants.service';
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
@@ -16,17 +16,16 @@ import { environment } from 'environments/environment';
 
 @Injectable()
 export class LegendUiService {
+  private manageStateService = inject(ManageStateService);
+  private sldService = inject(SldService);
+  private layerStatusService = inject(LayerStatusService);
+  private http = inject(HttpClient);
+  private dialog = inject(MatDialog);
+  private env = inject<any>('env' as any);
+
 
   // Track which legends are open
   displayedLegends: Map<string, MatDialogRef<LegendModalComponent>> = new Map<string, MatDialogRef<LegendModalComponent>>();
-
-  constructor(private manageStateService: ManageStateService,
-              private sldService: SldService,
-              private layerStatusService: LayerStatusService,
-              private http: HttpClient,
-              private dialog: MatDialog,
-              @Inject('env') private env
-  ) {}
 
   /**
    * Get the first WMS OnlineResource for a layer

@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, Inject, NgZone, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, NgZone, OnInit, ViewChild, inject } from '@angular/core';
 import { RectangleEditorObservable } from '@auscope/angular-cesium';
 
 import { CSWRecordModel } from '../../lib/portal-core-ui/model/data/cswrecord.model';
@@ -8,8 +8,7 @@ import { LayerHandlerService } from '../../lib/portal-core-ui/service/cswrecords
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 import { RenderStatusService } from '../../lib/portal-core-ui/service/cesium-map/renderstatus/render-status.service';
 import { UtilitiesService } from '../../lib/portal-core-ui/utility/utilities.service';
-import { Constants } from '../../lib/portal-core-ui/utility/constants.service';
-import { NgbDropdown, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Constants, ResourceType } from '../../lib/portal-core-ui/utility/constants.service';
 import { SearchService } from 'app/services/search/search.service';
 import { Observable, Subject, Subscription } from 'rxjs';
 
@@ -18,6 +17,7 @@ import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
 
 import { config } from '../../../environments/config';
+import { environment } from '../../../environments/environment';
 
 import { HttpClient, HttpHeaders, HttpParams, HttpUrlEncodingCodec } from '@angular/common/http';
 import { Download } from 'app/modalwindow/layeranalytic/nvcl/tsgdownload';
@@ -27,6 +27,9 @@ import { filter, take } from 'rxjs/operators';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { DownloadAuScopeCatModalComponent } from 'app/modalwindow/download-auscopecat/download-auscopecat.modal.component';
 import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
+import { MatDialog } from '@angular/material/dialog';
+import { PageEvent } from '@angular/material/paginator';
+import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
 
 // Search fields
 const SEARCH_FIELDS = [{
@@ -75,6 +78,9 @@ const OGC_SERVICES = [
     checked: true
   }]
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+declare let rudderanalytics: any;
+
 @Component({
     selector: 'app-search-panel',
     templateUrl: './searchpanel.component.html',
@@ -82,11 +88,22 @@ const OGC_SERVICES = [
     standalone: false
 })
 export class SearchPanelComponent implements OnInit {
+  private searchService = inject(SearchService);
+  private csMapService = inject(CsMapService);
+  private layerHandlerService = inject(LayerHandlerService);
+  private layerManagerService = inject(LayerManagerService);
+  private uiLayerModelService = inject(UILayerModelService);
+  private renderStatusService = inject(RenderStatusService);
+  private filterService = inject(FilterService);
+  private dialog = inject(MatDialog);
+  private http = inject(HttpClient);
+  private env = inject<any>('env' as any);
+  private ngZone = inject(NgZone);
+
 
   RESULTS_PER_PAGE = 10;
 
   @ViewChild('queryinput') textQueryInput: ElementRef;
-  @ViewChild('spatialOptionsDropdown') spatialOptionsDropdown: NgbDropdown;
 
   alertMessage = ''; // Alert messages
   showingResultsPanel = false; // True when results panel is being shown
@@ -131,16 +148,10 @@ export class SearchPanelComponent implements OnInit {
   public download1$: Observable<Download>;
 
   // Term suggestions
-  @ViewChild('suggesterDropdown') suggesterDropdown: NgbDropdown;
+  @ViewChild(MatAutocompleteTrigger) autocompleteTrigger!: MatAutocompleteTrigger;
   suggesterSubscription: Subscription;
   suggestedTerms: string[] = [];
   highlightedSuggestionIndex = -1;
-
-  constructor(private searchService: SearchService, private csMapService: CsMapService,
-              private layerHandlerService: LayerHandlerService, private layerManagerService: LayerManagerService,
-              private uiLayerModelService: UILayerModelService, private renderStatusService: RenderStatusService,
-              private filterService: FilterService, private modalService: NgbModal,
-              private http: HttpClient, @Inject('env') private env, private ngZone: NgZone) { }
 
   ngOnInit() {
     // Populate search results with all layers by default
@@ -157,8 +168,13 @@ export class SearchPanelComponent implements OnInit {
   /**
    * Detect external component clicks so we can close components that need to be when this happens
    */
-  @HostListener('document:click')
-  externalClick(): void {
+  @HostListener('document:click', ['$event'])
+  externalClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    // Ignore Angular Material overlay (stop paginator from closing dropdown)
+    if (target.closest('.cdk-overlay-container')) {
+      return;
+    }
     if (!this.searchClick && !this.infoDialogOpen) {
       if (this.showingResultsPanel) {
         this.setShowingResultsPanel(false);
@@ -406,15 +422,16 @@ export class SearchPanelComponent implements OnInit {
   public showLayerInformation(event: any, layer: LayerModel): void {
     event.stopPropagation();
     if (layer) {
-      const modalRef = this.modalService.open(InfoPanelComponent, {
-        size: 'lg',
-        backdrop: false,
-        scrollable: true
+      const dialogRef = this.dialog.open(InfoPanelComponent, {
+        width: '800px',
+        maxWidth: '800px',
+        data: {
+          cswRecords: layer.cswRecords,
+          layer: layer
+        }
       });
-      modalRef.componentInstance.cswRecords = layer.cswRecords;
-      modalRef.componentInstance.layer = layer;
       this.infoDialogOpen = true;
-      modalRef.result.then(() => {
+      dialogRef.afterClosed().subscribe(() => {
         // Delay setting infoDialogOpen to false so external click handler has time to see it open
         setTimeout(() => {
           this.infoDialogOpen = false;
@@ -442,7 +459,9 @@ export class SearchPanelComponent implements OnInit {
    * @param layer the LayerModel
    */
   isMapSupportedLayer(layer: LayerModel): boolean {
-    return UtilitiesService.isMapSupportedLayer(layer);
+    return UtilitiesService.isMapSupportedLayer(layer)
+        && !(layer.id.startsWith("registry-csw:") &&
+             UtilitiesService.layerContainsResourceType(layer, ResourceType.IRIS));
   }
 
   /**
@@ -580,14 +599,7 @@ export class SearchPanelComponent implements OnInit {
 
         this.alertMessage = '';
         this.restrictBounds = true;
-
-        // Re-open bounds dropdown
-        setTimeout(() => {
-          this.ngZone.run(() => {
-            this.spatialOptionsDropdown.open();
-          });
-        });
-    });
+      });
   }
 
   /**
@@ -644,8 +656,8 @@ export class SearchPanelComponent implements OnInit {
       this.suggesterSubscription.unsubscribe();
     }
     this.highlightedSuggestionIndex = -1;
-    if (this.suggesterDropdown.isOpen()) {
-      this.suggesterDropdown.close();
+    if (this.autocompleteTrigger.panelOpen) {
+      this.autocompleteTrigger.closePanel();
     }
   }
 
@@ -720,6 +732,14 @@ export class SearchPanelComponent implements OnInit {
       southBounds = this.bbox.southBoundLatitude;
     }
 
+    // Track search event
+    if (environment.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
+      rudderanalytics.track('search', {
+        query: this.queryText,
+        search_fields: this.searchFields.filter(f => f.checked).flatMap(f => f.fields)
+      });
+    }
+
     // Search CSW records
     this.searchService.searchCSWRecords(this.queryText, selectedSearchFields, null, null, selectedServices,
         this.boundsRelationship.toLowerCase(), westBounds, eastBounds,
@@ -745,6 +765,15 @@ export class SearchPanelComponent implements OnInit {
         }
         this.searching = false;
         this.showingAllLayers = false;
+
+        if (this.searchResults.length === 0) {
+          if (environment.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
+            rudderanalytics.track('search_zero_results', {
+              query: this.queryText,
+              search_fields: this.searchFields.filter(f => f.checked).flatMap(f => f.fields)
+            });
+          }
+        }
 
         // Select first result
         if (this.searchResults.length > 0) {
@@ -780,7 +809,7 @@ export class SearchPanelComponent implements OnInit {
    */
   public onKeyUp(event: KeyboardEvent) {
     // Arrow keys scroll down/down through suggestions if they're open and Enter will select
-    if (this.suggesterDropdown.isOpen() && this.suggestedTerms.length > 0) {
+    if (this.autocompleteTrigger.panelOpen && this.suggestedTerms.length > 0) {
       switch (event.key) {
         case 'ArrowDown':
           if (this.highlightedSuggestionIndex === -1) {
@@ -799,7 +828,7 @@ export class SearchPanelComponent implements OnInit {
         case 'Enter':
           if (this.highlightedSuggestionIndex !== -1) {
             this.queryText = this.suggestedTerms[this.highlightedSuggestionIndex];
-            this.suggesterDropdown.close();
+            this.autocompleteTrigger.closePanel();
             this.highlightedSuggestionIndex = -1;
           }
           break;
@@ -819,10 +848,10 @@ export class SearchPanelComponent implements OnInit {
       }
       this.suggesterSubscription = this.searchService.suggestTerm(this.queryText.toLowerCase()/*, NUMBER_OF_SUGGESTIONS*/).subscribe(terms => {
         this.suggestedTerms = terms;
-        if (this.suggestedTerms.length > 0 && !this.suggesterDropdown.isOpen()) {
-          this.suggesterDropdown.open();
-        } else if (this.suggestedTerms.length === 0 && this.suggesterDropdown.isOpen()) {
-          this.suggesterDropdown.close();
+        if (this.suggestedTerms.length > 0 && !this.autocompleteTrigger.panelOpen) {
+          this.autocompleteTrigger.openPanel();
+        } else if (this.suggestedTerms.length === 0 && this.autocompleteTrigger.panelOpen) {
+          this.autocompleteTrigger.closePanel();
         }
       });
     }
@@ -834,7 +863,7 @@ export class SearchPanelComponent implements OnInit {
    * @param term the selected term
    */
   public suggestedTermSelected(term: string): void {
-    this.suggesterDropdown.close();
+    this.autocompleteTrigger.closePanel();
     this.resetSuggestedTerms();
     this.queryText = term;
     this.search(true);
@@ -853,6 +882,7 @@ export class SearchPanelComponent implements OnInit {
    * Search page change
    * @param pageChangeEvent
    */
+  /*
   public pageChange(newPageNo): void {
     this.currentPage = newPageNo;
     if (this.showingAllLayers) {
@@ -861,15 +891,32 @@ export class SearchPanelComponent implements OnInit {
       this.search(false);
     }
   }
+    */
+   onPageChange(event: PageEvent): void {
+    // MatPaginator pageIndex is zero-based
+    this.currentPage = event.pageIndex + 1;
+    this.RESULTS_PER_PAGE = event.pageSize;
+
+    /*
+    if (this.showingAllLayers) {
+      this.showFeaturedLayers();
+    } else {
+      this.search(false);
+    }
+    */
+  }
 
   downloadWithAuScopeCat(layer: LayerModel): void {
-    const bsModalRef = this.modalService.open(DownloadAuScopeCatModalComponent, {
-      size: 'lg',
-      backdrop: false
+    this.dialog.open(DownloadAuScopeCatModalComponent, {
+      width: '800px',
+      maxWidth: '800px',
+      height: '80vh',
+      data: {
+          layer: layer,
+          bbox: this.bbox
+          //polygon: this.polygonFilter;
+      }
     });
-    bsModalRef.componentInstance.layer = layer;
-    bsModalRef.componentInstance.bbox = this.bbox;
-    //bsModalRef.componentInstance.polygon = this.polygonFilter;
   }
 
 }

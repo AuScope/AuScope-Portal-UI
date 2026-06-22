@@ -1,4 +1,4 @@
-import { Component, inject, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { LegendUiService } from 'app/services/legend/legend-ui.service';
 import { forkJoin, Observable } from 'rxjs';
@@ -10,6 +10,8 @@ import { forkJoin, Observable } from 'rxjs';
     standalone: false
 })
 export class LegendModalComponent {
+  private dialogRef = inject<MatDialogRef<LegendModalComponent>>(MatDialogRef);
+
 
   private legendUiService = inject(LegendUiService);
 
@@ -24,7 +26,9 @@ export class LegendModalComponent {
   requestLegendFailed = false; // True if all legend requests failed
 
 
-  constructor(private dialogRef: MatDialogRef<LegendModalComponent>, @Inject(MAT_DIALOG_DATA) data) {
+  constructor() {
+    const data = inject(MAT_DIALOG_DATA);
+
     this.layerId = data.layerId;
     this.legendTitle = data.legendTitle;
     this.legendRequestList = data.legendRequestList;

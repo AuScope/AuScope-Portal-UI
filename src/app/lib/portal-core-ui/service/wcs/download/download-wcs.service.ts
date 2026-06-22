@@ -1,6 +1,6 @@
 
 import { throwError as observableThrowError, Observable } from 'rxjs';
-import { Injectable, Inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { timeoutWith, map, catchError } from 'rxjs/operators';
 import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 
@@ -20,13 +20,12 @@ import { GetCoverageService } from '../get-coverage.service';
  */
 @Injectable()
 export class DownloadWcsService {
+  private layerHandlerService = inject(LayerHandlerService);
+  private getCapsService = inject(GetCapsService);
+  private getCoverageService = inject(GetCoverageService);
+  private http = inject(HttpClient);
+  private env = inject<any>('env' as any);
 
-
-
-  constructor(private layerHandlerService: LayerHandlerService, private getCapsService: GetCapsService,
-    private getCoverageService: GetCoverageService,private http: HttpClient, @Inject('env') private env) {
-
-  }
 
   /**
    * Download the layer as a zip file

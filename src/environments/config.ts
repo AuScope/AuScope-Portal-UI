@@ -9,7 +9,8 @@ export const config = {
   //  omitGsmlpShapeProperty: true
   datasetUrlSupportedLayer: {
     'mscl-borehole': {
-      datasetURL: 'datasetURL'
+      datasetURL: 'datasetURL',
+      omitGsmlpShapeProperty: false
     }
   },
 
@@ -305,7 +306,26 @@ export const config = {
     'sa-rad-th',
     'sa-rad-u',
     'sa-rad-u2th',
-    'sa-rad-tc'
+    'sa-rad-tc',
+    'nsw-assay-surface',
+    'nsw-field-observations',
+    'nsw-downhole-assay-samples',
+    'nsw-geochemistry-isotope',
+    'nsw-geochemistry-hydrogeochemistry',
+    'nsw-geochemistry-drillhole',
+    'nsw-all-drillholes',
+    'nsw-hylogger-boreholes',
+    'nsw-mineral-occurrence-industry',
+    'nsw-mineral-occurrence-commodity',
+    'nsw-titles-mineral-allocation-areas',
+    'nsw-titles-applications',
+    'nsw-titles-ancilliary-mining-areas',
+    'nsw-titles-granted',
+    'nsw-titles-historic',
+    'geop-tern-radi-pota',
+    'geophysics-isostatic-bouger-gravity',
+    'geop-isos-grav-over-tmi-rtp-tilt',
+    'nsw-geological-provinces'
   ],
   // Layers that require a JSON response for WMS GetFeature requests
   wmsGetFeatureJSON: [
@@ -449,6 +469,60 @@ export const config = {
         erlNamespace: "http://xmlns.earthresourceml.org/earthresourceml-lite/1.0"
     }
   ],
+  // Some ERL providers expose different filter field names or do not support
+  // all configured filters for a shared known layer.
+  erlProviderFilterOverrides: {
+    'erl-commodityresourceview': [
+      {
+        url: 'services.ga.gov.au',
+        filterOverrides: {
+          'Commodity': {
+            xpath: 'erl:commodity_uri'
+          },
+          'JORC Category': {
+            enabled: false
+          }
+        }
+      },
+      {
+        url: 'gs.geoscience.nsw.gov.au',
+        filterOverrides: {
+          'Mine Name': {
+            xpath: 'erl:mineralOccurrenceName'
+          },
+          'JORC Category': {
+            enabled: false
+          }
+        }
+      }
+    ],
+    'erl-mineraloccurrenceview': [
+      {
+        url: 'services.ga.gov.au',
+        filterOverrides: {
+          'Geologic Timescale': {
+            enabled: false
+          }
+        }
+      },
+      {
+        url: 'gs.geoscience.nsw.gov.au',
+        filterOverrides: {
+          'Geologic Timescale': {
+            enabled: false
+          }
+        }
+      },
+      {
+        url: 'sarigdata.pir.sa.gov.au',
+        filterOverrides: {
+          'Geologic Timescale': {
+            enabled: false
+          }
+        }
+      }
+    ]
+  },
   // Some services do not provide enough information to create citations or do not need it
   cannotCite: [
     "lithodat.com",

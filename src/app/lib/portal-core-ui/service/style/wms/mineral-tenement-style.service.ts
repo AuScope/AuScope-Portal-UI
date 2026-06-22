@@ -25,11 +25,30 @@ export class MineralTenementStyleService {
 
   private static readonly TENEMENT_COLOUR_MAP = {
     // TenementType colors
+    /*
+    NT: 'Exploration Licence (EL)', 'Extractive Mineral Permit (EMP)', 'Mineral Lease (ML)',
+        'Mineral Authority (MA)', 'Exploration Licence in Retention (ELR)', 'Mineral Lease (Northern) (MLN)',
+        'Extractive Mineral Exploration Licence (EMEL)', 'Access Authority (AA)', 'Reserve Land (RL)',
+        'Fossicking Area (s.131) (FA)', 'Mineral Lease (Central) (MLC)', 'Authorised Holdings (Central) (HLDC)',
+        'Authorised Holdings (Southern) (HLDS)', 'Mineral Claim (Northern) (MCN)',
+        'Extractive Mineral Permit (Northern) (EMPN)', Extractive Mineral Permit (Southern) (EMPS)'
+    WA: 'EXPLORATION LICENCE', 'PROSPECTING LICENCE', 'MISCELLANEOUS LICENCE', 'MINING LEASE',
+        'GENERAL PURPOSE LEASE', 'COAL MINING LEASE'
+    Vic: 'Exploration Licence', 'Retention Licence', 'Work Authority', 'Mining Licence', 'Prospect Licence',
+    NSW: 'Assessment Lease', 'Consolidated Mining Lease', 'Dredging Lease', 'Exploration Licence', 'Gold Lease',
+         'Exploration Prospecting Lease', 'Mineral Claim converted to Lease', 'Mining (Mineral Owner) Lease',
+         'Mining Purposes Lease', 'Private Lands (Mining Purposes) Lease', 'Special (Crown & Private Lands) Lease',
+         'Special Lease'
+    TAS: 'LICENCE', 'LEASE', 'ERA'
+    */
     'exploration': '#0000FF',
-    'prospecting': '#00FFFF',
+    'prospect': '#00FFFF',
     'miscellaneous': '#00FF00',
-    'mining': '#FFFF00',
-    'licence': '#FF0050',
+    'mining': '#FF0040',
+    'mineral': '#FF0040',
+    'reserve': '#0080FF',
+    'licence': '#995544',
+    'lease': '#998899',
     /* TenementStatus colours
     NSW: "Granted" "Application"
     Vic: "Current" "Renewal" "Application" "Proposal"
@@ -54,7 +73,15 @@ export class MineralTenementStyleService {
     'PENDING SURRENDER': "#8000EE",
     'PENDING PARTIAL SURRENDER': "#A000AA",
     'EXPORATION RELEASE AREA': "#8888FF",
-
+    /* ESRI QLD MinTens
+     */
+    /* Tenement Type */
+    'Mining lease': "#0000FF",
+    'Exploration permit minerals': "#883344",
+    'Exploration permit coal': "#FF0000",
+    /* Status */
+    'Granted': "#00FF00",
+    'Application': "#FFEE00",
     // Default color
     'MineralTenement': '#0000FF'
   };
@@ -68,17 +95,19 @@ export class MineralTenementStyleService {
       ownerField: 'mt:owner',
       shapeField: 'mt:shape',
       typeField: 'mt:tenementType',
-      statusField: 'mt:status'
+      statusField: 'mt:status',
+      providerType: ServiceProviderType.GeoServer
     },
     [ServiceProviderType.ArcGIS]: {
       featureType: 'MineralTenement',
-      fillColour: '#00ff00',
-      borderColour: '#66ff66',
+      fillColour: '#77ff77',
+      borderColour: '#99ff99',
       nameField: 'TENNAME',
       ownerField: 'TENOWNER',
       shapeField: 'SHAPE',
       typeField: 'TENTYPE',
-      statusField: 'STATUS'
+      statusField: 'TENSTATUS',
+      providerType: ServiceProviderType.ArcGIS
     }
   };
 
@@ -99,8 +128,8 @@ export class MineralTenementStyleService {
         ['sld:NamedLayer', null,
           ['sld:Name', null, layerName],
           ['sld:UserStyle', null,
-            ['sld:Name', null, styleName],
-            ['sld:Title', null, styleName],
+            ['sld:Name', null, styleName?styleName:layerName],
+            ['sld:Title', null, styleName?styleName:layerName],
             ['sld:IsDefault', null, '1'],
             ['sld:FeatureTypeStyle', null,
               ...this.createRules(params.ccProperty, params.optionalFilters, config)
@@ -111,22 +140,36 @@ export class MineralTenementStyleService {
     );
   }
 
-  private static createRules(ccProperty?: string, optionalFilters?: OptionalFilter[], config?: any): any[] {
+  private static createRules(ccProperty: string, optionalFilters: OptionalFilter[], config: any): any[] {
     const rules = [];
-
-    if (ccProperty === 'TenementType') {
-      ['exploration', 'prospecting', 'miscellaneous', 'mining', 'licence'].forEach(type => {
-        rules.push(...this.createRulePair(type, config, optionalFilters));
-      });
-    } else if (ccProperty === 'TenementStatus') {
-      ['LIVE', 'CURRENT', 'PENDING','APPLICATION','PROPOSAL',
-       'RENEWAL','GRANT','ISSUED','CEASED','GRANTED','REDUCTION RETAINED',
-       'RENEW RETAINED','REVISED APPLICATION','PENDING RENEWAL',
-        'PENDING SURRENDER','PENDING PARTIAL SURRENDER','EXPORATION RELEASE AREA'].forEach(status => {
-        rules.push(...this.createRulePair(status, config, optionalFilters));
-      });
-    } else {
-      rules.push(...this.createRulePair('Default', config, optionalFilters));
+    if (config.providerType === ServiceProviderType.GeoServer) {
+        if (ccProperty === 'TenementType') {
+            ['exploration','prospect', 'miscellaneous', 'mining', 'mineral',
+             'reserve', 'licence', 'lease'].forEach(type => {
+                rules.push(...this.createRulePair(type, config, optionalFilters));
+            });
+        } else if (ccProperty === 'TenementStatus') {
+            ['LIVE', 'CURRENT', 'PENDING','APPLICATION','PROPOSAL',
+            'RENEWAL','GRANT','ISSUED','CEASED','GRANTED','REDUCTION RETAINED',
+            'RENEW RETAINED','REVISED APPLICATION','PENDING RENEWAL',
+                'PENDING SURRENDER','PENDING PARTIAL SURRENDER','EXPORATION RELEASE AREA'].forEach(status => {
+                rules.push(...this.createRulePair(status, config, optionalFilters));
+            });
+        } else {
+            rules.push(...this.createRulePair('Default', config, optionalFilters));
+        }
+    } else { // ArcGIS - cannot have too many because of length limitations of HTTP GET requests
+        if (ccProperty === 'TenementType') {
+            ['Mining lease', 'Exploration permit minerals', 'Exploration permit coal'].forEach(status => {
+                rules.push(...this.createRulePair(status, config, optionalFilters))
+            });
+        } else if (ccProperty === 'TenementStatus') {
+            ['Granted','Application'].forEach(status => {
+                rules.push(...this.createRulePair(status, config, optionalFilters))
+            });
+        } else {
+            rules.push(...this.createRulePair('Default', config, optionalFilters));
+        }
     }
 
     return rules;
@@ -134,27 +177,43 @@ export class MineralTenementStyleService {
 
   private static createRulePair(tenementType: string, config: any, optionalFilters?: OptionalFilter[]): any[] {
     const color = this.TENEMENT_COLOUR_MAP[tenementType] || config.fillColour;
-    return [
-      // Rule for zoomed in view with labels
-      [
-        'sld:Rule', null,
-        ['sld:Name', null, `${tenementType}-detailed`],
-        ['sld:Title', null, tenementType],
-        ['sld:MaxScaleDenominator', null, '4000000'],
-        this.createFilter(tenementType, config, optionalFilters),
-        this.createSymbolizer(color),
-        this.createTextSymbolizer(config)
-      ],
-      // Rule for zoomed out view without labels
-      [
-        'sld:Rule', null,
-        ['sld:Name', null, `${tenementType}-overview`],
-        ['sld:Title', null, tenementType],
-        ['sld:MinScaleDenominator', null, '4000000'],
-        this.createFilter(tenementType, config, optionalFilters),
-        this.createSymbolizer(color)
-      ]
-    ];
+    let retVal;
+    // Only GeoServer can handle detailed view
+    if (config.providerType === ServiceProviderType.GeoServer) {
+        retVal = [
+            // Rule for zoomed in view with labels
+            [
+                'sld:Rule', null,
+                ['sld:Name', null, `${tenementType}-detailed`],
+                ['sld:Title', null, tenementType],
+                ['sld:MaxScaleDenominator', null, '4000000'],
+                this.createFilter(tenementType, config, optionalFilters),
+                this.createSymbolizer(color),
+                this.createTextSymbolizer(config)
+            ],
+            // Rule for zoomed out view without labels
+            [
+                'sld:Rule', null,
+                ['sld:Name', null, `${tenementType}-overview`],
+                ['sld:Title', null, tenementType],
+                ['sld:MinScaleDenominator', null, '4000000'],
+                this.createFilter(tenementType, config, optionalFilters),
+                this.createSymbolizer(color)
+            ]
+        ];
+    } else {
+        retVal = [
+            // Rule for ArcGIS without labels
+            [
+                'sld:Rule', null,
+                ['sld:Name', null, `${tenementType}-overview`],
+                ['sld:Title', null, tenementType],
+                this.createFilter(tenementType, config, optionalFilters),
+                this.createSymbolizer(color)
+            ]
+        ]
+    }
+    return retVal;
   }
 
   private static createSymbolizer(color: string): any[] {
@@ -162,11 +221,11 @@ export class MineralTenementStyleService {
       'sld:PolygonSymbolizer', null,
       ['sld:Fill', null,
         ['sld:CssParameter', { name: 'fill' } as HiccupAttrs, color],
-        ['sld:CssParameter', { name: 'fill-opacity' } as HiccupAttrs, '0.4']
+        ['sld:CssParameter', { name: 'fill-opacity' } as HiccupAttrs, '0.8']
       ],
       ['sld:Stroke', null,
         ['sld:CssParameter', { name: 'stroke' } as HiccupAttrs, color],
-        ['sld:CssParameter', { name: 'stroke-width' } as HiccupAttrs, '0.5']
+        ['sld:CssParameter', { name: 'stroke-width' } as HiccupAttrs, '1']
       ]
     ];
   }
@@ -199,9 +258,14 @@ export class MineralTenementStyleService {
     ];
   }
 
-  private static createFilter(tenementType: string, config: any, optionalFilters?: OptionalFilter[] | string): any {
+  /**
+   * Create OGC filter XML
+   *
+   * tenementLiteral - the string to be used as filter
+   */
+  private static createFilter(tenementLiteral: string, config: any, optionalFilters?: OptionalFilter[] | string): any {
     // Build tenement type/status filter (if not Default)
-    if (tenementType === 'Default') {
+    if (tenementLiteral === 'Default') {
       // If optional filters are present, prefer them
       const optFrag = StyleService.generateFilter(optionalFilters as any);
       if (optFrag) { return optFrag; }
@@ -217,16 +281,21 @@ export class MineralTenementStyleService {
       ];
     }
 
-    const propertyName = config.featureType === 'MineralTenement'
-      ? (this.isTenementStatus(tenementType) ? config.statusField : config.typeField)
-      : (this.isTenementStatus(tenementType) ? 'mt:status' : 'mt:tenementType');
+    const propertyName = this.isTenementStatus(tenementLiteral) ? config.statusField : config.typeField;
 
-    const typeFilter = ['ogc:PropertyIsLike', {
-      wildCard: '*', singleChar: '#', escapeChar: '!', matchCase: 'false'
-    } as HiccupAttrs,
-      ['ogc:PropertyName', null, propertyName],
-      ['ogc:Literal', null, this.isTenementStatus(tenementType) ? tenementType : `*${tenementType}*`]
-    ];
+    let typeFilter;
+    if (config.providerType === ServiceProviderType.GeoServer) {
+        typeFilter = ['ogc:PropertyIsLike', { wildCard: '*', singleChar: '#', escapeChar: '!', matchCase: 'false' } as HiccupAttrs,
+            ['ogc:PropertyName', null, propertyName],
+            // Use wildcards for tenement type as it has so many variations
+            ['ogc:Literal', null, this.isTenementStatus(tenementLiteral) ? tenementLiteral : `*${tenementLiteral}*`]
+        ];
+    } else {
+        typeFilter = ['ogc:PropertyIsEqualTo', null,
+            ['ogc:PropertyName', null, propertyName],
+            ['ogc:Literal', null, tenementLiteral ]
+        ];
+    }
 
     // Merge optional filters produced by StyleService (if any)
     const optFrag = StyleService.generateFilter(optionalFilters as any);
@@ -248,7 +317,8 @@ export class MineralTenementStyleService {
     return ['LIVE', 'CURRENT', 'PENDING','APPLICATION',
     'PROPOSAL','RENEWAL','GRANT','ISSUED','CEASED','GRANTED','REDUCTION RETAINED',
     'RENEW RETAINED','REVISED APPLICATION','PENDING RENEWAL',
-    'PENDING SURRENDER','PENDING PARTIAL SURRENDER','EXPORATION RELEASE AREA'].includes(value);
+    'PENDING SURRENDER','PENDING PARTIAL SURRENDER','EXPORATION RELEASE AREA',
+    'Granted','Application'].includes(value);
   }
 
   private static getProviderType(serviceUrl?: string): ServiceProviderType {

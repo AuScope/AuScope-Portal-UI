@@ -1,6 +1,6 @@
 
 import { throwError as observableThrowError, Observable } from 'rxjs';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 
@@ -12,28 +12,24 @@ import { ResourceType } from '../../utility/constants.service';
 import { RenderStatusService } from '../cesium-map/renderstatus/render-status.service';
 import { KMLDocService } from './kml.service';
 import { UtilitiesService } from '../../utility/utilities.service';
-
-// NB: Cannot use "import { XXX, YYY, ZZZ, Color } from 'cesium';" - it prevents initialising ContextLimits.js properly
-// which causes a 'DeveloperError' when trying to draw the KML
-declare let Cesium;
+import { KmlDataSource } from 'cesium';
 
 /**
  * Use Cesium to add layer to map. This service class adds KML layer to the map
  */
 @Injectable()
 export class CsKMLService {
+  private layerHandlerService = inject(LayerHandlerService);
+  private http = inject(HttpClient);
+  private renderStatusService = inject(RenderStatusService);
+  private mapsManagerService = inject(MapsManagerService);
+  private kmlService = inject(KMLDocService);
+
 
   // List of KML layers that have been cancelled
   private cancelledLayers: Array<string> = [];
   // Number of KML resources added for a given layer
   private numberOfResourcesAdded: Map<string, number> = new Map<string, number>();
-
-  constructor(private layerHandlerService: LayerHandlerService,
-    private http: HttpClient,
-    private renderStatusService: RenderStatusService,
-    private mapsManagerService: MapsManagerService,
-    private kmlService: KMLDocService) {
-  }
 
   /**
    * Downloads KML, cleans it
@@ -57,11 +53,11 @@ export class CsKMLService {
    * @param layer the KML layer to add to the map
    * @param param parameters for the KML layer
    */
-  public addLayer(layer: LayerModel, _param?: any): void {
+  public addLayer(layer: LayerModel, _param?: any) {
     // Remove from cancelled layer list (if present)
     this.cancelledLayers = this.cancelledLayers.filter(l => l !== layer.id);
 
-    let kmlOnlineResources: OnlineResourceModel[];
+    let kmlOnlineResources: OnlineResourceModel[] = [];
 
     if (UtilitiesService.layerContainsResourceType(layer, ResourceType.KML)) {
       kmlOnlineResources = this.layerHandlerService.getOnlineResources(layer, ResourceType.KML);
@@ -83,7 +79,7 @@ export class CsKMLService {
       this.renderStatusService.addResource(layer, onlineResource);
 
       // Create data source
-      const source = new Cesium.KmlDataSource(options);
+      const source = new KmlDataSource(options);
       // Add an event to tell us when loading is finished
       source.loadingEvent.addEventListener((evt, isLoading: boolean) => {
         if (!isLoading) {
@@ -96,9 +92,9 @@ export class CsKMLService {
       // note: KML and KMZ, loaded either from a local file or url now have
       // a layer.kmlDoc entry - so some of the following code is redundant
       if (layer.kmlDoc) {
-        source.load(layer.kmlDoc).then(dataSource => {
+        void source.load(layer.kmlDoc).then(dataSource => {
           if (this.cancelledLayers.indexOf(layer.id) === -1) {
-            viewer.dataSources.add(dataSource).then(dataSrc => {
+            void viewer.dataSources.add(dataSource).then((dataSrc: any) => {
               layer.csLayers.push(dataSrc);
               this.incrementLayersAdded(layer, 1);
             });
@@ -111,8 +107,8 @@ export class CsKMLService {
 
         if (UtilitiesService.layerContainsResourceType(layer, ResourceType.KMZ)) {
           // add KMZ to map
-          source.load(onlineResource.url).then(dataSource => {
-            viewer.dataSources.add(dataSource).then(dataSrc => {
+          void source.load(onlineResource.url).then(dataSource => {
+            void viewer.dataSources.add(dataSource).then((dataSrc: any) => {
               layer.csLayers.push(dataSrc);
               this.incrementLayersAdded(layer, kmlOnlineResources.length);
             });
@@ -123,9 +119,9 @@ export class CsKMLService {
           this.getKMLFeature(onlineResource.url).subscribe(response => {
             const parser = new DOMParser();
             const doc = parser.parseFromString(response, 'text/xml');
-            source.load(doc).then(dataSource => {
+            void source.load(doc).then(dataSource => {
               if (this.cancelledLayers.indexOf(layer.id) === -1) {
-                viewer.dataSources.add(dataSource).then(dataSrc => {
+                void viewer.dataSources.add(dataSource).then((dataSrc: any) => {
                   layer.csLayers.push(dataSrc);
                   this.incrementLayersAdded(layer, kmlOnlineResources.length);
                 });
@@ -150,6 +146,9 @@ export class CsKMLService {
    * @param totalLayers total number of layers for LayerModel
    */
   private incrementLayersAdded(layer: LayerModel, totalLayers: number) {
+    if (!this.numberOfResourcesAdded.get(layer.id)) {
+      this.numberOfResourcesAdded.set(layer.id, 0);
+    }
     this.numberOfResourcesAdded.set(layer.id, this.numberOfResourcesAdded.get(layer.id) + 1);
     if (this.numberOfResourcesAdded.get(layer.id) === totalLayers) {
       this.cancelledLayers = this.cancelledLayers.filter(l => l !== layer.id);

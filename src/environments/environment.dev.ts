@@ -18,7 +18,8 @@ export const environment = {
   authBaseUrl: 'https://auportal-dev.geoanalytics.group/api/',
   hostUrl: 'https://auportal-dev.geoanalytics.group',
   nVCLAnalyticalUrl: 'https://nvclanalytics.azurewebsites.net/NVCLAnalyticalServices/',
-  googleAnalyticsKey: null,
+  rudderStackWriteKey: null, // RudderStack write key
+  rudderStackDataPlaneUrl: null, // RudderStack data plane URL
   bingMapsKey: 'Bing_Maps_Key',
   baseMapLayers: [
     { value: 'World_Imagery', viewValue: 'ESRI World Imagery', tooltip: 'ESRI World Imagery', layerType: 'ESRI' },
@@ -32,6 +33,7 @@ export const environment = {
     { value: 'AerialWithLabels', viewValue: 'Bing Aerial With Labels', tooltip: 'Bing Maps Aerial with Labels', layerType: 'Bing' },
     { value: 'Natural_Earth_II', viewValue: 'Natural Earth II',
       tooltip: 'Natural Earth II, darkened for contrast.\nhttp://www.naturalearthdata.com/', layerType: 'NEII' },
+    { value: '', viewValue: 'National Map', tooltip: 'Australia National Map', layerType: 'GA' }
   ],
   grace: {
     hostUrl: 'https://insargrace.geoanalytics.csiro.au:/grace/grace'

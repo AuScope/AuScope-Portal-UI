@@ -1,5 +1,5 @@
 
-import { Inject, Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { OnlineResourceModel } from '../../model/data/onlineresource.model';
 import { LayerModel } from '../../model/data/layer.model';
@@ -8,27 +8,24 @@ import { MapsManagerService } from '@auscope/angular-cesium';
 import { ResourceType } from '../../utility/constants.service';
 import { RenderStatusService } from '../cesium-map/renderstatus/render-status.service';
 import { UtilitiesService } from '../../utility/utilities.service';
-
-
-declare let Cesium;
+import { Color, DistanceDisplayCondition, GeoJsonDataSource, HeightReference, NearFarScalar, PointGraphics } from 'cesium';
 
 /**
  * Use Cesium to add layer to map. This service class adds GeoJSON layer to the map
  */
 @Injectable()
 export class CsGeoJsonService {
+  private layerHandlerService = inject(LayerHandlerService);
+  private http = inject(HttpClient);
+  private renderStatusService = inject(RenderStatusService);
+  private mapsManagerService = inject(MapsManagerService);
+  private env = inject<any>('env' as any);
+
 
   // List of geoJson layers that have been cancelled
   private cancelledLayers: Array<string> = [];
   // Number of geoJson resources added for a given layer
   private numberOfResourcesAdded: Map<string, number> = new Map<string, number>();
-
-  constructor(private layerHandlerService: LayerHandlerService,
-    private http: HttpClient,
-    private renderStatusService: RenderStatusService,
-    private mapsManagerService: MapsManagerService,
-    @Inject('env') private env) {
-  }
 
   /**
    * Add the geoJson layer
@@ -39,7 +36,7 @@ export class CsGeoJsonService {
     // Remove from cancelled layer list (if present)
     this.cancelledLayers = this.cancelledLayers.filter(l => l !== layer.id);
 
-    let jsonOnlineResources: OnlineResourceModel[];
+    let jsonOnlineResources: OnlineResourceModel[] = [];
 
     if (UtilitiesService.layerContainsResourceType(layer, ResourceType.GEOJSON)) {
         jsonOnlineResources = this.layerHandlerService.getOnlineResources(layer, ResourceType.GEOJSON);
@@ -48,16 +45,12 @@ export class CsGeoJsonService {
 
     // Get CesiumJS viewer
     const viewer = me.getViewer();
-    const options = {
-      camera: viewer.scene.camera,
-      canvas: viewer.scene.canvas,
-    };
 
     for (const onlineResource of jsonOnlineResources) {
       // Tell UI that we're about to add a resource to map
       me.renderStatusService.addResource(layer, onlineResource);
       // Create data source
-      const source = new Cesium.GeoJsonDataSource(options);
+      const source = new GeoJsonDataSource(layer.name);
       // Add an event to tell us when loading is finished
       source.loadingEvent.addEventListener((evt, isLoading: boolean) => {
         if (!isLoading) {
@@ -77,9 +70,9 @@ export class CsGeoJsonService {
         }
         let promise;
         if (layer.jsonDoc) {
-          promise = Cesium.GeoJsonDataSource.load(JSON.parse(layer.jsonDoc));
+          promise = GeoJsonDataSource.load(JSON.parse(layer.jsonDoc));
         } else {
-          promise = Cesium.GeoJsonDataSource.load(layer.proxyUrl);
+          promise = GeoJsonDataSource.load(layer.proxyUrl);
         }
         promise
           .then(function (dataSource) {
@@ -101,26 +94,26 @@ export class CsGeoJsonService {
     }
   }
   private styleGeoJsonEntity(entity) {
-    let dotColor = Cesium.Color.YELLOW;
+    let dotColor = Color.YELLOW;
     if (entity.properties.Message) {
       const message = entity.properties.Message.getValue();
       if (message.indexOf('Hit') >= 0) {
-        dotColor = Cesium.Color.BLUE;
+        dotColor = Color.BLUE;
       } else if (message.indexOf('Fail') >= 0 || message.indexOf('Miss') >= 0) {
-        dotColor = Cesium.Color.RED;
+        dotColor = Color.RED;
       } else {
-        dotColor = Cesium.Color.YELLOW;
+        dotColor = Color.YELLOW;
       }
     }
-    entity.point = new Cesium.PointGraphics({
+    entity.point = new PointGraphics({
       color: dotColor,
       outlineColor: dotColor,
       outlineWidth: 2,
       pixelSize: 20,
       disableDepthTestDistance: Number.POSITIVE_INFINITY,
-      distanceDisplayCondition: new Cesium.DistanceDisplayCondition(1.0, 8000000.0),
-      heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
-      scaleByDistance: new Cesium.NearFarScalar(1.5e2, 0.35, 1.5e7, 0.35),
+      distanceDisplayCondition: new DistanceDisplayCondition(1.0, 8000000.0),
+      heightReference: HeightReference.RELATIVE_TO_GROUND,
+      scaleByDistance: new NearFarScalar(1.5e2, 0.35, 1.5e7, 0.35),
     });
   }
   /**
@@ -130,6 +123,9 @@ export class CsGeoJsonService {
    * @param totalLayers total number of layers for LayerModel
    */
   private incrementLayersAdded(layer: LayerModel, totalLayers: number) {
+    if (!this.numberOfResourcesAdded.get(layer.id)) {
+      this.numberOfResourcesAdded.set(layer.id, 0);
+    }
     this.numberOfResourcesAdded.set(layer.id, this.numberOfResourcesAdded.get(layer.id) + 1);
     if (this.numberOfResourcesAdded.get(layer.id) === totalLayers) {
       this.cancelledLayers = this.cancelledLayers.filter(l => l !== layer.id);
@@ -167,7 +163,7 @@ export class CsGeoJsonService {
    * Fetches Cesium 'Viewer'
    */
   private getViewer() {
-    return this.mapsManagerService.getMap().getCesiumViewer();
+    return this.mapsManagerService.getMap()?.getCesiumViewer();
   }
 
 }

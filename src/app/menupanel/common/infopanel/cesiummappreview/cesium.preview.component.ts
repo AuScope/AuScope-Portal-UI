@@ -1,6 +1,6 @@
 import { CsMapService } from '../../../../lib/portal-core-ui/service/cesium-map/cs-map.service';
 import { CSWRecordModel } from '../../../../lib/portal-core-ui/model/data/cswrecord.model';
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild, inject } from '@angular/core';
 import { ViewerConfiguration } from '@auscope/angular-cesium';
 import { CsMapComponent } from 'app/cesium-map/csmap.component';
 import { Cartesian3, Color, ColorMaterialProperty, MapMode2D, PolygonHierarchy, Viewer } from 'cesium';
@@ -17,6 +17,9 @@ import { Cartesian3, Color, ColorMaterialProperty, MapMode2D, PolygonHierarchy, 
     standalone: false
 })
 export class CesiumMapPreviewComponent {
+    private csMapService = inject(CsMapService);
+    private viewerConf = inject(ViewerConfiguration);
+
 
     @ViewChild('previewMapElement', { static: true }) mapElement: ElementRef;
     viewer: Viewer;
@@ -39,7 +42,7 @@ export class CesiumMapPreviewComponent {
     /**
      * This constructor creates the preview map
      */
-    constructor(private csMapService: CsMapService, private viewerConf: ViewerConfiguration) {
+    constructor() {
         // viewerOptions will be passed the Cesium.Viewer constuctor
         this.viewerConf.viewerOptions = {
             selectionIndicator: false,

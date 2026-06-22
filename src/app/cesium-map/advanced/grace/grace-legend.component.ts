@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { GraceService } from '../../../services/wcustom/grace/grace.service';
 import { AdvancedMapComponent } from '../advanced-map.component';
 import { GraceStyleSettings } from '../../../modalwindow/querier/customanalytic/grace/grace-graph.models';
@@ -13,12 +13,10 @@ import { GraceStyleSettings } from '../../../modalwindow/querier/customanalytic/
     standalone: false
 })
 export class GraceLegendComponent extends AdvancedMapComponent implements OnInit {
+    private graceService = inject(GraceService);
+
 
     graceStyleSettings: GraceStyleSettings;
-
-    constructor(private graceService: GraceService) {
-        super();
-    }
 
     ngOnInit() {
         this.graceStyleSettings = {

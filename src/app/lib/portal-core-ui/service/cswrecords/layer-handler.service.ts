@@ -2,7 +2,7 @@ import { throwError as observableThrowError, Observable, BehaviorSubject } from 
 
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { CSWRecordModel } from '../../model/data/cswrecord.model';
-import { Injectable, Inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 
 import { LayerModel } from '../../model/data/layer.model';
@@ -17,11 +17,15 @@ import { GetCapsService } from '../wms/get-caps.service';
  */
 @Injectable()
 export class LayerHandlerService {
+  private http = inject(HttpClient);
+  private getCapsService = inject(GetCapsService);
+  private env = inject<any>('env' as any);
+
 
   private layerRecord$: BehaviorSubject<any> = new BehaviorSubject({});
   public readonly layerRecord: Observable<any> = this.layerRecord$.asObservable();
 
-  constructor(private http: HttpClient, private getCapsService: GetCapsService, @Inject('env') private env) {
+  constructor() {
     this.layerRecord$.next({});
   }
 

@@ -55,6 +55,10 @@
 
     .search-dropdown {
         flex: 1;
+
+        .search-input-wrapper {
+          position: relative;
+        }
     }
 
     .suggestion-button {
@@ -158,12 +162,6 @@
                 margin-right: 4px;
             }
 
-            .advanced-options-panel {
-                padding-left: 5px;
-                padding-right: 5px;
-                min-width: max-content;
-            }
-
             .spatial-options-panel {
                 width: 240px;
             }
@@ -248,7 +246,6 @@
                         height: 90%;
                         width: 8.5rem;  // consistency so Add/Remove don't push the CSW/Featured labels out and break alignment
                         text-align: center;
-                        float: right;
                         padding: 2px;
                         margin-left: 8px;
                         min-height: 8px;
@@ -259,7 +256,10 @@
                         width: 3rem; // consistency so Add/Remove don't push the CSW/Featured labels out and break alignment
                         min-width: 3rem;
                         text-align: center;
-                        float: right;
+
+                        vertical-align: center;
+                        display: inline;
+
                         padding: 2px;
                         margin-left: 8px;
                         min-height: 8px;
@@ -303,7 +303,7 @@
 
                 .clear-search-results-button {
                     margin: 0px 0px 0px 20px;
-                    padding: 0px 2px 0px 0px;
+                    padding: 0px 5px 0px 0px;
                     border-radius: 2px;
                 }
 
@@ -321,6 +321,10 @@
                       .download-layers-list {
                           max-height: calc(100vh - 560px);
                           overflow-y: auto;
+
+                          .search-download-icon {
+                            translate: -1px 0;
+                          }
                       }
                   }
                 }
@@ -344,24 +348,52 @@
             margin-bottom: 2px;
         }
     }
-
-    .pagination {
-        overflow: hidden;
-        margin-bottom: -17px; // too much default room underneath this component
-
-        button {
-            margin: 0px 4px 0px 0px;
-        }
-
-        // Mis-match of ng-bootstrap and bootstrap versions will show " (current)" next to current page number without this
-        ::ng-deep .visually-hidden {
-            display: none;
-        }
-    }
 }
 
 input:disabled {
     background-color: #e9ecef;
     cursor: not-allowed;
     opacity: 0.65;
-}  
+}
+
+.advanced-options-panel {
+    padding-left: 5px;
+    padding-right: 5px;
+    min-width: max-content;
+}
+
+.spatial-bounds-label {
+    margin-left: 0.2rem;
+    vertical-align: middle;
+}
+
+:host ::ng-deep .mat-mdc-text-field-wrapper {
+  background-color: white;
+}
+
+:host ::ng-deep .search-panel {
+  .mat-mdc-button,
+  .mat-mdc-raised-button,
+  .mat-mdc-outlined-button,
+  .mat-mdc-unelevated-button {
+    min-height: auto;
+    padding: 4px 8px;
+    font-size: 20px;
+    line-height: 1.2;
+  }
+}
+
+:host ::ng-deep .search-panel {
+
+  .mat-mdc-icon-button {
+    width: 32px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    min-width: 32px !important;
+    line-height: 32px !important;
+  }
+
+  .mat-mdc-button-base {
+    min-height: auto !important;
+  }
+}

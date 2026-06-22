@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { UserStateService } from 'app/services/user/user-state.service';
 import { User } from 'app/models/user.model';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CreatePermanentLinkModalComponent } from 'app/modalwindow/permanentlink/create-permanentlink.modal.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
     selector: 'app-permanent-link',
@@ -12,12 +12,15 @@ import { CreatePermanentLinkModalComponent } from 'app/modalwindow/permanentlink
     standalone: false
 })
 export class PermanentLinkComponent {
+  private userStateService = inject(UserStateService);
+  private dialog = inject(MatDialog);
+
   public bShowDialog = false;
   public user: User;
   public permanentlink = "";
   public shorteningMode = false;
 
-  constructor(private userStateService: UserStateService, private modalService: NgbModal) {
+  constructor() {
     this.userStateService.user.subscribe(user => {
       this.user = user;
     });
@@ -65,10 +68,9 @@ export class PermanentLinkComponent {
    * Show the create permanent link dialog for a logged in user
    */
   public showUserPermanentLinkDialog() {
-    this.modalService.open(CreatePermanentLinkModalComponent, {
-      size: 'lg',
-      backdrop: false,
-      scrollable: true
+    this.dialog.open(CreatePermanentLinkModalComponent, {
+      width: '800px',
+      maxWidth: '800px'
     });
   }
 

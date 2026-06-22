@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AuscopeApiService } from '../api/auscope-api.service';
 import { SearchResponse } from 'app/models/searchresponse.model';
@@ -6,8 +6,8 @@ import { SearchResponse } from 'app/models/searchresponse.model';
 
 @Injectable({ providedIn: 'root' })
 export class SearchService {
+  private apiService = inject(AuscopeApiService);
 
-  constructor(private apiService: AuscopeApiService) {}
 
   public getSearchKeywords(): Observable<string[]> {
     return this.apiService.getSearchKeywords();

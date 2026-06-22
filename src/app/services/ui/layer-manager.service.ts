@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { CsMapService } from '../../lib/portal-core-ui/service/cesium-map/cs-map.service';
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 import { ManageStateService } from '../../lib/portal-core-ui/service/permanentlink/manage-state.service';
@@ -11,20 +11,22 @@ import * as $ from 'jquery';
 import { SidebarService } from 'app/portal/sidebar.service';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-declare let gtag: Function;
+declare let rudderanalytics: any;
 
 /**
  * Class for managing the addition and removal of map layers.
  */
 @Injectable()
 export class LayerManagerService {
+  private csMapService = inject(CsMapService);
+  private manageStateService = inject(ManageStateService);
+  private uiLayerModelService = inject(UILayerModelService);
+  private advancedComponentService = inject(AdvancedComponentService);
+  private legendUiService = inject(LegendUiService);
+  private sidebarService = inject(SidebarService);
+
 
   filterList = []; // an array of all active layers - object = {layer, filterState }
-
-  constructor(private csMapService: CsMapService, private manageStateService: ManageStateService,
-    private uiLayerModelService: UILayerModelService, private advancedComponentService: AdvancedComponentService,
-    private legendUiService: LegendUiService, private sidebarService: SidebarService) {
-  }
 
   /**
    * returns a boolean for whether a layer has filters; from the array filerList
@@ -82,8 +84,8 @@ export class LayerManagerService {
    * and apply here when it's needed to adding from SearchPanel etc. will apply filter as well
    */
   public addLayer(layer: LayerModel, optionalFilters: Array<object>, layerFilterCollection: any, layerTime: Date) {
-    if (environment.googleAnalyticsKey && typeof gtag === 'function') {
-      gtag('event', 'Addlayer', {
+    if (environment.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
+      rudderanalytics.track('Addlayer', {
         event_category: 'Addlayer',
         event_action: 'AddLayer:' + layer.id
       });

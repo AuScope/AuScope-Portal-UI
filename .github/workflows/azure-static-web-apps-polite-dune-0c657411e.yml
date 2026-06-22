@@ -15,14 +15,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
-      - uses: jsdaniell/create-json@v1.2.3
-        with:
-          name: "context.json"
-          json: '{"portalBaseUrl":"${{ vars.AZURE_PORTAL_API_URL_DEV }}","hostUrl":"${{ vars.AZURE_PORTAL_URL_DEV }}","authBaseUrl":"${{ vars.AZURE_PORTAL_URL_DEV }}/api/","portalProxyUrl": "${{ vars.AZURE_PORTAL_URL_DEV }}/api/"}'
-          dir: 'src/contexts/'
+      - name: Create context.json
+        run: |
+          mkdir -p src/contexts
+          echo -n '{"portalBaseUrl":"${{ vars.AZURE_PORTAL_API_URL_DEV }}","hostUrl":"${{ vars.AZURE_PORTAL_URL_DEV }}","authBaseUrl":"${{ vars.AZURE_PORTAL_URL_DEV }}/api/","portalProxyUrl":"${{ vars.AZURE_PORTAL_URL_DEV }}/api/"}' > src/contexts/context.json
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1

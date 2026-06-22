@@ -1,5 +1,5 @@
 import { CSWRecordModel } from '../../model/data/cswrecord.model';
-import { Injectable, Inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { LayerModel } from '../../model/data/layer.model';
 import { OnlineResourceModel } from '../../model/data/onlineresource.model';
 import { PrimitiveModel } from '../../model/data/primitive.model';
@@ -12,11 +12,10 @@ import { RenderStatusService } from '../cesium-map/renderstatus/render-status.se
  */
 @Injectable()
 export class CsWWWService {
+  private layerHandlerService = inject(LayerHandlerService);
+  private renderStatusService = inject(RenderStatusService);
+  private env = inject<any>('env' as any);
 
-  constructor(private layerHandlerService: LayerHandlerService,
-              private renderStatusService: RenderStatusService,
-              @Inject('env') private env) {
-  }
 
   /**
    * Add geometry type point to the map

@@ -1,9 +1,10 @@
 
 import { enableProdMode } from '@angular/core';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { platformBrowser } from '@angular/platform-browser';
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
 import { ContextService } from "@csiro-geoanalytics/ng";
+import * as Cesium from 'cesium';
 
 ContextService.load()
 	.then(context => {
@@ -16,18 +17,32 @@ ContextService.load()
 			enableProdMode();
 		  }
 
-		  if (environment.googleAnalyticsKey) {
-			const gtagscript = document.createElement('script');
-			gtagscript.src = 'https://www.googletagmanager.com/gtag/js?id=' + environment.googleAnalyticsKey;
-			gtagscript.async = true;
-			document.head.appendChild(gtagscript);
-			const gtaginitscript = document.createElement('script');
-			gtaginitscript.innerHTML = 'window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag(\'js\', new Date());gtag(\'config\', \'' +
-			environment.googleAnalyticsKey + '\');';
-			document.head.appendChild(gtaginitscript);
+		  if (environment.rudderStackWriteKey && environment.rudderStackDataPlaneUrl) {
+			import('@rudderstack/analytics-js').then((module: any) => {
+			  // Create RudderAnalytics instance
+			  const rudderanalytics = new module.RudderAnalytics();
+
+			  // Attach to window for global access
+			  window['rudderanalytics'] = rudderanalytics;
+
+			  // Initialize RudderStack with load method
+			  rudderanalytics.load(
+				environment.rudderStackWriteKey,
+				environment.rudderStackDataPlaneUrl,
+				{
+				  logLevel: environment.production ? 'ERROR' : 'DEBUG',
+				  configUrl: 'https://api.rudderstack.com'
+				}
+			  );
+
+			  // Track initial page view
+			  rudderanalytics.page();
+			}).catch(err => {
+			  console.error('Failed to load RudderStack:', err);
+			});
 		  }
 
-		return platformBrowserDynamic().bootstrapModule(AppModule)
+		return platformBrowser().bootstrapModule(AppModule)
 	})
 	.catch(err => console.error(err));
 
@@ -40,6 +55,8 @@ declare let require;
 // Ion.defaultAccessToken =
 
 window['CESIUM_BASE_URL'] = '/assets/cesium/';
+
+(window as any).Cesium = Cesium;
 
 /*
 	To run the application under a different execution context provide a path to context
