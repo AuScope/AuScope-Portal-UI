@@ -374,7 +374,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     // Force immediate change detection to show the no-results message if needed
     this.changeDetectorRef.detectChanges();
     this.onDataChange();
-    if (this.data.docs.length === 1 && this.data.htmls.length === 0) {
+    if (this.data.docs.length >= 1 && this.data.htmls.length === 0) {
       this.setWFS(this.data.docs[0], 0);
       this.openTab(event, 'wfs')
     } else if (this.data.htmls.length === 1 && this.data.docs.length === 0) {
