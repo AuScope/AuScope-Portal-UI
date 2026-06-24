@@ -1,6 +1,6 @@
 {
   "name": "auscope-portal",
-  "version": "6.9.2",
+  "version": "6.11.0",
   "license": "MIT",
   "scripts": {
     "ng": "node --max_old_space_size=8000 ./node_modules/@angular/cli/bin/ng",

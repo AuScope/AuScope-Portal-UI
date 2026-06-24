@@ -377,7 +377,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     if (this.data.docs.length >= 1 && this.data.htmls.length === 0) {
       this.setWFS(this.data.docs[0], 0);
       this.openTab(event, 'wfs')
-    } else if (this.data.htmls.length === 1 && this.data.docs.length === 0) {
+    } else if (this.data.htmls.length >= 1 && this.data.docs.length === 0) {
       this.setHTML(this.data.htmls[0].key);
     }
   }
