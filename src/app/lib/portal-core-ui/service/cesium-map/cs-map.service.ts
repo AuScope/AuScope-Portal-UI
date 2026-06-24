@@ -1,4 +1,3 @@
-import { CSWRecordModel } from '../../model/data/cswrecord.model';
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { point } from '@turf/helpers';
@@ -18,6 +17,7 @@ import { Entity, ProviderViewModel, buildModuleUrl, OpenStreetMapImageryProvider
          ArcGisMapServerImageryProvider, Cartesian2, WebMercatorProjection, SplitDirection,
          Rectangle } from 'cesium';
 import { UtilitiesService } from '../../utility/utilities.service';
+import { UILayerModelService } from '../../../../services/ui/uilayer-model.service';
 import { ImageryLayerCollection } from 'cesium';
 import { CsGeoJsonService } from '../geojson/cs-geojson.service';
 import * as Cesium from 'cesium';
@@ -36,6 +36,7 @@ export class CsMapService {
   private mapsManagerService = inject(MapsManagerService);
   private csVMFService = inject(CsVMFService);
   private csGeoJsonService = inject(CsGeoJsonService);
+  private uiLayerModelService =inject(UILayerModelService);
   private env = inject<any>('env' as any);
   private conf = inject<any>('conf' as any);
 
@@ -246,8 +247,10 @@ export class CsMapService {
    * e.g. WMS, CSW, KML ...
    *
    * @param layer the layer to add to the map
+   * @return true if no problems are encountered adding layer. Note that this will only return false if
+   *         there are issues with adding CSW records
    */
-  public addLayer(layer: LayerModel, param: any): void {
+  public addLayer(layer: LayerModel, param: any): boolean {
     layer.initialLoad = true;
     // initiate csLayers to prevent undefined errors
     if (!layer.csLayers) {
@@ -302,7 +305,10 @@ export class CsMapService {
     }
     */
     else if(UtilitiesService.layerContainsBboxGeographicElement(layer)) {
-      this.csCSWService.addLayer(layer);
+      if (!this.csCSWService.addLayer(layer)) {
+        this.uiLayerModelService.removeUILayerModel(layer.id);
+        return false;
+      }
       this.cacheLayerModelList(layer);
     } else {
       throw new Error('No Suitable service found');
@@ -328,7 +334,7 @@ export class CsMapService {
         this.map.getCameraService().cameraFlyTo({ destination: bboxDataset });
       }
     }
-
+    return true;
   }
 
   /**
@@ -353,27 +359,6 @@ export class CsMapService {
    public appendToLayerModelList(layer) {
      this.cacheLayerModelList(layer);
    }
-
-  /**
-   * Add layer to the map. taking a short cut by wrapping the csw in a layerModel
-   * @param layer the layer to add to the map
-   */
-  public addCSWRecord(cswRecord: CSWRecordModel): void {
-    const itemLayer = new LayerModel();
-    itemLayer.cswRecords = [cswRecord];
-    itemLayer['expanded'] = false;
-    itemLayer.id = cswRecord.id;
-    itemLayer.description = cswRecord.description;
-    itemLayer.hidden = false;
-    itemLayer.layerMode = 'NA';
-    itemLayer.name = cswRecord.name;
-    itemLayer.splitDirection = SplitDirection.NONE;
-    try {
-      this.addLayer(itemLayer, {});
-    } catch (error) {
-      throw error;
-    }
-  }
 
   /**
    * Remove layer from map

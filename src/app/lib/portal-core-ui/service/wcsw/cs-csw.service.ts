@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { LayerModel } from '../../model/data/layer.model';
 import { OnlineResourceModel } from '../../model/data/onlineresource.model';
 import { LayerHandlerService } from '../cswrecords/layer-handler.service';
@@ -25,6 +26,7 @@ export class CsCSWService {
   private layerHandlerService = inject(LayerHandlerService);
   private renderStatusService = inject(RenderStatusService);
   private mapsManagerService = inject(MapsManagerService);
+  private snackBar = inject(MatSnackBar);
 
 
   // VT in the event we cannot find a suitable renderer, we default to csw. we need to store the layers that have been rendered
@@ -115,8 +117,11 @@ export class CsCSWService {
   /**
    * Add the CSW layer
    * @param layer the layer to add to the map
+   * @return true if CSW record added to map,currently will only return false if
+   *         there is an issue with coordinates order
    */
-  public addLayer(layer: LayerModel): void {
+  public addLayer(layer: LayerModel): boolean {
+    let layerAdded = false;
     const cswRecords = this.layerHandlerService.getCSWRecord(layer);
     this.map = this.mapsManagerService.getMap();
     this.viewer = this.map.getCesiumViewer();
@@ -142,16 +147,27 @@ export class CsCSWService {
           } else {
             // Render polygon same size as CSW record's bounding box, but first check that coords aren't reversed
             if ((geoEl.westBoundLongitude > geoEl.eastBoundLongitude) || (geoEl.northBoundLatitude < geoEl.southBoundLatitude)) {
-              console.warn("Cannot add layer", cswRecord.name, " - BBOX coords are not in correct north > south or east > west order");
+              const snackBarMessage =
+                `Cannot add layer ${cswRecord.name} - BBOX coords are not in correct north > south or east > west order`;
+              const snackBarRef = this.snackBar.open(snackBarMessage, 'Close', {
+                horizontalPosition: 'center',
+                verticalPosition: 'top'
+              });
+              snackBarRef.onAction().subscribe(() => {
+                snackBarRef.dismiss();
+              })
               continue;
             }
             layer.csLayers.push(this.addPolygon(cswRecord.name, geoEl));
+            layerAdded = true;
           }
           layer.csLayers.push(this.addLabel(cswRecord.name, geoEl.eastBoundLongitude, geoEl.northBoundLatitude));
+          layerAdded = true;
         }
       }
     }
     this.renderStatusService.updateComplete(layer, onlineResource);
+    return layerAdded;
   }
 
 }
