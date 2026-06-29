@@ -132,7 +132,9 @@ export class LayerManagerService {
     }
 
     // Add layer to map in Cesium
-    this.csMapService.addLayer(layer, param);
+    if (!this.csMapService.addLayer(layer, param)) {
+      return;
+    }
 
     // Update the optional filter display
     this.csMapService.updateFilterDisplay(layer.id, optionalFilters);
