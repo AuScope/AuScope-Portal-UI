@@ -565,6 +565,24 @@ export class UtilitiesService {
     }
 
     /**
+     * Returns true if (if and only if) this is an ERDAS APOLLO (eg NT WMS) server
+     * @param onlineResource online resource record for service
+     */
+    public static resourceIsERDAS_NT(onlineResource: OnlineResourceModel): boolean {
+        return ((onlineResource?.applicationProfile.indexOf('ERDAS_NT') > -1) ||
+                        (onlineResource?.url.indexOf('ERDAS_NT') > -1));
+    }
+    /**
+     * Returns true if (if and only if) this is an ERDAS APOLLO (eg TAS WMS) server
+     * @param onlineResource online resource record for service
+     */
+    public static resourceIsERDAS_TAS(onlineResource: OnlineResourceModel): boolean {
+        return ((onlineResource?.applicationProfile.indexOf('ERDAS_TAS') > -1) ||
+                        (onlineResource?.url.indexOf('ERDAS_TAS') > -1));
+    }
+
+
+    /**
      * Returns true iff (if and only if) this is an ESRI ArcGIS server
      * @param onlineResource online resource record for service
      */

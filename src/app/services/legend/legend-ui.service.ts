@@ -244,7 +244,21 @@ export class LegendUiService {
             return of(undefined);
           })
         );
-        this.displayLegendDialog(layer.id, layer.name, [getRequest, postRequest]);
+
+        // Create a GET request, using the LegendURL
+        let getRequestLegendUrl: Observable<any>;
+        layer.capabilityRecords[0].layers.forEach(l => {
+          if (l.name.startsWith(layer.id)) {
+            const requestLegendUrl = l.legendUrl;
+            getRequestLegendUrl = this.http.get(requestLegendUrl, { responseType: 'blob' }).pipe(
+              catchError(() => {
+                return of(undefined);
+              })
+            );
+          }          
+        });
+
+        this.displayLegendDialog(layer.id, layer.name, [getRequest, postRequest, getRequestLegendUrl]);
       }
     });
   }
