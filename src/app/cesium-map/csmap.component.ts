@@ -766,7 +766,7 @@ export class CsMapComponent implements AfterViewInit {
             // Create a JSON-based feature
             treeCollections.push({
               // Loop3D layers uniquely identified by id field not present in GSKY
-              key: String(jsonFeature.id ? jsonFeature.id : feature.layer.name),    // Force String, WMTS was returning numeric IDs
+              key: String(jsonFeature.id ? jsonFeature.id : feature.layer.name), // Force String, WMTS was returning numeric IDs
               layer: feature.layer,
               onlineResource: feature.onlineResource,
               value: jsonFeature.properties ?? jsonFeature,
@@ -816,7 +816,7 @@ export class CsMapComponent implements AfterViewInit {
         break;
       }
       treeCollection.raw = result;
-      // AUS-4207 Filter out "Serious Error"      
+      // AUS-4207 Filter out "Serious Error"
       if (String(treeCollection.key).indexOf('Server Error') >= 0) {
         console.log('FeatureInfo:Server Error:' + treeCollection.key);
         continue;

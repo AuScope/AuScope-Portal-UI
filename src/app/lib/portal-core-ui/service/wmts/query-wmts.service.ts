@@ -30,7 +30,7 @@ export class QueryWMTSService {
     level: number,
     infoFormat = 'application/json'
   ): Observable<string> {
-    let formdata = new HttpParams()
+    const formdata = new HttpParams()
       .set('serviceUrl', onlineResource.url)
       .set('layer', onlineResource.name)
       .set('style', onlineResource.wmts.wmtsStyle)
@@ -116,7 +116,6 @@ export class QueryWMTSService {
       pixel.x = (provider.tileWidth * (projected.x - rectangle.west) / rectangle.width) | 0;
       pixel.y = (provider.tileHeight * (rectangle.north - projected.y) / rectangle.height) | 0;
 
-      
       if (pixel.x < 0 || pixel.x >= provider.tileWidth || pixel.y < 0 || pixel.y >= provider.tileHeight) {
           continue;
       }
