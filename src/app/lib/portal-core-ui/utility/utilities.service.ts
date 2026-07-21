@@ -773,7 +773,10 @@ export class UtilitiesService {
    * @returns a list of supported OnlineResource types as strings
    */
   public static getSupportedOnlineResourceTypes(): ResourceType[] {
-    return [ResourceType.WMS, ResourceType.IRIS, ResourceType.KML, ResourceType.KMZ, ResourceType.VMF,ResourceType.GEOJSON];
+    return [
+      ResourceType.WMS, ResourceType.WMTS, ResourceType.IRIS, ResourceType.KML,
+      ResourceType.KMZ, ResourceType.VMF,ResourceType.GEOJSON
+    ];
   }
 
   /**

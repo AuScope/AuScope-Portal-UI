@@ -9,6 +9,7 @@ import { GMLParserService } from '../lib/portal-core-ui/utility/gmlparser.servic
 import { LayerModel } from '../lib/portal-core-ui/model/data/layer.model';
 import { ManageStateService } from '../lib/portal-core-ui/service/permanentlink/manage-state.service';
 import { QueryWMSService } from '../lib/portal-core-ui/service/wms/query-wms.service';
+import { QueryWMTSService } from 'app/lib/portal-core-ui/service/wmts/query-wmts.service';
 import { SimpleXMLService } from '../lib/portal-core-ui/utility/simplexml.service';
 import { UtilitiesService } from '../lib/portal-core-ui/utility/utilities.service';
 import { CsMapObject } from '../lib/portal-core-ui/service/cesium-map/cs-map-object';
@@ -27,7 +28,6 @@ import { Observable, forkJoin, of } from 'rxjs';
 import { catchError, finalize, tap, timeout } from 'rxjs/operators';
 import { ToolbarComponent } from 'app/menupanel/toolbar/toolbar.component';
 import { NVCLBoreholeAnalyticService } from 'app/modalwindow/layeranalytic/nvcl/nvcl.boreholeanalytic.service';
-import { OnlineResourceModel } from 'app/lib/portal-core-ui/model/data/onlineresource.model';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
@@ -70,6 +70,7 @@ export class CsMapComponent implements AfterViewInit {
   private csMapService = inject(CsMapService);
   private dialog = inject(MatDialog);
   private queryWMSService = inject(QueryWMSService);
+  private queryWMTSService = inject(QueryWMTSService);
   private gmlParserService = inject(GMLParserService);
   private manageStateService = inject(ManageStateService);
   private advancedMapComponentService = inject(AdvancedComponentService);
@@ -200,7 +201,6 @@ export class CsMapComponent implements AfterViewInit {
     return this.viewer;
   }
 
-
   ngAfterViewInit() {
     this.csMapService.init();
     // This code is used to display the map for nvclanid job's urlLink
@@ -234,7 +234,7 @@ export class CsMapComponent implements AfterViewInit {
                       onlineResource: layerStateObj[layerKey].onlineResource,
                       layer: layer
                     }
-                    this.setModal(layerKey, layerStateObj[layerKey].raw, mapLayer, null, layerStateObj[layerKey].gmlid);
+                    this.setModal(layerStateObj[layerKey].raw, mapLayer, null, layerStateObj[layerKey].gmlid);
                   }
                 }, 0);
               })
@@ -406,7 +406,7 @@ export class CsMapComponent implements AfterViewInit {
           this.displayModal(mapClickInfo.clickCoord);
           const handler = new KMLQuerierHandler(entity);
           this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.dialogRef);
-          // KML/KMZ layers
+          // VMF layers
         } else if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.VMF))) {
           this.displayModal(mapClickInfo.clickCoord);
           const handler = new VMFQuerierHandler(entity);
@@ -488,10 +488,12 @@ export class CsMapComponent implements AfterViewInit {
       for (const i of maplayer.clickCSWRecordsIndex) {
         const cswRecord: CSWRecordModel = maplayer.cswRecords[i];
 
-        // Get the WMS OnlineResource, if that fails use the first in the list
-        let onlineResource: OnlineResourceModel = cswRecord.onlineResources?.find(or => or.type === ResourceType.WMS);
+        // Get the WMS/WMTS OnlineResource, if that fails use the first in the list
+        const wmsResource = cswRecord.onlineResources?.find(or => or.type === ResourceType.WMS);
+        const wmtsResource = cswRecord.onlineResources?.find(or => or.type === ResourceType.WMTS);
+        let onlineResource = wmsResource ?? wmtsResource;
         if (!onlineResource && cswRecord.onlineResources?.length > 0) {
-          onlineResource = cswRecord.onlineResources[0];
+            onlineResource = cswRecord.onlineResources[0];
         }
 
         let optProviderFound = false;
@@ -518,10 +520,6 @@ export class CsMapComponent implements AfterViewInit {
 
           // Display WMS layer info
           if (onlineResource) {
-            const params = this.getParams(maplayer.clickPixel[0], maplayer.clickPixel[1]);
-            if (!params) {
-              continue;
-            }
             // Does layer have a 'styles' parameter?
             let styles = '';
             if (maplayer.sldParam?.length > 0) {
@@ -591,22 +589,69 @@ export class CsMapComponent implements AfterViewInit {
             }
 
             // Build GetFeatureInfo requests
-            getFeatureInfoRequests.push(
-              this.queryWMSService.getFeatureInfo(onlineResource, styles, sldBody, infoFormat, postMethod, maplayer.clickCoord[0],
-                maplayer.clickCoord[1], params.x, params.y, params.width, params.height, params.bbox).pipe(
+            if (onlineResource.type === ResourceType.WMS) {
+              const wmsParams = this.getParams(maplayer.clickPixel[0], maplayer.clickPixel[1]);
+              if (!wmsParams) {
+                continue;
+              }
+              getFeatureInfoRequests.push(
+                this.queryWMSService.getFeatureInfo(
+                  onlineResource,
+                  styles,
+                  sldBody,
+                  infoFormat,
+                  postMethod,
+                  maplayer.clickCoord[0], maplayer.clickCoord[1],
+                  wmsParams.x, wmsParams.y,
+                  wmsParams.width, wmsParams.height,
+                  wmsParams.bbox
+                ).pipe(
                   timeout(15000),
                   tap(result => {
-                    // Update the modal features as each request completes
-                    const feature = { onlineResource: onlineResource, layer: maplayer };
-                    const numberOfLayerFeatures = this.setModal(maplayer.id, result, feature, mapClickInfo.clickCoord);
+                    const feature = {
+                      onlineResource,
+                      layer: maplayer
+                    };
+                    const numberOfLayerFeatures =
+                      this.setModal(result, feature, mapClickInfo.clickCoord);
                     if (numberOfLayerFeatures > 0) {
                       _numberOfFeatures += numberOfLayerFeatures;
                     }
-                  }), catchError(() => {
-                    return of(null);
-                  })
+                  }),
+                  catchError(() => of(null))
                 )
-            );
+              );
+            } else if (onlineResource.type === ResourceType.WMTS) {
+              const wmtsParams =
+                this.queryWMTSService.getWMTSFeatureInfoParams(this.viewer, maplayer.clickPixel[0], maplayer.clickPixel[1], onlineResource);
+              if (!wmtsParams) {
+                continue;
+              }
+              getFeatureInfoRequests.push(
+                this.queryWMTSService.getFeatureInfo(
+                  onlineResource,
+                  wmtsParams.tileMatrix,
+                  wmtsParams.tileRow, wmtsParams.tileCol,
+                  wmtsParams.i, wmtsParams.j,
+                  wmtsParams.format,
+                  wmtsParams.level,
+                ).pipe(
+                  timeout(15000),
+                  tap(result => {
+                    const feature = {
+                      onlineResource,
+                      layer: maplayer
+                    };
+                    const numberOfLayerFeatures =
+                      this.setModal(result, feature, mapClickInfo.clickCoord);
+                    if (numberOfLayerFeatures > 0) {
+                      _numberOfFeatures += numberOfLayerFeatures;
+                    }
+                  }),
+                  catchError(() => of(null))
+                )
+              );
+            }
           }
         }
       }
@@ -653,7 +698,6 @@ export class CsMapComponent implements AfterViewInit {
     return html;
   }
 
-
   /**
    * Display the querier modal on map click
    * @param clickCoord map click coordinates
@@ -683,16 +727,6 @@ export class CsMapComponent implements AfterViewInit {
         })
       }
       */
-    }
-  }
-
-
-  /**
-   * Hide the querier modal
-   */
-  private hideModal() {
-    if (this.dialogRef) {
-      this.dialogRef.close();
     }
   }
 
@@ -732,10 +766,10 @@ export class CsMapComponent implements AfterViewInit {
             // Create a JSON-based feature
             treeCollections.push({
               // Loop3D layers uniquely identified by id field not present in GSKY
-              key: jsonFeature.id ? jsonFeature.id : feature.layer.name,
+              key: String(jsonFeature.id ? jsonFeature.id : feature.layer.name),    // Force String, WMTS was returning numeric IDs
               layer: feature.layer,
               onlineResource: feature.onlineResource,
-              value: jsonFeature,
+              value: jsonFeature.properties ?? jsonFeature,
               format: 'JSON'
             });
           }
@@ -745,25 +779,29 @@ export class CsMapComponent implements AfterViewInit {
       console.error("Could not parse JSON", err);
       return [];
     }
+
     return treeCollections;
   }
 
-
   /**
    * Set the modal dialog with the layers that have been clicked on
-   * @param layerId the ID of the layer
    * @param result response string
    * @param feature map feature object
    * @param clickCoord map click coordinates
    * @param gmlid a optional filter to only display the gmlId specified
    */
-  private setModal(layerId: string, result: string, feature: any, clickCoord: { x: number, y: number, z: number }, gmlid?: string) {
+  private setModal(result: string, feature: any, clickCoord: { x: number, y: number, z: number }, gmlid?: string) {
     let treeCollections = [];
 
     // Some layers return JSON
-    if (config.wmsGetFeatureJSON.indexOf(layerId) !== -1) {
-      treeCollections = this.parseJSONResponse(result, feature);
-    } else {
+    try {
+      const parsedJson = JSON.parse(result);
+      if (parsedJson && (parsedJson.type === 'FeatureCollection' || parsedJson.type === 'Feature')) {
+        treeCollections = this.parseJSONResponse(result, feature);
+      } else {
+        treeCollections = SimpleXMLService.parseTreeCollection(this.gmlParserService.getRootNode(result), feature);
+      }
+    } catch {
       treeCollections = SimpleXMLService.parseTreeCollection(this.gmlParserService.getRootNode(result), feature);
     }
 
@@ -778,8 +816,8 @@ export class CsMapComponent implements AfterViewInit {
         break;
       }
       treeCollection.raw = result;
-      // AUS-4207 Filter out "Serious Error"
-      if (treeCollection.key.indexOf('Server Error') >= 0) {
+      // AUS-4207 Filter out "Serious Error"      
+      if (String(treeCollection.key).indexOf('Server Error') >= 0) {
         console.log('FeatureInfo:Server Error:' + treeCollection.key);
         continue;
       }
@@ -806,7 +844,6 @@ export class CsMapComponent implements AfterViewInit {
     }
     return featureCount;
   }
-
 
   /**
    * Set the modal dialog with an HTML message

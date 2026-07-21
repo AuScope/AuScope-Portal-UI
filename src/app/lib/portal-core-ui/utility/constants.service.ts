@@ -16,6 +16,7 @@ export enum ResourceType {
   UNSUPPORTED = 'Unsupported',
   VMF = "VMF",
   WMS = "WMS",
+  WMTS = "WMTS",
   WFS = "WFS",
   WCS = "WCS",
   WWW = "WWW",

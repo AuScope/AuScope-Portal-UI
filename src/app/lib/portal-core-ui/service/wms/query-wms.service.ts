@@ -106,7 +106,6 @@ export class QueryWMSService {
       .set('HEIGHT', height.toString())
       .set('BBOX', bbox.join(','))
       .set('version', onlineResource.version)
-
       .set('INFO_FORMAT', infoFormat)
       .set('postMethod', String(postMethod));
 

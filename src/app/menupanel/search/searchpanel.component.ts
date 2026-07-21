@@ -57,6 +57,10 @@ const OGC_SERVICES = [
     fields: ['OGC:WMS'],
     checked: true
   }, {
+    name: 'WMTS',
+    fields: ['OGC:WMTS'],
+    checked: true
+  }, {
     name: 'IRIS',
     fields: ['iris'],
     checked: true
@@ -199,7 +203,7 @@ export class SearchPanelComponent implements OnInit {
   private showFeaturedLayers(): void {
     this.queryText = '';
     this.searchResults = [];
-    const layers = [];
+    const layers: SearchResult[] = [];
     this.layerHandlerService.getLayerRecord().pipe(take(1)).subscribe(records => {
       let totalLayerCount = 0;
       for (const layerGroup in records) {
@@ -877,32 +881,10 @@ export class SearchPanelComponent implements OnInit {
     return this.csMapService.getLayerModelList();
   }
 
-  /**
-   * Search page change
-   * @param pageChangeEvent
-   */
-  /*
-  public pageChange(newPageNo): void {
-    this.currentPage = newPageNo;
-    if (this.showingAllLayers) {
-      this.showFeaturedLayers();
-    } else {
-      this.search(false);
-    }
-  }
-    */
-   onPageChange(event: PageEvent): void {
+  onPageChange(event: PageEvent): void {
     // MatPaginator pageIndex is zero-based
     this.currentPage = event.pageIndex + 1;
     this.RESULTS_PER_PAGE = event.pageSize;
-
-    /*
-    if (this.showingAllLayers) {
-      this.showFeaturedLayers();
-    } else {
-      this.search(false);
-    }
-    */
   }
 
   downloadWithAuScopeCat(layer: LayerModel): void {
