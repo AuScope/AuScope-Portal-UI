@@ -101,12 +101,12 @@ export class CsGeoJsonService {
           const features = layer.jsonDoc.features;
           const length = features.length;
 
-          let extentBB = {minX:0,minY:0,maxX:0,maxY:0} // bounding box of these points
+          let extentBB = { minX: 0, minY: 0, maxX: 0, maxY: 0 } // bounding box of these points
           const positions = [];
           for (let i = 0; i < length; i++) {
             const feature = features[i];
             const coords = feature.geometry.coordinates; // [longitude, latitude, elevation (optional)]
-            
+
             // initialize for the first iteration
             if (i === 0) {
               extentBB.minX = coords[0];
@@ -148,7 +148,7 @@ export class CsGeoJsonService {
               layer.stylefn(entity);
             }
             layer.csLayers.push(dataSource);
-            
+
             viewer.flyTo(dataSource);
 
             me.incrementLayersAdded(layer, 1);
@@ -165,16 +165,18 @@ export class CsGeoJsonService {
 
   private isPointLayer(layer): boolean {
     let status: boolean = false;
-    const features = layer.features;
-    const length = features.length;
+    if (layer.features) {
+      const features = layer.features;
+      const length = features.length;
 
-    let ptCnt = 0;
-    for (let i = 0; i < length; i++) {
-      if (features[i].geometry.type === 'Point') {
-        ptCnt++;
+      let ptCnt = 0;
+      for (let i = 0; i < length; i++) {
+        if (features[i].geometry.type === 'Point') {
+          ptCnt++;
+        }
       }
+      if (ptCnt === length) { status = true; }
     }
-    if (ptCnt === length) { status = true; }
     return status;
   }
 
