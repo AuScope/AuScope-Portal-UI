@@ -43,9 +43,9 @@ export class GetCapsService {
    *
    * @param doc Document interface of GetCapabilities response
    * @param nsResolver namespace resolver function
-   * @returns applicationProfile string
+   * @returns applicationProfile string or {server, version}
    */
-  private findApplicationProfile(doc: Document, nsResolver: (prefix: string) => string): string {
+  private findApplicationProfile(doc: Document, nsResolver: (prefix: string) => string): any {
     const SCHEMA_LOCATION = "string(/xsi:WMS_Capabilities/@*[local-name()='schemaLocation'])";
     const SERVICE_TITLE = "string(/xsi:WMS_Capabilities/xsi:Service/xsi:Title)";
 
@@ -66,10 +66,10 @@ export class GetCapsService {
     const COMMENT_APOLLO = "normalize-space(//comment()[1])";
     const schemaApollo = SimpleXMLService.evaluateXPathString(doc, doc, COMMENT_APOLLO, nsResolver);
     if (schemaApollo.includes("ERDAS APOLLO Core 2022")) {
-      return "ERDAS_TAS";
+      return {server:"ERDAS", version:"Core 2022"};
     }
     if (schemaApollo.includes("ERDAS APOLLO Essentials 2015")) {
-      return "ERDAS_NT";
+      return {server:"ERDAS", version:"Essentials 2015"};
     }
 
     return "OSGeo:GeoServer";

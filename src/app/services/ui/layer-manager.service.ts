@@ -9,6 +9,7 @@ import { environment } from 'environments/environment';
 import * as _ from 'lodash';
 import * as $ from 'jquery';
 import { SidebarService } from 'app/portal/sidebar.service';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 declare let rudderanalytics: any;
@@ -18,6 +19,9 @@ declare let rudderanalytics: any;
  */
 @Injectable()
 export class LayerManagerService {
+  layerLoaded() {
+    throw new Error('Method not implemented.');
+  }
   private csMapService = inject(CsMapService);
   private manageStateService = inject(ManageStateService);
   private uiLayerModelService = inject(UILayerModelService);
@@ -25,6 +29,23 @@ export class LayerManagerService {
   private legendUiService = inject(LegendUiService);
   private sidebarService = inject(SidebarService);
 
+  public isLayerLoaded: BehaviorSubject<boolean>; // observable used in custompanel 
+  /**
+   * returns the observable of the "isLayerLoaded" variable
+   */
+  getLayerLoaded(): Observable<boolean> {
+    return this.isLayerLoaded.asObservable();
+  }
+  /**
+   * sets the state of the "isLayerLoaded" variable
+   */
+  setLayerLoaded(state: boolean): void {
+    this.isLayerLoaded.next(state);
+  }
+
+  constructor() {
+    this.isLayerLoaded = new BehaviorSubject<boolean>(false);
+  }
 
   filterList = []; // an array of all active layers - object = {layer, filterState }
 
@@ -120,7 +141,7 @@ export class LayerManagerService {
 
     // Transfer mandatory filters from the 'layerFilterCollection' input to the 'layer' object
     if (layer?.filterCollection?.mandatoryFilters &&
-        layerFilterCollection?.mandatoryFilters) {
+      layerFilterCollection?.mandatoryFilters) {
       for (const layerFilt of layer.filterCollection.mandatoryFilters) {
         for (const mandFilt of layerFilterCollection.mandatoryFilters) {
           if (layerFilt.label === mandFilt.label) {
@@ -158,6 +179,8 @@ export class LayerManagerService {
 
     // Open sidebar if closed
     this.sidebarService.setOpenState(true);
+
+    this.setLayerLoaded(true); // indicate that the layer is now loaded (observable)
   }
 
   /**

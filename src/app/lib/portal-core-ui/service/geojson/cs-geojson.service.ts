@@ -8,7 +8,9 @@ import { MapsManagerService } from '@auscope/angular-cesium';
 import { ResourceType } from '../../utility/constants.service';
 import { RenderStatusService } from '../cesium-map/renderstatus/render-status.service';
 import { UtilitiesService } from '../../utility/utilities.service';
-import { Color, DistanceDisplayCondition, GeoJsonDataSource, HeightReference, NearFarScalar, PointGraphics } from 'cesium';
+import { Math, AxisAlignedBoundingBox, Cartesian3, Color, DistanceDisplayCondition, GeoJsonDataSource, HeightReference, NearFarScalar, PointGraphics, PointPrimitiveCollection, Rectangle, Camera, Ellipsoid, Cartographic } from 'cesium';
+import { from } from 'rxjs/internal/observable/from';
+import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 
 /**
  * Use Cesium to add layer to map. This service class adds GeoJSON layer to the map
@@ -27,6 +29,13 @@ export class CsGeoJsonService {
   // Number of geoJson resources added for a given layer
   private numberOfResourcesAdded: Map<string, number> = new Map<string, number>();
 
+  // Cesium map
+  private map;
+
+  public init() {
+    this.map = this.mapsManagerService.getMap();
+  }
+
   /**
    * Add the geoJson layer
    * @param layer the geoJson layer to add to the map
@@ -39,7 +48,7 @@ export class CsGeoJsonService {
     let jsonOnlineResources: OnlineResourceModel[] = [];
 
     if (UtilitiesService.layerContainsResourceType(layer, ResourceType.GEOJSON)) {
-        jsonOnlineResources = this.layerHandlerService.getOnlineResources(layer, ResourceType.GEOJSON);
+      jsonOnlineResources = this.layerHandlerService.getOnlineResources(layer, ResourceType.GEOJSON);
     }
     const me = this;
 
@@ -65,17 +74,73 @@ export class CsGeoJsonService {
 
       if (UtilitiesService.layerContainsResourceType(layer, ResourceType.GEOJSON)) {
         // add geoJson to map
-        if (! layer.stylefn) {
-           layer.stylefn = (entity: any) => me.styleGeoJsonEntity(entity);
+        if (!layer.stylefn) {
+          layer.stylefn = (entity: any) => me.styleGeoJsonEntity(entity);
         }
         let promise;
         if (layer.jsonDoc) {
-          promise = GeoJsonDataSource.load(JSON.parse(layer.jsonDoc));
+          if (typeof layer.jsonDoc === 'object') {
+            if (Array.isArray(layer.jsonDoc)) {
+              promise = GeoJsonDataSource.load(layer.jsonDoc[0]); // should only be one, but just in case
+            } else {
+              promise = GeoJsonDataSource.load(layer.jsonDoc);
+            }
+          } else {
+            promise = GeoJsonDataSource.load(JSON.parse(layer.jsonDoc));
+          }
         } else {
           promise = GeoJsonDataSource.load(layer.proxyUrl);
         }
-        promise
-          .then(function (dataSource) {
+
+        if (this.isPointLayer(layer.jsonDoc)) {
+
+          // Create a fast primitive collection and add it to the scene
+          const pointCollection = viewer.scene.primitives.add(new PointPrimitiveCollection());
+
+          // Loop through the features array directly
+          const features = layer.jsonDoc.features;
+          const length = features.length;
+
+          let extentBB = {minX:0,minY:0,maxX:0,maxY:0} // bounding box of these points
+          const positions = [];
+          for (let i = 0; i < length; i++) {
+            const feature = features[i];
+            const coords = feature.geometry.coordinates; // [longitude, latitude, elevation (optional)]
+            
+            // initialize for the first iteration
+            if (i === 0) {
+              extentBB.minX = coords[0];
+              extentBB.minY = coords[1];
+              extentBB.maxX = coords[0];
+              extentBB.maxY = coords[1];
+            }
+            // find extent mins and maxs
+            if (coords[0] < extentBB.minX) { extentBB.minX = coords[0]; }
+            if (coords[1] < extentBB.minY) { extentBB.minY = coords[1]; }
+            if (coords[0] > extentBB.maxX) { extentBB.maxX = coords[0]; }
+            if (coords[1] > extentBB.maxY) { extentBB.maxY = coords[1]; }
+
+            feature.properties._layerId = layer.id; // we might want to redact this property, hence the _
+            pointCollection.add({
+              position: Cartesian3.fromDegrees(coords[0], coords[1], coords[2] || 0.0),
+              color: Color.YELLOW, //Color.fromCssColorString('#00E6F0'), // Light cyan
+              pixelSize: 6, //20, //6,
+              outlineColor: Color.BLACK,
+              outlineWidth: 1,
+              id: feature.properties
+            });
+          }
+          layer.csLayers.push(pointCollection);
+          const bboxDataset = Rectangle.fromDegrees(extentBB.minX, extentBB.minY, extentBB.maxX, extentBB.maxY);
+          const camera: Camera = this.mapsManagerService.getMap().getCameraService().getCamera();
+          camera.flyTo({ destination: bboxDataset });
+
+          me.incrementLayersAdded(layer, 1);
+          me.renderStatusService.updateComplete(layer, onlineResource, true);
+
+        } else {
+          promise.then(function (dataSource) {
+
             viewer.dataSources.add(dataSource);
             //Get the array of entities
             for (const entity of dataSource.entities.values) {
@@ -83,16 +148,36 @@ export class CsGeoJsonService {
               layer.stylefn(entity);
             }
             layer.csLayers.push(dataSource);
+            
+            viewer.flyTo(dataSource);
+
             me.incrementLayersAdded(layer, 1);
             me.renderStatusService.updateComplete(layer, onlineResource, true);
           })
-          .catch(function (error) {
-            window.alert(error);
-          });
+            .catch(function (error) {
+              window.alert(error);
+            });
+        }
 
       }
     }
   }
+
+  private isPointLayer(layer): boolean {
+    let status: boolean = false;
+    const features = layer.features;
+    const length = features.length;
+
+    let ptCnt = 0;
+    for (let i = 0; i < length; i++) {
+      if (features[i].geometry.type === 'Point') {
+        ptCnt++;
+      }
+    }
+    if (ptCnt === length) { status = true; }
+    return status;
+  }
+
   private styleGeoJsonEntity(entity) {
     let dotColor = Color.YELLOW;
     if (entity.properties.Message) {
@@ -148,12 +233,19 @@ export class CsGeoJsonService {
    * @param layer the VMF layer to remove from the map.
    */
   public rmLayer(layer: LayerModel): void {
+    console.log("{cs-geojson]rmLayer().layer = ", layer);
     // Request cancellation of layer if it's still being added
     this.cancelLayerAdded(layer.id);
 
     const viewer = this.getViewer();
     for (const dataSrc of layer.csLayers) {
-      viewer.dataSources.remove(dataSrc);
+      if (dataSrc instanceof PointPrimitiveCollection) {
+        console.log("{cs-geojson]rmLayer(primitives).dataSrc = ", dataSrc);
+        viewer.scene.primitives.remove(dataSrc);
+      } else {
+        console.log("{cs-geojson]rmLayer(dataSrc).dataSrc = ", dataSrc);
+        viewer.dataSources.remove(dataSrc);
+      }
     }
     layer.csLayers = [];
     this.renderStatusService.resetLayer(layer.id);
