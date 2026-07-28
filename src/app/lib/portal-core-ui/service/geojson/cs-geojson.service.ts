@@ -235,17 +235,14 @@ export class CsGeoJsonService {
    * @param layer the VMF layer to remove from the map.
    */
   public rmLayer(layer: LayerModel): void {
-    console.log("{cs-geojson]rmLayer().layer = ", layer);
     // Request cancellation of layer if it's still being added
     this.cancelLayerAdded(layer.id);
 
     const viewer = this.getViewer();
     for (const dataSrc of layer.csLayers) {
       if (dataSrc instanceof PointPrimitiveCollection) {
-        console.log("{cs-geojson]rmLayer(primitives).dataSrc = ", dataSrc);
         viewer.scene.primitives.remove(dataSrc);
       } else {
-        console.log("{cs-geojson]rmLayer(dataSrc).dataSrc = ", dataSrc);
         viewer.dataSources.remove(dataSrc);
       }
     }
