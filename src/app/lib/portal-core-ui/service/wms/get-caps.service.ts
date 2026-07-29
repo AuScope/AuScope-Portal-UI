@@ -66,10 +66,10 @@ export class GetCapsService {
     const COMMENT_APOLLO = "normalize-space(//comment()[1])";
     const schemaApollo = SimpleXMLService.evaluateXPathString(doc, doc, COMMENT_APOLLO, nsResolver);
     if (schemaApollo.includes("ERDAS APOLLO Core 2022")) {
-      return {server:"ERDAS", version:"Core 2022"};
+      return { server:"ERDAS", version:"Core 2022" };
     }
     if (schemaApollo.includes("ERDAS APOLLO Essentials 2015")) {
-      return {server:"ERDAS", version:"Essentials 2015"};
+      return { server:"ERDAS", version:"Essentials 2015" };
     }
 
     return "OSGeo:GeoServer";
@@ -309,12 +309,12 @@ export class GetCapsService {
 
     const styleNodes = SimpleXMLService.getMatchingChildNodes(node, null, "Style");
     if (styleNodes.length > 0) {
-      const legendNodes = SimpleXMLService.getMatchingChildNodes(styleNodes[0], null, "LegendURL"); 
+      const legendNodes = SimpleXMLService.getMatchingChildNodes(styleNodes[0], null, "LegendURL");
       if (legendNodes.length > 0) {
         const resourceNodes = SimpleXMLService.getMatchingChildNodes(legendNodes[0], null, "OnlineResource");
-        if (resourceNodes.length > 0) { 
+        if (resourceNodes.length > 0) {
           const hrefNodes = SimpleXMLService.getMatchingAttributes(resourceNodes[0], null, "href");
-          if (hrefNodes.length > 0) { 
+          if (hrefNodes.length > 0) {
             legendUrl = hrefNodes[0].nodeValue;
           }
         }

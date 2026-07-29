@@ -16,8 +16,7 @@ import { MapsManagerService, RectangleEditorObservable, EventRegistrationInput, 
 import {
   Entity, ProviderViewModel, buildModuleUrl, OpenStreetMapImageryProvider, BingMapsStyle,
   ArcGisMapServerImageryProvider, Cartesian2, WebMercatorProjection, SplitDirection,
-  Rectangle,
-  PointPrimitiveCollection
+  Rectangle
 } from 'cesium';
 import { UtilitiesService } from '../../utility/utilities.service';
 import { UILayerModelService } from '../../../../services/ui/uilayer-model.service';

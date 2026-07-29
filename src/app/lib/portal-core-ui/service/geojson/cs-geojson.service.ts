@@ -8,9 +8,7 @@ import { MapsManagerService } from '@auscope/angular-cesium';
 import { ResourceType } from '../../utility/constants.service';
 import { RenderStatusService } from '../cesium-map/renderstatus/render-status.service';
 import { UtilitiesService } from '../../utility/utilities.service';
-import { Math, AxisAlignedBoundingBox, Cartesian3, Color, DistanceDisplayCondition, GeoJsonDataSource, HeightReference, NearFarScalar, PointGraphics, PointPrimitiveCollection, Rectangle, Camera, Ellipsoid, Cartographic } from 'cesium';
-import { from } from 'rxjs/internal/observable/from';
-import { forkJoin } from 'rxjs/internal/observable/forkJoin';
+import { Cartesian3, Color, DistanceDisplayCondition, GeoJsonDataSource, HeightReference, NearFarScalar, PointGraphics, PointPrimitiveCollection, Rectangle, Camera } from 'cesium';
 
 /**
  * Use Cesium to add layer to map. This service class adds GeoJSON layer to the map
@@ -101,8 +99,7 @@ export class CsGeoJsonService {
           const features = layer.jsonDoc.features;
           const length = features.length;
 
-          let extentBB = { minX: 0, minY: 0, maxX: 0, maxY: 0 } // bounding box of these points
-          const positions = [];
+          const extentBB = { minX: 0, minY: 0, maxX: 0, maxY: 0 } // bounding box of these points
           for (let i = 0; i < length; i++) {
             const feature = features[i];
             const coords = feature.geometry.coordinates; // [longitude, latitude, elevation (optional)]
