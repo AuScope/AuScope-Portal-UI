@@ -805,8 +805,8 @@ export class CsMapComponent implements AfterViewInit {
     const usesLatLonOrder = normalizedSrsName.indexOf('urn:x-ogc:def:crs:epsg') >= 0 ||
       normalizedSrsName.indexOf('http://www.opengis.net/gml/srs/epsg.xml#') >= 0;
 
-    let lon = usesLatLonOrder ? b : a;
-    let lat = usesLatLonOrder ? a : b;
+    const lon = usesLatLonOrder ? b : a;
+    const lat = usesLatLonOrder ? a : b;
 
     if (normalizedSrsName.indexOf('3857') >= 0 ||
         normalizedSrsName.indexOf('900913') >= 0 ||
@@ -878,7 +878,7 @@ export class CsMapComponent implements AfterViewInit {
    * @param clickCoord map click coordinates
    * @param gmlid a optional filter to only display the gmlId specified
    */
-  private setModal(layerId: string, result: string, feature: any, clickCoord: { x: number, y: number, z: number } | null, gmlid?: string) {
+  private setModal(result: string, feature: any, clickCoord: { x: number, y: number, z: number } | null, gmlid?: string) {
     let treeCollections = [];
 
     // Some layers return JSON
