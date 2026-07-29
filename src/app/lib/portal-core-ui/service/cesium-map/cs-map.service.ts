@@ -8,6 +8,7 @@ import { ManageStateService } from '../permanentlink/manage-state.service';
 import { CsCSWService } from '../wcsw/cs-csw.service';
 import { CsMapObject } from './cs-map-object';
 import { CsWMSService } from '../wms/cs-wms.service';
+import { CsWMTSService } from '../wmts/cs-wmts.service';
 import { ResourceType } from '../../utility/constants.service';
 import { CsIrisService } from '../kml/cs-iris.service';
 import { CsKMLService } from '../kml/cs-kml.service';
@@ -28,6 +29,7 @@ import * as Cesium from 'cesium';
 @Injectable()
 export class CsMapService {
   private csWMSService = inject(CsWMSService);
+  private csWMTSService = inject(CsWMTSService);
   private csMapObject = inject(CsMapObject);
   private manageStateService = inject(ManageStateService);
   private csCSWService = inject(CsCSWService);
@@ -265,6 +267,10 @@ export class CsMapService {
       // Add a WMS layer to map
       this.csWMSService.addLayer(layer, param);
       this.cacheLayerModelList(layer);
+    } else if (UtilitiesService.layerContainsResourceType(layer, ResourceType.WMTS)) {
+      // Add a WMTS layer to map
+      this.csWMTSService.addLayer(layer);
+      this.cacheLayerModelList(layer);
     } else if (UtilitiesService.layerContainsResourceType(layer, ResourceType.IRIS)) {
       // Add an IRIS layer
       this.csIrisService.addLayer(layer, param);
@@ -369,6 +375,8 @@ export class CsMapService {
     this.manageStateService.removeLayer(layer.id);
     if (UtilitiesService.layerContainsResourceType(layer, ResourceType.WMS)) {
       this.csWMSService.rmLayer(layer);
+    } else if (UtilitiesService.layerContainsResourceType(layer, ResourceType.WMTS)) {
+      this.csWMTSService.rmLayer(layer);
     } else if (UtilitiesService.layerContainsResourceType(layer, ResourceType.IRIS)) {
       this.csIrisService.rmLayer(layer);
     } else if (UtilitiesService.layerContainsResourceType(layer, ResourceType.VMF)) {
@@ -437,7 +445,8 @@ export class CsMapService {
    */
   public setLayerOpacity(layer: LayerModel, opacity: number) {
     if (this.layerExists(layer.id)) {
-      if (UtilitiesService.layerContainsResourceType(layer, ResourceType.WMS)) {
+      if (UtilitiesService.layerContainsResourceType(layer, ResourceType.WMS) ||
+          UtilitiesService.layerContainsResourceType(layer, ResourceType.WMTS)) {
         this.csWMSService.setLayerOpacity(layer, opacity);
       } else if (UtilitiesService.layerContainsBboxGeographicElement(layer)) {
         this.csCSWService.setLayerOpacity(layer, opacity);

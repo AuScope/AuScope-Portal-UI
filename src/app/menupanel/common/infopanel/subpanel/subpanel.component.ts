@@ -100,7 +100,11 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
      * @returns true if OnlineResource is of type WMS, WFS, WCS or CSW
      */
     public isGetCapabilitiesType(onlineResource: OnlineResourceModel): boolean {
-        return onlineResource.type === ResourceType.WMS || onlineResource.type === ResourceType.WFS || onlineResource.type === ResourceType.WCS || onlineResource.type === ResourceType.CSW;
+        return onlineResource.type === ResourceType.WMS ||
+               onlineResource.type === ResourceType.WMTS ||
+               onlineResource.type === ResourceType.WFS ||
+               onlineResource.type === ResourceType.WCS ||
+               onlineResource.type === ResourceType.CSW;
     }
 
     /**
@@ -117,30 +121,35 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
     }
 
     /**
-     * Create a WMS/WFS/WCS/CSW GetCapabilities URL from the provided OnlineResource
+     * Create a WMS/WMTS/WFS/WCS/CSW GetCapabilities URL from the provided OnlineResource
      *
      * @param onlineResource the OnlineResourceModel
      * @returns a WMS, WFS or WCS GetCapabilities URL as a string
      */
     public onlineResourceGetCapabilitiesUrl(onlineResource: OnlineResourceModel): string {
-        // Determine base path, append mandatory service and request parameters
-        const paramIndex = onlineResource.url.indexOf('?');
-        let path = paramIndex !== -1 ? onlineResource.url.substring(0, onlineResource.url.indexOf('?')) : onlineResource.url;
-        path += '?service=' + onlineResource.type + '&request=GetCapabilities';
-        // Apend any other non-service or request parameters to path
-        if (paramIndex !== -1 && onlineResource.url.length > paramIndex + 1) {
-            const paramString = onlineResource.url.substring(paramIndex + 1, onlineResource.url.length);
-            const paramArray = paramString.split('&');
-            for (const keyValueString of paramArray) {
-                const keyValue = keyValueString.split('=');
-                if (keyValue.length === 2) {
-                    if (keyValue[0].toLowerCase() !== 'service' && keyValue[0].toLowerCase() !== 'request') {
-                        path += '&' + keyValue[0] + '=' + keyValue[1];
-                    }
-                }
-            }
+        // A lot of WMTS services provide a GetCapabilities URL in the WMTSResourceModel, so use that if available
+        if (onlineResource.type === ResourceType.WMTS && onlineResource.wmts?.wmtsCapabilitiesUrl) {
+            return onlineResource.wmts.wmtsCapabilitiesUrl;
+        } else {
+          // Determine base path, append mandatory service and request parameters
+          const paramIndex = onlineResource.url.indexOf('?');
+          let path = paramIndex !== -1 ? onlineResource.url.substring(0, onlineResource.url.indexOf('?')) : onlineResource.url;
+          path += '?service=' + onlineResource.type + '&request=GetCapabilities';
+          // Apend any other non-service or request parameters to path
+          if (paramIndex !== -1 && onlineResource.url.length > paramIndex + 1) {
+              const paramString = onlineResource.url.substring(paramIndex + 1, onlineResource.url.length);
+              const paramArray = paramString.split('&');
+              for (const keyValueString of paramArray) {
+                  const keyValue = keyValueString.split('=');
+                  if (keyValue.length === 2) {
+                      if (keyValue[0].toLowerCase() !== 'service' && keyValue[0].toLowerCase() !== 'request') {
+                          path += '&' + keyValue[0] + '=' + keyValue[1];
+                      }
+                  }
+              }
+          }
+          return path;
         }
-        return path;
     }
 
     /**

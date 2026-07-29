@@ -1,4 +1,6 @@
 import { ResourceType } from "../../utility/constants.service";
+import { WMTSResourceModel } from "../wmts.model";
+
 /**
  * A representation of a online resource
  */
@@ -11,4 +13,5 @@ export class OnlineResourceModel {
   version: string;
   geographicElements: any;
   protocolRequest: string;
+  wmts?: WMTSResourceModel; // Optional WMTS information
 }

@@ -473,7 +473,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     }
 
     const reg = new RegExp(config.clipboard.supportedLayersRegKeyword, 'gi');
-    this.bToClipboard = name.search(reg) === -1 ? false : true;
+    this.bToClipboard = reg.test(name);
 
     let result = doc;
     // If it is not JSON then convert to JSON
@@ -793,8 +793,8 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   private escapeCSV(value: string | number): string {
     if (!value) return '';
 
-    // If it's a number return a string
-    if (typeof value === "number") {
+    // If it's a number or boolean return a string
+    if (typeof value === "number" || typeof value === "boolean") {
       return String(value);
     }
 
