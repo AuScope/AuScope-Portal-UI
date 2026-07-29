@@ -513,32 +513,20 @@ this.layerHandlerService.getCustomLayerRecord(searchUrl).subscribe(layerRecs => 
       reader.readAsText(file);
     } else if (getExtension(file.name) === "shp" || getExtension(file.name) === "zip") {
       // .shp .cpg .prj .shx .dbf
-      /*
-      const filename = getFilename(file.name);
-      const reader = new FileReader();
-      // When file has been read this function is called
-      reader.onload = () => {
-        if (typeof reader.result === "string") {
-          console.log(reader.result);
-        }
-      };
-      // Initiate reading the SHPfile as text, result will be a string
-      reader.readAsText(file);
-      */
 
       let geoJsonData: any = null;
 
       //const file = input.files[0];
       this.loading = true;
       geoJsonData = null;
-      // 1. Convert the file to an ArrayBuffer using native Promise syntax
+      // Convert the file to an ArrayBuffer using native Promise syntax
       file.arrayBuffer()
         .then((buffer: ArrayBuffer) => {
-          // 2. Parse the buffer using shpjs Promise
+          // Parse the buffer using shpjs Promise
           return shp(buffer);
         })
         .then((result) => {
-          // 3. Handle successful conversion
+          // Handle successful conversion
           //geoJsonData = JSON.stringify(result);
           geoJsonData = result;
 
@@ -547,11 +535,12 @@ this.layerHandlerService.getCustomLayerRecord(searchUrl).subscribe(layerRecs => 
               geoJsonData.forEach((features) => {
                 this.setupLayer(this, features.fileName, features, "", ResourceType.GEOJSON, "FILE");
               })
+            } else {
+              this.setupLayer(this, geoJsonData.fileName, {type: 'FeatureCollection', features: geoJsonData.features}, "", ResourceType.GEOJSON, "FILE");
             }
           }
           this.loading = false;
 
-          //this.setupLayer(this, file.name, geoJsonData, "", ResourceType.GEOJSON, "FILE");
         })
         .catch((error) => {
           this.loading = false;

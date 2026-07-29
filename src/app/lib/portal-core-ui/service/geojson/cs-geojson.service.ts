@@ -171,7 +171,7 @@ export class CsGeoJsonService {
 
       let ptCnt = 0;
       for (let i = 0; i < length; i++) {
-        if (features[i].geometry.type === 'Point') {
+        if (features[i].geometry && features[i].geometry.type === 'Point') {
           ptCnt++;
         }
       }
