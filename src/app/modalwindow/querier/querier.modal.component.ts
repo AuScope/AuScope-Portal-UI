@@ -107,9 +107,9 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   };
 
   // Data Structures used to create a folding flat tree which displays feature data
-  public flatTreeControl = {};
+  public flatTreeControl: { [key: string]: any } = {};
   public treeFlattener = new MatTreeFlattener(this._transformer, node => node.level, node => node.expandable, node => node.children);
-  public flatTreeDataSource = {}; // Tree structure is assigned to this
+  public flatTreeDataSource: { [key: string]: any } = {}; // Tree structure is assigned to this
 
 
   // Does the 'FlatNode' have children?

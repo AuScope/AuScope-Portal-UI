@@ -8,12 +8,29 @@ export class GeoJsonQuerierHandler {
    * @returns HTML string
    */
   public getHTML(): string {
-    let html = '<div class="row"><div class="col-md-3">Name</div><div class="col-md-9">' + this.entity['name'] + '</div></div><hr>';
-
-    const extendedData = this.entity['_properties']['_propertyNames'];
+    let html;
+    if (this.entity['name']) {
+      html = '<div class="row"><div class="col-md-3">Name</div><div class="col-md-9">' + this.entity['name'] + '</div></div><hr>';
+    } else {
+      html = '<div class="row"><div class="col-md-3">Name</div><div class="col-md-9">' + this.entity['NAME'] + '</div></div><hr>';
+    }
+    let extendedData:any;
+    if (this.entity['_properties']) {
+      extendedData = this.entity['_properties']['_propertyNames'];
+    } else {
+      // might be a "PointPrimitiveCollection"
+      extendedData = this.entity;
+    }
     for (const attr in extendedData) {
         const key = extendedData[attr];
-        html += '<div class="row"><div class="col-md-3">' + key + '</div><div class="col-md-9">' + this.entity['_properties'][key]['_value'] + '</div></div>';
+        if (this.entity['_properties']) {
+          html += '<div class="row"><div class="col-md-3">' + key + '</div><div class="col-md-9">' + this.entity['_properties'][key]['_value'] + '</div></div>';
+        } else {
+          // eg might be a "PointPrimitiveCollection"
+          if (!attr.startsWith("_")) {
+            html += '<div class="row"><div class="col-md-3">' + attr + '</div><div class="col-md-9">' + key + '</div></div>';
+          }
+        }
     }
     html += '</div></div>';
     return html;
@@ -25,7 +42,11 @@ export class GeoJsonQuerierHandler {
    * @returns feature name string
    */
   public getFeatureName(): string {
-    return this.entity['name'];
+    if (this.entity['name']) {
+      return this.entity['name'];
+    } else {
+      return this.entity['NAME'];
+    }
   }
 
 }

@@ -359,6 +359,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
     // Look for a WMS URL
     if (layer.cswRecords) {
       for (const record of layer.cswRecords) {
+        if (!record.legendSupport) { return false; }
         if (record.onlineResources.find(r => r.type.toLowerCase() === 'wms')) {
           return true;
         }

@@ -34,8 +34,8 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 declare let rudderanalytics: any;
 
 @Component({
-    selector: 'app-cs-map',
-    template: `
+  selector: 'app-cs-map',
+  template: `
     <div #mapElement id="map" class="h-100 w-100" (mouseout)="mouseLongitude=undefined;mouseLatitude=undefined;">
       <ac-map>
         <app-browse-menu></app-browse-menu>
@@ -58,11 +58,11 @@ declare let rudderanalytics: any;
       </ac-map>
     </div>
     `,
-    providers: [ViewerConfiguration, NVCLBoreholeAnalyticService], // Don't forget to Provide it
-    styleUrls: ['./csmap.component.scss']
-    // The "#" (template reference variable) matters to access the map element with the ViewChild decorator!
-    ,
-    standalone: false
+  providers: [ViewerConfiguration, NVCLBoreholeAnalyticService], // Don't forget to Provide it
+  styleUrls: ['./csmap.component.scss']
+  // The "#" (template reference variable) matters to access the map element with the ViewChild decorator!
+  ,
+  standalone: false
 })
 
 export class CsMapComponent implements AfterViewInit {
@@ -96,8 +96,8 @@ export class CsMapComponent implements AfterViewInit {
   cesiumLoaded = true;
   viewer: any;
 
-  mouseLatitude: string;
-  mouseLongitude: string;
+  mouseLatitude: string | undefined;
+  mouseLongitude: string | undefined;
 
   sliderMoveActive = false;
 
@@ -354,11 +354,11 @@ export class CsMapComponent implements AfterViewInit {
         const name = go.querySelector('name').textContent;
         const description = go.querySelector('description').textContent;
 
-        // const handler = new KMLQuerierHandler(entity);
-        html = '<div class="row"><div class="col-md-3">Name</div><div class="col-md-9">' + layerList[0].name + '</div></div><hr>';
-        html += '<div class="row"><div class="col-md-3">' + "name" + '</div><div class="col-md-9">' + name + '</div></div>';
-        html += '<div class="row"><div class="col-md-3">' + "description" + '</div><div class="col-md-9">' + description + '</div></div>';
-        html += '</div></div>';
+          // const handler = new KMLQuerierHandler(entity);
+          html = '<div class="row"><div class="col-md-3">Name</div><div class="col-md-9">' + layerList[0].name + '</div></div><hr>';
+          html += '<div class="row"><div class="col-md-3">' + "name" + '</div><div class="col-md-9">' + name + '</div></div>';
+          html += '<div class="row"><div class="col-md-3">' + "description" + '</div><div class="col-md-9">' + description + '</div></div>';
+          html += '</div></div>';
 
       }
     }
@@ -565,6 +565,12 @@ export class CsMapComponent implements AfterViewInit {
               postMethod = false;
             }
 
+            if (UtilitiesService.resourceIsERDAS_Core_2022(onlineResource) || UtilitiesService.resourceIsERDAS_Essentials_2015(onlineResource)) {
+              infoFormat = 'image/png';
+              sldBody = '';
+              postMethod = false;
+            }
+
             // GSKY and some Loop3D layers require JSON response
             if (config.wmsGetFeatureJSON.indexOf(maplayer.id) !== -1) {
               infoFormat = 'application/json';
@@ -580,12 +586,12 @@ export class CsMapComponent implements AfterViewInit {
             // Patch for South Australian GeoSciML-lite v4.1
             let url = null;
             try {
-                url = new URL(onlineResource.url);
+              url = new URL(onlineResource.url);
             } catch (_error) {
-                // skip
+              // skip
             }
             if (url?.hostname.endsWith('.sa.gov.au') && onlineResource.name === 'gsmlp:BoreholeView') {
-              sldBody = sldBody.replace('xmlns:gsmlp="http://xmlns.geosciml.org/geosciml-portrayal/4.0"','xmlns:gsmlp="http://www.opengis.net/gsml/4.1/geosciml-lite"');
+              sldBody = sldBody.replace('xmlns:gsmlp="http://xmlns.geosciml.org/geosciml-portrayal/4.0"', 'xmlns:gsmlp="http://www.opengis.net/gsml/4.1/geosciml-lite"');
             }
 
             // Build GetFeatureInfo requests
@@ -690,9 +696,9 @@ export class CsMapComponent implements AfterViewInit {
       html += '<p><a style="color: #000000" target="_blank" href="' + onlineResource.url + '">' + (onlineResource.name ? onlineResource.name : 'Web resource link') + '</a></p>';
     }
     if (cswRecord.datasetURIs?.length > 0) {
-        for (const datasetUri of cswRecord.datasetURIs) {
-            html += '<p><a style="color: #000000" target="_blank" href="' + datasetUri + '">Dataset URI</a></p>';
-        }
+      for (const datasetUri of cswRecord.datasetURIs) {
+        html += '<p><a style="color: #000000" target="_blank" href="' + datasetUri + '">Dataset URI</a></p>';
+      }
     }
     html += '</div></div>';
     return html;
@@ -705,16 +711,16 @@ export class CsMapComponent implements AfterViewInit {
   private displayModal(_clickCoord: { x: number, y: number, z: number }) {
     if (!this.modalDisplayed) {
       this.dialogRef = this.dialog.open(QuerierModalComponent, {
-        width : '800px',
-        maxWidth : '800px',
+        width: '800px',
+        maxWidth: '800px',
         //panelClass: 'querier-dialog-panel',
         data: {
-            downloading: true,
-            docs: [],
-            htmls: [],
-            uniqueLayerNames: [],
-            currentDoc: null,
-            currentHTML: '',
+          downloading: true,
+          docs: [],
+          htmls: [],
+          uniqueLayerNames: [],
+          currentDoc: null,
+          currentHTML: '',
         }
       });
       this.modalDisplayed = true;

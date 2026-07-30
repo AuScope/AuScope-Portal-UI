@@ -474,7 +474,6 @@ export class CsWMSService {
             // Also the colours should more closely match that of geoserver
             params.bgcolor = '0x909090';
         }
-
         // NB: ArcGisMapServerImageryProvider does not allow additional parameters for ArcGIS, i.e. no styling
         // So we use a normal GET request & WebMapServiceImageryProvider instead
         wmsImagProv = new WebMapServiceImageryProvider({
@@ -559,12 +558,26 @@ export class CsWMSService {
         };
         /* End of 'createImage' overwrite */
 
-        // Create a resource which uses our custom proxy
-        const proxyUrl = me.env.portalBaseUrl + Constants.PROXY_API + '?usewhitelist=' + (layer.useProxyWhitelist ? 'true' : 'false') + '&url=';
-        const res = new Resource({ url: url, proxy: new MyDefaultProxy(proxyUrl) });
-
         // Force Resource to use 'POST' and our proxy
         params['usepost'] = true;
+
+        // Create a resource which uses our custom proxy; if ERDAS APOLLO WMS (i.e. NT)
+        let erdasParam: string = "";
+        if (UtilitiesService.resourceIsERDAS_Essentials_2015(wmsOnlineResource)) {
+          erdasParam = "&erdas=Essentials_2015&usegetafterproxy=true";
+          params.version = "1.1.1";
+          params.srs = "EPSG:4326";
+          params.usepost = false;
+        }
+        if (UtilitiesService.resourceIsERDAS_Core_2022(wmsOnlineResource)) {
+          erdasParam = "&erdas=Core_2022&usegetafterproxy=true";
+          params.version = "1.1.1";
+          params.srs = "EPSG:4326";
+          params.usepost = false;
+        }
+        const proxyUrl = me.env.portalBaseUrl + Constants.PROXY_API + '?usewhitelist=' + (layer.useProxyWhitelist ? 'true' : 'false') + erdasParam + '&url=';
+        const res = new Resource({ url: url, proxy: new MyDefaultProxy(proxyUrl) });
+
         wmsImagProv = new WebMapServiceImageryProvider({
           url: res,
           layers: wmsOnlineResource.name,

@@ -565,12 +565,40 @@ export class UtilitiesService {
     }
 
     /**
+     * Returns true if (if and only if) this is an ERDAS APOLLO (eg NT WMS) server
+     * @param onlineResource online resource record for service
+     */
+    public static resourceIsERDAS_Essentials_2015(onlineResource: OnlineResourceModel): boolean {
+        var status: boolean = false;
+        if (onlineResource.applicationProfile["server"]) {
+            if (onlineResource.applicationProfile["version"]) {
+                status = (onlineResource.applicationProfile["version"].indexOf('Essentials 2015') > -1);
+            }
+        }
+        return status;
+    }
+    /**
+     * Returns true if (if and only if) this is an ERDAS APOLLO (eg TAS WMS) server
+     * @param onlineResource online resource record for service
+     */
+    public static resourceIsERDAS_Core_2022(onlineResource: OnlineResourceModel): boolean {
+        var status: boolean = false;
+        if (onlineResource.applicationProfile["server"]) {
+            if (onlineResource.applicationProfile["version"]) {
+                status = (onlineResource.applicationProfile["version"].indexOf('Core 2022') > -1);
+            }
+        }
+        return status;
+    }
+
+
+    /**
      * Returns true iff (if and only if) this is an ESRI ArcGIS server
      * @param onlineResource online resource record for service
      */
     public static resourceIsArcGIS(onlineResource: OnlineResourceModel): boolean {
-        return ((onlineResource?.applicationProfile.indexOf('Esri:ArcGIS Server') > -1) ||
-                        (onlineResource?.url.indexOf('arcgis') > -1));
+        return ((onlineResource?.applicationProfile.toString().indexOf('Esri:ArcGIS Server') > -1) ||
+            (onlineResource?.url.toString().indexOf('arcgis') > -1));
     }
 
     /**
