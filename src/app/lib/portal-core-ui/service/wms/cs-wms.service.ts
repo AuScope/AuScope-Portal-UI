@@ -561,16 +561,16 @@ export class CsWMSService {
         // Force Resource to use 'POST' and our proxy
         params['usepost'] = true;
 
-        // Create a resource which uses our custom proxy; if ERDAS APOLLO WMS (i.e.NT)
+        // Create a resource which uses our custom proxy; if ERDAS APOLLO WMS (i.e. NT)
         let erdasParam: string  = "";
-        if (UtilitiesService.resourceIsERDAS_NT(wmsOnlineResource)) {
-          erdasParam = "&erdas=NT&usegetafterproxy=true";
+        if (UtilitiesService.resourceIsERDAS_Essentials_2015(wmsOnlineResource)) {
+          erdasParam = "&erdas=Essentials_2015&usegetafterproxy=true";
           params.version = "1.1.1";
           params.srs = "EPSG:4326";
           params.usepost = false;
         }
-        if (UtilitiesService.resourceIsERDAS_TAS(wmsOnlineResource)) {
-          erdasParam = "&erdas=TAS&usegetafterproxy=true";
+        if (UtilitiesService.resourceIsERDAS_Core_2022(wmsOnlineResource)) {
+          erdasParam = "&erdas=Core_2022&usegetafterproxy=true";
           params.version = "1.1.1";
           params.srs = "EPSG:4326";
           params.usepost = false;

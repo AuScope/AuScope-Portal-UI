@@ -567,7 +567,7 @@ export class CsMapComponent implements AfterViewInit {
               postMethod = false;
             }
 
-            if (UtilitiesService.resourceIsERDAS_TAS(onlineResource) || UtilitiesService.resourceIsERDAS_NT(onlineResource)) {
+            if (UtilitiesService.resourceIsERDAS_Core_2022(onlineResource) || UtilitiesService.resourceIsERDAS_Essentials_2015(onlineResource)) {
               infoFormat = 'image/png';
               sldBody = '';
               postMethod = false;
