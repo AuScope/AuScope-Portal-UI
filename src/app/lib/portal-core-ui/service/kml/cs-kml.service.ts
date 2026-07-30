@@ -14,7 +14,7 @@ import { KMLDocService } from './kml.service';
 import { UtilitiesService } from '../../utility/utilities.service';
 import { DefaultProxy, Rectangle, Resource } from 'cesium';
 import { KmlDataSource } from 'cesium';
-
+declare let Cesium;
 /**
  * Use Cesium to add layer to map. This service class adds KML layer to the map
  */
