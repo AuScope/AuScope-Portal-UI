@@ -4,9 +4,10 @@ import { CsMapObject } from '../../../../../lib/portal-core-ui/service/cesium-ma
 import { CsMapService } from '../../../../../lib/portal-core-ui/service/cesium-map/cs-map.service';
 import { GraceService } from 'app/services/wcustom/grace/grace.service';
 import { GraceGraphModalComponent } from 'app/modalwindow/querier/customanalytic/grace/grace-graph.modal.component';
-import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { AdvancedFilterDirective } from '../advanced-filter.directive';
 import { GraceStyleSettings } from 'app/modalwindow/querier/customanalytic/grace/grace-graph.models';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+
 
 @Component({
     templateUrl: './grace-advanced-filter.component.html',
@@ -19,10 +20,10 @@ import { GraceStyleSettings } from 'app/modalwindow/querier/customanalytic/grace
     private csMapService = inject<CsMapService>(CsMapService);
     private graceService = inject(GraceService);
     private formBuilder = inject(UntypedFormBuilder);
-    private modalService = inject(BsModalService);
+    private dialog = inject(MatDialog);
 
 
-    timeSeriesGraphModalRef?: BsModalRef;
+    timeSeriesGraphModalRef?: MatDialogRef<GraceGraphModalComponent>;
 
     DECIMAL_REGEX = '^-?\\d*\.{0,1}\\d+$';
     styleGroup: UntypedFormGroup;
@@ -59,9 +60,14 @@ import { GraceStyleSettings } from 'app/modalwindow/querier/customanalytic/grace
     public selectGraceDataPoint() {
         this.csMapObject.getPointFromClick().subscribe(point => {
             if (point) {
-                this.timeSeriesGraphModalRef = this.modalService.show(GraceGraphModalComponent, { class: 'modal-lg' });
-                this.timeSeriesGraphModalRef.content.x = point.longitude;
-                this.timeSeriesGraphModalRef.content.y = point.latitude;
+                this.timeSeriesGraphModalRef = this.dialog.open(GraceGraphModalComponent, {
+                  width: '1000px',
+                  maxWidth: '1000px',
+                  data: {
+                    x: point.longitude,
+                    y: point.latitude
+                  }
+                });
             }
         });
     }
@@ -79,9 +85,14 @@ import { GraceStyleSettings } from 'app/modalwindow/querier/customanalytic/grace
                 const singleCoord = c.split(',');
                 coordList.push([parseFloat(singleCoord[1]), parseFloat(singleCoord[0])]);
             }
-            this.timeSeriesGraphModalRef = this.modalService.show(GraceGraphModalComponent, { class: 'modal-lg' });
-            this.timeSeriesGraphModalRef.content.coords = coordList;
-            this.timeSeriesGraphModalRef.content.centroid = '(-45.0,144.0)';
+            this.timeSeriesGraphModalRef = this.dialog.open(GraceGraphModalComponent, {
+              width: '800px',
+              maxWidth: '800px',
+              data: {
+                coords: coordList,
+                centroid: '(-45.0,144.0)'
+              }
+            });
             setTimeout(() => {
                 this.csMapObject.clearPolygon();
             }, 500);

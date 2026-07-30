@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { BsModalRef } from 'ngx-bootstrap/modal';
+import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
     selector: 'app-ngbd-modal-status-report',
@@ -9,11 +9,8 @@ import { BsModalRef } from 'ngx-bootstrap/modal';
 
 
 export class NgbdModalStatusReportComponent {
-  bsModalRef = inject(BsModalRef);
-
-
+  bsModalRef = inject(MatDialogRef<NgbdModalStatusReportComponent>);
 
   public resourceMap = {};
-
 
 }

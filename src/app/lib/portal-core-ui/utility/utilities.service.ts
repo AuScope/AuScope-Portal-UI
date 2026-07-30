@@ -10,8 +10,9 @@ import { LayerModel } from '../model/data/layer.model';
 import proj4 from "proj4";
 import epsg from "epsg-index/all.json";
 import { EpsgEntry } from "../types/epsg";
+import { Ellipsoid } from 'cesium';
+import { config } from '../../../../environments/config';
 declare function unescape(s: string): string;
-declare let Cesium;
 
 /**
  * Port over from old portal-core extjs for dealing with xml in wfs
@@ -218,7 +219,7 @@ export class UtilitiesService {
      * @param params - filter parameter
      * @param url - the url of the resource we are matching
      */
-    public static filterProviderSkip(params: any, url: string): boolean {
+    public static filterProviderSkip(params: any, url: string, layerId?: string): boolean {
         let containProviderFilter = false;
         let urlMatch = false;
         let idx;
@@ -235,12 +236,88 @@ export class UtilitiesService {
             }
         }
 
+        if (layerId && this.hasUnsupportedProviderFilters(layerId, url, params)) {
+            return true;
+        }
+
         if (containProviderFilter && !urlMatch) {
             return true;
         } else {
             return false;
         }
 
+    }
+
+    private static getErlProviderFilterOverrides(layerId: string, url: string): any {
+        const providerOverrides = config.erlProviderFilterOverrides?.[layerId];
+        if (!providerOverrides?.length || !url) {
+            return null;
+        }
+
+        const matchingOverride = providerOverrides.find(entry => url.includes(entry.url));
+        return matchingOverride?.filterOverrides || null;
+    }
+
+    private static filterHasSelectedValue(filter: any): boolean {
+        if (!filter || filter.type === 'OPTIONAL.PROVIDER') {
+            return false;
+        }
+
+        if (Array.isArray(filter.value)) {
+            return filter.value.length > 0;
+        }
+
+        return filter.value !== null && filter.value !== undefined && filter.value !== '';
+    }
+
+    private static hasUnsupportedProviderFilters(layerId: string, url: string, optionalFilters: any[]): boolean {
+        const providerOverrides = this.getErlProviderFilterOverrides(layerId, url);
+        if (!providerOverrides || !optionalFilters?.length) {
+            return false;
+        }
+
+        return optionalFilters.some(filter => {
+            if (!this.filterHasSelectedValue(filter) || !filter.label) {
+                return false;
+            }
+
+            const override = providerOverrides[filter.label];
+            return override?.enabled === false;
+        });
+    }
+
+    private static applyProviderFilterOverrides(layer: LayerModel, onlineResource: OnlineResourceModel, optionalFilters: any[]): any[] {
+        if (!optionalFilters?.length) {
+            return optionalFilters;
+        }
+
+        const providerOverrides = this.getErlProviderFilterOverrides(layer?.id, onlineResource?.url);
+        if (!providerOverrides) {
+            return optionalFilters;
+        }
+
+        return optionalFilters.reduce((filters, filter) => {
+            if (!filter?.label) {
+                filters.push(filter);
+                return filters;
+            }
+
+            const override = providerOverrides[filter.label];
+            if (override?.enabled === false) {
+                return filters;
+            }
+
+            if (override?.xpath) {
+                filters.push({
+                    ...filter,
+                    xpath: override.xpath
+                });
+                return filters;
+            }
+
+            filters.push(filter);
+            return filters;
+        }, []);
     }
 
     /**
@@ -446,6 +523,8 @@ export class UtilitiesService {
         }
       }
 
+      param.optionalFilters = this.applyProviderFilterOverrides(layer, onlineResource, param.optionalFilters);
+
       // Set up time extents, if supplied and not already present
       if (!param.time && layer.capabilityRecords?.length > 0) {
           const capRec = layer.capabilityRecords[0];
@@ -486,12 +565,40 @@ export class UtilitiesService {
     }
 
     /**
+     * Returns true if (if and only if) this is an ERDAS APOLLO (eg NT WMS) server
+     * @param onlineResource online resource record for service
+     */
+    public static resourceIsERDAS_Essentials_2015(onlineResource: OnlineResourceModel): boolean {
+        var status: boolean = false;
+        if (onlineResource.applicationProfile["server"]) {
+            if (onlineResource.applicationProfile["version"]) {
+                status = (onlineResource.applicationProfile["version"].indexOf('Essentials 2015') > -1);
+            }
+        }
+        return status;
+    }
+    /**
+     * Returns true if (if and only if) this is an ERDAS APOLLO (eg TAS WMS) server
+     * @param onlineResource online resource record for service
+     */
+    public static resourceIsERDAS_Core_2022(onlineResource: OnlineResourceModel): boolean {
+        var status: boolean = false;
+        if (onlineResource.applicationProfile["server"]) {
+            if (onlineResource.applicationProfile["version"]) {
+                status = (onlineResource.applicationProfile["version"].indexOf('Core 2022') > -1);
+            }
+        }
+        return status;
+    }
+
+
+    /**
      * Returns true iff (if and only if) this is an ESRI ArcGIS server
      * @param onlineResource online resource record for service
      */
     public static resourceIsArcGIS(onlineResource: OnlineResourceModel): boolean {
-        return ((onlineResource?.applicationProfile.indexOf('Esri:ArcGIS Server') > -1) ||
-                        (onlineResource?.url.indexOf('arcgis') > -1));
+        return ((onlineResource?.applicationProfile.toString().indexOf('Esri:ArcGIS Server') > -1) ||
+            (onlineResource?.url.toString().indexOf('arcgis') > -1));
     }
 
     /**
@@ -523,8 +630,8 @@ export class UtilitiesService {
         const point2 = points[1].getPosition();
 
         // reproject to WGS84
-        const reprojectedPoint1 = Cesium.Ellipsoid.WGS84.cartesianToCartographic(point1);
-        const reprojectedPoint2 = Cesium.Ellipsoid.WGS84.cartesianToCartographic(point2);
+        const reprojectedPoint1 = Ellipsoid.WGS84.cartesianToCartographic(point1);
+        const reprojectedPoint2 = Ellipsoid.WGS84.cartesianToCartographic(point2);
         // convert radians to degrees
         if (reprojectedPoint1.longitude > reprojectedPoint2.longitude) {
             bbox.eastBoundLongitude = reprojectedPoint1.longitude * 180 / Math.PI;
@@ -694,7 +801,10 @@ export class UtilitiesService {
    * @returns a list of supported OnlineResource types as strings
    */
   public static getSupportedOnlineResourceTypes(): ResourceType[] {
-    return [ResourceType.WMS, ResourceType.IRIS, ResourceType.KML, ResourceType.KMZ, ResourceType.VMF,ResourceType.GEOJSON];
+    return [
+      ResourceType.WMS, ResourceType.WMTS, ResourceType.IRIS, ResourceType.KML,
+      ResourceType.KMZ, ResourceType.VMF,ResourceType.GEOJSON
+    ];
   }
 
   /**

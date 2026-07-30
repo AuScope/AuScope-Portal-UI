@@ -1,12 +1,15 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject } from '@angular/core';
 import { CSWRecordModel } from '../../../../lib/portal-core-ui/model/data/cswrecord.model';
 import { LayerModel } from '../../../../lib/portal-core-ui/model/data/layer.model';
 import { OnlineResourceModel } from '../../../../lib/portal-core-ui/model/data/onlineresource.model';
 import { UtilitiesService } from '../../../../lib/portal-core-ui/utility/utilities.service';
 import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
+import { LayerManagerService } from 'app/services/ui/layer-manager.service';
+import { LayerHandlerService } from 'app/lib/portal-core-ui/service/cswrecords/layer-handler.service';
 import { environment } from 'environments/environment';
 import { config } from 'environments/config';
 import { ResourceType } from '../../../../lib/portal-core-ui/utility/constants.service';
+import { take } from 'rxjs/operators';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 declare let rudderanalytics: any;
@@ -20,10 +23,14 @@ declare let rudderanalytics: any;
 export class InfoPanelSubComponent implements OnInit, OnChanges {
     private env = inject<any>('env' as any);
     private filterService = inject(FilterService);
+    private layerManagerService = inject(LayerManagerService);
+    private layerHandlerService = inject(LayerHandlerService);
 
     @Input() cswRecord: CSWRecordModel;
     @Input() layer: LayerModel;
     @Input() expanded: boolean;
+    @Input() showRecordAddButton = true;
+    @Output() layerAdded = new EventEmitter<void>();
 
     // These store the URL of the WMS preview, outline of Australia and legend
     wmsUrl: string;
@@ -93,10 +100,15 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
      * @returns true if OnlineResource is of type WMS, WFS, WCS or CSW
      */
     public isGetCapabilitiesType(onlineResource: OnlineResourceModel): boolean {
-        return onlineResource.type === ResourceType.WMS || onlineResource.type === ResourceType.WFS || onlineResource.type === ResourceType.WCS || onlineResource.type === ResourceType.CSW;
+        return onlineResource.type === ResourceType.WMS ||
+               onlineResource.type === ResourceType.WMTS ||
+               onlineResource.type === ResourceType.WFS ||
+               onlineResource.type === ResourceType.WCS ||
+               onlineResource.type === ResourceType.CSW;
     }
 
-    /** Removes proxy from URL for display purposes
+    /**
+     * Removes proxy from URL for display purposes
      *
      * e.g. "http://localhost:8080/getViaProxy.do?url=https://raw.githubusercontent.com/CesiumGS/cesium/main/Apps/SampleData/kml/bikeRide.kml"
      * get converted to "https://raw.githubusercontent.com/CesiumGS/cesium/main/Apps/SampleData/kml/bikeRide.kml"
@@ -109,30 +121,113 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
     }
 
     /**
-     * Create a WMS/WFS/WCS/CSW GetCapabilities URL from the provided OnlineResource
+     * Create a WMS/WMTS/WFS/WCS/CSW GetCapabilities URL from the provided OnlineResource
      *
      * @param onlineResource the OnlineResourceModel
      * @returns a WMS, WFS or WCS GetCapabilities URL as a string
      */
     public onlineResourceGetCapabilitiesUrl(onlineResource: OnlineResourceModel): string {
-        // Determine base path, append mandatory service and request parameters
-        const paramIndex = onlineResource.url.indexOf('?');
-        let path = paramIndex !== -1 ? onlineResource.url.substring(0, onlineResource.url.indexOf('?')) : onlineResource.url;
-        path += '?service=' + onlineResource.type + '&request=GetCapabilities';
-        // Apend any other non-service or request parameters to path
-        if (paramIndex !== -1 && onlineResource.url.length > paramIndex + 1) {
-            const paramString = onlineResource.url.substring(paramIndex + 1, onlineResource.url.length);
-            const paramArray = paramString.split('&');
-            for (const keyValueString of paramArray) {
-                const keyValue = keyValueString.split('=');
-                if (keyValue.length === 2) {
-                    if (keyValue[0].toLowerCase() !== 'service' && keyValue[0].toLowerCase() !== 'request') {
-                        path += '&' + keyValue[0] + '=' + keyValue[1];
-                    }
-                }
+        // A lot of WMTS services provide a GetCapabilities URL in the WMTSResourceModel, so use that if available
+        if (onlineResource.type === ResourceType.WMTS && onlineResource.wmts?.wmtsCapabilitiesUrl) {
+            return onlineResource.wmts.wmtsCapabilitiesUrl;
+        } else {
+          // Determine base path, append mandatory service and request parameters
+          const paramIndex = onlineResource.url.indexOf('?');
+          let path = paramIndex !== -1 ? onlineResource.url.substring(0, onlineResource.url.indexOf('?')) : onlineResource.url;
+          path += '?service=' + onlineResource.type + '&request=GetCapabilities';
+          // Apend any other non-service or request parameters to path
+          if (paramIndex !== -1 && onlineResource.url.length > paramIndex + 1) {
+              const paramString = onlineResource.url.substring(paramIndex + 1, onlineResource.url.length);
+              const paramArray = paramString.split('&');
+              for (const keyValueString of paramArray) {
+                  const keyValue = keyValueString.split('=');
+                  if (keyValue.length === 2) {
+                      if (keyValue[0].toLowerCase() !== 'service' && keyValue[0].toLowerCase() !== 'request') {
+                          path += '&' + keyValue[0] + '=' + keyValue[1];
+                      }
+                  }
+              }
+          }
+          return path;
+        }
+    }
+
+    /**
+     * Add this layer for all providers with defaut filters.
+     */
+    public addLayerForRecord(): void {
+        const optionalFilters = [];
+        const providerFilter = this.buildProviderFilterForRecord();
+        if (providerFilter) {
+            optionalFilters.push(providerFilter);
+            this.applyOptionalFiltersToLayerFilterCollection(optionalFilters);
+        }
+
+        const layerTimes = this.filterService.getLayerTimesBS(this.layer.id).getValue();
+        this.layerManagerService.addLayer(this.layer, optionalFilters, this.layer.filterCollection, layerTimes?.currentTime);
+        this.layerAdded.emit();
+    }
+
+    /**
+     * Add selected optional filters into the layer filter collection so they appear in FilterPanel
+     */
+    private applyOptionalFiltersToLayerFilterCollection(optionalFilters: any[]): void {
+        const layerOptionalFilters = this.layer?.filterCollection?.optionalFilters;
+        if (!layerOptionalFilters || layerOptionalFilters.length === 0) {
+            return;
+        }
+
+        for (const selectedFilter of optionalFilters) {
+            const existingFilter = layerOptionalFilters.find(filter => filter.label === selectedFilter.label);
+            if (existingFilter) {
+                existingFilter.value = selectedFilter.value;
+                existingFilter.added = true;
             }
         }
-        return path;
+
+        // Ensure there is a registered filter collection before updating it
+        this.filterService.registerLayerFilterCollection(this.layer.id, this.layer.filterCollection)
+            .pipe(take(1))
+            .subscribe(() => {
+                this.filterService.updateLayerFilterCollection(this.layer.id, this.layer.filterCollection);
+            });
+    }
+
+    /**
+     * Build an OPTIONAL.PROVIDER filter selecting only the provider for this record
+     */
+    private buildProviderFilterForRecord(): any {
+        const providerFilterTemplate = this.layer?.filterCollection?.optionalFilters?.find(
+            filter => filter.type === 'OPTIONAL.PROVIDER'
+        );
+        if (!providerFilterTemplate) {
+            return null;
+        }
+
+        const onlineResources = this.layerHandlerService.getOnlineResourcesFromCSW(this.cswRecord);
+        const firstResourceWithUrl = onlineResources.find(resource => !!resource?.url);
+        if (!firstResourceWithUrl) {
+            return null;
+        }
+
+        const providerDomain = UtilitiesService.getUrlDomain(firstResourceWithUrl.url);
+        if (!providerDomain) {
+            return null;
+        }
+
+        const providerValue = {};
+        if (providerFilterTemplate.value) {
+            for (const providerKey in providerFilterTemplate.value) {
+                providerValue[providerKey] = false;
+            }
+        }
+        providerValue[providerDomain] = true;
+
+        return {
+            ...providerFilterTemplate,
+            added: true,
+            value: providerValue
+        };
     }
 
     /**
@@ -194,7 +289,7 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
                 foundDOI = true;
                 foundCiteURL = true;
             }
-            if (!foundDOI && !foundCiteURL && onlineResource.type!== ResourceType.UNSUPPORTED) {
+            if (!foundDOI && !foundCiteURL && onlineResource.type !== ResourceType.UNSUPPORTED) {
                 if (this.isGetCapabilitiesType(onlineResource)) {
                     this.citeURL = this.onlineResourceGetCapabilitiesUrl(onlineResource);
                 } else {
@@ -236,15 +331,26 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
         // We subscribe to the layer times even though it may not be required, but if it is we'll update
         // the WMS urls after the times have been loaded
         this.filterService.getLayerTimesBS(this.layer.id).subscribe(layerTimes => {
+            // check the layer for a legendUrl property
+            this.layer.capabilityRecords[0].layers.forEach(l => {
+                if (this.layer.id === l.name) {
+                    this.legendUrl = l.legendUrl;
+                }
+            });
             const wmsOnlineResource = this.cswRecord.onlineResources.find(r => r.type.toLowerCase() === 'wms');
-            if (wmsOnlineResource) {
+            if ((wmsOnlineResource) && (this.cswRecord.legendSupport)){
                const params = 'SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png'
                     + '&LAYER=' + wmsOnlineResource.name + '&LAYERS=' + wmsOnlineResource.name
                     + '&LEGEND_OPTIONS=forceLabels:on;minSymbolSize:16';
                 this.legendUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(wmsOnlineResource.url), params);
             } else if (this.layer.legendImg && this.layer.legendImg !== '') {
-                this.legendUrl = this.env.portalBaseUrl + 'legend/' + this.layer.legendImg;
+                if (this.layer.legendImg.indexOf("http") != 0) {
+                    this.legendUrl = this.env.portalBaseUrl + 'legend/' + this.layer.legendImg;
+                } else {
+                    this.legendUrl = this.layer.legendImg;
+                }
             }
+            //}
 
             // Gather up BBOX coordinates to calculate the centre and envelope. Use a copy of coords so they don't stay modified for the main map
             const bbox = { ...this.cswRecord.geographicElements[0] };
@@ -265,7 +371,7 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
             }
 
             // Gather up lists of information URLs
-            if (wmsOnlineResource) {
+            if ((wmsOnlineResource) && (this.cswRecord.legendSupport)){
                 let params = 'SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&STYLES=&FORMAT=image/png&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&LAYERS='
                     + encodeURIComponent(wmsOnlineResource.name) + '&SRS=EPSG:4326&BBOX=' + bbox.westBoundLongitude + ',' + bbox.southBoundLatitude
                     + ',' + bbox.eastBoundLongitude + ',' + bbox.northBoundLatitude
@@ -276,10 +382,20 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
                     params += '&TIME=' + layerTimes.currentTime.toISOString();
                 }
 
-                this.wmsUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(wmsOnlineResource.url), params);
-                this.outlineUrl = "https://research-community.geoanalytics.csiro.au/geoserver/auscope/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&LAYERS=auscope%3AStates-and-Territories&TRANSPARENT=TRUE&SRS=EPSG:4326&FORMAT=image%2Fpng&BBOX="+
-                                + bbox.westBoundLongitude + ',' + bbox.southBoundLatitude
-                                + ',' + bbox.eastBoundLongitude + ',' + bbox.northBoundLatitude + "&WIDTH=400&HEIGHT=400";
+                if (this.layer.previewImg) {
+                    // either the preview is the image url (http) or user the "/preview" api endpoint
+                    if (this.layer.previewImg.indexOf("http") != 0) {
+                        this.wmsUrl = environment.portalBaseUrl + 'preview/' + this.layer.previewImg;
+                    } else {
+                        this.wmsUrl = this.layer.previewImg;
+                    }
+                    this.outlineUrl = "";
+                } else {
+                    this.wmsUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(wmsOnlineResource.url), params);
+                    this.outlineUrl = "https://research-community.geoanalytics.csiro.au/geoserver/auscope/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&LAYERS=auscope%3AStates-and-Territories&TRANSPARENT=TRUE&SRS=EPSG:4326&FORMAT=image%2Fpng&BBOX=" +
+                        + bbox.westBoundLongitude + ',' + bbox.southBoundLatitude
+                        + ',' + bbox.eastBoundLongitude + ',' + bbox.northBoundLatitude + "&WIDTH=400&HEIGHT=400";
+                }
             }
         });
     }
@@ -292,8 +408,8 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
     public copyCite(element: HTMLElement) {
         const text = element.innerText;
         navigator.clipboard.writeText(text)
-          .then(() => alert("Copied to clipboard"))
-          .catch(err => console.error("Failed to copy:", err));
+            .then(() => alert("Copied to clipboard"))
+            .catch(err => console.error("Failed to copy:", err));
     }
 
     /**

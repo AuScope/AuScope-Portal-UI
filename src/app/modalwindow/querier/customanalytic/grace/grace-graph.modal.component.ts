@@ -3,9 +3,9 @@ import { CsMapObject } from '../../../../lib/portal-core-ui/service/cesium-map/c
 import { Subscription } from 'rxjs';
 import { GraceService } from '../../../../services/wcustom/grace/grace.service';
 import { saveAs } from 'file-saver';
-import { BsModalRef } from 'ngx-bootstrap/modal';
 
 import * as Plotly from 'plotly.js-dist-min';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 /**
  * Modal to display GRACE time series data.
@@ -19,9 +19,12 @@ import * as Plotly from 'plotly.js-dist-min';
 export class GraceGraphModalComponent implements AfterViewInit {
     private graceService = inject(GraceService);
     private csMapObject = inject(CsMapObject);
-    modalRef = inject(BsModalRef);
+    dialogRef = inject(MatDialogRef<GraceGraphModalComponent>);
     private changeDetectorRef = inject(ChangeDetectorRef);
 
+    // Data will contain lat/lon (y and x) values for point location or
+    // coordinate array of lat/lon (coords) and centroid (centroid) for polys
+    data = inject(MAT_DIALOG_DATA);
 
     QueryStatus = {
         querying: 0,
@@ -30,12 +33,6 @@ export class GraceGraphModalComponent implements AfterViewInit {
     };
 
     showUncertainty = true;
-
-    // Lat/Lon inputs or coordinate array of lat/lon for polys
-    x: number;
-    y: number;
-    coords: any[];
-    centroid: string;
 
     querySubscription: Subscription;
     queryStatus: number = this.QueryStatus.querying;
@@ -108,8 +105,8 @@ export class GraceGraphModalComponent implements AfterViewInit {
         this.queryStatus = this.QueryStatus.querying;
 
         // Make call to GRACE service to get data for single parameter
-        if (this.x !== undefined && this.y !== undefined) {
-            this.querySubscription = this.graceService.getGraceTimeSeriesDataForPoint(this.x, this.y).subscribe(data => {
+        if (this.data.x !== undefined && this.data.y !== undefined) {
+            this.querySubscription = this.graceService.getGraceTimeSeriesDataForPoint(this.data.x, this.data.y).subscribe(data => {
                 if (data === null) {
                     this.queryStatus = this.QueryStatus.error;
                     this.changeDetectorRef.detectChanges();
@@ -126,9 +123,9 @@ export class GraceGraphModalComponent implements AfterViewInit {
                 this.queryStatus = this.QueryStatus.error;
                 this.changeDetectorRef.detectChanges();
             });
-        } else if (this.coords !== undefined && this.coords.length > 0) {
+        } else if (this.data.coords !== undefined && this.data.coords.length > 0) {
             // TODO: Remove hard-coding... will need to be a record keyword component
-            this.querySubscription = this.graceService.getGraceTimeSeriesDataForPolygon(this.coords).subscribe(data => {
+            this.querySubscription = this.graceService.getGraceTimeSeriesDataForPolygon(this.data.coords).subscribe(data => {
                 if (data === null) {
                     this.queryStatus = this.QueryStatus.error;
                     this.changeDetectorRef.detectChanges();
@@ -203,7 +200,7 @@ export class GraceGraphModalComponent implements AfterViewInit {
         if (this.querySubscription) {
             this.querySubscription.unsubscribe();
         }
-        this.modalRef?.hide();
+        this.dialogRef.close();
         this.csMapObject.clearPolygon();
     }
 

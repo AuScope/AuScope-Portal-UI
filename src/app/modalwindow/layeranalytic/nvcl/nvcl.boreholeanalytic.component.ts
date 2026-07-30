@@ -2,7 +2,6 @@ import { saveAs } from 'file-saver';
 import { LayerModel } from '../../../lib/portal-core-ui/model/data/layer.model';
 import { NVCLBoreholeAnalyticService } from './nvcl.boreholeanalytic.service';
 import { Component, Input, AfterViewInit, OnInit, ViewChild, inject } from '@angular/core';
-import { UserStateService } from 'app/services/user/user-state.service';
 import { LayerAnalyticInterface } from '../layer.analytic.interface';
 import { NgForm } from '@angular/forms';
 
@@ -25,7 +24,6 @@ import { NgForm } from '@angular/forms';
 export class NVCLBoreholeAnalyticComponent
   implements AfterViewInit, OnInit, LayerAnalyticInterface {
   nvclBoreholeAnalyticService = inject(NVCLBoreholeAnalyticService);
-  private userStateService = inject(UserStateService);
 
   @ViewChild('f', { static: true }) signupForm: NgForm;
   @Input() layer: LayerModel;

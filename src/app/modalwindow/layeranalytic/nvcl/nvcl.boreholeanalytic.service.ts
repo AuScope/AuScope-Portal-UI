@@ -14,8 +14,7 @@ import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import { UILayerModel } from 'app/menupanel/common/model/ui/uilayer.model';
-
-declare let Cesium;
+import { Color, DistanceDisplayCondition, HeightReference, NearFarScalar, PointGraphics } from 'cesium';
 
 @Injectable()
 export class NVCLBoreholeAnalyticService {
@@ -28,26 +27,26 @@ export class NVCLBoreholeAnalyticService {
 
 
   private styleNVCLAnalyticalGeoJsonEntity(entity) {
-    let dotColor = Cesium.Color.YELLOW;
+    let dotColor = Color.YELLOW;
     if (entity.properties.Message) {
       const message = entity.properties.Message.getValue();
       if (message.indexOf('Hit') >= 0) {
-        dotColor = Cesium.Color.BLUE;
+        dotColor = Color.BLUE;
       } else if (message.indexOf('Fail') >= 0 || message.indexOf('Miss') >= 0) {
-        dotColor = Cesium.Color.RED;
+        dotColor = Color.RED;
       } else {
-        dotColor = Cesium.Color.YELLOW;
+        dotColor = Color.YELLOW;
       }
     }
-    entity.point = new Cesium.PointGraphics({
+    entity.point = new PointGraphics({
       color: dotColor,
       outlineColor: dotColor,
       outlineWidth: 2,
       pixelSize: 20,
       disableDepthTestDistance: Number.POSITIVE_INFINITY,
-      distanceDisplayCondition: new Cesium.DistanceDisplayCondition(1.0, 8000000.0),
-      heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
-      scaleByDistance: new Cesium.NearFarScalar(1.5e2, 0.35, 1.5e7, 0.35),
+      distanceDisplayCondition: new DistanceDisplayCondition(1.0, 8000000.0),
+      heightReference: HeightReference.RELATIVE_TO_GROUND,
+      scaleByDistance: new NearFarScalar(1.5e2, 0.35, 1.5e7, 0.35),
     });
   }
 

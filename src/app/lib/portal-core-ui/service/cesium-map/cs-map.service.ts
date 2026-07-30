@@ -1,4 +1,3 @@
-import { CSWRecordModel } from '../../model/data/cswrecord.model';
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { point } from '@turf/helpers';
@@ -9,18 +8,22 @@ import { ManageStateService } from '../permanentlink/manage-state.service';
 import { CsCSWService } from '../wcsw/cs-csw.service';
 import { CsMapObject } from './cs-map-object';
 import { CsWMSService } from '../wms/cs-wms.service';
+import { CsWMTSService } from '../wmts/cs-wmts.service';
 import { ResourceType } from '../../utility/constants.service';
 import { CsIrisService } from '../kml/cs-iris.service';
 import { CsKMLService } from '../kml/cs-kml.service';
 import { CsVMFService } from '../vmf/cs-vmf.service';
 import { MapsManagerService, RectangleEditorObservable, EventRegistrationInput, CesiumEvent, EventResult } from '@auscope/angular-cesium';
-import { Entity, ProviderViewModel, buildModuleUrl, OpenStreetMapImageryProvider, BingMapsStyle,
-         ArcGisMapServerImageryProvider, Cartesian2, WebMercatorProjection, SplitDirection,
-         Rectangle } from 'cesium';
+import {
+  Entity, ProviderViewModel, buildModuleUrl, OpenStreetMapImageryProvider, BingMapsStyle,
+  ArcGisMapServerImageryProvider, Cartesian2, WebMercatorProjection, SplitDirection,
+  Rectangle
+} from 'cesium';
 import { UtilitiesService } from '../../utility/utilities.service';
+import { UILayerModelService } from '../../../../services/ui/uilayer-model.service';
 import { ImageryLayerCollection } from 'cesium';
 import { CsGeoJsonService } from '../geojson/cs-geojson.service';
-declare let Cesium: any;
+import * as Cesium from 'cesium';
 
 /**
  * Wrapper class to provide all things related to the drawing of polygons and bounding boxes in CesiumJS
@@ -28,6 +31,7 @@ declare let Cesium: any;
 @Injectable()
 export class CsMapService {
   private csWMSService = inject(CsWMSService);
+  private csWMTSService = inject(CsWMTSService);
   private csMapObject = inject(CsMapObject);
   private manageStateService = inject(ManageStateService);
   private csCSWService = inject(CsCSWService);
@@ -36,6 +40,7 @@ export class CsMapService {
   private mapsManagerService = inject(MapsManagerService);
   private csVMFService = inject(CsVMFService);
   private csGeoJsonService = inject(CsGeoJsonService);
+  private uiLayerModelService =inject(UILayerModelService);
   private env = inject<any>('env' as any);
   private conf = inject<any>('conf' as any);
 
@@ -65,6 +70,8 @@ export class CsMapService {
     mapEventManager.register(eventRegistration).subscribe((result) => {
       this.mapClickHandler(result);
     });
+    // Initialize basemap error handling
+    this.initializeBasemapLayers();
   }
 
   /**
@@ -107,8 +114,8 @@ export class CsMapService {
     try {
       // Filter out drag event
       if (!eventResult.movement ||
-          Math.abs(eventResult.movement.startPosition.x - eventResult.movement.endPosition.x) > 2 ||
-          Math.abs(eventResult.movement.startPosition.y - eventResult.movement.endPosition.y) > 2) {
+        Math.abs(eventResult.movement.startPosition.x - eventResult.movement.endPosition.x) > 2 ||
+        Math.abs(eventResult.movement.startPosition.y - eventResult.movement.endPosition.y) > 2) {
         return;
       }
       const pixel = eventResult.movement.startPosition;
@@ -120,25 +127,25 @@ export class CsMapService {
       const ellipsoid = viewer.scene.globe.ellipsoid;
       const cartesian = viewer.camera.pickEllipsoid(mousePosition, ellipsoid);
       const cartographic = ellipsoid.cartesianToCartographic(cartesian);
-      let lon = Cesium.Math.toDegrees(cartographic.longitude);
-      let lat = Cesium.Math.toDegrees(cartographic.latitude);
-      if (!Number(lat) || !Number(lon)) {
+      const lon = Cesium.Math.toDegrees(cartographic.longitude);
+      const lat = Cesium.Math.toDegrees(cartographic.latitude);
+      if (!Number.isFinite(lon) || !Number.isFinite(lat)) {
         return;
       }
+      const lonRounded = Math.round(lon * 1e5) / 1e5;
+      const latRounded = Math.round(lat * 1e5) / 1e5;
 
-      lon = Number.parseFloat(lon).toFixed(5);
-      lat = Number.parseFloat(lat).toFixed(5);
       const clickCoord = new WebMercatorProjection().project(cartographic);
       // Create a GeoJSON point
-      const clickPoint = point([lon, lat]);
+      const clickPoint = point([lonRounded, latRounded]);
       // Compile a list of clicked on layers
       const clickedLayerList: LayerModel[] = [];
 
       // tslint:disable-next-line:forin
       for (const layerModel of this.layerModelList) {
         if (!UtilitiesService.layerContainsResourceType(layerModel, ResourceType.WMS) &&
-            !UtilitiesService.layerContainsResourceType(layerModel, ResourceType.WWW) &&
-            !UtilitiesService.layerContainsBboxGeographicElement(layerModel)) {
+          !UtilitiesService.layerContainsResourceType(layerModel, ResourceType.WWW) &&
+          !UtilitiesService.layerContainsBboxGeographicElement(layerModel)) {
           continue;
         }
         const cswRecords = layerModel.cswRecords;
@@ -147,11 +154,11 @@ export class CsMapService {
           let bboxes = [];
           // Look for 'geographicElements' in 'onlineResource's
           if (cswRecords[i].onlineResources.length > 0 &&
-              cswRecords[i].onlineResources[0].hasOwnProperty('geographicElements') &&
-              cswRecords[i].onlineResources[0].geographicElements.length > 0) {
+            cswRecords[i].onlineResources[0].hasOwnProperty('geographicElements') &&
+            cswRecords[i].onlineResources[0].geographicElements.length > 0) {
             // Only take the first one, assuming all the onlineresoures have the same bbox
             bboxes = cswRecords[i].onlineResources[0].geographicElements;
-          // Look for 'geographicElements' in the cswRecord
+            // Look for 'geographicElements' in the cswRecord
           } else if (cswRecords[i].hasOwnProperty('geographicElements') && cswRecords[i].geographicElements.length > 0) {
             bboxes = cswRecords[i].geographicElements;
           }
@@ -164,7 +171,7 @@ export class CsMapService {
           const margin = 0.05;
           for (const bbox of bboxes) {
             const poly = bboxPolygon([bbox.westBoundLongitude - margin, bbox.southBoundLatitude - margin,
-                                    bbox.eastBoundLongitude + margin, bbox.northBoundLatitude + margin]);
+            bbox.eastBoundLongitude + margin, bbox.northBoundLatitude + margin]);
             if (booleanPointInPolygon(clickPoint, poly)) {
               // Add to list of clicked layers
               layerModel.clickPixel = [pixel.x, pixel.y];
@@ -244,8 +251,10 @@ export class CsMapService {
    * e.g. WMS, CSW, KML ...
    *
    * @param layer the layer to add to the map
+   * @return true if no problems are encountered adding layer. Note that this will only return false if
+   *         there are issues with adding CSW records
    */
-  public addLayer(layer: LayerModel, param: any): void {
+  public addLayer(layer: LayerModel, param: any): boolean {
     layer.initialLoad = true;
     // initiate csLayers to prevent undefined errors
     if (!layer.csLayers) {
@@ -259,6 +268,10 @@ export class CsMapService {
     if (UtilitiesService.layerContainsResourceType(layer, ResourceType.WMS)) {
       // Add a WMS layer to map
       this.csWMSService.addLayer(layer, param);
+      this.cacheLayerModelList(layer);
+    } else if (UtilitiesService.layerContainsResourceType(layer, ResourceType.WMTS)) {
+      // Add a WMTS layer to map
+      this.csWMTSService.addLayer(layer);
       this.cacheLayerModelList(layer);
     } else if (UtilitiesService.layerContainsResourceType(layer, ResourceType.IRIS)) {
       // Add an IRIS layer
@@ -300,7 +313,10 @@ export class CsMapService {
     }
     */
     else if(UtilitiesService.layerContainsBboxGeographicElement(layer)) {
-      this.csCSWService.addLayer(layer);
+      if (!this.csCSWService.addLayer(layer)) {
+        this.uiLayerModelService.removeUILayerModel(layer.id);
+        return false;
+      }
       this.cacheLayerModelList(layer);
     } else {
       throw new Error('No Suitable service found');
@@ -326,7 +342,7 @@ export class CsMapService {
         this.map.getCameraService().cameraFlyTo({ destination: bboxDataset });
       }
     }
-
+    return true;
   }
 
   /**
@@ -343,34 +359,13 @@ export class CsMapService {
     this.addLayerSubject.next(layer);
   }
 
-   /**
-    *  In the event we have custom layer that is handled outside olMapService, we will want to register that layer here so that
-    *  it can be handled by the clicked event handler.
-    *  this is to support custom layer renderer such as iris that uses kml
-    */
-   public appendToLayerModelList(layer) {
-     this.cacheLayerModelList(layer);
-   }
-
   /**
-   * Add layer to the map. taking a short cut by wrapping the csw in a layerModel
-   * @param layer the layer to add to the map
+   *  In the event we have custom layer that is handled outside olMapService, we will want to register that layer here so that
+   *  it can be handled by the clicked event handler.
+   *  this is to support custom layer renderer such as iris that uses kml
    */
-  public addCSWRecord(cswRecord: CSWRecordModel): void {
-    const itemLayer = new LayerModel();
-    itemLayer.cswRecords = [cswRecord];
-    itemLayer['expanded'] = false;
-    itemLayer.id = cswRecord.id;
-    itemLayer.description = cswRecord.description;
-    itemLayer.hidden = false;
-    itemLayer.layerMode = 'NA';
-    itemLayer.name = cswRecord.name;
-    itemLayer.splitDirection = SplitDirection.NONE;
-    try {
-      this.addLayer(itemLayer, {});
-    } catch (error) {
-      throw error;
-    }
+  public appendToLayerModelList(layer) {
+    this.cacheLayerModelList(layer);
   }
 
   /**
@@ -382,6 +377,8 @@ export class CsMapService {
     this.manageStateService.removeLayer(layer.id);
     if (UtilitiesService.layerContainsResourceType(layer, ResourceType.WMS)) {
       this.csWMSService.rmLayer(layer);
+    } else if (UtilitiesService.layerContainsResourceType(layer, ResourceType.WMTS)) {
+      this.csWMTSService.rmLayer(layer);
     } else if (UtilitiesService.layerContainsResourceType(layer, ResourceType.IRIS)) {
       this.csIrisService.rmLayer(layer);
     } else if (UtilitiesService.layerContainsResourceType(layer, ResourceType.VMF)) {
@@ -435,9 +432,40 @@ export class CsMapService {
   public getLayerForEntity(entity: Entity): LayerModel {
     for (const layer of this.layerModelList) {
       for (const csLayer of layer.csLayers) {
-          if (csLayer.entities && csLayer.entities.values.indexOf(entity) !== -1) {
-              return layer;
+        /*
+        if (csLayer instanceof PointPrimitiveCollection) {
+          console.log("getLayerForEntity(PointPrimitiveCollection).csLayer = ", csLayer);
+          // if the csLayer is a PointPrimitiveCollection then compare entity to layer.JsonDoc.features
+          // this works, but not very efficient - might go back to setting layerId in the properties
+          if (layer.jsonDoc) {
+            if (layer.jsonDoc.features) {
+              var i = 0;
+              let entityFnd: boolean = false;
+              while ((i < layer.jsonDoc.features.length) && (!entityFnd)) {
+                if (layer.jsonDoc.features[i].properties === entity) {
+                  console.log("getLayerForEntity(PointPrimitiveCollection).i = ",i);
+                  entityFnd = true;
+                }
+                i++;
+              }
+              if (entityFnd) {
+                  console.log("getLayerForEntity(PointPrimitiveCollection - entityFnd).layer = ",layer);
+                return layer;
+              }
+            }
           }
+        }
+        */
+        if (csLayer.entities) {
+          if (csLayer.entities && csLayer.entities.values.indexOf(entity) !== -1) {
+            return layer;
+          }
+        }
+      }
+      // this gets set in cs-geojson.service - addLayer()
+      // i.e. feature.properties._layerId = layer.id;
+      if (entity["_layerId"] && layer.id === entity["_layerId"]) {
+        return layer;
       }
     }
     return null;
@@ -450,7 +478,8 @@ export class CsMapService {
    */
   public setLayerOpacity(layer: LayerModel, opacity: number) {
     if (this.layerExists(layer.id)) {
-      if (UtilitiesService.layerContainsResourceType(layer, ResourceType.WMS)) {
+      if (UtilitiesService.layerContainsResourceType(layer, ResourceType.WMS) ||
+          UtilitiesService.layerContainsResourceType(layer, ResourceType.WMTS)) {
         this.csWMSService.setLayerOpacity(layer, opacity);
       } else if (UtilitiesService.layerContainsBboxGeographicElement(layer)) {
         this.csCSWService.setLayerOpacity(layer, opacity);
@@ -468,7 +497,7 @@ export class CsMapService {
   public layerHasOpacity(layer: LayerModel): boolean {
     if (this.layerExists(layer.id)) {
       if (UtilitiesService.layerContainsResourceType(layer, ResourceType.WMS) ||
-          UtilitiesService.layerContainsBboxGeographicElement(layer)) {
+        UtilitiesService.layerContainsBboxGeographicElement(layer)) {
         return true;
       }
     }
@@ -496,17 +525,17 @@ export class CsMapService {
     const southEast = UtilitiesService.coordinates3857To4326(extent[2], extent[3]);
     const southWest = UtilitiesService.coordinates3857To4326(extent[0], extent[3]);
     const extentPoly = this.getViewer().entities.add({
-      polygon : {
-        hierarchy : Cesium.Cartesian3.fromDegreesArray([
+      polygon: {
+        hierarchy: Cesium.Cartesian3.fromDegreesArray([
           northWest[0], northWest[1],
           northEast[0], northEast[1],
           southEast[0], southEast[1],
           southWest[0], southWest[1]
         ]),
-        height : 0,
-        material : new Cesium.Color(128, 128, 128, 0.25),
-        outline : true,
-        outlineColor : Cesium.Color.BLACK
+        height: 0,
+        material: new Cesium.Color(128, 128, 128, 0.25),
+        outline: true,
+        outlineColor: Cesium.Color.BLACK
       }
     });
     // Leave the highlight for 2 seconds after zooming, then remove
@@ -540,6 +569,145 @@ export class CsMapService {
   }
 
   /**
+   * Switch to fallback provider for base layers
+   */
+  private switchToFallbackProvider() {
+    const viewer = this.getViewer();
+
+    // Remove all imagery layers to stop the broken provider from trying to load
+    viewer.imageryLayers.removeAll();
+
+    // Switch to National Map directly using fromUrl
+    ArcGisMapServerImageryProvider.fromUrl(
+      'https://services.ga.gov.au/gis/rest/services/NationalBaseMap/MapServer'
+    ).then((provider) => {
+      viewer.imageryLayers.addImageryProvider(provider);
+      console.log('Switched to National Map fallback');
+    }).catch((error) => {
+      console.error('Failed to load National Map fallback:', error);
+      // Last resort is OSM
+      const osmProvider = new OpenStreetMapImageryProvider({
+        url: 'https://tile.openstreetmap.org/'
+      });
+      viewer.imageryLayers.addImageryProvider(osmProvider);
+      console.log('Switched to OSM fallback');
+    });
+  }
+
+  /**
+   * Initialize the basemap layers with error handling.
+   * - If the provider can't fetch metadata (readyPromise rejects) -> fallback
+   * - If provider is "ready" but fails to return any level-0 tile quickly -> fallback
+   * - After the first tile succeeds, ignore later tile errors.
+   */
+  public initializeBasemapLayers() {
+    const viewer = this.getViewer();
+
+    // Try to confirm at least one level-0 tile quickly
+    const probeFirstTile = async (provider: any, timeoutMs = 1500): Promise<boolean> => {
+      const withTimeout = <T>(p: Promise<T>) =>
+        new Promise<T>((resolve, reject) => {
+          const t = setTimeout(() => reject(new Error('tile probe timeout')), timeoutMs);
+          p.then(v => { clearTimeout(t); resolve(v); })
+            .catch(e => {
+              clearTimeout(t);
+              reject(e instanceof Error ? e : new Error(String(e)));
+            });
+        });
+
+      // Some providers may throw synchronously if level/coords invalid – wrap each call
+      const probes: Promise<any>[] = [];
+      try { probes.push(withTimeout(provider.requestImage(0, 0, 0))); } catch { }
+      try { probes.push(withTimeout(provider.requestImage(1, 0, 0))); } catch { }
+      if (probes.length === 0) return false;
+
+      const results = await Promise.allSettled(probes);
+      // Succeed only if any probe fulfilled with a renderable image
+      return results.some(r => {
+        if (r.status !== 'fulfilled' || !r.value) return false;
+        const img: any = (r as any).value;
+        if (typeof HTMLImageElement !== 'undefined' && img instanceof HTMLImageElement) {
+          return (img.naturalWidth ?? 0) > 0 && (img.naturalHeight ?? 0) > 0;
+        }
+        if (typeof img?.width === 'number' && typeof img?.height === 'number') {
+          return img.width > 0 && img.height > 0; // ImageBitmap/Canvas-like
+        }
+        return true;
+      });
+    };
+
+    // Attach init-only guard to a base layer provider
+    const attachInitGuard = (layer: Cesium.ImageryLayer | undefined) => {
+      const provider: any = layer?.imageryProvider;
+      if (!provider) return;
+
+      let firstTileConfirmed = false;
+
+      const bailToFallback = () => {
+        if (firstTileConfirmed) return;
+        try { provider.errorEvent?.removeEventListener(onError); } catch { }
+        this.switchToFallbackProvider();
+      };
+
+      const onError = (_err: any) => {
+        // Before first tile success, treat errors as init failure
+        if (!firstTileConfirmed) bailToFallback();
+      };
+
+      provider.errorEvent?.addEventListener(onError);
+
+      const onReady = async () => {
+        try {
+          const ok = await probeFirstTile(provider, 1200);
+          if (ok) {
+            firstTileConfirmed = true;
+            try { provider.errorEvent?.removeEventListener(onError); } catch { }
+          } else {
+            bailToFallback();
+          }
+        } catch {
+          bailToFallback();
+        }
+      };
+
+      if (provider.ready) {
+        // Already ready – probe on next tick
+        setTimeout(() => void onReady(), 0);
+      } else if (provider.readyPromise && typeof provider.readyPromise.then === 'function') {
+        provider.readyPromise.then(onReady).catch(() => bailToFallback());
+      } else {
+        // No readiness signal – treat as failure
+        bailToFallback();
+      }
+    };
+
+    // Existing base layer at startup
+    if (viewer.imageryLayers.length > 0) {
+      const base0 = viewer.imageryLayers.get(0);
+      attachInitGuard(base0);
+    }
+
+    // When a new layer is added at index 0, attach the guard
+    viewer.imageryLayers.layerAdded.addEventListener((layer: Cesium.ImageryLayer, index: number) => {
+      if (index === 0) attachInitGuard(layer);
+    });
+
+    // If base layer is removed and nothing replaces it shortly, fail to fallback
+    viewer.imageryLayers.layerRemoved.addEventListener((_layer, index) => {
+      if (index === 0) {
+        setTimeout(() => {
+          if (viewer.imageryLayers.length === 0) this.switchToFallbackProvider();
+        }, 0);
+      }
+    });
+
+    // If nothing shows up at startup fall back
+    setTimeout(() => {
+      if (viewer.imageryLayers.length === 0) this.switchToFallbackProvider();
+    }, 1500);
+  }
+
+  /**
    * Create a list of base maps from the environment file
    */
   public createBaseMapLayers(): any[] {
@@ -552,14 +720,39 @@ export class CsMapService {
             iconUrl: buildModuleUrl('Widgets/Images/ImageryProviders/openStreetMap.png'),
             tooltip: layer.tooltip,
             creationFunction() {
-              return new OpenStreetMapImageryProvider({
-                url: 'https://tile.openstreetmap.org/',
-              });
+              try {
+                return new OpenStreetMapImageryProvider({
+                  url: 'https://tile.openstreetmap.org/',
+                });
+              } catch (err) {
+                console.error('Failed to create OSM imagery provider:', err);
+                return ArcGisMapServerImageryProvider.fromUrl('https://services.ga.gov.au/gis/rest/services/NationalBaseMap/MapServer');
+              }
             },
           })
         );
+      } else if (layer.layerType === 'GA') {
+        baseMapLayers.push(
+          new ProviderViewModel({
+            name: layer.viewValue,
+            iconUrl: 'extension/images/ImageryProviders/nationalMap.png',
+            tooltip: layer.tooltip,
+            creationFunction: async () => {
+              try {
+                return await ArcGisMapServerImageryProvider.fromUrl(
+                  'https://services.ga.gov.au/gis/rest/services/NationalBaseMap/MapServer'
+                );
+              } catch (err) {
+                console.error('Failed to create National Map imagery provider:', err);
+                return new OpenStreetMapImageryProvider({
+                  url: 'https://tile.openstreetmap.org/',
+                });
+              }
+            }
+          })
+        );
       } else if (layer.layerType === 'Bing' && this.env.hasOwnProperty('bingMapsKey') &&
-                 this.env.bingMapsKey.trim() && this.env.bingMapsKey !== 'Bing_Maps_Key') {
+        this.env.bingMapsKey.trim() && this.env.bingMapsKey !== 'Bing_Maps_Key') {
         let bingMapsStyle = BingMapsStyle.AERIAL;
         let bingMapsIcon = '';
         switch (layer.value) {
@@ -582,16 +775,21 @@ export class CsMapService {
             name: layer.viewValue,
             iconUrl: buildModuleUrl('Widgets/Images/ImageryProviders/' + bingMapsIcon),
             tooltip: layer.tooltip,
-            creationFunction: async function() {
-              return await Cesium.BingMapsImageryProvider.fromUrl(
-                'https://dev.virtualearth.net',
-                {
-                  key: this.env.bingMapsKey,
-                  mapStyle: bingMapsStyle,
-                }
-              )
+            creationFunction: async () => {
+              try {
+                return await Cesium.BingMapsImageryProvider.fromUrl(
+                  'https://dev.virtualearth.net',
+                  {
+                    key: this.env.bingMapsKey,
+                    mapStyle: bingMapsStyle,
+                  }
+                )
+              } catch (err) {
+                console.error('Failed to create Bing imagery provider:', err);
+                return ArcGisMapServerImageryProvider.fromUrl('https://services.ga.gov.au/gis/rest/services/NationalBaseMap/MapServer');
+              }
             }
-        }));
+          }));
       } else if (layer.layerType === 'ESRI') {
         const esriUrl =
           'https://services.arcgisonline.com/ArcGIS/rest/services/' + layer.value + '/MapServer';
@@ -630,10 +828,13 @@ export class CsMapService {
             name: layer.viewValue,
             iconUrl: Cesium.buildModuleUrl('Widgets/Images/ImageryProviders/' + esriIcon),
             tooltip: layer.tooltip,
-            creationFunction: async function() {
-              return await ArcGisMapServerImageryProvider.fromUrl(
-                esriUrl
-              );
+            creationFunction: async () => {
+              try {
+                return await ArcGisMapServerImageryProvider.fromUrl(esriUrl);
+              } catch (err) {
+                console.error('Failed to create ESRI imagery provider:', err);
+                return ArcGisMapServerImageryProvider.fromUrl('https://services.ga.gov.au/gis/rest/services/NationalBaseMap/MapServer');
+              }
             }
           })
         );
@@ -733,7 +934,7 @@ export class CsMapService {
       }
     } else {
       const layerPositionsToMove = toCesiumLayerIndices[toCesiumLayerIndices.length - 1] -
-                                   fromCesiumLayerIndices[fromCesiumLayerIndices.length - 1];
+        fromCesiumLayerIndices[fromCesiumLayerIndices.length - 1];
       for (let i = fromCesiumLayerIndices.length - 1; i >= 0; i--) {
         const layerToMove = imageryCollection.get(fromCesiumLayerIndices[i]);
         for (let j = 0; j < layerPositionsToMove; j++) {

@@ -1,13 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PermanentLinksModalComponent } from 'app/modalwindow/permanentlink/permanentlinks.modal.component';
 import { PermanentLink } from 'app/models/permanentlink.model';
 import { User } from 'app/models/user.model';
 import { AuthService } from 'app/services/auth/auth.service';
 import { UserStateService } from '../../services/user/user-state.service';
 import { ROIModalComponent } from 'app/modalwindow/roi/roi.modal.component';
-import { CsClipboardService } from '../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
+import { MatDialog } from '@angular/material/dialog';
+
 @Component({
     selector: '[app-login-menu]',
     templateUrl: './login-menu.component.html',
@@ -18,9 +18,7 @@ export class LoginMenuComponent {
   private router = inject(Router);
   private authService = inject(AuthService);
   private userStateService = inject(UserStateService);
-  private csClipboardService = inject(CsClipboardService);
-  private modalService = inject(NgbModal);
-
+  private dialog = inject(MatDialog);
 
   user: User;
   states: PermanentLink[];
@@ -53,9 +51,7 @@ export class LoginMenuComponent {
    * Manage user's ROI list
    */
   manageROI() {
-    this.modalService.open(ROIModalComponent, {
-      size: 'sm',
-      backdrop: false
+    this.dialog.open(ROIModalComponent, {
     });
   }
   /**
@@ -80,10 +76,9 @@ export class LoginMenuComponent {
    * Manage user's permanent links
    */
   manageStates() {
-    this.modalService.open(PermanentLinksModalComponent, {
-      size: 'lg',
-      backdrop: false,
-      scrollable: true
+    this.dialog.open(PermanentLinksModalComponent, {
+      width: '800px',
+      maxWidth: '800px',
     });
   }
 

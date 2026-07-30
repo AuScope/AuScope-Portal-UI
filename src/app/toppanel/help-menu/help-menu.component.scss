@@ -1,5 +1,9 @@
 @use '../../globals';
 
+.help-button:hover {
+    background-color: rgba(255, 255, 2545, 0.2);
+}
+
 .menu-link {
     color: globals.$auscope-royal-blue;
     display: flex;

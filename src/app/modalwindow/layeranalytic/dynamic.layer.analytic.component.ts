@@ -31,18 +31,11 @@ export class DynamicLayerAnalyticComponent {
    * dyanmically load component based on the configuration in the ref file
    */
   loadComponent() {
-
-
     const componentFactory = this.componentFactoryResolver.resolveComponentFactory(ref.layeranalytic[this._layer.id]);
-
     const viewContainerRef = this.dynamicAnalyticHost
     viewContainerRef.clear();
     const componentRef = viewContainerRef.createComponent(componentFactory);
-
     (<LayerAnalyticInterface>componentRef.instance).layer = this._layer;
-
-
-
     this.changeDetectorRef.detectChanges();
 
   }

@@ -1,4 +1,5 @@
 @use 'app/globals';
+@use './material-theme';
 
 [hidden] { display: none !important;}
 
@@ -922,3 +923,4 @@ fieldset.show-fieldset-borders-whitebg legend{
     cursor: pointer;
     z-index: 1000;    
 }
+

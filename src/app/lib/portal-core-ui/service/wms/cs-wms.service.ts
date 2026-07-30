@@ -327,7 +327,7 @@ export class CsWMSService {
     const wmsOnlineResources = this.layerHandlerService.getWMSResource(layer);
 
     for (const wmsOnlineResource of wmsOnlineResources) {
-      if (UtilitiesService.filterProviderSkip(param.optionalFilters, wmsOnlineResource.url)) {
+      if (UtilitiesService.filterProviderSkip(param.optionalFilters, wmsOnlineResource.url, layer.id)) {
         this.renderStatusService.skip(layer, wmsOnlineResource);
         continue;
       }
@@ -385,6 +385,7 @@ export class CsWMSService {
       // Perform request for style data, store subscription so we can cancel if user removes layer
       this.sldSubscriptions[layer.id].push(
         this.sldService.getSldBody(wmsOnlineResource, collatedParam, layer).subscribe(sldBody => {
+          const sldBodyKey = `${UtilitiesService.rmParamURL(wmsOnlineResource.url)}|${wmsOnlineResource.name}`;
           const usePost = this.wmsUrlTooLong(sldBody, layer);
           // Create parameters for add layer request
           const params = wmsOnlineResource.version.startsWith('1.3')
@@ -410,10 +411,25 @@ export class CsWMSService {
           // Perform add layer request
           layer.csLayers.push(this.addCesiumLayer(layer, wmsOnlineResource, params, usePost, lonlatextent));
           layer.sldBody = sldBody;
+          if (!layer.sldBodyByResource) {
+            layer.sldBodyByResource = {};
+          }
+          layer.sldBodyByResource[sldBodyKey] = sldBody;
 
           // For 1.3.0 GetFeatureInfo requests need lat,lng swapped to lng,lat if polygon filter present
-          if (wmsOnlineResource.version === '1.3.0' && collatedParam.optionalFilters.find(f => f.type === 'OPTIONAL.POLYGONBBOX')) {
-            layer.sldBody130 = this.reverseSldBodyPolygonFilterCoordinates(sldBody);
+          if (wmsOnlineResource.version === '1.3.0') {
+            if (collatedParam.optionalFilters.find(f => f.type === 'OPTIONAL.POLYGONBBOX')) {
+              layer.sldBody130 = this.reverseSldBodyPolygonFilterCoordinates(sldBody);
+              if (!layer.sldBody130ByResource) {
+                layer.sldBody130ByResource = {};
+              }
+              layer.sldBody130ByResource[sldBodyKey] = layer.sldBody130;
+            } else {
+              layer.sldBody130 = '';
+              if (layer.sldBody130ByResource && layer.sldBody130ByResource[sldBodyKey]) {
+                delete layer.sldBody130ByResource[sldBodyKey];
+              }
+            }
           }
         }));
     }
@@ -458,7 +474,6 @@ export class CsWMSService {
             // Also the colours should more closely match that of geoserver
             params.bgcolor = '0x909090';
         }
-
         // NB: ArcGisMapServerImageryProvider does not allow additional parameters for ArcGIS, i.e. no styling
         // So we use a normal GET request & WebMapServiceImageryProvider instead
         wmsImagProv = new WebMapServiceImageryProvider({
@@ -543,12 +558,26 @@ export class CsWMSService {
         };
         /* End of 'createImage' overwrite */
 
-        // Create a resource which uses our custom proxy
-        const proxyUrl = me.env.portalBaseUrl + Constants.PROXY_API + '?usewhitelist=' + (layer.useProxyWhitelist ? 'true' : 'false') + '&url=';
-        const res = new Resource({ url: url, proxy: new MyDefaultProxy(proxyUrl) });
-
         // Force Resource to use 'POST' and our proxy
         params['usepost'] = true;
+
+        // Create a resource which uses our custom proxy; if ERDAS APOLLO WMS (i.e. NT)
+        let erdasParam: string = "";
+        if (UtilitiesService.resourceIsERDAS_Essentials_2015(wmsOnlineResource)) {
+          erdasParam = "&erdas=Essentials_2015&usegetafterproxy=true";
+          params.version = "1.1.1";
+          params.srs = "EPSG:4326";
+          params.usepost = false;
+        }
+        if (UtilitiesService.resourceIsERDAS_Core_2022(wmsOnlineResource)) {
+          erdasParam = "&erdas=Core_2022&usegetafterproxy=true";
+          params.version = "1.1.1";
+          params.srs = "EPSG:4326";
+          params.usepost = false;
+        }
+        const proxyUrl = me.env.portalBaseUrl + Constants.PROXY_API + '?usewhitelist=' + (layer.useProxyWhitelist ? 'true' : 'false') + erdasParam + '&url=';
+        const res = new Resource({ url: url, proxy: new MyDefaultProxy(proxyUrl) });
+
         wmsImagProv = new WebMapServiceImageryProvider({
           url: res,
           layers: wmsOnlineResource.name,
@@ -595,4 +624,3 @@ MyDefaultProxy.prototype.getURL = function (resource) {
   const prefix = this.proxy.indexOf('?') === -1 ? '?' : '';
   return this.proxy + prefix + resource;
 };
-

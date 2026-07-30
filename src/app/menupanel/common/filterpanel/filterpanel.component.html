@@ -46,229 +46,244 @@
 
   <!-- If there are no filters display a warning -->
   @if ((!layerFilterCollection || layerFilterCollection.optionalFilters?.length === 0) && !layerHasAdvancedFilterComponent(layer.id)) {
-    <div style="font-size: small;"
-      >
+    <div style="font-size: small;">
       <!-- <div class="alert alert-warning fade show">
-      <i class="ti-bell float-left"></i>
-      <p>There are no filters associated with this layer</p>
-    </div> -->
-  </div>
-}
-
-<!-- Optional filters, if supported -->
-@if (layerFilterCollection?.optionalFilters && layerFilterCollection.optionalFilters.length > 0) {
-  <fieldset
-    class="show-fieldset-borders">
-    <legend>
-      <h5>Optional Filters</h5>
-    </legend>
-    <div class="form-group form-group-sm">
-      @if (optionalFilters.length > 0) {
-        <label style="display:flex;font-size:0.9rem;" title="Remove filter">
-          Select Filter:<i style="margin-left:auto;font-size:0.9rem;" class="hasEvent red"
-        (click)="refreshFilter()">Clear All</i></label>
-      }
-      <!-- Render the filter selector -->
-      <select class="form-control form-control-sm" [ngModel]="selectedFilter" (ngModelChange)="addFilter($event)">
-        @for (filt of layerFilterCollection['optionalFilters']; track filt) {
-          <option [ngValue]="filt">{{filt.label}}
-          </option>
-        }
-      </select>
+        <i class="ti-bell float-left"></i>
+        <p>There are no filters associated with this layer</p>
+      </div> -->
     </div>
-    <!-- Already selected optional filters are rendered here -->
-    @if (optionalFilters.length > 0) {
-      <hr class="nav-divider filter-divider">
-    }
-    @for (optionalFilter of optionalFilters; track optionalFilter; let i = $index) {
-      <div>
-        @if (optionalFilter.type==='OPTIONAL.TEXT') {
-          <div>
-            <div class="form-group  form-group-sm">
-              <label>{{optionalFilter.label}}:</label>
-              <input type="text" class="form-control form-control-sm" [(ngModel)]="optionalFilter.value">
+  }
+
+  <!-- Optional filters, if supported -->
+  @if (layerFilterCollection?.optionalFilters && layerFilterCollection.optionalFilters.length > 0) {
+    <fieldset
+      class="show-fieldset-borders">
+      <legend>
+        <h5>Optional Filters</h5>
+      </legend>
+      <div class="form-group form-group-sm">
+        @if (optionalFilters.length > 0) {
+          <label style="display:flex;font-size:0.9rem;" title="Remove filter">
+            Select Filter:<i style="margin-left:auto;font-size:0.9rem;" class="hasEvent red"
+          (click)="refreshFilter()">Clear All</i></label>
+        }
+        <!-- Render the filter selector -->
+        <select class="form-control form-control-sm" [ngModel]="selectedFilter" (ngModelChange)="addFilter($event)">
+          @for (filt of layerFilterCollection['optionalFilters']; track filt) {
+            <option [ngValue]="filt">{{filt.label}}
+            </option>
+          }
+        </select>
+      </div>
+      <!-- Already selected optional filters are rendered here -->
+      @if (optionalFilters.length > 0) {
+        <hr class="nav-divider filter-divider">
+      }
+      @for (optionalFilter of optionalFilters; track optionalFilter; let i = $index) {
+        <div>
+          @if (optionalFilter.type==='OPTIONAL.TEXT') {
+            <div>
+              <div class="form-group  form-group-sm">
+                <label>{{optionalFilter.label}}:</label>
+                <input type="text" class="form-control form-control-sm" [(ngModel)]="optionalFilter.value">
+              </div>
+            </div>
+          }
+          @if (optionalFilter.type==='OPTIONAL.DATE') {
+            <div>
+              <div class="form-group">
+                <label class="control-label">{{optionalFilter.label}}:</label>
+                <input type="date" class="form-control form-control-sm" [(ngModel)]="optionalFilter.value" />
+              </div>
+            </div>
+          }
+          @if (optionalFilter.type==='OPTIONAL.DROPDOWNSELECTLIST') {
+            <div>
+              <div class="form-group  form-group-sm">
+                <label>{{optionalFilter.label}}</label>
+                @if (optionalFilter.multiSelect) {
+                  <div>
+                    <!-- Can select multiple options -->
+                    <mat-radio-group title="Select union or intersection of properties"
+                      aria-label="Select union or intersection of properties" [(ngModel)]="optionalFilter.boolOp">
+                      <mat-radio-button value="OR"><span style="color: #7E7CAA">Union</span></mat-radio-button>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<mat-radio-button value="AND"><span
+                    style="color: #7E7CAA">Intersect</span></mat-radio-button>
+                  </mat-radio-group>
+                  <ng-select [(ngModel)]="optionalFilter.value" [multiple]="true" placeholder="Select...">
+                    @for (option of optionalFilter.options; track option) {
+                      <ng-option ng-if="option!=''"
+                      [value]="getValue(option)">{{getKey(option)}}</ng-option>
+                    }
+                  </ng-select>
+                </div>
+              } @else {
+                <!-- Can only select a single option -->
+                <select class="form-control form-control-sm" [(ngModel)]="optionalFilter.value">
+                  <option value="" selected="selected">-- Choose a {{optionalFilter.label}} --</option>
+                  @for (option of optionalFilter.options; track option) {
+                    <option>{{getKey(option)}}</option>
+                  }
+                </select>
+              }
+              <ng-template #singleSelect>
+                <!-- Can only select a single option -->
+                <select class="form-control form-control-sm" [(ngModel)]="optionalFilter.value">
+                  <option value="" selected="selected">-- Choose a {{optionalFilter.label}} --</option>
+                  @for (option of optionalFilter.options; track option) {
+                    <option>{{getKey(option)}}</option>
+                  }
+                </select>
+              </ng-template>
             </div>
           </div>
         }
-        @if (optionalFilter.type==='OPTIONAL.DATE') {
-          <div>
-            <div class="form-group">
-              <label class="control-label">{{optionalFilter.label}}:</label>
-              <input type="date" class="form-control form-control-sm" [(ngModel)]="optionalFilter.value" />
-            </div>
-          </div>
-        }
-        @if (optionalFilter.type==='OPTIONAL.DROPDOWNSELECTLIST') {
+        @if (optionalFilter.type==='OPTIONAL.DROPDOWNREMOTE') {
           <div>
             <div class="form-group  form-group-sm">
               <label>{{optionalFilter.label}}</label>
-              @if (optionalFilter.multiSelect) {
-                <div>
-                  <!-- Can select multiple options -->
-                  <mat-radio-group title="Select union or intersection of properties"
-                    aria-label="Select union or intersection of properties" [(ngModel)]="optionalFilter.boolOp">
-                    <mat-radio-button value="OR"><span style="color: #7E7CAA">Union</span></mat-radio-button>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<mat-radio-button value="AND"><span
-                  style="color: #7E7CAA">Intersect</span></mat-radio-button>
-                </mat-radio-group>
-                <ng-select [(ngModel)]="optionalFilter.value" [multiple]="true" placeholder="Select...">
-                  @for (option of optionalFilter.options; track option) {
-                    <ng-option ng-if="option!=''"
-                    [value]="getValue(option)">{{getKey(option)}}</ng-option>
-                  }
-                </ng-select>
-              </div>
-            } @else {
-              <!-- Can only select a single option -->
               <select class="form-control form-control-sm" [(ngModel)]="optionalFilter.value">
-                <option value="" selected="selected">-- Choose a {{optionalFilter.label}} --</option>
+                <option value="" selected="selected">-- choose a {{optionalFilter.label}} --</option>
                 @for (option of optionalFilter.options; track option) {
-                  <option>{{getKey(option)}}</option>
+                  <option [ngValue]="option.value">{{option.key}}
+                  </option>
                 }
               </select>
-            }
-            <ng-template #singleSelect>
-              <!-- Can only select a single option -->
-              <select class="form-control form-control-sm" [(ngModel)]="optionalFilter.value">
-                <option value="" selected="selected">-- Choose a {{optionalFilter.label}} --</option>
-                @for (option of optionalFilter.options; track option) {
-                  <option>{{getKey(option)}}</option>
-                }
-              </select>
-            </ng-template>
-          </div>
-        </div>
-      }
-      @if (optionalFilter.type==='OPTIONAL.DROPDOWNREMOTE') {
-        <div>
-          <div class="form-group  form-group-sm">
-            <label>{{optionalFilter.label}}</label>
-            <select class="form-control form-control-sm" [(ngModel)]="optionalFilter.value">
-              <option value="" selected="selected">-- choose a {{optionalFilter.label}} --</option>
-              @for (option of optionalFilter.options; track option) {
-                <option [ngValue]="option.value">{{option.key}}
-                </option>
-              }
-            </select>
-          </div>
-        </div>
-      }
-      @if (optionalFilter.type==='OPTIONAL.PROVIDER') {
-        <div>
-          <div class="form-group">
-            @for (provider of providers; track provider; let idx = $index) {
-              <div style="display: flex">
-                <div style="width: 10%;">
-                  <input class="form-control-sm" id="{{ 'filter-OPTIONAL.PROVIDER-' + idx + '-' + layer.id }}"
-                    type="checkbox" [(ngModel)]="optionalFilter.value[provider.value]" />
-                </div>
-                <div style="width: 90%">
-                  <label for="{{ 'filter-OPTIONAL.PROVIDER-' + idx + '-' + layer.id }}">
-                    {{provider.label}}
-                  </label>
-                </div>
-              </div>
-            }
-          </div>
-        </div>
-      }
-      @if (optionalFilter.type==='OPTIONAL.POLYGONBBOX') {
-        <div class="d-none d-md-block">
-          <div class="form-group form-group-sm">
-            <div class="checkbox">
-              <input class="form-control-sm" id="{{ 'filter-OPTIONAL.POLYGONBBOX-0-' + layer.id }}"
-                type="checkbox" [(ngModel)]="bApplyClipboardBBox" />
-              <label for="{{ 'filter-OPTIONAL.POLYGONBBOX-0-' + layer.id }}">Apply clipboard BBox</label>
             </div>
           </div>
-        </div>
-      }
-      @if (optionalFilter.type==='OPTIONAL.POLYGONBBOX') {
-        <div class="d-block d-md-none">
-          <div class="alert alert-warning fade show">
-            <i class="ti-bell float-left"></i>
-            <p>This filter is not supported on a small screen and would not return any results.</p>
+        }
+        @if (optionalFilter.type==='OPTIONAL.PROVIDER') {
+          <div>
+            <div class="form-group">
+              @for (provider of providers; track provider; let idx = $index) {
+                <div style="display: flex">
+                  <div style="width: 10%;">
+                    <input class="form-control-sm" id="{{ 'filter-OPTIONAL.PROVIDER-' + idx + '-' + layer.id }}"
+                      type="checkbox" [(ngModel)]="optionalFilter.value[provider.value]" />
+                  </div>
+                  <div style="width: 90%">
+                    <label for="{{ 'filter-OPTIONAL.PROVIDER-' + idx + '-' + layer.id }}">
+                      {{provider.label}}
+                    </label>
+                  </div>
+                </div>
+              }
+            </div>
           </div>
-        </div>
-      }
-      @if (i < optionalFilters.length - 1) {
-        <hr class="nav-divider filter-divider">
-      }
-    </div>
+        }
+        @if (optionalFilter.type==='OPTIONAL.POLYGONBBOX') {
+          <div class="d-none d-md-block">
+            <div class="form-group form-group-sm">
+              <div class="checkbox">
+                <input class="form-control-sm" id="{{ 'filter-OPTIONAL.POLYGONBBOX-0-' + layer.id }}"
+                  type="checkbox" [(ngModel)]="bApplyClipboardBBox" />
+                <label for="{{ 'filter-OPTIONAL.POLYGONBBOX-0-' + layer.id }}">Apply clipboard BBox</label>
+              </div>
+            </div>
+          </div>
+        }
+        @if (optionalFilter.type==='OPTIONAL.POLYGONBBOX') {
+          <div class="d-block d-md-none">
+            <div class="alert alert-warning fade show">
+              <i class="ti-bell float-left"></i>
+              <p>This filter is not supported on a small screen and would not return any results.</p>
+            </div>
+          </div>
+        }
+        @if (i < optionalFilters.length - 1) {
+          <hr class="nav-divider filter-divider">
+        }
+      </div>
+    }
+  </fieldset>
   }
-</fieldset>
-}
 
-<!-- Toolbars specific to layer (Optional, defined in ref.ts) -->
-<ng-template #advancedFilterComponents></ng-template>
+  <!-- Toolbars specific to layer (Optional, defined in ref.ts) -->
+  <ng-template #advancedFilterComponents></ng-template>
 
-<!-- WMS time periods (if time extents present in LayerModel.capabilityRecords or GetCapabilities) -->
-<!--<div [style.visibility]="hasFilters(layer.id) ? 'visible' : 'hidden'">-->
-@if (hasFilters(layer.id) || (!hasFilters(layer.id) && layerHasAdvancedFilterComponent(layer.id))) {
-  <div>
-    <div class="time-extent-button">
-      @if (layerTimes && layerTimes.loadingTimeExtent) {
-        <button type="button"
-          class="btn btn-primary btn-sm unclickable-btn time-btn" style="position:absolute;left:0;"><i
-        class="fa fa-spinner fa-spin" style="cursor:default;"></i>&nbsp;&nbsp;Querying time</button>
-      }
-      @if (layerTimes && layerTimes.currentTime) {
-        <div ngbDropdown id="timeDropdown" dropdownClass="time-dropdown"
-          style="position:absolute;" container="body">
+  <!-- WMS time periods (if time extents present in LayerModel.capabilityRecords or GetCapabilities) -->
+  @if (hasFilters(layer.id) || (!hasFilters(layer.id) && layerHasAdvancedFilterComponent(layer.id))) {
+    <div>
+      <div class="time-extent-button">
+        @if (layerTimes && layerTimes.loadingTimeExtent) {
+          <button
+            type="button"
+            class="btn btn-sm btn-primary unclickable-btn time-btn"
+            style="position:absolute; left:0;"
+            disabled>
+            <i class="fa fa-spinner fa-spin" style="cursor:default;"></i>
+            &nbsp;&nbsp;Querying time
+          </button>
+        }
+        @if (layerTimes && layerTimes.currentTime) {
+          <!-- Single time (no dropdown) -->
           @if (!layerTimes.loadingTimeExtent && layerTimes.timeExtent.length === 1) {
-            <button type="button"
-              class="btn btn-primary btn-sm date-btn unclickable-btn" style="cursor:default;"><i
-            class="fa fa-calendar"></i>&nbsp;&nbsp;{{ layerTimes.currentTime | date }}</button>
+            <button
+              type="button"
+              class="btn btn-sm btn-primary date-btn unclickable-btn"
+              style="position:absolute; cursor:default;"
+              disabled>
+              <i class="fa fa-calendar"></i>
+              &nbsp;&nbsp;{{ layerTimes.currentTime | date }}
+            </button>
           }
+          <!-- Multiple times -->
           @if (!layerTimes.loadingTimeExtent && layerTimes.timeExtent.length > 1) {
-            <button type="button"
-              class="btn btn-primary btn-sm date-btn" ngbDropdownToggle><i class="fa fa-calendar"></i>&nbsp;&nbsp;{{
-            layerTimes.currentTime | date }}</button>
-          }
-          @if (!layerTimes.loadingTimeExtent && layerTimes.timeExtent && layerTimes.timeExtent.length > 1) {
-            <div class="dropdown-menu" title="Select time to display"
-              ngbDropdownMenu>
+            <button
+              type="button"
+              class="btn btn-sm btn-primary date-btn"
+              style="position:absolute;"
+              [matMenuTriggerFor]="timeMenu">
+              <i class="fa fa-calendar"></i>
+              &nbsp;&nbsp;{{ layerTimes.currentTime | date }}
+            </button>
+
+            <mat-menu
+              #timeMenu="matMenu"
+              xPosition="after"
+              yPosition="below">
               @for (d of layerTimes.timeExtent; track d) {
-                <div>
-                  <button ngbDropdownItem (click)="changeCurrentTime(d)">{{ d | date }}</button>
-                </div>
+                <button
+                  mat-menu-item
+                  (click)="changeCurrentTime(d)">
+                  {{ d | date }}
+                </button>
               }
-            </div>
+            </mat-menu>
           }
-        </div>
-      }
+        }
+      </div>
     </div>
+  }
+
+  <!-- If layer services are unresponsive then display a warning message -->
+  @if (layerStatus.isLayerDown(layer.id)) {
+    <p class='small text-danger'><i class="fa fa-warning text-warning"></i>One
+    or more of the services used by this layer are reported to be experiencing issues at the moment. Click on the
+  info panel for more information.</p>
+  }
+
+  <div>
+    <!-- Optional layer analytics button -->
+    @if (analyticMap[layer.id]) {
+      <button type="button" class="btn btn-warning btn-sm analytic-btn"
+        title="Display analytics" (click)="processLayerAnalytic(layer)"><i class="fa fa-bar-chart"
+      aria-hidden="true"></i>&nbsp;Analytic</button>
+    }
+    <!-- Update layer button -->
+    @if (isMapSupportedLayer(layer) && (hasFilters(layer.id) || layerHasAdvancedFilterComponent(layer.id))) {
+      <button type="button"
+        class="btn btn-primary btn-sm add-layer-btn float-right" (click)="addLayer(layer)">
+        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+        &nbsp;Apply Filter
+      </button>
+    }
+    <!-- Optional unsupported layer message & icon -->
+    @if (!isMapSupportedLayer(layer)) {
+      <div class="unsupported-layer-message">
+        <em class="fa fa-exclamation-triangle warning-icon"></em>
+        {{ getUnsupportedLayerMessage() }}
+      </div>
+    }
   </div>
-}
-
-<!-- If layer services are unresponsive then display a warning message -->
-@if (layerStatus.isLayerDown(layer.id)) {
-  <p class='small text-danger'><i class="fa fa-warning text-warning"></i>One
-  or more of the services used by this layer are reported to be experiencing issues at the moment. Click on the
-info panel for more information.</p>
-}
-
-<div>
-  <!-- Optional layer analytics button -->
-  @if (analyticMap[layer.id]) {
-    <button type="button" class="btn btn-warning btn-sm analytic-btn"
-      title="Display analytics" (click)="processLayerAnalytic(layer)"><i class="fa fa-bar-chart"
-    aria-hidden="true"></i>&nbsp;Analytic</button>
-  }
-  <!-- Update layer button -->
-  @if (isMapSupportedLayer(layer) && (hasFilters(layer.id) || layerHasAdvancedFilterComponent(layer.id))) {
-    <button type="button"
-      class="btn btn-primary btn-sm add-layer-btn float-right" (click)="addLayer(layer)">
-      <i class="fa fa-plus-circle" aria-hidden="true"></i>
-      &nbsp;Apply Filter
-    </button>
-  }
-  <!-- Optional unsupported layer message & icon -->
-  @if (!isMapSupportedLayer(layer)) {
-    <div class="unsupported-layer-message">
-      <em class="fa fa-exclamation-triangle warning-icon"></em>
-      {{ getUnsupportedLayerMessage() }}
-    </div>
-  }
-</div>
 </div>

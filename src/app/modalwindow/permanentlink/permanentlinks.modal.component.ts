@@ -1,11 +1,11 @@
 import { DatePipe } from '@angular/common';
 import { Component, ElementRef, OnInit, QueryList, ViewChildren, inject } from '@angular/core';
 import { AbstractControl, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PermanentLink } from 'app/models/permanentlink.model';
 import { UserStateService } from 'app/services/user/user-state.service';
 import { environment } from '../../../environments/environment';
 import { ConfirmModalComponent } from '../confirm/confirm.modal.component';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 /**
  * Modal component used to display a user's permanent links
@@ -19,14 +19,14 @@ import { ConfirmModalComponent } from '../confirm/confirm.modal.component';
 })
 export class PermanentLinksModalComponent implements OnInit {
   private formBuilder = inject(UntypedFormBuilder);
-  private modalService = inject(NgbModal);
-  activeModal = inject(NgbActiveModal);
+  private dialog = inject(MatDialog);
   private userStateService = inject(UserStateService);
   private datePipe = inject(DatePipe);
 
-
   private userStates: PermanentLink[];
   private userId: string;
+
+  public dialogRef = inject(MatDialogRef<PermanentLinksModalComponent>);
 
   // Keep track of load state links so we can pass through button container's clicks
   @ViewChildren('loadStateLink') loadStateLinks: QueryList<ElementRef<HTMLElement>>;
@@ -49,7 +49,7 @@ export class PermanentLinksModalComponent implements OnInit {
       this.userStates = states;
       // Close if empty (only happens after delete)
       if (this.userStates.length === 0) {
-        this.activeModal.close();
+        this.dialogRef.close();
       }
       for (const state of this.userStates) {
         this.statesFormArray.push(this.addStateToFormArray(state));
@@ -84,15 +84,15 @@ export class PermanentLinksModalComponent implements OnInit {
   deleteState(stateNo: number) {
     console.log('Delete stateNo: ' + stateNo);
     // Confirm delete
-    const modalRef = this.modalService.open(ConfirmModalComponent, {
-      size: 'sm',
-      backdrop: false
-    });
-    modalRef.componentInstance.title = 'Confirm Delete';
-    modalRef.componentInstance.modalContent = 'Are you sure you wish to delete this state?';
-    modalRef.componentInstance.cancelButtonText = 'Cancel';
-    modalRef.componentInstance.confirmButtonText = 'Delete';
-    modalRef.result.then(result => {
+    const dialogRef = this.dialog.open(ConfirmModalComponent, {
+      data: {
+        title: 'Confirm Delete',
+        modalContent: 'Are you sure you wish to delete this state?',
+        cancelButtonText: 'Cancel',
+        confirmButtonText: 'Delete'
+       }
+      });
+    dialogRef.afterClosed().subscribe(result => {
       if (result && result === 'OK') {
         const stateId = this.userStates[stateNo].id;
         this.userStateService.removeState(stateId).subscribe(() => {
@@ -101,9 +101,7 @@ export class PermanentLinksModalComponent implements OnInit {
           alert('Error removing state: ' + err.message);
         });
       }
-    }).catch(
-        (error) => console.error("Could not delete state", error)
-    );
+    });
   }
 
   /**
@@ -142,23 +140,22 @@ export class PermanentLinksModalComponent implements OnInit {
     if (stateNo !== this.editingState) {
 
       if (this.editingState !== -1 && this.statesFormArray.controls[this.editingState].dirty) {
-        const modalRef = this.modalService.open(ConfirmModalComponent, {
-          size: 'sm',
-          backdrop: false
+        const dialogRef = this.dialog.open(ConfirmModalComponent, {
+          data: {
+            title: 'Unsaved Changes',
+            modalContent: 'You have unsaved changes, do you wish to save?',
+            cancelButtonText: 'Cancel',
+            confirmButtonText: 'Save'
+          }
         });
-        modalRef.componentInstance.title = 'Save Changes';
-        modalRef.componentInstance.modalContent = 'You have unsaved changes, do you wish to save?';
-        modalRef.componentInstance.cancelButtonText = 'Cancel';
-        modalRef.componentInstance.confirmButtonText = 'Save';
-        modalRef.result.then(result => {
+        dialogRef.afterClosed().subscribe(result => {
           if (result && result === 'OK') {
            this.saveState(this.editingState);
            this.editingState = -1;
            this.editState(stateNo);
           }
-        }).catch((error) => console.error("Could not save changes", error));
+        });
       } else {
-
         if (this.editingState !== -1) {
           // TODO: Prompt unsaved changes (if any)
           this.enableStateFormControls(this.editingState, false);
@@ -192,21 +189,21 @@ export class PermanentLinksModalComponent implements OnInit {
 
   public close() {
     if (this.editingState !== -1 && this.statesFormArray.controls[this.editingState].dirty) {
-      const modalRef = this.modalService.open(ConfirmModalComponent, {
-        size: 'sm',
-        backdrop: false
-      });
-      modalRef.componentInstance.title = 'Unsaved Changes';
-      modalRef.componentInstance.modalContent = 'You have unsaved changes, do you wish to continue without saving?';
-      modalRef.componentInstance.cancelButtonText = 'Cancel';
-      modalRef.componentInstance.confirmButtonText = 'OK';
-      modalRef.result.then(result => {
-        if (result && result === 'OK') {
-         this.activeModal.close();
+      const dialogRef = this.dialog.open(ConfirmModalComponent, {
+        data: {
+          title: 'Unsaved Changes',
+          modalContent: 'You have unsaved changes, do you wish to continue without saving?',
+          cancelButtonText: 'Cancel',
+          confirmButtonText: 'OK'
         }
-      }).catch((error) => console.error('Could not close permlink dialog', error));
+      });
+      dialogRef.afterClosed().subscribe(result => {
+        if (result && result === 'OK') {
+          this.dialogRef.close();
+        }
+      });
     } else {
-      this.activeModal.close();
+      this.dialogRef.close();
     }
   }
 

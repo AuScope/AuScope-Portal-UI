@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, Renderer2, ChangeDetectorRef, inject } from '@angular/core';
 import { MSCLService } from './mscl.service';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
     selector: 'app-mscl.analytic',
@@ -12,16 +13,17 @@ export class MSCLAnalyticComponent implements OnInit {
     msclService = inject(MSCLService);
     private renderer = inject(Renderer2);
     private changeDetectorRef = inject(ChangeDetectorRef);
-
-
-    // Data inserted at modal dialogue creation point
-    startDepth: number; // Start depth for plotting
-    endDepth: number; // End depth for plotting
-    featureId: string; // Identifier of the borehole
-    metricList: string[]; // List of metric enums to plot
-    closeGraphModal: () => null; // Function to call when the modal dialogue must be closed
-    usesGMLObs: boolean; // Response has values nested within GeoSciML observations
-    serviceUrl: string; // URL of MSCL service
+    /**
+     * Data inserted at modal dialogue creation point
+     *   startDepth: number; // Start depth for plotting
+     *   endDepth: number; // End depth for plotting
+     *   featureId: string; // Identifier of the borehole
+     *   metricList: string[]; // List of metric enums to plot
+     *   closeGraphModal: () => null; // Function to call when the modal dialogue must be closed
+     *   usesGMLObs: boolean; // Response has values nested within GeoSciML observations
+     *   serviceUrl: string; // URL of MSCL service
+    */
+    data = inject(MAT_DIALOG_DATA);
     processingData = false;
 
     @ViewChild('error_display', { static: true }) public error_display: ElementRef; // Area used to display error messages
@@ -41,7 +43,13 @@ export class MSCLAnalyticComponent implements OnInit {
         const error_display = this.error_display.nativeElement;
         // Fetch data from MSCL service
         this.processingData = true;
-        this.msclService.getMSCLDownload(this.serviceUrl, this.featureId, this.startDepth, this.endDepth, this.usesGMLObs, this.metricList).subscribe(valuesList => {
+        this.msclService.getMSCLDownload(
+          this.data.serviceUrl,
+          this.data.featureId,
+          this.data.startDepth,
+          this.data.endDepth,
+          this.data.usesGMLObs,
+          this.data.metricList).subscribe(valuesList => {
             // Check response
             if (valuesList == null || !(Symbol.iterator in Object(valuesList))) {
                 this.processingData = false;
@@ -53,13 +61,13 @@ export class MSCLAnalyticComponent implements OnInit {
             // Compile lists of X and Y values; plots are vertical, Y is common to all plots
             const xLists: object = {};
             const yList: number[] = [];
-            for (const metricEnum of this.metricList) {
+            for (const metricEnum of this.data.metricList) {
                 xLists[metricEnum] = [];
             }
             for (const values of valuesList) {
-                for (const metricEnum of this.metricList) {
+                for (const metricEnum of this.data.metricList) {
                     const featName = this.msclService.getMetricInfoAttr(metricEnum, 'feat_elem');
-                    if (this.usesGMLObs) {
+                    if (this.data.usesGMLObs) {
                         xLists[metricEnum].push(values[featName.replace(/_/g, ' ')]);
                     } else {
                         xLists[metricEnum].push(values[featName]);
@@ -69,8 +77,8 @@ export class MSCLAnalyticComponent implements OnInit {
             }
 
             // Create plots - Angular will auto update plots when the inputs change
-            const traceList = this.msclService.getGraphTraceList(this.metricList, xLists, yList);
-            const layout = this.msclService.getGraphLayout(this.metricList, xLists);
+            const traceList = this.msclService.getGraphTraceList(this.data.metricList, xLists, yList);
+            const layout = this.msclService.getGraphLayout(this.data.metricList, xLists);
 
             // Update graph
             this.graphInput.layout = layout;
