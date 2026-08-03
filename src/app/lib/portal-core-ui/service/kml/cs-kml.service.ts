@@ -1,8 +1,8 @@
 
 import { throwError as observableThrowError, Observable } from 'rxjs';
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
-import { catchError, map } from 'rxjs/operators';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { map } from 'rxjs/operators';
 
 import { OnlineResourceModel } from '../../model/data/onlineresource.model';
 import { LayerModel } from '../../model/data/layer.model';
@@ -152,7 +152,7 @@ export class CsKMLService {
                 try {
                   this.http.post(this.env.portalBaseUrl + "shorturl", body, {
                     headers: new HttpHeaders().set('Content-Type', 'application/json')
-                  }).subscribe( {
+                  }).subscribe({
                     next: res => {
                       const shortenedUrl = res["data"]["url"];
                       const overlayProvider = new Cesium.SingleTileImageryProvider({
@@ -318,15 +318,15 @@ export class CsKMLService {
 
   private getPlacemark(kmlDoc: Document): any {
     let result = {};
-    let pms = kmlDoc.querySelectorAll("Placemark");
-    var pts = [];
-    var maxLon: number = 0.0, minLon: number = 180.0, maxLat: number = -90.0, minLat: number = 0.0;
+    const pms = kmlDoc.querySelectorAll("Placemark");
+    const pts = [];
+    let maxLon: number = 0.0, minLon: number = 180.0, maxLat: number = -90.0, minLat: number = 0.0;
     if (pms) {
       pms.forEach(pm => {
-        let lookatEntity = pm.querySelector("LookAt");
+        const lookatEntity = pm.querySelector("LookAt");
         if (lookatEntity) {
-          let lon = lookatEntity.querySelector('longitude').textContent;
-          let lat = lookatEntity.querySelector('latitude').textContent;
+          const lon = lookatEntity.querySelector('longitude').textContent;
+          const lat = lookatEntity.querySelector('latitude').textContent;
 
           pts.push({ "lat": lat, "lon": lon });
         }
