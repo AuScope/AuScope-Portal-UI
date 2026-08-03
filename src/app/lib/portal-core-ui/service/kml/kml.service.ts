@@ -17,17 +17,17 @@ export class KMLDocService {
   public getIconRecord(iconUrl: string, portalBaseUrl: any): Observable<any> {
 
     return this.http.get(portalBaseUrl + "/" + iconUrl, { responseType: "text" }).pipe(map(
-      (response) => {
+      (_response) => {
         return { status: true, url: iconUrl };
       }), catchError(
-        (error: HttpResponse<any>) => {
+        (_error: HttpResponse<any>) => {
           this.getIconRecord(portalBaseUrl + Constants.PROXY_API + "?usewhitelist=false&url=" + iconUrl, portalBaseUrl + Constants.PROXY_API + "?usewhitelist=false&url=");
           return this.http.get(iconUrl, { responseType: "text" }).pipe(map(
-            (response) => {
+            (_response) => {
               return { status: true, url: iconUrl };
             }), catchError(
-              (error: HttpResponse<any>) => {
-                return throwError('This will error').pipe(catchError(error => of({ status: false, url: iconUrl })))
+              (_error: HttpResponse<any>) => {
+                return throwError('This will error').pipe(catchError(_error => of({ status: false, url: iconUrl })))
               }
             ));
 
