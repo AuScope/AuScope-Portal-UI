@@ -401,8 +401,8 @@ export class CsMapComponent implements AfterViewInit {
           const handler = new IrisQuerierHandler(layer, entity);
           this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.dialogRef);
           // KML/KMZ layers
-        } else if ((layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.KML))) ||  
-          (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.KMZ)))) { 
+        } else if ((layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.KML))) ||
+          (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.KMZ)))) {
           this.displayModal(mapClickInfo.clickCoord);
           const handler = new KMLQuerierHandler(entity);
           this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.dialogRef);
