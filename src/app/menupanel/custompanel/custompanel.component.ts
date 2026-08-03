@@ -64,7 +64,7 @@ export class CustomPanelComponent {
       this.isLayerLoaded = result;
 
       //this.loading = !result;
-      if (this.isLayerLoaded) { 
+      if (this.isLayerLoaded) {
         this.loading = false;
       } else {
         this.loading = result;

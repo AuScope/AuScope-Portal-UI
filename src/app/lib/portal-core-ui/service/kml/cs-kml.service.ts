@@ -117,15 +117,14 @@ export class CsKMLService {
       // a layer.kmlDoc entry - so some of the following code is redundant
       if (layer.kmlDoc) {
 
-        var iconObject = this.getIcon(layer.kmlDoc);
+        const iconObject = this.getIcon(layer.kmlDoc);
         // TODO: remove <GroundOverlay> from the kml before the source is loaded!!
         //       elements still to handle: name, description, rotation
-        let overlayRect;
-        let kmlDoc = layer.kmlDoc;
+        let overlayRect: Rectangle;
         if (iconObject.rectangle) {
           overlayRect = Rectangle.fromDegrees(iconObject.rectangle.west, iconObject.rectangle.south, iconObject.rectangle.east, iconObject.rectangle.north);
           // remove <GroundOverlay> from KML
-          kmlDoc = this.removeOverlay(layer.kmlDoc);
+          this.removeOverlay(layer.kmlDoc);
         }
 
         source.load(layer.kmlDoc).then(dataSource => {
@@ -135,15 +134,14 @@ export class CsKMLService {
               layer.csLayers.push(dataSrc); // TODO: should this be removed??
               if (!iconObject.url) {
                 this.incrementLayersAdded(layer, 1);
-                var placemarkObject = this.getPlacemark(layer.kmlDoc);
-                var placemarkRect = Rectangle.fromDegrees(placemarkObject.rectangle.west, placemarkObject.rectangle.south, placemarkObject.rectangle.east, placemarkObject.rectangle.north);
+                const placemarkObject = this.getPlacemark(layer.kmlDoc);
+                const placemarkRect = Rectangle.fromDegrees(placemarkObject.rectangle.west, placemarkObject.rectangle.south, placemarkObject.rectangle.east, placemarkObject.rectangle.north);
                 setTimeout(() => {
                   viewer.camera.flyTo({ destination: placemarkRect });
                 }, 100);
               } else {
                 this.incrementLayersAdded(layer, 2);
 
-                const layers = viewer.scene.imageryLayers;
                 // Use the proxy
                 const proxyUrl = this.env.portalBaseUrl + Constants.PROXY_API + "?usewhitelist=false&url=" + iconObject.url;
 
@@ -155,7 +153,7 @@ export class CsKMLService {
                   this.http.post(this.env.portalBaseUrl + "shorturl", body, {
                     headers: new HttpHeaders().set('Content-Type', 'application/json')
                   }).subscribe(res => {
-                    var shortenedUrl = res["data"]["url"];
+                    const shortenedUrl = res["data"]["url"];
 
                     const overlayProvider = new Cesium.SingleTileImageryProvider({
                       url: shortenedUrl,
@@ -176,7 +174,7 @@ export class CsKMLService {
                     }, 100);
 
                     layer.kmlDoc.querySelector("Folder").appendChild(this.overlayDoc);
-                    var newLayer = viewer.imageryLayers.addImageryProvider(overlayProvider);
+                    const newLayer = viewer.imageryLayers.addImageryProvider(overlayProvider);
                     layer.csLayers.push(newLayer);
 
                   }), catchError((error: HttpResponse<any>) => {
@@ -189,6 +187,10 @@ export class CsKMLService {
               }
             })
           }
+        }, (error) => {
+          // rejected
+          console.error("Could not load KML doc:", error);
+          alert("Could not load KML doc:" + error);
         });
       } else {
         if (!this.numberOfResourcesAdded.get(layer.id)) {
@@ -218,8 +220,8 @@ export class CsKMLService {
               }
             });
           }, (err) => {
-            alert('Unable to load KML: ' + err.message);
-            console.error('Unable to load KML: ', err);
+            alert('Unable to load KML URL: ' + err.message);
+            console.error('Unable to load KML URL: ', err);
             // Tell UI that we have completed updating the map & there was an error
             this.renderStatusService.updateComplete(layer, onlineResource, true);
             this.incrementLayersAdded(layer, kmlOnlineResources.length);

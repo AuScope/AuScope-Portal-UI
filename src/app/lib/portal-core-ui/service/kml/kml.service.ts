@@ -61,8 +61,8 @@ export class KMLDocService {
 
   /**
    * check if document contains a ground overlay
-   * 
-   * @param kmlDoc 
+   *
+   * @param kmlDoc
    * @returns overlayStatus
    */
   public groundOverlay(kmlStr: string): boolean {
@@ -94,7 +94,7 @@ export class KMLDocService {
     kmlTxt = kmlTxt.replace(/\x02/g, '');
     // Inserts local paddle image to avoid CORS errors
     // Cesium does not load proxied images for some as yet unknown reason
-    
+
     var overlay = this.groundOverlay(kmlTxt);
 
     // make a list of start and end positions for urls enclosed by the xml <Icon><href>
