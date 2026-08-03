@@ -545,7 +545,7 @@ this.layerHandlerService.getCustomLayerRecord(searchUrl).subscribe(layerRecs => 
                 this.setupLayer(this, features.fileName, features, "", ResourceType.GEOJSON, "FILE");
               })
             } else {
-              this.setupLayer(this, geoJsonData.fileName, {type: 'FeatureCollection', features: geoJsonData.features}, "", ResourceType.GEOJSON, "FILE");
+              this.setupLayer(this, geoJsonData.fileName, { type: 'FeatureCollection', features: geoJsonData.features }, "", ResourceType.GEOJSON, "FILE");
             }
           }
           this.loading = false;
@@ -620,7 +620,7 @@ this.layerHandlerService.getCustomLayerRecord(searchUrl).subscribe(layerRecs => 
       reader.onload = () => {
         if (typeof reader.result === "string") {
           // Remove unwanted characters and inject proxy for embedded URLs
-          
+
             var kmlTxt = reader.result;
 
             this.kmlService.cleanKML(kmlTxt, this.env.portalBaseUrl).subscribe({
@@ -634,7 +634,7 @@ this.layerHandlerService.getCustomLayerRecord(searchUrl).subscribe(layerRecs => 
                 // todo: loadImage
               },
               error: (err: any) => console.error('[custompanel]onFileSelected()Error:', err),
-              complete: () => { 
+              complete: () => {
                                 //console.log('[custompanel]onFileSelected()Observable complete');
                               }
             });
@@ -650,10 +650,10 @@ this.layerHandlerService.getCustomLayerRecord(searchUrl).subscribe(layerRecs => 
   /**
    * check the coordinate referen system for the layer, if present it will be in the cswRecords[0]
    * CRS:1 in Web Map Service (WMS) is a non-geospatial, cartesian coordinate reference system defined
-   * in WMS 1.3.0, used for displaying imagery without real-world geographic coordinates. It works in 
+   * in WMS 1.3.0, used for displaying imagery without real-world geographic coordinates. It works in
    * pixel-space, often with the y-axis pointing down, mapping 1 unit to 1 pixel, and is ideal for plotting
    * non-georeferenced images.
-   * 
+   *
    * if found then the layer is a non-earth image, which is currently not supported
   */
   public isImage(layer: LayerModel): boolean {

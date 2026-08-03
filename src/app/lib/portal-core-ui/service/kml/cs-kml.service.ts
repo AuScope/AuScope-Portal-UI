@@ -12,7 +12,7 @@ import { Constants, ResourceType } from '../../utility/constants.service';
 import { RenderStatusService } from '../cesium-map/renderstatus/render-status.service';
 import { KMLDocService } from './kml.service';
 import { UtilitiesService } from '../../utility/utilities.service';
-import { DefaultProxy, Rectangle, Resource } from 'cesium';
+import { Rectangle } from 'cesium';
 import { KmlDataSource } from 'cesium';
 declare let Cesium;
 /**
@@ -32,7 +32,7 @@ export class CsKMLService {
   // Number of KML resources added for a given layer
   private numberOfResourcesAdded: Map<string, number> = new Map<string, number>();
 
-  private overlayDoc: Node; // used to make a temporary copy of <GroundOverlay> for restoring to layer.kmlDoc 
+  private overlayDoc: Node; // used to make a temporary copy of <GroundOverlay> for restoring to layer.kmlDoc
 
 
   /**
@@ -60,10 +60,10 @@ export class CsKMLService {
 
 
   private removeOverlay(kmlDoc: Document): Document {
-    let gos = kmlDoc.querySelectorAll("GroundOverlay");
+    const gos = kmlDoc.querySelectorAll("GroundOverlay");
     if (gos) {
       gos.forEach(go => {
-        // backup <GroundOverlay> and restore after the kml source is loaded 
+        // backup <GroundOverlay> and restore after the kml source is loaded
         this.overlayDoc = go.cloneNode(true);
         go.remove();
       });
@@ -292,17 +292,17 @@ export class CsKMLService {
 
   private getIcon(kmlDoc: Document): any {
     let result = {};
-    let gos = kmlDoc.querySelectorAll("GroundOverlay");
+    const gos = kmlDoc.querySelectorAll("GroundOverlay");
     if (gos) {
       gos.forEach(go => {
-        let iconEntity = go.querySelector("Icon");
-        let iconURL = iconEntity.querySelector('href').textContent;
+        const iconEntity = go.querySelector("Icon");
+        const iconURL = iconEntity.querySelector('href').textContent;
         if (iconURL.toLowerCase().startsWith("http")) {
-          let rectEntity = go.querySelector("LatLonBox");
-          let north = rectEntity.querySelector('north').textContent;
-          let south = rectEntity.querySelector('south').textContent;
-          let east = rectEntity.querySelector('east').textContent;
-          let west = rectEntity.querySelector('west').textContent;
+          const rectEntity = go.querySelector("LatLonBox");
+          const north = rectEntity.querySelector('north').textContent;
+          const south = rectEntity.querySelector('south').textContent;
+          const east = rectEntity.querySelector('east').textContent;
+          const west = rectEntity.querySelector('west').textContent;
           result = { url: iconURL, rectangle: { north: north, south: south, east: east, west: west } };
         }
       });
