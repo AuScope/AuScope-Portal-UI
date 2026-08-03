@@ -255,7 +255,7 @@ export class LegendUiService {
                 return of(undefined);
               })
             );
-          }          
+          }
         });
 
         this.displayLegendDialog(layer.id, layer.name, [getRequest, postRequest, getRequestLegendUrl]);

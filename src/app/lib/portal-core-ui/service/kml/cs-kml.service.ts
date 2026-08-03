@@ -152,33 +152,32 @@ export class CsKMLService {
                 try {
                   this.http.post(this.env.portalBaseUrl + "shorturl", body, {
                     headers: new HttpHeaders().set('Content-Type', 'application/json')
-                  }).subscribe(res => {
-                    const shortenedUrl = res["data"]["url"];
+                  }).subscribe( {
+                    next: res => {
+                      const shortenedUrl = res["data"]["url"];
+                      const overlayProvider = new Cesium.SingleTileImageryProvider({
+                        url: shortenedUrl,
+                        layers: layer.name,
+                        rectangle: overlayRect,
+                        credit: "credit for the data source",
+                      });
 
-                    const overlayProvider = new Cesium.SingleTileImageryProvider({
-                      url: shortenedUrl,
-                      layers: layer.name,
-                      rectangle: overlayRect,
-                      credit: "credit for the data source",
-                    });
+                      overlayProvider.errorEvent.addEventListener(function (tileProviderError) {
+                        console.error('*** An error occurred in SingleTileImageryProvider:');
+                        console.error('*** Message: ' + tileProviderError.message);
+                        console.error('*** Error Code: ' + tileProviderError.error);
+                        console.error('Error at level : ' + tileProviderError.level);
+                      });
 
-                    overlayProvider.errorEvent.addEventListener(function (tileProviderError) {
-                      console.error('*** An error occurred in SingleTileImageryProvider:');
-                      console.error('*** Message: ' + tileProviderError.message);
-                      console.error('*** Error Code: ' + tileProviderError.error);
-                      console.error('Error at level : ' + tileProviderError.level);
-                    });
+                      setTimeout(() => {
+                        viewer.camera.flyTo({ destination: overlayRect });
+                      }, 100);
 
-                    setTimeout(() => {
-                      viewer.camera.flyTo({ destination: overlayRect });
-                    }, 100);
-
-                    layer.kmlDoc.querySelector("Folder").appendChild(this.overlayDoc);
-                    const newLayer = viewer.imageryLayers.addImageryProvider(overlayProvider);
-                    layer.csLayers.push(newLayer);
-
-                  }), catchError((error: HttpResponse<any>) => {
-                    return observableThrowError(error);
+                      layer.kmlDoc.querySelector("Folder").appendChild(this.overlayDoc);
+                      const newLayer = viewer.imageryLayers.addImageryProvider(overlayProvider);
+                      layer.csLayers.push(newLayer);
+                    },
+                    error: err => { return observableThrowError(err) }
                   });
 
                 } catch (e) {

@@ -29,7 +29,7 @@ export class LayerManagerService {
   private legendUiService = inject(LegendUiService);
   private sidebarService = inject(SidebarService);
 
-  public isLayerLoaded: BehaviorSubject<boolean>; // observable used in custompanel 
+  public isLayerLoaded: BehaviorSubject<boolean>; // observable used in custompanel
   /**
    * returns the observable of the "isLayerLoaded" variable
    */
