@@ -38,18 +38,18 @@ export class KMLDocService {
 
   // make a list of start and end positions for urls enclosed by the xml <Icon><href>
   getXmlElements(kmlTxt: string, xmlStartPattern: string, xmlEndPattern: string) {
-    var iconPosList: { start: number; end: number; }[] = [];
-    var startPos = 0;
-    var endScan: boolean = false;
+    const iconPosList: { start: number; end: number; }[] = [];
+    let startPos = 0;
+    let endScan: boolean = false;
     while (!endScan) {
       endScan = true;
-      var pos1 = kmlTxt.indexOf(xmlStartPattern, startPos);
+      const pos1 = kmlTxt.indexOf(xmlStartPattern, startPos);
       if (pos1 > 0) {
-        var pos1a = kmlTxt.indexOf("<href>", pos1);
+        const pos1a = kmlTxt.indexOf("<href>", pos1);
         if (pos1a > 0) {
           endScan = false;
           startPos = pos1 + 6; //  + <href>
-          var pos2 = kmlTxt.indexOf(xmlEndPattern, startPos);
+          const pos2 = kmlTxt.indexOf(xmlEndPattern, startPos);
           const iconItem = { start: pos1a + 6, end: pos2 };
           iconPosList.push(iconItem);
           startPos = pos2;
