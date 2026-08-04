@@ -126,7 +126,7 @@ export class CustomPanelComponent {
 
           // Remove unwanted characters and inject proxy for embedded URLs
           if (typeof kmlTxt === "string") {
-            var kmlStr;
+            let kmlStr;
             this.kmlService.cleanKML(kmlTxt, this.env.portalBaseUrl).subscribe({
               next: (value: string) => {
                 // This code runs when a value is emitted
@@ -594,7 +594,7 @@ this.layerHandlerService.getCustomLayerRecord(searchUrl).subscribe(layerRecs => 
       getKmlDom(file).then(() => {
         // uncomment the following lines will write (download) the unzipped kml to the file kmStr2.kml
         //let kmlStr2 = new XMLSerializer().serializeToString(kmlDom)
-        //var blob5 = new Blob([kmlStr2], { type: 'text/xml' })
+        //const blob5 = new Blob([kmlStr2], { type: 'text/xml' })
         //saveAs(blob5, "kmlStr2.kml");
 
         // add the re-zipped and processed (proxy, metadata) kmz blob
@@ -621,7 +621,7 @@ this.layerHandlerService.getCustomLayerRecord(searchUrl).subscribe(layerRecs => 
         if (typeof reader.result === "string") {
           // Remove unwanted characters and inject proxy for embedded URLs
 
-            var kmlTxt = reader.result;
+            let kmlTxt = reader.result;
 
             this.kmlService.cleanKML(kmlTxt, this.env.portalBaseUrl).subscribe({
               next: (value: string) => {

@@ -66,19 +66,19 @@ export class KMLDocService {
    * @returns overlayStatus
    */
   public groundOverlay(kmlStr: string): boolean {
-    var overlayStatus = false;
-    var doc : any;
+    let overlayStatus = false;
+    let doc : any;
 
     const parser = new DOMParser();
-    let kmlDoc = parser.parseFromString(kmlStr, "text/xml");
+    const kmlDoc = parser.parseFromString(kmlStr, "text/xml");
 
     doc = kmlDoc;
-    let gos = doc.querySelector("GroundOverlay");
+    const gos = doc.querySelector("GroundOverlay");
 
     if (gos) {
       overlayStatus = true;
     }
-      return overlayStatus;
+    return overlayStatus;
   }
 
   /**
@@ -95,23 +95,22 @@ export class KMLDocService {
     // Inserts local paddle image to avoid CORS errors
     // Cesium does not load proxied images for some as yet unknown reason
 
-    var overlay = this.groundOverlay(kmlTxt);
+    const overlay = this.groundOverlay(kmlTxt);
 
     // make a list of start and end positions for urls enclosed by the xml <Icon><href>
-    var iconPosList: { start: number; end: number; }[] = [];
+    let iconPosList: { start: number; end: number; }[] = [];
     iconPosList = this.getXmlElements(kmlTxt, '<Icon>', '</href>');
     if (iconPosList.length > 0) {
 
       // An array of Observables, where each represents a GET request
-      var requests: Observable<{ status: boolean, url: string }>[] = [];
-      var requestsProxy: Observable<{ status: boolean, url: string }>[] = [];
+      const requests: Observable<{ status: boolean, url: string }>[] = [];
 
-      var me = this;
+      const me = this;
 
-      var iconCount = 0;
+      let iconCount = 0;
       iconPosList.forEach(iconItem => {
         iconCount++;
-        var urlTxt = kmlTxt.substring(iconItem.start, iconItem.end);
+        const urlTxt = kmlTxt.substring(iconItem.start, iconItem.end);
         //if (iconCount === 1) { urlTxt += "_bad"; } // test to make a "bad" url
         requests.push(this.getIconRecord(urlTxt, portalBaseUrl));
       });
@@ -123,7 +122,7 @@ export class KMLDocService {
           // Now that data is 100% populated, emit to anything subscribed to cleanKML().
 
           // check for "bad" icon urls and replace any with "white-paddle"
-          var i = 0;
+          let i = 0;
           res.forEach(ui => {
             if (!ui['status']) { // for a "bad" url replace with "white-paddle" in the kml
               const iconItem = iconPosList[i];
