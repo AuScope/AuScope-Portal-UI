@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, inject } from '@angular/core';
+import { Component, Output, EventEmitter, inject, OnInit } from '@angular/core';
 import { LayerHandlerService } from '../../lib/portal-core-ui/service/cswrecords/layer-handler.service';
 import { ResourceType } from '../../lib/portal-core-ui/utility/constants.service';
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
@@ -9,8 +9,8 @@ import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import * as JSZip from 'jszip';
 import { HttpClient } from '@angular/common/http';
-import { throwError as observableThrowError, Observable, forkJoin, of, throwError } from 'rxjs';
-import { catchError, finalize, map, mergeMap, switchMap } from 'rxjs/operators';
+import { throwError as observableThrowError, Observable } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { HttpResponse } from '@angular/common/http';
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
@@ -24,7 +24,7 @@ import shp from 'shpjs';
   styleUrls: ['../menupanel.scss', './custompanel.component.scss'],
   standalone: false
 })
-export class CustomPanelComponent {
+export class CustomPanelComponent implements OnInit {
   private env = inject<any>('env' as any);
 
   private http = inject(HttpClient);
@@ -507,7 +507,6 @@ this.layerHandlerService.getCustomLayerRecord(searchUrl).subscribe(layerRecs => 
    */
   public onFileSelected(event) {
   const getExtension = fileName => fileName.split(".").pop().toLowerCase()
-  const getFilename = fileName => fileName.split(".")[0].toLowerCase()
   const file: File = event.target.files[0];
   if (file) {
     if (getExtension(file.name) === "geojson") {

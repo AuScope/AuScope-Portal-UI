@@ -67,13 +67,10 @@ export class KMLDocService {
    */
   public groundOverlay(kmlStr: string): boolean {
     let overlayStatus = false;
-    let doc : any;
 
     const parser = new DOMParser();
     const kmlDoc = parser.parseFromString(kmlStr, "text/xml");
-
-    doc = kmlDoc;
-    const gos = doc.querySelector("GroundOverlay");
+    const gos = kmlDoc.querySelector("GroundOverlay");
 
     if (gos) {
       overlayStatus = true;
@@ -105,11 +102,9 @@ export class KMLDocService {
       // An array of Observables, where each represents a GET request
       const requests: Observable<{ status: boolean, url: string }>[] = [];
 
-      const me = this;
-
-      let iconCount = 0;
+      //let iconCount = 0;
       iconPosList.forEach(iconItem => {
-        iconCount++;
+        //iconCount++;
         const urlTxt = kmlTxt.substring(iconItem.start, iconItem.end);
         //if (iconCount === 1) { urlTxt += "_bad"; } // test to make a "bad" url
         requests.push(this.getIconRecord(urlTxt, portalBaseUrl));
@@ -126,9 +121,6 @@ export class KMLDocService {
           res.forEach(ui => {
             if (!ui['status']) { // for a "bad" url replace with "white-paddle" in the kml
               const iconItem = iconPosList[i];
-
-              // Use the proxy
-              const proxyUrl = portalBaseUrl + Constants.PROXY_API + "?usewhitelist=false&url=" + kmlTxt.substring(iconItem.start, iconItem.end);
 
               const startUrl = kmlTxt.substring(0, iconItem.start);
               const endUrl = kmlTxt.substring(iconItem.end, kmlTxt.length);
