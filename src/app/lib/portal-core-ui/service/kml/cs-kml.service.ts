@@ -122,8 +122,8 @@ export class CsKMLService {
                   }
                 }
               } else {
-                // Use ground overlay rectangle to fly to, and add the overlay to the map 
-                this.incrementLayersAdded(layer, 2);                  
+                // Use ground overlay rectangle to fly to, and add the overlay to the map
+                this.incrementLayersAdded(layer, 2);
                 const layerObj = viewer.entities.add({
                   name: layer.name,
                   rectangle: {
