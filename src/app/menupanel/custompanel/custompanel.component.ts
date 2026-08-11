@@ -125,19 +125,34 @@ export class CustomPanelComponent implements OnInit {
           // Remove unwanted characters and inject proxy for embedded URLs
           if (typeof kmlTxt === "string") {
             let kmlStr;
+            let hasError = false;
             this.kmlService.cleanKML(kmlTxt, this.env.portalBaseUrl).subscribe({
               next: (value: string) => {
-                // This code runs when a value is emitted
+                // This code may run multiple times, once for each value emitted by the observable
                 kmlStr = value;
                 const parser = new DOMParser();
                 let kmlDoc = parser.parseFromString(kmlStr, "text/xml");
-                kmlDoc = this.parseExtendedData(kmlDoc);
-                this.setupLayer(this, layerName, kmlDoc, proxyUrl, ResourceType.KML, "URL");
+                const errorNode = kmlDoc.querySelector("parsererror");
+                if (errorNode) {
+                  hasError = true;
+                  console.error("Failed to parse KML:", errorNode.textContent);
+                }
+                if (!hasError) {
+                  kmlDoc = this.parseExtendedData(kmlDoc);
+                  this.setupLayer(this, layerName, kmlDoc, proxyUrl, ResourceType.KML, "URL");
+                }
               },
-              error: (err: any) => console.error('[custompanel]onFileSelected(getRemoteBlob)Error:', err),
+              error: (err: any) =>  {
+                console.error('[custompanel]onFileSelected(getRemoteBlob)Error:', err);
+                // Warn user that the KML could not be parsed
+                alert('Failed to parse KML');
+              },
               complete: () => {
-                              console.log('[custompanel]onFileSelected(getRemoteBlob)Observable complete')
-                              }
+                if (hasError) {
+                  // Warn user that the KML could not be parsed
+                  alert('Failed to parse KML');
+                }
+              }
             }); // subscribe
           }
           this.loading = false;
@@ -203,6 +218,11 @@ export class CustomPanelComponent implements OnInit {
 
                     const parser = new DOMParser();
                     let kmlDoc = parser.parseFromString(kmlStr, "text/xml");
+                    const errorNode = kmlDoc.querySelector("parsererror");
+                    if (errorNode) {
+                      console.error("Failed to parse KML in KMZ:", errorNode.textContent);
+                      return Promise.reject(Error("Failed to parse KML in KMZ: " + errorNode.textContent));
+                    }
 
                     // setup metadata in a format that cesium expects
                     kmlDoc = this.parseExtendedData(kmlDoc);
@@ -614,18 +634,37 @@ export class CustomPanelComponent implements OnInit {
             // Remove unwanted characters and inject proxy for embedded URLs
 
             let kmlTxt = reader.result;
+            let hasError = false;
 
             this.kmlService.cleanKML(kmlTxt, this.env.portalBaseUrl).subscribe({
               next: (value: string) => {
-                // This code runs when a value is emitted
+                // This code may run multiple times, once for each value emitted by the observable
                 kmlTxt = value;
                 const parser = new DOMParser();
                 let kmlDoc = parser.parseFromString(kmlTxt, "text/xml");
-                kmlDoc = this.parseExtendedData(kmlDoc);
-                this.setupLayer(this, file.name, kmlDoc, "", ResourceType.KML, "FILE");
-                // todo: loadImage
+                const errorNode = kmlDoc.querySelector("parsererror");
+                if (errorNode) {
+                  hasError = true;
+                  console.error('Failed to parse KML:', errorNode.textContent);
+                  return;
+                }
+                if (!hasError) {
+                  kmlDoc = this.parseExtendedData(kmlDoc);
+                  this.setupLayer(this, file.name, kmlDoc, "", ResourceType.KML, "FILE");
+                  // todo: loadImage
+                }
               },
-              error: (err: any) => console.error('[custompanel]onFileSelected()Error:', err)
+              error: (err: any) => {
+                console.error('[custompanel]onFileSelected()Error:', err);
+                // Warn user that the KML could not be parsed
+                alert('Failed to parse KML');
+              },
+              complete: () => {
+                if (hasError) {
+                  // Warn user that the KML could not be parsed
+                  alert('Failed to parse KML');
+                }
+              }
             });
           }
         };
