@@ -625,8 +625,7 @@ export class CustomPanelComponent implements OnInit {
                 this.setupLayer(this, file.name, kmlDoc, "", ResourceType.KML, "FILE");
                 // todo: loadImage
               },
-              error: (err: any) => console.error('[custompanel]onFileSelected()Error:', err),
-              complete: () => {}
+              error: (err: any) => console.error('[custompanel]onFileSelected()Error:', err)
             });
           }
         };
