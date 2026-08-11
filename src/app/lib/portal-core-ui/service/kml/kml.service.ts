@@ -1,8 +1,18 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
-import { catchError, map } from 'rxjs/operators';
+import { map, catchError } from 'rxjs/operators';
 import { Observable, forkJoin, of, throwError } from 'rxjs';
 import { Constants } from '../../utility/constants.service';
+
+export type StatusUrlResponse = {
+  status: boolean;
+  url: string;
+};
+
+export type IconPos = {
+  start: number;
+  end: number;
+};
 
 /**
  * This service class contains functions used for manipulating KML documents
@@ -14,31 +24,40 @@ export class KMLDocService {
   private http = inject(HttpClient);
 
   // check if the icon - href url works/exists
-  public getIconRecord(iconUrl: string, portalBaseUrl: any): Observable<any> {
-
-    return this.http.get(portalBaseUrl + "/" + iconUrl, { responseType: "text" }).pipe(map(
-      (_response) => {
-        return { status: true, url: iconUrl };
-      }), catchError(
-        (_error: HttpResponse<any>) => {
-          this.getIconRecord(portalBaseUrl + Constants.PROXY_API + "?usewhitelist=false&url=" + iconUrl, portalBaseUrl + Constants.PROXY_API + "?usewhitelist=false&url=");
+  public getIconRecord(iconUrl: string, portalBaseUrl: string): Observable<StatusUrlResponse> {
+    if (iconUrl.startsWith("http:") || iconUrl.startsWith("https:")) {
+          iconUrl = portalBaseUrl + Constants.PROXY_API + "?usewhitelist=false&url=" + iconUrl;
           return this.http.get(iconUrl, { responseType: "text" }).pipe(map(
             (_response) => {
               return { status: true, url: iconUrl };
             }), catchError(
               (_error: HttpResponse<any>) => {
-                return throwError('This will error').pipe(catchError(_error => of({ status: false, url: iconUrl })))
+                return throwError('Cannot load icon URL').pipe(catchError(_error => of({ status: false, url: iconUrl })))
               }
             ));
-
+    }
+    return this.http.get(portalBaseUrl + "/" + iconUrl, { responseType: "text" }).pipe(map(
+      (_response) => {
+        return { status: true, url: iconUrl };
+      }), catchError(
+        (_error: HttpResponse<any>) => {
+          iconUrl = portalBaseUrl + Constants.PROXY_API + "?usewhitelist=false&url=" + iconUrl;
+          return this.http.get(iconUrl, { responseType: "text" }).pipe(map(
+            (_response) => {
+              return { status: true, url: iconUrl };
+            }), catchError(
+              (_error: HttpResponse<any>) => {
+                return throwError('Cannot load icon URL').pipe(catchError(_error => of({ status: false, url: iconUrl })))
+              }
+            ));
         }
       )
     );
   }
 
   // make a list of start and end positions for urls enclosed by the xml <Icon><href>
-  getXmlElements(kmlTxt: string, xmlStartPattern: string, xmlEndPattern: string) {
-    const iconPosList: { start: number; end: number; }[] = [];
+  private getXmlElements(kmlTxt: string, xmlStartPattern: string, xmlEndPattern: string): IconPos[] {
+    const iconPosList: IconPos[] = [];
     let startPos = 0;
     let endScan: boolean = false;
     while (!endScan) {
@@ -95,18 +114,19 @@ export class KMLDocService {
     const overlay = this.groundOverlay(kmlTxt);
 
     // make a list of start and end positions for urls enclosed by the xml <Icon><href>
-    let iconPosList: { start: number; end: number; }[] = [];
+    let iconPosList: IconPos[] = [];
     iconPosList = this.getXmlElements(kmlTxt, '<Icon>', '</href>');
     if (iconPosList.length > 0) {
 
       // An array of Observables, where each represents a GET request
-      const requests: Observable<{ status: boolean, url: string }>[] = [];
+      const requests: Observable<StatusUrlResponse>[] = [];
 
       //let iconCount = 0;
       iconPosList.forEach(iconItem => {
         //iconCount++;
         const urlTxt = kmlTxt.substring(iconItem.start, iconItem.end);
         //if (iconCount === 1) { urlTxt += "_bad"; } // test to make a "bad" url
+        // Test to see if the icon - href url works/exists
         requests.push(this.getIconRecord(urlTxt, portalBaseUrl));
       });
 
@@ -118,23 +138,22 @@ export class KMLDocService {
 
           // check for "bad" icon urls and replace any with "white-paddle"
           let i = 0;
+          let offset = 0; // offset is used to adjust the start and end positions of the icon urls in the kmlTxt as they are replaced with new urls of different lengths
           res.forEach(ui => {
+            const iconItem = iconPosList[i];
+            const startUrl = kmlTxt.substring(0, iconItem.start + offset);
+            const endUrl = kmlTxt.substring(iconItem.end + offset, kmlTxt.length);
+            let subStr = "";
             if (!ui['status']) { // for a "bad" url replace with "white-paddle" in the kml
-              const iconItem = iconPosList[i];
-
-              const startUrl = kmlTxt.substring(0, iconItem.start);
-              const endUrl = kmlTxt.substring(iconItem.end, kmlTxt.length);
-
-              if (overlay) {
-                //kmlTxt = startUrl + proxyUrl + endUrl;
-              } else {
-                kmlTxt = startUrl + "extension/images/white-paddle.png" + endUrl;
-              }
+              subStr = "extension/images/white-paddle.png".replace(/&/g, '&amp;');
+            } else {
+              subStr = ui['url'].replace(/&/g, '&amp;');
             }
+            kmlTxt = startUrl + subStr + endUrl;
+            offset += subStr.length - (iconItem.end - iconItem.start);
             i++;
+            observer.next(kmlTxt);
           })
-
-          observer.next(kmlTxt);
           observer.complete();
         });
 
