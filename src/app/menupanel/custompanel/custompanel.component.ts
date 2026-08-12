@@ -142,7 +142,7 @@ export class CustomPanelComponent implements OnInit {
                   this.setupLayer(this, layerName, kmlDoc, proxyUrl, ResourceType.KML, "URL");
                 }
               },
-              error: (err: any) =>  {
+              error: (err: any) => {
                 console.error('[custompanel]onFileSelected(getRemoteBlob)Error:', err);
                 // Warn user that the KML could not be parsed
                 alert('Failed to parse KML');

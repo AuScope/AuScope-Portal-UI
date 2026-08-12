@@ -111,8 +111,6 @@ export class KMLDocService {
     // Inserts local paddle image to avoid CORS errors
     // Cesium does not load proxied images for some as yet unknown reason
 
-    const overlay = this.groundOverlay(kmlTxt);
-
     // make a list of start and end positions for urls enclosed by the xml <Icon><href>
     let iconPosList: IconPos[] = [];
     iconPosList = this.getXmlElements(kmlTxt, '<Icon>', '</href>');
