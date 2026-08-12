@@ -29,7 +29,7 @@ export class LayerManagerService {
   private legendUiService = inject(LegendUiService);
   private sidebarService = inject(SidebarService);
 
-  public isLayerLoaded: BehaviorSubject<boolean>; // observable used in custompanel 
+  public isLayerLoaded: BehaviorSubject<boolean>; // observable used in custompanel
   /**
    * returns the observable of the "isLayerLoaded" variable
    */
@@ -104,7 +104,7 @@ export class LayerManagerService {
    * TODO: FilterPanel is only place bounding box filter can currently be set, better to shift flag to FilterService
    * and apply here when it's needed to adding from SearchPanel etc. will apply filter as well
    */
-  public addLayer(layer: LayerModel, optionalFilters: Array<object>, layerFilterCollection: any, layerTime: Date) {
+  public addLayer(layer: LayerModel, optionalFilters: Array<object>, layerFilterCollection: any, layerTime: Date | null) {
     if (environment.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
       rudderanalytics.track('Addlayer', {
         event_category: 'Addlayer',

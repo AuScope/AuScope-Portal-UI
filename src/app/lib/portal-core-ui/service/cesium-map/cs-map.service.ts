@@ -439,7 +439,7 @@ export class CsMapService {
           // this works, but not very efficient - might go back to setting layerId in the properties
           if (layer.jsonDoc) {
             if (layer.jsonDoc.features) {
-              var i = 0;
+              let i = 0;
               let entityFnd: boolean = false;
               while ((i < layer.jsonDoc.features.length) && (!entityFnd)) {
                 if (layer.jsonDoc.features[i].properties === entity) {
