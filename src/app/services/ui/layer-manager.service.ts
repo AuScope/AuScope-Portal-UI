@@ -9,6 +9,7 @@ import { environment } from 'environments/environment';
 import * as _ from 'lodash';
 import * as $ from 'jquery';
 import { SidebarService } from 'app/portal/sidebar.service';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 declare let rudderanalytics: any;
@@ -18,6 +19,9 @@ declare let rudderanalytics: any;
  */
 @Injectable()
 export class LayerManagerService {
+  layerLoaded() {
+    throw new Error('Method not implemented.');
+  }
   private csMapService = inject(CsMapService);
   private manageStateService = inject(ManageStateService);
   private uiLayerModelService = inject(UILayerModelService);
@@ -25,6 +29,23 @@ export class LayerManagerService {
   private legendUiService = inject(LegendUiService);
   private sidebarService = inject(SidebarService);
 
+  public isLayerLoaded: BehaviorSubject<boolean>; // observable used in custompanel
+  /**
+   * returns the observable of the "isLayerLoaded" variable
+   */
+  getLayerLoaded(): Observable<boolean> {
+    return this.isLayerLoaded.asObservable();
+  }
+  /**
+   * sets the state of the "isLayerLoaded" variable
+   */
+  setLayerLoaded(state: boolean): void {
+    this.isLayerLoaded.next(state);
+  }
+
+  constructor() {
+    this.isLayerLoaded = new BehaviorSubject<boolean>(false);
+  }
 
   filterList = []; // an array of all active layers - object = {layer, filterState }
 
@@ -83,7 +104,7 @@ export class LayerManagerService {
    * TODO: FilterPanel is only place bounding box filter can currently be set, better to shift flag to FilterService
    * and apply here when it's needed to adding from SearchPanel etc. will apply filter as well
    */
-  public addLayer(layer: LayerModel, optionalFilters: Array<object>, layerFilterCollection: any, layerTime: Date) {
+  public addLayer(layer: LayerModel, optionalFilters: Array<object>, layerFilterCollection: any, layerTime: Date | null) {
     if (environment.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
       rudderanalytics.track('Addlayer', {
         event_category: 'Addlayer',
@@ -120,7 +141,7 @@ export class LayerManagerService {
 
     // Transfer mandatory filters from the 'layerFilterCollection' input to the 'layer' object
     if (layer?.filterCollection?.mandatoryFilters &&
-        layerFilterCollection?.mandatoryFilters) {
+      layerFilterCollection?.mandatoryFilters) {
       for (const layerFilt of layer.filterCollection.mandatoryFilters) {
         for (const mandFilt of layerFilterCollection.mandatoryFilters) {
           if (layerFilt.label === mandFilt.label) {
@@ -132,7 +153,9 @@ export class LayerManagerService {
     }
 
     // Add layer to map in Cesium
-    this.csMapService.addLayer(layer, param);
+    if (!this.csMapService.addLayer(layer, param)) {
+      return;
+    }
 
     // Update the optional filter display
     this.csMapService.updateFilterDisplay(layer.id, optionalFilters);
@@ -156,6 +179,8 @@ export class LayerManagerService {
 
     // Open sidebar if closed
     this.sidebarService.setOpenState(true);
+
+    this.setLayerLoaded(true); // indicate that the layer is now loaded (observable)
   }
 
   /**

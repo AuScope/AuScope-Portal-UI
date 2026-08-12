@@ -107,9 +107,9 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   };
 
   // Data Structures used to create a folding flat tree which displays feature data
-  public flatTreeControl = {};
+  public flatTreeControl: { [key: string]: any } = {};
   public treeFlattener = new MatTreeFlattener(this._transformer, node => node.level, node => node.expandable, node => node.children);
-  public flatTreeDataSource = {}; // Tree structure is assigned to this
+  public flatTreeDataSource: { [key: string]: any } = {}; // Tree structure is assigned to this
 
 
   // Does the 'FlatNode' have children?
@@ -374,10 +374,10 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     // Force immediate change detection to show the no-results message if needed
     this.changeDetectorRef.detectChanges();
     this.onDataChange();
-    if (this.data.docs.length === 1 && this.data.htmls.length === 0) {
+    if (this.data.docs.length >= 1 && this.data.htmls.length === 0) {
       this.setWFS(this.data.docs[0], 0);
       this.openTab(event, 'wfs')
-    } else if (this.data.htmls.length === 1 && this.data.docs.length === 0) {
+    } else if (this.data.htmls.length >= 1 && this.data.docs.length === 0) {
       this.setHTML(this.data.htmls[0].key);
     }
   }
@@ -473,7 +473,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     }
 
     const reg = new RegExp(config.clipboard.supportedLayersRegKeyword, 'gi');
-    this.bToClipboard = name.search(reg) === -1 ? false : true;
+    this.bToClipboard = reg.test(name);
 
     let result = doc;
     // If it is not JSON then convert to JSON
@@ -790,8 +790,13 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   /**
    * Escape CSV values (handle commas, quotes, newlines)
    */
-  private escapeCSV(value: string): string {
+  private escapeCSV(value: string | number): string {
     if (!value) return '';
+
+    // If it's a number or boolean return a string
+    if (typeof value === "number" || typeof value === "boolean") {
+      return String(value);
+    }
 
     // If value contains comma, quote, or newline, wrap in quotes and escape internal quotes
     if (value.includes(',') || value.includes('"') || value.includes('\n') || value.includes('\r')) {

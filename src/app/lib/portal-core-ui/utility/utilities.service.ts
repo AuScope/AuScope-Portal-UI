@@ -569,7 +569,7 @@ export class UtilitiesService {
      * @param onlineResource online resource record for service
      */
     public static resourceIsERDAS_Essentials_2015(onlineResource: OnlineResourceModel): boolean {
-        var status: boolean = false;
+        let status: boolean = false;
         if (onlineResource.applicationProfile["server"]) {
             if (onlineResource.applicationProfile["version"]) {
                 status = (onlineResource.applicationProfile["version"].indexOf('Essentials 2015') > -1);
@@ -582,7 +582,7 @@ export class UtilitiesService {
      * @param onlineResource online resource record for service
      */
     public static resourceIsERDAS_Core_2022(onlineResource: OnlineResourceModel): boolean {
-        var status: boolean = false;
+        let status: boolean = false;
         if (onlineResource.applicationProfile["server"]) {
             if (onlineResource.applicationProfile["version"]) {
                 status = (onlineResource.applicationProfile["version"].indexOf('Core 2022') > -1);
@@ -801,7 +801,10 @@ export class UtilitiesService {
    * @returns a list of supported OnlineResource types as strings
    */
   public static getSupportedOnlineResourceTypes(): ResourceType[] {
-    return [ResourceType.WMS, ResourceType.IRIS, ResourceType.KML, ResourceType.KMZ, ResourceType.VMF,ResourceType.GEOJSON];
+    return [
+      ResourceType.WMS, ResourceType.WMTS, ResourceType.IRIS, ResourceType.KML,
+      ResourceType.KMZ, ResourceType.VMF,ResourceType.GEOJSON
+    ];
   }
 
   /**

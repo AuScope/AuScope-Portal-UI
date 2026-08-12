@@ -8,7 +8,7 @@ import { LayerHandlerService } from '../../lib/portal-core-ui/service/cswrecords
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 import { RenderStatusService } from '../../lib/portal-core-ui/service/cesium-map/renderstatus/render-status.service';
 import { UtilitiesService } from '../../lib/portal-core-ui/utility/utilities.service';
-import { Constants } from '../../lib/portal-core-ui/utility/constants.service';
+import { Constants, ResourceType } from '../../lib/portal-core-ui/utility/constants.service';
 import { SearchService } from 'app/services/search/search.service';
 import { Observable, Subject, Subscription } from 'rxjs';
 
@@ -55,6 +55,10 @@ const OGC_SERVICES = [
   {
     name: 'WMS',
     fields: ['OGC:WMS'],
+    checked: true
+  }, {
+    name: 'WMTS',
+    fields: ['OGC:WMTS'],
     checked: true
   }, {
     name: 'IRIS',
@@ -168,8 +172,13 @@ export class SearchPanelComponent implements OnInit {
   /**
    * Detect external component clicks so we can close components that need to be when this happens
    */
-  @HostListener('document:click')
-  externalClick(): void {
+  @HostListener('document:click', ['$event'])
+  externalClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    // Ignore Angular Material overlay (stop paginator from closing dropdown)
+    if (target.closest('.cdk-overlay-container')) {
+      return;
+    }
     if (!this.searchClick && !this.infoDialogOpen) {
       if (this.showingResultsPanel) {
         this.setShowingResultsPanel(false);
@@ -194,7 +203,7 @@ export class SearchPanelComponent implements OnInit {
   private showFeaturedLayers(): void {
     this.queryText = '';
     this.searchResults = [];
-    const layers = [];
+    const layers: SearchResult[] = [];
     this.layerHandlerService.getLayerRecord().pipe(take(1)).subscribe(records => {
       let totalLayerCount = 0;
       for (const layerGroup in records) {
@@ -454,7 +463,9 @@ export class SearchPanelComponent implements OnInit {
    * @param layer the LayerModel
    */
   isMapSupportedLayer(layer: LayerModel): boolean {
-    return UtilitiesService.isMapSupportedLayer(layer);
+    return UtilitiesService.isMapSupportedLayer(layer)
+        && !(layer.id.startsWith("registry-csw:") &&
+             UtilitiesService.layerContainsResourceType(layer, ResourceType.IRIS));
   }
 
   /**
@@ -463,7 +474,6 @@ export class SearchPanelComponent implements OnInit {
    * @param layer LayerModel
    */
   public addLayer(layer: LayerModel) {
-
     if (!this.uiLayerModelService.getUILayerModel(layer.id)) {
       const uiLayerModel = new UILayerModel(layer.id, 100, this.renderStatusService.getStatusBSubject(layer));
       this.uiLayerModelService.setUILayerModel(layer.id, uiLayerModel);
@@ -871,32 +881,10 @@ export class SearchPanelComponent implements OnInit {
     return this.csMapService.getLayerModelList();
   }
 
-  /**
-   * Search page change
-   * @param pageChangeEvent
-   */
-  /*
-  public pageChange(newPageNo): void {
-    this.currentPage = newPageNo;
-    if (this.showingAllLayers) {
-      this.showFeaturedLayers();
-    } else {
-      this.search(false);
-    }
-  }
-    */
-   onPageChange(event: PageEvent): void {
+  onPageChange(event: PageEvent): void {
     // MatPaginator pageIndex is zero-based
     this.currentPage = event.pageIndex + 1;
     this.RESULTS_PER_PAGE = event.pageSize;
-
-    /*
-    if (this.showingAllLayers) {
-      this.showFeaturedLayers();
-    } else {
-      this.search(false);
-    }
-    */
   }
 
   downloadWithAuScopeCat(layer: LayerModel): void {

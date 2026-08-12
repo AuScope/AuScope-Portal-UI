@@ -1,6 +1,6 @@
 {
   "name": "auscope-portal",
-  "version": "6.9.2",
+  "version": "6.11.0",
   "license": "MIT",
   "scripts": {
     "ng": "node --max_old_space_size=8000 ./node_modules/@angular/cli/bin/ng",
@@ -12,7 +12,11 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "docs": "npm run typedoc -- --options typedoc.json --out ./src/app/portal-core-ui/docs --exclude '**/*.spec.ts' ./app/portal-core-ui",
-    "typedoc": "typedoc"
+    "typedoc": "typedoc",
+    "test:live": "ts-node --skip-project --compiler-options '{\"module\":\"CommonJS\",\"moduleResolution\":\"node\",\"target\":\"ES2022\",\"lib\":[\"ES2022\",\"DOM\"],\"skipLibCheck\":true}' src/test/live-layer-integration.ts",
+    "test:live:prod": "ts-node --skip-project --compiler-options '{\"module\":\"CommonJS\",\"moduleResolution\":\"node\",\"target\":\"ES2022\",\"lib\":[\"ES2022\",\"DOM\"],\"skipLibCheck\":true}' src/test/live-layer-integration.ts --env prod",
+    "test:live:e2e": "ts-node --skip-project --compiler-options '{\"module\":\"CommonJS\",\"moduleResolution\":\"node\",\"target\":\"ES2022\",\"lib\":[\"ES2022\",\"DOM\"],\"skipLibCheck\":true}' src/test/live-layer-e2e.ts",
+    "test:live:e2e:prod": "ts-node --skip-project --compiler-options '{\"module\":\"CommonJS\",\"moduleResolution\":\"node\",\"target\":\"ES2022\",\"lib\":[\"ES2022\",\"DOM\"],\"skipLibCheck\":true}' src/test/live-layer-e2e.ts --env prod"
   },
   "engines": {
     "node": ">=18.0.0"
@@ -32,7 +36,9 @@
     "@angular/platform-server": "^20.3.18",
     "@angular/router": "^20.3.18",
     "@auscope/angular-cesium": "^20.4.0",
-    "@auscope/angular2parse": "^20.0.2",
+    "@auscope/angular2parse": "^20.3.0",
+    "@cesium/engine": "22.0.0",
+    "@cesium/widgets": "14.0.0",
     "@csiro-geoanalytics/ng": "^2.5.0",
     "@csiro-geoanalytics/utils-rxjs": "^2.0.1",
     "@fortawesome/fontawesome-free": "^7.1.0",
@@ -76,6 +82,7 @@
     "proj4": "^2.15.0",
     "rickshaw": "^1.7.1",
     "rxjs": "~6.6.7",
+    "shpjs": "^6.2.0",
     "simplify-ts": "^1.0.2",
     "systemjs": "^6.13.0",
     "tslib": "^2.4.1",
@@ -99,6 +106,7 @@
     "@types/jasminewd2": "^2.0.10",
     "@types/node": "^13.13.52",
     "@types/rx": "^4.1.2",
+    "@types/shpjs": "^3.4.7",
     "@typescript-eslint/eslint-plugin": "^8.48.0",
     "@typescript-eslint/parser": "^8.48.0",
     "angular-ide": "^0.9.77",
@@ -115,6 +123,7 @@
     "karma-coverage-istanbul-reporter": "~3.0.3",
     "karma-jasmine": "~4.0.2",
     "karma-jasmine-html-reporter": "^1.7.0",
+    "playwright": "^1.60.0",
     "prettier": "^3.1.1",
     "sass": "~1.56.0",
     "ts-node": "^8.10.2",

@@ -1,9 +1,10 @@
 
 import { enableProdMode } from '@angular/core';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { platformBrowser } from '@angular/platform-browser';
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
 import { ContextService } from "@csiro-geoanalytics/ng";
+import * as Cesium from 'cesium';
 
 ContextService.load()
 	.then(context => {
@@ -41,7 +42,7 @@ ContextService.load()
 			});
 		  }
 
-		return platformBrowserDynamic().bootstrapModule(AppModule)
+		return platformBrowser().bootstrapModule(AppModule)
 	})
 	.catch(err => console.error(err));
 
@@ -54,6 +55,8 @@ declare let require;
 // Ion.defaultAccessToken =
 
 window['CESIUM_BASE_URL'] = '/assets/cesium/';
+
+(window as any).Cesium = Cesium;
 
 /*
 	To run the application under a different execution context provide a path to context

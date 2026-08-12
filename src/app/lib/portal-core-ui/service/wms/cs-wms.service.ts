@@ -562,7 +562,7 @@ export class CsWMSService {
         params['usepost'] = true;
 
         // Create a resource which uses our custom proxy; if ERDAS APOLLO WMS (i.e. NT)
-        let erdasParam: string  = "";
+        let erdasParam: string = "";
         if (UtilitiesService.resourceIsERDAS_Essentials_2015(wmsOnlineResource)) {
           //erdasParam = "&erdas=Essentials_2015&usegetafterproxy=true";
           erdasParam = "&escdelim=%26&usegetafterproxy=true";

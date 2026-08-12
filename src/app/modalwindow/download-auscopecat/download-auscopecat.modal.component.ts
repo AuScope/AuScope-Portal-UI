@@ -7,6 +7,7 @@ import { Feature } from '@turf/helpers';
 import intersect from '@turf/intersect';
 import { Polygon } from 'geojson';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop';
 
 type LatLon = [number, number];
 
@@ -17,7 +18,7 @@ type LatLon = [number, number];
     selector: 'app-download-auscopecat-modal',
     templateUrl: './download-auscopecat.modal.component.html',
     styleUrls: ['./download-auscopecat.modal.component.scss'],
-    imports: [ MatDialogModule],
+    imports: [ MatDialogModule, CdkDrag, CdkDragHandle],
     standalone: true
 })
 export class DownloadAuScopeCatModalComponent implements OnInit {

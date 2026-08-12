@@ -110,7 +110,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
 
   ngOnChanges(changes: SimpleChanges): void {
     // Will fire when a layer is added and remove all existing panel filters
-    if (changes.layer && changes.layer.currentValue) {
+    if (changes.layer && changes.layer.currentValue && !changes.layer.firstChange) { // take into account the first time
         setTimeout(() => {
             const hasPreselectedOptionalFilters = !!this.layer?.filterCollection?.optionalFilters?.some(f => f.added === true);
             if (!hasPreselectedOptionalFilters) {

@@ -55,6 +55,10 @@
 
     .search-dropdown {
         flex: 1;
+
+        .search-input-wrapper {
+          position: relative;
+        }
     }
 
     .suggestion-button {
@@ -242,7 +246,6 @@
                         height: 90%;
                         width: 8.5rem;  // consistency so Add/Remove don't push the CSW/Featured labels out and break alignment
                         text-align: center;
-                        float: right;
                         padding: 2px;
                         margin-left: 8px;
                         min-height: 8px;
@@ -253,7 +256,10 @@
                         width: 3rem; // consistency so Add/Remove don't push the CSW/Featured labels out and break alignment
                         min-width: 3rem;
                         text-align: center;
-                        float: right;
+
+                        vertical-align: center;
+                        display: inline;
+
                         padding: 2px;
                         margin-left: 8px;
                         min-height: 8px;
@@ -297,7 +303,7 @@
 
                 .clear-search-results-button {
                     margin: 0px 0px 0px 20px;
-                    padding: 0px 2px 0px 0px;
+                    padding: 0px 5px 0px 0px;
                     border-radius: 2px;
                 }
 
@@ -315,6 +321,10 @@
                       .download-layers-list {
                           max-height: calc(100vh - 560px);
                           overflow-y: auto;
+
+                          .search-download-icon {
+                            translate: -1px 0;
+                          }
                       }
                   }
                 }
@@ -346,14 +356,16 @@ input:disabled {
     opacity: 0.65;
 }
 
-
 .advanced-options-panel {
     padding-left: 5px;
     padding-right: 5px;
     min-width: max-content;
 }
 
-
+.spatial-bounds-label {
+    margin-left: 0.2rem;
+    vertical-align: middle;
+}
 
 :host ::ng-deep .mat-mdc-text-field-wrapper {
   background-color: white;

@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, inject } from '@angular/core';
+import { Component, Output, EventEmitter, inject, OnInit } from '@angular/core';
 import { LayerHandlerService } from '../../lib/portal-core-ui/service/cswrecords/layer-handler.service';
 import { ResourceType } from '../../lib/portal-core-ui/utility/constants.service';
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
@@ -7,7 +7,7 @@ import { KMLDocService } from '../../lib/portal-core-ui/service/kml/kml.service'
 import { Constants } from '../../lib/portal-core-ui/utility/constants.service';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
-import * as JSZip from 'jszip';
+import JSZip from 'jszip';
 import { HttpClient } from '@angular/common/http';
 import { throwError as observableThrowError, Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
@@ -15,27 +15,28 @@ import { HttpResponse } from '@angular/common/http';
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
 import { MatDialog } from '@angular/material/dialog';
+import shp from 'shpjs';
 
 
 @Component({
-    selector: '[app-custom-panel]',
-    templateUrl: './custompanel.component.html',
-    styleUrls: ['../menupanel.scss', './custompanel.component.scss'],
-    standalone: false
+  selector: '[app-custom-panel]',
+  templateUrl: './custompanel.component.html',
+  styleUrls: ['../menupanel.scss', './custompanel.component.scss'],
+  standalone: false
 })
-export class CustomPanelComponent {
+export class CustomPanelComponent implements OnInit {
   private env = inject<any>('env' as any);
 
   private http = inject(HttpClient);
   private layerHandlerService = inject(LayerHandlerService);
   private layerManagerService = inject(LayerManagerService);
   private renderStatusService = inject(RenderStatusService);
-  private uiLayerModelService = inject(UILayerModelService);
+  public uiLayerModelService = inject(UILayerModelService);
   private kmlService = inject(KMLDocService);
   private dialog = inject(MatDialog);
 
   // URL that the user types in
-  searchUrl: string;
+  searchUrl!: string;
 
   // UI loading spinner
   loading: boolean;
@@ -50,10 +51,26 @@ export class CustomPanelComponent {
   fileLayers: LayerModel[] = [];
 
   @Output() expanded: EventEmitter<any> = new EventEmitter();
+  isLayerLoaded: boolean = false;
 
   constructor() {
     this.loading = false;
     this.statusMsg = 'Enter your OGC WMS service endpoint</br>e.g. "https://server.gov.au/service/wms"</br>or KML/KMZ/GeoJSON URL and hit <i class="fa fa-search"></i>.';
+  }
+
+
+  ngOnInit() {
+    this.layerManagerService.getLayerLoaded().subscribe((result) => {
+      this.isLayerLoaded = result;
+
+      if (this.isLayerLoaded) {
+        this.loading = false;
+      } else {
+        this.loading = result;
+      }
+      // Calling this to update the UI
+      //this.onDataChange();
+    });
   }
 
   /**
@@ -68,7 +85,7 @@ export class CustomPanelComponent {
   /**
    * From a given URL get the remote blob - KML, KMZ or GeoJSON
    */
-  private getRemoteBlob(url: string): Observable<any> {
+  private getRemoteBlob(url: string): Observable < any > {
     return this.http.get(url, { responseType: 'blob' }).pipe(map((docBlob) => {
       return docBlob;
     }), catchError(
@@ -87,15 +104,14 @@ export class CustomPanelComponent {
     let url: URL;
     try {
       url = new URL(searchUrl);
-    } catch (err) {
+    } catch(err: any) {
       this.statusMsg = '<div class="text-danger">URL could not be parsed:' + (err?.message || err) + '</div>';
       return;
     }
     // Extract a layer name from URL
-    const layerName = url.pathname.split('/').pop();
+    const layerName = url.pathname.split('/').pop() ?? 'kml-file';
     // Use the proxy
     const proxyUrl = this.env.portalBaseUrl + Constants.PROXY_API + "?usewhitelist=false&url=" + searchUrl;
-
     this.getRemoteBlob(proxyUrl).subscribe({
       next: (response) => {
         const kml = response;
@@ -104,16 +120,40 @@ export class CustomPanelComponent {
 
         // This fires after the blob has been read/loaded.
         reader.addEventListener('loadend', (e) => {
-          const kmlTxt = e.target.result;
+          const kmlTxt = e?.target?.result as string;
 
           // Remove unwanted characters and inject proxy for embedded URLs
           if (typeof kmlTxt === "string") {
-            const kmlStr = this.kmlService.cleanKML(kmlTxt);
-            const parser = new DOMParser();
-            let kmlDoc = parser.parseFromString(kmlStr, "text/xml");
-            kmlDoc = this.parseExtendedData(kmlDoc);
-
-            this.setupLayer(this, layerName, kmlDoc, proxyUrl, ResourceType.KML, "URL");
+            let kmlStr;
+            let hasError = false;
+            this.kmlService.cleanKML(kmlTxt, this.env.portalBaseUrl).subscribe({
+              next: (value: string) => {
+                // This code may run multiple times, once for each value emitted by the observable
+                kmlStr = value;
+                const parser = new DOMParser();
+                let kmlDoc = parser.parseFromString(kmlStr, "text/xml");
+                const errorNode = kmlDoc.querySelector("parsererror");
+                if (errorNode) {
+                  hasError = true;
+                  console.error("Failed to parse KML:", errorNode.textContent);
+                }
+                if (!hasError) {
+                  kmlDoc = this.parseExtendedData(kmlDoc);
+                  this.setupLayer(this, layerName, kmlDoc, proxyUrl, ResourceType.KML, "URL");
+                }
+              },
+              error: (err: any) => {
+                console.error('[custompanel]onFileSelected(getRemoteBlob)Error:', err);
+                // Warn user that the KML could not be parsed
+                alert('Failed to parse KML');
+              },
+              complete: () => {
+                if (hasError) {
+                  // Warn user that the KML could not be parsed
+                  alert('Failed to parse KML');
+                }
+              }
+            }); // subscribe
           }
           this.loading = false;
         });
@@ -141,12 +181,12 @@ export class CustomPanelComponent {
     let url: URL;
     try {
       url = new URL(searchUrl);
-    } catch (err) {
+    } catch(err: any) {
       this.statusMsg = '<div class="text-danger">URL could not be parsed:' + (err?.message || err) + '</div>';
       return;
     }
     // Extract a layer name from URL
-    const layerName = url.pathname.split('/').pop();
+    const layerName = url.pathname.split('/').pop() ?? 'kmz-file';
     // Use the proxy
     const proxyUrl = this.env.portalBaseUrl + Constants.PROXY_API + "?usewhitelist=false&url=" + searchUrl;
 
@@ -158,17 +198,17 @@ export class CustomPanelComponent {
 
       // This fires after the blob has been read/loaded.
       reader.addEventListener('loadend', (e) => {
-        const kmzTxt = e.target.result;
-        const getExtension = fileName => fileName.split(".").pop().toLowerCase();
+        const kmzTxt = e?.target?.result as string;
+        const getExtension = (fileName: string) => fileName.split(".").pop()?.toLowerCase();
 
         // unzip the kmz and iterate through the files
         const zipKMZ = new JSZip(); // reassemble the kmz (files) in this object
-        const getKmzDom = (kmzDoc) => {
+        const getKmzDom = (kmzDoc: any) => {
           const zip = new JSZip()
           return zip.loadAsync(kmzDoc)
             .then(zip => {
               let kmlDom = null
-              zip.forEach((relPath, file) => {
+              zip.forEach((relPath: string, file: JSZip.JSZipObject) => {
 
                 if (getExtension(relPath) === "kml") {
                   kmlDom = file.async("string").then(x => {
@@ -178,6 +218,11 @@ export class CustomPanelComponent {
 
                     const parser = new DOMParser();
                     let kmlDoc = parser.parseFromString(kmlStr, "text/xml");
+                    const errorNode = kmlDoc.querySelector("parsererror");
+                    if (errorNode) {
+                      console.error("Failed to parse KML in KMZ:", errorNode.textContent);
+                      return Promise.reject(Error("Failed to parse KML in KMZ: " + errorNode.textContent));
+                    }
 
                     // setup metadata in a format that cesium expects
                     kmlDoc = this.parseExtendedData(kmlDoc);
@@ -194,36 +239,36 @@ export class CustomPanelComponent {
                   // add the file (non kml) into the zip
                   file.async("blob").then(x => {
                     zipKMZ.file(relPath, x);
-                  }).catch(err => {
+                  }).catch((err: any) => {
                     console.log("Failed to add KMZ file to ZIP", err);
                   });
                 }
               })
               return kmlDom || Promise.reject(Error("No kmz file found"))
-            }).catch((err) => {
+            }).catch((err: any) => {
               return console.log("ERROR [unzipping kmz]: " + err.msg + JSON.stringify(err));
             })
         };
 
         getKmzDom(kmzTxt).then(() => {
           // add the re-zipped and processed (proxy, metadata) kmz blob
-          zipKMZ.generateAsync({ type: "blob" }).then((kmzBlob) => {
+          zipKMZ.generateAsync({ type: "blob" }).then((kmzBlob: any) => {
             // uncomment the following to save the kmz as a file
             //saveAs(kmzBlob, "zipKMZ.kmz");
             this.setupLayer(this, layerName, kmzBlob, proxyUrl, ResourceType.KMZ, "URL");
             this.loading = false;
-          }).catch(err => {
+          }).catch((err: any) => {
             console.log("Failed to generate KML blob", err);
           })
-        }).catch(err => {
+        }).catch((err: any) => {
           console.log("Failed to retrieve KMZ", err);
         });
-      });
-
-      // Start reading the blob as binary.
-      reader.readAsBinaryString(kmz);
     });
-  }
+
+    // Start reading the blob as binary.
+    reader.readAsBinaryString(kmz);
+  });
+}
 
   /**
    * Load a GeoJSON file
@@ -233,7 +278,7 @@ export class CustomPanelComponent {
     let url: URL;
     try {
       url = new URL(searchUrl);
-    } catch (err) {
+    } catch(err: any) {
       this.statusMsg = '<div class="text-danger">URL could not be parsed:' + (err?.message || err) + '</div>';
       return;
     }
@@ -264,7 +309,7 @@ export class CustomPanelComponent {
             // or pass the object if your layer handler accepts it. Here we pass the string.
             this.setupLayer(this, layerName || 'geojson', jsonTxt, proxyUrl, ResourceType.GEOJSON, "URL");
             this.loading = false;
-          } catch (err) {
+          } catch (err: any) {
             this.statusMsg = '<div class="text-danger">Failed to parse GeoJSON: ' + (err?.message || err) + '</div>';
             this.loading = false;
           }
@@ -272,7 +317,7 @@ export class CustomPanelComponent {
 
         reader.readAsText(blob);
       },
-      error: (err) => {
+      error: (err: any) => {
         this.statusMsg = '<div class="text-danger">Failed to retrieve GeoJSON: ' + (err?.message || err) + '</div>';
         this.loading = false;
       }
@@ -386,7 +431,7 @@ export class CustomPanelComponent {
             extendedData.removeChild(schemaData);
             const simpleData = schemaData.querySelectorAll("SimpleData");
             simpleData.forEach(data => {
-              const att = data.getAttribute('name');
+              const att = data.getAttribute('name') ?? 'name-not-specfied';
               const value = data.textContent;
 
               const newData = kmlDoc.createElement("Data");
@@ -412,7 +457,7 @@ export class CustomPanelComponent {
    */
   public updateKML(kmlTxt: any): string {
     let kmlDom = null;
-    const getDom = xml => (new DOMParser()).parseFromString(xml, "text/xml")
+    const getDom = (xml: string) => (new DOMParser()).parseFromString(xml, "text/xml")
 
     // Remove unwanted characters and inject proxy for embedded URLs
     const kmlStr = this.kmlService.cleanKMZ(kmlTxt);
@@ -438,7 +483,7 @@ export class CustomPanelComponent {
    * @returns true if the layer is found within recordsList, false otherwise
    */
   private recordsListContainsRecord(recordsList: any, name: string, url: string): boolean {
-    if (recordsList.findIndex(x => x.cswRecords[0].name === name && x.cswRecords[0].onlineResources[0].url === url) != -1) {
+    if (recordsList.findIndex((x: LayerModel) => x.cswRecords[0].name === name && x.cswRecords[0].onlineResources[0].url === url) != -1) {
       return true;
     }
     return false;
@@ -450,7 +495,7 @@ export class CustomPanelComponent {
    * @param sourceType URL or File
    */
   public setupLayer(me: this, name: string, sourceData: any, proxyUrl: string, docType: ResourceType, sourceType: string) {
-    let layerRec: LayerModel= null;
+    let layerRec: LayerModel | null = null;
     // Make a layer model object
     if (docType == ResourceType.GEOJSON) {
       layerRec = me.layerHandlerService.makeCustomGEOJSONLayerRecord(name, proxyUrl, sourceData);
@@ -478,9 +523,9 @@ export class CustomPanelComponent {
    *
    * @param event Javascript file selection event object
    */
-  public onFileSelected(event) {
-    const getExtension = fileName => fileName.split(".").pop().toLowerCase()
-    const file: File = event.target.files[0];
+  public onFileSelected(event: Event) {
+    const getExtension = (fileName: string): string | undefined => fileName?.split(".")?.pop()?.toLowerCase()
+    const file: File | undefined = (event?.target as HTMLInputElement)?.files?.[0];
     if (file) {
       if (getExtension(file.name) === "geojson") {
         const reader = new FileReader();
@@ -492,17 +537,49 @@ export class CustomPanelComponent {
         };
         // Initiate reading the GEOJSON file as text, result will be a string
         reader.readAsText(file);
+      } else if (getExtension(file.name) === "shp" || getExtension(file.name) === "zip") {
+        // .shp .cpg .prj .shx .dbf
+
+        let geoJsonData: any = null;
+        this.loading = true;
+        geoJsonData = null;
+        // Convert the file to an ArrayBuffer using native Promise syntax
+        file.arrayBuffer()
+          .then((buffer: ArrayBuffer) => {
+            // Parse the buffer using shpjs Promise
+            return shp(buffer);
+          })
+          .then((result) => {
+            geoJsonData = result;
+
+            if (typeof geoJsonData === 'object') {
+              if (Array.isArray(geoJsonData)) {
+                geoJsonData.forEach((features) => {
+                  this.setupLayer(this, features.fileName, features, "", ResourceType.GEOJSON, "FILE");
+                })
+              } else {
+                this.setupLayer(this, geoJsonData.fileName, { type: 'FeatureCollection', features: geoJsonData.features }, "", ResourceType.GEOJSON, "FILE");
+              }
+            }
+            this.loading = false;
+          })
+          .catch((error: any) => {
+            this.loading = false;
+            console.error('Error converting shapefile:', error);
+            alert('Failed to parse Shapefile. Ensure the ZIP contains valid .shp and .dbf files.');
+          });
+
       } else if (getExtension(file.name) === "kmz") {
         this.loading = true; // start spinner
 
         // unzip the kmz and iterate through the files
         const zipKMZ = new JSZip(); // reassemble the kmz (files) in this object
-        const getKmlDom = (kmzFile) => {
+        const getKmlDom = (kmzFile: File) => {
           const zip = new JSZip()
           return zip.loadAsync(kmzFile)
-            .then(zip => {
+            .then((zip: any) => {
               let kmlDom = null
-              zip.forEach((relPath, file) => {
+              zip.forEach((relPath: string, file: JSZip.JSZipObject) => {
 
                 if (getExtension(relPath) === "kml") {
                   kmlDom = file.async("string").then(kmlTxt => {
@@ -513,14 +590,14 @@ export class CustomPanelComponent {
                   // add the file (non kml) into the zip
                   file.async("blob").then(x => {
                     zipKMZ.file(relPath, x);
-                  }).catch(err => {
+                  }).catch((err: any) => {
                     console.log("Failed to add KMZ file to ZIP", err);
                     this.loading = false;
                   });
                 }
               })
               return kmlDom || Promise.reject(Error("No kmz file found"))
-            }).catch((err) => {
+            }).catch((err: any) => {
               this.loading = false;
               return console.log("ERROR [unzipping kml]: " + err.msg + JSON.stringify(err));
             });
@@ -529,62 +606,93 @@ export class CustomPanelComponent {
         getKmlDom(file).then(() => {
           // uncomment the following lines will write (download) the unzipped kml to the file kmStr2.kml
           //let kmlStr2 = new XMLSerializer().serializeToString(kmlDom)
-          //var blob5 = new Blob([kmlStr2], { type: 'text/xml' })
+          //const blob5 = new Blob([kmlStr2], { type: 'text/xml' })
           //saveAs(blob5, "kmlStr2.kml");
 
           // add the re-zipped and processed (proxy, metadata) kmz blob
-          zipKMZ.generateAsync({ type: "blob" }).then((kmzBlob) => {
+          zipKMZ.generateAsync({ type: "blob" }).then((kmzBlob: any) => {
             //saveAs(kmzBlob, "zipKMZ.kmz");
             this.setupLayer(this, file.name, kmzBlob, "", ResourceType.KMZ, "FILE");
             this.loading = false;
-          }).catch(err => {
+          }).catch((err: any) => {
             console.log("Failed to generate KML blob", err);
             this.loading = false;
           });
-        }).catch(err => {
+        }).catch((err: any) => {
           console.log("Failed to retrieve KMZ", err);
           this.loading = false;
         });
       } else {
         const reader = new FileReader();
+
+        // Initiate reading the KML file as text, result will be a string
+        reader.readAsText(file);
+
         // When file has been read this function is called
         reader.onload = () => {
           if (typeof reader.result === "string") {
             // Remove unwanted characters and inject proxy for embedded URLs
-            const kmlStr = this.kmlService.cleanKML(reader.result);
-            const parser = new DOMParser();
-            let kmlDoc = parser.parseFromString(kmlStr, "text/xml");
-            kmlDoc = this.parseExtendedData(kmlDoc);
-            this.setupLayer(this, file.name, kmlDoc, "", ResourceType.KML, "FILE");
+
+            let kmlTxt = reader.result;
+            let hasError = false;
+
+            this.kmlService.cleanKML(kmlTxt, this.env.portalBaseUrl).subscribe({
+              next: (value: string) => {
+                // This code may run multiple times, once for each value emitted by the observable
+                kmlTxt = value;
+                const parser = new DOMParser();
+                let kmlDoc = parser.parseFromString(kmlTxt, "text/xml");
+                const errorNode = kmlDoc.querySelector("parsererror");
+                if (errorNode) {
+                  hasError = true;
+                  console.error('Failed to parse KML:', errorNode.textContent);
+                  return;
+                }
+                if (!hasError) {
+                  kmlDoc = this.parseExtendedData(kmlDoc);
+                  this.setupLayer(this, file.name, kmlDoc, "", ResourceType.KML, "FILE");
+                  // todo: loadImage
+                }
+              },
+              error: (err: any) => {
+                console.error('[custompanel]onFileSelected()Error:', err);
+                // Warn user that the KML could not be parsed
+                alert('Failed to parse KML');
+              },
+              complete: () => {
+                if (hasError) {
+                  // Warn user that the KML could not be parsed
+                  alert('Failed to parse KML');
+                }
+              }
+            });
           }
         };
-        // Initiate reading the KML file as text, result will be a string
-        reader.readAsText(file);
       }
     }
   }
 
   /**
-   * check the coordinate referen system for the layer, if present it will be in the cswRecords[0]
+   * Check the coordinate reference system for the layer, if present it will be in the cswRecords[0]
    * CRS:1 in Web Map Service (WMS) is a non-geospatial, cartesian coordinate reference system defined
-   * in WMS 1.3.0, used for displaying imagery without real-world geographic coordinates. It works in 
+   * in WMS 1.3.0, used for displaying imagery without real-world geographic coordinates. It works in
    * pixel-space, often with the y-axis pointing down, mapping 1 unit to 1 pixel, and is ideal for plotting
    * non-georeferenced images.
-   * 
+   *
    * if found then the layer is a non-earth image, which is currently not supported
   */
-  private isImage(layer:  LayerModel) : boolean {
-    let imageLayer : boolean = false;
+  public isImage(layer: LayerModel): boolean {
+    let imageLayer: boolean = false;
 
-    if (layer.cswRecords[0].layerSRS.length > 0) {
-        layer.cswRecords[0].layerSRS.forEach((srs) => {
-          if (srs.toLowerCase() === "crs:1") {
-            imageLayer = true;
-          }
-        });
+    if (layer.cswRecords[0]?.layerSRS?.length > 0) {
+      layer.cswRecords[0].layerSRS.forEach((srs) => {
+        if (srs.toLowerCase() === "crs:1") {
+          imageLayer = true;
+        }
+      });
     } else {
-      if (layer.capabilityRecords[0].layerSRS.toLowerCase() === "crs:1") {
-            imageLayer = true;
+      if (layer.capabilityRecords[0]?.layerSRS?.toLowerCase() === "crs:1") {
+        imageLayer = true;
       }
     }
     return imageLayer;
@@ -596,22 +704,26 @@ export class CustomPanelComponent {
    * @param layer the KML LayerModel
    */
   public addLayer(layer: LayerModel) {
-    let imageLayer : boolean = false;
+    let imageLayer: boolean = false;
 
-    if (layer.cswRecords[0] && layer.cswRecords[0].layerSRS && layer.cswRecords[0].layerSRS.length > 0) {
-        layer.cswRecords[0].layerSRS.forEach((srs) => {
-          if (srs.toLowerCase() === "crs:1") {
-            imageLayer = true;
-          }
-        });
+    if (layer.cswRecords[0]?.layerSRS?.length > 0) {
+      layer.cswRecords[0].layerSRS.forEach((srs) => {
+        if (srs.toLowerCase() === "crs:1") {
+          imageLayer = true;
+        }
+      });
     }
     if (!imageLayer) {
-      if (layer.cswRecords[0] && layer.cswRecords[0].layerSRS) {
+      if (layer.cswRecords[0]?.layerSRS) {
         layer.capabilityRecords[0].layerSRS = layer.cswRecords[0].layerSRS;
       }
-      this.layerManagerService.addLayer(layer, [], null, null);
+      this.loading = true;
+      setTimeout(() => {
+        this.layerManagerService.addLayer(layer, [], null, null);
+      }, 0);
+
     }
-  }
+}
 
   /**
    * Remove a KML layer from the map.

@@ -347,11 +347,19 @@ export class LayerHandlerService {
   }
 
  /**
-  * Search and retrieve only wms records
+  * Search and retrieve only WMS records
   * @param layer the layer to query for wms records
   */
   public getWMSResource(layer: LayerModel): OnlineResourceModel[] {
        return this.getOnlineResources(layer, ResourceType.WMS);
+  }
+
+  /**
+  * Search and retrieve only WMTS records
+  * @param layer the layer to query for wmts records
+  */
+  public getWMTSResource(layer: LayerModel): OnlineResourceModel[] {
+       return this.getOnlineResources(layer, ResourceType.WMTS);
   }
 
    /**
@@ -363,7 +371,7 @@ export class LayerHandlerService {
   }
 
   /**
-   * Search and retrieve only wfs records
+   * Search and retrieve only WFS records
    * @param layer the layer to query for wfs records
    */
   public getWFSResource(layer: LayerModel): OnlineResourceModel[] {

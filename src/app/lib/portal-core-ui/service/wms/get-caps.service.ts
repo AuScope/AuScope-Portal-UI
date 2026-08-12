@@ -304,7 +304,7 @@ export class GetCapsService {
    * @param nsResolver namespace resolver function
    * @returns the legend URL for the layer
    */
-  private getLegendUrl(doc: Document, node: Node, nsResolver: (prefix: string) => string): string {
+  private getLegendUrl(doc: Document, node: Node, _nsResolver: (prefix: string) => string): string {
     let legendUrl = "";
 
     const styleNodes = SimpleXMLService.getMatchingChildNodes(node, null, "Style");

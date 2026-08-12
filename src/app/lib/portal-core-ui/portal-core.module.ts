@@ -13,6 +13,7 @@ import { RenderStatusService } from './service/cesium-map/renderstatus/render-st
 import { ManageStateService } from './service/permanentlink/manage-state.service';
 import { DownloadWfsService } from './service/wfs/download/download-wfs.service';
 import { CsWMSService } from './service/wms/cs-wms.service';
+import { CsWMTSService } from './service/wmts/cs-wmts.service';
 import { CsWFSService } from './service/wfs/cs-wfs.service';
 import { CsIrisService } from './service/kml/cs-iris.service';
 import { CsKMLService } from './service/kml/cs-kml.service';
@@ -28,6 +29,7 @@ import { CsCSWService } from './service/wcsw/cs-csw.service';
 import { DownloadWcsService } from './service/wcs/download/download-wcs.service';
 import { CsWWWService } from './service/www/cs-www.service';
 import { QueryWMSService } from './service/wms/query-wms.service';
+import { QueryWMTSService } from './service/wmts/query-wmts.service';
 import { QueryWFSService } from './service/wfs/query-wfs.service';
 import { SldService } from './service/style/wms/sld.service';
 
@@ -44,6 +46,7 @@ import { PolygonsEditorService } from '@auscope/angular-cesium';
         BrowserModule, FormsModule], imports: [BrowserModule,
         FormsModule], providers: [LayerHandlerService,
         CsWMSService,
+        CsWMTSService,
         CsIrisService,
         CsKMLService,
         CsVMFService,
@@ -62,6 +65,7 @@ import { PolygonsEditorService } from '@auscope/angular-cesium';
         ImgLoadingDirective,
         NotificationService,
         QueryWMSService,
+        QueryWMTSService,
         QueryWFSService,
         ManageStateService,
         LayerStatusService,

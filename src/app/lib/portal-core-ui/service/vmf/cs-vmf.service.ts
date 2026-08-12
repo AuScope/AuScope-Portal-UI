@@ -60,7 +60,8 @@ export class CsVMFService {
     //e.g. url="https://native-land.ca/api/index.php";
     return this.http.post(url, body, {
       // this will cause a preflight )OPTIONS/CORS) error - 'application/json'
-      headers: new HttpHeaders().set('Content-Type', 'text/plain')
+      //headers: new HttpHeaders().set('Content-Type', 'text/plain')
+      headers: new HttpHeaders().set('Content-Type', 'application/json')
     }).pipe(map(response => {
       return response;
     }), catchError((error: HttpResponse<any>) => {

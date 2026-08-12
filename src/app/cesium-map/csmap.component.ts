@@ -9,6 +9,7 @@ import { GMLParserService } from '../lib/portal-core-ui/utility/gmlparser.servic
 import { LayerModel } from '../lib/portal-core-ui/model/data/layer.model';
 import { ManageStateService } from '../lib/portal-core-ui/service/permanentlink/manage-state.service';
 import { QueryWMSService } from '../lib/portal-core-ui/service/wms/query-wms.service';
+import { QueryWMTSService } from 'app/lib/portal-core-ui/service/wmts/query-wmts.service';
 import { SimpleXMLService } from '../lib/portal-core-ui/utility/simplexml.service';
 import { UtilitiesService } from '../lib/portal-core-ui/utility/utilities.service';
 import { CsMapObject } from '../lib/portal-core-ui/service/cesium-map/cs-map-object';
@@ -27,15 +28,14 @@ import { Observable, forkJoin, of } from 'rxjs';
 import { catchError, finalize, tap, timeout } from 'rxjs/operators';
 import { ToolbarComponent } from 'app/menupanel/toolbar/toolbar.component';
 import { NVCLBoreholeAnalyticService } from 'app/modalwindow/layeranalytic/nvcl/nvcl.boreholeanalytic.service';
-import { OnlineResourceModel } from 'app/lib/portal-core-ui/model/data/onlineresource.model';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 declare let rudderanalytics: any;
 
 @Component({
-    selector: 'app-cs-map',
-    template: `
+  selector: 'app-cs-map',
+  template: `
     <div #mapElement id="map" class="h-100 w-100" (mouseout)="mouseLongitude=undefined;mouseLatitude=undefined;">
       <ac-map>
         <app-browse-menu></app-browse-menu>
@@ -58,11 +58,11 @@ declare let rudderanalytics: any;
       </ac-map>
     </div>
     `,
-    providers: [ViewerConfiguration, NVCLBoreholeAnalyticService], // Don't forget to Provide it
-    styleUrls: ['./csmap.component.scss']
-    // The "#" (template reference variable) matters to access the map element with the ViewChild decorator!
-    ,
-    standalone: false
+  providers: [ViewerConfiguration, NVCLBoreholeAnalyticService], // Don't forget to Provide it
+  styleUrls: ['./csmap.component.scss']
+  // The "#" (template reference variable) matters to access the map element with the ViewChild decorator!
+  ,
+  standalone: false
 })
 
 export class CsMapComponent implements AfterViewInit {
@@ -70,6 +70,7 @@ export class CsMapComponent implements AfterViewInit {
   private csMapService = inject(CsMapService);
   private dialog = inject(MatDialog);
   private queryWMSService = inject(QueryWMSService);
+  private queryWMTSService = inject(QueryWMTSService);
   private gmlParserService = inject(GMLParserService);
   private manageStateService = inject(ManageStateService);
   private advancedMapComponentService = inject(AdvancedComponentService);
@@ -95,8 +96,8 @@ export class CsMapComponent implements AfterViewInit {
   cesiumLoaded = true;
   viewer: any;
 
-  mouseLatitude: string;
-  mouseLongitude: string;
+  mouseLatitude: string | undefined;
+  mouseLongitude: string | undefined;
 
   sliderMoveActive = false;
 
@@ -200,7 +201,6 @@ export class CsMapComponent implements AfterViewInit {
     return this.viewer;
   }
 
-
   ngAfterViewInit() {
     this.csMapService.init();
     // This code is used to display the map for nvclanid job's urlLink
@@ -234,7 +234,7 @@ export class CsMapComponent implements AfterViewInit {
                       onlineResource: layerStateObj[layerKey].onlineResource,
                       layer: layer
                     }
-                    this.setModal(layerKey, layerStateObj[layerKey].raw, mapLayer, null, layerStateObj[layerKey].gmlid);
+                    this.setModal(layerStateObj[layerKey].raw, mapLayer, null, layerStateObj[layerKey].gmlid);
                   }
                 }, 0);
               })
@@ -342,23 +342,23 @@ export class CsMapComponent implements AfterViewInit {
    * @param mapClickInfo object with map click information
    * @returns html for display in the modal
    */
-  private kmlGroundOverlay(mapClickInfo) : string {
+  private kmlGroundOverlay(mapClickInfo: any) : string {
 
     let html = "";
 
-    const layerList = mapClickInfo.clickedLayerList
-    if (layerList[0].kmlDoc) {
-      const go = layerList[0].kmlDoc.querySelector("GroundOverlay");
+    const layerList = mapClickInfo.clickedLayerList;
+    if (layerList?.[0]?.kmlDoc) {
+      const go = layerList[0].kmlDoc.querySelector?.("GroundOverlay");
       if (go) {
         // make an entity? = [name, description]
         const name = go.querySelector('name').textContent;
         const description = go.querySelector('description').textContent;
 
-        // const handler = new KMLQuerierHandler(entity);
-        html = '<div class="row"><div class="col-md-3">Name</div><div class="col-md-9">' + layerList[0].name + '</div></div><hr>';
-        html += '<div class="row"><div class="col-md-3">' + "name" + '</div><div class="col-md-9">' + name + '</div></div>';
-        html += '<div class="row"><div class="col-md-3">' + "description" + '</div><div class="col-md-9">' + description + '</div></div>';
-        html += '</div></div>';
+          // const handler = new KMLQuerierHandler(entity);
+          html = '<div class="row"><div class="col-md-3">Name</div><div class="col-md-9">' + layerList[0].name + '</div></div><hr>';
+          html += '<div class="row"><div class="col-md-3">' + "name" + '</div><div class="col-md-9">' + name + '</div></div>';
+          html += '<div class="row"><div class="col-md-3">' + "description" + '</div><div class="col-md-9">' + description + '</div></div>';
+          html += '</div></div>';
 
       }
     }
@@ -406,7 +406,7 @@ export class CsMapComponent implements AfterViewInit {
           this.displayModal(mapClickInfo.clickCoord);
           const handler = new KMLQuerierHandler(entity);
           this.setModalHTML(handler.getHTML(), layer.name + ": " + handler.getFeatureName(), entity, this.dialogRef);
-          // KML/KMZ layers
+          // VMF layers
         } else if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.VMF))) {
           this.displayModal(mapClickInfo.clickCoord);
           const handler = new VMFQuerierHandler(entity);
@@ -488,10 +488,12 @@ export class CsMapComponent implements AfterViewInit {
       for (const i of maplayer.clickCSWRecordsIndex) {
         const cswRecord: CSWRecordModel = maplayer.cswRecords[i];
 
-        // Get the WMS OnlineResource, if that fails use the first in the list
-        let onlineResource: OnlineResourceModel = cswRecord.onlineResources?.find(or => or.type === ResourceType.WMS);
+        // Get the WMS/WMTS OnlineResource, if that fails use the first in the list
+        const wmsResource = cswRecord.onlineResources?.find(or => or.type === ResourceType.WMS);
+        const wmtsResource = cswRecord.onlineResources?.find(or => or.type === ResourceType.WMTS);
+        let onlineResource = wmsResource ?? wmtsResource;
         if (!onlineResource && cswRecord.onlineResources?.length > 0) {
-          onlineResource = cswRecord.onlineResources[0];
+            onlineResource = cswRecord.onlineResources[0];
         }
 
         let optProviderFound = false;
@@ -518,10 +520,6 @@ export class CsMapComponent implements AfterViewInit {
 
           // Display WMS layer info
           if (onlineResource) {
-            const params = this.getParams(maplayer.clickPixel[0], maplayer.clickPixel[1]);
-            if (!params) {
-              continue;
-            }
             // Does layer have a 'styles' parameter?
             let styles = '';
             if (maplayer.sldParam?.length > 0) {
@@ -588,31 +586,78 @@ export class CsMapComponent implements AfterViewInit {
             // Patch for South Australian GeoSciML-lite v4.1
             let url = null;
             try {
-                url = new URL(onlineResource.url);
+              url = new URL(onlineResource.url);
             } catch (_error) {
-                // skip
+              // skip
             }
             if (url?.hostname.endsWith('.sa.gov.au') && onlineResource.name === 'gsmlp:BoreholeView') {
-              sldBody = sldBody.replace('xmlns:gsmlp="http://xmlns.geosciml.org/geosciml-portrayal/4.0"','xmlns:gsmlp="http://www.opengis.net/gsml/4.1/geosciml-lite"');
+              sldBody = sldBody.replace('xmlns:gsmlp="http://xmlns.geosciml.org/geosciml-portrayal/4.0"', 'xmlns:gsmlp="http://www.opengis.net/gsml/4.1/geosciml-lite"');
             }
 
             // Build GetFeatureInfo requests
-            getFeatureInfoRequests.push(
-              this.queryWMSService.getFeatureInfo(onlineResource, styles, sldBody, infoFormat, postMethod, maplayer.clickCoord[0],
-                maplayer.clickCoord[1], params.x, params.y, params.width, params.height, params.bbox).pipe(
+            if (onlineResource.type === ResourceType.WMS) {
+              const wmsParams = this.getParams(maplayer.clickPixel[0], maplayer.clickPixel[1]);
+              if (!wmsParams) {
+                continue;
+              }
+              getFeatureInfoRequests.push(
+                this.queryWMSService.getFeatureInfo(
+                  onlineResource,
+                  styles,
+                  sldBody,
+                  infoFormat,
+                  postMethod,
+                  maplayer.clickCoord[0], maplayer.clickCoord[1],
+                  wmsParams.x, wmsParams.y,
+                  wmsParams.width, wmsParams.height,
+                  wmsParams.bbox
+                ).pipe(
                   timeout(15000),
                   tap(result => {
-                    // Update the modal features as each request completes
-                    const feature = { onlineResource: onlineResource, layer: maplayer };
-                    const numberOfLayerFeatures = this.setModal(maplayer.id, result, feature, mapClickInfo.clickCoord);
+                    const feature = {
+                      onlineResource,
+                      layer: maplayer
+                    };
+                    const numberOfLayerFeatures =
+                      this.setModal(result, feature, mapClickInfo.clickCoord);
                     if (numberOfLayerFeatures > 0) {
                       _numberOfFeatures += numberOfLayerFeatures;
                     }
-                  }), catchError(() => {
-                    return of(null);
-                  })
+                  }),
+                  catchError(() => of(null))
                 )
-            );
+              );
+            } else if (onlineResource.type === ResourceType.WMTS) {
+              const wmtsParams =
+                this.queryWMTSService.getWMTSFeatureInfoParams(this.viewer, maplayer.clickPixel[0], maplayer.clickPixel[1], onlineResource);
+              if (!wmtsParams) {
+                continue;
+              }
+              getFeatureInfoRequests.push(
+                this.queryWMTSService.getFeatureInfo(
+                  onlineResource,
+                  wmtsParams.tileMatrix,
+                  wmtsParams.tileRow, wmtsParams.tileCol,
+                  wmtsParams.i, wmtsParams.j,
+                  wmtsParams.format,
+                  wmtsParams.level,
+                ).pipe(
+                  timeout(15000),
+                  tap(result => {
+                    const feature = {
+                      onlineResource,
+                      layer: maplayer
+                    };
+                    const numberOfLayerFeatures =
+                      this.setModal(result, feature, mapClickInfo.clickCoord);
+                    if (numberOfLayerFeatures > 0) {
+                      _numberOfFeatures += numberOfLayerFeatures;
+                    }
+                  }),
+                  catchError(() => of(null))
+                )
+              );
+            }
           }
         }
       }
@@ -651,14 +696,13 @@ export class CsMapComponent implements AfterViewInit {
       html += '<p><a style="color: #000000" target="_blank" href="' + onlineResource.url + '">' + (onlineResource.name ? onlineResource.name : 'Web resource link') + '</a></p>';
     }
     if (cswRecord.datasetURIs?.length > 0) {
-        for (const datasetUri of cswRecord.datasetURIs) {
-            html += '<p><a style="color: #000000" target="_blank" href="' + datasetUri + '">Dataset URI</a></p>';
-        }
+      for (const datasetUri of cswRecord.datasetURIs) {
+        html += '<p><a style="color: #000000" target="_blank" href="' + datasetUri + '">Dataset URI</a></p>';
+      }
     }
     html += '</div></div>';
     return html;
   }
-
 
   /**
    * Display the querier modal on map click
@@ -667,16 +711,16 @@ export class CsMapComponent implements AfterViewInit {
   private displayModal(_clickCoord: { x: number, y: number, z: number }) {
     if (!this.modalDisplayed) {
       this.dialogRef = this.dialog.open(QuerierModalComponent, {
-        width : '800px',
-        maxWidth : '800px',
+        width: '800px',
+        maxWidth: '800px',
         //panelClass: 'querier-dialog-panel',
         data: {
-            downloading: true,
-            docs: [],
-            htmls: [],
-            uniqueLayerNames: [],
-            currentDoc: null,
-            currentHTML: '',
+          downloading: true,
+          docs: [],
+          htmls: [],
+          uniqueLayerNames: [],
+          currentDoc: null,
+          currentHTML: '',
         }
       });
       this.modalDisplayed = true;
@@ -689,16 +733,6 @@ export class CsMapComponent implements AfterViewInit {
         })
       }
       */
-    }
-  }
-
-
-  /**
-   * Hide the querier modal
-   */
-  private hideModal() {
-    if (this.dialogRef) {
-      this.dialogRef.close();
     }
   }
 
@@ -738,10 +772,10 @@ export class CsMapComponent implements AfterViewInit {
             // Create a JSON-based feature
             treeCollections.push({
               // Loop3D layers uniquely identified by id field not present in GSKY
-              key: jsonFeature.id ? jsonFeature.id : feature.layer.name,
+              key: String(jsonFeature.id ? jsonFeature.id : feature.layer.name), // Force String, WMTS was returning numeric IDs
               layer: feature.layer,
               onlineResource: feature.onlineResource,
-              value: jsonFeature,
+              value: jsonFeature.properties ?? jsonFeature,
               format: 'JSON'
             });
           }
@@ -751,26 +785,133 @@ export class CsMapComponent implements AfterViewInit {
       console.error("Could not parse JSON", err);
       return [];
     }
+
     return treeCollections;
   }
 
 
+  private getNodeText(node: any): string {
+    return node?.textContent?.trim?.() || '';
+  }
+
+  private getNodeSrsName(node: any): string {
+    let current = node;
+    while (current?.getAttribute) {
+      const srsName = current.getAttribute('srsName');
+      if (srsName) {
+        return srsName;
+      }
+      current = current.parentElement;
+    }
+    return '';
+  }
+
+  private projectFeatureCoordinate(a: number, b: number, srsName: string): { x: number, y: number } | null {
+    const normalizedSrsName = (srsName || '').toLowerCase();
+    const usesLatLonOrder = normalizedSrsName.indexOf('urn:x-ogc:def:crs:epsg') >= 0 ||
+      normalizedSrsName.indexOf('http://www.opengis.net/gml/srs/epsg.xml#') >= 0;
+
+    const lon = usesLatLonOrder ? b : a;
+    const lat = usesLatLonOrder ? a : b;
+
+    if (normalizedSrsName.indexOf('3857') >= 0 ||
+        normalizedSrsName.indexOf('900913') >= 0 ||
+        normalizedSrsName.indexOf('102100') >= 0) {
+      return { x: lon, y: lat };
+    }
+
+    // Most clicked WMS features are returned in geographic coordinates.
+    if (globalThis.Math.abs(lon) <= 180 && globalThis.Math.abs(lat) <= 90) {
+      const projected = new WebMercatorProjection().project(Cartographic.fromDegrees(lon, lat));
+      return { x: projected.x, y: projected.y };
+    }
+
+    return { x: lon, y: lat };
+  }
+
+  /**
+   * Extract a representative feature coordinate in the same projected CRS as clickCoord.
+   * Tries gml:pos (point), gml:posList (line/polygon, first pair),
+   * and gml:coordinates (GML 2.x) in that order.
+   */
+  private extractFeatureCoordinate(valueNode: any): { x: number, y: number } | null {
+    if (!valueNode?.getElementsByTagNameNS) return null;
+
+    const posNodes = valueNode.getElementsByTagNameNS('*', 'pos');
+    for (let i = 0; i < posNodes.length; i++) {
+      const parts = this.getNodeText(posNodes[i]).split(/\s+/);
+      if (parts.length >= 2) {
+        const a = parseFloat(parts[0]);
+        const b = parseFloat(parts[1]);
+        if (!isNaN(a) && !isNaN(b)) {
+          return this.projectFeatureCoordinate(a, b, this.getNodeSrsName(posNodes[i]));
+        }
+      }
+    }
+
+    const posListNodes = valueNode.getElementsByTagNameNS('*', 'posList');
+    if (posListNodes.length > 0) {
+      const parts = this.getNodeText(posListNodes[0]).split(/\s+/);
+      if (parts.length >= 2) {
+        const a = parseFloat(parts[0]);
+        const b = parseFloat(parts[1]);
+        if (!isNaN(a) && !isNaN(b)) {
+          return this.projectFeatureCoordinate(a, b, this.getNodeSrsName(posListNodes[0]));
+        }
+      }
+    }
+
+    const coordNodes = valueNode.getElementsByTagNameNS('*', 'coordinates');
+    if (coordNodes.length > 0) {
+      const firstTuple = this.getNodeText(coordNodes[0]).split(/\s+/)[0];
+      const parts = firstTuple.split(',');
+      if (parts.length >= 2) {
+        const a = parseFloat(parts[0]);
+        const b = parseFloat(parts[1]);
+        if (!isNaN(a) && !isNaN(b)) {
+          return this.projectFeatureCoordinate(a, b, this.getNodeSrsName(coordNodes[0]));
+        }
+      }
+    }
+
+    return null;
+  }
+
   /**
    * Set the modal dialog with the layers that have been clicked on
-   * @param layerId the ID of the layer
    * @param result response string
    * @param feature map feature object
    * @param clickCoord map click coordinates
    * @param gmlid a optional filter to only display the gmlId specified
    */
-  private setModal(layerId: string, result: string, feature: any, clickCoord: { x: number, y: number, z: number }, gmlid?: string) {
+  private setModal(result: string, feature: any, clickCoord: { x: number, y: number, z: number } | null, gmlid?: string) {
     let treeCollections = [];
 
     // Some layers return JSON
-    if (config.wmsGetFeatureJSON.indexOf(layerId) !== -1) {
-      treeCollections = this.parseJSONResponse(result, feature);
-    } else {
+    try {
+      const parsedJson = JSON.parse(result);
+      if (parsedJson && (parsedJson.type === 'FeatureCollection' || parsedJson.type === 'Feature')) {
+        treeCollections = this.parseJSONResponse(result, feature);
+      } else {
+        treeCollections = SimpleXMLService.parseTreeCollection(this.gmlParserService.getRootNode(result), feature);
+      }
+    } catch {
       treeCollections = SimpleXMLService.parseTreeCollection(this.gmlParserService.getRootNode(result), feature);
+    }
+
+    if (clickCoord) {
+      // AUS-4445 Sort features by distance to click point so the closest is always first.
+      // clickCoord is WebMercator, so feature coordinates must be projected before comparison.
+      treeCollections.sort((a, b) => {
+        const coordA = this.extractFeatureCoordinate(a.value);
+        const coordB = this.extractFeatureCoordinate(b.value);
+        if (!coordA && !coordB) return 0;
+        if (!coordA) return 1;
+        if (!coordB) return -1;
+        const distA = (coordA.x - clickCoord.x) * (coordA.x - clickCoord.x) + (coordA.y - clickCoord.y) * (coordA.y - clickCoord.y);
+        const distB = (coordB.x - clickCoord.x) * (coordB.x - clickCoord.x) + (coordB.y - clickCoord.y) * (coordB.y - clickCoord.y);
+        return distA - distB;
+      });
     }
 
     let featureCount = 0;
@@ -785,7 +926,7 @@ export class CsMapComponent implements AfterViewInit {
       }
       treeCollection.raw = result;
       // AUS-4207 Filter out "Serious Error"
-      if (treeCollection.key.indexOf('Server Error') >= 0) {
+      if (String(treeCollection.key).indexOf('Server Error') >= 0) {
         console.log('FeatureInfo:Server Error:' + treeCollection.key);
         continue;
       }
@@ -812,7 +953,6 @@ export class CsMapComponent implements AfterViewInit {
     }
     return featureCount;
   }
-
 
   /**
    * Set the modal dialog with an HTML message
