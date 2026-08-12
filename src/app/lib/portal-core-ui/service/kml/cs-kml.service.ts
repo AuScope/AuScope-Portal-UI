@@ -148,8 +148,8 @@ export class CsKMLService {
           alert("Could not load KML doc:" + error);
         });
       } // if
-    } // for 
-  } 
+    } // for
+  }
 
 
   /**

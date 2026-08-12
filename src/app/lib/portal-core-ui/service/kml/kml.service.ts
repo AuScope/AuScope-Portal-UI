@@ -4,12 +4,12 @@ import { map, catchError } from 'rxjs/operators';
 import { Observable, forkJoin, of, throwError } from 'rxjs';
 import { Constants } from '../../utility/constants.service';
 
-export type StatusUrlResponse = {
+export interface StatusUrlResponse {
   status: boolean;
   url: string;
 };
 
-export type IconPos = {
+export interface IconPos {
   start: number;
   end: number;
 };
