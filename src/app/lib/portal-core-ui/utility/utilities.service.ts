@@ -485,7 +485,7 @@ export class UtilitiesService {
      */
     public static collateParam(layer: LayerModel, onlineResource: OnlineResourceModel, parameter: object) {
 
-      let param = _.cloneDeep(parameter);
+      let param:any = _.cloneDeep(parameter);
       if (!param) {
         param = {};
       }

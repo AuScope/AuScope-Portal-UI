@@ -380,7 +380,7 @@ export class CsWMSService {
       }
 
       // Collate parameters for style request
-      const collatedParam = UtilitiesService.collateParam(layer, wmsOnlineResource, param);
+      const collatedParam:any = UtilitiesService.collateParam(layer, wmsOnlineResource, param);
 
       // Perform request for style data, store subscription so we can cancel if user removes layer
       this.sldSubscriptions[layer.id].push(
@@ -564,13 +564,15 @@ export class CsWMSService {
         // Create a resource which uses our custom proxy; if ERDAS APOLLO WMS (i.e. NT)
         let erdasParam: string = "";
         if (UtilitiesService.resourceIsERDAS_Essentials_2015(wmsOnlineResource)) {
-          erdasParam = "&erdas=Essentials_2015&usegetafterproxy=true";
+          //erdasParam = "&erdas=Essentials_2015&usegetafterproxy=true";
+          erdasParam = "&escdelim=%26&usegetafterproxy=true";
           params.version = "1.1.1";
           params.srs = "EPSG:4326";
           params.usepost = false;
         }
         if (UtilitiesService.resourceIsERDAS_Core_2022(wmsOnlineResource)) {
-          erdasParam = "&erdas=Core_2022&usegetafterproxy=true";
+          //erdasParam = "&erdas=Core_2022&usegetafterproxy=true";
+          erdasParam = "&escdelim=amp&usegetafterproxy=true";
           params.version = "1.1.1";
           params.srs = "EPSG:4326";
           params.usepost = false;
