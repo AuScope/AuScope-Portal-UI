@@ -194,6 +194,24 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
     }
 
     /**
+     * Whether to show Add button for this individual record
+     *
+     * @returns true if showRecordAddButton is true AND the record has at least one
+     *          online resource of type WMS, WMTS or WFS. False otherwise.
+     */
+    public showAddButton(): boolean {
+      if (
+        this.showRecordAddButton &&
+        this.cswRecord.onlineResources?.some(resource =>
+          resource.type === ResourceType.WMS ||
+          resource.type === ResourceType.WMTS ||
+          resource.type === ResourceType.WFS)) {
+        return true;
+      }
+      return false;
+    }
+
+    /**
      * Build an OPTIONAL.PROVIDER filter selecting only the provider for this record
      */
     private buildProviderFilterForRecord(): any {
