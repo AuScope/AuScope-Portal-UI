@@ -322,6 +322,7 @@ export const config = {
     'nsw-titles-ancilliary-mining-areas',
     'nsw-titles-granted',
     'nsw-titles-historic',
+    'ntd_register_nat',
     'geop-tern-radi-pota',
     'geophysics-isostatic-bouger-gravity',
     'geop-isos-grav-over-tmi-rtp-tilt',
