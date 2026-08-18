@@ -325,7 +325,26 @@ export const config = {
     'geop-tern-radi-pota',
     'geophysics-isostatic-bouger-gravity',
     'geop-isos-grav-over-tmi-rtp-tilt',
-    'nsw-geological-provinces'
+    'nsw-geological-provinces',
+    'cate-3-expl-lice-poly-of-tasm-min-reso-tasm',
+    'cate-1-expl-lice-poly-of-tasm-min-reso-tasm',
+    'proc-land-area-of-tasm-min-reso-tasm',
+    'airb-geop-surv-of-tasm-min-reso-tasm',
+    'land-poin-of-tasm-min-reso-tasm',
+    'mine-occu-poin-of-tasm-min-reso-tasm',
+    'land-line-of-tasm-min-reso-tasm',
+    'land-dama-poly-of-tasm-min-reso-tasm',
+    'cate-4-expl-lice-poly-of-tasm-min-reso-tasm',
+    'cate-6-expl-lice-poly-of-tasm-min-reso-tasm',
+    'mini-leas-poly-of-tasm-min-reso-tasm',
+    'cate-2-expl-lice-poly-of-tasm-min-reso-tasm',
+    'grav-meas-of-tasm-min-reso-tasm',
+    'cate-5-expl-lice-poly-of-tasm-min-reso-tasm',
+    'land-dama-poin-of-tasm-min-reso-tasm',
+    'grav-base-stat-of-tasm-min-reso-tasm',
+    'strategic-prospectivity-zones',
+    'land-poly-of-tasm-min-reso-tasm',
+    'bore-trac-of-tasm-min-reso-tasm'
   ],
   // Layers that require a JSON response for WMS GetFeature requests
   wmsGetFeatureJSON: [
