@@ -23,3 +23,58 @@
     }
   }
 }
+
+:host {
+  /* 1. Reset ONLY the inner visual rows as full-width flex containers */
+  .mat-tree-node {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center;
+    box-sizing: border-box;
+    background-color: transparent !important; /* Strip default solid material backgrounds */
+  }
+
+  /* 2. Clear default background layout properties on your inner tables */
+  .custom-table, 
+  .custom-result-row, 
+  .custom-table td {
+    background-color: transparent !important;
+    width: 100%;
+  }
+
+  /* 3. The Structural Nested Fix: Ensure deep children elements indent cleanly */
+  div[role="group"] {
+    padding-left: 20px; /* Restores the alignment spacing offset for sub-layers */
+    background: transparent !important;
+  }
+
+  .scroll-container {
+    /* 1. CRITICAL: Lock the maximum container size to a viewport height fragment */
+    height: 70vh !important;  /* Forces the container to take up exactly 70% of the visible window height */
+    max-height: 100% !important;
+
+    /* 2. Enforce absolute scroll clipping mechanics */
+    overflow-y: auto !important; 
+    overflow-x: hidden !important; 
+
+    /* 3. Keep standard layout boundary controls intact */
+    display: block !important; 
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    padding: 15px;
+    position: relative;
+  }
+
+  /* 4. Ensure Angular Material Tree handles fluid calculations natively within the scroll viewport */
+  mat-tree {
+    display: block !important;       
+    height: max-content !important;  
+    width: 100% !important;
+  }
+}
+
+.clear-search-results-button {
+  margin: 0px 0px 0px 20px;
+  padding: 0px 5px 0px 0px;
+  border-radius: 2px;
+}

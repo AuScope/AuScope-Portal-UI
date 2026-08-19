@@ -382,6 +382,30 @@ export class GetCapsService {
     return false;
   }
 
+  // parse the capabilities document and return a nested layer structure
+  private parseCapabilities(xmlString: string): any | null {
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+
+    // Find the root capability layer safely
+    const topLayer = xmlDoc.querySelector('Capability > Layer');
+    if (!topLayer) return null;
+
+    return this.extractLayer(topLayer);
+  }
+
+  // Recursively extract layer information from a Layer element and its children
+  private extractLayer(layerElement: Element): any {
+    const title = layerElement.querySelector(':scope > Title')?.textContent?.trim() || '';
+    const name = layerElement.querySelector(':scope > Name')?.textContent?.trim() || '';
+
+    // ':scope > Layer' targets only immediate child elements
+    const childElements = Array.from(layerElement.querySelectorAll(':scope > Layer'));
+    const layers = childElements.map(child => this.extractLayer(child));
+
+    return { title, name, layers, group: '' };
+  }
+
   /**
    * Build layer CSW records and capability records from a GetCapabilities response
    *
@@ -401,14 +425,16 @@ export class GetCapsService {
     const rootNode = SimpleXMLService.parseStringToDOM(getCapsResponse);
     const nsResolverFn = (prefix: string) => this.nsResolver(prefix);
     // Root layers are all layers with an attribute "queryable=1"
-    const ROOT_LAYERS = '//xsi:Layer[@queryable=1]';
+    //const ROOT_LAYERS = '//xsi:Layer[@queryable=1]';
+    const ROOT_LAYERS = '//xsi:Layer';
     const rootLayers: Element[] = SimpleXMLService.evaluateXPathNodeArray(rootNode, rootNode, ROOT_LAYERS, nsResolverFn);
+    const nestedLayers = this.parseCapabilities(getCapsResponse); // parse the capabilities document to get a nested layer structure
     const mapFormats = this.getMapFormats(rootNode, rootNode, nsResolverFn);
     const applicationProfile = this.findApplicationProfile(rootNode, nsResolverFn);
     const legendSupport = this.isLegendSupported(rootNode, nsResolverFn);
     const accessConstraints = this.findAccessConstraints(rootNode, nsResolverFn);
 
-    const retVal = { data: { cswRecords: [], capabilityRecords: [], invalidLayerCount: 0 }, msg: '', success: true, serviceUrl: '' };
+    const retVal = { data: { cswRecords: [], capabilityRecords: [], invalidLayerCount: 0 }, msg: '', success: true, serviceUrl: '', nestedLayers: nestedLayers };
 
     if (rootLayers.length == 0) {
       // check for the element "mdb:identificationInfo"
