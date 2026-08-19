@@ -90,15 +90,17 @@ export class LayerHandlerService {
    * @param serviceUrl WMS URL of service
    * @returns a layer with the retrieved cswrecord wrapped in a layer model.
    */
-  public getCustomLayerRecord(serviceUrl: string): Observable<LayerModel[]> {
+  public getCustomLayerRecord(serviceUrl: string): Observable<{LayerModel:LayerModel[],nestedLayers:any}> {
     // Send out a 'GetCapabilities' request
     const retVal = this.getCapsService.getCaps(serviceUrl, 'custom').pipe(
-                        map((response: { data: { cswRecords: any, capabilityRecords: any }}) => {
+                        map((response: { data: { cswRecords: any, capabilityRecords: any }, nestedLayers: any}) => {
       // Create a list of LayerModels using the 'GetCapabilities' response
       if (Object.keys(response).length === 0) {
         return;
       }
-      const itemLayers: LayerModel[] = [];
+      // include list of nested layers
+      const itemLayers: {LayerModel: LayerModel[]; nestedLayers: any;} = {LayerModel: [], nestedLayers: null};
+      itemLayers.nestedLayers = response.nestedLayers;
       const cswRecord = response['data']['cswRecords'];
       if (cswRecord) {
         cswRecord.forEach(function (item, _i, _ar) {
@@ -118,7 +120,7 @@ export class LayerHandlerService {
             // Custom layers to use default proxy and skip whitelist
             itemLayer.useDefaultProxy = true;
             itemLayer.useProxyWhitelist = false;
-            itemLayers.push(itemLayer);
+            itemLayers.LayerModel.push(itemLayer);
         });
       }
       return itemLayers;

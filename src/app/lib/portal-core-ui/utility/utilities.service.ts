@@ -565,6 +565,19 @@ export class UtilitiesService {
     }
 
     /**
+     * Returns true if (if and only if) this is a thredds url
+     * @param onlineResource online resource record for service
+     */
+    public static resourceIsThredds(onlineResource: OnlineResourceModel): boolean {
+
+        let status: boolean = false;
+        if ((onlineResource?.applicationProfile.toString().indexOf('OSGeo:GeoServer') > -1) &&
+            (onlineResource?.url.toString().endsWith('.nc'))) {
+                status = true;
+        }
+        return status;
+    }
+    /**
      * Returns true if (if and only if) this is an ERDAS APOLLO (eg NT WMS) server
      * @param onlineResource online resource record for service
      */

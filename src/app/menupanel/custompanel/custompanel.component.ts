@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, inject, OnInit } from '@angular/core';
+import { Component, Output, EventEmitter, inject, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { LayerHandlerService } from '../../lib/portal-core-ui/service/cswrecords/layer-handler.service';
 import { ResourceType } from '../../lib/portal-core-ui/utility/constants.service';
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
@@ -9,21 +9,34 @@ import { UILayerModel } from '../common/model/ui/uilayer.model';
 import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
 import JSZip from 'jszip';
 import { HttpClient } from '@angular/common/http';
-import { throwError as observableThrowError, Observable } from 'rxjs';
+import { throwError as observableThrowError, Observable, Subscription } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { HttpResponse } from '@angular/common/http';
 import { LayerManagerService } from 'app/services/ui/layer-manager.service';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
 import { MatDialog } from '@angular/material/dialog';
 import shp from 'shpjs';
+import { MatTree, MatTreeNestedDataSource } from '@angular/material/tree';
+import { NestedTreeControl } from '@angular/cdk/tree';
 
+/**
+ * Layer data with nested structure.
+ * Each node has a name and an optional list of children (layers).
+ */
+interface LayerNode {
+  title: string;
+  name?: string;
+  layers?: LayerNode[];
+};
 
 @Component({
   selector: '[app-custom-panel]',
   templateUrl: './custompanel.component.html',
   styleUrls: ['../menupanel.scss', './custompanel.component.scss'],
-  standalone: false
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush // Use OnPush for performance optimization
 })
+
 export class CustomPanelComponent implements OnInit {
   private env = inject<any>('env' as any);
 
@@ -34,6 +47,22 @@ export class CustomPanelComponent implements OnInit {
   public uiLayerModelService = inject(UILayerModelService);
   private kmlService = inject(KMLDocService);
   private dialog = inject(MatDialog);
+
+  // Fast hash map to store loaded layers by their name identifier
+  private layerCacheMap = new Map<string, any>();
+
+  @ViewChild('tree') tree!: MatTree<any>;
+
+  // Provide the children accessor function to the template
+  childrenAccessor = (node: any) => node.nestedLayers || node.layers || [];
+
+  treeControl = new NestedTreeControl<any>(node => node.layers);
+
+  // Determine if a node is ex  pandable (has children)
+  hasChild = (_: number, node: LayerNode) => 'layers' in node && node.layers !== undefined && node.layers.length > 0;
+
+  // Data source for the tree structure, initialized with an empty array
+  dataSource = new MatTreeNestedDataSource<LayerNode>();
 
   // URL that the user types in
   searchUrl!: string;
@@ -51,13 +80,15 @@ export class CustomPanelComponent implements OnInit {
   fileLayers: LayerModel[] = [];
 
   @Output() expanded: EventEmitter<any> = new EventEmitter();
+
   isLayerLoaded: boolean = false;
 
-  constructor() {
+  private statusSub!: Subscription;
+
+  constructor(private cdr: ChangeDetectorRef) {
     this.loading = false;
     this.statusMsg = 'Enter your OGC WMS service endpoint</br>e.g. "https://server.gov.au/service/wms"</br>or KML/KMZ/GeoJSON URL and hit <i class="fa fa-search"></i>.';
   }
-
 
   ngOnInit() {
     this.layerManagerService.getLayerLoaded().subscribe((result) => {
@@ -68,9 +99,53 @@ export class CustomPanelComponent implements OnInit {
       } else {
         this.loading = result;
       }
+      // Explicitly wake up the tree component to turn off the spinners
+      this.cdr.markForCheck();
+
       // Calling this to update the UI
       //this.onDataChange();
     });
+
+    // Listen for any layer removal broadcasts from the service layer
+    this.statusSub = this.layerManagerService.layerStatusChanged$.subscribe((layerName) => {
+      this.syncTreeNodeState(this.dataSource.data, layerName);
+
+      // Force change detection refresh loop execution boundary
+      this.dataSource.data = [...this.dataSource.data];
+      this.cdr.markForCheck();
+    });
+  }
+
+  // Deep scanner helper function to search through lots of layers, eg WMS for NT
+  private syncTreeNodeState(nodes: any[], targetName: string) {
+    if (!nodes || !Array.isArray(nodes)) return;
+
+    for (const node of nodes) {
+      // Checks both name and title variations.
+      if (node.name === targetName || node.title === targetName || node.cachedLayer?.name === targetName) {
+        // Explicitly clear the status marker, bypassing any timing bugs with isLayerAdded
+        node.isAdded = false;
+        return; // Target found, exit out of this stack branch
+      }
+
+      //  Dynamic child tracking to scan both 'layers' and 'nestedLayers' structures safely
+      let children: any[] = [];
+      if (Array.isArray(node.nestedLayers)) {
+        children = node.nestedLayers;
+      } else if (Array.isArray(node.layers)) {
+        children = node.layers;
+      } else if (Array.isArray(node.children)) {
+        children = node.children;
+      }
+
+      if (children.length > 0) {
+        this.syncTreeNodeState(children, targetName);
+      }
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.statusSub) this.statusSub.unsubscribe();
   }
 
   /**
@@ -85,7 +160,7 @@ export class CustomPanelComponent implements OnInit {
   /**
    * From a given URL get the remote blob - KML, KMZ or GeoJSON
    */
-  private getRemoteBlob(url: string): Observable < any > {
+  private getRemoteBlob(url: string): Observable<any> {
     return this.http.get(url, { responseType: 'blob' }).pipe(map((docBlob) => {
       return docBlob;
     }), catchError(
@@ -104,7 +179,7 @@ export class CustomPanelComponent implements OnInit {
     let url: URL;
     try {
       url = new URL(searchUrl);
-    } catch(err: any) {
+    } catch (err: any) {
       this.statusMsg = '<div class="text-danger">URL could not be parsed:' + (err?.message || err) + '</div>';
       return;
     }
@@ -181,7 +256,7 @@ export class CustomPanelComponent implements OnInit {
     let url: URL;
     try {
       url = new URL(searchUrl);
-    } catch(err: any) {
+    } catch (err: any) {
       this.statusMsg = '<div class="text-danger">URL could not be parsed:' + (err?.message || err) + '</div>';
       return;
     }
@@ -263,12 +338,12 @@ export class CustomPanelComponent implements OnInit {
         }).catch((err: any) => {
           console.log("Failed to retrieve KMZ", err);
         });
-    });
+      });
 
-    // Start reading the blob as binary.
-    reader.readAsBinaryString(kmz);
-  });
-}
+      // Start reading the blob as binary.
+      reader.readAsBinaryString(kmz);
+    });
+  }
 
   /**
    * Load a GeoJSON file
@@ -278,7 +353,7 @@ export class CustomPanelComponent implements OnInit {
     let url: URL;
     try {
       url = new URL(searchUrl);
-    } catch(err: any) {
+    } catch (err: any) {
       this.statusMsg = '<div class="text-danger">URL could not be parsed:' + (err?.message || err) + '</div>';
       return;
     }
@@ -339,11 +414,31 @@ export class CustomPanelComponent implements OnInit {
     this.layerHandlerService.getCustomLayerRecord(searchUrl).subscribe(layerRecs => {
       this.loading = false;
       if (layerRecs != null) {
-        if (layerRecs.length === 0) {
+        if (layerRecs.LayerModel.length === 0) {
           this.statusMsg = '<div class="text-danger">No valid layers could be found for this endpoint.</div>';
         } else {
-          // Evaluate the layers and if found set up loadable map layers
-          for (const layerRec of layerRecs) {
+
+          //  Fully wipe the data source reference array first
+          this.dataSource.data = [];
+
+          //  Clear any old expansion track states before parsing the new WMS
+          if (this.tree && typeof this.tree.collapseAll === 'function') {
+            this.tree.collapseAll();
+          }
+
+          // Determine the child array based on available properties
+          const rawArray = Array.isArray(layerRecs.nestedLayers)
+            ? layerRecs.nestedLayers
+            : [layerRecs.nestedLayers];
+
+          const optimizedLayers = this.prepareTreeData(rawArray);
+          // Assign the optimized data to the tree data source
+          this.dataSource.data = optimizedLayers;
+          // Pass the optimized layers to your existing data loaded handler
+          this.onWmsDataLoaded(optimizedLayers);
+          this.cdr.markForCheck();
+
+          for (const layerRec of layerRecs.LayerModel) {
             // Make the layer group listing visible in the UI
             this.urlLayers.unshift(layerRec);
 
@@ -365,6 +460,10 @@ export class CustomPanelComponent implements OnInit {
    * Search list of available WMS layers given an OGC WMS URL, or try to load a KML/KMZ URL
    */
   public search() {
+    if (this.searchUrl.length === 0) {
+      return;
+    }
+
     // Clear the status message
     this.statusMsg = '';
 
@@ -684,6 +783,10 @@ export class CustomPanelComponent implements OnInit {
   public isImage(layer: LayerModel): boolean {
     let imageLayer: boolean = false;
 
+    if (!layer.cswRecords || layer.cswRecords.length === 0) {
+      return false;
+
+    }
     if (layer.cswRecords[0]?.layerSRS?.length > 0) {
       layer.cswRecords[0].layerSRS.forEach((srs) => {
         if (srs.toLowerCase() === "crs:1") {
@@ -723,7 +826,7 @@ export class CustomPanelComponent implements OnInit {
       }, 0);
 
     }
-}
+  }
 
   /**
    * Remove a KML layer from the map.
@@ -751,6 +854,227 @@ export class CustomPanelComponent implements OnInit {
         }
       });
     }
+  }
+
+  // Clear the custom layers from the panel and reset the state
+  clearCustomLayer() {
+    this.searchUrl = '';
+    this.urlLayers = [];
+    this.fileLayers = [];
+    this.dataSource.data = [];
+  }
+
+  // get the layer given the name (from the nested layers)
+  getLayer(layerName: String): LayerModel | null {
+    if (!this.urlLayers || this.urlLayers.length === 0) {
+      return null;
+    }
+
+    let fndLayer: LayerModel | null = null;
+    var i = 0;
+    let layerFnd: boolean = false;
+    while (i < this.urlLayers.length && !layerFnd) {
+      const layer = this.urlLayers[i];
+      if (layer.id === layerName) {
+        layerFnd = true;
+        fndLayer = layer;
+      } else {
+        i++;
+      }
+    }
+    return fndLayer;
+  }
+
+  // Run this function exactly ONCE right after your WMS dataSource data loads
+  public onWmsDataLoaded(rawLayersArray: any) {
+    // Exit silently if the target array data model hasn't been instantiated yet
+    if (!rawLayersArray || (Array.isArray(rawLayersArray) && rawLayersArray.length === 0)) {
+      return;
+    }
+    this.layerCacheMap.clear();
+
+    const cacheLayers = (layers: any) => {
+      // verify 'layers' is a valid iterable array before looping
+      if (!layers || !Array.isArray(layers)) return;
+
+      for (const layer of layers) {
+        if (!layer) continue;
+
+        if (layer.name) {
+          // Cache the layer object for quick retrieval by name
+          const layerObj = this.getLayer(layer.name);
+          if (layerObj) {
+            this.layerCacheMap.set(layer.name, layerObj);
+          }
+        }
+
+        // Recursively crawl down child nodes if they exist
+        if (layer.layers) {
+          cacheLayers(layer.layers);
+        }
+      }
+    };
+
+    // Accept both a top-level array or a single root object wrapped in an array fallback
+    if (Array.isArray(rawLayersArray)) {
+      cacheLayers(rawLayersArray);
+    } else if (rawLayersArray) {
+      // If it's a single root layer object, feed its array directly or wrap it
+      if (rawLayersArray.layers) {
+        cacheLayers(rawLayersArray.layers);
+      } else {
+        cacheLayers([rawLayersArray]);
+      }
+    }
+  }
+
+  // Retrieve a layer from the cache or fetch it live if not cached
+  getCachedLayer(name: string | undefined): any {
+    if (!name) return null;
+
+    // If the cache map has the item, return it instantly
+    if (this.layerCacheMap.has(name)) {
+      return this.layerCacheMap.get(name);
+    }
+
+    // If the master layer data array hasn't arrived yet, exit early!
+    if (!this.urlLayers || this.urlLayers.length === 0) {
+      return null;
+    }
+
+    // If data loaded dynamically and cache is empty,
+    // do a live query and save it to the cache right now so it works instantly!
+    const liveLayer = this.getLayer(name);
+    if (liveLayer) {
+      this.layerCacheMap.set(name, liveLayer);
+    }
+    return liveLayer;
+  }
+
+  // Check if a layer is already added to the map
+  isLayerAdded(name: string): boolean {
+    const layer = this.getCachedLayer(name);
+    return layer ? this.uiLayerModelService.isLayerAdded(layer.id) : false;
+  }
+
+  // is it an image layer? (crs:1) - if so, we don't support it - yet
+  isImageLayer(name: string): boolean {
+    const layer = this.getCachedLayer(name);
+    return layer ? this.isImage(layer) : false;
+  }
+
+  // Checks if a layer possesses any active scale constraint bounds
+  hasScaleConstraints(node: any | undefined): boolean {
+    if (!node?.name) return false;
+
+    const layer = this.getCachedLayer(node.name);
+    // Safely grab the first capability record
+    const capRecord = layer?.capabilityRecords?.[0];
+    if (!capRecord?.layers) return false;
+
+    const innerLayer = capRecord.layers.find(l => l?.title === node.title);
+
+    // Safely check if either denominator exists and is truthy
+    return !!(innerLayer?.minScaleDenominator || innerLayer?.maxScaleDenominator);
+  }
+
+  // wrapper for UI status checks
+  getLayerRenderStatus(nodeName: string | undefined): { started: boolean; complete: boolean; error: boolean } {
+    const fallback = { started: false, complete: false, error: false };
+    const layer = this.getCachedLayer(nodeName);
+    if (!layer || !layer.id) return fallback;
+
+    // Retrieve the UI layer model object using your existing framework mapping service
+    const uiModel = this.getUILayerModel(layer.id);
+    if (!uiModel || !uiModel.statusMap) return fallback;
+
+    return {
+      started: !!uiModel.statusMap.getRenderStarted(),
+      complete: !!uiModel.statusMap.getRenderComplete(),
+      error: !!uiModel.statusMap.getContainsError()
+    };
+  }
+
+  // Replaced inline array literal to stop ICU block parsing failures
+  isStandardLayerGroup(group: string | undefined): boolean {
+    if (!group) return true;
+    return !['kml-layer', 'kmz-layer', 'geojson-layer'].includes(group);
+  }
+
+  // Recursively process the tree data to ensure each node has the necessary properties and structure
+  prepareTreeData(nodes: any[] | undefined): any[] {
+    if (!nodes || !Array.isArray(nodes)) return [];
+
+    return nodes.map(node => {
+      // Fetch your cached layer explicitly
+      const cached = this.getCachedLayer(node.name);
+
+      // Build the optimized node layout object
+      const updatedNode = {
+        ...node,
+        cachedLayer: cached || null, // Ensure it's never undefined
+        hasScaleConstraints: this.hasScaleConstraints(node),
+        isAdded: this.isLayerAdded(node.name),
+        isImage: this.isImageLayer(node.name),
+        isStandardGroup: this.isStandardLayerGroup(node?.group),
+        renderStatus: this.getLayerRenderStatus(node?.name)
+      };
+
+      // Determine the child array based on available properties
+      let childArray: any[] = [];
+      if (Array.isArray(node.nestedLayers)) {
+        childArray = node.nestedLayers;
+      } else if (Array.isArray(node.layers)) {
+        childArray = node.layers;
+      } else if (Array.isArray(node.children)) {
+        childArray = node.children;
+      }
+
+      // Map recursively and clean the structural contract
+      if (childArray.length > 0) {
+        const processedChildren = this.prepareTreeData(childArray);
+        // Assign to BOTH common names to protect your original tree components configuration
+        updatedNode.nestedLayers = processedChildren;
+        updatedNode.layers = processedChildren;
+      } else {
+        updatedNode.nestedLayers = [];
+        updatedNode.layers = [];
+      }
+
+      return updatedNode;
+    });
+  }
+
+  // Add a layer to the map and update the node state
+  handleAddLayer(node: any) {
+    const layer = node.cachedLayer || this.getCachedLayer(node.name);
+    if (layer) {
+      this.addLayer(layer);
+      node.isAdded = true;
+      node.renderStatus = this.getLayerRenderStatus(node.name);
+
+      // ⚡ FIX: Force refresh the tree array reference structure
+      this.dataSource.data = [...this.dataSource.data];
+      this.cdr.markForCheck();
+    }
+  }
+
+  // Remove a layer from the map and update the node state
+  handleRemoveLayer(node: any) {
+    const layer = node.cachedLayer || this.getCachedLayer(node.name);
+    if (layer) {
+      this.removeLayer(layer);
+      node.isAdded = false;
+
+      // ⚡ FIX: Force refresh the tree array reference structure
+      this.dataSource.data = [...this.dataSource.data];
+      this.cdr.markForCheck();
+    }
+  }
+
+  // Add this helper function to your component class
+  trackByNodeName(index: number, node: any): string {
+    return node.name || index.toString();
   }
 
 }
