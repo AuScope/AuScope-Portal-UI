@@ -345,7 +345,13 @@ export const config = {
     'grav-base-stat-of-tasm-min-reso-tasm',
     'strategic-prospectivity-zones',
     'land-poly-of-tasm-min-reso-tasm',
-    'bore-trac-of-tasm-min-reso-tasm'
+    'bore-trac-of-tasm-min-reso-tasm',
+    'mrt-document-index',
+    'Tas-Statewide-Map-Index',
+    'Tas-250000-Geology-Map-Index',
+    'Tas-25000-Geology-Map-Index',
+    'Tas-50000-Geology-Map-Index',
+    'Tas-Published-3D-Model'
   ],
   // Layers that require a JSON response for WMS GetFeature requests
   wmsGetFeatureJSON: [
