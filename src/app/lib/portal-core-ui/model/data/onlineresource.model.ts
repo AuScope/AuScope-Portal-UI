@@ -5,7 +5,7 @@ import { WMTSResourceModel } from "../wmts.model";
  * A representation of a online resource
  */
 export class OnlineResourceModel {
-  applicationProfile: string;
+  applicationProfile: string | {server:string, version:string};
   description: string;
   name: string;
   type: ResourceType;

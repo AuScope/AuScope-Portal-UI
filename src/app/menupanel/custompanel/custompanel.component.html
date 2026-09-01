@@ -34,8 +34,8 @@
 
           <table class="custom-table" style="width: 100%; table-layout: fixed;">
             <tr class="custom-result-row">
-              <td class="text-truncate">
-                {{ node.title }}
+              <td>
+                <span class="text-truncate" title="{{node.title}}">{{ node.title }}</span>
                 <!--  for scale constraint checking -->
                 @if (node.hasScaleConstraints || hasScaleConstraints(node)) {
                 <div class="scale-text">
@@ -139,7 +139,7 @@
     <tr class="custom-result-row">
       <td>
         <div>
-          <div class="text-truncate">{{layer.name}}</div>
+          <div><span class="text-truncate" title="{{layer.name}}"></span></div>
           @if (getUILayerModel(layer.id)?.statusMap.getRenderStarted() &&
           !getUILayerModel(layer.id)?.statusMap.getRenderComplete()) {
           <i class="float-right light-blue fa fa-spin fa-spinner"></i>
