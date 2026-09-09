@@ -9,7 +9,7 @@ import { environment } from 'environments/environment';
 import * as _ from 'lodash';
 import * as $ from 'jquery';
 import { SidebarService } from 'app/portal/sidebar.service';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 declare let rudderanalytics: any;
@@ -42,6 +42,8 @@ export class LayerManagerService {
   setLayerLoaded(state: boolean): void {
     this.isLayerLoaded.next(state);
   }
+
+  layerStatusChanged$ = new Subject<string>(); 
 
   constructor() {
     this.isLayerLoaded = new BehaviorSubject<boolean>(false);
@@ -203,6 +205,11 @@ export class LayerManagerService {
     // Close sidebar if layer was last open
     if (this.csMapService.getLayerModelList().length === 0) {
       this.sidebarService.setOpenState(false);
+    }
+
+    // Broadcast the name of the layer that just got removed
+    if (layer?.name) {
+      this.layerStatusChanged$.next(layer.name);
     }
   }
 

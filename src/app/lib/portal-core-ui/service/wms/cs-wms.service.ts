@@ -343,10 +343,10 @@ export class CsWMSService {
       if (layer?.sldParam) {
         param['styles'] = '';
         for (const tup of layer.sldParam) {
-            if (wmsOnlineResource.url.includes(tup[0])) {
-                param['styles'] = tup[1];
-                break;
-            }
+          if (wmsOnlineResource.url.includes(tup[0])) {
+            param['styles'] = tup[1];
+            break;
+          }
         }
       }
 
@@ -393,7 +393,7 @@ export class CsWMSService {
             : this.getWMS1_1param(layer, wmsOnlineResource, collatedParam, usePost, sldBody);
 
           let lonlatextent;
-          if (wmsOnlineResource.geographicElements.length > 0) {
+          if (wmsOnlineResource.geographicElements.length > 0) { 
             const cswExtent = wmsOnlineResource.geographicElements[0];
 
             const cswExtentPoly = bboxPolygon([cswExtent.westBoundLongitude, cswExtent.southBoundLatitude,
@@ -401,13 +401,15 @@ export class CsWMSService {
             const globalExtentPoly = bboxPolygon([-180, -90, 180, 90]);
             const intersectionPoly = intersect(cswExtentPoly, globalExtentPoly);
             lonlatextent = bbox(intersectionPoly);
+            if (lonlatextent[0] === Infinity) { // this is probably an image and the CRS:1
+              lonlatextent = [-0.1, -0.1, 0.1, 0.1];
+            }
           } else {
             // if extent isnt contained in the csw record then use global extent
             lonlatextent = [-180, -90, 180, 90];
             // the current view extent cannot be used as the bounds for the layer because the user could zoom out
             // after adding the layer to the map.
           }
-
           // Perform add layer request
           layer.csLayers.push(this.addCesiumLayer(layer, wmsOnlineResource, params, usePost, lonlatextent));
           layer.sldBody = sldBody;
@@ -466,13 +468,13 @@ export class CsWMSService {
       // If it is ArcGIS do not use proxy as ArcGIS does not work with POST requests
       if (UtilitiesService.layerIsArcGIS(layer) || UtilitiesService.resourceIsArcGIS(wmsOnlineResource) || (!usePost && !layer.useDefaultProxy)) {
         if ((UtilitiesService.layerIsArcGIS(layer) || UtilitiesService.resourceIsArcGIS(wmsOnlineResource)) &&
-            (params.sld_body)) {
-            // For ArcGIS 'styles' parameter must match name in SLD_BODY
-            params.styles = wmsOnlineResource.name;
-            // Add a 'BGCOLOR' parameter to the request. This avoids ESRI's overpowering
-            // white background and untidy way it spills out over the polygon boundary.
-            // Also the colours should more closely match that of geoserver
-            params.bgcolor = '0x909090';
+          (params.sld_body)) {
+          // For ArcGIS 'styles' parameter must match name in SLD_BODY
+          params.styles = wmsOnlineResource.name;
+          // Add a 'BGCOLOR' parameter to the request. This avoids ESRI's overpowering
+          // white background and untidy way it spills out over the polygon boundary.
+          // Also the colours should more closely match that of geoserver
+          params.bgcolor = '0x909090';
         }
         // NB: ArcGisMapServerImageryProvider does not allow additional parameters for ArcGIS, i.e. no styling
         // So we use a normal GET request & WebMapServiceImageryProvider instead
@@ -557,27 +559,35 @@ export class CsWMSService {
             }).catch(deferred.reject);
         };
         /* End of 'createImage' overwrite */
-
         // Force Resource to use 'POST' and our proxy
         params['usepost'] = true;
 
+        let serverParam: string = "";
+
+        // create thredds resource
+        if (UtilitiesService.resourceIsThredds(wmsOnlineResource)) {
+          serverParam = "&escdelim=amp&usegetafterproxy=true";
+          params.version = "1.3.0";
+          params.srs = "EPSG:4326";
+          params.usepost = false;
+        }
+
         // Create a resource which uses our custom proxy; if ERDAS APOLLO WMS (i.e. NT)
-        let erdasParam: string = "";
         if (UtilitiesService.resourceIsERDAS_Essentials_2015(wmsOnlineResource)) {
           //erdasParam = "&erdas=Essentials_2015&usegetafterproxy=true";
-          erdasParam = "&escdelim=%26&usegetafterproxy=true";
+          serverParam = "&escdelim=%26&usegetafterproxy=true";
           params.version = "1.1.1";
           params.srs = "EPSG:4326";
           params.usepost = false;
         }
         if (UtilitiesService.resourceIsERDAS_Core_2022(wmsOnlineResource)) {
           //erdasParam = "&erdas=Core_2022&usegetafterproxy=true";
-          erdasParam = "&escdelim=amp&usegetafterproxy=true";
+          serverParam = "&escdelim=amp&usegetafterproxy=true";
           params.version = "1.1.1";
           params.srs = "EPSG:4326";
           params.usepost = false;
         }
-        const proxyUrl = me.env.portalBaseUrl + Constants.PROXY_API + '?usewhitelist=' + (layer.useProxyWhitelist ? 'true' : 'false') + erdasParam + '&url=';
+        const proxyUrl = me.env.portalBaseUrl + Constants.PROXY_API + '?usewhitelist=' + (layer.useProxyWhitelist ? 'true' : 'false') + serverParam + '&url=';
         const res = new Resource({ url: url, proxy: new MyDefaultProxy(proxyUrl) });
 
         wmsImagProv = new WebMapServiceImageryProvider({
