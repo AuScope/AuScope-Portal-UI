@@ -19,7 +19,7 @@
     "test:live:e2e:prod": "ts-node --skip-project --compiler-options '{\"module\":\"CommonJS\",\"moduleResolution\":\"node\",\"target\":\"ES2022\",\"lib\":[\"ES2022\",\"DOM\"],\"skipLibCheck\":true}' src/test/live-layer-e2e.ts --env prod"
   },
   "engines": {
-    "node": ">=24.15.0"
+    "node": "^24.15.0"
   },
   "private": true,
   "dependencies": {
@@ -106,6 +106,7 @@
     "@types/shpjs": "^3.4.7",
     "@typescript-eslint/eslint-plugin": "^8.67.0",
     "@typescript-eslint/parser": "^8.67.0",
+    "angular-eslint": "22.1.0",
     "angular-ide": "^0.9.77",
     "esbuild": "^0.27.7",
     "eslint": "^9.39.1",
@@ -125,7 +126,8 @@
     "sass": "~1.56.0",
     "ts-node": "^8.10.2",
     "typedoc": "^0.28.4",
-    "typescript": "~6.0.3"
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.67.0"
   },
   "overrides": {
     "@xmldom/xmldom": "^0.8.12"
