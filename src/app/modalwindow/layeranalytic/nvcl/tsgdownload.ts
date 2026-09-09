@@ -42,7 +42,7 @@ import { HttpEvent, HttpEventType, HttpProgressEvent, HttpResponse } from "@angu
               };
             }
             if (isHttpResponse(event)) {
-              if (saver) {
+              if (saver && event.body) {
                 saver(event.body);
               }
               return {

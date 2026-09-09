@@ -1,5 +1,5 @@
 
-import { throwError as observableThrowError, Observable } from 'rxjs';
+import { throwError, Observable } from 'rxjs';
 
 import { catchError, map } from 'rxjs/operators';
 
@@ -11,6 +11,12 @@ import { MapsManagerService } from '@auscope/angular-cesium';
 import { ResourceType } from '../../utility/constants.service';
 import { RenderStatusService } from '../cesium-map/renderstatus/render-status.service';
 import { Cartesian2, Color, DistanceDisplayCondition, HeightReference, HorizontalOrigin, KmlDataSource, LabelGraphics, LabelStyle, NearFarScalar, PointGraphics } from 'cesium';
+
+interface StationResult {
+  stationLst: any[];
+  minDate: string | number | Date | null;
+  maxDate: string | number | Date | null;
+}
 
 /**
  * Use Cesium to add layer to map. This service class adds IRIS layer to the map
@@ -62,41 +68,47 @@ export class CsIrisService {
    */
   public getIrisStationFeature(layer: LayerModel): Observable<any> {
     try {
-      const retVal = { data: [], msg: "", success: true };
+      const retVal: {
+        data: StationResult[];
+        msg: string;
+        success: boolean;
+      } = { data: [], msg: "", success: true };
       return this.getKMLFeature(layer).pipe(map(
         (response) => {
           const parser = new DOMParser();
-          const stationLst = []; // List of stations in a network
-          let minStartDate: string | number | Date = null; // Earliest start date for all stations in a network
-          let maxEndDate: string | number | Date = null; // Latest end date for all stations in a network
+          const stationLst: any[] = []; // List of stations in a network
+          let minStartDate: string | number | Date | null = null; // Earliest start date for all stations in a network
+          let maxEndDate: string | number | Date | null = null; // Latest end date for all stations in a network
           const dom = parser.parseFromString(response, "application/xml");
           const placemarks = dom.querySelectorAll("Placemark");
           // for each station
           placemarks.forEach(placemark => {
             let channelLst = []; // List of channels for a station
-            const extendedData = placemark.querySelector("ExtendedData").querySelectorAll("Data");
-            let stationCode: string;
-            let startDate: string | number | Date; // Start date for a station's data
-            let endDate: string | number | Date; // End date for a station's data
-            extendedData.forEach(data => {
+            const extendedData = placemark.querySelector("ExtendedData")?.querySelectorAll("Data");
+            let stationCode: string | undefined;
+            let startDate: string | number | Date | undefined; // Start date for a station's data
+            let endDate: string | number | Date | undefined; // End date for a station's data
+            extendedData?.forEach(data => {
               const att = data.getAttribute('name');
+              const value = data.querySelector('value')?.textContent ?? undefined;
+
               if (att == 'Code') {
-                stationCode = data.querySelector("value").textContent;
+                stationCode = value ?? undefined;
               }
               if (att == 'StartDate') {
-                startDate = data.querySelector("value").textContent;
+                startDate = value ?? undefined;
               }
               if (att == 'EndDate') {
-                endDate = data.querySelector("value").textContent;
+                endDate = value ?? undefined;
               }
             })
             channelLst = this.parseChannelInfo(placemark);
 
             // Assemble a list of station information
             const station = {
-              name: placemark.querySelector("name").textContent,
-              description: placemark.querySelector("description").textContent,
-              code: stationCode,
+              name: placemark.querySelector("name")?.textContent ?? null,
+              description: placemark.querySelector("description")?.textContent ?? null,
+              code: stationCode ?? null,
               startDate: startDate ? new Date(startDate).toISOString().slice(0, 10) : null,
               endDate: endDate ? new Date(endDate).toISOString().slice(0, 10) : null,
               channelLst: channelLst
@@ -104,8 +116,8 @@ export class CsIrisService {
             stationLst.push(station);
 
             // Calculate the earliest start date and latest end data for all stations in a network
-            minStartDate = !minStartDate || minStartDate > startDate ? station.startDate : minStartDate;
-            maxEndDate = !maxEndDate || maxEndDate < endDate ? station.endDate : maxEndDate;
+            minStartDate = !minStartDate || (startDate && minStartDate > startDate) ? station.startDate : minStartDate;
+            maxEndDate = !maxEndDate || (endDate && maxEndDate < endDate) ? station.endDate : maxEndDate;
           });
           // Creating a list of station information with min start and max end dates
           retVal.data.push({
@@ -116,8 +128,8 @@ export class CsIrisService {
           return retVal;
         }));
     } catch (e) {
-      console.error("Retrieves stations error:", e);
-      return observableThrowError(e);
+      console.error('Retrieves stations error:', e);
+      return throwError(() => e);
     }
   }
 
@@ -128,7 +140,7 @@ export class CsIrisService {
  * @return List of channels
  */
   private parseChannelInfo(placemark: Element) {
-    const channelLst = [];
+    const channelLst: any[] = [];
     //extract channel information
     const channels = placemark.querySelector("Channels")
     const channelItems=channels?channels.querySelectorAll("Channel"):[];
@@ -136,9 +148,9 @@ export class CsIrisService {
     channelItems.forEach(channel => {
       channelLst.push({
         code: channel.getAttribute('Code'),
-        azimuth: channel.querySelector("Azimuth").textContent,
-        dip: channel.querySelector("Dip").textContent,
-        sampleRate: channel.querySelector("SampleRate").textContent
+        azimuth: channel.querySelector("Azimuth")?.textContent,
+        dip: channel.querySelector("Dip")?.textContent,
+        sampleRate: channel.querySelector("SampleRate")?.textContent
       });
     })
     return channelLst;
@@ -165,25 +177,26 @@ export class CsIrisService {
       // Send request to proxy/conversion service
       return this.http.get(this.env.portalBaseUrl + layer.proxyUrl, {
         params: httpParams
-      }).pipe(map(response => {
+      }).pipe(map((response: any) => {
         if (response['success'] === true) {
           return response['msg'];
         } else {
-          return observableThrowError(response['Error retriving IRIS data']);
+          return throwError(() => response['Error retriving IRIS data']);
         }
       }), catchError(
         (error: HttpResponse<any>) => {
-          return observableThrowError(error);
+          return throwError(() => error);
         }
       ));
     };
+    return throwError(() => new Error('No KML resource found'))
   }
 
   /**
    * Private function to style the KML using Cesium's API
    * @param entity
    */
-  private styleIrisEntity(entity) {
+  private styleIrisEntity(entity: any) {
     if (entity.name) {
       // Style label for each point
       entity.label = new LabelGraphics({
@@ -246,13 +259,13 @@ export class CsIrisService {
         const selectedLayer = this.irisLayers.find(l => l.layerId === layer.id);
         void source.load(dom).then(function (dataSource) {
           for (const entity of dataSource.entities.values) {
-            entity['color'] = selectedLayer ? selectedLayer.color : Color.CRIMSON;
-            entity['maxDist'] = selectedLayer ? selectedLayer.maxDist : 8000000.0;
+            (entity as any).color = selectedLayer ? selectedLayer.color : Color.CRIMSON;
+            (entity as any).maxDist = selectedLayer ? selectedLayer.maxDist : 8000000.0;
             // Style each KML point
             stylefn(entity);
           }
           // Add all the KML points to map
-          viewer.dataSources.add(dataSource).then(dataSrc => {
+          viewer.dataSources.add(dataSource).then((dataSrc: any) => {
             layer.csLayers.push(dataSrc);
           });
         }).then(() => {
@@ -286,7 +299,7 @@ export class CsIrisService {
    * Fetches Cesium 'Viewer'
   */
   private getViewer() {
-    return this.mapsManagerService.getMap().getCesiumViewer();
+    return this.mapsManagerService.getMap()?.getCesiumViewer();
   }
 
 }

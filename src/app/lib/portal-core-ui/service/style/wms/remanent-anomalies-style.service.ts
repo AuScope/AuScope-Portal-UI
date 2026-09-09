@@ -46,7 +46,7 @@ export class RemanentAnomaliesStyleService {
     const filterParts: string[] = [];
 
     // Handle optional filters first
-    if (params.optionalFilters?.length > 0) {
+    if (params?.optionalFilters && params.optionalFilters.length > 0) {
       params.optionalFilters.forEach(filter => {
         if (filter.added) {
           switch (filter.type) {

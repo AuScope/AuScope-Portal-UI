@@ -3,7 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 import { CsMapObject } from './cs-map-object';
 import { GeometryType } from '../../utility/constants.service';
 import { isNumber } from '@turf/helpers';
-import { SimplifyAP } from 'simplify-ts';
+import { ISimplifyArrayPoint, SimplifyAP } from 'simplify-ts';
 import { MapsManagerService } from '@auscope/angular-cesium';
 import { UtilitiesService } from '../../utility/utilities.service';
 
@@ -13,10 +13,9 @@ import { UtilitiesService } from '../../utility/utilities.service';
 @Injectable()
 export class CsClipboardService {
   private csMapObject = inject(CsMapObject);
-  private mapsManagerService = inject(MapsManagerService);
 
-  public polygonBBox: Polygon;
-  public polygonsBS: BehaviorSubject<Polygon>;
+  public polygonBBox: Polygon | null;
+  public polygonsBS: BehaviorSubject<Polygon | null>;
 
   private bShowClipboard: boolean = false;
   public clipboardBS = new BehaviorSubject<boolean>(this.bShowClipboard);
@@ -28,7 +27,7 @@ export class CsClipboardService {
 
   constructor() {
     this.polygonBBox = null;
-    this.polygonsBS = new BehaviorSubject<Polygon>(this.polygonBBox);
+    this.polygonsBS = new BehaviorSubject<Polygon | null>(this.polygonBBox);
     this.polygonsBS.next(this.polygonBBox);
     this.isDrawingPolygonBS = this.csMapObject.isDrawingPolygonBS;
   }
@@ -171,16 +170,16 @@ export class CsClipboardService {
       const reader = new FileReader();
       reader.onload = () => {
           // eslint-disable-next-line @typescript-eslint/no-base-to-string
-          const kml = reader.result.toString();
-          const coordsString = kml.substring(
+          const kml = reader.result?.toString();
+          const coordsString = kml?.substring(
             kml.indexOf("<coordinates>") + "<coordinates>".length,
             kml.lastIndexOf("</coordinates>")
           );
-          const coordsEPSG4326LngLat = coordsString.trim().replace(/\r?\n|\r/g, ' ');
-          const coordsList = coordsEPSG4326LngLat.split(' ');
+          const coordsEPSG4326LngLat = coordsString?.trim().replace(/\r?\n|\r/g, ' ');
+          const coordsList = coordsEPSG4326LngLat?.split(' ') ?? [];
           const coordsListLngLat = [];
           const coordsListLatLng = [];
-          for (let i = 0; i<coordsList.length; i++) {
+          for (let i = 0; i < coordsList.length; i++) {
             const coord = coordsList[i].split(',');
             const lng = Math.round(parseFloat(coord[0]) * 1000) / 1000;
             const lat = Math.round(parseFloat(coord[1]) * 1000) / 1000;
@@ -210,7 +209,7 @@ export class CsClipboardService {
    *
    * @param roi roi polygon object, contains , assumes EPSG:4326
    */
-  public loadPolygonFromROI(roi) {
+  public loadPolygonFromROI(roi: any) {
     let coords = roi.coordinates;
     // If backend returned full GML/XML, extract the inner <gml:coordinates> content
     if (typeof coords === 'string' && coords.indexOf('<gml:coordinates') !== -1) {
@@ -279,7 +278,7 @@ export class CsClipboardService {
     // Simplify process might reduce 90% points.
     const tolerance: number = 0.05;
     const highQuality: boolean = true;
-    const simplifiedCoords4326 = SimplifyAP(coords4326ListLngLat, tolerance, highQuality);
+    const simplifiedCoords4326 = SimplifyAP(coords4326ListLngLat as ISimplifyArrayPoint[], tolerance, highQuality);
 
     coords4326ListLngLat = [];
     coords4326ListLatLng = [];

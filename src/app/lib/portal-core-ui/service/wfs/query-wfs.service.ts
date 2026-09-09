@@ -25,7 +25,7 @@ export class QueryWFSService {
 
       return this.http.get(this.env.portalBaseUrl + 'requestFeature.do', {
         params: httpParams
-      }).pipe(map(response => {
+      }).pipe(map((response: any) => {
         if (response['success']) {
           return response['data']['gml'];
         } else {

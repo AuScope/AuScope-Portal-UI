@@ -238,8 +238,8 @@ export class GMLParserService {
      * @param rootNode - rootNode
      * @return Number - the feature count
      */
-    getFeatureCount(rootNode: any): number {
-        const wfsFeatureCollection = SimpleXMLService.getMatchingChildNodes(rootNode, null, 'FeatureCollection');
+    getFeatureCount(rootNode: any): number | null {
+        const wfsFeatureCollection = SimpleXMLService.getMatchingChildNodes(rootNode, undefined, 'FeatureCollection');
         if (UtilitiesService.isEmpty(wfsFeatureCollection)) {
             return null;
         }
@@ -265,16 +265,16 @@ export class GMLParserService {
         }
      */
     makePrimitives(rootNode: any): any {
-        const primitives = [];
-        const wfsFeatureCollection = SimpleXMLService.getMatchingChildNodes(rootNode, null, 'FeatureCollection');
+        const primitives: any[] = [];
+        const wfsFeatureCollection = SimpleXMLService.getMatchingChildNodes(rootNode, undefined, 'FeatureCollection');
         let features = null;
         // Read through our wfs:FeatureCollection and gml:featureMember(s) elements
         if (UtilitiesService.isEmpty(wfsFeatureCollection)) {
             return primitives;
         }
-        let featureMembers = SimpleXMLService.getMatchingChildNodes(wfsFeatureCollection[0], null, 'featureMembers');
+        let featureMembers = SimpleXMLService.getMatchingChildNodes(wfsFeatureCollection[0], undefined, 'featureMembers');
         if (UtilitiesService.isEmpty(featureMembers)) {
-            featureMembers = SimpleXMLService.getMatchingChildNodes(wfsFeatureCollection[0], null, 'featureMember');
+            featureMembers = SimpleXMLService.getMatchingChildNodes(wfsFeatureCollection[0], undefined, 'featureMember');
             features = featureMembers;
         } else {
             features = featureMembers[0].childNodes;

@@ -8,14 +8,14 @@
       <div class="input-group-append" title="Add KML, KMZ, GeoJSON or OGC WMS service URL layer to map"
         (click)="search()">
         <button class="btn btn-auscope-primary" type="button" [disabled]="!searchUrl || searchUrl.trim() === ''">
-          @if (!loading) {
+          @if (!loading()) {
           <i class="fa fa-search"></i>
           @if (searchUrl) {
           <button title="Clear custom layer" class="btn btn-sm btn-danger clear-search-results-button" type="button"
             (click)="clearCustomLayer()"><i class="fa fa-ban"></i>&nbsp;Clear&nbsp;</button>
           }
           }
-          @if (loading) {
+          @if (loading()) {
           <i class="fa fa-spinner fa-spin fa-fw"></i>
           }
         </button>
@@ -62,7 +62,7 @@
                 !isImageLayer(node.name))) {
                 <button class="btn-sm btn-success custom-btn" (click)="handleAddLayer(node)">
                   Add&nbsp;<i class="fa fa-plus"></i>
-                  @if (loading) { <i class="fa fa-spinner fa-spin fa-fw"></i> }
+                  @if (loading()) { <i class="fa fa-spinner fa-spin fa-fw"></i> }
                 </button>
                 }
 
@@ -124,10 +124,10 @@
         class="btn-primary btn-sm">
         <i class="fa fa-lg fa-file" aria-hidden="true"></i>
         &nbsp;Load KML/KMZ/GeoJSON/SHP(zip)
-        @if (!loading) {
+        @if (!loading()) {
         <i class="fa"></i>
         }
-        @if (loading) {
+        @if (loading()) {
         <i class="fa fa-spinner fa-spin fa-fw"></i>
         }
       </button>
@@ -135,7 +135,7 @@
   </div>
   <!-- Once a file has been uploaded, its layer is shown here -->
   <table class="custom-table">
-    @for (layer of fileLayers; track layer) {
+    @for (layer of fileLayers(); track layer.id) {
     <tr class="custom-result-row">
       <td>
         <div>
@@ -153,7 +153,7 @@
       <td>
         @if (!uiLayerModelService.isLayerAdded(layer.id)) {
         <button class="btn-sm btn-success custom-btn" (click)="addLayer(layer)">Add&nbsp;<i class="fa fa-plus"></i>
-          @if (loading) {
+          @if (loading()) {
           <i class="fa fa-spinner fa-spin fa-fw"></i>
           }</button>
         }
@@ -161,10 +161,13 @@
         <button class="btn-sm btn-danger custom-btn" (click)="removeLayer(layer)">Remove&nbsp;<i
             class="fa fa-trash"></i></button>
         }
+        <!-- XXX -->
+        <!--
         @if (isStandardLayerGroup(node?.group)) {
         <button class="btn-sm btn-info custom-btn" (click)="displayRecordInfo(layer)">Info&nbsp;<i
             class="fa fa-info-circle"></i></button>
         }
+        -->
       </td>
       <!--
       @if (getUILayerModel(layer.id).statusMap.getRenderStarted()) {

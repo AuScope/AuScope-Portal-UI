@@ -33,18 +33,17 @@ export class CsCSWService {
   // so that the querier will be able to know which layer have been rendered as csw
   public static cswDiscoveryRendered = [];
 
-  private map: AcMapComponent = null;
+  private map: AcMapComponent | undefined = undefined;
   private viewer: any = null;
-
 
   /**
    * rmLayer - remove layer from map
    * @param layer layer to be removed
    */
-  public rmLayer(layer) {
+  public rmLayer(layer: any) {
     if (!this.map) {
       this.map = this.mapsManagerService.getMap();
-      this.viewer = this.map.getCesiumViewer();
+      this.viewer = this.map?.getCesiumViewer();
     }
     for (const entity of layer.csLayers) {
       this.viewer.entities.remove(entity);
@@ -58,7 +57,7 @@ export class CsCSWService {
    * @param layer the LayerModel
    * @param opacity value from 0.0 to 1.0
    */
-  public setLayerOpacity(layer, opacity: number) {
+  public setLayerOpacity(layer: any, opacity: number) {
     for (const entity of layer.csLayers) {
       if (entity.rectangle) {
         entity.rectangle.material = new ColorMaterialProperty(Color.fromAlpha(POLYGON_COLOUR, opacity * POLYGON_ALPHA));
@@ -96,7 +95,7 @@ export class CsCSWService {
    * @param name - name to be put on label
    * @param bbox - bounding box object; members: westBoundLongitude, southBoundLatitude, eastBoundLongitude, northBoundLatitude
    */
-  private addPolygon(name, bbox): Entity {
+  private addPolygon(name: any, bbox: any): Entity {
     return this.viewer.entities.add({
       name: name,
       rectangle: {
@@ -124,7 +123,7 @@ export class CsCSWService {
     let layerAdded = false;
     const cswRecords = this.layerHandlerService.getCSWRecord(layer);
     this.map = this.mapsManagerService.getMap();
-    this.viewer = this.map.getCesiumViewer();
+    this.viewer = this.map?.getCesiumViewer();
 
     const onlineResource = new OnlineResourceModel();
     onlineResource.url = 'Rendering from csw records';

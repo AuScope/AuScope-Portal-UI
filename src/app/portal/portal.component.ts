@@ -1,4 +1,4 @@
-import { AuthService } from 'app/services/auth/auth.service';
+import { AuthService } from '../services/auth/auth.service';
 import { Component, OnInit, OnDestroy, AfterViewInit, inject } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { SidebarService } from './sidebar.service';
@@ -15,7 +15,7 @@ import { SidebarService } from './sidebar.service';
 export class PortalComponent implements OnInit, OnDestroy, AfterViewInit {
   private authService = inject(AuthService);
   private sidebarService = inject(SidebarService);
-  private sidebarSubscription: Subscription;
+  private sidebarSubscription!: Subscription;
   featuredLayersCheckbox: boolean = true;
   isSidebarOpen = false;
 
