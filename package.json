@@ -19,7 +19,7 @@
     "test:live:e2e:prod": "ts-node --skip-project --compiler-options '{\"module\":\"CommonJS\",\"moduleResolution\":\"node\",\"target\":\"ES2022\",\"lib\":[\"ES2022\",\"DOM\"],\"skipLibCheck\":true}' src/test/live-layer-e2e.ts --env prod"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=24.15.0"
   },
   "private": true,
   "dependencies": {
