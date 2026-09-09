@@ -5,13 +5,18 @@ import { WMTSResourceModel } from "../wmts.model";
  * A representation of a online resource
  */
 export class OnlineResourceModel {
-  applicationProfile: string;
-  description: string;
-  name: string;
-  type: ResourceType;
-  url: string;
-  version: string;
+  applicationProfile!: string | ApplicationProfileInfo;
+  description!: string;
+  name!: string;
+  type!: ResourceType;
+  url!: string;
+  version!: string;
   geographicElements: any;
-  protocolRequest: string;
+  protocolRequest!: string;
   wmts?: WMTSResourceModel; // Optional WMTS information
+}
+
+export class ApplicationProfileInfo {
+  server!: string;
+  version!: string;
 }

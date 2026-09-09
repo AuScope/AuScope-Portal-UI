@@ -13,9 +13,7 @@ import { OnlineResourceModel } from '../../model/data/onlineresource.model';
 import { LayerHandlerService } from '../cswrecords/layer-handler.service';
 import { RenderStatusService } from '../cesium-map/renderstatus/render-status.service';
 import { LayerStatusService } from '../../utility/layerstatus.service';
-import bbox from '@turf/bbox';
-import bboxPolygon from '@turf/bbox-polygon';
-import intersect from '@turf/intersect';
+import * as turf from '@turf/turf';
 
 @Injectable()
 export class CsWMTSService {
@@ -25,7 +23,7 @@ export class CsWMTSService {
   private renderStatusService = inject(RenderStatusService);
   private layerStatusService = inject(LayerStatusService);
 
-  private map: AcMapComponent;
+  private map: AcMapComponent | undefined;
   private imageryLayerOnlineResources = new Map<ImageryLayer, OnlineResourceModel>();
 
   constructor() {
@@ -36,7 +34,7 @@ export class CsWMTSService {
    * Remove WMTS layer
    */
   public rmLayer(layer: LayerModel): void {
-    const viewer = this.map.getCesiumViewer();
+    const viewer = this.map?.getCesiumViewer();
 
     if (layer.csLayers) {
       for (const imageryLayer of layer.csLayers) {
@@ -71,17 +69,21 @@ export class CsWMTSService {
 
         const cswExtent = resource.geographicElements[0];
 
-        const cswExtentPoly = bboxPolygon([
+        const cswExtentPoly = turf.bboxPolygon([
           cswExtent.westBoundLongitude,
           cswExtent.southBoundLatitude,
           cswExtent.eastBoundLongitude,
           cswExtent.northBoundLatitude
         ]);
 
-        const globalExtentPoly = bboxPolygon([-180, -90, 180, 90]);
-        const intersectionPoly = intersect(cswExtentPoly, globalExtentPoly);
+        const globalExtentPoly = turf.bboxPolygon([-180, -90, 180, 90]);
+        const intersectionPoly = turf.intersect(turf.featureCollection([cswExtentPoly, globalExtentPoly]));
 
-        lonlatextent = bbox(intersectionPoly);
+        if (intersectionPoly) {
+          lonlatextent = turf.bbox(intersectionPoly);
+        } else {
+          lonlatextent = [-180, -90, 180, 90];
+        }
 
       } else {
         lonlatextent = [-180, -90, 180, 90];
@@ -107,8 +109,8 @@ export class CsWMTSService {
   /**
    * Add WMTS layer to map
    */
-  private addCesiumLayer(layer: LayerModel, onlineResource: OnlineResourceModel, lonlatextent): ImageryLayer {
-    const viewer = this.map.getCesiumViewer();
+  private addCesiumLayer(layer: LayerModel, onlineResource: OnlineResourceModel, lonlatextent: any): ImageryLayer {
+    const viewer = this.map?.getCesiumViewer();
     const cleanUrl = onlineResource.url.split('?')[0];
     const provider = new WebMapTileServiceImageryProvider({
       url: cleanUrl,
@@ -137,7 +139,7 @@ export class CsWMTSService {
    * Works only when WMTS TileMatrix identifiers map directly to Cesium zoom levels.
    */
   private addCesiumTemplateLayer(layer: LayerModel, onlineResource: OnlineResourceModel, lonlatextent: number[]): ImageryLayer {
-    const viewer = this.map.getCesiumViewer();
+    const viewer = this.map?.getCesiumViewer();
 
     console.log(
       'WMTS labels',
@@ -198,7 +200,7 @@ export class CsWMTSService {
     }
   }
 
-  public getOnlineResourceForImageryLayer(imageryLayer: ImageryLayer): OnlineResourceModel {
+  public getOnlineResourceForImageryLayer(imageryLayer: ImageryLayer): OnlineResourceModel | undefined {
     return this.imageryLayerOnlineResources.get(imageryLayer);
   }
 }

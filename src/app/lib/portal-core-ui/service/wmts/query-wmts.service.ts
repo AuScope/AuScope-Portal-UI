@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { OnlineResourceModel } from "../../model/data/onlineresource.model";
-import { Observable } from "rxjs";
+import { Observable, throwError } from "rxjs";
 import { Cartesian2, Cartesian3, GeographicProjection, Math, Rectangle, UrlTemplateImageryProvider, WebMapTileServiceImageryProvider, WebMercatorProjection } from "cesium";
 import { WMTSFeatureInfoParams } from "../../model/wmts.model";
 import { CsWMTSService } from "./cs-wmts.service";
@@ -30,11 +30,17 @@ export class QueryWMTSService {
     level: number,
     infoFormat = 'application/json'
   ): Observable<string> {
+    if (!onlineResource) {
+      return throwError(() => new Error('Online resource is undefined'));
+    }
+    if (!onlineResource.wmts) {
+      return throwError(() => new Error('WMTS infromaiton is missing'));
+    }
     const formdata = new HttpParams()
       .set('serviceUrl', onlineResource.url)
       .set('layer', onlineResource.name)
       .set('style', onlineResource.wmts.wmtsStyle)
-      .set('tileMatrixSet', onlineResource.wmts?.wmtsTileMatrixSet)
+      .set('tileMatrixSet', onlineResource.wmts.wmtsTileMatrixSet)
       .set('tileMatrix', tileMatrix)
       .set('tileRow', tileRow.toString())
       .set('tileCol', tileCol.toString())

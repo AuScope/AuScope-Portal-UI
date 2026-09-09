@@ -13,6 +13,6 @@ export class LayerAnalyticModalComponent {
   dialogRef = inject(MatDialogRef<LayerAnalyticModalComponent>);
   data = inject(MAT_DIALOG_DATA);
 
-  public analyticMap;
+  public analyticMap: any;
 
 }

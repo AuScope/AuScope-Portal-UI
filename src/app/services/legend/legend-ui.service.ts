@@ -8,10 +8,10 @@ import { ManageStateService } from '../../lib/portal-core-ui/service/permanentli
 import { OnlineResourceModel } from '../../lib/portal-core-ui/model/data/onlineresource.model';
 import { SldService } from '../../lib/portal-core-ui/service/style/wms/sld.service';
 import { UtilitiesService } from '../../lib/portal-core-ui/utility/utilities.service';
-import { LegendModalComponent } from 'app/modalwindow/legend/legend.modal.component';
+import { LegendModalComponent } from '../../modalwindow/legend/legend.modal.component';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { environment } from 'environments/environment';
+import { environment } from '../../../environments/environment';
 
 
 @Injectable()
@@ -33,8 +33,8 @@ export class LegendUiService {
    * @param layer the Layermodel for the layer
    * @returns the first WMS OnlineResourceModel for the layer, or undefined if one doesn't exist
    */
-  private getWMSOnlineResource(layer: LayerModel): OnlineResourceModel {
-    let wmsOnlineResource: OnlineResourceModel;
+  private getWMSOnlineResource(layer: LayerModel): OnlineResourceModel | undefined {
+    let wmsOnlineResource: OnlineResourceModel | undefined;
     if (layer.cswRecords) {
       for (const cswRecord of layer.cswRecords) {
         if (cswRecord.onlineResources) {
@@ -246,8 +246,8 @@ export class LegendUiService {
         );
 
         // Create a GET request, using the LegendURL
-        let getRequestLegendUrl: Observable<any>;
-        layer.capabilityRecords[0].layers.forEach(l => {
+        let getRequestLegendUrl: Observable<any> | undefined;
+        layer.capabilityRecords[0].layers.forEach((l: any) => {
           if (l.name.startsWith(layer.id)) {
             const requestLegendUrl = l.legendUrl;
             getRequestLegendUrl = this.http.get(requestLegendUrl, { responseType: 'blob' }).pipe(
@@ -257,8 +257,9 @@ export class LegendUiService {
             );
           }
         });
-
-        this.displayLegendDialog(layer.id, layer.name, [getRequest, postRequest, getRequestLegendUrl]);
+        if (getRequestLegendUrl) {
+          this.displayLegendDialog(layer.id, layer.name, [getRequest, postRequest, getRequestLegendUrl]);
+        }
       }
     });
   }
@@ -269,8 +270,9 @@ export class LegendUiService {
    * @param layerId ID of relevant layer
    */
   public removeLegend(layerId: string): void {
-    if (this.displayedLegends.has(layerId)) {
-      this.displayedLegends.get(layerId).close();
+    const legend = this.displayedLegends.get(layerId);
+    if (legend) {
+      legend.close();
       this.displayedLegends.delete(layerId);
     }
   }

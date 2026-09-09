@@ -1,13 +1,12 @@
 import { Clipboard } from '@angular/cdk/clipboard';
-
-import { Component, inject, OnInit } from '@angular/core';
-import { OnlineResourceModel } from '../../lib/portal-core-ui/model/data/onlineresource.model';
-import bboxPolygon from '@turf/bbox-polygon';
-import { Feature } from '@turf/helpers';
-import intersect from '@turf/intersect';
-import { Polygon } from 'geojson';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop';
+import { Component, inject, OnInit } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+
+import * as turf from '@turf/turf';
+import { Feature, Polygon } from 'geojson';
+
+import { OnlineResourceModel } from '../../lib/portal-core-ui/model/data/onlineresource.model';
 
 type LatLon = [number, number];
 
@@ -24,7 +23,7 @@ type LatLon = [number, number];
 export class DownloadAuScopeCatModalComponent implements OnInit {
 
     data = inject(MAT_DIALOG_DATA); // Input data: { layer: LayerModel, bbox?: BBox, polygon?: string }
-    code: string; // Code block output
+    code!: string; // Code block output
     codeCopied: boolean = false; // Flag for code having been copied
     private clipboard = inject(Clipboard); // clipboard for coying code
     private dialogRef = inject(MatDialogRef<DownloadAuScopeCatModalComponent>); // dialog ref for closing modal
@@ -40,8 +39,8 @@ export class DownloadAuScopeCatModalComponent implements OnInit {
 
         // WFS resources
         const wfsResources = this.data.layer.cswRecords
-            .flatMap(r => r.onlineResources ?? [])
-            .filter(r => r.type.toLowerCase() === 'wfs');
+            .flatMap((r: any) => r.onlineResources ?? [])
+            .filter((r: any) => r.type.toLowerCase() === 'wfs');
 
         if (!wfsResources.length) {
             this.code = '# This layer appears to have no WFS resources for downloading.';
@@ -65,17 +64,19 @@ export class DownloadAuScopeCatModalComponent implements OnInit {
         const intersecting: string[] = [];
         const fallback: string[] = [];
 
-        wfsResources.forEach((res, idx) => {
+        wfsResources.forEach((res: any, idx: any) => {
             const call = this.buildDownloadCall(res, idx + 1);
             const geoEls = res.geographicElements ?? [];
-            const doesIntersect = geoEls.some(el =>
-                el.type === 'bbox' &&
-                intersect(boundsPoly,
-                    bboxPolygon([
-                        el.westBoundLongitude,
-                        el.southBoundLatitude,
-                        el.eastBoundLongitude,
-                        el.northBoundLatitude
+            const doesIntersect = geoEls.some((el: any) =>
+                el.type === 'bbox' && turf.intersect(
+                    turf.featureCollection([
+                        boundsPoly,
+                        turf.bboxPolygon([
+                            el.westBoundLongitude,
+                            el.southBoundLatitude,
+                            el.eastBoundLongitude,
+                            el.northBoundLatitude
+                        ])
                     ])
                 ) !== null);
             (doesIntersect ? intersecting : fallback).push(call);
@@ -139,7 +140,7 @@ export class DownloadAuScopeCatModalComponent implements OnInit {
             ].join('\n');
 
             return {
-                boundsPoly: bboxPolygon([w, s, e, n]),
+                boundsPoly: turf.bboxPolygon([w, s, e, n]),
                 pythonHeader: header
             };
         }
@@ -174,7 +175,7 @@ export class DownloadAuScopeCatModalComponent implements OnInit {
         ].join('\n');
 
         return {
-            boundsPoly: bboxPolygon([defaultBounds.west, defaultBounds.south, defaultBounds.east, defaultBounds.north]),
+            boundsPoly: turf.bboxPolygon([defaultBounds.west, defaultBounds.south, defaultBounds.east, defaultBounds.north]),
             pythonHeader: header
         };
     }

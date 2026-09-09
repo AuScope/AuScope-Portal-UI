@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, inject, OnInit } from '@angular/core';
+import { Component, Output, EventEmitter, inject, OnInit, signal } from '@angular/core';
 import { LayerHandlerService } from '../../lib/portal-core-ui/service/cswrecords/layer-handler.service';
 import { ResourceType } from '../../lib/portal-core-ui/utility/constants.service';
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
@@ -6,13 +6,13 @@ import { RenderStatusService } from '../../lib/portal-core-ui/service/cesium-map
 import { KMLDocService } from '../../lib/portal-core-ui/service/kml/kml.service';
 import { Constants } from '../../lib/portal-core-ui/utility/constants.service';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
-import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
+import { UILayerModelService } from '../../services/ui/uilayer-model.service';
 import JSZip from 'jszip';
 import { HttpClient } from '@angular/common/http';
 import { throwError as observableThrowError, Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { HttpResponse } from '@angular/common/http';
-import { LayerManagerService } from 'app/services/ui/layer-manager.service';
+import { LayerManagerService } from '../../services/ui/layer-manager.service';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
 import { MatDialog } from '@angular/material/dialog';
 import shp from 'shpjs';
@@ -39,7 +39,7 @@ export class CustomPanelComponent implements OnInit {
   searchUrl!: string;
 
   // UI loading spinner
-  loading: boolean;
+  loading = signal<boolean>(false);
 
   // Used to display info and error messages
   statusMsg: string;
@@ -48,13 +48,13 @@ export class CustomPanelComponent implements OnInit {
   urlLayers: LayerModel[] = [];
 
   // Displays custom layers for KML file in sidebar
-  fileLayers: LayerModel[] = [];
+  fileLayers = signal<LayerModel[]>([]);
 
   @Output() expanded: EventEmitter<any> = new EventEmitter();
   isLayerLoaded: boolean = false;
 
   constructor() {
-    this.loading = false;
+    this.loading.set(false);
     this.statusMsg = 'Enter your OGC WMS service endpoint</br>e.g. "https://server.gov.au/service/wms"</br>or KML/KMZ/GeoJSON URL and hit <i class="fa fa-search"></i>.';
   }
 
@@ -64,9 +64,9 @@ export class CustomPanelComponent implements OnInit {
       this.isLayerLoaded = result;
 
       if (this.isLayerLoaded) {
-        this.loading = false;
+        this.loading.set(false);
       } else {
-        this.loading = result;
+        this.loading.set(result);
       }
       // Calling this to update the UI
       //this.onDataChange();
@@ -78,7 +78,7 @@ export class CustomPanelComponent implements OnInit {
    * @param layerId ID of layer
    * @returns UILayerModel for layer
    */
-  public getUILayerModel(layerId: string): UILayerModel {
+  public getUILayerModel(layerId: string): UILayerModel | undefined {
     return this.uiLayerModelService.getUILayerModel(layerId);
   }
 
@@ -155,7 +155,7 @@ export class CustomPanelComponent implements OnInit {
               }
             }); // subscribe
           }
-          this.loading = false;
+          this.loading.set(false);
         });
 
         // Start reading the blob as text.
@@ -164,7 +164,7 @@ export class CustomPanelComponent implements OnInit {
       error: err => {
         console.error('Failed to retrieve KML', err);
         this.statusMsg = '<div class="text-danger">Failed to retrieve KML: ' + (err?.message || err) + '</div>';
-        this.loading = false;
+        this.loading.set(false);
       }
     });
   }
@@ -256,7 +256,7 @@ export class CustomPanelComponent implements OnInit {
             // uncomment the following to save the kmz as a file
             //saveAs(kmzBlob, "zipKMZ.kmz");
             this.setupLayer(this, layerName, kmzBlob, proxyUrl, ResourceType.KMZ, "URL");
-            this.loading = false;
+            this.loading.set(false);
           }).catch((err: any) => {
             console.log("Failed to generate KML blob", err);
           })
@@ -286,7 +286,7 @@ export class CustomPanelComponent implements OnInit {
     const layerName = url.pathname.split('/').pop();
     const proxyUrl = this.env.portalBaseUrl + Constants.PROXY_API + "?usewhitelist=false&url=" + searchUrl;
 
-    this.loading = true;
+    this.loading.set(true);
 
     this.getRemoteBlob(proxyUrl).subscribe({
       next: (response) => {
@@ -301,17 +301,17 @@ export class CustomPanelComponent implements OnInit {
             // Basic validation: must be an object and have type or features
             if (!parsed || typeof parsed !== 'object' || (!parsed.type && !parsed.features)) {
               this.statusMsg = '<div class="text-danger">The file is not a valid GeoJSON document.</div>';
-              this.loading = false;
+              this.loading.set(false);
               return;
             }
 
             // Pass the string so downstream code that expects text can handle it,
             // or pass the object if your layer handler accepts it. Here we pass the string.
             this.setupLayer(this, layerName || 'geojson', jsonTxt, proxyUrl, ResourceType.GEOJSON, "URL");
-            this.loading = false;
+            this.loading.set(false);
           } catch (err: any) {
             this.statusMsg = '<div class="text-danger">Failed to parse GeoJSON: ' + (err?.message || err) + '</div>';
-            this.loading = false;
+            this.loading.set(false);
           }
         });
 
@@ -319,7 +319,7 @@ export class CustomPanelComponent implements OnInit {
       },
       error: (err: any) => {
         this.statusMsg = '<div class="text-danger">Failed to retrieve GeoJSON: ' + (err?.message || err) + '</div>';
-        this.loading = false;
+        this.loading.set(false);
       }
     });
   }
@@ -337,7 +337,7 @@ export class CustomPanelComponent implements OnInit {
       this.searchUrl = searchUrl;
     }
     this.layerHandlerService.getCustomLayerRecord(searchUrl).subscribe(layerRecs => {
-      this.loading = false;
+      this.loading.set(false);
       if (layerRecs != null) {
         if (layerRecs.length === 0) {
           this.statusMsg = '<div class="text-danger">No valid layers could be found for this endpoint.</div>';
@@ -357,7 +357,7 @@ export class CustomPanelComponent implements OnInit {
       }
     }, () => {
       this.statusMsg = '<div class="text-danger">No viable OGC WMS found on the service endpoint. Kindly check your URL again.</div>';
-      this.loading = false;
+      this.loading.set(false);
     });
   }
 
@@ -370,11 +370,11 @@ export class CustomPanelComponent implements OnInit {
 
     // Clear the results from the previous search, start the loading spinner
     this.urlLayers = [];
-    this.loading = true;
+    this.loading.set(true);
 
     // Check for empty URL
     if (this.searchUrl == undefined) {
-      this.loading = false;
+      this.loading.set(false);
       this.statusMsg = '<div class="text-danger">Please input the URL you want to search!</div>';
       return;
     }
@@ -513,8 +513,8 @@ export class CustomPanelComponent implements OnInit {
     // Make the layer group listing visible in the UI
     if (sourceType == "URL" && !this.recordsListContainsRecord(me.urlLayers, name, proxyUrl)) {
       me.urlLayers.unshift(layerRec);
-    } else if (!this.recordsListContainsRecord(me.fileLayers, name, proxyUrl)) {
-      me.fileLayers.unshift(layerRec);
+    } else if (!this.recordsListContainsRecord(me.fileLayers(), name, proxyUrl)) {
+      me.fileLayers.set([layerRec, ...this.fileLayers()]);
     }
   }
 
@@ -541,7 +541,7 @@ export class CustomPanelComponent implements OnInit {
         // .shp .cpg .prj .shx .dbf
 
         let geoJsonData: any = null;
-        this.loading = true;
+        this.loading.set(true);
         geoJsonData = null;
         // Convert the file to an ArrayBuffer using native Promise syntax
         file.arrayBuffer()
@@ -561,16 +561,16 @@ export class CustomPanelComponent implements OnInit {
                 this.setupLayer(this, geoJsonData.fileName, { type: 'FeatureCollection', features: geoJsonData.features }, "", ResourceType.GEOJSON, "FILE");
               }
             }
-            this.loading = false;
+            this.loading.set(false);
           })
           .catch((error: any) => {
-            this.loading = false;
+            this.loading.set(false);
             console.error('Error converting shapefile:', error);
             alert('Failed to parse Shapefile. Ensure the ZIP contains valid .shp and .dbf files.');
           });
 
       } else if (getExtension(file.name) === "kmz") {
-        this.loading = true; // start spinner
+        this.loading.set(true); // start spinner
 
         // unzip the kmz and iterate through the files
         const zipKMZ = new JSZip(); // reassemble the kmz (files) in this object
@@ -592,13 +592,13 @@ export class CustomPanelComponent implements OnInit {
                     zipKMZ.file(relPath, x);
                   }).catch((err: any) => {
                     console.log("Failed to add KMZ file to ZIP", err);
-                    this.loading = false;
+                    this.loading.set(false);
                   });
                 }
               })
               return kmlDom || Promise.reject(Error("No kmz file found"))
             }).catch((err: any) => {
-              this.loading = false;
+              this.loading.set(false);
               return console.log("ERROR [unzipping kml]: " + err.msg + JSON.stringify(err));
             });
         }
@@ -613,14 +613,14 @@ export class CustomPanelComponent implements OnInit {
           zipKMZ.generateAsync({ type: "blob" }).then((kmzBlob: any) => {
             //saveAs(kmzBlob, "zipKMZ.kmz");
             this.setupLayer(this, file.name, kmzBlob, "", ResourceType.KMZ, "FILE");
-            this.loading = false;
+            this.loading.set(false);
           }).catch((err: any) => {
             console.log("Failed to generate KML blob", err);
-            this.loading = false;
+            this.loading.set(false);
           });
         }).catch((err: any) => {
           console.log("Failed to retrieve KMZ", err);
-          this.loading = false;
+          this.loading.set(false);
         });
       } else {
         const reader = new FileReader();
@@ -717,9 +717,9 @@ export class CustomPanelComponent implements OnInit {
       if (layer.cswRecords[0]?.layerSRS) {
         layer.capabilityRecords[0].layerSRS = layer.cswRecords[0].layerSRS;
       }
-      this.loading = true;
+      this.loading.set(true);
       setTimeout(() => {
-        this.layerManagerService.addLayer(layer, [], null, null);
+        this.layerManagerService.addLayer(layer, [], undefined, undefined);
       }, 0);
 
     }

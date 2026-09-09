@@ -16,10 +16,10 @@ export class RecordModalComponent implements OnInit {
   layerStatus = inject(LayerStatusService);
   dialogRef = inject(MatDialogRef<RecordModalComponent>);
 
-  @Input() cswRecords: CSWRecordModel[];
-  @Input() layer: LayerModel;
+  @Input() cswRecords!: CSWRecordModel[];
+  @Input() layer!: LayerModel;
   @ViewChild(CesiumMapPreviewComponent, { static: true })
-  private previewMap: CesiumMapPreviewComponent;
+  private previewMap!: CesiumMapPreviewComponent;
 
   featureArr: any = [];
 

@@ -5,10 +5,10 @@
     <input type="text" class="form-control" [(ngModel)] = "searchUrl" (keyup)="onKeyUp($event)">
     <div class="input-group-append" title="Add KML, KMZ, GeoJSON or OGC WMS service URL layer to map" (click)="search()">
       <button class="btn btn-auscope-primary" type="button" [disabled]="!searchUrl || searchUrl.trim() === ''">
-        @if (!loading) {
+        @if (!loading()) {
           <i class="fa fa-search"></i>
         }
-        @if (loading) {
+        @if (loading()) {
           <i class="fa fa-spinner fa-spin fa-fw"></i>
         }
       </button>
@@ -39,7 +39,7 @@
       <td style="vertical-align: middle;">
         @if (!uiLayerModelService.isLayerAdded(layer.id) && !isImage(layer)) {
           <button class="btn-sm btn-success custom-btn" (click)="addLayer(layer)">Add&nbsp;<i class="fa fa-plus"></i>
-          @if (loading) {
+          @if (loading()) {
             <i class="fa fa-spinner fa-spin fa-fw"></i>
           }</button>
         }
@@ -65,10 +65,10 @@
     <button (click)="customFileLoader.click()" type="button" title="Load KML/KMZ/GeoJSON/SHP(zip) file"  class="btn-primary btn-sm">
       <i class="fa fa-lg fa-file" aria-hidden="true"></i>
       &nbsp;Load KML/KMZ/GeoJSON/SHP(zip)
-      @if (!loading) {
+      @if (!loading()) {
         <i class="fa"></i>
       }
-      @if (loading) {
+      @if (loading()) {
         <i class="fa fa-spinner fa-spin fa-fw"></i>
       }
     </button>
@@ -76,7 +76,7 @@
 </div>
 <!-- Once a file has been uploaded, its layer is shown here -->
 <table class="custom-table">
-  @for (layer of fileLayers; track layer) {
+  @for (layer of fileLayers(); track layer) {
     <tr class="custom-result-row">
       <td>
         <div>
@@ -92,7 +92,7 @@
       <td>
         @if (!uiLayerModelService.isLayerAdded(layer.id)) {
           <button class="btn-sm btn-success custom-btn" (click)="addLayer(layer)">Add&nbsp;<i class="fa fa-plus"></i>
-          @if (loading) {
+          @if (loading()) {
             <i class="fa fa-spinner fa-spin fa-fw"></i>
           }</button>
         }

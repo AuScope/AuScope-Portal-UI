@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit, inject, signal } from '@angular/core';
 import { ResourceType } from '../../../lib/portal-core-ui/utility/constants.service';
 import { saveAs } from 'file-saver';
 import { config } from '../../../../environments/config';
@@ -13,13 +13,12 @@ import { LayerModel } from '../../../lib/portal-core-ui/model/data/layer.model';
 import { UtilitiesService } from '../../../lib/portal-core-ui/utility/utilities.service';
 import { Polygon } from '../../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
 import { Bbox } from '../../../lib/portal-core-ui/model/data/bbox.model';
-import { NVCLTSGDownloadComponent } from 'app/modalwindow/layeranalytic/nvcl/nvcl.tsgdownload.component';
-import { isNumber } from '@turf/helpers';
-import { BoundsService } from 'app/services/bounds/bounds.service';
+import { NVCLTSGDownloadComponent } from '../../../modalwindow/layeranalytic/nvcl/nvcl.tsgdownload.component';
+import { BoundsService } from '../../../services/bounds/bounds.service';
 import { NVCLService } from '../../../modalwindow/querier/customanalytic/nvcl/nvcl.service';
 import { shareReplay } from 'rxjs/operators';
 import { Subject } from 'rxjs';
-import { DownloadAuScopeCatModalComponent } from 'app/modalwindow/download-auscopecat/download-auscopecat.modal.component';
+import { DownloadAuScopeCatModalComponent } from '../../../modalwindow/download-auscopecat/download-auscopecat.modal.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
@@ -50,17 +49,17 @@ export class DownloadPanelComponent implements OnInit {
   private conf = inject<any>('conf' as any);
 
   [x: string]: any;
-  @Input() layer: LayerModel;
+  @Input() layer!: LayerModel;
 
-  bbox: Bbox|null;
-  polygonBbox: Bbox|null;
-  polygonFilter: any;
-  drawBoundsStarted: boolean;
-  drawPolygonStarted: boolean;
-  downloadStarted: boolean;
-  download4pStarted: boolean;
-  download4PolygonKMLStarted: boolean;
-  isPolygonSupportedLayer: boolean;
+  bbox = signal<Bbox | null>(null);
+  polygonBbox = signal<Bbox | null>(null);
+  polygonFilter = signal<any>(null);
+  drawBoundsStarted = signal<boolean>(false);
+  drawPolygonStarted = signal<boolean>(false);
+  downloadStarted = signal<boolean>(false);
+  download4pStarted = signal<boolean>(false);
+  download4PolygonKMLStarted = signal<boolean>(false);
+  isPolygonSupportedLayer = signal<boolean>(false);
   isCsvSupportedLayer: boolean; // Supports CSV downloads of WFS Features
   isDatasetURLSupportedLayer: boolean; // Supports dataset downloads using a URL in the WFS GetFeature response
   omitGslmpShapeProperty: boolean;
@@ -98,11 +97,11 @@ export class DownloadPanelComponent implements OnInit {
     this.isNvclLayer = false;
     this.isTsgDownloadAvailable = false;
     this.isIRISDownloadSupported = false;
-    this.bbox = null;
-    this.polygonBbox = null;
-    this.polygonFilter = null;
-    this.drawBoundsStarted = false;
-    this.downloadStarted = false;
+    this.bbox.set(null);
+    this.polygonBbox.set(null);
+    this.polygonFilter.set(null);
+    this.drawBoundsStarted.set(false);
+    this.downloadStarted.set(false);
     this.wcsDownloadForm = {};
     this.showDOIs = false;
     this.downloadSizeLimit = 0;
@@ -111,12 +110,12 @@ export class DownloadPanelComponent implements OnInit {
     this.isWCSDownloadSupported = false;
     this.datasetUrl = "datasetURL";
     this.isDatasetURLSupportedLayer = false;
-    this.drawPolygonStarted = false;
-    this.download4pStarted = false;
-    this.download4PolygonKMLStarted = false;
+    this.drawPolygonStarted.set(false);
+    this.download4pStarted.set(false);
+    this.download4PolygonKMLStarted.set(false);
     this.omitGslmpShapeProperty = false;
     this.isCsvSupportedLayer = false;
-    this.isPolygonSupportedLayer = false;
+    this.isPolygonSupportedLayer.set(false);
   }
 
   ngOnInit(): void {
@@ -140,7 +139,7 @@ export class DownloadPanelComponent implements OnInit {
         });
       }
 
-      this.isPolygonSupportedLayer = config.polygonSupportedLayer.indexOf(this.layer.id) >= 0;
+      this.isPolygonSupportedLayer.set(config.polygonSupportedLayer.indexOf(this.layer.id) >= 0);
       this.isCsvSupportedLayer = this.layer.supportsCsvDownloads;
       this.isDatasetURLSupportedLayer = config.datasetUrlSupportedLayer[<dsUrlLayerKey>this.layer.id] !== undefined;
       if (this.isDatasetURLSupportedLayer) {
@@ -176,10 +175,10 @@ export class DownloadPanelComponent implements OnInit {
 
       // Capture bounds events from the bounds service
       this.boundsService.bbox.subscribe(bbox => {
-        this.bbox = bbox;
+        this.bbox.set(bbox);
       });
       this.boundsService.drawingStarted.subscribe(drawBoundsStarted => {
-        this.drawBoundsStarted = drawBoundsStarted;
+        this.drawBoundsStarted.set(drawBoundsStarted);
       });
 
       // Capture polygon events from the clipboard service
@@ -187,17 +186,17 @@ export class DownloadPanelComponent implements OnInit {
         if (isDrawingPolygon) {
           this.clearBounds();
         }
-        this.drawPolygonStarted = isDrawingPolygon;
+        this.drawPolygonStarted.set(isDrawingPolygon);
       });
       this.csClipboardService.polygonsBS.subscribe(
         (polygon) => {
           if (polygon && polygon.coordinates) {
-            this.bbox = null; // Clear this in case user has drawn poly from clipboard panel
-            this.polygonFilter = this.createPolygonFilterFromPolygon(polygon);
-            this.polygonBbox = this.getBboxFromPolygon(polygon);
+            this.bbox.set(null); // Clear this in case user has drawn poly from clipboard panel
+            this.polygonFilter.set(this.createPolygonFilterFromPolygon(polygon));
+            this.polygonBbox.set(this.getBboxFromPolygon(polygon));
           } else {
-            this.polygonFilter = null;
-            this.polygonBbox = null;
+            this.polygonFilter.set(null);
+            this.polygonBbox.set(null);
           }
       });
       //reset first this.downloadWfsService.tsgDownloadStartBS
@@ -219,7 +218,7 @@ export class DownloadPanelComponent implements OnInit {
     } else {
       this.isCsvSupportedLayer = false;
       this.isWCSDownloadSupported = false;
-      this.isPolygonSupportedLayer = false;
+      this.isPolygonSupportedLayer.set(false);
       this.isDatasetURLSupportedLayer = false;
     }
   }
@@ -371,7 +370,7 @@ export class DownloadPanelComponent implements OnInit {
       let stationLst = response['data'][0].stationLst;
       stationLst = [{ 'code': this.SELECT_ALL_CODE, 'name': this.SELECT_ALL_STATION }].concat(stationLst);
       //sort for stationLst
-      stationLst.sort((a,b) => a.name.charCodeAt(0) - b.name.charCodeAt(0));
+      stationLst.sort((a: any, b: any) => a.name.charCodeAt(0) - b.name.charCodeAt(0));
       this.irisDownloadListOption = {
         serviceTypeList: serviceTypeList,
         stationLst: stationLst,
@@ -462,8 +461,8 @@ export class DownloadPanelComponent implements OnInit {
    * - this.isTsgDownloadAvailable
    */
   downloadButtonEnabled(): boolean {
-    if (this.bbox || this.isTsgDownloadAvailable || this.irisDownloadListOption ||
-        (this.polygonFilter && (this.isPolygonSupportedLayer || this.isWCSDownloadSupported))) {
+    if (this.bbox() || this.isTsgDownloadAvailable || this.irisDownloadListOption ||
+        (this.polygonFilter() && (this.isPolygonSupportedLayer() || this.isWCSDownloadSupported))) {
       return true;
     }
     return false;
@@ -473,8 +472,13 @@ export class DownloadPanelComponent implements OnInit {
    * Download the layer
    */
   public download(): void {
-    if (this.downloadStarted) {
+    if (this.downloadStarted()) {
       alert('Download in progress, please wait for it to complete');
+      return;
+    }
+    const bboxx = this.bbox();
+    if (!bboxx) {
+      alert('A bounding box is required');
       return;
     }
     let observableResponse = null;
@@ -482,7 +486,7 @@ export class DownloadPanelComponent implements OnInit {
 
     // WCS download
     if (this.isWCSDownloadSupported) {
-      if (!this.bbox || UtilitiesService.isEmpty(this.wcsDownloadForm)) {
+      if (!this.bbox() || UtilitiesService.isEmpty(this.wcsDownloadForm)) {
         alert('Required information missing. Make sure you have selected an area, crs and format for download.');
         return;
       }
@@ -504,26 +508,26 @@ export class DownloadPanelComponent implements OnInit {
         return;
       }
 
-      this.downloadStarted = true;
+      this.downloadStarted.set(true);
       let timePositions: any[] = [];
       if (this.wcsDownloadForm.timePosition) {
         timePositions = [this.wcsDownloadForm.timePosition];
       }
       const maxImageSize = config.wcsSupportedLayer[<wcsKey>this.layer.id].maxImageSize;
       // Convert BBox coords to the CRS of WCS layer 'inputCrs' parameter
-      const bbox = UtilitiesService.coordConvBbox(this.bbox, this.wcsDownloadForm.inputCrs);
+      const bbox = UtilitiesService.coordConvBbox(bboxx, this.wcsDownloadForm.inputCrs);
       // Perform WCS download
       observableResponse = this.downloadWcsService.download(this.layer, bbox, this.wcsDownloadForm.inputCrs,
         this.wcsDownloadForm.downloadFormat, this.wcsDownloadForm.outputCrs, timePositions, maxImageSize);
 
     // Download datasets using a URL in the WFS GetFeature response
     } else if (this.isDatasetURLSupportedLayer) {
-      this.downloadStarted = true;
-      observableResponse = this.downloadWfsService.downloadDatasetURL(this.layer, this.bbox, null, this.datasetUrl, this.omitGslmpShapeProperty);
+      this.downloadStarted.set(true);
+      observableResponse = this.downloadWfsService.downloadDatasetURL(this.layer, bboxx, null, this.datasetUrl, this.omitGslmpShapeProperty);
 
     // Download IRIS datasets by constructing a data download URL. User can select the either Dataselect or Station
     } else if (this.irisDownloadListOption) {
-      this.downloadStarted = true;
+      this.downloadStarted.set(true);
 
       const start = (this.irisDownloadListOption.dateFrom !== null && this.irisDownloadListOption.dateFrom !== '') ? new Date(new Date(this.irisDownloadListOption.dateFrom)).toISOString().substring(0, 10) : null;
       const end = (this.irisDownloadListOption.dateToTo !== null && this.irisDownloadListOption.dateTo !== '') ? new Date(new Date(this.irisDownloadListOption.dateTo)).toISOString().substring(0, 10) : null;
@@ -532,19 +536,19 @@ export class DownloadPanelComponent implements OnInit {
       const channel = !this.irisDownloadListOption.selectedChannels.includes(this.SELECT_ALL_CHANNEL) ? this.irisDownloadListOption.selectedChannels.join(",") : this.SELECT_ALL_CODE;
 
       if (this.irisDownloadListOption.selectedserviceType === 'Station') {
-        observableResponse = this.downloadIrisService.downloadIRISStation(this.layer, this.bbox, station, channel, start, end);
+        observableResponse = this.downloadIrisService.downloadIRISStation(this.layer, bboxx, station, channel, start, end);
       } else {
         observableResponse = this.downloadIrisService.downloadIRISDataselect(this.layer, station, channel, start, end);
       }
     // Standard WFS feature download as a CSV
     } else {
-      this.downloadStarted = true;
-      observableResponse = this.downloadWfsService.downloadCSV(this.layer, this.bbox, '', true);
+      this.downloadStarted.set(true);
+      observableResponse = this.downloadWfsService.downloadCSV(this.layer, bboxx, '', true);
     }
 
     // Kick off the download process and save zip file in browser
     observableResponse.subscribe(value => {
-      this.downloadStarted = false;
+      this.downloadStarted.set(false);
       // Catch No Content (204) response
       if (value.status === 204) {
         alert('No content could be found for the specified area. Please adjust the download bounds.');
@@ -561,7 +565,7 @@ export class DownloadPanelComponent implements OnInit {
         });
       }
     }, err => {
-      this.downloadStarted = false;
+      this.downloadStarted.set(false);
       // No error message
       if (UtilitiesService.isEmpty(err.message)) {
         alert('An error has occurred whilst attempting to download. Please contact cg-admin@csiro.au');
@@ -577,12 +581,12 @@ export class DownloadPanelComponent implements OnInit {
       // Catch-all
       else {
         let alertMessage = 'There is an error, when downloading (' + this.layer.name + ') layer';
-        if (this.bbox) {
+        if (bboxx) {
           alertMessage += ' at location (' +
-            'eLongitude:' + Math.floor(this.bbox.eastBoundLongitude)
-            + ' nLatitude: ' + Math.floor(this.bbox.northBoundLatitude)
-            + ' sLatitude:' + Math.floor(this.bbox.southBoundLatitude)
-            + ' wLongitude:' + Math.floor(this.bbox.westBoundLongitude)
+            'eLongitude:' + Math.floor(bboxx.eastBoundLongitude)
+            + ' nLatitude: ' + Math.floor(bboxx.northBoundLatitude)
+            + ' sLatitude:' + Math.floor(bboxx.southBoundLatitude)
+            + ' wLongitude:' + Math.floor(bboxx.westBoundLongitude)
             + '). Detail of the error: (' + err.message + ')';
         }
         alert(alertMessage);
@@ -611,10 +615,11 @@ export class DownloadPanelComponent implements OnInit {
   public saveKML(csv: string): void {
     // TODO: Almost all variables in this method have lat/lng around the wrong way
     let coordsEPSG4326LngLat: string;
-    if (this.polygonFilter) {
-      coordsEPSG4326LngLat = this.csClipboardService.getCoordinates(this.polygonFilter);
-    } else if (this.bbox) {
-      coordsEPSG4326LngLat = this.getCoordinatesFromBbox(this.bbox);
+    const bbox = this.bbox();
+    if (this.polygonFilter()) {
+      coordsEPSG4326LngLat = this.csClipboardService.getCoordinates(this.polygonFilter());
+    } else if (bbox) {
+      coordsEPSG4326LngLat = this.getCoordinatesFromBbox(bbox);
     } else {
       return;
     }
@@ -625,12 +630,12 @@ export class DownloadPanelComponent implements OnInit {
     const coordsList = coordsEPSG4326LngLat.split(' ');
 
     for (let i = 0; i < coordsList.length; i++) {
-      const coord = coordsList[i].split(',')
-      const lng = parseFloat(coord[0]).toFixed(3);
-      const lat = parseFloat(coord[1]).toFixed(3)
-      if (isNumber(lng) && isNumber(lat)) {
-        coordsListLngLat.push(lng);
-        coordsListLngLat.push(lat);
+      const coord = coordsList[i].split(',');
+      const lng = parseFloat(coord[0]);
+      const lat = parseFloat(coord[1]);
+      if (!isNaN(lng) && !isNaN(lat)) {
+        coordsListLngLat.push(lng.toFixed(3));
+        coordsListLngLat.push(lat.toFixed(3));
         coordsListLatLng.push(lat.toString() + ',' + lng.toString());
       }
     }
@@ -701,28 +706,28 @@ export class DownloadPanelComponent implements OnInit {
    * Download the layer
    */
   public download4PolygonKML() {
-    if (this.download4PolygonKMLStarted) {
+    if (this.download4PolygonKMLStarted()) {
       alert('Download in progress, please wait for it to complete');
       return;
     }
-    if (this.polygonFilter === null && this.bbox === null) {
+    if (this.polygonFilter() === null && this.bbox() === null) {
       return;
     }
 
     // If the user has drawn a bounding box construct a polygon from that, otherwise use polygon
-    const downloadPolygonFilter = this.polygonFilter ? this.polygonFilter : this.createPolygonFilterFromBbox(this.bbox);
+    const downloadPolygonFilter = this.polygonFilter() ? this.polygonFilter() : this.createPolygonFilterFromBbox(this.bbox());
 
     let observableResponse = null;
     // fetch polygon filter
-    this.download4PolygonKMLStarted = true;
+    this.download4PolygonKMLStarted.set(true);
     observableResponse = this.downloadWfsService.downloadCSV(this.layer, null, downloadPolygonFilter, false);
 
     // Kick off the download process and save zip file in browser
     observableResponse.subscribe(csv => {
       this.saveKML(csv);
-      this.download4PolygonKMLStarted = false;
+      this.download4PolygonKMLStarted.set(false);
     }, err => {
-      this.download4PolygonKMLStarted = false;
+      this.download4PolygonKMLStarted.set(false);
       alert('export2KML: An error has occurred whilst attempting to download. (' + err.message + ') Please contact cg-admin@csiro.au');
     });
   }
@@ -731,7 +736,7 @@ export class DownloadPanelComponent implements OnInit {
    * Popup the TSGDownload Model window.
    */
   public popupTSGDownload() {
-    if (this.polygonFilter === null && this.bbox === null) {
+    if (this.polygonFilter() === null && this.bbox() === null) {
       alert('Please draw a boundary or polygon first, otherwise the TSG datasets will be too big to download.');
       return;
     }
@@ -751,12 +756,12 @@ export class DownloadPanelComponent implements OnInit {
   public download4TsgFiles() {
     let observableResponse = null;
     // Download WFS features as CSV files
-    if (this.polygonFilter) {
+    if (this.polygonFilter()) {
       console.log('called:downloadTsgFileUrls.Polygon');
-      observableResponse = this.downloadWfsService.downloadTsgFileUrls(this.layer, null, this.tsgDownloadEmail, this.polygonFilter).pipe(shareReplay(1));
+      observableResponse = this.downloadWfsService.downloadTsgFileUrls(this.layer, null, this.tsgDownloadEmail, this.polygonFilter()).pipe(shareReplay(1));
     } else {
       console.log('called:downloadTsgFileUrls');
-      observableResponse = this.downloadWfsService.downloadTsgFileUrls(this.layer, this.bbox, this.tsgDownloadEmail, null).pipe(shareReplay(1));
+      observableResponse = this.downloadWfsService.downloadTsgFileUrls(this.layer, this.bbox(), this.tsgDownloadEmail, null).pipe(shareReplay(1));
     }
     // Kick off the download process and save zip file in browser
     observableResponse.subscribe(urls => {
@@ -804,25 +809,25 @@ export class DownloadPanelComponent implements OnInit {
    */
   public download4Polygon(): void {
 
-    if (this.download4pStarted) {
+    if (this.download4pStarted()) {
       alert('Download in progress, please wait for it to completed');
       return;
     }
     let observableResponse = null;
-    this.download4pStarted = true;
+    this.download4pStarted.set(true);
 
     // Download datasets using a URL in the WFS GetFeature response
     if (this.isDatasetURLSupportedLayer) {
-      observableResponse = this.downloadWfsService.downloadDatasetURL(this.layer, null, this.polygonFilter, this.datasetUrl, this.omitGslmpShapeProperty);
+      observableResponse = this.downloadWfsService.downloadDatasetURL(this.layer, null, this.polygonFilter(), this.datasetUrl, this.omitGslmpShapeProperty);
 
       // Download WFS features as CSV files
     } else {
-      observableResponse = this.downloadWfsService.downloadCSV(this.layer, null, this.polygonFilter, true);
+      observableResponse = this.downloadWfsService.downloadCSV(this.layer, null, this.polygonFilter(), true);
     }
 
     // Kick off the download process and save zip file in browser
     observableResponse.subscribe(value => {
-      this.download4pStarted = false;
+      this.download4pStarted.set(false);
       const blob = new Blob([value], { type: 'application/zip' });
       saveAs(blob, 'download.zip');
       if (environment.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
@@ -834,7 +839,7 @@ export class DownloadPanelComponent implements OnInit {
         });
       }
     }, err => {
-      this.download4pStarted = false;
+      this.download4pStarted.set(false);
       if (UtilitiesService.isEmpty(err.message)) {
         alert('An error has occurred whilst attempting to download. Please contact cg-admin@csiro.au');
       } else {
@@ -865,7 +870,7 @@ export class DownloadPanelComponent implements OnInit {
       this.irisDownloadListOption.dateFrom = this.irisAllStationsMinDate;
       this.irisDownloadListOption.dateTo = this.irisAllStationsMaxDate;
     } else {
-      const stations = this.irisDownloadListOption.stationLst.filter(station => this.irisDownloadListOption.selectedStations.includes(station.code));
+      const stations = this.irisDownloadListOption.stationLst.filter((station: any) => this.irisDownloadListOption.selectedStations.includes(station.code));
       // Update the channel list
       this.irisDownloadListOption.channelLst = this.getAvilChannel(stations);
       // Update the to/from and start/end dates according to the channels selected
@@ -887,8 +892,8 @@ export class DownloadPanelComponent implements OnInit {
         width: '800px',
         data: {
           layer: this.layer,
-          bbox: this.bbox,
-          polygonFilter: this.polygonFilter
+          bbox: this.bbox(),
+          polygonFilter: this.polygonFilter()
           // If we want to download TSG data later
           // isTsgLayer: this.isTsgDownloadAvailable;
         }

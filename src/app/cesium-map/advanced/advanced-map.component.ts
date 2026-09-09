@@ -8,7 +8,7 @@ import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 @Directive()
  export abstract class AdvancedMapComponent {
 
-  layer: LayerModel;
+  layer!: LayerModel;
   public advancedParams = {};
 
   public getLayer(): LayerModel {

@@ -3,7 +3,7 @@ import { Bbox } from '../model/data/bbox.model';
 import { Injectable } from '@angular/core';
 import { HttpParams } from '@angular/common/http';
 import * as _ from 'lodash';
-import * as $ from 'jquery';
+import $ from 'jquery';
 import { ResourceType } from './constants.service';
 import { LayerModel } from '../model/data/layer.model';
 
@@ -52,7 +52,7 @@ export class UtilitiesService {
      * @param character character to pad out with
      * @return padded string
      */
-    public static leftPad(str, size, character) {
+    public static leftPad(str: any, size: any, character: any) {
         let result = String(str);
         character = character || ' ';
         while (result.length < size) {
@@ -68,7 +68,7 @@ export class UtilitiesService {
      * @param obj - the object to query
      * @return string - the key of the object
      */
-    public static getKey(options): string {
+    public static getKey(options: any): string {
       return Object.keys(options)[0];
     }
 
@@ -78,7 +78,7 @@ export class UtilitiesService {
      * @param obj - the object to query
      * @return string - the key of the object
      */
-    public static getValue(options): string {
+    public static getValue(options: any): string | undefined {
       for (const key in options) {
         return options[key];
       }
@@ -101,7 +101,7 @@ export class UtilitiesService {
      * @param options - splitArgs - {Boolean} Split comma delimited params into arrays? Default is true
      */
     public static getUrlParameters(url: string, options?: any): any {
-        const localStringContain = function(s, c) {
+        const localStringContain = function(s: any, c: any) {
             return s.indexOf(c) !== -1;
         };
         options = options || {};
@@ -117,7 +117,7 @@ export class UtilitiesService {
             paramsString = url.substring(start, end);
         }
 
-        const parameters = {};
+        const parameters: Record<string, any> = {};
         const pairs = paramsString.split(/[&;]/);
         for (let i = 0, len = pairs.length; i < len; ++i) {
             const keyValue = pairs[i].split('=');
@@ -208,7 +208,7 @@ export class UtilitiesService {
      *
      * @param url
      */
-    public static getBaseUrl(url): string {
+    public static getBaseUrl(url: string): string {
         const splitUrl = url.split('://');
         return splitUrl[0] + '://' + splitUrl[1].slice(0, splitUrl[1].indexOf('/'));
     }
@@ -249,12 +249,12 @@ export class UtilitiesService {
     }
 
     private static getErlProviderFilterOverrides(layerId: string, url: string): any {
-        const providerOverrides = config.erlProviderFilterOverrides?.[layerId];
+        const providerOverrides = (config.erlProviderFilterOverrides as Record<string, any>)?.[layerId];
         if (!providerOverrides?.length || !url) {
             return null;
         }
 
-        const matchingOverride = providerOverrides.find(entry => url.includes(entry.url));
+        const matchingOverride = providerOverrides.find((entry: any) => url.includes(entry.url));
         return matchingOverride?.filterOverrides || null;
     }
 
@@ -327,7 +327,7 @@ export class UtilitiesService {
      * @return unique count by url
      */
     public static uniqueCountOfResourceByUrl(onlineResources: { [key: string]: any; }): number {
-        const unique = {};
+        const unique: Record<string, any> = {};
 
         for (const key in onlineResources) {
            unique[onlineResources[key].url] = true;
@@ -500,7 +500,7 @@ export class UtilitiesService {
         }
         for (const hiddenParam of hiddenParams) {
           if (hiddenParam.type === 'MANDATORY.UIHiddenResourceAttribute') {
-            param[hiddenParam.parameter] = onlineResource[hiddenParam.attribute];
+            param[hiddenParam.parameter] = onlineResource[hiddenParam.attribute as keyof OnlineResourceModel];
           } else {
             param[hiddenParam.parameter] = hiddenParam.value;
           }
@@ -546,7 +546,7 @@ export class UtilitiesService {
      * filter object into a HttpParams
      * @param httpParam the httpParam to set the parameters
      */
-    public static convertObjectToHttpParam(httpParam: HttpParams, paramObject: object): HttpParams {
+    public static convertObjectToHttpParam(httpParam: HttpParams, paramObject: Record<string, any>): HttpParams {
       // https://github.com/angular/angular/pull/18490 (this is needed to parse object into parameter
       if(paramObject && paramObject['optionalFilters']) {
         let first = true;
@@ -569,28 +569,18 @@ export class UtilitiesService {
      * @param onlineResource online resource record for service
      */
     public static resourceIsERDAS_Essentials_2015(onlineResource: OnlineResourceModel): boolean {
-        let status: boolean = false;
-        if (onlineResource.applicationProfile["server"]) {
-            if (onlineResource.applicationProfile["version"]) {
-                status = (onlineResource.applicationProfile["version"].indexOf('Essentials 2015') > -1);
-            }
-        }
-        return status;
+        const profile = onlineResource.applicationProfile;
+        return typeof profile !== 'string' && profile.server === 'ERDAS' && profile.version.includes('Essentials 2015');
     }
+
     /**
      * Returns true if (if and only if) this is an ERDAS APOLLO (eg TAS WMS) server
      * @param onlineResource online resource record for service
      */
     public static resourceIsERDAS_Core_2022(onlineResource: OnlineResourceModel): boolean {
-        let status: boolean = false;
-        if (onlineResource.applicationProfile["server"]) {
-            if (onlineResource.applicationProfile["version"]) {
-                status = (onlineResource.applicationProfile["version"].indexOf('Core 2022') > -1);
-            }
-        }
-        return status;
+        const profile = onlineResource.applicationProfile;
+        return typeof profile !== 'string' && profile.server === 'ERDAS' && profile.version.includes('Core 2022');
     }
-
 
     /**
      * Returns true iff (if and only if) this is an ESRI ArcGIS server
@@ -673,7 +663,7 @@ export class UtilitiesService {
      * Convert String to  Int Vector
      */
     public static stringToIntVector(strVal: string, seperator: string): number[]{
-        const retVal = [];
+        const retVal: any[] = [];
         strVal.split(seperator).map(function(item) {
             retVal.push(parseInt(item, 10));
         });
@@ -684,7 +674,7 @@ export class UtilitiesService {
      * Convert String to float Vector
      */
     public static stringToFloatVector(strVal: string, seperator: string): number[]{
-        const retVal = [];
+        const retVal: any[] = [];
         strVal.split(seperator).map(function(item) {
             retVal.push(parseFloat(item));
         });
@@ -736,11 +726,10 @@ export class UtilitiesService {
    * @param epsgCode
    * @returns EPSG number or null
    */
-  private static getEPSGNum(epsgCode: string): number {
+  private static getEPSGNum(epsgCode: string): number | undefined {
     const match = epsgCode.match(/\d+/);
-    return match ? parseInt(match[0], 10) : null;
-}
-
+    return match ? parseInt(match[0], 10) : undefined;
+  }
 
   /**
    * Convert bbox coordinates to a desired CRS
@@ -754,7 +743,7 @@ export class UtilitiesService {
     const fromProj = proj4.Proj(bbox.crs);
     // Register 'crs' Proj4 string with 'proj4', use EPSG:4326 as a fallback
     const epsgNum = UtilitiesService.getEPSGNum(crs) || 4326;
-    const entry: EpsgEntry = epsg[epsgNum];
+    const entry: EpsgEntry = (epsg as unknown as Record<string, EpsgEntry>)[String(epsgNum)];
     if (entry) {
       proj4.defs(crs, entry.proj4);
     } else {
@@ -765,6 +754,9 @@ export class UtilitiesService {
     // Convert east+north & south+west coords
     const en = proj4.transform(fromProj, toProj, [bbox.eastBoundLongitude, bbox.northBoundLatitude], false);
     const sw = proj4.transform(fromProj, toProj, [bbox.westBoundLongitude, bbox.southBoundLatitude], false);
+    if (!en || !sw) {
+      throw new Error('Invalid bbox coordinates');
+    }
     // Create new Bbox and return it
     const bboxOut: Bbox = new Bbox();
     bboxOut.eastBoundLongitude = en.x;

@@ -192,10 +192,11 @@ export class CsVMFService {
    * @param totalLayers total number of layers for LayerModel
    */
   private incrementLayersAdded(layer: LayerModel, totalLayers: number) {
-    if (!this.numberOfResourcesAdded.get(layer.id)) {
-      this.numberOfResourcesAdded.set(layer.id, 0);
+    let numberOfResources = this.numberOfResourcesAdded.get(layer.id);
+    if (!numberOfResources) {
+      numberOfResources = 0;
     }
-    this.numberOfResourcesAdded.set(layer.id, this.numberOfResourcesAdded.get(layer.id) + 1);
+    this.numberOfResourcesAdded.set(layer.id, numberOfResources + 1);
     if (this.numberOfResourcesAdded.get(layer.id) === totalLayers) {
       this.cancelledLayers = this.cancelledLayers.filter(l => l !== layer.id);
     }

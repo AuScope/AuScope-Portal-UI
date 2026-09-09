@@ -16,7 +16,7 @@ import { MineralTenementStyleService } from './mineral-tenement-style.service';
 import { RemanentAnomaliesAutoSearchStyleService } from './remanent-anomalies-auto-search-style.service';
 import { RemanentAnomaliesStyleService } from './remanent-anomalies-style.service';
 import { GenericStyleService } from './generic-style.service';
-import { LayerModel } from 'app/lib/portal-core-ui/model/data/layer.model';
+import { LayerModel } from '../../../model/data/layer.model';
 import { config } from '../../../../../../../src/environments/config';
 
 @Injectable()
@@ -99,7 +99,7 @@ export class SldService {
       return new Observable((observer) => {
         try {
           // Get the style service
-          const StyleService = this.styleServiceMap[styleConfig.serviceName];
+          const StyleService = this.styleServiceMap[styleConfig.serviceName as keyof typeof this.styleServiceMap];
           if (!StyleService) {
             throw new Error(`Style service ${styleConfig.serviceName} not found`);
           }

@@ -16,11 +16,11 @@ export class BoundsService {
 
 
   // Bounds on map as drawn by user
-  private boundsObservable: RectangleEditorObservable;
+  private boundsObservable!: RectangleEditorObservable | null;
 
   // Bounding box observable for user
-  private _bbox: BehaviorSubject<Bbox> = new BehaviorSubject(null);
-  public readonly bbox: Observable<Bbox> = this._bbox.asObservable();
+  private _bbox: BehaviorSubject<Bbox | null> = new BehaviorSubject<Bbox | null>(null);
+  public readonly bbox: Observable<Bbox | null> = this._bbox.asObservable();
 
   // Keep track of drawing in progress
   private _drawingStarted: BehaviorSubject<boolean> = new BehaviorSubject(false);
@@ -50,12 +50,12 @@ export class BoundsService {
       const width = points[0].getPosition().x - points[1].getPosition().x;
       const length = points[0].getPosition().y - points[1].getPosition().y;
       const area = Math.abs(width * length);
-      if (config.wcsSupportedLayer[layerId]) {
+      if (config.wcsSupportedLayer[layerId as keyof typeof config.wcsSupportedLayer]) {
         // If 'downloadAreaMaxsize' is not set to Number.MAX_SAFE_INTEGER then download limits will apply
-        const maxSize = config.wcsSupportedLayer[layerId].downloadAreaMaxSize;
+        const maxSize = config.wcsSupportedLayer[layerId as keyof typeof config.wcsSupportedLayer].downloadAreaMaxSize;
         if (maxSize !== Number.MAX_SAFE_INTEGER && maxSize < area) {
           alert('The area size you have selected of ' + area + 'm2 exceed the limited size of ' +
-            config.wcsSupportedLayer[layerId].downloadAreaMaxSize + 'm2. Due to the size of the dataset' +
+            config.wcsSupportedLayer[layerId as keyof typeof config.wcsSupportedLayer].downloadAreaMaxSize + 'm2. Due to the size of the dataset' +
             ' we have to limit the download area');
           this._bbox.next(null);
           return;

@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { LegendUiService } from 'app/services/legend/legend-ui.service';
+import { LegendUiService } from '../../services/legend/legend-ui.service';
 import { forkJoin, Observable } from 'rxjs';
 
 @Component({
