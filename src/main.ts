@@ -5,14 +5,23 @@ import { environment } from './environments/environment';
 import { ContextService } from '@csiro-geoanalytics/ng';
 import * as Cesium from 'cesium';
 
-if (environment.production) {
-  enableProdMode();
-}
+ContextService.load()
+	.then(context => {
+		/*
+			each property of the context file is copied over to the environment object, replacing any that share the same name.
+		*/
+    Object.assign(environment, context as Partial<typeof environment>);
 
-platformBrowser().bootstrapModule(AppModule, {
-  applicationProviders: [provideZoneChangeDetection()]
-})
+
+  if (environment.production) {
+    enableProdMode();
+  }
+
+  platformBrowser().bootstrapModule(AppModule, {
+    applicationProviders: [provideZoneChangeDetection()]
+  })
 .catch(err => console.error(err));
+  })
 
 // If required, Cesium access token can be set here
 // Ion.defaultAccessToken =
