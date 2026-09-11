@@ -2,7 +2,7 @@ import { SimpleXMLService } from './../../utility/simplexml.service';
 import { UtilitiesService } from './../../utility/utilities.service';
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Constants } from '../../utility/constants.service';
 
@@ -85,6 +85,9 @@ export class GetCoverageService {
   public parseCoverageRes(response: string) {
     let MAP_FORMATS;
     const rootNode = SimpleXMLService.parseStringToDOM(response);
+    if (!rootNode) {
+      return throwError(() => new Error('Could not parse root node'));
+    }
     const nsResolverFn = (prefix: any) => this.nsResolver(prefix);
     MAP_FORMATS = '/wcs:CoverageDescription/wcs:CoverageOffering';
     const nodes = SimpleXMLService.evaluateXPathNodeArray(rootNode, rootNode, MAP_FORMATS, nsResolverFn);
@@ -114,11 +117,12 @@ export class GetCoverageService {
       const temporalDomain = this.getTemporalDomain(rootNode, node, nsResolverFn);
       const rangeSet = this.getRangeSet(rootNode, node, nsResolverFn);
 
-      const retVal = { data: [], msg: "", success: true };
+      const retVal = { data: [] as any, msg: "", success: true };
       retVal.data.push({
-        description: wcsRecElems["description"],
-        label: wcsRecElems["label"],
-        name: wcsRecElems["name"],
+        // Note: This should be typed
+        description: (wcsRecElems as any).description,
+        label: (wcsRecElems as any).label,
+        name: (wcsRecElems as any).name,
         supportedRequestCRSs: supportedRequestCRSs,
         supportedResponseCRSs: supportedResponseCRSs,
         supportedFormats: supportedFormats,
@@ -160,15 +164,15 @@ export class GetCoverageService {
    * @param nsResolver namespace resolver function
    * @returns a WCSRecord object with these property names: 'name', 'label', 'description'
    */
-  private getWCSRecElems(doc: Document, node: Node, nsResolver: (prefix: string) => string) {
+  private getWCSRecElems(doc: Document, node: Node, nsResolver: (prefix: string | null) => string) {
     const wcs_REC = {
       'name': 'wcs:name',
       'label': 'wcs:label',
       'description': 'wcs:description',
     };
-    const wcsRecElems = {};
+    const wcsRecElems: any = {};
     for (const xpath of Object.keys(wcs_REC)) {
-      wcsRecElems[xpath] = SimpleXMLService.evaluateXPathString(doc, node, wcs_REC[xpath], nsResolver);
+      wcsRecElems[xpath] = SimpleXMLService.evaluateXPathString(doc, node, (wcs_REC as any).xpath, nsResolver);
     }
     return wcsRecElems;
   }
@@ -181,11 +185,11 @@ export class GetCoverageService {
    * @param nsResolver namespace resolver function
    * @returns a list of supported Request and Respond CRSs
   */
-  private getSupportedReqRes(doc: Document, node: Node, nsResolver: (prefix: string) => string) {
+  private getSupportedReqRes(doc: Document, node: Node, nsResolver: (prefix: string | null) => string) {
     let MAP_FORMATS = 'wcs:supportedCRSs/wcs:requestResponseCRSs';
     let tempNodeList: Element[] = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
-    const supportedRequestCRSs = [];
-    const supportedResponseCRSs = [];
+    const supportedRequestCRSs: any[] = [];
+    const supportedResponseCRSs: any[] = [];
 
     if (tempNodeList.length > 0) {
       tempNodeList.forEach(elem => {
@@ -212,9 +216,9 @@ export class GetCoverageService {
    * @param MAP_FORMATS
    * @returns a list of maped array
    */
-  private getNodeArray(doc: Document, node: Node, nsResolver: (prefix: string) => string, MAP_FORMATS: string) {
+  private getNodeArray(doc: Document, node: Node, nsResolver: (prefix: string | null) => string, MAP_FORMATS: string) {
     const tempNodeList: Element[] = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
-    const nodeArray = [];
+    const nodeArray: any[] = [];
     tempNodeList.forEach(elem => nodeArray.push(elem.textContent));
     return nodeArray;
   }
@@ -227,14 +231,14 @@ export class GetCoverageService {
    * @param nsResolver namespace resolver function
    * @returns  spatial domain object
    */
-  private getSpatialDomain(doc: Document, node: Node, nsResolver: (prefix: string) => string) {
+  private getSpatialDomain(doc: Document, node: Node, nsResolver: (prefix: string | null) => string) {
     let MAP_FORMATS = 'wcs:Envelope ' +
       '| gml:Envelope ' +
       '| gml:EnvelopeWithTimePeriod';
 
     const tempNodeList: Element[] = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
 
-    const envelopes = [];
+    const envelopes: any[] = [];
     tempNodeList.forEach(elem => envelopes.push(this.simpleEnvelope(doc, elem, nsResolver)));
 
     MAP_FORMATS = 'gml:RectifiedGrid';
@@ -252,15 +256,24 @@ export class GetCoverageService {
    * @param nsResolver namespace resolver function
    * @returns SimpleEnvelope object
   */
-  public simpleEnvelope(doc: Document, node: Node, nsResolver: (prefix: string) => string) {
+  public simpleEnvelope(doc: Document, node: Node, nsResolver: (prefix: string | null) => string) {
 
-    let retVal = {
+    let retVal: {
+      eastBoundLongitude: string | null,
+      southBoundLatitude: string | null,
+      westBoundLongitude: string | null,
+      northBoundLatitude: string | null,
+      timePositionStart: string | undefined,
+      timePositionEnd: string | undefined,
+      srsName: string | null,
+      type: string | null
+    } = {
       eastBoundLongitude: null,
       southBoundLatitude: null,
       westBoundLongitude: null,
       northBoundLatitude: null,
-      timePositionStart: null,
-      timePositionEnd: null,
+      timePositionStart: undefined,
+      timePositionEnd: undefined,
       srsName: null,
       type: null
     };
@@ -321,9 +334,7 @@ export class GetCoverageService {
    * @param nsResolver namespace resolver function
    * @returns rectifiedGrid object
    */
-
-
-  public rectifiedGrid(doc: Document, node: Node, nsResolver: (prefix: string) => string) {
+  public rectifiedGrid(doc: Document, node: Node, nsResolver: (prefix: string | null) => string) {
     let rectifiedGrid = {};
 
     const srsName = SimpleXMLService.evaluateXPathString(doc, node, "@srsName", nsResolver);
@@ -373,15 +384,15 @@ export class GetCoverageService {
   * @param nsResolver namespace resolver function
   * @returns Get the temporal range
   */
-  private getTemporalDomain(doc: Document, node: Node, nsResolver: (prefix: string) => string) {
+  private getTemporalDomain(doc: Document, node: Node, nsResolver: (prefix: string | null) => string) {
 
     let MAP_FORMATS = 'wcs:domainSet/wcs:temporalDomain';
     const tempNode = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
-    const temporalDomain = [];
+    const temporalDomain: any[] = [];
     if (tempNode != null && tempNode.length > 0) {
       MAP_FORMATS = 'wcs:domainSet/wcs:temporalDomain/*';
       const tempNodeList = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
-      tempNodeList.forEach(elem => {
+      tempNodeList.forEach((elem: any) => {
         const name = SimpleXMLService.getNodeLocalName(elem);
         if (name == "timePosition") {
           temporalDomain.push(this.simpleTimePosition(elem, nsResolver));
@@ -404,11 +415,13 @@ export class GetCoverageService {
    */
 
   private simpleTimePosition(node: Node, _nsResolver: (prefix: string) => string) {
-    const timePosition = Date.parse(node.textContent)
-    return {
-      timePosition: timePosition,
-      type: SimpleXMLService.getNodeLocalName(node)
-    };
+    if (node.textContent) {
+      const timePosition = Date.parse(node.textContent)
+      return {
+        timePosition: timePosition,
+        type: SimpleXMLService.getNodeLocalName(node)
+      };
+    }
   }
 
   /**
@@ -419,7 +432,7 @@ export class GetCoverageService {
    * @param nsResolver namespace resolver function
    * @returns Get the timePeriod
    */
-  private simpleTimePeriod(doc: Document, node: Node, nsResolver: (prefix: string) => string) {
+  private simpleTimePeriod(doc: Document, node: Node, nsResolver: (prefix: string | null) => string) {
     const beginPositionNode = SimpleXMLService.evaluateXPathString(doc, node, "beginPosition", nsResolver);
     const endPositionNode = SimpleXMLService.evaluateXPathString(doc, node, "endPosition", nsResolver);
 
@@ -442,7 +455,7 @@ export class GetCoverageService {
    * @param nsResolver namespace resolver function
    * @returns RangeSetImpl instance
   */
-  private getRangeSet(doc: Document, node: Node, nsResolver: (prefix: string) => string) {
+  private getRangeSet(doc: Document, node: Node, nsResolver: (prefix: string | null) => string) {
     let MAP_FORMATS = 'wcs:rangeSet/wcs:RangeSet/wcs:description';
     const tempNode: Element[] = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
     let description;
@@ -456,14 +469,14 @@ export class GetCoverageService {
     MAP_FORMATS = 'wcs:rangeSet/wcs:RangeSet/wcs:label';
     const label = SimpleXMLService.evaluateXPathString(doc, node, MAP_FORMATS, nsResolver);
 
-    const axisDescriptions = [];
+    const axisDescriptions: any[] = [];
     MAP_FORMATS = 'wcs:rangeSet/wcs:RangeSet/wcs:axisDescription/wcs:AxisDescription';
     let tempNodeList: Element[] = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
     tempNodeList.forEach(elem => {
       axisDescriptions.push(this.axisDescriptionImpl(doc, elem, nsResolver));
     });
 
-    const nullValues = [];
+    const nullValues: any[] = [];
     MAP_FORMATS = 'wcs:rangeSet/wcs:RangeSet/wcs:nullValues/wcs:*';
     tempNodeList = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
     tempNodeList.forEach(elem => {
@@ -487,11 +500,11 @@ export class GetCoverageService {
    * @param nsResolver namespace resolver function
    * @returns AxisDescription
   */
-  private axisDescriptionImpl(doc: Document, node: Node, nsResolver: (prefix: string) => string) {
+  private axisDescriptionImpl(doc: Document, node: Node, nsResolver: (prefix: string | null) => string) {
 
     let MAP_FORMATS = 'wcs:description';
     const tempNode: Element[] = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
-    let description: string;
+    let description: string  | undefined;
     if (tempNode != null && tempNode.length > 0) {
       description = SimpleXMLService.evaluateXPathString(doc, node, MAP_FORMATS, nsResolver);
     }
@@ -502,7 +515,7 @@ export class GetCoverageService {
     MAP_FORMATS = 'wcs:label';
     const label = SimpleXMLService.evaluateXPathString(doc, node, MAP_FORMATS, nsResolver);
 
-    const values = [];
+    const values: any[] = [];
     MAP_FORMATS = 'wcs:values/wcs:*';
     const tempNodeList: Element[] = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
     tempNodeList.forEach(elem => {
@@ -525,7 +538,7 @@ export class GetCoverageService {
    * @param nsResolver namespace resolver function
    * @returns RangeSetImpl instance
   */
-  private valueEnumTypeFactory(doc: Document, node: Node, nsResolver: (prefix: string) => string) {
+  private valueEnumTypeFactory(doc: Document, node: Node, nsResolver: (prefix: string | null) => string) {
     const name = SimpleXMLService.getNodeLocalName(node);
     if (name == "singleValue") {
       return {
@@ -547,26 +560,26 @@ export class GetCoverageService {
    * @param nsResolver namespace resolver function
    * @returns <wcs:interval> element
   */
-  private getInterval(doc: Document, node: Node, nsResolver: (prefix: string) => string) {
+  private getInterval(doc: Document, node: Node, nsResolver: (prefix: string | null) => string) {
     const type = SimpleXMLService.getNodeLocalName(node);
 
     let MAP_FORMATS = 'wcs:min';
     let tempNode: Element[] = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
-    let min: number;
+    let min: number | undefined;
     if (tempNode != null && tempNode.length > 0) {
       min = parseFloat(SimpleXMLService.evaluateXPathString(doc, node, MAP_FORMATS, nsResolver));
     }
 
     MAP_FORMATS = 'wcs:max';
     tempNode = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
-    let max: number;
+    let max: number | undefined;
     if (tempNode != null && tempNode.length > 0) {
       max = parseFloat(SimpleXMLService.evaluateXPathString(doc, node, MAP_FORMATS, nsResolver));
     }
 
     MAP_FORMATS = 'wcs:resolution';
     tempNode = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
-    let resolution: number;
+    let resolution: number | undefined;
     if (tempNode != null && tempNode.length > 0) {
       resolution = parseFloat(SimpleXMLService.evaluateXPathString(doc, node, MAP_FORMATS, nsResolver));
     }

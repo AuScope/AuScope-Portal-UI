@@ -1,12 +1,11 @@
-import { throwError as observableThrowError, Observable, ReplaySubject, Subject } from 'rxjs';
-
-import { catchError, map, timeoutWith, mergeMap } from 'rxjs/operators';
+import { Observable, ReplaySubject, Subject, timeout, throwError } from 'rxjs';
+import { catchError, map, mergeMap } from 'rxjs/operators';
 import { Bbox } from '../../../model/data/bbox.model';
 import { LayerModel } from '../../../model/data/layer.model';
 import { LayerHandlerService } from '../../cswrecords/layer-handler.service';
 import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 declare let rudderanalytics: any;
@@ -74,9 +73,12 @@ export class DownloadWfsService {
                              .set('omitGsmlpShapeProperty', omitGsmlpShapeProperty);
       // Call WFS GetFeature to find the dataset URLs
       return this.http.get(this.env.portalBaseUrl + 'doBoreholeViewFilter.do', { params: httpParams }).pipe(
-        timeoutWith(300000, observableThrowError(new Error('Request has timed out after 5 minutes'))),
+        timeout({
+          each: 300000,
+          with: () => throwError(() => new Error('Request has timed out after 5 minutes'))
+        }),
         // 'mergeMap' can be used when you want to create nested observables
-        mergeMap((response) => {
+        mergeMap((response: any) => {
           if (response['success'] === true) {
             // Extract dataset URLs from JSON feature data
             const urlList: string[] = [];
@@ -92,12 +94,12 @@ export class DownloadWfsService {
             const bundle = this.bundleDatasets(urlList);
             return bundle;
           }
-          return observableThrowError(response['msg']);
+          return throwError(() => response['msg']);
         })
       );
     } catch (e) {
       console.error('Download error: ', e);
-      return observableThrowError(e);
+      return throwError(() => e);
     }
   }
 
@@ -148,25 +150,31 @@ export class DownloadWfsService {
         return this.http.post(this.env.portalBaseUrl + 'downloadTsgFiles.do', httpParams.toString(), {
           headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
           responseType: 'text'
-        }).pipe(timeoutWith(360000, observableThrowError(new Error('Request have timeout out after 6 minutes'))),
+        }).pipe(timeout({
+          each: 360000,
+          with: () => throwError(() => new Error('Request have timeout out after 6 minutes'))
+        }),
           map((response) => { // download file
             return response;
       }), catchError((error: HttpResponse<any>) => {
-            return observableThrowError(error);
+            return throwError(error);
           }),);
       } catch (e) {
-        return observableThrowError(e);
+        return throwError(() => e);
       }
 
     }
   public checkTsgDownloadAvailable(): Observable<any> {
     return this.http.get(this.env.portalBaseUrl + 'isTSGDownloadAvailable.do', {
       responseType: 'json'
-    }).pipe(timeoutWith(360000, observableThrowError(new Error('Request have timeout out after 6 minutes'))),
+    }).pipe(timeout({
+      each: 360000,
+      with: () => throwError(() => new Error('Request have timeout out after 6 minutes'))
+    }),
       map((response) => {
         return response;
     }), catchError((error: HttpResponse<any>) => {
-        return observableThrowError(error);
+        return throwError(() => error);
     }),);
   }
 
@@ -178,11 +186,15 @@ export class DownloadWfsService {
   public downloadTsgFile(url: string): Observable<any> {
     //https://nvcldb.blob.core.windows.net/nvcldb/GBD021_chips.zip
     //https://nvclanalyticscache.z8.web.core.windows.net/Qld/Mirrica1.zip'
-    return this.http.get(url, { responseType: 'blob' }).pipe(timeoutWith(6000000, observableThrowError(new Error('Request have timeout out after 100 minutes'))),
+    return this.http.get(url, { responseType: 'blob' }).pipe(
+      timeout({
+        each: 6000000,
+        with: () => throwError(() => new Error('Request have timeout out after 100 minutes'))
+      }),
       map((response) => { // download file
       return response;
     }), catchError((error: HttpResponse<any>) => {
-        return observableThrowError(error);
+        return throwError(() => error);
     }),);
 
   }
@@ -224,7 +236,7 @@ export class DownloadWfsService {
         const serviceUrl = this.env.portalBaseUrl + downloadUrl + '?';
         httpParams = httpParams.append('serviceUrls', serviceUrl + $.param(filterParameters));
       }
-      let downloadObserver;
+      let downloadObserver: Observable<Blob | string>;
       if (bZip) {
         downloadObserver = this.http.post(this.env.portalBaseUrl + 'downloadGMLAsZip.do', httpParams.toString(), {
           headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
@@ -236,14 +248,19 @@ export class DownloadWfsService {
           responseType: 'text'
         });
       }
-      return downloadObserver.pipe(timeoutWith(360000, observableThrowError(new Error('Request have timeout out after 6 minutes'))),
-        map((response) => { // download file
-          return response;
-        }), catchError((error: HttpResponse<any>) => {
-          return observableThrowError(error);
-        }),);
+
+      return downloadObserver.pipe(
+        timeout({
+          each: 360000,
+          with: () => throwError(() => new Error('Request has timed out after 6 minutes'))
+        }),
+        map(response => response),
+        catchError((error: HttpResponse<any>) => {
+          return throwError(() => error);
+        })
+      );
     } catch (e) {
-      return observableThrowError(e);
+      return throwError(() => e);
     }
 
   }

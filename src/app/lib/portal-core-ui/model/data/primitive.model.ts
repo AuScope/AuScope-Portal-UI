@@ -4,9 +4,9 @@ import { GeometryType } from "../../utility/constants.service";
  */
 export class PrimitiveModel {
   coords: any;
-  description: string;
+  description!: string;
   featureNode: any;
-  geometryType: GeometryType;
-  name: string;
-  srsName: string;
+  geometryType!: GeometryType;
+  name!: string;
+  srsName!: string;
 }

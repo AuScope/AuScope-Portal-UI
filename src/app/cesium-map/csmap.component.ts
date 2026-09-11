@@ -9,7 +9,7 @@ import { GMLParserService } from '../lib/portal-core-ui/utility/gmlparser.servic
 import { LayerModel } from '../lib/portal-core-ui/model/data/layer.model';
 import { ManageStateService } from '../lib/portal-core-ui/service/permanentlink/manage-state.service';
 import { QueryWMSService } from '../lib/portal-core-ui/service/wms/query-wms.service';
-import { QueryWMTSService } from 'app/lib/portal-core-ui/service/wmts/query-wmts.service';
+import { QueryWMTSService } from '../lib/portal-core-ui/service/wmts/query-wmts.service';
 import { SimpleXMLService } from '../lib/portal-core-ui/utility/simplexml.service';
 import { UtilitiesService } from '../lib/portal-core-ui/utility/utilities.service';
 import { CsMapObject } from '../lib/portal-core-ui/service/cesium-map/cs-map-object';
@@ -20,18 +20,27 @@ import {
 } from 'cesium';
 import { IrisQuerierHandler } from './custom-querier-handler/iris-querier-handler.service';
 import { KMLQuerierHandler } from './custom-querier-handler/kml-querier-handler.service';
-import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
-import { UserStateService } from 'app/services/user/user-state.service';
+import { AdvancedComponentService } from '../services/ui/advanced-component.service';
+import { UserStateService } from '../services/user/user-state.service';
 import { VMFQuerierHandler } from './custom-querier-handler/vmf-querier-handler.service';
 import { GeoJsonQuerierHandler } from './custom-querier-handler/geojson-querier-handler.service'
 import { Observable, forkJoin, of } from 'rxjs';
 import { catchError, finalize, tap, timeout } from 'rxjs/operators';
-import { ToolbarComponent } from 'app/menupanel/toolbar/toolbar.component';
-import { NVCLBoreholeAnalyticService } from 'app/modalwindow/layeranalytic/nvcl/nvcl.boreholeanalytic.service';
+import { ToolbarComponent } from '../menupanel/toolbar/toolbar.component';
+import { NVCLBoreholeAnalyticService } from '../modalwindow/layeranalytic/nvcl/nvcl.boreholeanalytic.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 declare let rudderanalytics: any;
+
+interface TileInfo {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  bbox: number[];
+  level: number;
+}
 
 @Component({
   selector: 'app-cs-map',
@@ -83,14 +92,14 @@ export class CsMapComponent implements AfterViewInit {
   public static AUSTRALIA = Rectangle.fromDegrees(114.591, -45.837, 148.97, -5.73);
 
   // This is necessary to access the html element to set the map target (after view init)!
-  @ViewChild('mapElement', { static: true }) mapElement: ElementRef;
+  @ViewChild('mapElement', { static: true }) mapElement!: ElementRef;
 
-  @ViewChild('mapSlider', { static: false }) mapSlider: ElementRef;
+  @ViewChild('mapSlider', { static: false }) mapSlider!: ElementRef;
 
   @ViewChild(ToolbarComponent) toolbar!: ToolbarComponent;
 
   // Advanced map components (legends etc.)
-  @ViewChild('advancedmapcomponents', { static: true, read: ViewContainerRef }) advancedMapComponents: ViewContainerRef;
+  @ViewChild('advancedmapcomponents', { static: true, read: ViewContainerRef }) advancedMapComponents!: ViewContainerRef;
 
   name = 'Angular';
   cesiumLoaded = true;
@@ -101,7 +110,7 @@ export class CsMapComponent implements AfterViewInit {
 
   sliderMoveActive = false;
 
-  private dialogRef: MatDialogRef<QuerierModalComponent>;
+  private dialogRef!: MatDialogRef<QuerierModalComponent>;
   private modalDisplayed = false;
 
   constructor() {
@@ -135,7 +144,7 @@ export class CsMapComponent implements AfterViewInit {
         window.alert('This browser does not support pickPosition.');
       }
       const handler = new ScreenSpaceEventHandler(scene.canvas);
-      handler.setInputAction((movement) => {
+      handler.setInputAction((movement: any) => {
         this.csMapObject.processClick(movement);
       }, ScreenSpaceEventType.LEFT_UP);
 
@@ -146,7 +155,7 @@ export class CsMapComponent implements AfterViewInit {
       viewer.scene.globe.tileCacheSize = 100000;
 
       // Keep track of lat/lon at mouse
-      handler.setInputAction((movement) => {
+      handler.setInputAction((movement: any) => {
         const ellipsoid = this.viewer.scene.globe.ellipsoid;
         const cartesian = this.viewer.camera.pickEllipsoid(movement.endPosition, ellipsoid);
         this.ngZone.run(() => {
@@ -254,7 +263,7 @@ export class CsMapComponent implements AfterViewInit {
    * @param mouseY y position in screen
    * @returns {x: y: width: height: bbox:} or undefined if could not calculate
    */
-  public getParams(mouseX: number, mouseY: number): { x: number, y: number, width: number, height: number, bbox: number[], level: number } {
+  public getParams(mouseX: number, mouseY: number): TileInfo | undefined {
 
     // Convert mouse coords to X,Y,Z cartesian
     const mousePosition = new Cartesian2(mouseX, mouseY);
@@ -369,7 +378,7 @@ export class CsMapComponent implements AfterViewInit {
    * Handles the map click event
    * @param mapClickInfo object with map click information
    */
-  private handleLayerClick(mapClickInfo) {
+  private handleLayerClick(mapClickInfo: any) {
     if (this.csMapObject.getIgnoreMapClick()) {
       return;
     }
@@ -393,7 +402,7 @@ export class CsMapComponent implements AfterViewInit {
     // Process lists of entities
     for (const entity of mapClickInfo.clickedEntityList) {
       // TODO: Ignore polygon filter entities here or in portal-core-ui
-      const layer: LayerModel = this.csMapService.getLayerForEntity(entity);
+      const layer: LayerModel | null = this.csMapService.getLayerForEntity(entity);
       if (layer !== null) {
         // IRIS layers
         if (layer.cswRecords.find(c => c.onlineResources.find(o => o.type === ResourceType.IRIS))) {
@@ -667,12 +676,12 @@ export class CsMapComponent implements AfterViewInit {
       // All requests completed, add zoom message to modal if no results were found
       forkJoin(getFeatureInfoRequests).pipe(
         finalize(() => {
-          this.dialogRef.componentInstance.data.downloading = false;
+          this.dialogRef.componentInstance.data().downloading = false;
           this.dialogRef.componentInstance.allLayersLoaded();
         })
       ).subscribe();
     } else {
-      this.dialogRef.componentInstance.data.downloading = false;
+      this.dialogRef.componentInstance.data().downloading = false;
       this.dialogRef.componentInstance.allLayersLoaded();
     }
 
@@ -708,7 +717,7 @@ export class CsMapComponent implements AfterViewInit {
    * Display the querier modal on map click
    * @param clickCoord map click coordinates
    */
-  private displayModal(_clickCoord: { x: number, y: number, z: number }) {
+  private displayModal(_clickCoord: { x: number, y: number, z: number } | null) {
     if (!this.modalDisplayed) {
       this.dialogRef = this.dialog.open(QuerierModalComponent, {
         width: '800px',
@@ -931,9 +940,9 @@ export class CsMapComponent implements AfterViewInit {
         continue;
       }
 
-      this.dialogRef.componentInstance.data.docs.push(treeCollection);
-      if (this.dialogRef.componentInstance.data.uniqueLayerNames.indexOf(feature.layer.name) === -1) {
-        this.dialogRef.componentInstance.data.uniqueLayerNames.push(feature.layer.name);
+      this.dialogRef.componentInstance.data().docs.push(treeCollection);
+      if (this.dialogRef.componentInstance.data().uniqueLayerNames.indexOf(feature.layer.name) === -1) {
+        this.dialogRef.componentInstance.data().uniqueLayerNames.push(feature.layer.name);
       }
     }
 
@@ -962,13 +971,13 @@ export class CsMapComponent implements AfterViewInit {
    * @param bsModalRef modal dialog reference
    */
   private setModalHTML(html: string, key: any, layer: LayerModel, dialogRef: MatDialogRef<QuerierModalComponent>) {
-    dialogRef.componentInstance.data.htmls.push({
+    dialogRef.componentInstance.data().htmls.push({
       key: key,
       layer: layer,
       value: html
     });
-    if (dialogRef.componentInstance.data.uniqueLayerNames.indexOf(layer.name) === -1) {
-      dialogRef.componentInstance.data.uniqueLayerNames.push(layer.name)
+    if (dialogRef.componentInstance.data().uniqueLayerNames.indexOf(layer.name) === -1) {
+      dialogRef.componentInstance.data().uniqueLayerNames.push(layer.name)
     }
     this.dialogRef.componentInstance.onDataChange();
   }
@@ -977,7 +986,7 @@ export class CsMapComponent implements AfterViewInit {
    * Updates the splitPosition when the slider is moved
    * @param movement mouse event
    */
-  private moveSlider = (movement) => {
+  private moveSlider = (movement: any) => {
     if (!this.sliderMoveActive) {
       return;
     }

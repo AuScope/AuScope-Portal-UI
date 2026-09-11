@@ -1,5 +1,5 @@
 
-import { throwError as observableThrowError, Observable } from 'rxjs';
+import { throwError, Observable } from 'rxjs';
 import { Injectable, inject } from '@angular/core';
 import { timeoutWith, map, catchError } from 'rxjs/operators';
 import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
@@ -89,14 +89,14 @@ export class DownloadWcsService {
       return this.http.get(this.env.portalBaseUrl + 'downloadWCSAsZip.do', {
         params: httpParams,
         responseType: 'blob'
-      }).pipe(timeoutWith(360000, observableThrowError(new Error('The request has timed out after 5 minutes'))),
+      }).pipe(timeoutWith(360000, throwError(() => new Error('The request has timed out after 5 minutes'))),
         map((response) => { // download file
           return response;
 	  }), catchError((error: HttpResponse<any>) => {
-          return observableThrowError(error);
+          return throwError(() => error);
         }),);
     } catch (e) {
-      return observableThrowError(e);
+      return throwError(() => e);
     }
 
   }
@@ -108,11 +108,15 @@ export class DownloadWcsService {
    *  @return observable containing the describe coverage response or error
    */
   public describeCoverage(serviceUrl: string, coverageName: string, useProxy: boolean): Observable<any> {
-    const retVal = this.getCoverageService.getCoverage(serviceUrl,coverageName, useProxy).pipe(map((response: { data: { cswRecords: any, capabilityRecords: any }}) => {
-      if (response['success'] === true) {
-        return response['data'][0];
+    /*
+    Note: response was originally '{ data: { cswRecords: any, capabilityRecords: any }}'
+          I've changed it to data for quick migration to Angular 22, but better to switch to using proper typing in future
+    */
+    const retVal = this.getCoverageService.getCoverage(serviceUrl,coverageName, useProxy).pipe(map((response: any) => {
+      if (response.success) {
+        return response.data[0];
       } else {
-        return observableThrowError(response['msg']);
+        return throwError(() => response.msg);
       }}));
     return retVal;
   }

@@ -14,7 +14,7 @@ export class MSCLComponent implements OnInit {
     msclService = inject(MSCLService);
     private changeDetectorRef = inject(ChangeDetectorRef);
     private dialog = inject(MatDialog);
-    private dialogRef: MatDialogRef<MSCLAnalyticComponent>;
+    private dialogRef!: MatDialogRef<MSCLAnalyticComponent>;
     /**
      * Input data:
      *   layer: LayerModel;
@@ -24,13 +24,18 @@ export class MSCLComponent implements OnInit {
      */
     public data = inject(MAT_DIALOG_DATA);
 
-    public msclform: { startDepth: number, endDepth: number, bMetric: object, bGroup: object }; // Used to store form data
+    public msclform: {
+      startDepth: number,
+      endDepth: number,
+      bMetric: Record<string, any>,
+      bGroup: Record<string, any>
+    }; // Used to store form data
 
     public metricPNameList: string[]; // Printable list of all selectable metrics
     public metricGroupList: string[]; // List of selectable group names
     public modalDisplayed = false; // Is modal dialogue displayed?
     public allTicked = false; // Are all tickboxes ticked?
-    public showSelectMetricError: boolean; // Show error if no metrics chosen when Draw Graph is pressed
+    public showSelectMetricError!: boolean; // Show error if no metrics chosen when Draw Graph is pressed
 
     private usesGMLObs = false; // Response has values nested within GeoSciML observations
 

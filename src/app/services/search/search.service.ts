@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AuscopeApiService } from '../api/auscope-api.service';
-import { SearchResponse } from 'app/models/searchresponse.model';
+import { SearchResponse } from '../../models/searchresponse.model';
 
 
 @Injectable({ providedIn: 'root' })
@@ -36,8 +36,10 @@ export class SearchService {
    * @param northBoundLatitude North bound
    * @returns a list of CSW records and known layers
    */
-  public searchCSWRecords(queryText: string, searchFields: string[], page: number, pageSize: number, ogcServices: string[], spatialRelation: string,
-          westBoundLongitude: number, eastBoundLongitude: number, southBoundLatitude: number, northBoundLatitude: number): Observable<SearchResponse> {
+  public searchCSWRecords(queryText: string, searchFields: string[], page: number | null, pageSize: number | null,
+      ogcServices: string[], spatialRelation: string,
+      westBoundLongitude?: number | undefined, eastBoundLongitude?: number | undefined,
+      southBoundLatitude?: number, northBoundLatitude?: number | undefined): Observable<SearchResponse> {
   return this.apiService.searchCSWRecords(queryText, searchFields, page, pageSize, ogcServices,
     spatialRelation, westBoundLongitude, eastBoundLongitude, southBoundLatitude, northBoundLatitude);
   }

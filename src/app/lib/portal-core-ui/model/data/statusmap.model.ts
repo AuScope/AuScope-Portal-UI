@@ -1,3 +1,4 @@
+import { signal } from '@angular/core';
 import { OnlineResourceModel } from './onlineresource.model';
 import { BehaviorSubject } from 'rxjs';
 
@@ -8,10 +9,10 @@ import { BehaviorSubject } from 'rxjs';
 export class StatusMapModel {
   private total: number;
   private completed: number;
-  private completePercentage: string;
-  public resourceMap: object;
-  private renderComplete: boolean;
-  private renderStarted: boolean;
+  private completePercentage!: string;
+  public resourceMap: any;
+  private renderComplete = signal<boolean>(false);
+  private renderStarted = signal<boolean>(false);
   private errorMessage: string;
   private _statusMap = new BehaviorSubject<StatusMapModel>(this);
 
@@ -20,8 +21,8 @@ export class StatusMapModel {
     this.completed = 0;
     this.total = 0;
     this.resourceMap = {};
-    this.renderComplete = false;
-    this.renderStarted = false;
+    this.renderComplete.set(false);
+    this.renderStarted.set(false);
     this.errorMessage = '';
   }
 
@@ -39,7 +40,7 @@ export class StatusMapModel {
     }
     this.resourceMap[onlineresource.url].total += 1;
     this.total += 1;
-    this.renderStarted = true;
+    this.renderStarted.set(true);
     this._statusMap.next(this);
   }
 
@@ -60,7 +61,7 @@ export class StatusMapModel {
     } else {
       this.completePercentage = Math.floor(this.completed / this.total * 100) + '%';
     }
-    this.renderStarted = true;
+    this.renderStarted.set(true);
     this._statusMap.next(this);
   }
 
@@ -111,7 +112,7 @@ export class StatusMapModel {
       }
     }
     if (this.completed === this.total) {
-      this.renderComplete = true;
+      this.renderComplete.set(true);
     }
     this._statusMap.next(this);
   }
@@ -131,8 +132,8 @@ export class StatusMapModel {
     this.completed = 0;
     this.total = 0;
     this.resourceMap = {};
-    this.renderComplete = false;
-    this.renderStarted = false;
+    this.renderComplete.set(false);
+    this.renderStarted.set(false);
     this.errorMessage = '';
     this._statusMap.next(this);
   }
@@ -142,11 +143,11 @@ export class StatusMapModel {
   }
 
   public getRenderComplete(): boolean {
-    return this.renderComplete;
+    return this.renderComplete();
   }
 
   public getRenderStarted(): boolean {
-    return this.renderStarted;
+    return this.renderStarted();
   }
 
   public getContainsError(): boolean {

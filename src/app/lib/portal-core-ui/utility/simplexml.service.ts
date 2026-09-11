@@ -35,7 +35,7 @@ export class SimpleXMLService {
    * @param nsResolver [Optional] namespace resolver function
    * @returns string value
    */
-  public static evaluateXPathString(document: Document, domNode: Node, xPath: string, nsResolver?: (prefix: string) => string): string {
+  public static evaluateXPathString(document: Document, domNode: Node, xPath: string, nsResolver?: (prefix: string | null) => string): string {
     const xpathResult = this.evaluateXPath(document, domNode, xPath, Constants.XPATH_STRING_TYPE, nsResolver);
     return xpathResult.stringValue;
   }
@@ -55,7 +55,7 @@ export class SimpleXMLService {
    * @return dom - the dom result
    */
   public static evaluateXPath(document: Document, domNode: Node, xPath: string, resultType: any,
-                              nsResolver?: (prefix: string) => string): any {
+                              nsResolver?: (prefix: string | null) => string): any {
     if (document.evaluate) {
       let result;
       try {
@@ -131,7 +131,7 @@ export class SimpleXMLService {
    * @param nsResolver [Optional] namespace resolver function
    * @return dom - the dom result
    */
-  public static evaluateXPathNodeArray(document: Document, domNode: Node, xPath: string, nsResolver?: (prefix: string) => string): any {
+  public static evaluateXPathNodeArray(document: Document, domNode: Node, xPath: string, nsResolver?: (prefix: string | null) => string): any {
     let xpathResult = null;
     try {
       xpathResult = this.evaluateXPath(document, domNode, xPath, XPathResult.UNORDERED_NODE_ITERATOR_TYPE, nsResolver);
@@ -206,7 +206,7 @@ export class SimpleXMLService {
    * @param nodeName String to compare against the node localName
    * @return dom - return the result in a dom
    */
-  public static filterNodeArray(nodeArray: any, nodeType: number, namespaceUri: string, nodeName: string): any {
+  public static filterNodeArray(nodeArray: any, nodeType: number, namespaceUri: string | undefined, nodeName: string | undefined): any {
     const matchingNodes = [];
     for (let i = 0; i < nodeArray.length; i++) {
       const node = nodeArray[i];
@@ -289,7 +289,7 @@ export class SimpleXMLService {
    * @param xmlString - xml string
    * @return dom - return the result in a dom
    */
-  public static parseStringToDOM(xmlString: string): Document {
+  public static parseStringToDOM(xmlString: string): Document | null {
     // Load our xml string into DOM
     let xmlDocument = null;
     if (window.DOMParser) {
@@ -315,8 +315,8 @@ export class SimpleXMLService {
    * @param node - Node class, defines where to start cleaning
    */
   public static removeEmptyNodes(node: Node) {
-    if (node.nodeType === SimpleXMLService.XML_NODE.XML_NODE_TEXT && node.nodeName === '#text' && node.nodeValue.trim().length === 0) {
-        node.parentNode.removeChild(node);
+    if (node.nodeType === SimpleXMLService.XML_NODE.XML_NODE_TEXT && node.nodeName === '#text' && node.nodeValue?.trim().length === 0) {
+        node.parentNode?.removeChild(node);
     } else {
         for (let i = node.childNodes.length - 1 ; i >= 0; i--) {
           this.removeEmptyNodes(node.childNodes.item(i));
@@ -335,10 +335,10 @@ export class SimpleXMLService {
     const docs: any[] = [];
     if (rootNode) {
       let features = null;
-      const wfsFeatureCollection = SimpleXMLService.getMatchingChildNodes(rootNode, null, 'FeatureCollection');
+      const wfsFeatureCollection = SimpleXMLService.getMatchingChildNodes(rootNode, undefined, 'FeatureCollection');
       if (UtilitiesService.isEmpty(wfsFeatureCollection)) {
         // Check for error reports - some WMS servers mark their error reports with <ServiceExceptionReport>, some with <html>
-        const exceptionNode = SimpleXMLService.getMatchingChildNodes(rootNode, null, 'ServiceExceptionReport');
+        const exceptionNode = SimpleXMLService.getMatchingChildNodes(rootNode, undefined, 'ServiceExceptionReport');
         const serviceErrorNode = SimpleXMLService.evaluateXPath(rootNode, rootNode, 'html', Constants.XPATH_UNORDERED_NODE_ITERATOR_TYPE);
         const nextNode = serviceErrorNode.iterateNext();
         if (!UtilitiesService.isEmpty(exceptionNode) || nextNode != null) {
@@ -352,13 +352,13 @@ export class SimpleXMLService {
           });
           return docs;
         }
-        const featureInfoNode = SimpleXMLService.getMatchingChildNodes(rootNode, null, 'FeatureInfoResponse');
+        const featureInfoNode = SimpleXMLService.getMatchingChildNodes(rootNode, undefined, 'FeatureInfoResponse');
         if (UtilitiesService.isEmpty(featureInfoNode)) {
           // Assume the node to be a feature node.
           features = [rootNode];
         } else {
           // 'text/xml'
-          const fieldNodes = SimpleXMLService.getMatchingChildNodes(featureInfoNode[0], null, 'FIELDS');
+          const fieldNodes = SimpleXMLService.getMatchingChildNodes(featureInfoNode[0], undefined, 'FIELDS');
           if (UtilitiesService.isEmpty(fieldNodes)) {
             features = featureInfoNode;
             // Skip the empty tenement feature from esri server.
@@ -394,9 +394,9 @@ export class SimpleXMLService {
           }
         }
       } else {
-        let featureMembers = SimpleXMLService.getMatchingChildNodes(wfsFeatureCollection[0], null, 'featureMembers');
+        let featureMembers = SimpleXMLService.getMatchingChildNodes(wfsFeatureCollection[0], undefined, 'featureMembers');
         if (UtilitiesService.isEmpty(featureMembers)) {
-          featureMembers = SimpleXMLService.getMatchingChildNodes(wfsFeatureCollection[0], null, 'featureMember');
+          featureMembers = SimpleXMLService.getMatchingChildNodes(wfsFeatureCollection[0], undefined, 'featureMember');
           features = featureMembers;
         } else {
           features = featureMembers[0].childNodes;

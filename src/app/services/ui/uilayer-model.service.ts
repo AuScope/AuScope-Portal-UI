@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { UILayerModel } from 'app/menupanel/common/model/ui/uilayer.model';
+import { Injectable, signal } from '@angular/core';
+import { UILayerModel } from '../../menupanel/common/model/ui/uilayer.model';
 
 @Injectable({
   providedIn: 'root'
@@ -8,18 +8,22 @@ export class UILayerModelService {
   /**
    *  Keep track of the UILayerModels in use (Active Layers, Featured Layers, Custom Search and Catalogue Search)
    */
-  private uiLayerModels = new Map<string, UILayerModel>();
+  private uiLayerModels = signal(new Map<string, UILayerModel>());
 
-  public getUILayerModel(layerId: string): UILayerModel {
-    return this.uiLayerModels.get(layerId);
+  public getUILayerModel(layerId: string): UILayerModel | undefined{
+    return this.uiLayerModels().get(layerId);
   }
 
   public setUILayerModel(layerId: string, uiLayerModel: UILayerModel): void {
-    this.uiLayerModels.set(layerId, uiLayerModel);
+    const currentModels = this.uiLayerModels();
+    currentModels.set(layerId, uiLayerModel);
+    this.uiLayerModels.set(currentModels);
   }
 
   public removeUILayerModel(layerId: string): void {
-    this.uiLayerModels.delete(layerId);
+    const currentModels = this.uiLayerModels();
+    currentModels.delete(layerId);
+    this.uiLayerModels.set(currentModels);
   }
 
   /**
@@ -29,7 +33,14 @@ export class UILayerModelService {
    * @returns true if layer has been added to the map, false otherwise
    */
   isLayerAdded(layerId: string): boolean {
-    return this.uiLayerModels.has(layerId) && this.getUILayerModel(layerId).statusMap.getRenderStarted();
+    return this.getUILayerModel(layerId)?.statusMap.getRenderStarted() ?? false;
+  }
+
+  /**
+   * Notify subscribers that the UILayerModel has changed as the signal does not automatically detect changes to the Map object
+   */
+  notifyChanged() {
+    this.uiLayerModels.update(map => new Map(map));
   }
 
 }

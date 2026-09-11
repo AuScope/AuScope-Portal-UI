@@ -5,10 +5,10 @@ import { ManageStateService } from '../../lib/portal-core-ui/service/permanentli
 import { AdvancedComponentService } from './advanced-component.service';
 import { LegendUiService } from '../legend/legend-ui.service';
 import { UILayerModelService } from './uilayer-model.service';
-import { environment } from 'environments/environment';
-import * as _ from 'lodash';
-import * as $ from 'jquery';
-import { SidebarService } from 'app/portal/sidebar.service';
+import { environment } from '../../../environments/environment';
+import _ from 'lodash';
+import $ from 'jquery';
+import { SidebarService } from '../../portal/sidebar.service';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
@@ -49,7 +49,7 @@ export class LayerManagerService {
     this.isLayerLoaded = new BehaviorSubject<boolean>(false);
   }
 
-  filterList = []; // an array of all active layers - object = {layer, filterState }
+  filterList: any[] = []; // an array of all active layers - object = {layer, filterState }
 
   /**
    * returns a boolean for whether a layer has filters; from the array filerList
@@ -71,7 +71,7 @@ export class LayerManagerService {
    * sets the state of "hasFilters" variable for the given layer in the array filterList
    */
   setFilters(layerId: string, filterState: boolean): void {
-    const objIndex = this.filterList.findIndex(obj => obj.layer == layerId);
+    const objIndex = this.filterList.findIndex((obj: any) => obj.layer == layerId);
     if (objIndex >= 0) {
       this.filterList[objIndex].hasFilters = filterState;
     } else {
@@ -106,14 +106,14 @@ export class LayerManagerService {
    * TODO: FilterPanel is only place bounding box filter can currently be set, better to shift flag to FilterService
    * and apply here when it's needed to adding from SearchPanel etc. will apply filter as well
    */
-  public addLayer(layer: LayerModel, optionalFilters: Array<object>, layerFilterCollection: any, layerTime: Date | null) {
+  public addLayer(layer: LayerModel, optionalFilters: Array<object>, layerFilterCollection: any, layerTime: Date | undefined) {
     if (environment.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
       rudderanalytics.track('Addlayer', {
         event_category: 'Addlayer',
         event_action: 'AddLayer:' + layer.id
       });
     }
-    const param = {
+    const param: any = {
       optionalFilters: _.cloneDeep(optionalFilters)
     };
 
@@ -127,11 +127,11 @@ export class LayerManagerService {
     if (advancedFilter) {
       advancedFilterParams = advancedFilter.getAdvancedParams();
       // Append any call parameters the AdvancedFilter may add
-      Object.assign(param, advancedFilter.getCallParams());
+      Object.assign(param, advancedFilter.getCallParams?.() ?? {});
     }
 
     // Remove filters without values from parameter list
-    param.optionalFilters = param.optionalFilters.filter(f => this.filterHasValue(f));
+    param.optionalFilters = param.optionalFilters.filter((f: any) => this.filterHasValue(f));
     for (const optFilter of param.optionalFilters) {
       if (optFilter['options']) {
         optFilter['options'] = [];
@@ -219,7 +219,7 @@ export class LayerManagerService {
    * @param filter the filter to test
    * @returns true if the filter contains a valid value
    */
-  private filterHasValue(filter: object): boolean {
+  private filterHasValue(filter: any): boolean {
     let hasValue = false;
     if (filter['type'] === 'OPTIONAL.PROVIDER') {
       for (const provider in filter['value']) {

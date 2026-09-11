@@ -16,7 +16,7 @@
         Unable to retrieve GRACE data, please try again.
       </div>
     }
-    <plotly-plot #gracePlot id="gracePlot" [divId]="gracePlot" [updateOnDataChange]="true" [data]="graph.data" [layout]="graph.layout" [config]="graph.config"></plotly-plot>
+    <plotly-plot #gracePlot id="gracePlot" id="gracePlot" [updateOnDataChange]="true" [data]="graph.data" [layout]="graph.layout" [config]="graph.config"></plotly-plot>
   </div>
   @if (queryStatus===QueryStatus.loaded) {
     <div class="citations">

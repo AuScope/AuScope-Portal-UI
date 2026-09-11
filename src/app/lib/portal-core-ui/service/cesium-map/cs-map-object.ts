@@ -2,7 +2,7 @@ import { RenderStatusService } from './renderstatus/render-status.service';
 import { UtilitiesService } from '../../utility/utilities.service';
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { EditActions, MapsManagerService, PolygonEditorObservable, PolygonEditUpdate, PolygonsEditorService,
+import { EditActions, EventResult, MapsManagerService, PolygonEditorObservable, PolygonEditUpdate, PolygonsEditorService,
          RectangleEditorObservable, RectanglesEditorService } from '@auscope/angular-cesium';
 import { Camera, Cartesian2, Cartesian3, Color, ColorMaterialProperty, Ellipsoid, Math as CesiumMath, SceneMode, ScreenSpaceEventHandler,
          ScreenSpaceEventType, WebMercatorProjection } from 'cesium';
@@ -20,10 +20,10 @@ export class CsMapObject {
   private mapsManagerService = inject(MapsManagerService);
 
 
-  private groupLayer: object;
+  private groupLayer: any;
   private clickHandlerList: ((p: any) => void)[] = [];
   private ignoreMapClick = false;
-  private polygonEditable$: PolygonEditorObservable;
+  private polygonEditable$!: PolygonEditorObservable | undefined;
   public isDrawingPolygonBS = new BehaviorSubject<boolean>(false);
 
   constructor() {
@@ -49,7 +49,7 @@ export class CsMapObject {
    * Register a click handler callback function which is called when there is a click event
    * @param clickHandler callback function, input parameter is the pixel coords that were clicked on
    */
-  public registerClickHandler(clickHandler: (p: number[]) => void) {
+  public registerClickHandler(clickHandler: (eventResult: EventResult) => void) {
     this.clickHandlerList.push(clickHandler);
   }
 
@@ -59,7 +59,7 @@ export class CsMapObject {
    * @returns [width, height] of canvas
    */
   public getViewSize(): [number, number] {
-    const viewer = this.mapsManagerService.getMap().getCesiumViewer();
+    const viewer = this.mapsManagerService.getMap()?.getCesiumViewer();
     return [viewer.canvas.width, viewer.canvas.height];
   }
 
@@ -69,8 +69,8 @@ export class CsMapObject {
    * @returns a MapState object
    */
    public getCurrentMapState(): MapState {
-     const camera: Camera = this.mapsManagerService.getMap().getCameraService().getCamera();
-     const sceneMode: SceneMode = this.mapsManagerService.getMap().getCesiumViewer().scene.mode;
+     const camera: Camera = this.mapsManagerService.getMap()?.getCameraService().getCamera();
+     const sceneMode: SceneMode = this.mapsManagerService.getMap()?.getCesiumViewer().scene.mode;
      const mapState: MapState = {
       camera: { position: camera.position.clone(),
                 direction: camera.direction.clone(),
@@ -88,8 +88,12 @@ export class CsMapObject {
    * @param mapState The state of the map in simple JSON
    */
    public resumeMapState(mapState: any) {
-     this.mapsManagerService.getMap().getCesiumViewer().scene.mode = mapState.scene.mode;
-     const camera: Camera = this.mapsManagerService.getMap().getCameraService().getCamera();
+     const map = this.mapsManagerService.getMap();
+     if (!map) {
+      throw new Error('Unable to retrieve map');
+     }
+     map.getCesiumViewer().scene.mode = mapState.scene.mode;
+     const camera: Camera = map.getCameraService().getCamera();
      // Convert simple JSON map state to Cartesian3
      camera.up = new Cartesian3(mapState.camera.up.x, mapState.camera.up.y, mapState.camera.up.z);
      camera.position = new Cartesian3(mapState.camera.position.x, mapState.camera.position.y, mapState.camera.position.z);
@@ -101,7 +105,11 @@ export class CsMapObject {
    * epsg4326 1.0 degree to 111km roughly
    */
   public getDistPerPixel(): any {
-    const viewer = this.mapsManagerService.getMap().getCesiumViewer();
+    const map = this.mapsManagerService.getMap();
+    if (!map) {
+      throw new Error('Unable to retrieve map');
+    }
+    const viewer = map.getCesiumViewer();
     const width = viewer.canvas.width;
     const height = viewer.canvas.height;
     const posWS = viewer.camera.pickEllipsoid(new Cartesian2(1, height), Ellipsoid.WGS84);
@@ -125,7 +133,11 @@ export class CsMapObject {
    * @returns [ minX, minY, maxX, maxY ]
    */
   public getMapViewBounds(): any {
-    const viewer = this.mapsManagerService.getMap().getCesiumViewer();
+    const map = this.mapsManagerService.getMap();
+    if (!map) {
+      throw new Error('Unable to retrieve map');
+    }
+    const viewer = map.getCesiumViewer();
     const width = viewer.canvas.width;
     const height = viewer.canvas.height;
     const posWS = viewer.camera.pickEllipsoid(new Cartesian2(1, height), Ellipsoid.WGS84);
@@ -221,6 +233,9 @@ export class CsMapObject {
     const polygonStringBS = new BehaviorSubject<string>(coordString);
     this.polygonEditable$.subscribe((editUpdate: PolygonEditUpdate) => {
       if (editUpdate.editAction === EditActions.ADD_LAST_POINT) {
+        if (!this.polygonEditable$) {
+          return;
+        }
         element.style.cursor = 'default';
         const cartesian3 = this.polygonEditable$.getCurrentPoints()
           .map(p => p.getPosition());
@@ -266,20 +281,28 @@ export class CsMapObject {
    * Get lon/lat of mouse click
    * @returns Point object representing lon/lat location of click
    */
-  public getPointFromClick(): BehaviorSubject<Point> {
+  public getPointFromClick(): BehaviorSubject<Point | null> {
     this.ignoreMapClick = true;
     const element = document.getElementsByTagName('canvas')[0];
     element.style.cursor = 'crosshair';
-    const handler = new ScreenSpaceEventHandler(this.mapsManagerService.getMap().getCesiumViewer().scene.canvas);
-    const pointBS = new BehaviorSubject<Point>(null);
-    handler.setInputAction(click => {
+    const map = this.mapsManagerService.getMap();
+    if (!map) {
+      throw new Error('Could not retrieve map');
+    }
+    const handler = new ScreenSpaceEventHandler(map.getCesiumViewer().scene.canvas);
+    const pointBS = new BehaviorSubject<Point | null>(null);
+    handler.setInputAction((click: any) => {
       const pixel = click.position;
       if (!pixel || !pixel.x || !pixel.y) {
         this.ignoreMapClick = false;
         return;
       }
       const mousePosition = new Cartesian2(pixel.x, pixel.y);
-      const viewer = this.mapsManagerService.getMap().getCesiumViewer();
+      const map = this.mapsManagerService.getMap();
+      if (!map) {
+        throw new Error('Could not retrieve map');
+      }
+      const viewer = map.getCesiumViewer();
       const ellipsoid = viewer.scene.globe.ellipsoid;
       const cartesian = viewer.camera.pickEllipsoid(mousePosition, ellipsoid);
       const cartographic = ellipsoid.cartesianToCartographic(cartesian);

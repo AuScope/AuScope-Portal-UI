@@ -5,30 +5,30 @@ import { TemporalExtentModel } from './temporal-extent.model';
  * A representation of a csw record
  */
 export class CSWRecordModel {
-  adminArea: string;
-  contactPerson: string;
-  authors: string[];
+  adminArea!: string;
+  contactPerson!: string;
+  authors!: string[];
   childRecords: any;
   constraints: any;
   useLimitConstraints: any;
   accessConstraints: any;
-  contactOrg: string;
-  funderOrg: string;
-  datasetURIs: string[];
-  date: string;
-  description: string;
+  contactOrg!: string;
+  funderOrg!: string;
+  datasetURIs!: string[];
+  date!: string;
+  description!: string;
   descriptiveKeywords: any;
   geographicElements: any;
-  id: string;
-  name: string;
-  noCache: boolean;
-  onlineResources: OnlineResourceModel[];
-  recordInfoUrl: string;
-  resourceProvider: string;
-  service: boolean;
+  id!: string;
+  name!: string;
+  noCache!: boolean;
+  onlineResources!: OnlineResourceModel[];
+  recordInfoUrl!: string;
+  resourceProvider!: string;
+  service!: boolean;
   expanded = false;
   temporalExtent?: TemporalExtentModel;
   knownLayerIds?: string[];
-  layerSRS: string[];
-  legendSupport : boolean;
+  layerSRS!: string[];
+  legendSupport! : boolean;
 }
