@@ -2,10 +2,10 @@ import { Component, OnInit, inject } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { CsMapObject } from '../../../../../lib/portal-core-ui/service/cesium-map/cs-map-object';
 import { CsMapService } from '../../../../../lib/portal-core-ui/service/cesium-map/cs-map.service';
-import { GraceService } from 'app/services/wcustom/grace/grace.service';
-import { GraceGraphModalComponent } from 'app/modalwindow/querier/customanalytic/grace/grace-graph.modal.component';
+import { GraceService } from '../../../../../services/wcustom/grace/grace.service';
+import { GraceGraphModalComponent } from '../../../../../modalwindow/querier/customanalytic/grace/grace-graph.modal.component';
 import { AdvancedFilterDirective } from '../advanced-filter.directive';
-import { GraceStyleSettings } from 'app/modalwindow/querier/customanalytic/grace/grace-graph.models';
+import { GraceStyleSettings } from '../../../../../modalwindow/querier/customanalytic/grace/grace-graph.models';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 
@@ -26,7 +26,7 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
     timeSeriesGraphModalRef?: MatDialogRef<GraceGraphModalComponent>;
 
     DECIMAL_REGEX = '^-?\\d*\.{0,1}\\d+$';
-    styleGroup: UntypedFormGroup;
+    styleGroup!: UntypedFormGroup;
 
     ngOnInit() {
         // Construct form current GRACE style

@@ -7,7 +7,7 @@ import { NVCLDatasetListComponent } from '../app/modalwindow/querier/customanaly
 import { TIMAComponent } from '../app/modalwindow/querier/customanalytic/tima/tima.component';
 import { MSCLComponent } from '../app/modalwindow/querier/customanalytic/mscl/mscl.component';
 import { GraceLegendComponent } from '../app/cesium-map/advanced/grace/grace-legend.component';
-import { GraceAdvancedFilterComponent } from 'app/menupanel/common/filterpanel/advance/grace/grace-advanced-filter.component';
+import { GraceAdvancedFilterComponent } from '../app/menupanel/common/filterpanel/advance/grace/grace-advanced-filter.component';
 
 
 export const ref = {

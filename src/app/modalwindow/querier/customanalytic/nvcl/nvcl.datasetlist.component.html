@@ -6,7 +6,7 @@
 
 <div id="nvcl-dataset">
   <!-- this will now only ever be one item, ie i will always be zero; the list of features is now in the querier.modal -->
-  @for (nvclDataset of nvclDatasets; track nvclDataset; let i = $index) {
+  @for (nvclDataset of nvclDatasets(); track nvclDataset; let i = $index) {
     <div>
       <!-- BEGIN IMAGE tabcontent-->
       <div id="image" class="tabcontent">
@@ -100,7 +100,7 @@
           <div class="container-fluid">
             <div class="row justify-content-between d-none d-md-flex">
               <div class="col-3">
-                @if (jobList[featureId] && jobList[featureId].length > 0) {
+                @if (jobList[data.featureId] && jobList[data.featureId].length > 0) {
                   <div data-toggle="tooltip"
                     title="Job View" (click)="jobView=true;" class="btn btn-light btn-sm"
                     [ngClass]="{'lightgray-bg':jobView}">
@@ -186,7 +186,7 @@
                       <!-- BEGIN container -->
                       <div class="container-fluid">
                         <!-- BEGIN row -->
-                        @for (job of jobList[featureId]; track job) {
+                        @for (job of jobList[data.featureId]; track job) {
                           <div class="row rowScalar">
                             <div class="col-sm-1 checkbox">
                               <input type="checkbox" value="10"

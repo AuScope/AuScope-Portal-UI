@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { UserStateService } from 'app/services/user/user-state.service';
-import { User } from 'app/models/user.model';
-import { CreatePermanentLinkModalComponent } from 'app/modalwindow/permanentlink/create-permanentlink.modal.component';
+import { UserStateService } from '../../services/user/user-state.service';
+import { User } from '../../models/user.model';
+import { CreatePermanentLinkModalComponent } from '../../modalwindow/permanentlink/create-permanentlink.modal.component';
 import { MatDialog } from '@angular/material/dialog';
 
 @Component({
@@ -16,7 +16,7 @@ export class PermanentLinkComponent {
   private dialog = inject(MatDialog);
 
   public bShowDialog = false;
-  public user: User;
+  public user?: User;
   public permanentlink = "";
   public shorteningMode = false;
 

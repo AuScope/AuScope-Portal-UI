@@ -18,10 +18,10 @@ export class FilterPanelService {
   /**
    * Helper service to retrieve remote options for the filter options
    */
-  public getFilterRemoteParam(url: string): Observable<any> {
+  public getFilterRemoteParam(url: string): Observable<any> | undefined{
     switch (url) {
       case 'xxx.do':
-        return // VT: in the event we need special handling this.xxx(url);
+        return; // VT: in the event we need special handling this.xxx(url);
       default:
         return this.getRemoteParam(this.env.portalBaseUrl + url);
     }
@@ -32,10 +32,10 @@ export class FilterPanelService {
    */
   public getRemoteParam(url: string): Observable<any> {
     return this.http.get(url).pipe(
-      map(response => {
+      map((response: any) => {
         const data = response['data'];
-        const result = [];
-        data.forEach(function(item, _i, _ar) {
+        const result: any[] = [];
+        data.forEach(function(item: any, _i: any, _ar: any) {
           result.push({
             key: item[1],
             value: item[0]
@@ -44,6 +44,5 @@ export class FilterPanelService {
         return result;
       }));
   }
-
 
 }

@@ -16,7 +16,7 @@ export class GraceLegendComponent extends AdvancedMapComponent implements OnInit
     private graceService = inject(GraceService);
 
 
-    graceStyleSettings: GraceStyleSettings;
+    graceStyleSettings!: GraceStyleSettings;
 
     ngOnInit() {
         this.graceStyleSettings = {

@@ -40,10 +40,10 @@ export class LayerHandlerService {
         return this.layerRecord;
       } else {
         return this.http.get(this.env.portalBaseUrl + this.env.getCSWRecordEndP).pipe(
-          map(response => {
-            const newLayerRecord = {};
+          map((response: any) => {
+            const newLayerRecord: any = {};
             const cswRecord = response['data'];
-            cswRecord.forEach(function(item, _i, _ar) {
+            cswRecord.forEach(function(item: any, _i: any, _ar: any) {
               if (newLayerRecord[item.group] === undefined) {
                 newLayerRecord[item.group] = [];
               }
@@ -65,8 +65,8 @@ export class LayerHandlerService {
    * @param layerIds array of layer IDs
    * @returns an Observable containing an array of LayerModels
    */
-  public getLayerModelsForIds(layerIds: string[]): Observable<LayerModel[]> {
-    const layersBS = new BehaviorSubject<LayerModel[]>(null);
+  public getLayerModelsForIds(layerIds: string[]): Observable<LayerModel[] | null> {
+    const layersBS = new BehaviorSubject<LayerModel[] | null>(null);
     return this.layerRecord.pipe(switchMap(records => {
       const matchingLayers: LayerModel[] = [];
       for (const layerGroup in records) {
@@ -90,21 +90,22 @@ export class LayerHandlerService {
    * @param serviceUrl WMS URL of service
    * @returns a layer with the retrieved cswrecord wrapped in a layer model.
    */
-  public getCustomLayerRecord(serviceUrl: string): Observable<LayerModel[]> {
+  public getCustomLayerRecord(serviceUrl: string): Observable<{ LayerModel: LayerModel[]; nestedLayers:any } | undefined> {
     // Send out a 'GetCapabilities' request
     const retVal = this.getCapsService.getCaps(serviceUrl, 'custom').pipe(
-                        map((response: { data: { cswRecords: any, capabilityRecords: any }}) => {
+                        map((response: { data: { cswRecords: any, capabilityRecords: any }, nestedLayers: any}) => {
       // Create a list of LayerModels using the 'GetCapabilities' response
       if (Object.keys(response).length === 0) {
         return;
       }
-      const itemLayers: LayerModel[] = [];
+      // include list of nested layers
+      const itemLayers: {LayerModel: LayerModel[]; nestedLayers: any;} = {LayerModel: [], nestedLayers: null};
+      itemLayers.nestedLayers = response.nestedLayers;
       const cswRecord = response['data']['cswRecords'];
       if (cswRecord) {
-        cswRecord.forEach(function (item, _i, _ar) {
+        cswRecord.forEach(function (item: any, _i: any, _ar: any) {
             const itemLayer = new LayerModel();
             itemLayer.cswRecords = [item];
-            itemLayer['expanded'] = false;
             itemLayer.id = item.id;
             itemLayer.description = item.description;
             itemLayer.hidden = false;
@@ -118,7 +119,7 @@ export class LayerHandlerService {
             // Custom layers to use default proxy and skip whitelist
             itemLayer.useDefaultProxy = true;
             itemLayer.useProxyWhitelist = false;
-            itemLayers.push(itemLayer);
+            itemLayers.LayerModel.push(itemLayer);
         });
       }
       return itemLayers;
@@ -141,7 +142,6 @@ export class LayerHandlerService {
     const itemLayer = new LayerModel();
     const cswRec = this.makeCustomKMLCSWRec(name, id, url);
     itemLayer.cswRecords = [cswRec];
-    itemLayer['expanded'] = false;
     itemLayer.id = id;
     itemLayer.description = 'Because this is a custom KML layer there is no more information to display';
     itemLayer.hidden = false;
@@ -163,7 +163,6 @@ export class LayerHandlerService {
     const itemLayer = new LayerModel();
     const cswRec = this.makeCustomJsonCSWRec(name, id, url);
     itemLayer.cswRecords = [cswRec];
-    itemLayer['expanded'] = false;
     itemLayer.id = id;
     itemLayer.description = 'Because this is a custom GEOJSON layer there is no more information to display';
     itemLayer.hidden = false;
@@ -185,7 +184,6 @@ export class LayerHandlerService {
       const itemLayer = new LayerModel();
       const cswRec = this.makeCustomKMZCSWRec(name, id, url);
       itemLayer.cswRecords = [cswRec];
-      itemLayer['expanded'] = false;
       itemLayer.id = id;
       itemLayer.description = 'Because this is a custom KMZ layer there is no more information to display';
       itemLayer.hidden = false;

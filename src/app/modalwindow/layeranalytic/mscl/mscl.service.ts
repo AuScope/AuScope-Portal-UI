@@ -125,7 +125,6 @@ export class MSCLService {
         }
     }
 
-
     /**
      * Returns a complete list of printable metric name if no parameter supplied
      * or converts a list of feature element names to printable names
@@ -134,7 +133,7 @@ export class MSCLService {
      * @returns a list of printable metric names for MSCL data service
      */
     public getMetricPNameList(featList?: string[]): string[] {
-        const retList = [];
+        const retList: any[] = [];
         if (featList) {
             // Convert feature name list to a list of names and group names
             for (const featElem of featList) {
@@ -159,7 +158,6 @@ export class MSCLService {
         return retList;
     }
 
-
     /**
      * Returns true if the input string is a metric group name
      *
@@ -175,7 +173,6 @@ export class MSCLService {
         return false;
     }
 
-
     /**
      * Gets a list of 'Info' attributes for a group
      *
@@ -184,15 +181,14 @@ export class MSCLService {
      * @returns list of WFS feature element names
      */
     public getInfoAttrsForGrp(groupName: string, attr: string): string[] {
-        const retList = [];
+        const retList: any[] = [];
         for (const mm of metricMap.values()) {
             if (mm.group === groupName) {
-                retList.push(mm[attr]);
+                retList.push(mm[attr as keyof Info]);
             }
         }
         return retList;
     }
-
 
     /**
      * Converts WFS feature attribute from string to Metric
@@ -202,7 +198,7 @@ export class MSCLService {
      */
     public toMetricEnum(featAttr: string): string {
         for (const m of metricMap.keys()) {
-            if (metricMap.get(m).feat_elem === featAttr) {
+            if (metricMap.get(m)?.feat_elem === featAttr) {
                 return m;
             }
         }
@@ -235,12 +231,11 @@ export class MSCLService {
     public getMetricInfoAttr(metricPName: string, attr: string): string {
         for (const info of metricMap.values()) {
             if (info.pname === metricPName) {
-                return info[attr];
+                return info[attr as keyof Info];
             }
         }
         return "";
     }
-
 
     /**
      * Smooths an array of numbers to a particular window size
@@ -269,7 +264,6 @@ export class MSCLService {
         return result
     }
 
-
     /**
      * Smooth out x-values
      *
@@ -277,14 +271,13 @@ export class MSCLService {
      * @param xLists lists of x-values in associative array, key is metric string
      * @return smoothed x-values in same format as 'xLists'
      */
-    private smoothOut(metricList: string[], xLists: object, windowSize: number) {
-        const xLists_out = {};
+    private smoothOut(metricList: string[], xLists: any, windowSize: number) {
+        const xListsOut: any = {};
         for (const metric of metricList) {
-            xLists_out[metric] = this.smooth(xLists[metric], windowSize);
+            xListsOut[metric] = this.smooth(xLists[metric], windowSize);
         }
-        return xLists_out;
+        return xListsOut;
     }
-
 
     /**
      * Creates layout for several plots in one area
@@ -292,7 +285,7 @@ export class MSCLService {
      * @param metricList list of Metrics to plot
      * @returns plot layout
      */
-    public getGraphLayout(metricList: string[], xLists: object): Partial<Layout> {
+    public getGraphLayout(metricList: string[], xLists: any): Partial<Layout> {
         const layout: Partial<Layout> = {
             hovermode: 'closest',
             grid: { rows: 1, columns: metricList.length, pattern: 'independent' },
@@ -337,8 +330,8 @@ export class MSCLService {
             }
             idx += SM_WINDOW_LIST.length;
         }
-        layout['sliders'][0]['steps'].push({ label: 'lines', method: 'restyle', args: [{ 'mode': 'lines' }, lineIndexList] });
-        layout['sliders'][0]['steps'].push({ label: 'markers', method: 'restyle', args: [{ 'mode': 'markers', 'marker': MARKER_SZ }] });
+        layout['sliders']?.[0]['steps']?.push({ label: 'lines', method: 'restyle', args: [{ 'mode': 'lines' }, lineIndexList] });
+        layout['sliders']?.[0]['steps']?.push({ label: 'markers', method: 'restyle', args: [{ 'mode': 'markers', 'marker': MARKER_SZ }] });
 
         // Make the slider steps for the plot line smoothing
         // Set up a 'visibleList' to only show one smoothed line at a time
@@ -351,7 +344,7 @@ export class MSCLService {
                     visibleList.push(true);
                 }
             }
-            layout['sliders'][1]['steps'].push({ label: SM_WINDOW_LIST[i], method: 'restyle', args: ['visible', visibleList] });
+            layout['sliders']?.[1]['steps']?.push({ label: SM_WINDOW_LIST[i], method: 'restyle', args: ['visible', visibleList] });
         }
         let axisNum = 1;
         for (const metric of metricList) {
@@ -363,7 +356,7 @@ export class MSCLService {
                 yAxisName += axisNum.toString();
                 yTitle = '';
             }
-            layout[xAxisName] = {
+            (layout as Record<string, any>)[xAxisName] = {
                 title: {
                     text: metric
                 },
@@ -373,7 +366,7 @@ export class MSCLService {
                 autorange: false,
                 range: this.getRange(xLists[metric])
             };
-            layout[yAxisName] = {
+            (layout as Record<string, any>)[yAxisName] = {
                 autorange: 'reversed',
                 title: {
                     text: yTitle
@@ -385,8 +378,8 @@ export class MSCLService {
                 // Logarithmic x-axis for these
                 case Metric.magSuscPoint:
                 case Metric.resistivity:
-                    layout[xAxisName]['type'] = 'log';
-                    layout[xAxisName]['autorange'] = true;
+                    (layout as Record<string, any>)[xAxisName]['type'] = 'log';
+                    (layout as Record<string, any>)[xAxisName]['autorange'] = true;
                     break;
             }
             axisNum++;
@@ -413,9 +406,9 @@ export class MSCLService {
      * @param yList y-axis data
      * @return plotly 'Data' object containing plot data
      */
-    public getGraphTraceList(metricList: string[], xLists: object, yList: number[]): Data[] {
+    public getGraphTraceList(metricList: string[], xLists: any, yList: number[]): Data[] {
         const traceList: Data[] = [];
-        const xLists_sm = {};
+        const xLists_sm: any = {};
         xLists_sm[SM_WINDOW_LIST[0]] = xLists;
         for (let i = 1; i < SM_WINDOW_LIST.length; i++) {
             xLists_sm[SM_WINDOW_LIST[i]] = this.smoothOut(metricList, xLists, parseInt(SM_WINDOW_LIST[i], 10));
@@ -424,7 +417,7 @@ export class MSCLService {
         // A new plot for each metric
         for (const metric of metricList) {
             // Draw lines of varying degrees of smoothing in each plot
-            const trace_sm: object = {};
+            const trace_sm: any = {};
             for (const win of SM_WINDOW_LIST) {
                 trace_sm[win] = {
                     x: xLists_sm[win][metric],
@@ -519,6 +512,9 @@ export class MSCLService {
       */
       public findMetricTypes(xmlStr: string): any[] {
         const rootNode = SimpleXMLService.parseStringToDOM(xmlStr);
+        if (!rootNode) {
+          return [];
+        }
         const METRICS = '//gsmlbh:specification/om:OM_Observation/om:result/swe:Quantity/swe:label';
         const nodeList = SimpleXMLService.evaluateXPathNodeArray(rootNode, rootNode, METRICS, this.nsResolver.bind(this));
         const metricVals = [];
@@ -572,7 +568,7 @@ export class MSCLService {
         return this.http.post(environment.portalBaseUrl + 'getMsclObservationsForGraph.do', httpParams.toString(), {
             headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
             responseType: 'json'
-        }).pipe(map(response => {
+        }).pipe(map((response: any) => {
             if (response['success'] === true) {
                 return response['data']['series'];
             } else {

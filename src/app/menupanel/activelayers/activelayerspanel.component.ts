@@ -1,4 +1,4 @@
-import { Component, Input, ViewChildren, QueryList, AfterViewInit, inject } from '@angular/core';
+import { Component, Input, ViewChildren, QueryList, AfterViewInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CsMapService } from '../../lib/portal-core-ui/service/cesium-map/cs-map.service';
 import { ResourceType } from '../../lib/portal-core-ui/utility/constants.service';
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
@@ -9,20 +9,20 @@ import { CsClipboardService } from '../../lib/portal-core-ui/service/cesium-map/
 import { ref } from "../../../environments/ref";
 import { SplitDirection } from 'cesium';
 import { UILayerModel } from '../common/model/ui/uilayer.model';
-import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
-import { LegendUiService } from 'app/services/legend/legend-ui.service';
+import { UILayerModelService } from '../../services/ui/uilayer-model.service';
+import { LegendUiService } from '../../services/legend/legend-ui.service';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { LayerManagerService } from 'app/services/ui/layer-manager.service';
-import { UserStateService } from 'app/services/user/user-state.service';
-import { environment } from 'environments/environment';
+import { LayerManagerService } from '../../services/ui/layer-manager.service';
+import { UserStateService } from '../../services/user/user-state.service';
+import { environment } from '../../../environments/environment';
 import { FilterPanelComponent } from '../common/filterpanel/filterpanel.component';
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
 import { DownloadPanelComponent } from '../common/downloadpanel/downloadpanel.component';
-import { Bookmark } from 'app/models/bookmark.model';
+import { Bookmark } from '../../models/bookmark.model';
 import { config } from '../../../environments/config';
-import { AuthService } from 'app/services/auth/auth.service';
+import { AuthService } from '../../services/auth/auth.service';
 import { MatDialog } from '@angular/material/dialog';
-import { NgbdModalStatusReportComponent } from 'app/toppanel/renderstatus/renderstatus.component';
+import { NgbdModalStatusReportComponent } from '../../toppanel/renderstatus/renderstatus.component';
 
 // Filter modes available in the dropdown layer filter selector
 enum FilterMode {
@@ -48,25 +48,32 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
   manageStateService = inject(ManageStateService);
   authService = inject(AuthService);
   dialog = inject(MatDialog);
+  changeDetectorRef = inject(ChangeDetectorRef);
 
-  @ViewChildren(FilterPanelComponent) filterComponents: QueryList<FilterPanelComponent>;
-  @ViewChildren(DownloadPanelComponent) downloadComponents: QueryList<DownloadPanelComponent>;
+  @ViewChildren(FilterPanelComponent) filterComponents!: QueryList<FilterPanelComponent>;
+  @ViewChildren(DownloadPanelComponent) downloadComponents!: QueryList<DownloadPanelComponent>;
 
   // Create a FilterMode that can be used in the HTML template
   eFilterMode = FilterMode;
 
-  @Input() public layer; /* The layer object that this component represents */
+  @Input() public layer: any; /* The layer object that this component represents */
 
-  areLayersPolygonFiltered: boolean;
+  areLayersPolygonFiltered!: boolean;
 
   // User bookmarks (if logged in and stored)
   bookmarks: Bookmark[] = [];
   showingOnlyBookmarkedLayers = false;
   isSidebarOpen = false;
 
+
+
   constructor() {
     this.csClipboardService.filterLayersBS.subscribe(filterLayers => {
       this.areLayersPolygonFiltered = filterLayers;
+    });
+    // TODO: this forces a re-render, better to subscribe to layer list or use signals
+    this.csMapService.getAddLayerSubject().subscribe(() => {
+      this.changeDetectorRef.detectChanges();
     });
   }
 
@@ -186,23 +193,25 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
     // Add ordered layers to map
     for (const layerId of orderedLayerKeys) {
       this.layerHandlerService.getLayerModelsForIds([layerId]).subscribe(layers => {
-        for (const layerModel of layers) {
-          // This adds layer to the map
-          this.layerManagerService.addLayer(layerModel,
-            layerStateObj[layerId].optionalFilters,
-            layerStateObj[layerId].filterCollection,
-            layerStateObj[layerId].time);
-          setTimeout(() => {
-            const layerFilterPanel: FilterPanelComponent = this.filterComponents.find(fc => fc.layer.id === layerId);
-            if (layerFilterPanel) {
-              // Update filter values, times and map opacity
-              layerFilterPanel.addLayerFromState(layerStateObj[layerId]);
-              // Set opacity slider to correct position
-              const uiLayerModel = this.uiLayerModelService.getUILayerModel(layerId);
-              uiLayerModel.opacity = layerStateObj[layerId].opacity;
-              this.uiLayerModelService.setUILayerModel(layerId, uiLayerModel);
-            }
-          }, 500);
+        if (layers) {
+          for (const layerModel of layers) {
+            // This adds layer to the map
+            this.layerManagerService.addLayer(layerModel,
+              layerStateObj[layerId].optionalFilters,
+              layerStateObj[layerId].filterCollection,
+              layerStateObj[layerId].time);
+            setTimeout(() => {
+              const layerFilterPanel: FilterPanelComponent | undefined = this.filterComponents.find(fc => fc.layer.id === layerId);
+              if (layerFilterPanel) {
+                // Update filter values, times and map opacity
+                layerFilterPanel.addLayerFromState(layerStateObj[layerId]);
+                // Set opacity slider to correct position
+                const uiLayerModel: any = this.uiLayerModelService.getUILayerModel(layerId);
+                uiLayerModel.opacity = layerStateObj[layerId].opacity;
+                this.uiLayerModelService.setUILayerModel(layerId, uiLayerModel);
+              }
+            }, 500);
+          }
         }
       });
     }
@@ -221,7 +230,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
    *
    * @param layerId ID of layer
    */
-  public getUILayerModel(layerId: string): UILayerModel {
+  public getUILayerModel(layerId: string): UILayerModel | undefined {
     return this.uiLayerModelService.getUILayerModel(layerId);
   }
 
@@ -268,8 +277,9 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
    * @returns boolean
    */
   public getShowSplitMapButtons(layer: LayerModel): boolean {
-    return this.csMapService.getSplitMapShown() &&
-      (this.getUILayerModel(layer.id).statusMap.getRenderStarted() || this.getUILayerModel(layer.id).statusMap.getRenderComplete());
+    const uiLayer = this.getUILayerModel(layer.id);
+    return !!uiLayer && this.csMapService.getSplitMapShown() &&
+      (uiLayer.statusMap.getRenderStarted() || uiLayer.statusMap.getRenderComplete());
   }
 
   /**
@@ -306,7 +316,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
   public getLayerSplitDirection(layerId: string): string {
     let splitDir = "none";
     if (this.csMapService.getLayerModel(layerId) !== undefined) {
-      switch (this.csMapService.getLayerModel(layerId).splitDirection) {
+      switch (this.csMapService.getLayerModel(layerId)?.splitDirection) {
         case SplitDirection.LEFT:
           splitDir = "left";
           break;
@@ -335,8 +345,11 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
       width: '800px',
       maxWidth: '800px'
     });
-    uiLayerModel.statusMap.getStatusBSubject().subscribe((value) => {
+    const subscription = uiLayerModel.statusMap.getStatusBSubject().subscribe((value) => {
       dialogRef.componentInstance.resourceMap = value.resourceMap;
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      subscription.unsubscribe();
     });
   }
 
@@ -408,8 +421,11 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
    * @param panelType panel type string, either 'filterpanel' or 'downloadpanel'
    */
   public selectTabPanel(layerId: string, panelType: string) {
-    this.getUILayerModel(layerId).tabpanel.setPanelOpen(panelType);
-    this.isDownloadExpanded = this.getUILayerModel(layerId).tabpanel.downloadpanel.expanded;
+    const uiLayerModel = this.getUILayerModel(layerId);
+    if (uiLayerModel) {
+      uiLayerModel.tabpanel.setPanelOpen(panelType);
+      this.isDownloadExpanded = uiLayerModel.tabpanel.downloadpanel.expanded;
+    }
   }
 
   /**
@@ -421,7 +437,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
     layer.expanded = !layer.expanded;
     if (layer.expanded) {
       if (config.queryGetCapabilitiesTimes.indexOf(layer.id) > -1) {
-        const layerFilter: FilterPanelComponent = this.filterComponents.find(fc => fc.layer.id === layer.id);
+        const layerFilter = this.filterComponents.find(fc => fc.layer.id === layer.id);
         if (layerFilter) {
           layerFilter.setLayerTimeExtent();
         }
@@ -451,14 +467,14 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
     let isDatasetURLSupportedLayer = false;
     let isIRISDownloadSupported = false;
 
-    if (config.wcsSupportedLayer[layer.id]) {
+    if (config.wcsSupportedLayer[layer.id as keyof typeof config.wcsSupportedLayer]) {
       isWCSDownloadSupported = true;
     }
     isCsvSupportedLayer = layer.supportsCsvDownloads;
 
-    isDatasetURLSupportedLayer = config.datasetUrlSupportedLayer[layer.id] !== undefined;
+    isDatasetURLSupportedLayer = config.datasetUrlSupportedLayer[layer.id as keyof typeof config.datasetUrlSupportedLayer] !== undefined;
 
-    if (config.datasetUrlAussPassLayer && layer.group && config.datasetUrlAussPassLayer[layer.group.toLowerCase()] !== undefined &&
+    if (config.datasetUrlAussPassLayer && layer.group && config.datasetUrlAussPassLayer[layer.group.toLowerCase() as keyof typeof config.datasetUrlAussPassLayer] !== undefined &&
       UtilitiesService.layerContainsResourceType(layer, ResourceType.IRIS)) {
       isIRISDownloadSupported = true;
     }
@@ -471,7 +487,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
    * Returns true if any layer in a layer group is visible in the sidebar
    * "layerGroup" - an instance of this.layerGroups[key].value
    */
-  public isLayerGroupVisible(layerGroupValue): boolean {
+  public isLayerGroupVisible(layerGroupValue: any): boolean {
     if (layerGroupValue.expanded && layerGroupValue.loaded) {
       for (const layer of layerGroupValue.loaded) {
         if (layer.hide === false) {
@@ -488,7 +504,7 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
    *
    * @param layerGroupValue - an instance of this.layerGroups[key].value
    */
-  public isLayerGroupActive(layerGroupValue): boolean {
+  public isLayerGroupActive(layerGroupValue: any): boolean {
     for (const layer of layerGroupValue) {
       if (this.csMapService.getLayerModelList().findIndex(l => l.id === layer.id) > -1) {
         return true;
@@ -527,8 +543,9 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
    * @returns true iff info panel is visible
    */
   public isInfoPanelExpanded(layerId: string): boolean {
-    if (this.getUILayerModel(layerId)) {
-      return this.getUILayerModel(layerId).tabpanel.infopanel.expanded;
+    const uiLayerModel = this.getUILayerModel(layerId);
+    if (uiLayerModel) {
+      return uiLayerModel.tabpanel.infopanel.expanded;
     }
     return false;
   }
@@ -540,8 +557,9 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
    * @returns true iff filter panel is visible
    */
   public isFilterPanelExpanded(layerId: string): boolean {
-    if (this.getUILayerModel(layerId)) {
-      return this.getUILayerModel(layerId).tabpanel.filterpanel.expanded;
+    const uiLayerModel = this.getUILayerModel(layerId);
+    if (uiLayerModel) {
+      return uiLayerModel.tabpanel.filterpanel.expanded;
     }
     return false;
   }
@@ -553,8 +571,9 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
    * @returns true iff download panel is visible
    */
   public isDownloadPanelExpanded(layerId: string): boolean {
-    if (this.getUILayerModel(layerId)) {
-      return this.getUILayerModel(layerId).tabpanel.downloadpanel.expanded;
+    const uiLayerModel = this.getUILayerModel(layerId);
+    if (uiLayerModel) {
+      return uiLayerModel.tabpanel.downloadpanel.expanded;
     }
     return false;
   }

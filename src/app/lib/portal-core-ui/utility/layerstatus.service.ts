@@ -27,9 +27,9 @@ export class LayerStatusService {
     const me = this;
     timer(0, 15 * 60 * 1000).subscribe(() => { // will execute every 15 minutes
       return this.http.get(this.env.portalBaseUrl + this.env.getCSWRecordEndP)
-        .subscribe((response) => {
+        .subscribe((response: any) => {
           const layerList = response['data'];
-          layerList.forEach(function (item, _i) {
+          layerList.forEach(function (item: any, _i: any) {
             me.layerStatusMap.set(item.id, item.stackdriverFailingHosts);
           });
        });

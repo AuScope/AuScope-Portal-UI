@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef, Renderer2, ChangeDetectorRef, inject } from '@angular/core';
-import { MSCLService } from './mscl.service';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Config, Data, Layout } from 'plotly.js-dist-min'
+import { MSCLService } from './mscl.service';
 
 @Component({
     selector: 'app-mscl.analytic',
@@ -26,10 +27,14 @@ export class MSCLAnalyticComponent implements OnInit {
     data = inject(MAT_DIALOG_DATA);
     processingData = false;
 
-    @ViewChild('error_display', { static: true }) public error_display: ElementRef; // Area used to display error messages
+    @ViewChild('error_display', { static: true }) public error_display!: ElementRef; // Area used to display error messages
 
-    public graphInput = {
-        data: {},
+    public graphInput: {
+        data: Data[];
+        layout: Partial<Layout>
+        options: Partial<Config>;
+    } = {
+        data: [],
         layout: {},
         options: {
             displaylogo: false
@@ -59,7 +64,7 @@ export class MSCLAnalyticComponent implements OnInit {
             }
 
             // Compile lists of X and Y values; plots are vertical, Y is common to all plots
-            const xLists: object = {};
+            const xLists: any = {};
             const yList: number[] = [];
             for (const metricEnum of this.data.metricList) {
                 xLists[metricEnum] = [];

@@ -2,6 +2,7 @@ import { Component, AfterViewInit, inject } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { TIMAService } from './tima.service';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Color, ScaleType } from '@swimlane/ngx-charts';
 
 
 @Component({
@@ -23,17 +24,22 @@ export class TIMAComponent implements AfterViewInit {
    */
   public data = inject(MAT_DIALOG_DATA);
 
-  public imageUrl;
+  public imageUrl: any;
   public ClassificationActive = false;
 
-  view: any[] = [959, 500];
-  public ngxdata = [];
-
-  colorScheme = {
-    domain: ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8',
-      '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080', '#ffffff', '#000000']
+  view: [number, number] = [959, 500];
+  public ngxdata: any[] = [];
+  
+  colorScheme: Color = {
+    name: 'custom',
+    selectable: true,
+    group: ScaleType.Ordinal,
+    domain: [
+      '#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6',
+      '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3',
+      '#808000', '#ffd8b1', '#000075', '#808080', '#ffffff', '#000000'
+    ]
   };
-
 
   ngAfterViewInit(): void {
     // the timeout fixes the - NG0100: ExpressionChangedAfterItHasBeenCheckedError error
@@ -49,7 +55,7 @@ export class TIMAComponent implements AfterViewInit {
           const mineral_pixel_count = mineralInfo[mineral_name]['mineral_pixel_count'];
           this.ngxdata.push({ name: mineral_name, value: mineral_pixel_count });
         }
-        this.ngxdata.sort((a, b) => {
+        this.ngxdata.sort((a: any, b: any) => {
           return a.name.localeCompare(b.name);
         });
       }

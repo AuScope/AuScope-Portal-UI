@@ -6,7 +6,7 @@ export class CQLService {
      * @param filters filter specification for a layer [ { predicate: string, value: []|string,  xpath: string }, ... ]
      * @returns string
      */
-    public static assembleQuery(filters): string {
+    public static assembleQuery(filters: any): string {
         let cql_str = "";
         for (const filt of filters) {
             if (filt.predicate.toUpperCase() === 'CQL_LIKE') {

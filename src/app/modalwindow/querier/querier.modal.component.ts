@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/member-ordering */
-import { ApplicationRef, ChangeDetectorRef, Component, OnInit, ElementRef, ViewChild, AfterViewInit, Renderer2, inject } from '@angular/core';
+import { ApplicationRef, ChangeDetectorRef, Component, OnInit, ElementRef, ViewChild, AfterViewInit, Renderer2, inject, signal, effect } from '@angular/core';
 import { config } from '../../../environments/config';
 import { ref } from '../../../environments/ref';
+import { environment } from '../../../environments/environment';
 import { CsClipboardService } from '../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
 import { GMLParserService } from '../../lib/portal-core-ui/utility/gmlparser.service';
 import { Polygon } from '../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
@@ -11,22 +12,23 @@ import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import * as _ from 'lodash';
-import * as X2JS from 'x2js';
+import X2JS from 'x2js';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MSCLService } from '../layeranalytic/mscl/mscl.service';
 import { NVCLBoreholeAnalyticService } from '../layeranalytic/nvcl/nvcl.boreholeanalytic.service';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 export class FileNode {
-  children: FileNode[];
-  filename: string;
+  children!: FileNode[];
+  filename!: string;
   type: any;
 }
 
 /** Flat node with expandable and level information */
 interface FlatNode {
   expandable: boolean;
-  name: string;
+  filename: string;
+  type: any;
   level: number;
 }
 
@@ -42,7 +44,6 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   csClipboardService = inject(CsClipboardService);
   private gmlParserService = inject(GMLParserService);
   private http = inject(HttpClient);
-  private env = inject<any>('env' as any);
   private sanitizer = inject(DomSanitizer);
   nvclBoreholeAnalyticService = inject(NVCLBoreholeAnalyticService);
   private changeDetectorRef = inject(ChangeDetectorRef);
@@ -51,30 +52,35 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   private renderer = inject(Renderer2);
   dialog = inject(MatDialog);
   dialogRef = inject(MatDialogRef<QuerierModalComponent>);
-  data = inject(MAT_DIALOG_DATA);
+  readonly data = signal(inject(MAT_DIALOG_DATA));
 
-  [x: string]: any;
-  @ViewChild('childElement', { static: false }) childElement: ElementRef;
+  //[x: string]: any;
+  @ViewChild('childElement', { static: false }) childElement!: ElementRef;
+
+  public analyticTab = signal<boolean>(false);
+  public initialScalarLoad = false;
+  public screenWidth = window.innerWidth;
+  public drawGraphMode = false;
 
   public transformingToHtml: Map<string, boolean> = new Map<string, boolean>();
   public selectLayerNameFilter = 'ALL';
-  public analyticMap;
-  public tab: object;
-  public bToClipboard = false;
+  public analyticMap: any;
+  public tab!: object;
+  public bToClipboard = signal<boolean>(false);
   public hasMsclAnalytics = false; // Display 'Analytics' tab to analyse GML observation
-  public selectedNode: string;
+  public selectedNode!: string;
   public currentIndex = 0;
-  public jsonDoc;
-  public list = [];
+  public jsonDoc!: any;
+  public list = signal<any[]>([]);
 
   public selectedFeature = 'Feature';
   public currentFeature = 'Feature';
-  public selectedLayer = 'Layer';
+  public selectedLayer = signal<string>('Layer');
   public selectedToolTip = '';
-  public imScDoButtonsEnabled = false; // Image-Scalar-Download buttons used by NVCL boreholes layer
-  public analyticEnabled = false;
+  public imScDoButtonsEnabled = signal<boolean>(false); // Image-Scalar-Download buttons used by NVCL boreholes layer
+  public analyticEnabled = signal<boolean>(false);
   public copyFeedbackMessage = '';
-  public showCopyFeedbackToast = false;
+  public showCopyFeedbackToast = signal<boolean>(false);
 
   public scalarPriorityOrder: string[] = ['Grp1 dTSAS+', 'Grp2 dTSAS+', 'Grp3 dTSAS+', 'Grp1 uTSAS+', 'Grp2 uTSAS+', 'Grp3 uTSAS+', 'Grp1 sTSAS+', 'Grp2 sTSAS+',
     'Grp3 sTSAS+', 'Grp1 dTSAS', 'Grp2 dTSAS', 'Grp3 dTSAS', 'Grp1 uTSAS', 'Grp2 uTSAS', 'Grp3 uTSAS', 'Grp1 SWIR-CLS', 'Grp2 SWIR-CLS', 'Grp3 SWIR-CLS', 'Grp1 sTSAS',
@@ -107,10 +113,9 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   };
 
   // Data Structures used to create a folding flat tree which displays feature data
-  public flatTreeControl: { [key: string]: any } = {};
+  public flatTreeControl = signal<{ [key: string]: any }>({});
   public treeFlattener = new MatTreeFlattener(this._transformer, node => node.level, node => node.expandable, node => node.children);
-  public flatTreeDataSource: { [key: string]: any } = {}; // Tree structure is assigned to this
-
+  public flatTreeDataSource = signal<{ [key: string]: any }>({}); // Tree structure is assigned to this
 
   // Does the 'FlatNode' have children?
   public hasChild = (_: number, node: FlatNode) => node.expandable;
@@ -130,16 +135,21 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
    *
    * If this was not done the two components would not see the same state of the service variable "isAnalytic"
   */
-  public flagNVCLAnalytic: boolean;
+  public flagNVCLAnalytic = signal<boolean>(false);
   public listingdata: any;
-  public isScalarLoaded = false;
+  public isScalarLoaded = signal<boolean>(false);
   public modalVisible = true;
 
   constructor() {
     this.analyticMap = ref.analytic;
-    this.flagNVCLAnalytic = false;
+    this.flagNVCLAnalytic.set(false);
     this.initialScalarLoad = true;
     this.screenWidth = window.innerWidth;
+
+    effect(() => {
+      console.log('analyticTab', this.analyticTab());
+    });
+
   }
 
   ngAfterViewInit(): void {
@@ -165,7 +175,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
      * and updates the local variable "flagNVCLAnalytic" - which updates the Analytic TAB in the html
      */
     this.nvclService.getAnalytic().subscribe((result) => {
-      this.flagNVCLAnalytic = result;
+      this.flagNVCLAnalytic.set(result);
 
       // Calling this to update the UI
       this.onDataChange();
@@ -176,7 +186,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
      * and updates the local variable "isScalarLoaded" - which updates the scalar button in the html
      */
     this.nvclService.getScalarLoaded().subscribe((result) => {
-      this.isScalarLoaded = result;
+      this.isScalarLoaded.set(result);
 
       // Calling this to update the UI
       this.onDataChange();
@@ -226,7 +236,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
    * Copy drawn polygon to clipboard
    * @param document polygon as document
    */
-  public copyToClipboard(document) {
+  public copyToClipboard(document: any) {
     const name = document.key;
     const doc = document.value;
     let polygon: Polygon;
@@ -256,13 +266,13 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
    *
    * @param key key used to select HTML to display
    */
-  public setHTML(key) {
+  public setHTML(key: any) {
     // Clear the WFS XML display
-    this.data.currentDoc = null;
+    this.data.update((data: any) => ({ ...data, currentDoc: null }));
     // Search for our HTML to display
-    for (const html of this.data.htmls) {
+    for (const html of this.data().htmls) {
       if (html.key == key) {
-        this.data.currentHTML = html.value;
+        this.data.update((data: any) => ({ ...data, currentHTML: html.value }));
         return;
       }
     }
@@ -274,19 +284,22 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
    * @param doc XML document
    * @param i index of this XML docment in list of XML documents
    */
-  public setWFS(doc, i) {
+  public setWFS(doc: any, i: any) {
     // Clear the HTML display
-    this.data.currentHTML = "";
+    this.data.update((data: any) => ({ ...data, currentHTML: "" }));
     // Set up, convert the XML and display in popup
     this.updateDropDownButtonText(doc);
     this.currentIndex = i;
-    this.data.currentDoc = doc;
-    this.data.currentDoc.analytic = false;
-    this.data.currentDoc.home = true;
-    this.transformToHtml(this.data.currentDoc, i);
+    this.data.update((data: any) => ({ ...data, currentDoc: doc }));
+    this.data.update((data: any) => {
+      const updatedDoc = { ...data.currentDoc, analytic: false };
+      return { ...data, currentDoc: updatedDoc };
+    });
+    this.data.update((data: any) => ({ ...data, currentDoc: { ...data.currentDoc, home: true } }));
+    this.transformToHtml(this.data().currentDoc, i);
 
-    if (this.analyticEnabled) {
-        //this.analytic_tab = true;
+    if (this.analyticEnabled()) {
+        //this.analyticTab = true;
         this.changeDetectorRef.detectChanges();
     }
   }
@@ -297,9 +310,18 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
  * @param evt
  * @param tabName
  */
-  public openTab(evt, tabName) {
+  public openTab(evt: any, tabName: any) {
+    if (this.imScDoButtonsEnabled()) {
+      this.analyticTab.set(true);
+      this.changeDetectorRef.detectChanges();
+    }
+    setTimeout(() => {
+      const docElement = document.getElementById(tabName);
+      console.log('delayed element', docElement);
+    }, 50);
+
     let i;
-    if (this.imScDoButtonsEnabled) { this.analytic_tab = true; }
+    if (this.imScDoButtonsEnabled()) { this.analyticTab.set(true); }
 
     // set all the "tabs" to display:none - ie hidden
     const tabcontent = document.getElementsByClassName("tabcontent");
@@ -311,8 +333,9 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
       tablinks[i].className = tablinks[i].className.replace(" active", "");
     }
 
-    if (document.getElementById(tabName)) {
-      document.getElementById(tabName).style.display = "block";
+    const docElement = document.getElementById(tabName);
+    if (docElement) {
+      docElement.style.display = "block";
       if (evt) {
         if (evt.target) {
           if (evt.target.className) {
@@ -327,11 +350,17 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
    * Look for changes and update UI after brief delay
    */
   public onDataChange(): void {
-    const htmldata = []
+    const htmldata: any[] = []
     const Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
     const objExp = new RegExp(Expression);
-    for (let i = 0; i < this.data.docs.length; i++) {
-      const doc = new DOMParser().parseFromString(this.data.docs[i].raw, 'text/xml');
+    for (let i = 0; i < this.data().docs.length; i++) {
+      // Skip non-XML content
+      const raw = this.data().docs[i].raw;
+      if (!raw?.trim().startsWith('<')) {
+        continue;
+      }
+
+      const doc = new DOMParser().parseFromString(raw, 'text/xml');
       if (doc.getElementsByTagName('gml:name').length != 0) {
         for (let nameIdx = 0; nameIdx < doc.getElementsByTagName('gml:name').length; nameIdx++) {
           if (!objExp.test(doc.getElementsByTagName('gml:name')[nameIdx].innerHTML)) {
@@ -357,7 +386,11 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
           }
         }
       }
-      this.data.docs[i]['node_name'] = htmldata[i]
+      this.data.update((data: any) => {
+        const updatedDocs = [...data.docs];
+        updatedDocs[i] = { ...updatedDocs[i], node_name: htmldata[i] };
+        return { ...data, docs: updatedDocs };
+      });
     }
 
     setTimeout(() => {
@@ -370,15 +403,15 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
    * if it is the only one in the list
    */
   allLayersLoaded() {
-    this.data.downloading = false;
+    this.data.update((data: any) => ({ ...data, downloading: false }));
     // Force immediate change detection to show the no-results message if needed
     this.changeDetectorRef.detectChanges();
     this.onDataChange();
-    if (this.data.docs.length >= 1 && this.data.htmls.length === 0) {
-      this.setWFS(this.data.docs[0], 0);
+    if (this.data().docs.length >= 1 && this.data().htmls.length === 0) {
+      this.setWFS(this.data().docs[0], 0);
       this.openTab(event, 'wfs')
-    } else if (this.data.htmls.length >= 1 && this.data.docs.length === 0) {
-      this.setHTML(this.data.htmls[0].key);
+    } else if (this.data().htmls.length >= 1 && this.data().docs.length === 0) {
+      this.setHTML(this.data().htmls[0].key);
     }
   }
 
@@ -387,18 +420,18 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
    *
    * @param document
    */
-  public transformToHtml(document, index): void {
+  public transformToHtml(document: any, index: number): void {
     this.selectedNode = document.node_name;
     this.currentIndex = index;
     if (this.msclService.usesGMLObs(document.raw)) {
       this.hasMsclAnalytics = true;
     }
 
-    if (!this.imScDoButtonsEnabled) {
+    if (!this.imScDoButtonsEnabled()) {
       if (this.analyticMap[document.layer.id]) { // turn on analytic button, if in "ref.analytic" and not NVCL2
-        this.analyticEnabled = true;
+        this.analyticEnabled.set(true);
       } else {
-        this.analyticEnabled = false;
+        this.analyticEnabled.set(false);
       }
     }
 
@@ -417,37 +450,37 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
       return this.parseTree(document);
     }
 
-    this.transformingToHtml[document.key] = true;
+    this.transformingToHtml.set(document.key, true);
     this.changeDetectorRef.detectChanges();
 
     let formdata = new HttpParams();
     formdata = formdata.append('gml', document.value.outerHTML);
 
-    this.http.post(this.env.portalBaseUrl + 'transformToHtmlPopup.do', formdata.toString(), {
+    this.http.post(environment.portalBaseUrl + 'transformToHtmlPopup.do', formdata.toString(), {
       headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
       responseType: 'text'
     }).subscribe(response => {
-      const bodyHtml = /<body.*?>([\s\S]*)<\/body>/.exec(response)[1];
+      const bodyHtml = /<body.*?>([\s\S]*)<\/body>/.exec(response)?.[1] ?? '';
       if (bodyHtml.length < 1) {
-        this.transformingToHtml[document.key] = false;
+        this.transformingToHtml.set(document.key, false);
         // if no transformation, fallback to XML tree
         return this.parseTree(document);
       }
       //sanitizer will make sure the HTML styling is applied
       document.transformed = this.sanitizer.bypassSecurityTrustHtml(response);
       if (!document.transformed) {
-        this.transformingToHtml[document.key] = false;
+        this.transformingToHtml.set(document.key, false);
         // fallback to XML tree
         return this.parseTree(document);
       }
       document.home = true;
       document.loadSubComponent = true;
-      this.transformingToHtml[document.key] = false;
+      this.transformingToHtml.set(document.key, false);
       this.changeDetectorRef.detectChanges();
     }, () => {
       // try default XML tree display
       this.parseTree(document);
-      this.transformingToHtml[document.key] = false;
+      this.transformingToHtml.set(document.key, false);
       this.changeDetectorRef.detectChanges();
     });
   }
@@ -456,11 +489,14 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
    * Parses server response and builds a document tree
    * @param document server response object
    */
-  public parseTree(document): void {
+  public parseTree(document: any): void {
+
+    console.log("*** PARSE TREE ***");
+
     const name = document.key;
     const doc = document.value;
 
-    if (this.flatTreeDataSource[name]) {
+    if (this.flatTreeDataSource()[name]) {
       return;
     }
 
@@ -473,7 +509,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     }
 
     const reg = new RegExp(config.clipboard.supportedLayersRegKeyword, 'gi');
-    this.bToClipboard = reg.test(name);
+    this.bToClipboard.set(reg.test(name));
 
     let result = doc;
     // If it is not JSON then convert to JSON
@@ -488,10 +524,23 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     }
     // Parse the response and build a recursive tree of FileNode objects and assign them to the tree
     const data = this.buildFileTree(JSON.parse(`{"${name}":${JSON.stringify(result)}}`), 0);
-    this.flatTreeControl[name] = new FlatTreeControl<FlatNode>(node => node.level, node => node.expandable);
-    this.flatTreeDataSource[name] = new MatTreeFlatDataSource(this.flatTreeControl[name], this.treeFlattener);
-    this.flatTreeDataSource[name].data = data;
-    this.flatTreeControl[name].expandAll();
+    const control = new FlatTreeControl<FlatNode>(
+      node => node.level,
+      node => node.expandable
+    );
+    this.flatTreeControl.update(current => ({ ...current, [name]: control }));
+    const dataSource = new MatTreeFlatDataSource(
+      control,
+      this.treeFlattener
+    );
+    dataSource.data = data;
+    this.flatTreeDataSource.update(current => ({...current, [name]: dataSource}));
+    control.expandAll();
+
+    console.log('name', name);
+    console.log('flatTreeControl', this.flatTreeControl());
+    console.log('flatTreeDataSource', this.flatTreeDataSource());
+
     this.changeDetectorRef.detectChanges();
   }
 
@@ -605,10 +654,10 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     return terms.join(' ');
   }
 
-  public formatXML(doc) {
+  public formatXML(doc: any) {
     if (!doc) { return }
 
-    this.list = [];
+    this.list.set([]);
 
     let result = doc;
 
@@ -622,7 +671,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
         const value = result.BoreholeView[key];
         const listKey = key.toString();
         const listValue = value.toString();
-        this.list.push({ [listKey]: listValue });
+        this.list.update(prev => [...prev, { [listKey]: listValue }]);
       })
 
       //result.BoreholeView.forEach((element) => {
@@ -634,29 +683,29 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     }
   }
 
-  public updateDropDownButtonText(doc) {
+  public updateDropDownButtonText(doc: any) {
     this.selectedFeature = '';
     if (doc.node_name) {
       this.selectedFeature = doc.node_name;
     } else if (doc.key) {
       this.selectedFeature = doc.key;
     }
-    this.selectedLayer = this.getAbbr(doc.layer.name, " ");
-    this.imScDoButtonsEnabled = false;
-    this.analyticEnabled = false;
+    this.selectedLayer.set(this.getAbbr(doc.layer.name, " "));
+    this.imScDoButtonsEnabled.set(false);
+    this.analyticEnabled.set(false);
 
     // should we check flagNVCLAnalytic ?
-    if (this.selectedLayer == "NVCLV-2.0") {
-      this.imScDoButtonsEnabled = true;
+    if (this.selectedLayer() == "NVCLV-2.0") {
+      this.imScDoButtonsEnabled.set(true);
     }
 
     this.selectedToolTip = doc.layer.name + ":" + this.selectedFeature;
 
     if (this.selectedFeature != this.currentFeature) {
       // if changed feature selection then reset
-      this.isScalarLoaded = false;
+      this.isScalarLoaded.set(false);
       this.drawGraphMode = false;
-      this.analyticEnabled = false;
+      this.analyticEnabled.set(false);
     }
     this.currentFeature = this.selectedFeature;
   }
@@ -680,7 +729,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     return abbr;
   }
 
-  private isAlpha(str) {
+  private isAlpha(str: string) {
     const regex = /^[a-zA-Z]+$/;
     return regex.test(str);
   }
@@ -689,7 +738,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
    * Download feature information as a simple flattened CSV
    */
   public downloadFeatureCSV() {
-    if (!this.data.currentDoc) {
+    if (!this.data().currentDoc) {
       return;
     }
 
@@ -708,11 +757,11 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     csvRows.push('Field,Value');
 
     // Add basic information
-    csvRows.push(`Layer,${this.escapeCSV(this.selectedLayer)}`);
+    csvRows.push(`Layer,${this.escapeCSV(this.selectedLayer())}`);
     csvRows.push(`Feature,${this.escapeCSV(this.selectedFeature)}`);
 
     // Add properties from HTML table
-    if (this.data.currentDoc.transformed) {
+    if (this.data().currentDoc.transformed) {
       const tableData = this.extractTableDataForCSV();
       tableData.forEach(item => {
         csvRows.push(`${this.escapeCSV(item.key)},${this.escapeCSV(item.value)}`);
@@ -720,8 +769,8 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     }
 
     // Add XML tree data (flattened)
-    if (this.flatTreeDataSource[this.data.currentDoc.key]) {
-      const treeData = this.flatTreeDataSource[this.data.currentDoc.key].data;
+    if (this.flatTreeDataSource()[this.data().currentDoc.key]) {
+      const treeData = this.flatTreeDataSource()[this.data().currentDoc.key].data;
       this.addTreeDataToCSV(treeData, csvRows);
     }
 
@@ -734,9 +783,9 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
   private extractTableDataForCSV(): Array<{key: string, value: string}> {
     const data: Array<{key: string, value: string}> = [];
 
-    if (this.data.currentDoc.transformed) {
+    if (this.data().currentDoc.transformed) {
       const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = this.data.currentDoc.transformed;
+      tempDiv.innerHTML = this.data().currentDoc.transformed;
 
       // Remove style and script tags
       const styleTags = tempDiv.querySelectorAll('style, script');

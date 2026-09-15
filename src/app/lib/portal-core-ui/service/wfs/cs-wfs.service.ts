@@ -44,13 +44,13 @@ export class CsWFSService {
     if (layer.proxyUrl) {
       return this.http.get(this.env.portalBaseUrl + layer.proxyUrl, {
         params: httpParams
-      }).pipe(map(response => {
+      }).pipe(map((response: any) => {
         return response['data'];
       }));
     } else {
       return this.http.get(this.env.portalBaseUrl + 'getAllFeatures.do', {
         params: httpParams
-      }).pipe(map(response => {
+      }).pipe(map((response: any) => {
         return response['data'];
       }), catchError(
       (error: HttpResponse<any>) => {

@@ -10,12 +10,12 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 @Component({
     selector: 'app-nvcl-tsgdownload-component',
     templateUrl: './nvcl.tsgdownload.component.html',
-    styles: [
-        'input:invalid + span:after { content: \'✖\'; color: #f00; padding-left: 15px; }',
-        'input:valid + span:after { content: \'✓\'; color: #26b72b; padding-left: 15px;}',
-        'select:invalid + span:after { content: \'✖\'; color: #f00; padding-left: 15px; }',
-        'select:valid + span:after { content: \'✓\'; color: #26b72b; padding-left: 15px;}'
-    ],
+    styles: [`
+        input:invalid + span:after { content: '✖'; color: #f00; padding-left: 15px; }
+        input:valid + span:after { content: '✓'; color: #26b72b; padding-left: 15px; }
+        select:invalid + span:after { content: '✖'; color: #f00; padding-left: 15px; }
+        select:valid + span:after { content: '✓'; color: #26b72b; padding-left: 15px; }
+    `],
     styleUrls: [
         '../../modalwindow.scss'
     ],
@@ -29,15 +29,15 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
 
   public data = inject(MAT_DIALOG_DATA);
   public dialogRef = inject(MatDialogRef<NVCLTSGDownloadComponent>);
-  public tsgform;
+  public tsgform: any;
   public ngSelectiveConfig = {};
   public total = 0;
   public completed = 0;
-  public completePercentage: string;
+  public completePercentage!: string;
   public downloadMsg = "Download";
   public isDownloading = false;
-  public urlsArray =[];
-  public download1$: Observable<Download>;
+  public urlsArray: any[] = [];
+  public download1$!: Observable<Download>;
 
   constructor() {
     this.tsgform = {};
@@ -75,11 +75,11 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
             me.download1$.subscribe(value => {
               if (value.state.startsWith('DONE')) {
                 me.completed++;
-                me.tsgDownloadService.downloadOneCompletBS.next('downloadOne:'+me.completed);
+                me.tsgDownloadService.downloadOneCompletBS?.next('downloadOne:'+me.completed);
               }
             });
           } else {
-            me.downloadWfsService.tsgDownloadBS.next('completed,completed');
+            me.downloadWfsService.tsgDownloadBS?.next('completed,completed');
             me.isDownloading = false;
           }
         }
@@ -140,7 +140,7 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
    * Called when the "Download" button is hit
    */
   public onDownload() {
-    this.downloadWfsService.tsgDownloadStartBS.next('start,' + this.tsgform.email);
+    this.downloadWfsService.tsgDownloadStartBS?.next('start,' + this.tsgform.email);
     this.isDownloading = true;
     this.downloadMsg = "Downloading...";
     this.nvclBoreholeAnalyticService.setUserEmail(this.tsgform.email);

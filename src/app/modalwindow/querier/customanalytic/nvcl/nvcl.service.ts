@@ -64,7 +64,7 @@ export class NVCLService {
     httpParams = httpParams.append('holeIdentifier', holeIdentifier.replace('gsml.borehole.', ''));
     return this.http.get(environment.portalBaseUrl + 'getNVCLDatasets.do', {
       params: httpParams
-    }).pipe(map(response => {
+    }).pipe(map((response: any) => {
       if (response['success'] === true) {
         return response['data'];
       } else {
@@ -86,7 +86,7 @@ export class NVCLService {
     httpParams = httpParams.append('mosaicService', 'true');
     return this.http.get(environment.portalBaseUrl + 'getNVCL2_0_Logs.do', {
       params: httpParams
-    }).pipe(map(response => {
+    }).pipe(map((response: any) => {
       if (response['success'] === true) {
         return response['data'];
       } else {
@@ -106,7 +106,7 @@ export class NVCLService {
     httpParams = httpParams.append('datasetId', datasetId);
     return this.http.get(environment.portalBaseUrl + 'getNVCLLogs.do', {
       params: httpParams
-    }).pipe(map(response => {
+    }).pipe(map((response: any) => {
       if (response['success'] === true) {
         return response['data'];
       } else {
@@ -175,13 +175,13 @@ export class NVCLService {
   }
 
 
-  public getLogDefinition(logName): Observable<any> {
+  public getLogDefinition(logName: string): Observable<any> {
     let httpParams = new HttpParams();
     httpParams = httpParams.append('repository', 'nvcl-scalars');
     httpParams = httpParams.append('label', logName);
     return this.http.get(environment.portalBaseUrl + 'getScalar.do', {
       params: httpParams
-    }).pipe(map(response => {
+    }).pipe(map((response: any) => {
       if (response['success'] === true) {
         return response['data'];
       } else {
@@ -225,7 +225,7 @@ export class NVCLService {
         }
         return url
       }
-    })).pipe(mergeMap(url => {
+    })).pipe(mergeMap((url: any) => {
       return this.http.head(url).pipe(map(_response => {
         return url;
       },() => {
@@ -234,9 +234,7 @@ export class NVCLService {
       }));
     }));
 
-
   }
-
 
   public getNVCLTSGDownload(serviceUrl: string, datasetId: string, downloadEmail: string) {
     let httpParams = new HttpParams();
@@ -293,7 +291,7 @@ export class NVCLService {
 
     return this.http.get(environment.portalBaseUrl + 'getNVCL2_0_TsgJobsByBoreholeId.do', {
       params: httpParams
-    }).pipe(map(response => {
+    }).pipe(map((response: any) => {
       if (response['success'] === true) {
         return response['data'];
       } else {
