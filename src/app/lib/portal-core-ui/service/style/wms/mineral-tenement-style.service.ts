@@ -132,7 +132,7 @@ export class MineralTenementStyleService {
             ['sld:Title', null, styleName?styleName:layerName],
             ['sld:IsDefault', null, '1'],
             ['sld:FeatureTypeStyle', null,
-              ...this.createRules(params.ccProperty, params.optionalFilters, config)
+              ...this.createRules(params.ccProperty ?? '', params.optionalFilters ?? [], config)
             ]
           ]
         ]
@@ -176,7 +176,7 @@ export class MineralTenementStyleService {
   }
 
   private static createRulePair(tenementType: string, config: any, optionalFilters?: OptionalFilter[]): any[] {
-    const color = this.TENEMENT_COLOUR_MAP[tenementType] || config.fillColour;
+    const color = this.TENEMENT_COLOUR_MAP[tenementType as keyof typeof this.TENEMENT_COLOUR_MAP] || config.fillColour;
     let retVal;
     // Only GeoServer can handle detailed view
     if (config.providerType === ServiceProviderType.GeoServer) {

@@ -10,13 +10,13 @@ import { Polygon } from '../../../lib/portal-core-ui/service/cesium-map/cs-clipb
 import { UtilitiesService } from '../../../lib/portal-core-ui/utility/utilities.service';
 import { CsCSWService } from '../../../lib/portal-core-ui/service/wcsw/cs-csw.service';
 import { ApplicationRef, Component, Input, OnInit, AfterViewInit, ViewChild, ViewContainerRef, OnChanges, SimpleChanges, inject } from '@angular/core';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { config } from '../../../../environments/config';
 import { ref } from '../../../../environments/ref';
 import { LayerAnalyticModalComponent } from '../../../modalwindow/layeranalytic/layer.analytic.modal.component';
-import { AdvancedComponentService } from 'app/services/ui/advanced-component.service';
-import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
-import { LayerManagerService } from 'app/services/ui/layer-manager.service';
+import { AdvancedComponentService } from '../../../services/ui/advanced-component.service';
+import { FilterService, LayerTimes } from '../../../services/filter/filter.service';
+import { LayerManagerService } from '../../../services/ui/layer-manager.service';
 import { MatDialog } from '@angular/material/dialog';
 
 
@@ -27,8 +27,6 @@ import { MatDialog } from '@angular/material/dialog';
     standalone: false
 })
 export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
-  private conf = inject<any>('conf' as any);
-
   csMapService = inject(CsMapService);
   layerHandlerService = inject(LayerHandlerService);
   layerManagerService = inject(LayerManagerService);
@@ -42,20 +40,20 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
   appRef = inject(ApplicationRef);
   advancedComponentService = inject(AdvancedComponentService);
 
-  @Input() layer: LayerModel;
-  private providers: Array<object>;
-  public optionalFilters: Array<object>; // Optional filters currently rendered by this component
-  public selectedFilter;
+  @Input() layer!: LayerModel;
+  public providers: Array<any>;
+  public optionalFilters: Array<any>; // Optional filters currently rendered by this component
+  public selectedFilter: any;
   public advancedParam = [];
-  public analyticMap;
+  public analyticMap: any;
   public advancedFilterMap;
   public showAdvancedFilter = true;
   public bApplyClipboardBBox = true;
-  public layerTimes: LayerTimes;
+  public layerTimes!: LayerTimes;
   public layerFilterCollection: any; // List of all filters that maybe rendered by this component
 
   // Layer toolbar
-  @ViewChild('advancedFilterComponents', { static: true, read: ViewContainerRef }) advancedFilterComponents: ViewContainerRef;
+  @ViewChild('advancedFilterComponents', { static: true, read: ViewContainerRef }) advancedFilterComponents!: ViewContainerRef;
 
 
   constructor() {
@@ -70,7 +68,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
     if (this.layer.filterCollection) {
       this.filterService.registerLayerFilterCollection(this.layer.id, this.layer.filterCollection).subscribe(filterCollection => {
         this.layerFilterCollection = filterCollection;
-        this.optionalFilters = this.layerFilterCollection.optionalFilters.filter(f => f.added === true);
+        this.optionalFilters = this.layerFilterCollection.optionalFilters.filter((f: any) => f.added === true);
         if (this.optionalFilters.length === 0) {
           this.selectedFilter = {};
         }
@@ -112,7 +110,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
     // Will fire when a layer is added and remove all existing panel filters
     if (changes.layer && changes.layer.currentValue && !changes.layer.firstChange) { // take into account the first time
         setTimeout(() => {
-            const hasPreselectedOptionalFilters = !!this.layer?.filterCollection?.optionalFilters?.some(f => f.added === true);
+            const hasPreselectedOptionalFilters = !!this.layer?.filterCollection?.optionalFilters?.some((f: any) => f.added === true);
             if (!hasPreselectedOptionalFilters) {
               this.refreshFilter();
             }
@@ -152,11 +150,11 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
     }
     // Advanced filter
     if (layerState.advancedFilter) {
-      this.advancedComponentService.getAdvancedFilterComponentForLayer(this.layer.id).setAdvancedParams(layerState.advancedFilter);
+      this.advancedComponentService.getAdvancedFilterComponentForLayer(this.layer.id)?.setAdvancedParams(layerState.advancedFilter);
     }
     // Merge state filters with optional filters
-    this.optionalFilters = this.optionalFilters.map(optFilt => {
-        const filt = layerState.optionalFilters.find((filt) => filt.label === optFilt['label']);
+    this.optionalFilters = this.optionalFilters.map((optFilt: any) => {
+        const filt = layerState.optionalFilters.find((filt: any) => filt.label === optFilt['label']);
         if (filt) {
           return filt;
         }
@@ -164,9 +162,9 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
     });
 
     setTimeout(() => {
-      for (const optFilter of this.optionalFilters) {
+      for (const optFilter of this.optionalFilters as Record<string, unknown>[]) {
         if (optFilter['value'] && optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
-          const geometry = optFilter['value'];
+          const geometry = optFilter['value'] as string;
           const swappedGeometry = this.csClipboardService.swapGeometry(geometry);
           const strToday=new Date();
           const dt= new Date(strToday).toISOString();
@@ -200,7 +198,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
    * @param filter the filter to test
    * @returns true if the filter contains a valid value
    */
-  private filterHasValue(filter: object): boolean {
+  private filterHasValue(filter: any): boolean {
     let hasValue = false;
     if (filter['type'] === 'OPTIONAL.PROVIDER') {
       for (const provider in filter['value']) {
@@ -237,7 +235,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
    * Add layer to map
    * @param layer the layer to add to map
    */
-  public addLayer(layer): void {
+  public addLayer(layer: any): void {
     this.onApplyClipboardBBox();
     this.layerManagerService.addLayer(layer, this.optionalFilters, this.layerFilterCollection, this.layerTimes.currentTime);
   }
@@ -246,7 +244,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
    * Get Filter for NvclAnalytical
    * @param layer the layer to add to map
    */
-  public getNvclFilter(layer): void {
+  public getNvclFilter(layer: any): void {
     this.onApplyClipboardBBox();
     const param = {
       optionalFilters: _.cloneDeep(this.optionalFilters)
@@ -293,7 +291,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
       return;
     }
 
-    for (const optFilter of this.optionalFilters) {
+    for (const optFilter of this.optionalFilters as any[]) {
       if (optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
         optFilter['value'] = null;
       }
@@ -304,11 +302,11 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
     return UtilitiesService.getKey(options);
   }
 
-  public getValue(options: object): string {
+  public getValue(options: object): string | undefined {
     return UtilitiesService.getValue(options);
   }
 
-  public onAdvancedParamChange($event) {
+  public onAdvancedParamChange($event: any) {
     this.advancedParam = $event;
   }
 
@@ -320,7 +318,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
    */
   private updateFilter(filter: any, filterAdded: boolean) {
     filter.added = filterAdded;
-    const i = this.layerFilterCollection.optionalFilters.indexOf(this.layerFilterCollection.optionalFilters.find(f => f.label === filter.label));
+    const i = this.layerFilterCollection.optionalFilters.indexOf(this.layerFilterCollection.optionalFilters.find((f: any) => f.label === filter.label));
     this.layerFilterCollection.optionalFilters[i] = filter;
     this.filterService.updateLayerFilterCollection(this.layer.id, this.layerFilterCollection);
   }
@@ -331,13 +329,13 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
    * @param filter filter object to be added to the panel
    * @param addEmpty if true, set filter value to be empty.
    */
-  public addFilter(filter, _addEmpty?: boolean): void {
+  public addFilter(filter: any, _addEmpty?: boolean): void {
     if (filter == null) {
       return;
     }
     // If filter is already in panel
     for (const filterobject of this.optionalFilters) {
-      if (filterobject['label'] === filter['label']) {
+      if ((filterobject as any)['label'] === filter['label']) {
         return;
       }
     }
@@ -345,7 +343,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
     if (filter.type === 'OPTIONAL.PROVIDER') {
       filter.value = {};
       for (const provider of this.providers) {
-        filter.value[provider['value']] = false;
+        filter.value[(provider as any)['value']] = false;
       }
     }
     // Fill up dropdown remote filter with values fetched from external service
@@ -353,12 +351,10 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
       UtilitiesService.isEmpty(filter.options) &&
       filter.type === 'OPTIONAL.DROPDOWNREMOTE'
     ) {
-      this.filterPanelService
-        .getFilterRemoteParam(filter.url)
-        .subscribe(response => {
-          filter.options = response;
-          this.updateFilter(filter, true);
-        });
+      this.filterPanelService.getFilterRemoteParam(filter.url)?.subscribe(response => {
+        filter.options = response;
+        this.updateFilter(filter, true);
+      });
       return;
     }
     // For polygon filter make clipboard visible on map
@@ -383,7 +379,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
    */
   public refreshFilter(): void {
     // Clear out filter values
-    for (const filter of this.optionalFilters) {
+    for (const filter of this.optionalFilters as Record<string, unknown>[]) {
       if (filter['type'] === 'OPTIONAL.DROPDOWNSELECTLIST' ||
           filter['type'] === 'OPTIONAL.DATE' ||
           filter['type'] === 'OPTIONAL.TEXT' ||
@@ -396,7 +392,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
         if (filter['value']) {
           for (const provider in filter['value']) {
             if (Object.prototype.hasOwnProperty.call(filter['value'], provider)) {
-              filter['value'][provider] = false;
+              (filter['value'] as Record<string, unknown>)[provider] = false;
             }
           }
         }
@@ -461,7 +457,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
    * @returns true if the layer has an AdvancedFilterComponent, false otherwise
    */
   layerHasAdvancedFilterComponent(layerId: string): boolean {
-    return ref.advancedFilter[layerId];
+    return layerId in ref.advancedFilter;
   }
 
 }

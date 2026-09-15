@@ -23,6 +23,6 @@ export class InfoPanelComponent {
     data = inject(MAT_DIALOG_DATA);
     layerStatus = inject(LayerStatusService);
 
-    @ViewChild('subPanelElement') subPanelElement: ElementRef;
+    @ViewChild('subPanelElement') subPanelElement!: ElementRef;
 
 }

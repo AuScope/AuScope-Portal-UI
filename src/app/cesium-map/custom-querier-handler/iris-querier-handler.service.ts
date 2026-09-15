@@ -12,8 +12,9 @@ export class IrisQuerierHandler {
    * @returns HTML string
    */
   public getHTML(): string {
-    const extendedData = this.entity['kml']['extendedData'];
-    let html = '<div class="row"><div class="col-md-3">Station</div><div class="col-md-9">' + this.entity['name'] + '</div></div><hr>';
+    const entity = this.entity as any;
+    const extendedData = entity.kml.extendedData;
+    let html = '<div class="row"><div class="col-md-3">Station</div><div class="col-md-9">' + entity.name + '</div></div><hr>';
     html += '<div class="row"><div class="col-md-3">Code</div><div class="col-md-9">' + extendedData['Code']['value'] + '</div></div><hr>';
     html += '<div class="row"><div class="col-md-3">Country</div><div class="col-md-9">' + extendedData['Country']['value'] + '</div></div><hr>';
     html += '<div class="row"><div class="col-md-3">Brief Description</div><div class="col-md-9">' + this.layer.description + '</div></div><hr>';
@@ -37,7 +38,8 @@ export class IrisQuerierHandler {
    * @returns feature name string
    */
   public getFeatureName(): string {
-    return this.entity['name'];
+    const entity = this.entity as any;
+    return entity.name;
   }
 
 }

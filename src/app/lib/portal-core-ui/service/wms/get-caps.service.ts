@@ -1,8 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { SimpleXMLService } from '../../utility/simplexml.service';
-import { throwError as observableThrowError, Observable, of } from 'rxjs';
+import { throwError as observableThrowError, Observable, of, throwError } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
+import { ApplicationProfileInfo } from '../../model/data/onlineresource.model';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +19,7 @@ export class GetCapsService {
    * @param string namespace prefix
    * @returns URL of namespace
    */
-  private nsResolver(prefix: string) {
+  private nsResolver(prefix: string | null) {
     switch (prefix) {
       case 'xsi':
         return "http://www.opengis.net/wms";
@@ -45,7 +46,7 @@ export class GetCapsService {
    * @param nsResolver namespace resolver function
    * @returns applicationProfile string or {server, version}
    */
-  private findApplicationProfile(doc: Document, nsResolver: (prefix: string) => string): any {
+  private findApplicationProfile(doc: Document, nsResolver: (prefix: string | null) => string): string | ApplicationProfileInfo {
     const SCHEMA_LOCATION = "string(/xsi:WMS_Capabilities/@*[local-name()='schemaLocation'])";
     const SERVICE_TITLE = "string(/xsi:WMS_Capabilities/xsi:Service/xsi:Title)";
 
@@ -82,12 +83,12 @@ export class GetCapsService {
    * @param nsResolver namespace resolver function
    * @returns applicationProfile boolean
    */
-  private isLegendSupported(doc: Document, nsResolver: (prefix: string) => string): boolean {
+  private isLegendSupported(doc: Document, nsResolver: (prefix: string | null) => string): boolean {
     let legendFound: boolean = false;
 
     const LEGEND_TEXT = "//xsi:WMS_Capabilities/xsi:Capability/xsi:Request/*";
     const nodes = SimpleXMLService.evaluateXPathNodeArray(doc, doc, LEGEND_TEXT, nsResolver);
-    nodes.forEach(node => {
+    nodes.forEach((node: any) => {
       const name = SimpleXMLService.getNodeLocalName(node);
       if (name.toLowerCase().startsWith("GetLegendGraphic")) {
         legendFound = true;
@@ -110,7 +111,7 @@ export class GetCapsService {
    * @param nsResolver namespace resolver function
    * @returns an object with the following property names: 'url', 'type', 'name', 'description', 'version'
    */
-  private getOnlineResElems(doc: Document, node: Node, nsResolver: (prefix: string) => string): any {
+  private getOnlineResElems(doc: Document, node: Node, nsResolver: (prefix: string | null) => string): any {
     const URL_GET = "/xsi:WMS_Capabilities/xsi:Capability/xsi:Request/xsi:GetMap/xsi:DCPType/xsi:HTTP/xsi:Get/xsi:OnlineResource/@*[local-name()='href']";
     const URL_POST = "/xsi:WMS_Capabilities/xsi:Capability/xsi:Request/xsi:GetMap/xsi:DCPType/xsi:HTTP/xsi:Post/xsi:OnlineResource/@*[local-name()='href']";
     const NAME = './xsi:Name';
@@ -147,7 +148,7 @@ export class GetCapsService {
    * @param nsResolver namespace resolver function
    * @returns object with the following properties: 'westBoundLongitude', 'eastBoundLongitude', 'southBoundLatitude', 'northBoundLatitude'
    */
-  private getGeoElems(doc: Document, node: Node, nsResolver: (prefix: string) => string): any {
+  private getGeoElems(doc: Document, node: Node, nsResolver: (prefix: string | null) => string): any {
     const GEO_ELEMS = {
       'westBoundLongitude': 'string(./xsi:EX_GeographicBoundingBox/xsi:westBoundLongitude)',
       'eastBoundLongitude': 'string(./xsi:EX_GeographicBoundingBox/xsi:eastBoundLongitude)',
@@ -163,7 +164,7 @@ export class GetCapsService {
     };
     // Get bounding box from node if present, if not check parent if it exists and is a Layer
     if (SimpleXMLService.evaluateXPathNodeArray(doc, node, './xsi:EX_GeographicBoundingBox', nsResolver).length !== 0) {
-      for (const xpath of Object.keys(GEO_ELEMS)) {
+      for (const xpath of Object.keys(GEO_ELEMS) as Array<keyof typeof GEO_ELEMS>) {
         const flt = parseFloat(SimpleXMLService.evaluateXPathString(doc, node, GEO_ELEMS[xpath], nsResolver));
         if (!isNaN(flt)) {
           geoElems[xpath] = flt;
@@ -183,7 +184,7 @@ export class GetCapsService {
    * @param nsResolver namespace resolver function
    * @returns a list of map format strings
    */
-  private getMapFormats(doc: Document, node: Node, nsResolver: (prefix: string) => string): any[] {
+  private getMapFormats(doc: Document, node: Node, nsResolver: (prefix: string | null) => string): any[] {
     const MAP_FORMATS = '/xsi:WMS_Capabilities/xsi:Capability/xsi:Request/xsi:GetMap/xsi:Format';
     const mapFormats = [];
     const mapFormatElems: Element[] = SimpleXMLService.evaluateXPathNodeArray(doc, node, MAP_FORMATS, nsResolver);
@@ -202,7 +203,7 @@ export class GetCapsService {
    * @param the current SRS array
    * @returns list of layer CRS strings
    */
-  private getLayerSRS(doc: Document, node: Node, nsResolver: (prefix: string) => string, layerSRS: string[]): any[] {
+  private getLayerSRS(doc: Document, node: Node, nsResolver: (prefix: string | null) => string, layerSRS: string[]): any[] {
     const LAYER_SRS = './xsi:CRS';
     const layerSRSElems: Element[] = SimpleXMLService.evaluateXPathNodeArray(doc, node, LAYER_SRS, nsResolver);
     for (const elem of layerSRSElems) {
@@ -226,7 +227,7 @@ export class GetCapsService {
    * @param nsResolver namespace resolver function
    * @returns a CSWRecord object with these property names: 'name', 'id', 'description', 'adminArea', 'contactOrg'
    */
-  private getCSWRecElems(doc: Document, node: Node, nsResolver: (prefix: string) => string): any {
+  private getCSWRecElems(doc: Document, node: Node, nsResolver: (prefix: string | null) => string): any {
     const CSW_REC = {
       'name': 'string(./xsi:Title)',
       'id': 'string(./xsi:Name)',
@@ -235,8 +236,8 @@ export class GetCapsService {
       'contactOrg': 'string(/xsi:WMS_Capabilities/xsi:Service/xsi:ContactInformation/xsi:ContactPersonPrimary/xsi:ContactOrganization)',
       'contactPerson': 'string(/xsi:WMS_Capabilities/xsi:Service/xsi:ContactInformation/xsi:ContactPersonPrimary/xsi:ContactPerson)'
     };
-    const cswRecElems = {};
-    for (const xpath of Object.keys(CSW_REC)) {
+    const cswRecElems: Record<string, any> = {};
+    for (const xpath of Object.keys(CSW_REC) as Array<keyof typeof CSW_REC>) {
       cswRecElems[xpath] = SimpleXMLService.evaluateXPathString(doc, node, CSW_REC[xpath], nsResolver);
     }
     return cswRecElems;
@@ -251,7 +252,7 @@ export class GetCapsService {
    * @param dimName name of dimension e.g. 'time' 'elevation' ...
    * @returns a list of dimensions or null if nothing found
    */
-  private findDims(doc: Document, node: Node, nsResolver: (prefix: string) => string, dimName: string): any[] {
+  private findDims(doc: Document, node: Node, nsResolver: (prefix: string | null) => string, dimName: string): any[] | null {
     const DIM = "string(./xsi:Dimension[@name='" + dimName + "'])";
     // Should contain a comma separated list of dimension values
     const dims = SimpleXMLService.evaluateXPathString(doc, node, DIM, nsResolver);
@@ -276,7 +277,7 @@ export class GetCapsService {
    * @param nsResolver namespace resolver function
    * @returns AccessConstraints string
    */
-  private findAccessConstraints(doc: Document, nsResolver: (prefix: string) => string): string[] {
+  private findAccessConstraints(doc: Document, nsResolver: (prefix: string | null) => string): string[] {
     const mapFormats = "string(/xsi:WMS_Capabilities/xsi:Service/xsi:AccessConstraints)";
     const accessConstraints = [];
     accessConstraints.push(SimpleXMLService.evaluateXPathString(doc, doc, mapFormats, nsResolver));
@@ -291,7 +292,7 @@ export class GetCapsService {
    * @param nsResolver namespace resolver function
    * @returns the metadata URL for the layer
    */
-  private getMetadataUrl(doc: Document, node: Node, nsResolver: (prefix: string) => string): string {
+  private getMetadataUrl(doc: Document, node: Node, nsResolver: (prefix: string | null) => string): string {
     const METADATA_URL = "./xsi:MetadataURL/xsi:OnlineResource/@*[local-name()='href']";
     return SimpleXMLService.evaluateXPathString(doc, node, METADATA_URL, nsResolver);
   }
@@ -304,16 +305,16 @@ export class GetCapsService {
    * @param nsResolver namespace resolver function
    * @returns the legend URL for the layer
    */
-  private getLegendUrl(doc: Document, node: Node, _nsResolver: (prefix: string) => string): string {
+  private getLegendUrl(doc: Document, node: Node, _nsResolver: (prefix: string | null) => string): string {
     let legendUrl = "";
 
-    const styleNodes = SimpleXMLService.getMatchingChildNodes(node, null, "Style");
+    const styleNodes = SimpleXMLService.getMatchingChildNodes(node, undefined, "Style");
     if (styleNodes.length > 0) {
-      const legendNodes = SimpleXMLService.getMatchingChildNodes(styleNodes[0], null, "LegendURL");
+      const legendNodes = SimpleXMLService.getMatchingChildNodes(styleNodes[0], undefined, "LegendURL");
       if (legendNodes.length > 0) {
-        const resourceNodes = SimpleXMLService.getMatchingChildNodes(legendNodes[0], null, "OnlineResource");
+        const resourceNodes = SimpleXMLService.getMatchingChildNodes(legendNodes[0], undefined, "OnlineResource");
         if (resourceNodes.length > 0) {
-          const hrefNodes = SimpleXMLService.getMatchingAttributes(resourceNodes[0], null, "href");
+          const hrefNodes = SimpleXMLService.getMatchingAttributes(resourceNodes[0], undefined, "href");
           if (hrefNodes.length > 0) {
             legendUrl = hrefNodes[0].nodeValue;
           }
@@ -332,7 +333,7 @@ export class GetCapsService {
    * @param nsResolver namespace resolver function
    * @returns the MinScaleDenomintor for the layer, or null if not present
    */
-  private getMinScaleDenominator(doc: Document, node: Node, nsResolver: (prefix: string) => string): number {
+  private getMinScaleDenominator(doc: Document, node: Node, nsResolver: (prefix: string | null) => string): number | null {
     let minScaleDenominator = null;
     const METADATA_URL = './xsi:MinScaleDenominator';
     const stringVal = SimpleXMLService.evaluateXPathString(doc, node, METADATA_URL, nsResolver);
@@ -350,7 +351,7 @@ export class GetCapsService {
    * @param nsResolver namespace resolver function
    * @returns the MaxScaleDenomintor for the layer, or null if not present
    */
-  private getMaxScaleDenominator(doc: Document, node: Node, nsResolver: (prefix: string) => string): number {
+  private getMaxScaleDenominator(doc: Document, node: Node, nsResolver: (prefix: string | null) => string): number | null {
     let maxScaleDenominator = null;
     const METADATA_URL = './xsi:MaxScaleDenominator';
     const stringVal = SimpleXMLService.evaluateXPathString(doc, node, METADATA_URL, nsResolver);
@@ -369,7 +370,7 @@ export class GetCapsService {
    * @param nsResolver namespace resolver function
    * @returns true if the layer has no GET URL but does have a POST URL, false otherwise
    */
-  private getUsePost(doc: Document, node: Node, nsResolver: (prefix: string) => string): boolean {
+  private getUsePost(doc: Document, node: Node, nsResolver: (prefix: string | null) => string): boolean {
     const URL_GET = "/xsi:WMS_Capabilities/xsi:Capability/xsi:Request/xsi:GetMap/xsi:DCPType/xsi:HTTP/xsi:Get/xsi:OnlineResource/@*[local-name()='href']";
     const URL_POST = "/xsi:WMS_Capabilities/xsi:Capability/xsi:Request/xsi:GetMap/xsi:DCPType/xsi:HTTP/xsi:Post/xsi:OnlineResource/@*[local-name()='href']";
     let url = SimpleXMLService.evaluateXPathString(doc, doc, URL_GET, nsResolver);
@@ -423,7 +424,10 @@ export class GetCapsService {
    */
   public getLayersFromGetCapabilities(getCapsResponse: any): any {
     const rootNode = SimpleXMLService.parseStringToDOM(getCapsResponse);
-    const nsResolverFn = (prefix: string) => this.nsResolver(prefix);
+    if (!rootNode) {
+      return throwError(() => new Error('Unable to parse root node from GetCapabilities'));
+    }
+    const nsResolverFn = (prefix: string | null) => this.nsResolver(prefix);
     // Root layers are all layers with an attribute "queryable=1"
     //const ROOT_LAYERS = '//xsi:Layer[@queryable=1]';
     const ROOT_LAYERS = '//xsi:Layer';
@@ -434,7 +438,8 @@ export class GetCapsService {
     const legendSupport = this.isLegendSupported(rootNode, nsResolverFn);
     const accessConstraints = this.findAccessConstraints(rootNode, nsResolverFn);
 
-    const retVal = { data: { cswRecords: [], capabilityRecords: [], invalidLayerCount: 0 }, msg: '', success: true, serviceUrl: '', nestedLayers: nestedLayers };
+    const retVal = { data: { cswRecords: [] as any[], capabilityRecords: [] as any[], invalidLayerCount: 0 },
+      msg: '', success: true, serviceUrl: '', nestedLayers };
 
     if (rootLayers.length == 0) {
       // check for the element "mdb:identificationInfo"

@@ -3,11 +3,11 @@ import { CSWRecordModel } from '../../../../lib/portal-core-ui/model/data/cswrec
 import { LayerModel } from '../../../../lib/portal-core-ui/model/data/layer.model';
 import { OnlineResourceModel } from '../../../../lib/portal-core-ui/model/data/onlineresource.model';
 import { UtilitiesService } from '../../../../lib/portal-core-ui/utility/utilities.service';
-import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
-import { LayerManagerService } from 'app/services/ui/layer-manager.service';
-import { LayerHandlerService } from 'app/lib/portal-core-ui/service/cswrecords/layer-handler.service';
-import { environment } from 'environments/environment';
-import { config } from 'environments/config';
+import { FilterService, LayerTimes } from '../../../../services/filter/filter.service';
+import { LayerManagerService } from '../../../../services/ui/layer-manager.service';
+import { LayerHandlerService } from '../../../../lib/portal-core-ui/service/cswrecords/layer-handler.service';
+import { environment } from '../../../../../environments/environment';
+import { config } from '../../../../../environments/config';
 import { ResourceType } from '../../../../lib/portal-core-ui/utility/constants.service';
 import { take } from 'rxjs/operators';
 
@@ -26,16 +26,16 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
     private layerManagerService = inject(LayerManagerService);
     private layerHandlerService = inject(LayerHandlerService);
 
-    @Input() cswRecord: CSWRecordModel;
-    @Input() layer: LayerModel;
-    @Input() expanded: boolean;
+    @Input() cswRecord!: CSWRecordModel;
+    @Input() layer!: LayerModel;
+    @Input() expanded!: boolean;
     @Input() showRecordAddButton = true;
     @Output() layerAdded = new EventEmitter<void>();
 
     // These store the URL of the WMS preview, outline of Australia and legend
-    wmsUrl: string;
-    outlineUrl: string;
-    legendUrl: string;
+    wmsUrl!: string;
+    outlineUrl!: string;
+    legendUrl!: string;
     // Have preview/legend loaded
     wmsLoaded = false;
     legendLoaded = false;
@@ -44,19 +44,19 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
     publicationYear: string = "NaN";
 
     // URL used in the citation
-    citeURL: string;
+    citeURL!: string;
 
     // Accessed date in citation
-    accessedDate: string;
+    accessedDate!: string;
 
     // Distributors in citation
-    distributor: string
+    distributor!: string
 
     // Saves the DOI reference
-    DOIname: string;
+    DOIname!: string;
 
     // Citable - some layers do not provide enough information to be citable
-    citable: boolean;
+    citable!: boolean;
 
     // A regexp to catch customer service/enquiries names
     regex: RegExp = new RegExp("enquiries|service|customer|infocentre", "i");
@@ -66,12 +66,13 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
      * @param constraints string array of contraints
      * @return string constraints in string format
      */
-    public selectConstraints(capabilityRecords, cswConstraints: string[]) {
+    public selectConstraints(capabilityRecords: any, cswConstraints: string[]): string {
         if (capabilityRecords && capabilityRecords.length > 0 && capabilityRecords[0].accessConstraints && capabilityRecords[0].accessConstraints.length > 0) {
             return this.cleanConstraints(capabilityRecords[0].accessConstraints);
         } else if (cswConstraints) {
             return this.cleanConstraints(cswConstraints);
         }
+        return '';
     }
 
     /**
@@ -178,7 +179,7 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
         }
 
         for (const selectedFilter of optionalFilters) {
-            const existingFilter = layerOptionalFilters.find(filter => filter.label === selectedFilter.label);
+            const existingFilter = layerOptionalFilters.find((filter: any) => filter.label === selectedFilter.label);
             if (existingFilter) {
                 existingFilter.value = selectedFilter.value;
                 existingFilter.added = true;
@@ -216,7 +217,7 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
      */
     private buildProviderFilterForRecord(): any {
         const providerFilterTemplate = this.layer?.filterCollection?.optionalFilters?.find(
-            filter => filter.type === 'OPTIONAL.PROVIDER'
+            (filter: any) => filter.type === 'OPTIONAL.PROVIDER'
         );
         if (!providerFilterTemplate) {
             return null;
@@ -233,7 +234,7 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
             return null;
         }
 
-        const providerValue = {};
+        const providerValue: any = {};
         if (providerFilterTemplate.value) {
             for (const providerKey in providerFilterTemplate.value) {
                 providerValue[providerKey] = false;
@@ -282,7 +283,6 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
         } else {
             // Citation using catalogue URL is a second best solution
             this.citeURL = this.cswRecord.recordInfoUrl;
-
         }
         this.DOIname = '';
         let usesNCI = false;
@@ -337,7 +337,6 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
     }
 
     ngOnInit(): void {
-
         // Assemble data fields for citation
         this.processCitation();
 
@@ -350,11 +349,13 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
         // the WMS urls after the times have been loaded
         this.filterService.getLayerTimesBS(this.layer.id).subscribe(layerTimes => {
             // check the layer for a legendUrl property
-            this.layer.capabilityRecords[0].layers.forEach(l => {
-                if (this.layer.id === l.name) {
-                    this.legendUrl = l.legendUrl;
-                }
-            });
+            if (this.layer.capabilityRecords && this.layer.capabilityRecords.length > 0) {
+              this.layer.capabilityRecords[0]?.layers?.forEach((l: any) => {
+                  if (this.layer.id === l.name) {
+                      this.legendUrl = l.legendUrl;
+                  }
+              });
+            }
             const wmsOnlineResource = this.cswRecord.onlineResources.find(r => r.type.toLowerCase() === 'wms');
             if ((wmsOnlineResource) && (this.cswRecord.legendSupport)){
                const params = 'SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png'
@@ -453,7 +454,7 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
             this.wmsUrl = environment.portalBaseUrl + 'getViaProxy.do?usewhitelist=false&usepostafterproxy=true&url=' + this.wmsUrl;
             (event.target as HTMLImageElement).src = this.wmsUrl;
         } else {
-            (event.target as HTMLImageElement).parentElement.style.display = 'none';
+            (event.target as HTMLImageElement).parentElement?.style.setProperty('display', 'none');
         }
     }
 
@@ -468,7 +469,7 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
             this.legendUrl = environment.portalBaseUrl + 'getViaProxy.do?usewhitelist=false&usepostafterproxy=true&url=' + this.legendUrl;
             (event.target as HTMLImageElement).src = this.legendUrl;
         } else {
-            (event.target as HTMLImageElement).parentElement.parentElement.style.display = 'none';
+            (event.target as HTMLImageElement).parentElement?.parentElement?.style.setProperty('display', 'none');
         }
     }
 

@@ -2,14 +2,20 @@
   <!-- Search bar and buttons -->
   <div class="input-group">
     <div class="input-group-prepend">
-      <button tabindex="-1" class="btn btn-auscope-primary search-toggle-button" type="button" title="{{showingResultsPanel ? 'Hide results' : 'Show results'}}" (click)="setShowingResultsPanel(!showingResultsPanel)">
-        @if (!showingResultsPanel) {
+      <button
+        tabindex="-1"
+        class="btn btn-auscope-primary search-toggle-button"
+        type="button"
+        title="{{ showingResultsPanel() ? 'Hide results' : 'Show results' }}"
+        (click)="setShowingResultsPanel(!showingResultsPanel())"
+      >
+        @if (!showingResultsPanel()) {
           <span class="fa-layers fa-fw">
             <i class="fa fa-list"></i>
             <i class="fa fa-caret-down caret-icon"></i>
           </span>
         }
-        @if (showingResultsPanel) {
+        @if (showingResultsPanel()) {
           <span class="fa-layers fa-fw">
             <i class="fa fa-list"></i>
             <i class="fa fa-caret-up caret-icon"></i>
@@ -30,31 +36,23 @@
           [(ngModel)]="queryText"
           (keyup)="onKeyUp($event)"
           (keydown)="onKeyDown($event)"
-          [disabled]="searching"
+          [disabled]="searching()"
           [matAutocomplete]="auto"
         />
-        @if (!searching && queryText) {
-          <button
-            type="button"
-            class="btn clear-query-button"
-            (click)="clearQueryText()">
-            &times;
-          </button>
+        @if (!searching() && queryText() !== '') {
+          <button type="button" class="btn clear-query-button" (click)="clearQueryText()">&times;</button>
         }
       </div>
       <!-- Suggester -->
-      <mat-autocomplete
-        #auto="matAutocomplete"
-        (optionSelected)="suggestedTermSelected($event.option.value)">
-
+      <mat-autocomplete #auto="matAutocomplete" (optionSelected)="suggestedTermSelected($event.option.value)">
         @for (term of suggestedTerms; track term; let i = $index) {
           <mat-option
             [value]="term"
             (mouseenter)="highlightedSuggestionIndex = i"
             [ngStyle]="{
-              'background-color':
-                i !== highlightedSuggestionIndex ? 'white' : 'lightgray'
-            }">
+              'background-color': i !== highlightedSuggestionIndex ? 'white' : 'lightgray',
+            }"
+          >
             {{ term }}
           </mat-option>
         }
@@ -63,35 +61,55 @@
 
     <div class="input-group-append">
       <!-- Search button -->
-      @if (!searching) {
-        <button tabindex="-1" class="btn btn-auscope-primary search-button" type="button" title="Search layers" (click)="search(true)"><i class="fa fa-search"></i></button>
+      @if (!searching()) {
+        <button
+          tabindex="-1"
+          class="btn btn-auscope-primary search-button"
+          type="button"
+          title="Search layers"
+          (click)="search(true)"
+        >
+          <i class="fa fa-search"></i>
+        </button>
       }
-      @if (searching) {
-        <button tabindex="-1" class="btn btn-auscope-primary search-button" type="button" title="Searching layers">@if (!showingKmlOgcOptions) {
-          <i class="fa fa-spin fa-spinner"></i>
-        }</button>
+      @if (searching()) {
+        <button tabindex="-1" class="btn btn-auscope-primary search-button" type="button" title="Searching layers">
+          @if (!showingKmlOgcOptions()) {
+            <i class="fa fa-spin fa-spinner"></i>
+          }
+        </button>
       }
       <!-- Advanced options selection -->
-      <button tabindex="-1" class="btn btn-auscope-primary advanced-options-button" title="{{showingAdvancedOptions ? 'Hide advanced search options' : 'Show advanced search options'}}" (click)="showingAdvancedOptions=!showingAdvancedOptions">
+      <button
+        tabindex="-1"
+        class="btn btn-auscope-primary advanced-options-button"
+        title="{{ showingAdvancedOptions() ? 'Hide advanced search options' : 'Show advanced search options' }}"
+        (click)="showingAdvancedOptions.set(!showingAdvancedOptions())"
+      >
         <span class="fa-layers">
           <i class="fa fa-sliders"></i>
-          @if (!showingAdvancedOptions) {
+          @if (!showingAdvancedOptions()) {
             <i class="fa fa-caret-down caret-icon"></i>
           }
-          @if (showingAdvancedOptions) {
+          @else if (showingAdvancedOptions()) {
             <i class="fa fa-caret-up caret-icon"></i>
           }
         </span>
       </button>
       <!-- small gap -->
       <!-- KML/OGC -->
-      <button tabindex="-1" class="btn btn-auscope-primary custom-layers-button" title="{{showingKmlOgcOptions ? 'Hide custom layer options' : 'Add custom layers'}}" (click)="setShowingKmlOgcOptions(!showingKmlOgcOptions)">
+      <button
+        tabindex="-1"
+        class="btn btn-auscope-primary custom-layers-button"
+        title="{{ showingKmlOgcOptions() ? 'Hide custom layer options' : 'Add custom layers' }}"
+        (click)="setShowingKmlOgcOptions(!showingKmlOgcOptions())"
+      >
         <span class="fa-layers">
           <span class="custom-layers-label">Custom Layers</span>
-          @if (!showingKmlOgcOptions) {
+          @if (!showingKmlOgcOptions()) {
             <i class="fa fa-caret-down caret-icon"></i>
           }
-          @if (showingKmlOgcOptions) {
+          @if (showingKmlOgcOptions()) {
             <i class="fa fa-caret-up caret-icon"></i>
           }
         </span>
@@ -99,198 +117,390 @@
     </div>
   </div>
   <!-- Search alerts -->
-  @if (alertMessage && alertMessage !== '') {
+  @if (alertMessage() && alertMessage() !== '') {
     <div #alert class="search-alert">
-      <label class="search-alert-label">{{ alertMessage }}
-        <button type="button" class="search-alert-button close" aria-label="Close" (click)="alertMessage='';">
+      <label class="search-alert-label"
+        >{{ alertMessage() }}
+        <button type="button" class="search-alert-button close" aria-label="Close" (click)="alertMessage.set('')">
           <span aria-hidden="true">&times;</span>
         </button>
       </label>
     </div>
   }
   <!-- Search options -->
-  @if (showingAdvancedOptions) {
+  @if (showingAdvancedOptions()) {
     <div class="options-panel">
       <div class="options-dropdowns">
         <!-- Search fields -->
-        <button class="btn btn-sm btn-secondary" type="button" [matMenuTriggerFor]="searchFieldsMenu">{{ getSearchFieldTitle() }}</button>
+        <button class="btn btn-sm btn-secondary" type="button" [matMenuTriggerFor]="searchFieldsMenu">
+          {{ getSearchFieldTitle() }}
+        </button>
         <mat-menu #searchFieldsMenu="matMenu">
           <div class="advanced-options-panel" (click)="$event.stopPropagation()">
-            <input type="checkbox" class="options-checkbox" [(ngModel)]="allSearchField.checked" (change)="allSearchFieldChange()">&nbsp;All
+            <input
+              type="checkbox"
+              class="options-checkbox"
+              [(ngModel)]="allSearchField.checked"
+              (change)="allSearchFieldChange()"
+            />&nbsp;All
             @for (field of searchFields; track field) {
               <div>
-                <input type="checkbox" class="options-checkbox" [(ngModel)]="field.checked" [disabled]="allSearchField.checked" (change)="searchFieldChange(field.name)">&nbsp;{{ field.name }}
+                <input
+                  type="checkbox"
+                  class="options-checkbox"
+                  [(ngModel)]="field.checked"
+                  [disabled]="allSearchField.checked"
+                  (change)="searchFieldChange(field.name)"
+                />&nbsp;{{ field.name }}
               </div>
             }
           </div>
         </mat-menu>
         <!-- Services -->
-        <button class="btn btn-sm btn-secondary" type="button" [matMenuTriggerFor]="servicesMenu">{{ getServicesTitle() }}</button>
+        <button class="btn btn-sm btn-secondary" type="button" [matMenuTriggerFor]="servicesMenu">
+          {{ getServicesTitle() }}
+        </button>
         <mat-menu #servicesMenu="matMenu">
           <div class="advanced-options-panel" (click)="$event.stopPropagation()">
-            <input type="checkbox" class="options-checkbox" [(ngModel)]="allOGCServices.checked" (change)="allOGCServicesChange()">&nbsp;All
+            <input
+              type="checkbox"
+              class="options-checkbox"
+              [(ngModel)]="allOGCServices.checked"
+              (change)="allOGCServicesChange()"
+            />&nbsp;All
             @for (service of ogcServices; track service) {
               <div>
-                <input type="checkbox" class="options-checkbox" [(ngModel)]="service.checked" [disabled]="allOGCServices.checked" (change)="ogcServiceChange(service.name)">&nbsp;{{ service.name }}
+                <input
+                  type="checkbox"
+                  class="options-checkbox"
+                  [(ngModel)]="service.checked"
+                  [disabled]="allOGCServices.checked"
+                  (change)="ogcServiceChange(service.name)"
+                />&nbsp;{{ service.name }}
               </div>
             }
           </div>
         </mat-menu>
         <!-- Spatial bounds -->
-        <button class="btn btn-sm btn-secondary" type="button" [matMenuTriggerFor]="spatialBoundsMenu">{{ getSpatialBoundsTitle() }}</button>
+        <button class="btn btn-sm btn-secondary" type="button" [matMenuTriggerFor]="spatialBoundsMenu">
+          {{ getSpatialBoundsTitle() }}
+        </button>
         <mat-menu #spatialBoundsMenu="matMenu">
           <div class="advanced-options-panel spatial-options-panel" (click)="$event.stopPropagation()">
-            <input type="checkbox" class="options-checkbox" title="Toggle bounds restriction" [(ngModel)]="restrictBounds"><label class="spatial-bounds-label"><strong>Restrict Spatial Bounds</strong></label>
-            <div style="display:flex;">
-              <button type="button" class="btn btn-sm btn-primary" title="Draw bounds on map" (click)="drawBounds()">Draw Bounds</button>
-              <button type="button" class="btn btn-sm btn-primary" title="Clear bounds from map" (click)="clearBounds()" [disabled]="!bbox">Clear Bounds</button>
+            <input
+              type="checkbox"
+              class="options-checkbox"
+              title="Toggle bounds restriction"
+              [(ngModel)]="restrictBounds"
+            /><label class="spatial-bounds-label"><strong>Restrict Spatial Bounds</strong></label>
+            <div style="display: flex">
+              <button type="button" class="btn btn-sm btn-primary" title="Draw bounds on map" (click)="drawBounds()">
+                Draw Bounds
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-primary"
+                title="Clear bounds from map"
+                (click)="clearBounds()"
+                [disabled]="!bbox()"
+              >
+                Clear Bounds
+              </button>
             </div>
             <div>
-              <button class="btn btn-sm btn-primary" type="button" title="How layers relate to bounds" [matMenuTriggerFor]="boundsRelationshipMenu">Relationship: {{ boundsRelationship }}</button>
+              <button
+                class="btn btn-sm btn-primary"
+                type="button"
+                title="How layers relate to bounds"
+                [matMenuTriggerFor]="boundsRelationshipMenu"
+              >
+                Relationship: {{ boundsRelationship }}
+              </button>
               <mat-menu #boundsRelationshipMenu="matMenu">
-                <div style="padding:10px;" (click)="$event.stopPropagation()">
-                  <input type="radio" id="intersects-relation" name="relationship-radio" value="Intersects" [(ngModel)]="boundsRelationship">
-                  <label for="intersects-relation">&nbsp;Intersects</label><br>
-                  <input type="radio" id="contains-relation" name="relationship-radio" value="Contains" [(ngModel)]="boundsRelationship">
-                  <label for="contains-relation">&nbsp;Contains</label><br>
-                  <input type="radio" id="within-relation" name="relationship-radio" value="Within" [(ngModel)]="boundsRelationship">
-                  <label for="within-relation">&nbsp;Within</label><br>
+                <div style="padding: 10px" (click)="$event.stopPropagation()">
+                  <input
+                    type="radio"
+                    id="intersects-relation"
+                    name="relationship-radio"
+                    value="Intersects"
+                    [(ngModel)]="boundsRelationship"
+                  />
+                  <label for="intersects-relation">&nbsp;Intersects</label><br />
+                  <input
+                    type="radio"
+                    id="contains-relation"
+                    name="relationship-radio"
+                    value="Contains"
+                    [(ngModel)]="boundsRelationship"
+                  />
+                  <label for="contains-relation">&nbsp;Contains</label><br />
+                  <input
+                    type="radio"
+                    id="within-relation"
+                    name="relationship-radio"
+                    value="Within"
+                    [(ngModel)]="boundsRelationship"
+                  />
+                  <label for="within-relation">&nbsp;Within</label><br />
                 </div>
               </mat-menu>
-              </div>
-            @if (bbox) {
+            </div>
+            @if (bbox()) {
               <div class="container">
                 <div class="row">
-                  <label style="margin-left:8px;margin-top:4px;"><strong>Bounding Box</strong></label>
+                  <label style="margin-left: 8px; margin-top: 4px"><strong>Bounding Box</strong></label>
                 </div>
-                <label><span class="badge badge-secondary d-inline ml-5 line-height-1-8">North: {{bbox.northBoundLatitude | number:'1.0-4'}}</span></label>
-                <label><span class="badge badge-secondary d-inline line-height-1-8">West: {{bbox.westBoundLongitude | number:'1.0-4'}}</span>
-                <span class="badge badge-secondary d-inline ml-3 line-height-1-8">East: {{bbox.eastBoundLongitude | number:'1.0-4'}}</span></label>
-                <label><span class="badge badge-secondary d-inline ml-5 line-height-1-8">South: {{bbox.southBoundLatitude | number:'1.0-4'}}</span></label>
+                <label
+                  ><span class="badge badge-secondary d-inline ml-5 line-height-1-8"
+                    >North: {{ bbox()?.northBoundLatitude | number: '1.0-4' }}</span
+                  ></label
+                >
+                <label
+                  ><span class="badge badge-secondary d-inline line-height-1-8"
+                    >West: {{ bbox()?.westBoundLongitude | number: '1.0-4' }}</span
+                  >
+                  <span class="badge badge-secondary d-inline ml-3 line-height-1-8"
+                    >East: {{ bbox()?.eastBoundLongitude | number: '1.0-4' }}</span
+                  ></label
+                >
+                <label
+                  ><span class="badge badge-secondary d-inline ml-5 line-height-1-8"
+                    >South: {{ bbox()?.southBoundLatitude | number: '1.0-4' }}</span
+                  ></label
+                >
               </div>
             }
           </div>
         </mat-menu>
         <!-- Reset advanced search options button -->
-        <button style="margin-left:auto;margin-right:6px;" class="btn btn-sm btn-secondary" (click)="resetAdvancedSearch()"><i class="fa fa-ban"></i>&nbsp;Reset All</button>
+        <button
+          style="margin-left: auto; margin-right: 6px"
+          class="btn btn-sm btn-secondary"
+          (click)="resetAdvancedSearch()"
+        >
+          <i class="fa fa-ban"></i>&nbsp;Reset All
+        </button>
       </div>
     </div>
   }
   <!-- Search results -->
-  @if (showingResultsPanel && !searching) {
+  @if (showingResultsPanel() && !searching()) {
     <div class="results-panel">
-      @if (!searchResults || searchResults.length === 0) {
+      @if (!searchResults() || searchResults().length === 0) {
         <div>
           <strong>No results found, try refining your search.</strong>
         </div>
       }
-      @if (searchResults?.length > 0) {
-          <div class = "results-row">
-            <!-- left column, search results and optional downloads -->
-            <div class="results-column">
-              <div class="search-results-title">
-                <label><strong>{{ getSearchResultsTitle() }}</strong></label>
-                @if (!showingAllLayers) {
-                  <button title="Show all layers" class="btn btn-sm btn-danger clear-search-results-button" type="button" (click)="showFeaturedLayers()"><i class="fa fa-ban"></i>&nbsp;Clear</button>
-                }
-              </div>
-              <div class="results-list">
-                <!-- Accordion layout with filter/download/info options -->
-                @for (searchResult of paginatedSearchResults(); track searchResult) {
-                  <div [id]="searchResult.layer.id">
-                    <span [ngClass]="searchResult  === selectedSearchResult ? 'selected-layer-header' : 'layer-header'" (click)="selectSearchResult(searchResult)">
-                      <span class="layer-header-label" title="{{searchResult.layer.name}}">{{ searchResult.layer.name }}</span>
-                      @if (searchResult.layer.id.startsWith('registry-csw:')) {
-                        <span class="csw-label search-result-button">Record</span>
-                      }
-                      @if (!searchResult.layer.id.startsWith('registry-csw:')) {
-                        <span class="layer-label search-result-button">Featured</span>
-                      }
-                      @if (!isLayerAdded(searchResult.layer.id)) {
-                        <button [disabled]="!isMapSupportedLayer(searchResult.layer)" class="btn btn-sm btn-success search-result-button" type="button" title="Add layer" (click)="addLayer(searchResult.layer)"><i class="fa fa-plus-circle"></i>&nbsp;Add</button>
-                      }
-                      @if (isLayerAdded(searchResult.layer.id)) {
-                        <button class="btn btn-sm btn-danger search-result-button" type="button" title="Remove layer from map" (click)="removeLayer($event, searchResult.layer)"><i class="fa fa-trash"></i>&nbsp;Remove</button>
-                      }
-                      <button class="btn btn-sm btn-info search-result-button" type="button" title="Layer information" (click)="showLayerInformation($event, searchResult.layer)"><i class="fa fa-info-circle"></i>&nbsp;Info</button>
-                      <button class="btn btn-sm btn-primary download-checkbox-button" type="button" title="Add to download list" [style.visibility]="isCsvDownloadable(searchResult.layer) ? 'visible' : 'hidden'">
-                        <i class="fa fa-download download-icon"></i>
-                        <input type="checkbox" class="faChkSqr" style="vertical-align: center;" [checked]="mapDownloadLayers.get(searchResult.layer.id)" (change)="OnChangeDownloadLayers(searchResult.layer)">
+      @if (searchResults()?.length > 0) {
+        <div class="results-row">
+          <!-- left column, search results and optional downloads -->
+          <div class="results-column">
+            <div class="search-results-title">
+              <label
+                ><strong>{{ getSearchResultsTitle() }}</strong></label
+              >
+              @if (!showingAllLayers()) {
+                <button
+                  title="Show all layers"
+                  class="btn btn-sm btn-danger clear-search-results-button"
+                  type="button"
+                  (click)="showFeaturedLayers()"
+                >
+                  <i class="fa fa-ban"></i>&nbsp;Clear
+                </button>
+              }
+            </div>
+            <div class="results-list">
+              <!-- Accordion layout with filter/download/info options -->
+              @for (searchResult of paginatedSearchResults(); track searchResult) {
+                <div [id]="searchResult.layer.id">
+                  <span
+                    [ngClass]="searchResult === selectedSearchResult() ? 'selected-layer-header' : 'layer-header'"
+                    (click)="selectSearchResult(searchResult)"
+                  >
+                    <span class="layer-header-label" title="{{ searchResult.layer.name }}">{{
+                      searchResult.layer.name
+                    }}</span>
+                    @if (searchResult.layer.id.startsWith('registry-csw:')) {
+                      <span class="csw-label search-result-button">Record</span>
+                    }
+                    @if (!searchResult.layer.id.startsWith('registry-csw:')) {
+                      <span class="layer-label search-result-button">Featured</span>
+                    }
+                    @if (!isLayerAdded(searchResult.layer.id)) {
+                      <button
+                        [disabled]="!isMapSupportedLayer(searchResult.layer)"
+                        class="btn btn-sm btn-success search-result-button"
+                        type="button"
+                        title="Add layer"
+                        (click)="addLayer(searchResult.layer)"
+                      >
+                        <i class="fa fa-plus-circle"></i>&nbsp;Add
                       </button>
-                    </span>
-                  </div>
-                }
-              </div>
-              <mat-paginator
-                *ngIf="searchResults.length > RESULTS_PER_PAGE"
-                [length]="totalSearchHits"
-                [pageSize]="RESULTS_PER_PAGE"
-                [pageSizeOptions]="[10, 20, 50]"
-                (page)="onPageChange($event)">
-              </mat-paginator>
-              <!-- Downloads -->
-              @if (mapDownloadLayers.size > 0 && showingResultsPanel && !searching) {
-                <div class="downloads-panel">
-                  <div class="results-list downloads-list">
-                    <!--<div class="break-border"></div>-->
-                    <div class="search-results-title">
-                      <label><strong>Selected Layers To Download:&nbsp;</strong></label>
-                      <span class="layer-header-label">Layers:&nbsp;{{total0}}:{{completed0}}</span>
-                      <span class="layer-header-label">&nbsp;&nbsp;Files:&nbsp;{{total}}:{{completed}}</span>
-                      <button title="Clear all layers" class="btn btn-sm btn-danger clear-search-results-button" type="button" (click)="clearDownloadLayers()"><i class="fa fa-ban"></i>&nbsp;Clear&nbsp;</button>
-                      <button title="Download all layers" style="float:right;" class="btn btn-sm btn-success clear-search-results-button" type="button" (click)="downloadAll()"><i class="fa fa-download"></i>&nbsp;All</button>
-                    </div>
-                    <!-- DownloadLayers list -->
-                    <div class="download-layers-list">
-                      @for (downloadLayer of mapDownloadLayers | keyvalue; track downloadLayer) {
-                        <div>
-                          <div style="line-height:1.7em;height:2.2em;padding:2px 5px 0px 5px;margin-bottom:2px;" class="btn layer-header" style="align-items: baseline;">
-                            <button style="float:right;padding:2px 2px 2px 0;margin-left:0px;margin-right:8px;line-height:100%;" class="btn btn-sm btn-danger" type="button" title="Click to remove" (click)="removeDownloadLayer(downloadLayer.value.Layer)">
-                              <i class="fa fa-close" style="color:white"></i>
-                            </button>
-                            <span class="layer-header-label" title="{{downloadLayer.value.Layer.name}}">{{ downloadLayer.value.Layer.name }}</span>
-                            <!--
-                            @if (downloadLayer.value.Ob | async as download) {
-                              <mat-progress-bar [mode]="download.state === 'PENDING' ? 'buffer' : 'determinate'" [value]="download.progress"></mat-progress-bar> 
-                            }
-                            -->
-                            @if (downloadLayer.value.Ob) {
-                              <mat-progress-bar style="height: 10px;" [mode]="determinate" [value]="downloadLayer.value.Ob.progress" ></mat-progress-bar>
-                            }
-                            <button class="btn btn-sm btn-primary download-button" type="button" title="Click to download" (click)="downloadAsCSV(downloadLayer.value.Layer)"><i class="fa fa-download search-download-icon"></i></button>
-                            <button class="btn btn-sm btn-primary download-button" type="button" title="Download with AuScope-Cat" (click)="downloadWithAuScopeCat(downloadLayer.value.Layer)"><i class="fa fa-plug search-download-icon"></i></button>
-                          </div>
-                        </div>
-                      }
-                    </div>
-                  </div>
+                    }
+                    @if (isLayerAdded(searchResult.layer.id)) {
+                      <button
+                        class="btn btn-sm btn-danger search-result-button"
+                        type="button"
+                        title="Remove layer from map"
+                        (click)="removeLayer($event, searchResult.layer)"
+                      >
+                        <i class="fa fa-trash"></i>&nbsp;Remove
+                      </button>
+                    }
+                    <button
+                      class="btn btn-sm btn-info search-result-button"
+                      type="button"
+                      title="Layer information"
+                      (click)="showLayerInformation($event, searchResult.layer)"
+                    >
+                      <i class="fa fa-info-circle"></i>&nbsp;Info
+                    </button>
+                    <button
+                      class="btn btn-sm btn-primary download-checkbox-button"
+                      type="button"
+                      title="Add to download list"
+                      [style.visibility]="isCsvDownloadable(searchResult.layer) ? 'visible' : 'hidden'"
+                    >
+                      <i class="fa fa-download download-icon"></i>
+                      <input
+                        type="checkbox"
+                        class="faChkSqr"
+                        style="vertical-align: center"
+                        [checked]="mapDownloadLayers.get(searchResult.layer.id)"
+                        (change)="OnChangeDownloadLayers(searchResult.layer)"
+                      />
+                    </button>
+                  </span>
                 </div>
               }
             </div>
-            <!-- Search Info Panel -->
-            @if (selectedSearchResult && showingInfoPanel && !searching) {
-              <div class="search-info-panel">
-                <a style="font-weight: bolder;">Information</a>
-                @for (cswRecord of selectedSearchResult.layer.cswRecords; track cswRecord; let i = $index) {
-                  <div>
-                    @if (selectedSearchResult) {
-                      <app-info-sub-panel [cswRecord]="cswRecord" [layer]="selectedSearchResult.layer" [expanded]=1></app-info-sub-panel>
-                    }
-                    @if (i !== selectedSearchResult.layer.cswRecords.length - 1) {
-                      <div class="break-border"></div>
+            @if (searchResults().length > RESULTS_PER_PAGE) {
+              <mat-paginator
+                [length]="totalSearchHits"
+                [pageSize]="RESULTS_PER_PAGE"
+                [pageSizeOptions]="[10, 20, 50]"
+                (page)="onPageChange($event)"
+              >
+              </mat-paginator>
+            }
+            <!-- Downloads -->
+            @if (mapDownloadLayers.size > 0 && showingResultsPanel() && !searching()) {
+              <div class="downloads-panel">
+                <div class="results-list downloads-list">
+                  <!--<div class="break-border"></div>-->
+                  <div class="search-results-title">
+                    <label><strong>Selected Layers To Download:&nbsp;</strong></label>
+                    <span class="layer-header-label">Layers:&nbsp;{{ total0 }}:{{ completed0 }}</span>
+                    <span class="layer-header-label">&nbsp;&nbsp;Files:&nbsp;{{ total }}:{{ completed }}</span>
+                    <button
+                      title="Clear all layers"
+                      class="btn btn-sm btn-danger clear-search-results-button"
+                      type="button"
+                      (click)="clearDownloadLayers()"
+                    >
+                      <i class="fa fa-ban"></i>&nbsp;Clear&nbsp;
+                    </button>
+                    <button
+                      title="Download all layers"
+                      style="float: right"
+                      class="btn btn-sm btn-success clear-search-results-button"
+                      type="button"
+                      (click)="downloadAll()"
+                    >
+                      <i class="fa fa-download"></i>&nbsp;All
+                    </button>
+                  </div>
+                  <!-- DownloadLayers list -->
+                  <div class="download-layers-list">
+                    @for (downloadLayer of mapDownloadLayers | keyvalue; track downloadLayer) {
+                      <div>
+                        <div
+                          style="line-height: 1.7em; height: 2.2em; padding: 2px 5px 0px 5px; margin-bottom: 2px"
+                          class="btn layer-header"
+                          style="align-items: baseline"
+                        >
+                          <button
+                            style="
+                              float: right;
+                              padding: 2px 2px 2px 0;
+                              margin-left: 0px;
+                              margin-right: 8px;
+                              line-height: 100%;
+                            "
+                            class="btn btn-sm btn-danger"
+                            type="button"
+                            title="Click to remove"
+                            (click)="removeDownloadLayer(downloadLayer.value.Layer)"
+                          >
+                            <i class="fa fa-close" style="color: white"></i>
+                          </button>
+                          <span class="layer-header-label" title="{{ downloadLayer.value.Layer.name }}">{{
+                            downloadLayer.value.Layer.name
+                          }}</span>
+                          <!--
+                            @if (downloadLayer.value.Ob | async as download) {
+                              <mat-progress-bar [mode]="download.state === 'PENDING' ? 'buffer' : 'determinate'" [value]="download.progress"></mat-progress-bar>
+                            }
+                            -->
+                          @if (downloadLayer.value.Ob) {
+                            <mat-progress-bar
+                              style="height: 10px"
+                              mode="determinate"
+                              [value]="downloadLayer.value.Ob.progress"
+                            ></mat-progress-bar>
+                          }
+                          <button
+                            class="btn btn-sm btn-primary download-button"
+                            type="button"
+                            title="Click to download"
+                            (click)="downloadAsCSV(downloadLayer.value.Layer)"
+                          >
+                            <i class="fa fa-download search-download-icon"></i>
+                          </button>
+                          <button
+                            class="btn btn-sm btn-primary download-button"
+                            type="button"
+                            title="Download with AuScope-Cat"
+                            (click)="downloadWithAuScopeCat(downloadLayer.value.Layer)"
+                          >
+                            <i class="fa fa-plug search-download-icon"></i>
+                          </button>
+                        </div>
+                      </div>
                     }
                   </div>
-                }
+                </div>
               </div>
             }
           </div>
+          <!-- Search Info Panel -->
+          @if (selectedSearchResult() && showingInfoPanel() && !searching()) {
+            <div class="search-info-panel">
+              <a style="font-weight: bolder">Information</a>
+              @for (cswRecord of selectedSearchResult().layer.cswRecords; track cswRecord; let i = $index) {
+                <div>
+                  @if (selectedSearchResult()) {
+                    <app-info-sub-panel
+                      [cswRecord]="cswRecord"
+                      [layer]="selectedSearchResult().layer"
+                      [expanded]="true"
+                    ></app-info-sub-panel>
+                  }
+                  @if (i !== selectedSearchResult().layer.cswRecords.length - 1) {
+                    <div class="break-border"></div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
       }
     </div>
   }
 
-<!-- KML/OGC options -->
-<div class="options-panel kml-options-panel" [style.display]="showingKmlOgcOptions ? 'block' : 'none'">
-  <ul class="card-sub" app-custom-panel style="display:contents;"></ul>
-</div>
-
+  <!-- KML/OGC options -->
+  <div class="options-panel kml-options-panel" [style.display]="showingKmlOgcOptions() ? 'block' : 'none'">
+    <ul class="card-sub" app-custom-panel style="display: contents"></ul>
+  </div>
 </div>

@@ -2,17 +2,17 @@ import { Component, OnInit, OnDestroy, AfterViewInit, inject } from '@angular/co
 import { LayerHandlerService } from '../lib/portal-core-ui/service/cswrecords/layer-handler.service';
 import { RenderStatusService } from '../lib/portal-core-ui/service/cesium-map/renderstatus/render-status.service';
 import { UILayerModel } from '../menupanel/common/model/ui/uilayer.model';
-import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
+import { UILayerModelService } from '../services/ui/uilayer-model.service';
 import { LayerModel } from '../lib/portal-core-ui/model/data/layer.model';
-import { LayerManagerService } from 'app/services/ui/layer-manager.service';
-import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
-import { SidebarService } from 'app/portal/sidebar.service';
+import { LayerManagerService } from '../services/ui/layer-manager.service';
+import { FilterService, LayerTimes } from '../services/filter/filter.service';
+import { SidebarService } from '../portal/sidebar.service';
 import { Subscription } from 'rxjs';
-import { UserStateService } from 'app/services/user/user-state.service';
-import { AuthService } from 'app/services/auth/auth.service';
+import { UserStateService } from '../services/user/user-state.service';
+import { AuthService } from '../services/auth/auth.service';
 import { take, filter } from 'rxjs/operators';
-import { config } from 'environments/config';
-import { SearchService } from 'app/services/search/search.service';
+import { config } from '../../environments/config';
+import { SearchService } from '../services/search/search.service';
 
 
 @Component({
@@ -33,15 +33,15 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
   private authService = inject(AuthService);
 
 
-  public layerGroupColumn: object; /* Holds the data structures for all layers and groups */
-  public layerColumn: []; /* List of layers for a certain group */
+  public layerGroupColumn!: any; /* Holds the data structures for all layers and groups */
+  public layerColumn: any[] = []; /* List of layers for a certain group */
   public layerColumnHeader = ""; /* Name of group is shown at the top of the layer column */
-  public selectedLayer; /* Selected layer, assigned a layer object */
+  public selectedLayer: any; /* Selected layer, assigned a layer object */
   public panelStayOpen = false; /* Checkbox state for user to keep panel open after adding a layer */
   public bShowBrowsePanel = false; /* If true menu panel is open */
   public isSidebarOpen = false; /* If true sidebar is open */
-  public sidebarSubscription: Subscription;
-  public layerBookmarked = {}; /* Object stores which layers are bookmarked. key is layer id, value is boolean */
+  public sidebarSubscription!: Subscription;
+  public layerBookmarked: any = {}; /* Object stores which layers are bookmarked. key is layer id, value is boolean */
   public showOnlyBookmarked = false; /* When true only bookmarked layers are shown in the browse menu */
 
   /**
@@ -73,13 +73,16 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
             this.layerGroupColumn[group][layer_idx].csLayers = [];
 
             // Initialise UILayerModel
-            const uiLayerModel = new UILayerModel(this.layerGroupColumn[group][layer_idx].id, 100, this.renderStatusService.getStatusBSubject(this.layerGroupColumn[group][layer_idx]));
-            this.uiLayerModelService.setUILayerModel(this.layerGroupColumn[group][layer_idx].id, uiLayerModel);
+            const statusModel = this.renderStatusService.getStatusBSubject(this.layerGroupColumn[group][layer_idx])
+            if (statusModel) {
+              const uiLayerModel = new UILayerModel(this.layerGroupColumn[group][layer_idx].id, 100, statusModel);
+              this.uiLayerModelService.setUILayerModel(this.layerGroupColumn[group][layer_idx].id, uiLayerModel);
+            }
           }
         }
         // Sort alphabetically by group name
         Object.keys(this.layerGroupColumn).forEach(group => {
-          this.layerGroupColumn[group].sort((a, b) => a.name.localeCompare(b.name));
+          this.layerGroupColumn[group].sort((a: any, b: any) => a.name.localeCompare(b.name));
         });
       }
     );
@@ -117,7 +120,7 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
    * @param layerGroupKey the key (string) of the layer group
    * @returns true iff the layer group contains a layer that has been bookmarked, false otherwise
    */
-  public layerGroupHasBookmarkedLayer(layerGroupKey: string): boolean {
+  public layerGroupHasBookmarkedLayer(layerGroupKey: string | number | symbol): boolean {
     if (this.layerGroupColumn.hasOwnProperty(layerGroupKey)) {;
       for (const layer of this.layerGroupColumn[layerGroupKey]) {
         if (this.layerBookmarked?.hasOwnProperty(layer.id) && this.layerBookmarked[layer.id]) {
@@ -142,7 +145,7 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
    *
    * @param layerGroup group
    */
-  public selectGroup(layerGroup): void {
+  public selectGroup(layerGroup: any): void {
     this.layerColumn = layerGroup.value;
     this.layerColumnHeader = layerGroup.key;
     layerGroup.value.expanded = !layerGroup.value.expanded;
@@ -154,7 +157,7 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
    *
    * @param layer layer
    */
-  public selectLayer(layer) {
+  public selectLayer(layer: any) {
     this.selectedLayer = layer;
   }
 
@@ -264,10 +267,10 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const selectedServices: string[] = []; // no OGC services
 
-    const westBounds: number = undefined;
-    const eastBounds: number = undefined;
-    const northBounds: number = undefined;
-    const southBounds: number = undefined;
+    const westBounds: number | undefined = undefined;
+    const eastBounds: number | undefined = undefined;
+    const northBounds: number | undefined = undefined;
+    const southBounds: number | undefined = undefined;
 
     // Search CSW records
     this.searchService.searchCSWRecords(queryText, selectedSearchFields, null, null, selectedServices,

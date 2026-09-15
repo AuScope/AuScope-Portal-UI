@@ -139,13 +139,13 @@
           "defaultConfiguration": "development"
         },
         "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "builder": "@angular/build:extract-i18n",
           "options": {
             "buildTarget": "project:build"
           }
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@angular/build:karma",
           "options": {
             "main": "src/test.ts",
             "karmaConfig": "./karma.conf.js",
@@ -168,12 +168,7 @@
               "src/extension/css/extensions.css",
               "src/extension/css/d3.css"
             ],
-            "assets": [
-              "src/template",
-              "src/extension",
-              "src/favicon-16x16.png",
-              "src/favicon-32x32.png"
-            ]
+            "assets": ["src/template", "src/extension", "src/favicon-16x16.png", "src/favicon-32x32.png"]
           }
         },
         "lint": {

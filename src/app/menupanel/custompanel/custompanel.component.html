@@ -8,14 +8,14 @@
       <div class="input-group-append" title="Add KML, KMZ, GeoJSON or OGC WMS service URL layer to map"
         (click)="search()">
         <button class="btn btn-auscope-primary" type="button" [disabled]="!searchUrl || searchUrl.trim() === ''">
-          @if (!loading) {
+          @if (!loading()) {
           <i class="fa fa-search"></i>
           @if (searchUrl) {
           <button title="Clear custom layer" class="btn btn-sm btn-danger clear-search-results-button" type="button"
             (click)="clearCustomLayer()"><i class="fa fa-ban"></i>&nbsp;Clear&nbsp;</button>
           }
           }
-          @if (loading) {
+          @if (loading()) {
           <i class="fa fa-spinner fa-spin fa-fw"></i>
           }
         </button>
@@ -24,94 +24,96 @@
     <span class="help-block small" [innerHTML]="statusMsg">
     </span>
   </div>
-  <div class="scroll-container">
-    <mat-tree #tree [dataSource]="dataSource" [childrenAccessor]="childrenAccessor" [trackBy]="trackByNodeName">
+  @if (dataSource.data.length > 0) {
+    <div class="scroll-container">
+      <mat-tree #tree [dataSource]="dataSource" [childrenAccessor]="childrenAccessor" [trackBy]="trackByNodeName">
 
-      <!-- Leaf Node Template (Nodes with no children) -->
-      <mat-nested-tree-node *matTreeNodeDef="let node">
-        <div class="mat-tree-node">
-          <button mat-icon-button disabled></button>
+        <!-- Leaf Node Template (Nodes with no children) -->
+        <mat-nested-tree-node *matTreeNodeDef="let node">
+          <div class="mat-tree-node">
+            <button mat-icon-button disabled></button>
 
-          <table class="custom-table" style="width: 100%; table-layout: fixed;">
-            <tr class="custom-result-row">
-              <td>
-                <span class="text-truncate" title="{{node.title}}">{{ node.title }}</span>
-                <!--  for scale constraint checking -->
-                @if (node.hasScaleConstraints || hasScaleConstraints(node)) {
-                <div class="scale-text">
-                  This layer has scale constraints and may not display at certain zoom levels.<br>
-                  Adjust zoom level if the data does not display.
+            <table class="custom-table" style="width: 100%; table-layout: fixed;">
+              <tr class="custom-result-row">
+                <td>
+                  <span class="text-truncate" title="{{node.title}}">{{ node.title }}</span>
+                  <!--  for scale constraint checking -->
+                  @if (node.hasScaleConstraints || hasScaleConstraints(node)) {
+                  <div class="scale-text">
+                    This layer has scale constraints and may not display at certain zoom levels.<br>
+                    Adjust zoom level if the data does not display.
 
-                  <!-- Dynamic fallback for real-time status tracker updates -->
-                  @if (node.renderStatus || getLayerRenderStatus(node.name); as status) {
-                  @if (status.started && !status.complete) {
-                  <i class="float-right light-blue fa fa-spin fa-spinner"></i>
+                    <!-- Dynamic fallback for real-time status tracker updates -->
+                    @if (node.renderStatus || getLayerRenderStatus(node.name); as status) {
+                      @if (status.started && !status.complete) {
+                        <i class="float-right light-blue fa fa-spin fa-spinner"></i>
+                      }
+                      @if (status.started && status.error) {
+                        <i class="fa fa-warning text-warning"></i>
+                      }
+                    }
+                  </div>
                   }
-                  @if (status.started && status.error) {
-                  <i class="fa fa-warning text-warning"></i>
+                </td>
+                <td
+                  style="vertical-align: middle; display: inline-flex; justify-content: flex-end; gap: 8px; width: 100%;">
+
+                  <!-- Add Button Condition -->
+                  @if ((node.cachedLayer || getCachedLayer(node.name)) && (!node.isAdded) && (!node.isImage &&
+                  !isImageLayer(node.name))) {
+                  <button class="btn-sm btn-success custom-btn" (click)="handleAddLayer(node)">
+                    Add&nbsp;<i class="fa fa-plus"></i>
+                    @if (loading()) { <i class="fa fa-spinner fa-spin fa-fw"></i> }
+                  </button>
                   }
+
+                  <!-- Image Warning Condition -->
+                  @if ((node.cachedLayer || getCachedLayer(node.name)) && (node.isImage || isImageLayer(node.name))) {
+                  <button class="btn-sm btn-warning custom-btn" data-toggle="tooltip"
+                    title="non-earth [CRS:1] images are not supported">
+                    Image&nbsp;<i class="fa fa-ban"></i>
+                  </button>
                   }
-                </div>
-                }
-              </td>
-              <td
-                style="vertical-align: middle; display: inline-flex; justify-content: flex-end; gap: 8px; width: 100%;">
 
-                <!-- Add Button Condition -->
-                @if ((node.cachedLayer || getCachedLayer(node.name)) && (!node.isAdded) && (!node.isImage &&
-                !isImageLayer(node.name))) {
-                <button class="btn-sm btn-success custom-btn" (click)="handleAddLayer(node)">
-                  Add&nbsp;<i class="fa fa-plus"></i>
-                  @if (loading) { <i class="fa fa-spinner fa-spin fa-fw"></i> }
-                </button>
-                }
+                  <!-- Remove Button Condition -->
+                  @if ((node.cachedLayer || getCachedLayer(node.name)) && node.isAdded) {
+                  <button class="btn-sm btn-danger custom-btn" (click)="handleRemoveLayer(node)">
+                    Remove&nbsp;<i class="fa fa-trash"></i>
+                  </button>
+                  }
 
-                <!-- Image Warning Condition -->
-                @if ((node.cachedLayer || getCachedLayer(node.name)) && (node.isImage || isImageLayer(node.name))) {
-                <button class="btn-sm btn-warning custom-btn" data-toggle="tooltip"
-                  title="non-earth [CRS:1] images are not supported">
-                  Image&nbsp;<i class="fa fa-ban"></i>
-                </button>
-                }
+                  <!-- Info Button Condition -->
+                  @if (node.isStandardGroup) {
+                  <button class="btn-sm btn-info custom-btn"
+                    (click)="displayRecordInfo(node.cachedLayer || getCachedLayer(node.name))">
+                    Info&nbsp;<i class="fa fa-info-circle"></i>
+                  </button>
+                  }
+                </td>
+              </tr>
+            </table>
+          </div>
+        </mat-nested-tree-node>
 
-                <!-- Remove Button Condition -->
-                @if ((node.cachedLayer || getCachedLayer(node.name)) && node.isAdded) {
-                <button class="btn-sm btn-danger custom-btn" (click)="handleRemoveLayer(node)">
-                  Remove&nbsp;<i class="fa fa-trash"></i>
-                </button>
-                }
+        <!-- Expandable Parent Node Template -->
+        <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild">
+          <div class="mat-tree-node">
+            <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.name">
+              <mat-icon class="mat-icon-rtl-mirror">
+                {{ tree.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+              </mat-icon>
+            </button>
+            {{ node.title }}
+          </div>
 
-                <!-- Info Button Condition -->
-                @if (node.isStandardGroup) {
-                <button class="btn-sm btn-info custom-btn"
-                  (click)="displayRecordInfo(node.cachedLayer || getCachedLayer(node.name))">
-                  Info&nbsp;<i class="fa fa-info-circle"></i>
-                </button>
-                }
-              </td>
-            </tr>
-          </table>
-        </div>
-      </mat-nested-tree-node>
+          <div [hidden]="!tree.isExpanded(node)" role="group" style="padding-left: 20px;">
+            <ng-container matTreeNodeOutlet></ng-container>
+          </div>
+        </mat-nested-tree-node>
 
-      <!-- Expandable Parent Node Template -->
-      <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild">
-        <div class="mat-tree-node">
-          <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.name">
-            <mat-icon class="mat-icon-rtl-mirror">
-              {{ tree.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
-            </mat-icon>
-          </button>
-          {{ node.title }}
-        </div>
-
-        <div [hidden]="!tree.isExpanded(node)" role="group" style="padding-left: 20px;">
-          <ng-container matTreeNodeOutlet></ng-container>
-        </div>
-      </mat-nested-tree-node>
-
-    </mat-tree>
-  </div>
+      </mat-tree>
+    </div>
+  }
 
   <!-- Custom Layer KML, KMZ or GeoJSON File Input -->
   <div class="form-group">
@@ -124,36 +126,36 @@
         class="btn-primary btn-sm">
         <i class="fa fa-lg fa-file" aria-hidden="true"></i>
         &nbsp;Load KML/KMZ/GeoJSON/SHP(zip)
-        @if (!loading) {
-        <i class="fa"></i>
+        @if (!loading()) {
+          <i class="fa"></i>
         }
-        @if (loading) {
-        <i class="fa fa-spinner fa-spin fa-fw"></i>
+        @if (loading()) {
+          <i class="fa fa-spinner fa-spin fa-fw"></i>
         }
       </button>
     </div>
   </div>
   <!-- Once a file has been uploaded, its layer is shown here -->
   <table class="custom-table">
-    @for (layer of fileLayers; track layer) {
+    @for (layer of fileLayers(); track layer.id) {
     <tr class="custom-result-row">
       <td>
         <div>
-          <div><span class="text-truncate" title="{{layer.name}}"></span></div>
+          <div><span class="text-truncate" title="{{layer.name}}">{{ layer.name }}</span></div>
           @if (getUILayerModel(layer.id)?.statusMap.getRenderStarted() &&
           !getUILayerModel(layer.id)?.statusMap.getRenderComplete()) {
-          <i class="float-right light-blue fa fa-spin fa-spinner"></i>
+            <i class="float-right light-blue fa fa-spin fa-spinner"></i>
           }
           @if (getUILayerModel(layer.id)?.statusMap.getRenderStarted() &&
           getUILayerModel(layer.id)?.statusMap.getContainsError()) {
-          <i class="fa fa-warning text-warning"></i>
+            <i class="fa fa-warning text-warning"></i>
           }
         </div>
       </td>
       <td>
         @if (!uiLayerModelService.isLayerAdded(layer.id)) {
         <button class="btn-sm btn-success custom-btn" (click)="addLayer(layer)">Add&nbsp;<i class="fa fa-plus"></i>
-          @if (loading) {
+          @if (loading()) {
           <i class="fa fa-spinner fa-spin fa-fw"></i>
           }</button>
         }
@@ -161,10 +163,11 @@
         <button class="btn-sm btn-danger custom-btn" (click)="removeLayer(layer)">Remove&nbsp;<i
             class="fa fa-trash"></i></button>
         }
-        @if (isStandardLayerGroup(node?.group)) {
-        <button class="btn-sm btn-info custom-btn" (click)="displayRecordInfo(layer)">Info&nbsp;<i
-            class="fa fa-info-circle"></i></button>
+        @if (isStandardLayerGroup(layer.group)) {
+          <button class="btn-sm btn-info custom-btn" (click)="displayRecordInfo(layer)">Info&nbsp;<i
+                  class="fa fa-info-circle"></i></button>
         }
+
       </td>
       <!--
       @if (getUILayerModel(layer.id).statusMap.getRenderStarted()) {

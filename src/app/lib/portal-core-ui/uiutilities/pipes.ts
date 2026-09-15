@@ -9,7 +9,7 @@ import { DomSanitizer } from '@angular/platform-browser';
     standalone: false
 })
 export class KeysPipe implements PipeTransform {
-  transform(value, _args: string[]): any {
+  transform(value: any, _args?: string[]): any {
     const keys = [];
     for (const key in value) {
       keys.push({ key: key, value: value[key] });
@@ -26,9 +26,9 @@ export class KeysPipe implements PipeTransform {
     standalone: false
 })
 export class QuerierFeatureSearchPipe implements PipeTransform {
-  transform(value, args?): Array<any> {
+  transform(value: any, args?: any): Array<any> {
     if (value && value.length > 0) {
-      return value.filter(feature => {
+      return value.filter((feature: any) => {
         if (feature.layer.name) {
           if (feature.layer.name === args || args === 'ALL') {
             return true;
@@ -50,7 +50,7 @@ export class QuerierFeatureSearchPipe implements PipeTransform {
 export class TrustResourceUrlPipe implements PipeTransform {
   private sanitizer = inject(DomSanitizer);
 
-  transform(url) {
+  transform(url: any) {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 }
@@ -65,7 +65,7 @@ export class TrustResourceUrlPipe implements PipeTransform {
 export class TrustResourceHtmlPipe implements PipeTransform {
   private sanitizer = inject(DomSanitizer);
 
-  transform(html) {
+  transform(html: any) {
     return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 }
