@@ -112,7 +112,8 @@ export class CsVMFService {
 
         //const proxyUrl = this.env.portalBaseUrl + "getViaProxy.do?usewhitelist=false&url=" + onlineResource.url;
         //const proxyUrl = "https://portal.auscope.org.au/"  + "getViaProxy.do?usewhitelist=false&url=" + onlineResource.url;
-        const proxyUrl = onlineResource.url;
+        //const proxyUrl = onlineResource.url;
+        const proxyUrl = this.env.portalBaseUrl + 'getViaProxy.do?usewhitelist=false&usepostafterproxy=true&url=' + onlineResource.url;
         const polygon = layer["geojson"]["polygon"];
         let polygonStr = "[";
         let delim = ",";
