@@ -1,7 +1,7 @@
 import { config } from '../../environments/config';
 import { environment } from '../../environments/environment';
 import { QuerierModalComponent } from '../modalwindow/querier/querier.modal.component';
-import { AfterViewInit, Component, ElementRef, NgZone, ViewChild, ViewContainerRef, inject } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, NgZone, ViewChild, ViewContainerRef, inject, signal } from '@angular/core';
 import { ViewerConfiguration } from '@auscope/angular-cesium';
 import { CsMapService } from '../lib/portal-core-ui/service/cesium-map/cs-map.service';
 import { CSWRecordModel } from '../lib/portal-core-ui/model/data/cswrecord.model';
@@ -45,7 +45,7 @@ interface TileInfo {
 @Component({
   selector: 'app-cs-map',
   template: `
-    <div #mapElement id="map" class="h-100 w-100" (mouseout)="mouseLongitude=undefined;mouseLatitude=undefined;">
+    <div #mapElement id="map" class="h-100 w-100" (mouseout)="mouseLongitude.set(undefined);mouseLatitude.set(undefined);">
       <ac-map>
         <app-browse-menu></app-browse-menu>
         <app-toolbar (splitToggleEvent)="toggleShowMapSplit()"></app-toolbar>
@@ -56,9 +56,9 @@ interface TileInfo {
             </div>
           </div>
         }
-        @if (mouseLongitude !== undefined && mouseLatitude !== undefined) {
+        @if (mouseLongitude() !== undefined && mouseLatitude() !== undefined) {
           <div class="mouse-coordinates">
-            Longitude:&nbsp;{{ mouseLongitude }},&nbsp;Latitude:&nbsp;{{ mouseLatitude }}
+            Longitude:&nbsp;{{ mouseLongitude() }},&nbsp;Latitude:&nbsp;{{ mouseLatitude() }}
           </div>
         }
         <div class="advancedmapcomponent">
@@ -105,8 +105,8 @@ export class CsMapComponent implements AfterViewInit {
   cesiumLoaded = true;
   viewer: any;
 
-  mouseLatitude: string | undefined;
-  mouseLongitude: string | undefined;
+  mouseLatitude = signal<string | undefined>(undefined);
+  mouseLongitude = signal<string | undefined>(undefined);
 
   sliderMoveActive = false;
 
@@ -161,12 +161,12 @@ export class CsMapComponent implements AfterViewInit {
         this.ngZone.run(() => {
           if (cartesian) {
             const cartographic = ellipsoid.cartesianToCartographic(cartesian);
-            this.mouseLongitude = Math.toDegrees(cartographic.longitude).toFixed(5);
-            this.mouseLatitude = Math.toDegrees(cartographic.latitude).toFixed(5);
+            this.mouseLongitude.set(Math.toDegrees(cartographic.longitude).toFixed(5));
+            this.mouseLatitude.set(Math.toDegrees(cartographic.latitude).toFixed(5));
             //const elev = viewer.scene.globe.getHeight(cartographic); // In case we need 3D
           } else {
-            this.mouseLongitude = undefined;
-            this.mouseLatitude = undefined;
+            this.mouseLongitude.set(undefined);
+            this.mouseLatitude.set(undefined);
           }
         });
       }, ScreenSpaceEventType.MOUSE_MOVE);
