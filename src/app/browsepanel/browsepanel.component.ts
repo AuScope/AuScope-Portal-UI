@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, inject, signal } from '@angular/core';
 import { LayerHandlerService } from '../lib/portal-core-ui/service/cswrecords/layer-handler.service';
 import { RenderStatusService } from '../lib/portal-core-ui/service/cesium-map/renderstatus/render-status.service';
 import { UILayerModel } from '../menupanel/common/model/ui/uilayer.model';
@@ -32,6 +32,8 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
   private userStateService = inject(UserStateService);
   private authService = inject(AuthService);
 
+  // Track whether a layer has any CSW records. If undefined the layer hasn't been checked
+  private cswAvailability = signal(new Map<string, boolean | undefined>());
 
   public layerGroupColumn!: any; /* Holds the data structures for all layers and groups */
   public layerColumn: any[] = []; /* List of layers for a certain group */
@@ -69,15 +71,20 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
           // Loop over each layer in a group
           for (let layer_idx = 0; layer_idx < this.layerGroupColumn[group].length; layer_idx++) {
 
+            const layer = this.layerGroupColumn[group][layer_idx];
+
             // Initialise a list of cesium layers
-            this.layerGroupColumn[group][layer_idx].csLayers = [];
+            layer.csLayers = [];
 
             // Initialise UILayerModel
-            const statusModel = this.renderStatusService.getStatusBSubject(this.layerGroupColumn[group][layer_idx])
+            const statusModel = this.renderStatusService.getStatusBSubject(layer)
             if (statusModel) {
-              const uiLayerModel = new UILayerModel(this.layerGroupColumn[group][layer_idx].id, 100, statusModel);
-              this.uiLayerModelService.setUILayerModel(this.layerGroupColumn[group][layer_idx].id, uiLayerModel);
+              const uiLayerModel = new UILayerModel(layer.id, 100, statusModel);
+              this.uiLayerModelService.setUILayerModel(layer.id, uiLayerModel);
             }
+
+            // Check CSW Layers
+            this.checkCSW(layer);
           }
         }
         // Sort alphabetically by group name
@@ -246,9 +253,19 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
    * Does this layer have any CSW records?
    *
    * @param layer LayerModel for layer
-   * @returns true if this layer has csw records
+   * @returns true if this layer has csw records, false if it doesn't, undefined if unchecked
    */
-  public isCSW(layer: any) {
+  public isCSW(layer: any): boolean | undefined {
+    return this.cswAvailability().get(layer.id) ?? false;
+  }
+
+  /**
+   * Check is a layer has any CSW records, if not check for an exact match with elastic search
+   *
+   * @param layer LayerModel for the layer
+   * @returns 
+   */
+  public checkCSW(layer: any) {
     if (layer.cswRecords.length > 0) {
       return true;
     }
@@ -260,7 +277,6 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
     /* if we don't have any csw records for the layer then check for an exact match with elastic search
      * refer to the code: searchpanel.component -> search()
     */
-
     const queryText = "\""+layer.name+"\"";
     const selectedSearchFields: string[] = ['knownLayerNames', 'serviceName', 'descriptiveKeywords', 'dataIdentificationAbstract', 'layerName'];
     const boundsRelationship = 'Intersects';
@@ -277,16 +293,23 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
         boundsRelationship.toLowerCase(), westBounds, eastBounds,
         southBounds, northBounds).subscribe(searchResponse => {
 
-        if (searchResponse.cswRecords.length > 0) {
+        const available = searchResponse.cswRecords.length > 0;
+        if (available) {
           layer.cswRecords.push(searchResponse.cswRecords[0]);
-          return true;
-        } else {
-          return false;
         }
+        this.cswAvailability.update(map => {
+          const next = new Map(map);
+          next.set(layer.id, available);
+          return next;
+        });
     }, error => {
       console.log('[searchCSWRecords.do (elastic search)]CSW search error: ' + error.error);
+      this.cswAvailability.update(map => {
+        const next = new Map(map);
+        next.set(layer.id, false);
+        return next;
+      });
     });
-
   }
 
   /**

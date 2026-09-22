@@ -71,7 +71,7 @@
           @if (!showOnlyBookmarked || checkLayerBookmarked(layer.id)) {
             <div class="col">
               <a class="layer-item-wrapper">
-                @if (!isLayerAdded(layer) && (isCSW(layer))) {
+                @if (!isLayerAdded(layer) && (isCSW(layer) === true)) {
                   <button class="btn btn-sm btn-success layer-row-action-button" style="margin-right: 8px;" title="Click to add layer" (click)="addLayerToMap(layer); $event.stopPropagation()">
                     <i class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp;Add
                   </button>
