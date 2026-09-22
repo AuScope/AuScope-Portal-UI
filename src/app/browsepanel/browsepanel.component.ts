@@ -256,7 +256,7 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
    * @returns true if this layer has csw records, false if it doesn't, undefined if unchecked
    */
   public isCSW(layer: any): boolean | undefined {
-    return this.cswAvailability().get(layer.id) ?? false;
+    return this.cswAvailability().get(layer.id);
   }
 
   /**
@@ -267,7 +267,12 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
    */
   public checkCSW(layer: any) {
     if (layer.cswRecords.length > 0) {
-      return true;
+      this.cswAvailability.update(map => {
+        const next = new Map(map);
+        next.set(layer.id, true);
+        return next;
+      });
+      return;
     }
 
     if (layer.cswCheck) { return false; }
