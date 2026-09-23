@@ -76,7 +76,7 @@
                     <i class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp;Add
                   </button>
                 }
-                @if (!isLayerAdded(layer) && (!isCSW(layer))) {
+                @if (!isLayerAdded(layer) && (isCSW(layer) === false)) {
                   <i class="fa fa-ban" style="margin-right: 8px; color: #dc3545;"></i>
                 }
                 @if (isLayerAdded(layer)) {
