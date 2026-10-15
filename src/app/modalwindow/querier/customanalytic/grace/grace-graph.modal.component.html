@@ -2,7 +2,7 @@
   <div class="modal-header"  cdkDragHandle>
     <h1 class="page-header">
       GRACE Time Series
-      @if (queryStatus===QueryStatus.querying) {
+      @if (queryStatus()===QueryStatus.querying) {
         <span>&nbsp;&nbsp;-&nbsp;&nbsp;Querying&nbsp;&nbsp;<i class="fa fa-spinner fa-spin"></i></span>
       }
     </h1>
@@ -11,14 +11,14 @@
     </button>
   </div>
   <div class="modal-body">
-    @if (queryStatus===QueryStatus.error) {
+    @if (queryStatus()===QueryStatus.error) {
       <div class="error">
         Unable to retrieve GRACE data, please try again.
       </div>
     }
-    <plotly-plot #gracePlot id="gracePlot" id="gracePlot" [updateOnDataChange]="true" [data]="graph.data" [layout]="graph.layout" [config]="graph.config"></plotly-plot>
+    <plotly-plot #gracePlot id="gracePlot" id="gracePlot" [updateOnDataChange]="true" [data]="graph().data" [layout]="graph().layout" [config]="graph().config"></plotly-plot>
   </div>
-  @if (queryStatus===QueryStatus.loaded) {
+  @if (queryStatus()===QueryStatus.loaded) {
     <div class="citations">
       If you use these data, please cite the following articles:<br>
       Allgeyer, S., P Tregoning, H. McQueen, S.C. McClusky, E.-K. Potter, J. Pfeffer, R. McGirr, A.P. Purcell, T.A. Herring and J.-P. Montillet , ANU GRACE data analysis: Orbit modelling, regularisation and inter-satellite range acceleration observations, Journal of Geophysical Research,&nbsp;

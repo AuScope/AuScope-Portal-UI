@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, AfterViewInit, inject, signal } from '@angular/core';
 import { CsMapObject } from '../../../../lib/portal-core-ui/service/cesium-map/cs-map-object';
 import { Subscription } from 'rxjs';
 import { GraceService } from '../../../../services/wcustom/grace/grace.service';
@@ -20,7 +20,6 @@ export class GraceGraphModalComponent implements AfterViewInit {
     private graceService = inject(GraceService);
     private csMapObject = inject(CsMapObject);
     dialogRef = inject(MatDialogRef<GraceGraphModalComponent>);
-    private changeDetectorRef = inject(ChangeDetectorRef);
 
     // Data will contain lat/lon (y and x) values for point location or
     // coordinate array of lat/lon (coords) and centroid (centroid) for polys
@@ -33,14 +32,12 @@ export class GraceGraphModalComponent implements AfterViewInit {
     };
 
     showUncertainty = true;
-
     querySubscription!: Subscription;
-    queryStatus: number = this.QueryStatus.querying;
-
-    queriedData: any = {};
+    queryStatus = signal<number>(this.QueryStatus.querying);
+    queriedData = signal<any>({});
 
     // Graph data
-    public graph = {
+    graph = signal({
         data: [{
             x: [],
             y: [],
@@ -75,7 +72,7 @@ export class GraceGraphModalComponent implements AfterViewInit {
                 'toggleSpikelines', 'hoverClosestCartesian', 'hoverCompareCartesian'
             ]
         }
-    };
+    });
 
     ngAfterViewInit() {
         // Cesium draw event is a bit slow, give dialog some time for content to be set
@@ -102,58 +99,53 @@ export class GraceGraphModalComponent implements AfterViewInit {
         if (this.querySubscription) {
             this.querySubscription.unsubscribe();
         }
-        this.queryStatus = this.QueryStatus.querying;
+        this.queryStatus.set(this.QueryStatus.querying);
 
         // Make call to GRACE service to get data for single parameter
         if (this.data.x !== undefined && this.data.y !== undefined) {
             this.querySubscription = this.graceService.getGraceTimeSeriesDataForPoint(this.data.x, this.data.y).subscribe(data => {
                 if (data === null) {
-                    this.queryStatus = this.QueryStatus.error;
-                    this.changeDetectorRef.detectChanges();
+                    this.queryStatus.set(this.QueryStatus.error);
                 } else {
-                    this.queriedData = data;
+                    this.queriedData.set(data);
 
-                    let title = '<b>Equivalent Water Height (EWH)</b><br>Primary Mascon: ' + data.response.primary_mascon_id;
-                    const responseCentroid = data.response.centroid;
+                    let title = '<b>Equivalent Water Height (EWH)</b><br>Primary Mascon: ' + data.primary_mascon_id;
+                    const responseCentroid = data.centroid;
                     if (responseCentroid) {
                       const centroid = this.parseCentroid(responseCentroid);
                       title += ' (' + centroid + ')<br>';
                     } else {
                       title += '<br>';
                     }
-                    const totalArea = data.response.total_area;
+                    const totalArea = data.total_area;
                     if (totalArea) {
                       title += 'Area: ' + (totalArea / 1000000).toFixed(3) + 'km<sup>2</sup>';
                     }
 
-                    this.plotGraph(title, data.response);
-                    this.queryStatus = this.QueryStatus.loaded;
+                    this.plotGraph(title, data);
+                    this.queryStatus.set(this.QueryStatus.loaded);
                 }
             }, () => {
-                this.queryStatus = this.QueryStatus.error;
-                this.changeDetectorRef.detectChanges();
+                this.queryStatus.set(this.QueryStatus.error);
             });
         } else if (this.data.coords !== undefined && this.data.coords.length > 0) {
             // TODO: Remove hard-coding... will need to be a record keyword component
             this.querySubscription = this.graceService.getGraceTimeSeriesDataForPolygon(this.data.coords).subscribe(data => {
                 if (data === null) {
-                    this.queryStatus = this.QueryStatus.error;
-                    this.changeDetectorRef.detectChanges();
+                    this.queryStatus.set(this.QueryStatus.error);
                 } else {
-                    this.queriedData = data;
+                    this.queriedData.set(data);
                     let title = '<b>Equivalent Water Height (EWH) for Region</b><br>' +
-                        'Primary Mascons: ' + data.response.primary_mascons;
-                    const totalArea = data.response.total_area;
+                        'Primary Mascons: ' + data.primary_mascons;
+                    const totalArea = data.total_area;
                     if (totalArea) {
                         title += '<br>Total Area: ' + (totalArea / 1000000).toFixed(3) + 'km<sup>2</sup>';
                     }
-                    this.plotGraph(title, data.response);
-                    this.queryStatus = this.QueryStatus.loaded;
-                    this.changeDetectorRef.detectChanges();
+                    this.plotGraph(title, data);
+                    this.queryStatus.set(this.QueryStatus.loaded);
                 }
             }, () => {
-                this.queryStatus = this.QueryStatus.error;
-                this.changeDetectorRef.detectChanges();
+                this.queryStatus.set(this.QueryStatus.error);
             });
         }
     }
@@ -174,28 +166,30 @@ export class GraceGraphModalComponent implements AfterViewInit {
             };
         }
 
-        this.graph.data = [{
-            x: data.graph_x,
-            y: data.graph_y,
-            mode: 'lines+points',
-            marker: {
-                color: 'blue'
-            },
-            // TODO: Errors if needed
-            error_y: errorPlot,
-            type: 'scatter' }
-        ];
-
-        this.graph.layout = {
-            autosize: true,
-            title: { text: title },
-            xaxis: {
-                title: { text: 'Date' }
-            },
-            yaxis: {
-                title: { text: 'Equivalent Water Height (m)' }
+        this.graph.set({
+            ...this.graph(),
+            data: [{
+              x: data.graph_x,
+              y: data.graph_y,
+              mode: 'lines+points',
+              marker: {
+                  color: 'blue'
+              },
+              // TODO: Errors if needed
+              error_y: errorPlot,
+              type: 'scatter' }
+            ],
+            layout: {
+              autosize: true,
+              title: { text: title },
+              xaxis: {
+                  title: { text: 'Date' }
+              },
+              yaxis: {
+                  title: { text: 'Equivalent Water Height (m)' }
+              }
             }
-        };
+        });
     }
 
     /**

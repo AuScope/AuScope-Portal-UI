@@ -168,16 +168,13 @@ export class FilterService {
                 const strDateArr = responseLayers[0].timeExtent.sort((a: any, b: any) => {
                         return <any>new Date(b) - <any>new Date(a);
                 });
-                layerTimes.timeExtent = []
-                for (const timeExt of strDateArr) {
-                    if (typeof timeExt === 'string') {
-                        layerTimes.timeExtent.push(new Date(timeExt));
-                    }
-                }
-                // Time may have already been set from retrieving state
-                if (!layerTimes.currentTime) {
-                    layerTimes.currentTime = layerTimes.timeExtent[0];
-                }
+                const newTimeExtent = strDateArr.filter((t: any) => typeof t === 'string').map((t: string) => new Date(t));
+                const newLayerTimes = new LayerTimes();
+                newLayerTimes.timeExtent = newTimeExtent;
+                newLayerTimes.currentTime = layerTimes.currentTime ??
+                newTimeExtent[0];
+                newLayerTimes.loadingTimeExtent = layerTimes.loadingTimeExtent;
+                return newLayerTimes;
             }
         }
         return layerTimes;
@@ -199,10 +196,11 @@ export class FilterService {
 
         // If WMS capability record not present
         if (!(layer.capabilityRecords?.length > 0)) {
-            // Call WMS GetCapabilites using layer info
-            layerTimes.loadingTimeExtent = true;
-            // Notify subscribers that loading has started
-            layerTimesBS.next(layerTimes);
+            // Call WMS GetCapabilites using layer info and notify subscribers that loading has started
+            layerTimesBS.next({
+              ...layerTimes,
+              loadingTimeExtent: true
+            });
             this.getCapabilityRecord(layer).subscribe(response => {
                 if (response) {
                     if (response.getCaps.data?.capabilityRecords.length === 1) {
@@ -213,8 +211,11 @@ export class FilterService {
                         layerTimes = this.extractLayerTimes(layer, layerTimes, response.layerName);
                     }
                 }
-                layerTimes.loadingTimeExtent = false;
-                layerTimesBS.next(layerTimes);
+
+                layerTimesBS.next({
+                  ...layerTimes,
+                  loadingTimeExtent: false
+                });
             }, () => { // If error still need to submit layerTimes
                 layerTimes.loadingTimeExtent = false;
                 layerTimesBS.next(layerTimes);
