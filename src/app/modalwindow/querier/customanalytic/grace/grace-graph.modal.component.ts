@@ -157,7 +157,7 @@ export class GraceGraphModalComponent implements AfterViewInit {
      */
     plotGraph(title: string, data: any) {
         let errorPlot = {};
-        if (data.hasOwnProperty('error_y')) {
+        if (Object.hasOwn(data, 'error_y')) {
             errorPlot = {
                 type: 'data',
                 array: data.error_y,

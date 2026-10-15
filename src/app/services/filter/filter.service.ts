@@ -44,7 +44,7 @@ export class FilterService {
     public registerLayerFilterCollection(layerId: string, filterCollection: any): Observable<any> {
         const existingFilterCollection = this.layerFilterCollections.get(layerId);
         if (!existingFilterCollection) {
-            const filterCollectionBS: BehaviorSubject<any> = new BehaviorSubject(filterCollection);
+            const filterCollectionBS = new BehaviorSubject<any>(filterCollection);
             this.layerFilterCollections.set(layerId, filterCollectionBS);
             return filterCollectionBS;
         }
@@ -71,7 +71,7 @@ export class FilterService {
      * @returns the existing providers as an Observable array if they have already been registered,
      *          or a new providers array otherwise
      */
-    public registerLayerProviders(layer: LayerModel): Observable<Array<object>> {
+    public registerLayerProviders(layer: LayerModel): Observable<object[]> {
         const existingLayerProviders = this.layerProviders.get(layer.id);
         if (!existingLayerProviders) {
             const layerProviders = [];
@@ -94,7 +94,7 @@ export class FilterService {
                     value: contactOrgsMap[key]
                 });
             }
-            const layerProvidersBS: BehaviorSubject<{ label: string; value: any; }[]> = new BehaviorSubject(layerProviders);
+            const layerProvidersBS = new BehaviorSubject<{ label: string; value: any; }[]>(layerProviders);
             this.layerProviders.set(layer.id, layerProvidersBS);
             return layerProvidersBS;
         }
@@ -166,7 +166,7 @@ export class FilterService {
             if (responseLayers[0]?.timeExtent?.length > 0) {
                 // Sort layer times: newest time is first, oldest time last
                 const strDateArr = responseLayers[0].timeExtent.sort((a: any, b: any) => {
-                        return <any>new Date(b) - <any>new Date(a);
+                    return new Date(b).getTime() - new Date(a).getTime();
                 });
                 const newTimeExtent = strDateArr.filter((t: any) => typeof t === 'string').map((t: string) => new Date(t));
                 const newLayerTimes = new LayerTimes();

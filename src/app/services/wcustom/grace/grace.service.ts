@@ -22,7 +22,7 @@ export class GraceService {
         maxValue: 1,
         transparentNeutralColor: false
     };
-    public currentGraceStyleSettingsBS: BehaviorSubject<GraceStyleSettings> = new BehaviorSubject(this.currentGraceStyleSettings);
+    public currentGraceStyleSettingsBS = new BehaviorSubject<GraceStyleSettings>(this.currentGraceStyleSettings);
     // Editor GRACE style settings
     public editedGraceStyleSettings: GraceStyleSettings = {
         minColor: '#ff0000',
@@ -34,7 +34,7 @@ export class GraceService {
         transparentNeutralColor: false
     };
 
-    private _graceDate: BehaviorSubject<Date> = new BehaviorSubject(new Date());
+    private _graceDate = new BehaviorSubject<Date>(new Date());
     private readonly graceDate: Observable<Date> = this._graceDate.asObservable();
 
     constructor() {

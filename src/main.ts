@@ -33,6 +33,6 @@ window.CESIUM_BASE_URL = '/assets/cesium/';
 (window as any).Cesium = Cesium;
 
 /*
-	To run the application under a different execution context provide a path to context
-	configuration file into the ContextService.load() method below.  Or just accept the default ./contexts/context.json
+  To run the application under a different execution context provide a path to context
+  configuration file into the ContextService.load() method below.  Or just accept the default ./contexts/context.json
 */
