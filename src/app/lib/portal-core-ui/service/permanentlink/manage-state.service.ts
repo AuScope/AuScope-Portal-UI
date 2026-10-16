@@ -16,11 +16,11 @@ export class ManageStateService {
   private csMapObject = inject(CsMapObject);
 
 
-  private state: any = {};
+  private state: Record<string, any> = {};
   private permLinkMode: boolean = false; // Is true if a permanent link has been employed
 
   // Layer requires expanding
-  private layerToExpandBS: BehaviorSubject<string> = new BehaviorSubject<string>(null);
+  private layerToExpandBS: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
   public readonly layerToExpand = this.layerToExpandBS.asObservable();
 
   /**
@@ -47,7 +47,7 @@ export class ManageStateService {
    * @param filterCollection the associated filtercollection of the layer
    * @param optionalFilters any optional filters that have been selected
    */
-  public addLayer(layerid: string, currentTime: Date, filterCollection: any, optionalFilters: any, advancedFilter: any) {
+  public addLayer(layerid: string, currentTime: Date | undefined, filterCollection: any, optionalFilters: any, advancedFilter: any) {
     if (!filterCollection && !advancedFilter) {
       this.state[layerid] = { filterCollection: {}, optionalFilters: [] };
     } else {

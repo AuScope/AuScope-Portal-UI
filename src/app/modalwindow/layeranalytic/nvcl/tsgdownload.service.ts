@@ -9,7 +9,7 @@ export class TSGDownloadService {
   private http = inject(HttpClient);
   private save = inject<Saver>(SAVER);
 
-  public downloadOneCompletBS:Subject<string> = null;
+  public downloadOneCompletBS:Subject<string> | null = null;
  /**
  * Download function to start the download and return the progress feedback.
  * @param url the url for the source of download.

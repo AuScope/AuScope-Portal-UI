@@ -11,9 +11,9 @@ import { environment } from '../../../../environments/environment';
 import { config } from '../../../../environments/config';
 
 import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
-import { LayerManagerService } from 'app/services/ui/layer-manager.service';
-import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
-import { UILayerModel } from 'app/menupanel/common/model/ui/uilayer.model';
+import { LayerManagerService } from '../../../services/ui/layer-manager.service';
+import { UILayerModelService } from '../../../services/ui/uilayer-model.service';
+import { UILayerModel } from '../../../menupanel/common/model/ui/uilayer.model';
 import { Color, DistanceDisplayCondition, HeightReference, NearFarScalar, PointGraphics } from 'cesium';
 
 @Injectable()
@@ -26,7 +26,7 @@ export class NVCLBoreholeAnalyticService {
   private storage = inject<StorageService>(LOCAL_STORAGE);
 
 
-  private styleNVCLAnalyticalGeoJsonEntity(entity) {
+  private styleNVCLAnalyticalGeoJsonEntity(entity: any) {
     let dotColor = Color.YELLOW;
     if (entity.properties.Message) {
       const message = entity.properties.Message.getValue();
@@ -58,7 +58,7 @@ export class NVCLBoreholeAnalyticService {
     }
     const me = this;
     const proxyUrl = "";
-    let layerRec: LayerModel= null;
+    let layerRec: LayerModel | undefined = undefined;
     // Make a layer model object
     layerRec = me.layerHandlerService.makeCustomGEOJSONLayerRecord(name, proxyUrl, jsonData);
     layerRec.group = 'geojson-layer';
@@ -66,7 +66,7 @@ export class NVCLBoreholeAnalyticService {
     // Configure layers so it can be added to map
     const uiLayerModel = new UILayerModel(layerRec.id, 100, me.renderStatusService.getStatusBSubject(layerRec));
     me.uiLayerModelService.setUILayerModel(layerRec.id, uiLayerModel);
-    me.layerManagerService.addLayer(layerRec, [], null, null);
+    me.layerManagerService.addLayer(layerRec, [], undefined, undefined);
   }
 
   public getNVCLGeoJson(jobId:string): Observable<any> {
@@ -96,7 +96,7 @@ export class NVCLBoreholeAnalyticService {
     httpParams = httpParams.append('serviceUrl', nvclUrl);
     return this.http.get(environment.portalBaseUrl + 'getNVCLAlgorithms.do', {
       params: httpParams
-    }).pipe(map(response => {
+    }).pipe(map((response: any) => {
       if (response['success'] === true) {
         return response['data'];
       } else {
@@ -123,7 +123,7 @@ export class NVCLBoreholeAnalyticService {
     httpParams = httpParams.append('serviceUrl', nvclUrl);
     return this.http.get(environment.portalBaseUrl + 'getNVCLClassifications.do', {
       params: httpParams
-    }).pipe(map(response => {
+    }).pipe(map((response: any) => {
       if (response['success'] === true) {
         return response['data'];
       } else {
@@ -149,7 +149,6 @@ export class NVCLBoreholeAnalyticService {
       }
       ),);
   }
-
 
   public getTSGAlgorithm(tsgAlgName: string): Observable<any> {
 
@@ -195,7 +194,7 @@ export class NVCLBoreholeAnalyticService {
 
     return this.http.get(environment.nVCLAnalyticalUrl + 'submitNVCLAnalyticalJob.do', {
       params: httpParams
-    }).pipe(map(response => {
+    }).pipe(map((response: any) => {
       if (response['response'] ==="SUCCESS") {
         return true;
       } else {
@@ -229,7 +228,7 @@ export class NVCLBoreholeAnalyticService {
 
     return this.http.get(environment.nVCLAnalyticalUrl + 'submitNVCLTSGModJob.do', {
       params: httpParams
-    }).pipe(map(response => {
+    }).pipe(map((response: any) => {
       if (response['response'] ==="SUCCESS") {
         return true;
       } else {
@@ -246,7 +245,6 @@ export class NVCLBoreholeAnalyticService {
     let httpParams = new HttpParams();
 
     httpParams = httpParams.append('email', email);
-
 
     return this.http.get(environment.nVCLAnalyticalUrl + 'checkNVCLAnalyticalJobStatus.do', {
       params: httpParams

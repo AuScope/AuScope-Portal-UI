@@ -17,7 +17,7 @@
         <!-- Title -->
         <div class="activeLayerTitle" title="{{ layer.name }}">{{ layer.name }}</div>
         <!-- Delete button -->
-        @if (getUILayerModel(layer.id).statusMap.getRenderStarted()) {
+        @if (getUILayerModel(layer.id)?.statusMap.getRenderStarted()) {
           <button mat-flat-button title="Remove layer" color="warn" class="delete-button" (click)="removeLayer(layer);$event.stopPropagation()"><i class="fa fa-trash layer-delete-icon"></i></button>
         }
       </div>
@@ -29,7 +29,7 @@
             <button type="button" class="btn btn-primary btn-sm active-layer-btn" title="Show layer legend" [disabled]="isLegendShown(layer.id)" (click)="showLegend(layer)">Legend</button>
           }
           <!-- Display metadata button -->
-          <button type="button" class="btn btn-primary btn-sm active-layer-btn" title="Show layer information" [ngClass]="{'active': getUILayerModel(layer.id)?.tabpanel.infopanel.expanded}" (click)="displayRecordInformation(layer)">Metadata</button>
+          <button type="button" class="btn btn-primary btn-sm active-layer-btn" title="Show layer information" [ngClass]="{'active': getUILayerModel(layer.id)?.tabpanel?.infopanel.expanded}" (click)="displayRecordInformation(layer)">Metadata</button>
           <!-- Boomark button if logged in -->
           @if (isUserLoggedIn() && !isLayerBookmarked(layer.id)) {
             <button (click)="addLayerBookmark(layer.id)" type="button" class="btn btn-primary btn-sm status-btn" title="Bookmark Layer"><i class="far fa-sm fa-bookmark"></i></button>
@@ -38,29 +38,33 @@
             <button (click)="removeLayerBookmark(layer.id)" type="button" class="btn btn-primary btn-sm status-btn" title="Remove Layer Bookmark"><i class="fas fa-sm fa-bookmark"></i></button>
           }
           <!-- Display status button while loading or if errors -->
-          @if (!getUILayerModel(layer.id).statusMap.getRenderComplete() || getUILayerModel(layer.id).statusMap.getContainsError()) {
-            <button
-              class="btn btn-primary btn-sm active-layer-btn status-btn"
-              title="Show layer status report"
-              (click)="openStatusReport(getUILayerModel(layer.id)); $event.stopPropagation();">
-              @if (!getUILayerModel(layer.id).statusMap.getRenderComplete()) {
-                <i class="fa fa-spin fa-spinner"></i>
-              }
-              @if (getUILayerModel(layer.id).statusMap.getContainsError()) {
-                <i class="fa fa-warning text-warning"></i>
-              }
-            </button>
+          @if (getUILayerModel(layer.id); as uiLayer) {
+            @if (!uiLayer.statusMap.getRenderComplete() || uiLayer.statusMap.getContainsError()) {
+              <button
+                class="btn btn-primary btn-sm active-layer-btn status-btn"
+                title="Show layer status report"
+                (click)="openStatusReport(uiLayer); $event.stopPropagation();">
+                @if (!getUILayerModel(layer.id)?.statusMap.getRenderComplete()) {
+                  <i class="fa fa-spin fa-spinner"></i>
+                }
+                @if (getUILayerModel(layer.id)?.statusMap.getContainsError()) {
+                  <i class="fa fa-warning text-warning"></i>
+                }
+              </button>
+            }
           }
         </div>
         <!-- Opacity slider -->
-        <div class="activeLayerOpacity">
-          <div style="font-size: small;">Opacity {{ getUILayerModel(layer.id).opacity }}%&nbsp;</div>
-          <!-- Opacity slider -->
-          <mat-slider [disabled] = "!showOpacitySlider(layer)" class="opacity-slider" min="0" max="100" (input)="layerOpacityChangeValue($event, layer)">
-            <input matSliderThumb
-              [(ngModel)]="getUILayerModel(layer.id).opacity">
-          </mat-slider>
-        </div>
+        @if (getUILayerModel(layer.id); as uiLayer) {
+          <div class="activeLayerOpacity">
+            <div style="font-size: small;">Opacity {{ uiLayer.opacity }}%&nbsp;</div>
+            <!-- Opacity slider -->
+            <mat-slider [disabled] = "!showOpacitySlider(layer)" class="opacity-slider" min="0" max="100" (input)="layerOpacityChangeValue($event, layer)">
+              <input matSliderThumb
+                [(ngModel)]="uiLayer.opacity">
+            </mat-slider>
+          </div>
+        }
         <!-- Map split controls -->
         @if (getShowSplitMapButtons(layer)) {
           <div class="split-panel" (click)="$event.stopPropagation()">
@@ -87,7 +91,7 @@
                 <ul id="card-tab">
                   <!-- Layer Styling tab -->
                   @if (hasFilters(layer.id)) {
-                    <li (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': !getUILayerModel(layer.id)?.tabpanel.downloadpanel.expanded}" class="tab-item">
+                    <li (click)="selectTabPanel(layer.id,'filterpanel')" [ngClass]="{'active': !getUILayerModel(layer.id)?.tabpanel?.downloadpanel.expanded}" class="tab-item">
                       <a>
                         <span class="d-none tab-link d-sm-inline">Layer Styling</span>
                       </a>
@@ -95,7 +99,7 @@
                   }
                   <!-- Layer Download tab -->
                   @if (isMapSupportedLayer(layer) && isDownloadSupportedLayer(layer)) {
-                    <li (click)="selectTabPanel(layer.id,'downloadpanel')" [ngClass]="{'active': !hasFilters(layer.id) || getUILayerModel(layer.id)?.tabpanel.downloadpanel.expanded}" class="tab-item">
+                    <li (click)="selectTabPanel(layer.id,'downloadpanel')" [ngClass]="{'active': !hasFilters(layer.id) || getUILayerModel(layer.id)?.tabpanel?.downloadpanel.expanded}" class="tab-item">
                       <a>
                         <span class="d-none tab-link d-sm-inline ml-2" >Download</span>
                       </a>
@@ -108,17 +112,17 @@
               <!-- Panel for layer styling -->
               <div
                 class="tab-pane fade"
-                [class.show]="getUILayerModel(layer.id)?.tabpanel.filterpanel.expanded"
-                [class.active]="getUILayerModel(layer.id)?.tabpanel.filterpanel.expanded"
-                [attr.aria-hidden]="getUILayerModel(layer.id)?.tabpanel.filterpanel.expanded">
+                [class.show]="getUILayerModel(layer.id)?.tabpanel.filterpanel?.expanded"
+                [class.active]="getUILayerModel(layer.id)?.tabpanel.filterpanel?.expanded"
+                [attr.aria-hidden]="getUILayerModel(layer.id)?.tabpanel.filterpanel?.expanded">
                 <app-filter-panel [layer]=layer></app-filter-panel>
               </div>
               <!-- Panel for layer download -->
               <div
                 class="tab-pane fade"
-                [class.show]="!hasFilters(layer.id) || getUILayerModel(layer.id)?.tabpanel.downloadpanel.expanded"
-                [class.active]="!hasFilters(layer.id) || getUILayerModel(layer.id)?.tabpanel.downloadpanel.expanded"
-                [attr.aria-hidden]="!hasFilters(layer.id) || getUILayerModel(layer.id)?.tabpanel.downloadpanel.expanded">
+                [class.show]="!hasFilters(layer.id) || getUILayerModel(layer.id)?.tabpanel.downloadpanel?.expanded"
+                [class.active]="!hasFilters(layer.id) || getUILayerModel(layer.id)?.tabpanel.downloadpanel?.expanded"
+                [attr.aria-hidden]="!hasFilters(layer.id) || getUILayerModel(layer.id)?.tabpanel.downloadpanel?.expanded">
                 <app-download-panel [layer]=layer></app-download-panel>
               </div>
             </div>

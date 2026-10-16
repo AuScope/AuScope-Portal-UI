@@ -5,14 +5,14 @@ import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 import { UtilitiesService } from '../../lib/portal-core-ui/utility/utilities.service';
 import { GetCapsService } from '../../lib/portal-core-ui/service/wms/get-caps.service';
 import { map } from 'rxjs/operators';
-import { ResourceType } from 'app/lib/portal-core-ui/utility/constants.service';
+import { ResourceType } from '../../lib/portal-core-ui/utility/constants.service';
 
 /**
  * Class for layer time information
  */
 export class LayerTimes {
     timeExtent: Date[] = []; // Array of dates representing time extent
-    currentTime: Date; // Current date within timeExtent
+    currentTime!: Date; // Current date within timeExtent
     loadingTimeExtent = false; // Are the times being loaded
 }
 
@@ -29,7 +29,7 @@ export class FilterService {
     // Collection of filters (filterCollection) for a given layer
     private layerFilterCollections: Map<string, BehaviorSubject<any>> = new Map<string, BehaviorSubject<any>>();
     // Providers for a given layer
-    private layerProviders: Map<string, BehaviorSubject<Array<object>>> = new Map<string, BehaviorSubject<Array<object>>>();
+    private layerProviders: Map<string, BehaviorSubject<{ label: string; value: any; }[]>> = new Map<string, BehaviorSubject<{ label: string; value: any; }[]>>();
     // Layer times retrieved from GetCaps
     private layerTimes: Map<string, BehaviorSubject<LayerTimes>> = new Map<string, BehaviorSubject<LayerTimes>>();
 
@@ -60,7 +60,7 @@ export class FilterService {
     public updateLayerFilterCollection(layerId: string, filterCollection: any): void {
         const existingFilterCollection = this.layerFilterCollections.get(layerId);
         if (existingFilterCollection) {
-            this.layerFilterCollections.get(layerId).next(filterCollection);
+            this.layerFilterCollections.get(layerId)?.next(filterCollection);
         }
     }
 
@@ -77,7 +77,7 @@ export class FilterService {
             const layerProviders = [];
             const cswRecords = layer.cswRecords;
             // Set up a map of contact orgs + URLs that belong to each
-            const contactOrgsMap = {};
+            const contactOrgsMap: Record<string, string> = {};
             for (const record of cswRecords) {
                 const contactOrg = record.contactOrg;
                 if (contactOrg !== null) {
@@ -94,7 +94,7 @@ export class FilterService {
                     value: contactOrgsMap[key]
                 });
             }
-            const layerProvidersBS: BehaviorSubject<Array<object>> = new BehaviorSubject(layerProviders);
+            const layerProvidersBS: BehaviorSubject<{ label: string; value: any; }[]> = new BehaviorSubject(layerProviders);
             this.layerProviders.set(layer.id, layerProvidersBS);
             return layerProvidersBS;
         }
@@ -106,7 +106,7 @@ export class FilterService {
      * @param layer layer model
      * @returns Observable<null> if no data, or Observable<{getCaps response, layer name}> if successful
      */
-    private getCapabilityRecord(layer: LayerModel): Observable<{getCaps: any, layerName: string}> {
+    private getCapabilityRecord(layer: LayerModel): Observable<{getCaps: any, layerName: string} | null> {
         const onlineResources = UtilitiesService.getLayerResources(layer, ResourceType.WMS);
         if (onlineResources.length > 0) {
             let wmsEndpointUrl = onlineResources[0].url;
@@ -131,7 +131,7 @@ export class FilterService {
      * @returns LayerTimes as Observable
      */
     public getLayerTimesBS(layerId: string): BehaviorSubject<LayerTimes> {
-        let layerTimesBS: BehaviorSubject<LayerTimes> = this.layerTimes.get(layerId);
+        let layerTimesBS: BehaviorSubject<LayerTimes> | undefined = this.layerTimes.get(layerId);
         if (layerTimesBS) {
             return layerTimesBS;
         }
@@ -160,12 +160,12 @@ export class FilterService {
      */
     private extractLayerTimes(layer: LayerModel, layerTimes: LayerTimes, layerName: string): LayerTimes {
         // Check if WMS capability record present and time extent set
-        const layerCapRec = layer.capabilityRecords.find(c => c.serviceType.toLowerCase() === 'wms');
+        const layerCapRec = layer.capabilityRecords.find((c: any) => c.serviceType.toLowerCase() === 'wms');
         if (layerCapRec.layers?.length > 0) {
-            const responseLayers = layerCapRec.layers.filter(l => l.name === layerName);
+            const responseLayers = layerCapRec.layers.filter((l: any) => l.name === layerName);
             if (responseLayers[0]?.timeExtent?.length > 0) {
                 // Sort layer times: newest time is first, oldest time last
-                const strDateArr = responseLayers[0].timeExtent.sort((a, b) => {
+                const strDateArr = responseLayers[0].timeExtent.sort((a: any, b: any) => {
                         return <any>new Date(b) - <any>new Date(a);
                 });
                 layerTimes.timeExtent = []
@@ -190,7 +190,7 @@ export class FilterService {
      * @param layerTimes the layer times
      */
     public updateLayerTimes(layer: LayerModel, layerTimes: LayerTimes) {
-        let layerTimesBS: BehaviorSubject<LayerTimes> = this.layerTimes.get(layer.id);
+        let layerTimesBS: BehaviorSubject<LayerTimes> | undefined = this.layerTimes.get(layer.id);
         if (!layerTimesBS) {
             const layerTimes: LayerTimes = new LayerTimes();
             layerTimesBS = new BehaviorSubject(layerTimes);
@@ -208,10 +208,10 @@ export class FilterService {
                     if (response.getCaps.data?.capabilityRecords.length === 1) {
                         layer.capabilityRecords = response.getCaps.data.capabilityRecords;
                     }
-                }
-                // Extract layer times from GetCaps response
-                if (layer.capabilityRecords?.length > 0) {
-                    layerTimes = this.extractLayerTimes(layer, layerTimes, response.layerName);
+                    // Extract layer times from GetCaps response
+                    if (layer.capabilityRecords?.length > 0) {
+                        layerTimes = this.extractLayerTimes(layer, layerTimes, response.layerName);
+                    }
                 }
                 layerTimes.loadingTimeExtent = false;
                 layerTimesBS.next(layerTimes);
@@ -234,5 +234,3 @@ export class FilterService {
         }
     }
 }
-
-

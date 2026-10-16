@@ -4,7 +4,7 @@ import { Polygon } from '../lib/portal-core-ui/service/cesium-map/cs-clipboard.s
 import { Component, OnInit, inject } from '@angular/core';
 import { isNumber } from '@turf/helpers';
 import { saveAs } from 'file-saver';
-import { UserStateService } from 'app/services/user/user-state.service';
+import { UserStateService } from '../services/user/user-state.service';
 
 @Component({
     selector: 'app-cs-clipboard',
@@ -29,12 +29,12 @@ export class CsMapClipboardComponent implements OnInit {
   private userStateService = inject(UserStateService);
 
   buttonText = 'clipboard';
-  polygonBBox: Polygon;
-  bShowClipboard: boolean;
+  polygonBBox: Polygon | null;
+  bShowClipboard!: boolean;
   public isFilterLayerShown: boolean;
-  public isDrawingPolygon: boolean;
+  public isDrawingPolygon!: boolean;
   kmlFileName = '';
-  roiNameList = [];
+  roiNameList: any[] = [];
 
 
   constructor() {
@@ -62,7 +62,7 @@ export class CsMapClipboardComponent implements OnInit {
 
   onRoiSave() {
     if (this.polygonBBox === null) return;
-    const roiPolygon= this.polygonBBox;
+    const roiPolygon = this.polygonBBox;
     if (this.roiNameList.includes(roiPolygon.name)) {
       console.log('existed already:'+ roiPolygon.name);
       return;
@@ -106,7 +106,7 @@ export class CsMapClipboardComponent implements OnInit {
     saveAs(blob, "Ap-Polygon.kml");
   }
 
-  onKmlFileSelected(event) {
+  onKmlFileSelected(event: any) {
 
     const file: File = event.target.files[0];
 
@@ -131,8 +131,8 @@ export class CsMapClipboardComponent implements OnInit {
     this.csClipboardService.drawPolygon();
   }
 
-  getPolygonBBoxs(): string {
-    return this.polygonBBox.coordinates;
+  getPolygonBBoxs(): string | undefined {
+    return this.polygonBBox?.coordinates;
   }
 
   toggleEditor() {

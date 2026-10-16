@@ -34,7 +34,7 @@ export class GraceGraphModalComponent implements AfterViewInit {
 
     showUncertainty = true;
 
-    querySubscription: Subscription;
+    querySubscription!: Subscription;
     queryStatus: number = this.QueryStatus.querying;
 
     queriedData: any = {};
@@ -67,9 +67,9 @@ export class GraceGraphModalComponent implements AfterViewInit {
             modeBarButtonsToAdd: [{
                 name: 'Download JSON data',
                 icon: Plotly.Icons.disk,
-                click: function() {
+                click: () => {
                     this.downloadData();
-                }.bind(this)
+                }
             }],
             modeBarButtonsToRemove: [
                 'toggleSpikelines', 'hoverClosestCartesian', 'hoverCompareCartesian'
@@ -112,10 +112,20 @@ export class GraceGraphModalComponent implements AfterViewInit {
                     this.changeDetectorRef.detectChanges();
                 } else {
                     this.queriedData = data;
-                    const centroid = this.parseCentroid(data.response.centroid);
-                    const title = '<b>Equivalent Water Height (EWH)</b><br>' +
-                        'Primary Mascon: ' + data.response.primary_mascon_id + ' (' + centroid + ')<br>' +
-                        'Area: ' + (data.response.total_area / 1000000).toFixed(3) + 'km<sup>2</sup>';
+
+                    let title = '<b>Equivalent Water Height (EWH)</b><br>Primary Mascon: ' + data.response.primary_mascon_id;
+                    const responseCentroid = data.response.centroid;
+                    if (responseCentroid) {
+                      const centroid = this.parseCentroid(responseCentroid);
+                      title += ' (' + centroid + ')<br>';
+                    } else {
+                      title += '<br>';
+                    }
+                    const totalArea = data.response.total_area;
+                    if (totalArea) {
+                      title += 'Area: ' + (totalArea / 1000000).toFixed(3) + 'km<sup>2</sup>';
+                    }
+
                     this.plotGraph(title, data.response);
                     this.queryStatus = this.QueryStatus.loaded;
                 }
@@ -131,9 +141,12 @@ export class GraceGraphModalComponent implements AfterViewInit {
                     this.changeDetectorRef.detectChanges();
                 } else {
                     this.queriedData = data;
-                    const title = '<b>Equivalent Water Height (EWH) for Region</b><br>' +
-                        'Primary Mascons: ' + data.response.primary_mascons + '<br>' +
-                        'Total Area: ' + (data.response.total_area / 1000000).toFixed(3) + 'km<sup>2</sup>';
+                    let title = '<b>Equivalent Water Height (EWH) for Region</b><br>' +
+                        'Primary Mascons: ' + data.response.primary_mascons;
+                    const totalArea = data.response.total_area;
+                    if (totalArea) {
+                        title += '<br>Total Area: ' + (totalArea / 1000000).toFixed(3) + 'km<sup>2</sup>';
+                    }
                     this.plotGraph(title, data.response);
                     this.queryStatus = this.QueryStatus.loaded;
                     this.changeDetectorRef.detectChanges();

@@ -1,8 +1,8 @@
 import { DatePipe } from '@angular/common';
-import { Component, ElementRef, OnInit, QueryList, ViewChildren, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, inject } from '@angular/core';
 import { AbstractControl, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { PermanentLink } from 'app/models/permanentlink.model';
-import { UserStateService } from 'app/services/user/user-state.service';
+import { PermanentLink } from '../../models/permanentlink.model';
+import { UserStateService } from '../../services/user/user-state.service';
 import { environment } from '../../../environments/environment';
 import { ConfirmModalComponent } from '../confirm/confirm.modal.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -18,21 +18,20 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
     standalone: false
 })
 export class PermanentLinksModalComponent implements OnInit {
+  public dialogRef = inject(MatDialogRef<PermanentLinksModalComponent>);
+  public userStates!: PermanentLink[];
   private formBuilder = inject(UntypedFormBuilder);
   private dialog = inject(MatDialog);
   private userStateService = inject(UserStateService);
   private datePipe = inject(DatePipe);
-
-  private userStates: PermanentLink[];
-  private userId: string;
-
-  public dialogRef = inject(MatDialogRef<PermanentLinksModalComponent>);
+  private userId!: string | undefined;
+  private changeDetectorRef = inject(ChangeDetectorRef);
 
   // Keep track of load state links so we can pass through button container's clicks
-  @ViewChildren('loadStateLink') loadStateLinks: QueryList<ElementRef<HTMLElement>>;
+  @ViewChildren('loadStateLink') loadStateLinks!: QueryList<ElementRef<HTMLElement>>;
 
-  statesForm: UntypedFormGroup;
-  statesFormArray: UntypedFormArray;
+  statesForm!: UntypedFormGroup;
+  statesFormArray!: UntypedFormArray;
 
   editingState: number = -1; // Keep track of state being edited (-1 = none)
 
@@ -45,7 +44,18 @@ export class PermanentLinksModalComponent implements OnInit {
       }
     });
     this.userStateService.states.subscribe(states => {
+      /*
+      for (const state of states) {
+        console.log('State:', state);
+        console.log('Name:', state.name);
+        console.log('Description:', state.description);
+        console.log('Date:', state.creationDate);
+      }
+      */
       this.statesFormArray = new UntypedFormArray([]);
+      this.statesForm = this.formBuilder.group({
+        states: this.statesFormArray
+      });
       this.userStates = states;
       // Close if empty (only happens after delete)
       if (this.userStates.length === 0) {
@@ -54,7 +64,10 @@ export class PermanentLinksModalComponent implements OnInit {
       for (const state of this.userStates) {
         this.statesFormArray.push(this.addStateToFormArray(state));
       }
+      this.changeDetectorRef.markForCheck();
     });
+
+    console.log('statesForm', this.statesForm);
   }
 
   /**
@@ -121,13 +134,13 @@ export class PermanentLinksModalComponent implements OnInit {
    */
   enableStateFormControls(stateNo: number, allowEdit: boolean) {
     if (allowEdit) {
-      this.statesFormArray.controls[stateNo].get('name').enable();
-      this.statesFormArray.controls[stateNo].get('description').enable();
-      this.statesFormArray.controls[stateNo].get('isPublic').enable();
+      this.statesFormArray.controls[stateNo].get('name')?.enable();
+      this.statesFormArray.controls[stateNo].get('description')?.enable();
+      this.statesFormArray.controls[stateNo].get('isPublic')?.enable();
     } else {
-      this.statesFormArray.controls[stateNo].get('name').disable();
-      this.statesFormArray.controls[stateNo].get('description').disable();
-      this.statesFormArray.controls[stateNo].get('isPublic').disable();
+      this.statesFormArray.controls[stateNo].get('name')?.disable();
+      this.statesFormArray.controls[stateNo].get('description')?.disable();
+      this.statesFormArray.controls[stateNo].get('isPublic')?.disable();
     }
   }
 
@@ -173,10 +186,13 @@ export class PermanentLinksModalComponent implements OnInit {
    */
   public saveState(stateNo: number) {
     if (stateNo === this.editingState) {
-      const id = this.statesFormArray.controls[this.editingState].get('id').value;
-      const name = this.statesFormArray.controls[this.editingState].get('name').value;
-      const description = this.statesFormArray.controls[this.editingState].get('description').value;
-      const isPublic = this.statesFormArray.controls[this.editingState].get('isPublic').value;
+      const id = this.statesFormArray.controls[this.editingState].get('id')?.value;
+      const name = this.statesFormArray.controls[this.editingState].get('name')?.value;
+      const description = this.statesFormArray.controls[this.editingState].get('description')?.value;
+      const isPublic = this.statesFormArray.controls[this.editingState].get('isPublic')?.value;
+      if (!this.userId) {
+        throw new Error('User name is null');
+      }
       this.userStateService.updateState(id, this.userId, name, description, isPublic).subscribe(() => {
         this.enableStateFormControls(stateNo, false);
         this.editingState = -1;

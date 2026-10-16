@@ -5,6 +5,13 @@ declare let d3: any;
 declare let Rickshaw: any;
 declare let RenderControls: any;
 
+interface DataPoint {
+  x: number;
+  y: number;
+}
+
+type DataBin = Record<string, Record<string, DataPoint[]>>;
+
 /**
  * Service class to handle rendering of rickshaw chart
  *
@@ -34,11 +41,11 @@ export class RickshawService {
   public drawNVCLDataGraph(response: string, logIds: Array<string>, logNames: Array<string>) {
     const me = this;
     // Once we have received the plot data, reformat it into (x,y) values and create colour table
-    const metric_colours = new Object;
-    const data_bin = new Object;
+    const metric_colours: Record<string, string> = {};
+    const data_bin: DataBin = {};
     let has_data = false;
-    const yaxis_labels = new Object;
-    const yaxis_keys = [];
+    const yaxis_labels: Record<string, string> = {};
+    const yaxis_keys: string[] = [];
     const jsonObj = JSON.parse(response);
     // {"success":true, "data":[{ "logId":"logid_1", "stringValues":[{"roundedDepth":170.5,"classCount":1,"classText":"Alunite-K","colour":4351080},
 
@@ -51,9 +58,9 @@ export class RickshawService {
           const metric_name = me._findLogName(bv.logId, logIds, logNames);
           if (metric_name.length > 0) {
             if (!(metric_name in data_bin)) {
-              data_bin[metric_name] = new Object;
+              data_bin[metric_name] = {};
             }
-                bv[dataType].forEach(function(val) {
+                bv[dataType].forEach(function(val: any) {
 
               // "stringValues" ==> units are called "Sample Count" and "numericValues" ==> "Meter Average"
               if (dataType === 'stringValues') {
@@ -104,32 +111,31 @@ export class RickshawService {
 
   }
 
-  public drawNVCLJobsGraph(response, logid_colour_table, logIds, logNames) {
-
+  public drawNVCLJobsGraph(response: any, logid_colour_table: any, logIds: any, logNames: any) {
     // Once we have received the plot data, reformat it into (x,y) values and create colour table
-    const metric_colours = new Object;
-    const data_bin = new Object;
+    const metric_colours: Record<string, string> = {};;
+    const data_bin: DataBin = {};
     let has_data = false;
-    const yaxis_labels = new Object;
-    const yaxis_keys = [];
+    const yaxis_labels: Record<string, string> = {};;
+    const yaxis_keys: string[] = [];
     const re = new RegExp('[^A-Za-z0-9]', 'g');
     const jsonObj = response;
     if ('success' in jsonObj && jsonObj.success === true && jsonObj.data.length > 0) {
-        jsonObj.data[0].binnedValues.forEach(function(bv) {
+        jsonObj.data[0].binnedValues.forEach(function(bv: any) {
           ['stringValues', 'numericValues'].forEach(function(dataType) {
           if (bv.startDepths.length === bv[dataType].length && bv[dataType].length > 0) {
             const metric_name = bv.name;
             if (!(metric_name in data_bin)) {
-              data_bin[metric_name] = new Object;
+              data_bin[metric_name] = {};
             }
 
-              bv[dataType].forEach(function(val, idx, _arr) {
+              bv[dataType].forEach(function(val: any, idx: any, _arr: any) {
 
               // "stringValues" ==> units are called "Sample Count" and "numericValues" ==> "Meter Average"
               if (dataType === 'stringValues') {
 
                 // Using entries(), make a name,value list, then use that to add to 'data_bin[metric_name]'
-                  d3.entries(val).forEach(function(meas) {
+                  d3.entries(val).forEach(function(meas: any) {
                   const key = meas.key;
                   if (!(key in metric_colours)) {
                     let logIdIdx = 999999;
@@ -188,7 +194,7 @@ export class RickshawService {
 
   }
 
-  public plot(data_bin, xaxis_name, yaxis_names, yaxis_keys, metric_colours) {
+  public plot(data_bin: DataBin, xaxis_name: string, yaxis_names: Record<string, string>, yaxis_keys: string[], metric_colours: Record<string, string>) {
     if (yaxis_keys.length === 0) {
       alert('auscope.chart.rickshawChart.plot(): \'yaxis_keys\' must have 1 member');
     }
@@ -202,10 +208,10 @@ export class RickshawService {
     });
 
     const local_div = d3.select('[id=rickshawChart_outer]');
-    let depth_list = [];
+    let depth_list: any[] = [];
 
-    d3.keys(data_bin).forEach(function(dataType) {
-      const temp_depth_list = [].concat(...d3.values(data_bin[dataType])).map(a => a.x);
+    d3.keys(data_bin).forEach(function(dataType: any) {
+      const temp_depth_list = [].concat(...d3.values(data_bin[dataType])).map((a: any) => a.x);
       depth_list = depth_list.concat(temp_depth_list);
     });
     const global_depth_set = d3.set(depth_list);
@@ -216,10 +222,10 @@ export class RickshawService {
     // (it is present at other depths), it is zero at this depth. Rickshaw will interpolate more readily when when the missing values are filled with zeros.
     // You can also use 'null' to fill missing values, but this gives ugly gaps in the line graph, and single isolated points that cannot be plotted.
     //
-    d3.keys(data_bin).forEach(function(dataType) {
-      d3.keys(data_bin[dataType]).forEach(function(db_key) {
+    d3.keys(data_bin).forEach(function(dataType: any) {
+      d3.keys(data_bin[dataType]).forEach(function(db_key: any) {
         const local_depth_list = data_bin[dataType][db_key].map(function(currentValue) {return currentValue.x; });
-        global_depth_set.forEach(function(global_depth) {
+        global_depth_set.forEach(function(global_depth: any) {
           // console.log("db_val JSON: "+JSON.stringify(data_bin[dataType][db_key]));
           const local_depth_set = d3.set(local_depth_list);
           if (!local_depth_set.has(global_depth)) {
@@ -230,35 +236,35 @@ export class RickshawService {
     });
 
     // Find max and min of x and y values
-    const max_y_val = new Object;
-    const min_y_val = new Object;
-    d3.keys(data_bin).forEach(function(dataType) {
-      const temp_y_list = [].concat(...d3.values(data_bin[dataType])).map(a => a.y);
+    const max_y_val: Record<any, any> = {};
+    const min_y_val: Record<any, any> = {};
+    d3.keys(data_bin).forEach(function(dataType: any) {
+      const temp_y_list = [].concat(...d3.values(data_bin[dataType])).map((a: any) => a.y);
       max_y_val[dataType] = d3.max(temp_y_list);
       min_y_val[dataType] = d3.min(temp_y_list);
     });
 
 
     // Use max/min values to setup two sets of scales for the y-axis
-    const scales = new Object;
-    d3.keys(data_bin).forEach(function(dataType) {
+    const scales: Record<string, any> = {};
+    d3.keys(data_bin).forEach(function(dataType: any) {
       scales[dataType] = new d3.scale.linear().domain([min_y_val[dataType], max_y_val[dataType]]);
     });
 
 
     // Strong colours do best with the 'mouseover the legend to display individual colours separately' function
-    const colorScale = function(colour_idx) {
+    const colorScale = function(colour_idx: any) {
       const scale = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f',
         '#bcbd22', '#17becf', '#393b79', '#5254a3', '#6b6ecf', '#637939', '#8ca252', '#b5cf6b',
         '#8c6d31', '#bd9e39', '#e7ba52', '#843c39', '#ad494a', '#d6616b', '#e7969c', '#7b4173',
         '#a55194', '#ce6dbd', '#de9ed6']; return scale[colour_idx % scale.length];
     };
-    const graph_list = [];
+    const graph_list: any[] = [];
 
     const ticksTreatment = 'plain'; // 'glow';
 
     // Used to format the depth measurements on the x-axis
-    const formatMetres = function(n) {
+    const formatMetres = function(n: any) {
       const abs_n = Math.abs(n);
       if (abs_n > 9999) {
         return n / 1000 + 'km';
@@ -275,11 +281,11 @@ export class RickshawService {
     yaxis_keys.forEach(function(yaxis_key, idx, _arr) {
 
       // Create an array of all the X-values for the graph, values must be sorted by x-value
-      const seriesX = [];
+      const seriesX: any[] = [];
       let index = 0;
 
       // If defined, use the colours in 'metric_colours', if colour can be found else the local colour table
-      d3.keys(data_bin[yaxis_key]).forEach(function(currentValue) {
+      d3.keys(data_bin[yaxis_key]).forEach(function(currentValue: any) {
         if (metric_colours && currentValue in metric_colours) {
           // Supplied colour table
           const X = {
@@ -318,10 +324,10 @@ export class RickshawService {
       // Set up a popup box with shows upon mouseover
       const _hoverDetail = new Rickshaw.Graph.HoverDetail({
         graph: graph,
-        formatter: function(series, x, y) {
+        formatter: function(series: any, x: any, y: any) {
           return series.name + ': ' + x.toString() + ',' + y.toString();
         },
-        xFormatter: function(_x) {return null; } // This stops annoying times hovering at the top of the graph
+        xFormatter: function(_x: any) {return null; } // This stops annoying times hovering at the top of the graph
       });
 
       // Create a legend, listing all the metrics
@@ -440,8 +446,5 @@ export class RickshawService {
     }, this);
 
   }
-
-
-
 
 }

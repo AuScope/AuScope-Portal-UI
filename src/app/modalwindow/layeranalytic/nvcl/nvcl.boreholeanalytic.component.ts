@@ -8,12 +8,12 @@ import { NgForm } from '@angular/forms';
 
 @Component({
     templateUrl: './nvcl.boreholeanalytic.component.html',
-    styles: [
-        'input:invalid + span:after { content: \'✖\'; color: #f00; padding-left: 15px; }',
-        'input:valid + span:after { content: \'✓\'; color: #26b72b; padding-left: 15px;}',
-        'select:invalid + span:after { content: \'✖\'; color: #f00; padding-left: 15px; }',
-        'select:valid + span:after { content: \'✓\'; color: #26b72b; padding-left: 15px;}'
-    ],
+    styles: [`
+        input:invalid + span:after { content: '✖'; color: #f00; padding-left: 15px; }
+        input:valid + span:after { content: '✓'; color: #26b72b; padding-left: 15px; }
+        select:invalid + span:after { content: '✖'; color: #f00; padding-left: 15px; }
+        select:valid + span:after { content: '✓'; color: #26b72b; padding-left: 15px; }
+    `],
     styleUrls: [
         './nvcl.boreholeanalytic.component.css',
         '../../modalwindow.scss'
@@ -25,20 +25,20 @@ export class NVCLBoreholeAnalyticComponent
   implements AfterViewInit, OnInit, LayerAnalyticInterface {
   nvclBoreholeAnalyticService = inject(NVCLBoreholeAnalyticService);
 
-  @ViewChild('f', { static: true }) signupForm: NgForm;
-  @Input() layer: LayerModel;
-  public nvclform;
-  public algorithms;
-  public selectedAlgorithm;
-  public classifications;
+  @ViewChild('f', { static: true }) signupForm!: NgForm;
+  @Input() layer!: LayerModel;
+  public nvclform: any;
+  public algorithms: any;
+  public selectedAlgorithm: any;
+  public classifications: any;
   public isExistingAlgorithm = true;
   public bApplyNvclFilter = true;
   public bPublished = true;
 
-  public ngSelectiveConfig = {};
-  public ngSelectiveOptions = [];
-  public currentStatus = [];
-  public tSGAlgorithmNames = [];
+  public ngSelectiveConfig: any = {};
+  public ngSelectiveOptions: any[] = [];
+  public currentStatus: any[] = [];
+  public tSGAlgorithmNames: any[] = [];
   // VT: object to keep track of the tabpanel
   public UItabpanel = {
     algorithm: true,
@@ -118,7 +118,7 @@ export class NVCLBoreholeAnalyticComponent
   /**
    * on version change retrieve the associated classification
    */
-  public onVersionChange($event) {
+  public onVersionChange($event: any) {
     const algorithmOutputIds = $event;
     if (algorithmOutputIds.length <= 0) {
       return;
@@ -126,7 +126,7 @@ export class NVCLBoreholeAnalyticComponent
     this.nvclBoreholeAnalyticService
       .getNVCLClassifications(algorithmOutputIds)
       .subscribe(classifications => {
-        classifications = classifications.sort((a,b)=> {
+        classifications = classifications.sort((a: any, b: any)=> {
           const a1 = a.classText.toLowerCase();
           const b1 = b.classText.toLowerCase();
           return a1 < b1 ? -1 : a1 > b1 ? 1 : 0;

@@ -1,6 +1,6 @@
 import { RickshawService } from '../../../../lib/portal-core-ui/widget/chart/rickshaw/rickshaw.service';
 import { NVCLService } from './nvcl.service';
-import { Component, OnInit, ApplicationRef, inject } from '@angular/core';
+import { Component, OnInit, ApplicationRef, inject, signal } from '@angular/core';
 import { HttpParams } from '@angular/common/http';
 import { DomSanitizer } from '@angular/platform-browser';
 import { saveAs } from 'file-saver';
@@ -36,14 +36,15 @@ export class NVCLDatasetListComponent implements OnInit {
    */
   public data = inject(MAT_DIALOG_DATA);
 
-  public nvclDatasets: any[] = [];
+  public nvclDatasets = signal<any[]>([]);
+
   public collapse: any[] = [];
-  public datasetImages: any[] = [];
-  public datasetScalars: any[] = [];
-  public datasetScalarDefinition = {};
-  public tipScalarDefinition = null;
+  public datasetImages: Record<string, any[]> = {};
+  public datasetScalars: Record<string, any[]> = {};
+  public datasetScalarDefinition: any = {};
+  public tipScalarDefinition: any = undefined;
   public drawGraphMode = false;
-  public selectedLogNames = [];
+  public selectedLogNames: Record<string, any[]> = {};
   public processingGraph = false;
   public downloadEmail = '';
   public downloadResponse = '';
@@ -52,7 +53,7 @@ export class NVCLDatasetListComponent implements OnInit {
   public selectedScalar = null;
   public selectedScalarName = '';
   public selectedScalardata: any;
-  public legendDialogRef = null;
+  public legendDialogRef = undefined;
   public imagesLoaded: string[] = [];
 
   public linPal: number[] = [255, 767, 1279, 1791, 2303, 3071, 3583, 4095, 4863, 5375, 5887, 6655, 7167, 7935, 8447, 9215, 9727, 10495, 11007, 11775, 12543, 13055, 13823, 14591,
@@ -91,7 +92,7 @@ export class NVCLDatasetListComponent implements OnInit {
 
 
   public jobList: any[] = [];
-  public currentStatus = [];
+  public currentStatus: any[] = [];
   public checkingTSG = false;
 
   ngOnInit(): void {
@@ -112,10 +113,10 @@ export class NVCLDatasetListComponent implements OnInit {
         if (this.nvclBoreholeAnalyticService.hasSavedEmail()) {
           this.downloadEmail = this.nvclBoreholeAnalyticService.getUserEmail();
         }
-        this._getNVCLImage(this.data.onlineResource.url, nvclDataset.datasetId, null);
+        this._getNVCLImage(this.data.onlineResource.url, nvclDataset.datasetId, undefined);
         this._getNVCLScalar(this.data.onlineResource.url, nvclDataset.datasetId);
         this.isCachedTSGFileAvailable(nvclDataset);
-        this.nvclDatasets.push(nvclDataset);
+        this.nvclDatasets.set([...this.nvclDatasets(), nvclDataset]);
       }
       if (result.length === 0) {
         this.nvclService.setAnalytic(false);
@@ -217,7 +218,7 @@ export class NVCLDatasetListComponent implements OnInit {
     })
   }
 
-  private _getNVCLImage(url: string, datasetId: string, scalarid: string) {
+  private _getNVCLImage(url: string, datasetId: string, scalarid?: string | null) {
     this.nvclService.getNVCL2_0_Images(url, datasetId).subscribe(trayImages => {
       for (const trayImage of trayImages) {
         if (trayImage.logName === 'Tray Thumbnail Images') {
@@ -227,7 +228,7 @@ export class NVCLDatasetListComponent implements OnInit {
           // httpParams = httpParams.append('logId', trayImage.logId);
           httpParams = httpParams.append('datasetid', datasetId);
           // httpParams = httpParams.append('width', '3');
-          if (scalarid != null) {
+          if (scalarid != undefined) {
             httpParams = httpParams.append('scalarids', scalarid);
           }
           this.datasetImages[datasetId].push(this.nvclService.getNVCLDataServiceUrl(this.data.onlineResource.url) + 'mosaic.html?' + httpParams.toString());
@@ -242,7 +243,7 @@ export class NVCLDatasetListComponent implements OnInit {
     }
     const scalarPriorityOrder = this.scalarPriorityOrder;
     this.nvclService.getNVCLScalars(url, datasetId).subscribe(scalars => {
-      this.datasetScalars[datasetId] = scalars.sort(function (one, two) {
+      this.datasetScalars[datasetId] = scalars.sort(function (one: any, two: any) {
         const oneindex = scalarPriorityOrder.findIndex((element) => (element === one.logName));
         const twoindex = scalarPriorityOrder.findIndex((element) => (element === two.logName));
         if (twoindex === -1 && oneindex === -1) { return (one.logName > two.logName) ? 1 : -1 }
@@ -275,8 +276,8 @@ export class NVCLDatasetListComponent implements OnInit {
 
       } else {
         const logs = this.datasetScalars[datasetId];
-        const logIds = [];
-        const logNames = [];
+        const logIds: any[] = [];
+        const logNames: any[] = [];
 
         for (const log of logs) {
           if (log.value) {
@@ -296,7 +297,7 @@ export class NVCLDatasetListComponent implements OnInit {
       }
 
     } else {
-      this.selectedLogNames = [];
+      this.selectedLogNames = {};
     }
   }
 
@@ -371,10 +372,10 @@ export class NVCLDatasetListComponent implements OnInit {
     }
   }
 
-  public _colourConvert(BGRColorNumber) {
-    return '#' + UtilitiesService.leftPad((BGRColorNumber & 255).toString(16), 2, '0') +
-      UtilitiesService.leftPad(((BGRColorNumber & 65280) >> 8).toString(16), 2, '0') +
-      UtilitiesService.leftPad((BGRColorNumber >> 16).toString(16), 2, '0');
+  public _colourConvert(bgrColorNumber: any) {
+    return '#' + UtilitiesService.leftPad((bgrColorNumber & 255).toString(16), 2, '0') +
+      UtilitiesService.leftPad(((bgrColorNumber & 65280) >> 8).toString(16), 2, '0') +
+      UtilitiesService.leftPad((bgrColorNumber >> 16).toString(16), 2, '0');
   }
 
   public openLegend(datasetId: string) {
@@ -396,7 +397,7 @@ export class NVCLDatasetListComponent implements OnInit {
                 // Find the log name for our log id, this will be our 'metric_name'
                 const metric_name = me.datasetScalars[datasetId].filter(x => x.logId === bv.logId)[0].logName;
                 if (metric_name.length > 0) {
-                  bv[dataType].forEach(function (val) {
+                  bv[dataType].forEach(function (val: any) {
 
                     // "stringValues" ==> units are called "Sample Count" and "numericValues" ==> "Meter Average"
                     if (dataType === 'stringValues') {

@@ -1,18 +1,18 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, inject, signal } from '@angular/core';
 import { LayerHandlerService } from '../lib/portal-core-ui/service/cswrecords/layer-handler.service';
 import { RenderStatusService } from '../lib/portal-core-ui/service/cesium-map/renderstatus/render-status.service';
 import { UILayerModel } from '../menupanel/common/model/ui/uilayer.model';
-import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
+import { UILayerModelService } from '../services/ui/uilayer-model.service';
 import { LayerModel } from '../lib/portal-core-ui/model/data/layer.model';
-import { LayerManagerService } from 'app/services/ui/layer-manager.service';
-import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
-import { SidebarService } from 'app/portal/sidebar.service';
+import { LayerManagerService } from '../services/ui/layer-manager.service';
+import { FilterService, LayerTimes } from '../services/filter/filter.service';
+import { SidebarService } from '../portal/sidebar.service';
 import { Subscription } from 'rxjs';
-import { UserStateService } from 'app/services/user/user-state.service';
-import { AuthService } from 'app/services/auth/auth.service';
+import { UserStateService } from '../services/user/user-state.service';
+import { AuthService } from '../services/auth/auth.service';
 import { take, filter } from 'rxjs/operators';
-import { config } from 'environments/config';
-import { SearchService } from 'app/services/search/search.service';
+import { config } from '../../environments/config';
+import { SearchService } from '../services/search/search.service';
 
 
 @Component({
@@ -32,16 +32,18 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
   private userStateService = inject(UserStateService);
   private authService = inject(AuthService);
 
+  // Track whether a layer has any CSW records. If undefined the layer hasn't been checked
+  private cswAvailability = signal(new Map<string, boolean | undefined>());
 
-  public layerGroupColumn: object; /* Holds the data structures for all layers and groups */
-  public layerColumn: []; /* List of layers for a certain group */
+  public layerGroupColumn!: any; /* Holds the data structures for all layers and groups */
+  public layerColumn: any[] = []; /* List of layers for a certain group */
   public layerColumnHeader = ""; /* Name of group is shown at the top of the layer column */
-  public selectedLayer; /* Selected layer, assigned a layer object */
+  public selectedLayer: any; /* Selected layer, assigned a layer object */
   public panelStayOpen = false; /* Checkbox state for user to keep panel open after adding a layer */
   public bShowBrowsePanel = false; /* If true menu panel is open */
   public isSidebarOpen = false; /* If true sidebar is open */
-  public sidebarSubscription: Subscription;
-  public layerBookmarked = {}; /* Object stores which layers are bookmarked. key is layer id, value is boolean */
+  public sidebarSubscription!: Subscription;
+  public layerBookmarked: any = {}; /* Object stores which layers are bookmarked. key is layer id, value is boolean */
   public showOnlyBookmarked = false; /* When true only bookmarked layers are shown in the browse menu */
 
   /**
@@ -69,17 +71,25 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
           // Loop over each layer in a group
           for (let layer_idx = 0; layer_idx < this.layerGroupColumn[group].length; layer_idx++) {
 
+            const layer = this.layerGroupColumn[group][layer_idx];
+
             // Initialise a list of cesium layers
-            this.layerGroupColumn[group][layer_idx].csLayers = [];
+            layer.csLayers = [];
 
             // Initialise UILayerModel
-            const uiLayerModel = new UILayerModel(this.layerGroupColumn[group][layer_idx].id, 100, this.renderStatusService.getStatusBSubject(this.layerGroupColumn[group][layer_idx]));
-            this.uiLayerModelService.setUILayerModel(this.layerGroupColumn[group][layer_idx].id, uiLayerModel);
+            const statusModel = this.renderStatusService.getStatusBSubject(layer)
+            if (statusModel) {
+              const uiLayerModel = new UILayerModel(layer.id, 100, statusModel);
+              this.uiLayerModelService.setUILayerModel(layer.id, uiLayerModel);
+            }
+
+            // Check CSW Layers
+            this.checkCSW(layer);
           }
         }
         // Sort alphabetically by group name
         Object.keys(this.layerGroupColumn).forEach(group => {
-          this.layerGroupColumn[group].sort((a, b) => a.name.localeCompare(b.name));
+          this.layerGroupColumn[group].sort((a: any, b: any) => a.name.localeCompare(b.name));
         });
       }
     );
@@ -117,7 +127,7 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
    * @param layerGroupKey the key (string) of the layer group
    * @returns true iff the layer group contains a layer that has been bookmarked, false otherwise
    */
-  public layerGroupHasBookmarkedLayer(layerGroupKey: string): boolean {
+  public layerGroupHasBookmarkedLayer(layerGroupKey: string | number | symbol): boolean {
     if (this.layerGroupColumn.hasOwnProperty(layerGroupKey)) {;
       for (const layer of this.layerGroupColumn[layerGroupKey]) {
         if (this.layerBookmarked?.hasOwnProperty(layer.id) && this.layerBookmarked[layer.id]) {
@@ -142,7 +152,7 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
    *
    * @param layerGroup group
    */
-  public selectGroup(layerGroup): void {
+  public selectGroup(layerGroup: any): void {
     this.layerColumn = layerGroup.value;
     this.layerColumnHeader = layerGroup.key;
     layerGroup.value.expanded = !layerGroup.value.expanded;
@@ -154,7 +164,7 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
    *
    * @param layer layer
    */
-  public selectLayer(layer) {
+  public selectLayer(layer: any) {
     this.selectedLayer = layer;
   }
 
@@ -243,11 +253,26 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
    * Does this layer have any CSW records?
    *
    * @param layer LayerModel for layer
-   * @returns true if this layer has csw records
+   * @returns true if this layer has csw records, false if it doesn't, undefined if unchecked
    */
-  public isCSW(layer: any) {
+  public isCSW(layer: any): boolean | undefined {
+    return this.cswAvailability().get(layer.id);
+  }
+
+  /**
+   * Check is a layer has any CSW records, if not check for an exact match with elastic search
+   *
+   * @param layer LayerModel for the layer
+   * @returns 
+   */
+  public checkCSW(layer: any) {
     if (layer.cswRecords.length > 0) {
-      return true;
+      this.cswAvailability.update(map => {
+        const next = new Map(map);
+        next.set(layer.id, true);
+        return next;
+      });
+      return;
     }
 
     if (layer.cswCheck) { return false; }
@@ -257,33 +282,39 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
     /* if we don't have any csw records for the layer then check for an exact match with elastic search
      * refer to the code: searchpanel.component -> search()
     */
-
     const queryText = "\""+layer.name+"\"";
     const selectedSearchFields: string[] = ['knownLayerNames', 'serviceName', 'descriptiveKeywords', 'dataIdentificationAbstract', 'layerName'];
     const boundsRelationship = 'Intersects';
 
     const selectedServices: string[] = []; // no OGC services
 
-    const westBounds: number = undefined;
-    const eastBounds: number = undefined;
-    const northBounds: number = undefined;
-    const southBounds: number = undefined;
+    const westBounds: number | undefined = undefined;
+    const eastBounds: number | undefined = undefined;
+    const northBounds: number | undefined = undefined;
+    const southBounds: number | undefined = undefined;
 
     // Search CSW records
     this.searchService.searchCSWRecords(queryText, selectedSearchFields, null, null, selectedServices,
         boundsRelationship.toLowerCase(), westBounds, eastBounds,
         southBounds, northBounds).subscribe(searchResponse => {
 
-        if (searchResponse.cswRecords.length > 0) {
+        const available = searchResponse.cswRecords.length > 0;
+        if (available) {
           layer.cswRecords.push(searchResponse.cswRecords[0]);
-          return true;
-        } else {
-          return false;
         }
+        this.cswAvailability.update(map => {
+          const next = new Map(map);
+          next.set(layer.id, available);
+          return next;
+        });
     }, error => {
       console.log('[searchCSWRecords.do (elastic search)]CSW search error: ' + error.error);
+      this.cswAvailability.update(map => {
+        const next = new Map(map);
+        next.set(layer.id, false);
+        return next;
+      });
     });
-
   }
 
   /**

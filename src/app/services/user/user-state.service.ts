@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { Bookmark } from 'app/models/bookmark.model';
-import { PermanentLink } from 'app/models/permanentlink.model';
+import { Bookmark } from '../../models/bookmark.model';
+import { PermanentLink } from '../../models/permanentlink.model';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { catchError, map, take } from 'rxjs/operators';
 import { User } from '../../models/user.model';
@@ -11,10 +11,12 @@ import { Polygon } from '../../lib/portal-core-ui/service/cesium-map/cs-clipboar
 import { UtilitiesService } from '../../lib/portal-core-ui/utility/utilities.service';
 import { v4 as uuidv4 } from 'uuid';
 import { HttpResponse } from '@angular/common/http';
-import { environment } from 'environments/environment';
+import { environment } from '../../../environments/environment';
 import { UILayerModelService } from '../ui/uilayer-model.service';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class UserStateService {
   private apiService = inject(AuscopeApiService);
   private manageStateService = inject(ManageStateService);
@@ -23,15 +25,15 @@ export class UserStateService {
 
 
   // User
-  private _user: BehaviorSubject<User> = new BehaviorSubject(null);
-  public readonly user: Observable<User> = this._user.asObservable();
+  private _user = new BehaviorSubject<User | undefined>(undefined);
+  public readonly user: Observable<User | undefined> = this._user.asObservable();
 
   // Bookmarks for User
-  private _bookmarks: BehaviorSubject<Bookmark[]> = new BehaviorSubject([]);
+  private _bookmarks = new BehaviorSubject(<Bookmark[]>[]);
   public readonly bookmarks: Observable<Bookmark[]> = this._bookmarks.asObservable();
 
   // Portal map states for User
-  private _states: BehaviorSubject<PermanentLink[]> = new BehaviorSubject([]);
+  private _states = new BehaviorSubject(<PermanentLink[]>[]);
   public readonly states: Observable<PermanentLink[]> = this._states.asObservable();
 
   //ROI for User
@@ -110,7 +112,7 @@ export class UserStateService {
    */
   public removeBookmark(layerId: string) {
     this.bookmarks.pipe(take(1)).subscribe(currentBookmarks => {
-      const bm = currentBookmarks.find(b => b.fileIdentifier === layerId);
+      const bm: any = currentBookmarks.find(b => b.fileIdentifier === layerId);
       if (bm) {
         // Remove bookmark from db via API
         this.apiService.removeBookmark(bm.id).subscribe(() => {
@@ -147,7 +149,7 @@ export class UserStateService {
    * @param description optional state description
    * @param isPublic whether the link is publically accessible
    */
-  public addState(name: string, description: string, isPublic: boolean, anonymous: boolean): Observable<any> {
+  public addState(name: string | null, description: string | null, isPublic: boolean, anonymous: boolean): Observable<any> {
     const id = uuidv4();
     const state = this.manageStateService.getState();
     // Add the base map to the state
@@ -161,7 +163,7 @@ export class UserStateService {
       if (layerKey.toLowerCase() !== 'map' && layerKey.toLowerCase() !== 'basemap') {
         const layerIndex = this.csMapService.getLayerIndex(layerKey);
         state[layerKey].index = layerIndex;
-        state[layerKey].opacity = this.uiLayerModelService.getUILayerModel(layerKey).opacity;
+        state[layerKey].opacity = this.uiLayerModelService.getUILayerModel(layerKey)?.opacity;
       }
     }
 
@@ -170,7 +172,7 @@ export class UserStateService {
     if (!anonymous) {
       apiCall = this.apiService.saveUserPortalState(id, name, description, JSON.stringify(state), isPublic);
     }
-    return apiCall.pipe(map(response => {
+    return apiCall.pipe(map((response: any) => {
       if (response['success']) {
         response['id'] = id;
       }
@@ -193,7 +195,7 @@ export class UserStateService {
    * @returns ID of state on success
    */
   public updateState(id: string, userId: string, name: string, description: string, isPublic: boolean): Observable<any> {
-    return this.apiService.updateUserPortalState(id, userId, name, description, isPublic).pipe(map(response => {
+    return this.apiService.updateUserPortalState(id, userId, name, description, isPublic).pipe(map((response: any) => {
       if (response['success']) {
         response['id'] = id;
       }

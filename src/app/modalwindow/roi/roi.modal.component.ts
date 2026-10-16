@@ -2,8 +2,8 @@ import { Component, inject } from '@angular/core';
 import { UntypedFormArray } from '@angular/forms';
 import { ConfirmModalComponent } from '../confirm/confirm.modal.component';
 import { CsClipboardService } from '../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
-import { UserStateService } from 'app/services/user/user-state.service';
-import { User } from 'app/models/user.model';
+import { UserStateService } from '../../services/user/user-state.service';
+import { User } from '../../models/user.model';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 
@@ -22,8 +22,8 @@ export class ROIModalComponent {
   private dialog = inject(MatDialog);
   dialogRef = inject(MatDialogRef<ROIModalComponent>);
 
-  public user: User;
-  roiFormArray: UntypedFormArray;
+  public user!: User;
+  roiFormArray!: UntypedFormArray;
   editingROI: number = -1; // Keep track of ROI being edited (-1 = none)
 
   /**

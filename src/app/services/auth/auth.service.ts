@@ -2,8 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { UserStateService } from '../user/user-state.service';
-import { environment } from 'environments/environment';
-import { User } from 'app/models/user.model';
+import { environment } from '../../../environments/environment';
+import { User } from '../../models/user.model';
 
 @Injectable()
 export class AuthService {
@@ -12,7 +12,7 @@ export class AuthService {
   private http = inject(HttpClient);
 
 
-  user: User;
+  user!: User | undefined;
 
   constructor() {
     this.userStateService.user.subscribe(user => {
@@ -38,7 +38,7 @@ export class AuthService {
     return this.user !== undefined;
   }
 
-  public get redirectUrl(): string {
+  public get redirectUrl(): string | null {
     return localStorage.getItem('redirectUrl');
   }
 
@@ -46,7 +46,7 @@ export class AuthService {
     localStorage.setItem('redirectUrl', url);
   }
 
-  resetRedirectUrl(): string {
+  resetRedirectUrl(): string | null {
     const url = localStorage.getItem('redirectUrl');
     localStorage.removeItem('redirectUrl');
     return url;

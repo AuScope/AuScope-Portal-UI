@@ -11,6 +11,6 @@ import { MatDialogRef } from '@angular/material/dialog';
 export class NgbdModalStatusReportComponent {
   bsModalRef = inject(MatDialogRef<NgbdModalStatusReportComponent>);
 
-  public resourceMap = {};
+  public resourceMap: any = {};
 
 }

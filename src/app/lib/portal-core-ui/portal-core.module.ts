@@ -24,7 +24,6 @@ import { DownloadIrisService } from './service/kml/download-iris.service';
 import { GMLParserService } from './utility/gmlparser.service';
 import { LayerStatusService } from './utility/layerstatus.service';
 import { LegendService } from './service/wms/legend.service';
-import { NotificationService } from './service/toppanel/notification.service';
 import { CsCSWService } from './service/wcsw/cs-csw.service';
 import { DownloadWcsService } from './service/wcs/download/download-wcs.service';
 import { CsWWWService } from './service/www/cs-www.service';
@@ -63,7 +62,6 @@ import { PolygonsEditorService } from '@auscope/angular-cesium';
         FilterPanelService,
         LegendService,
         ImgLoadingDirective,
-        NotificationService,
         QueryWMSService,
         QueryWMTSService,
         QueryWFSService,

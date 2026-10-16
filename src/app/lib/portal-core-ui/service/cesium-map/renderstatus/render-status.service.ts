@@ -23,10 +23,10 @@ export class RenderStatusService {
    * @param resource the resource from the layer that is being added.
    */
   public addResource(layer: LayerModel, resource: OnlineResourceModel) {
-    if (!this.statusmaps[layer.id]) {
-      this.statusmaps[layer.id] = new StatusMapModel();
+    if (!this.statusmaps.get(layer.id)) {
+      this.statusmaps.set(layer.id, new StatusMapModel());
     }
-    this.statusmaps[layer.id].updateTotal(resource);
+    this.statusmaps.get(layer.id)?.updateTotal(resource);
   }
 
   /**
@@ -37,10 +37,10 @@ export class RenderStatusService {
    * @param resource the resource from the layer that is being added.
    */
   public register(layer: LayerModel, resource: OnlineResourceModel) {
-    if (!this.statusmaps[layer.id]) {
-      this.statusmaps[layer.id] = new StatusMapModel();
+    if (!this.statusmaps.get(layer.id)) {
+      this.statusmaps.set(layer.id, new StatusMapModel());
     }
-    this.statusmaps[layer.id].register(resource);
+    this.statusmaps.get(layer.id)?.register(resource);
   }
 
   /**
@@ -49,10 +49,10 @@ export class RenderStatusService {
    * @param resource the resource from the layer to be skipped
    */
   public skip(layer: LayerModel, resource: OnlineResourceModel) {
-    if (!this.statusmaps[layer.id]) {
-      this.statusmaps[layer.id] = new StatusMapModel();
+    if (!this.statusmaps.get(layer.id)) {
+      this.statusmaps.set(layer.id, new StatusMapModel());
     }
-    this.statusmaps[layer.id].skip(resource);
+    this.statusmaps.get(layer.id)?.skip(resource);
   }
 
   /**
@@ -63,7 +63,7 @@ export class RenderStatusService {
    * @param resource the resource from the layer that is being added.
    */
   public updateComplete(layer: LayerModel, resource: OnlineResourceModel, error?: boolean) {
-    this.statusmaps[layer.id].updateComplete(resource, error);
+    this.statusmaps.get(layer.id)?.updateComplete(resource, error);
   }
 
   /**
@@ -71,11 +71,11 @@ export class RenderStatusService {
    * @param layer the layer that is being render
    * @return BehaviorSubject this can then be subscribed to and any updates will trigger a notification.
    */
-  public getStatusBSubject(layer: LayerModel): BehaviorSubject<StatusMapModel> {
-    if (!this.statusmaps[layer.id]) {
-      this.statusmaps[layer.id] = new StatusMapModel();
+  public getStatusBSubject(layer: LayerModel): BehaviorSubject<StatusMapModel> | undefined {
+    if (!this.statusmaps.get(layer.id)) {
+      this.statusmaps.set(layer.id, new StatusMapModel());
     }
-    return this.statusmaps[layer.id].getStatusBSubject();
+    return this.statusmaps.get(layer.id)?.getStatusBSubject();
   }
 
   /**
@@ -83,8 +83,8 @@ export class RenderStatusService {
    * @param layer the layer that is being reset
    */
   public resetLayer(layerId: string) {
-    if (this.statusmaps[layerId] !== undefined) {
-      this.statusmaps[layerId].resetStatus();
+    if (this.statusmaps.get(layerId) !== undefined) {
+      this.statusmaps.get(layerId)?.resetStatus();
     }
   }
 

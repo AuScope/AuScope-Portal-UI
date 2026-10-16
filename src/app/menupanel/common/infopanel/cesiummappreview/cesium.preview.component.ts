@@ -2,7 +2,7 @@ import { CsMapService } from '../../../../lib/portal-core-ui/service/cesium-map/
 import { CSWRecordModel } from '../../../../lib/portal-core-ui/model/data/cswrecord.model';
 import { Component, ElementRef, ViewChild, inject } from '@angular/core';
 import { ViewerConfiguration } from '@auscope/angular-cesium';
-import { CsMapComponent } from 'app/cesium-map/csmap.component';
+import { CsMapComponent } from '../../../../cesium-map/csmap.component';
 import { Cartesian3, Color, ColorMaterialProperty, MapMode2D, PolygonHierarchy, Viewer } from 'cesium';
 
 
@@ -21,8 +21,8 @@ export class CesiumMapPreviewComponent {
     private viewerConf = inject(ViewerConfiguration);
 
 
-    @ViewChild('previewMapElement', { static: true }) mapElement: ElementRef;
-    viewer: Viewer;
+    @ViewChild('previewMapElement', { static: true }) mapElement!: ElementRef;
+    viewer!: Viewer;
 
     BBOX_HIGHLIGHT_COLOUR = new ColorMaterialProperty(Color.YELLOW.withAlpha(0.25));
     BBOX_STANDARD_COLOUR = new ColorMaterialProperty(Color.BLUE.withAlpha(0.25));
@@ -34,10 +34,10 @@ export class CesiumMapPreviewComponent {
     ]));
 
     // Keep track of overall bounding box
-    minWest: number;
-    maxEast: number;
-    minSouth: number;
-    maxNorth: number;
+    minWest!: number;
+    maxEast!: number;
+    minSouth!: number;
+    maxNorth!: number;
 
     /**
      * This constructor creates the preview map
@@ -167,11 +167,13 @@ export class CesiumMapPreviewComponent {
             }
         });
         const bboxEntity = this.viewer.entities.getById('temp-bbox');
-        this.viewer.zoomTo(bboxEntity).then(() => {
-            this.viewer.entities.removeById('temp-bbox');
-        }).catch(
-            (error) => console.error("Could not zoom to box", error)
-        );
+        if (bboxEntity) {
+          this.viewer.zoomTo(bboxEntity).then(() => {
+              this.viewer.entities.removeById('temp-bbox');
+          }).catch(
+              (error) => console.error("Could not zoom to box", error)
+          );
+        }
     }
 
     /**
@@ -183,7 +185,7 @@ export class CesiumMapPreviewComponent {
     setBBoxHighlight(id: string, state: boolean): void {
         const entity = this.viewer.entities.getById(id);
         // No entity will be returned for world coverage layers as no bbox is shown
-        if (entity) {
+        if (entity && entity.polygon) {
             entity.polygon.material = state ? this.BBOX_HIGHLIGHT_COLOUR : this.BBOX_STANDARD_COLOUR;
         }
     }

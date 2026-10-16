@@ -1,12 +1,12 @@
 import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Bookmark } from 'app/models/bookmark.model';
-import { PermanentLink } from 'app/models/permanentlink.model';
-import { User } from 'app/models/user.model';
+import { Bookmark } from '../../models/bookmark.model';
+import { PermanentLink } from '../../models/permanentlink.model';
+import { User } from '../../models/user.model';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { SearchResponse } from 'app/models/searchresponse.model';
+import { SearchResponse } from '../../models/searchresponse.model';
 
 interface ApiResponse<T> {
   data: T;
@@ -36,7 +36,7 @@ export class AuscopeApiService {
     return this.apiGet<T>(endpoint, params, opts);
   }
 
-  private apiPost<T>(endpoint: string, params = {}, options = {}): Observable<T> {
+  private apiPost<T>(endpoint: string, params: any = {}, options: any = {}): Observable<T> {
     const url = environment.portalProxyUrl + endpoint;
     const body = new FormData();
     for (const key in params) {
@@ -61,13 +61,13 @@ export class AuscopeApiService {
     return this.http.post<ApiResponse<T>>(url, body, opts).pipe(switchMap(apiData));
   }
 
-  private apiGet<T>(endpoint: string, params = {}, options?): Observable<T> {
+  private apiGet<T>(endpoint: string, params = {}, options?: any): Observable<T> {
     const url = environment.portalProxyUrl + endpoint;
     const opts: { observe: 'body' } = { ...options, observe: 'body', params: params };
     return this.http.get<ApiResponse<T>>(url, opts).pipe(switchMap(apiData));
   }
 
-  private apiDelete<T>(endpoint: string, params = {}, options?): Observable<T> {
+  private apiDelete<T>(endpoint: string, params = {}, options?: any): Observable<T> {
     const url = environment.portalProxyUrl + endpoint;
     const opts: { observe: 'body' } = { ...options, observe: 'body', params: params };
     return this.http.delete<ApiResponse<T>>(url, opts).pipe(switchMap(apiData));
@@ -165,7 +165,7 @@ export class AuscopeApiService {
    * @param isPublic if true the state is accessible by all, false then only the currently logged in user
    * @returns true response on success, false otherwise
    */
-  public saveUserPortalState(id: string, name: string, description: string, jsonState: string, isPublic: boolean) {
+  public saveUserPortalState(id: string, name: string | null, description: string | null, jsonState: string, isPublic: boolean) {
     const options = {
       params: {
           id: id,
@@ -187,7 +187,7 @@ export class AuscopeApiService {
    * @param isPublic if true the state is accessible by all, false then only the currently logged in user
    * @returns true response on success, false otherwise
    */
-  public saveAnonymousPortalState(id: string, name: string, description: string, jsonState: string, isPublic: boolean) {
+  public saveAnonymousPortalState(id: string, name: string | null, description: string | null, jsonState: string, isPublic: boolean) {
     const options = {
       params: {
           id: id,
@@ -294,8 +294,9 @@ export class AuscopeApiService {
    * @param northBoundLatitude North bounds
    * @returns
    */
-  public searchCSWRecords(queryText: string, searchFields: string[], page: number, pageSize: number, ogcServices: string[], spatialRelation: string, westBoundLongitude: number,
-      eastBoundLongitude: number, southBoundLatitude: number, northBoundLatitude: number): Observable<SearchResponse> {
+  public searchCSWRecords(queryText: string, searchFields: string[], page: number | null, pageSize: number | null,
+      ogcServices: string[], spatialRelation: string, westBoundLongitude: number | undefined, eastBoundLongitude?: number | undefined,
+      southBoundLatitude?: number | undefined, northBoundLatitude?: number | undefined): Observable<SearchResponse> {
     let params: HttpParams = new HttpParams();
     params = params.append('query', queryText);
     for (const field of searchFields) {

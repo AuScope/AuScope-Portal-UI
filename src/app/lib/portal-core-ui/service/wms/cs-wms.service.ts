@@ -15,9 +15,7 @@ import { MapsManagerService, AcMapComponent } from '@auscope/angular-cesium';
 import { WebMapServiceImageryProvider, ImageryLayer, Resource, Rectangle } from 'cesium';
 import { LayerStatusService } from '../../utility/layerstatus.service';
 import { DeviceDetectorService } from 'ngx-device-detector';
-import bbox from '@turf/bbox';
-import bboxPolygon from '@turf/bbox-polygon';
-import intersect from '@turf/intersect';
+import * as turf from '@turf/turf';
 
 import * as when from 'when';
 import { TileProviderError } from 'cesium';
@@ -33,11 +31,11 @@ export class ErrorPayload {
    * Logs an error to console if WMS could not load on map
    * @param evt event
    */
-  public errorEvent(evt) {
+  public errorEvent(evt: any) {
     console.error('ERROR! evt = ', evt);
     const error: TileProviderError = evt;
     const rss: RenderStatusService = this.cmWmsService.getRenderStatusService();
-    rss.getStatusBSubject(this.layer).value.setErrorMessage(error.error.message);
+    rss.getStatusBSubject(this.layer)?.value.setErrorMessage(error.error.message);
   }
 }
 
@@ -57,14 +55,17 @@ export class CsWMSService {
   private conf = inject<any>('conf' as any);
 
 
-  private map: AcMapComponent;
+  private map!: AcMapComponent;
 
   private tileLoadUnsubscribes: Map<string, any> = new Map<string, any>();
   // Keep track of any getSldBdy subscriptions that can continue to run and add layers after a layer is removed
   private sldSubscriptions: Map<string, Subscription[]> = new Map<string, Subscription[]>();
 
   constructor() {
-    this.map = this.mapsManagerService.getMap();
+    const map = this.mapsManagerService.getMap();
+    if (map) {
+      this.map = map;
+    }
   }
 
   public getRenderStatusService(): RenderStatusService {
@@ -95,7 +96,7 @@ export class CsWMSService {
     usePost: boolean,
     sld_body?: string
   ): any {
-    const params = {
+    const params: any = {
       // VT: if the parameter contains featureType, it mean we are targeting a different featureType e.g capdf layer
       LAYERS:
         param && param.featureType ? param.featureType : onlineResource.name,
@@ -149,7 +150,7 @@ export class CsWMSService {
     usePost: boolean,
     sld_body?: string
   ): any {
-    const params = {
+    const params:any = {
       // VT: if the parameter contains featureType, it mean we are targeting a different featureType e.g capdf layer
       LAYERS:
         param && param.featureType ? param.featureType : onlineResource.name,
@@ -204,7 +205,7 @@ export class CsWMSService {
       layer
     );
     if (!filterUrl) {
-      return Observable.create(observer => {
+      return Observable.create((observer: any) => {
         observer.next(null);
         observer.complete();
       });
@@ -252,16 +253,20 @@ export class CsWMSService {
    */
   public rmLayer(layer: LayerModel): void {
     // Cease any getSldBody subscriptions that may still be adding layers to the map
-    for (const sub of this.sldSubscriptions[layer.id]) {
-      sub.unsubscribe();
+    const subscriptions = this.sldSubscriptions.get(layer.id);
+    if (subscriptions) {
+      for (const sub of subscriptions) {
+        sub.unsubscribe();
+      }
     }
-    this.sldSubscriptions[layer.id] = [];
+    this.sldSubscriptions.set(layer.id, []);
     // Unsubscribe from tile load listeners
     const wmsOnlineResources = this.layerHandlerService.getWMSResource(layer);
     for (const wmsOnlineResource of wmsOnlineResources) {
-      if (this.tileLoadUnsubscribes[wmsOnlineResource.url]) {
-        this.tileLoadUnsubscribes[wmsOnlineResource.url]();
-        delete this.tileLoadUnsubscribes[wmsOnlineResource.url];
+      const unsubscribe = this.tileLoadUnsubscribes.get(wmsOnlineResource.url);
+      if (unsubscribe) {
+        unsubscribe();
+        this.tileLoadUnsubscribes.delete(wmsOnlineResource.url);
       }
     }
     const viewer = this.map.getCesiumViewer();
@@ -318,11 +323,15 @@ export class CsWMSService {
    */
   public addLayer(layer: LayerModel, param?: any): void {
     // Any running sldSubscriptions should have been stopped in rmLayer
-    this.sldSubscriptions[layer.id] = [];
+    this.sldSubscriptions.set(layer.id, []);
     if (!param) {
       param = {};
     }
-    this.map = this.mapsManagerService.getMap();
+    const map = this.mapsManagerService.getMap();
+    if (!map) {
+      throw new Error('map is undefined');
+    }
+    this.map = map;
 
     const wmsOnlineResources = this.layerHandlerService.getWMSResource(layer);
 
@@ -343,10 +352,10 @@ export class CsWMSService {
       if (layer?.sldParam) {
         param['styles'] = '';
         for (const tup of layer.sldParam) {
-            if (wmsOnlineResource.url.includes(tup[0])) {
-                param['styles'] = tup[1];
-                break;
-            }
+          if (wmsOnlineResource.url.includes(tup[0])) {
+            param['styles'] = tup[1];
+            break;
+          }
         }
       }
 
@@ -383,7 +392,7 @@ export class CsWMSService {
       const collatedParam:any = UtilitiesService.collateParam(layer, wmsOnlineResource, param);
 
       // Perform request for style data, store subscription so we can cancel if user removes layer
-      this.sldSubscriptions[layer.id].push(
+      this.sldSubscriptions.get(layer.id)?.push(
         this.sldService.getSldBody(wmsOnlineResource, collatedParam, layer).subscribe(sldBody => {
           const sldBodyKey = `${UtilitiesService.rmParamURL(wmsOnlineResource.url)}|${wmsOnlineResource.name}`;
           const usePost = this.wmsUrlTooLong(sldBody, layer);
@@ -393,21 +402,28 @@ export class CsWMSService {
             : this.getWMS1_1param(layer, wmsOnlineResource, collatedParam, usePost, sldBody);
 
           let lonlatextent;
-          if (wmsOnlineResource.geographicElements.length > 0) {
+          if (wmsOnlineResource.geographicElements.length > 0) { 
             const cswExtent = wmsOnlineResource.geographicElements[0];
-
-            const cswExtentPoly = bboxPolygon([cswExtent.westBoundLongitude, cswExtent.southBoundLatitude,
-            cswExtent.eastBoundLongitude, cswExtent.northBoundLatitude]);
-            const globalExtentPoly = bboxPolygon([-180, -90, 180, 90]);
-            const intersectionPoly = intersect(cswExtentPoly, globalExtentPoly);
-            lonlatextent = bbox(intersectionPoly);
+            const cswExtentPoly = turf.bboxPolygon([cswExtent.westBoundLongitude, cswExtent.southBoundLatitude,
+                    cswExtent.eastBoundLongitude, cswExtent.northBoundLatitude]);
+            const globalExtentPoly = turf.bboxPolygon([-180, -90, 180, 90]);
+            const intersectionPoly = turf.intersect(
+              turf.featureCollection([cswExtentPoly, globalExtentPoly])
+            );
+            if (intersectionPoly) {
+				lonlatextent = turf.bbox(intersectionPoly); 
+				if (lonlatextent[0] === Infinity) {
+					lonlatextent = [-0.1, -0.1, 0.1, 0.1];
+				}
+			} else {
+				lonlatextent = [-180, -90, 180, 90];
+			}
           } else {
             // if extent isnt contained in the csw record then use global extent
             lonlatextent = [-180, -90, 180, 90];
             // the current view extent cannot be used as the bounds for the layer because the user could zoom out
             // after adding the layer to the map.
           }
-
           // Perform add layer request
           layer.csLayers.push(this.addCesiumLayer(layer, wmsOnlineResource, params, usePost, lonlatextent));
           layer.sldBody = sldBody;
@@ -418,7 +434,7 @@ export class CsWMSService {
 
           // For 1.3.0 GetFeatureInfo requests need lat,lng swapped to lng,lat if polygon filter present
           if (wmsOnlineResource.version === '1.3.0') {
-            if (collatedParam.optionalFilters.find(f => f.type === 'OPTIONAL.POLYGONBBOX')) {
+            if (collatedParam.optionalFilters.find((f: any) => f.type === 'OPTIONAL.POLYGONBBOX')) {
               layer.sldBody130 = this.reverseSldBodyPolygonFilterCoordinates(sldBody);
               if (!layer.sldBody130ByResource) {
                 layer.sldBody130ByResource = {};
@@ -444,9 +460,16 @@ export class CsWMSService {
    * @param lonlatextent longitude latitude extent of the layer as an array [west,south,east,north]
    * @returns the new CesiumJS ImageryLayer object
    */
-  private addCesiumLayer(layer, wmsOnlineResource, params, usePost: boolean, lonlatextent): ImageryLayer {
+  private addCesiumLayer(layer: LayerModel, wmsOnlineResource: OnlineResourceModel, params: any, usePost: boolean, lonlatextent: any)
+            : ImageryLayer | undefined {
+    const map = this.mapsManagerService.getMap();
+    if (!map) {
+      console.error('Map not registered');
+      return;
+    }
     const browserInfo = this.deviceService.getDeviceInfo();
-    const viewer = this.map.getCesiumViewer();
+    //const viewer = this.map.getCesiumViewer();
+    const viewer = map.getCesiumViewer();
     const me = this;
     if (UtilitiesService.layerContainsResourceType(layer, ResourceType.WMS)) {
       // WMS tile loading callback function, numLeft = number of tiles left to load
@@ -457,7 +480,7 @@ export class CsWMSService {
         }
       };
       // Register tile loading callback function
-      this.tileLoadUnsubscribes[wmsOnlineResource.url] = viewer.scene.globe.tileLoadProgressEvent.addEventListener(tileLoading);
+      this.tileLoadUnsubscribes.set(wmsOnlineResource.url, viewer.scene.globe.tileLoadProgressEvent.addEventListener(tileLoading));
 
       const url = UtilitiesService.rmParamURL(wmsOnlineResource.url);
       let wmsImagProv;
@@ -466,13 +489,13 @@ export class CsWMSService {
       // If it is ArcGIS do not use proxy as ArcGIS does not work with POST requests
       if (UtilitiesService.layerIsArcGIS(layer) || UtilitiesService.resourceIsArcGIS(wmsOnlineResource) || (!usePost && !layer.useDefaultProxy)) {
         if ((UtilitiesService.layerIsArcGIS(layer) || UtilitiesService.resourceIsArcGIS(wmsOnlineResource)) &&
-            (params.sld_body)) {
-            // For ArcGIS 'styles' parameter must match name in SLD_BODY
-            params.styles = wmsOnlineResource.name;
-            // Add a 'BGCOLOR' parameter to the request. This avoids ESRI's overpowering
-            // white background and untidy way it spills out over the polygon boundary.
-            // Also the colours should more closely match that of geoserver
-            params.bgcolor = '0x909090';
+          (params.sld_body)) {
+          // For ArcGIS 'styles' parameter must match name in SLD_BODY
+          params.styles = wmsOnlineResource.name;
+          // Add a 'BGCOLOR' parameter to the request. This avoids ESRI's overpowering
+          // white background and untidy way it spills out over the polygon boundary.
+          // Also the colours should more closely match that of geoserver
+          params.bgcolor = '0x909090';
         }
         // NB: ArcGisMapServerImageryProvider does not allow additional parameters for ArcGIS, i.e. no styling
         // So we use a normal GET request & WebMapServiceImageryProvider instead
@@ -489,7 +512,7 @@ export class CsWMSService {
         // Overwrite CesiumJS 'createImage' function to allow us to do 'POST' requests via a proxy
         // If there is a 'usepost' parameter in the URL, then 'POST' via proxy else uses standard 'GET'
         // TODO: Implement a Resource constructor parameter instead of 'usepost'
-        (Resource as any)._Implementations.createImage = function (request, crossOrigin, deferred, flipY, preferImageBitmap) {
+        (Resource as any)._Implementations.createImage = function (request: any, crossOrigin: any, deferred: any, flipY: any, preferImageBitmap: any) {
           const jURL = new URL(request.url);
           // If there's no 'usepost' parameter then call the old 'createImage' method which uses 'GET'
           if (!jURL.searchParams.has('usepost')) {
@@ -497,7 +520,7 @@ export class CsWMSService {
           }
           // Initiate loading WMS tiles via POST & a proxy
           (Resource as any).supportsImageBitmapOptions()
-            .then(function (_supportsImageBitmap) {
+            .then(function (_supportsImageBitmap: any) {
               const responseType = "blob";
               const method = "POST";
               const xhrDeferred = when.defer();
@@ -535,7 +558,7 @@ export class CsWMSService {
                   xhr.abort();
                 };
               }
-              return xhrDeferred.promise.then(function (blob) {
+              return xhrDeferred.promise.then(function (blob: any) {
                 if (!blob) {
                   deferred.reject(
                     new Error("Successfully retrieved " + url + " but it contained no content.")
@@ -557,27 +580,35 @@ export class CsWMSService {
             }).catch(deferred.reject);
         };
         /* End of 'createImage' overwrite */
-
         // Force Resource to use 'POST' and our proxy
         params['usepost'] = true;
 
+        let serverParam: string = "";
+
+        // create thredds resource
+        if (UtilitiesService.resourceIsThredds(wmsOnlineResource)) {
+          serverParam = "&escdelim=amp&usegetafterproxy=true";
+          params.version = "1.3.0";
+          params.srs = "EPSG:4326";
+          params.usepost = false;
+        }
+
         // Create a resource which uses our custom proxy; if ERDAS APOLLO WMS (i.e. NT)
-        let erdasParam: string = "";
         if (UtilitiesService.resourceIsERDAS_Essentials_2015(wmsOnlineResource)) {
           //erdasParam = "&erdas=Essentials_2015&usegetafterproxy=true";
-          erdasParam = "&escdelim=%26&usegetafterproxy=true";
+          serverParam = "&escdelim=%26&usegetafterproxy=true";
           params.version = "1.1.1";
           params.srs = "EPSG:4326";
           params.usepost = false;
         }
         if (UtilitiesService.resourceIsERDAS_Core_2022(wmsOnlineResource)) {
           //erdasParam = "&erdas=Core_2022&usegetafterproxy=true";
-          erdasParam = "&escdelim=amp&usegetafterproxy=true";
+          serverParam = "&escdelim=amp&usegetafterproxy=true";
           params.version = "1.1.1";
           params.srs = "EPSG:4326";
           params.usepost = false;
         }
-        const proxyUrl = me.env.portalBaseUrl + Constants.PROXY_API + '?usewhitelist=' + (layer.useProxyWhitelist ? 'true' : 'false') + erdasParam + '&url=';
+        const proxyUrl = me.env.portalBaseUrl + Constants.PROXY_API + '?usewhitelist=' + (layer.useProxyWhitelist ? 'true' : 'false') + serverParam + '&url=';
         const res = new Resource({ url: url, proxy: new MyDefaultProxy(proxyUrl) });
 
         wmsImagProv = new WebMapServiceImageryProvider({
@@ -592,7 +623,7 @@ export class CsWMSService {
       wmsImagProv.errorEvent.addEventListener((evt: any) => errorPayload.errorEvent(evt), errorPayload);
       return viewer.imageryLayers.addImageryProvider(wmsImagProv);
     }
-    return null;
+    return undefined;
   }
 
   /**
@@ -617,10 +648,10 @@ export class CsWMSService {
 // so that the parameters are not uuencoded
 class MyDefaultProxy {
   proxy: string;
-  constructor(proxy) {
+  constructor(proxy: any) {
     this.proxy = proxy;
   }
-  getURL: (any) => any;
+  getURL!: (any: any) => any;
 }
 MyDefaultProxy.prototype.getURL = function (resource) {
   const prefix = this.proxy.indexOf('?') === -1 ? '?' : '';

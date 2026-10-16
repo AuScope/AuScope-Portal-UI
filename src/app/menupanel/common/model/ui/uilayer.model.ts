@@ -8,14 +8,14 @@ import { BehaviorSubject } from 'rxjs';
 export class UILayerModel {
   expanded: boolean;
   tabpanel: UITabPanel;
-  statusMap: StatusMapModel;
+  statusMap!: StatusMapModel;
   opacity: number;
 
-  constructor(id: string, opacity: number, loadingSubject: BehaviorSubject<StatusMapModel>) {
+  constructor(id: string, opacity: number, loadingSubject: BehaviorSubject<StatusMapModel> | undefined) {
     this.tabpanel = new UITabPanel();
     this.expanded = false;
     this.opacity = opacity;
-    loadingSubject.subscribe((value) => {
+    loadingSubject?.subscribe((value) => {
       this.statusMap = value;
     });
   }

@@ -1,11 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { PermanentLinksModalComponent } from 'app/modalwindow/permanentlink/permanentlinks.modal.component';
-import { PermanentLink } from 'app/models/permanentlink.model';
-import { User } from 'app/models/user.model';
-import { AuthService } from 'app/services/auth/auth.service';
+import { PermanentLinksModalComponent } from '../../modalwindow/permanentlink/permanentlinks.modal.component';
+import { PermanentLink } from '../../models/permanentlink.model';
+import { User } from '../../models/user.model';
+import { AuthService } from '../../services/auth/auth.service';
 import { UserStateService } from '../../services/user/user-state.service';
-import { ROIModalComponent } from 'app/modalwindow/roi/roi.modal.component';
+import { ROIModalComponent } from '../../modalwindow/roi/roi.modal.component';
 import { MatDialog } from '@angular/material/dialog';
 
 @Component({
@@ -19,16 +19,19 @@ export class LoginMenuComponent {
   private authService = inject(AuthService);
   private userStateService = inject(UserStateService);
   private dialog = inject(MatDialog);
+  private changeDetectorRef = inject(ChangeDetectorRef);
 
-  user: User;
-  states: PermanentLink[];
+  user?: User;
+  states!: PermanentLink[];
 
   constructor() {
     this.userStateService.user.subscribe(user => {
       this.user = user;
+      this.changeDetectorRef.markForCheck();
     });
     this.userStateService.states.subscribe(states => {
       this.states = states;
+      this.changeDetectorRef.markForCheck();
     });
   }
 

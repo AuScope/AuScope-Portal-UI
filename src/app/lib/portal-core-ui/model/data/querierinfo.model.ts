@@ -4,9 +4,9 @@
 import { LayerModel } from './layer.model';
 import { OnlineResourceModel } from './onlineresource.model';
 export class QuerierInfoModel {
-  key: string;
+  key!: string;
   value: any;
-  layer: LayerModel;
-  onlineResource: OnlineResourceModel;
-  raw: string; // VT: contains the raw xml or html
+  layer!: LayerModel;
+  onlineResource!: OnlineResourceModel;
+  raw!: string; // VT: contains the raw xml or html
 }

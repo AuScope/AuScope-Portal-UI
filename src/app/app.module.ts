@@ -119,6 +119,7 @@ import { AuthErrorHandlerInterceptor } from './interceptors/auth-error.intercept
 import { ROIModule } from './modalwindow/roi/roi.modal.modules';
 import { ToolbarComponent } from './menupanel/toolbar/toolbar.component';
 import { DownloadAuScopeCatModalComponent } from './modalwindow/download-auscopecat/download-auscopecat.modal.component';
+import { ScrollingModule } from "@angular/cdk/scrolling";
 
 PlotlyModule.plotlyjs = PlotlyJS;
 
@@ -182,39 +183,40 @@ PlotlyModule.plotlyjs = PlotlyJS;
                  }
     ],
     imports: [
-        PortalCoreModule.forRoot(environment, config),
-        AppRoutingModule,
-        PortalCorePipesModule,
-        ClipboardModule,
-        NgSelectModule,
-        CdkTableModule,
-        MatAutocompleteModule,
-        MatButtonModule,
-        MatCardModule,
-        MatDialogModule,
-        MatIconModule,
-        MatInputModule,
-        MatMenuModule,
-        MatPaginatorModule,
-        MatProgressBarModule,
-        MatRadioModule,
-        MatSliderModule,
-        MatTooltipModule,
-        MatTreeModule,
-        NgxChartsModule,
-        NgxColorsModule,
-        BrowserAnimationsModule,
-        CommonModule,
-        PlotlyModule,
-        AngularCesiumModule.forRoot(),
-        AngularCesiumWidgetsModule,
-        FormsModule,
-        ReactiveFormsModule,
-        BrowserModule,
-        DragDropModule,
-        ROIModule,
-        DownloadAuScopeCatModalComponent
-    ],
+    PortalCoreModule.forRoot(environment, config),
+    AppRoutingModule,
+    PortalCorePipesModule,
+    ClipboardModule,
+    NgSelectModule,
+    CdkTableModule,
+    MatAutocompleteModule,
+    MatButtonModule,
+    MatCardModule,
+    MatDialogModule,
+    MatIconModule,
+    MatInputModule,
+    MatMenuModule,
+    MatPaginatorModule,
+    MatProgressBarModule,
+    MatRadioModule,
+    MatSliderModule,
+    MatTooltipModule,
+    MatTreeModule,
+    NgxChartsModule,
+    NgxColorsModule,
+    BrowserAnimationsModule,
+    CommonModule,
+    PlotlyModule,
+    AngularCesiumModule.forRoot(),
+    AngularCesiumWidgetsModule,
+    FormsModule,
+    ReactiveFormsModule,
+    BrowserModule,
+    DragDropModule,
+    ROIModule,
+    DownloadAuScopeCatModalComponent,
+    ScrollingModule
+],
     bootstrap: [
         AppComponent
     ]

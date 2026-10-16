@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { UserStateService } from 'app/services/user/user-state.service';
+import { UserStateService } from '../../services/user/user-state.service';
 import { environment } from '../../../environments/environment';
 import { MatDialogRef } from '@angular/material/dialog';
 
@@ -18,10 +18,10 @@ export class CreatePermanentLinkModalComponent implements OnInit {
   private formBuilder = inject(UntypedFormBuilder);
 
   dialogRef = inject(MatDialogRef<CreatePermanentLinkModalComponent>);
-  linkForm: UntypedFormGroup;
-  dialogMessage: string;
+  linkForm!: UntypedFormGroup;
+  dialogMessage!: string;
   savingState = false;
-  errorOccurred: boolean;
+  errorOccurred!: boolean;
 
   ngOnInit() {
     this.linkForm = this.formBuilder.group({
@@ -34,15 +34,16 @@ export class CreatePermanentLinkModalComponent implements OnInit {
   }
 
   savePermanentLink() {
-    this.linkForm.get('name').disable();
-    this.linkForm.get('description').disable();
-    this.linkForm.get('isPublic').disable();
+    this.linkForm.get('name')?.disable();
+    this.linkForm.get('description')?.disable();
+    this.linkForm.get('isPublic')?.disable();
     this.savingState = true;
-    this.userStateService.addState(this.linkForm.get('name').value, this.linkForm.get('description').value, this.linkForm.get('isPublic').value, false).subscribe(response => {
+    this.userStateService.addState(this.linkForm.get('name')?.value, this.linkForm.get('description')?.value,
+        this.linkForm.get('isPublic')?.value, false).subscribe(response => {
       this.errorOccurred = false;
       this.savingState = false;
       const link = environment.hostUrl + '?state=' + response;
-      this.linkForm.get('link').setValue(link);
+      this.linkForm.get('link')?.setValue(link);
       this.dialogMessage = 'The state has been saved. You can view and manage your permanent links by selecting "Manage Permanent Links" from the user menu.';
       this.userStateService.updateUserStates();
     }, () => {

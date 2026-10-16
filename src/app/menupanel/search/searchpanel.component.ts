@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, NgZone, OnInit, ViewChild, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { RectangleEditorObservable } from '@auscope/angular-cesium';
 
 import { CSWRecordModel } from '../../lib/portal-core-ui/model/data/cswrecord.model';
@@ -9,27 +9,28 @@ import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
 import { RenderStatusService } from '../../lib/portal-core-ui/service/cesium-map/renderstatus/render-status.service';
 import { UtilitiesService } from '../../lib/portal-core-ui/utility/utilities.service';
 import { Constants, ResourceType } from '../../lib/portal-core-ui/utility/constants.service';
-import { SearchService } from 'app/services/search/search.service';
+import { SearchService } from '../../services/search/search.service';
 import { Observable, Subject, Subscription } from 'rxjs';
 
 import { InfoPanelComponent } from '../common/infopanel/infopanel.component';
-import { UILayerModelService } from 'app/services/ui/uilayer-model.service';
-import { LayerManagerService } from 'app/services/ui/layer-manager.service';
+import { UILayerModelService } from '../../services/ui/uilayer-model.service';
+import { LayerManagerService } from '../../services/ui/layer-manager.service';
 
 import { config } from '../../../environments/config';
 import { environment } from '../../../environments/environment';
 
 import { HttpClient, HttpHeaders, HttpParams, HttpUrlEncodingCodec } from '@angular/common/http';
-import { Download } from 'app/modalwindow/layeranalytic/nvcl/tsgdownload';
-import * as saveAs from 'file-saver';
+import { Download } from '../../modalwindow/layeranalytic/nvcl/tsgdownload';
+import { saveAs } from 'file-saver';
 import { filter, take } from 'rxjs/operators';
 
 import { UILayerModel } from '../common/model/ui/uilayer.model';
-import { DownloadAuScopeCatModalComponent } from 'app/modalwindow/download-auscopecat/download-auscopecat.modal.component';
-import { FilterService, LayerTimes } from 'app/services/filter/filter.service';
+import { DownloadAuScopeCatModalComponent } from '../../modalwindow/download-auscopecat/download-auscopecat.modal.component';
+import { FilterService, LayerTimes } from '../../services/filter/filter.service';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { SearchResponse } from '../../models/searchresponse.model';
 
 // Search fields
 const SEARCH_FIELDS = [{
@@ -102,23 +103,22 @@ export class SearchPanelComponent implements OnInit {
   private dialog = inject(MatDialog);
   private http = inject(HttpClient);
   private env = inject<any>('env' as any);
-  private ngZone = inject(NgZone);
-
+  private changeDetectorRef = inject(ChangeDetectorRef);
 
   RESULTS_PER_PAGE = 10;
 
-  @ViewChild('queryinput') textQueryInput: ElementRef;
+  @ViewChild('queryinput') textQueryInput!: ElementRef;
 
-  alertMessage = ''; // Alert messages
-  showingResultsPanel = false; // True when results panel is being shown
-  showingAdvancedOptions = false; // True when advanced options are being displayed
-  showingKmlOgcOptions = false; // True when KML/OGC panel is displayed
-  showingInfoPanel = false;
-  queryText = ''; // User entered query text
-  searching = false; // True if search in progress
-  searchResults: SearchResult[] = []; // Search results
-  showingAllLayers = false; // True if all layers being shown (no search)
-  selectedSearchResult; // Currently selected search result
+  alertMessage = signal<string>(''); // Alert messages
+  showingResultsPanel = signal<boolean>(false); // True when results panel is being shown
+  showingAdvancedOptions = signal<boolean>(false); // True when advanced options are being displayed
+  showingKmlOgcOptions = signal<boolean>(false); // True when KML/OGC panel is displayed
+  showingInfoPanel = signal<boolean>(false);
+  queryText = signal<string>(''); // User entered query text
+  searching = signal<boolean>(false); // True if search in progress
+  searchResults = signal<SearchResult[]>([]); // Search results
+  showingAllLayers = signal<boolean>(false); // True if all layers being shown (no search)
+  selectedSearchResult = signal<any>(null); // Currently selected search result
 
   // Options
   allSearchField: SearchField = new SearchField('All', [], true);
@@ -126,7 +126,7 @@ export class SearchPanelComponent implements OnInit {
   allOGCServices: SearchField = new SearchField('All', [], true);
   ogcServices: SearchField[] = OGC_SERVICES;
   restrictBounds = false; // Could probably just use bbox if set
-  bbox: Bbox;
+  bbox = signal<Bbox | null>(null);
   boundsRelationship = 'Intersects';
 
   // Pagination
@@ -138,7 +138,7 @@ export class SearchPanelComponent implements OnInit {
   infoDialogOpen = false;
 
   // Limit bounds
-  private boundsRectangleObservable: RectangleEditorObservable;
+  private boundsRectangleObservable!: RectangleEditorObservable | null;
   private drawBoundsStarted = false;
 
   // DownloadLayers to CSV files.
@@ -148,12 +148,12 @@ export class SearchPanelComponent implements OnInit {
   public total:number=0;
   public completed:number=0;
   public isDownloading = false;
-  public downloadOneCompletS:Subject<string> = null;
-  public download1$: Observable<Download>;
+  public downloadOneCompletS: Subject<string> | null = null;
+  public download1$!: Observable<Download>;
 
   // Term suggestions
   @ViewChild(MatAutocompleteTrigger) autocompleteTrigger!: MatAutocompleteTrigger;
-  suggesterSubscription: Subscription;
+  suggesterSubscription!: Subscription;
   suggestedTerms: string[] = [];
   highlightedSuggestionIndex = -1;
 
@@ -180,9 +180,9 @@ export class SearchPanelComponent implements OnInit {
       return;
     }
     if (!this.searchClick && !this.infoDialogOpen) {
-      if (this.showingResultsPanel) {
+      if (this.showingResultsPanel()) {
         this.setShowingResultsPanel(false);
-      } else if (this.showingKmlOgcOptions) {
+      } else if (this.showingKmlOgcOptions()) {
         this.setShowingKmlOgcOptions(false);
       }
     }
@@ -193,16 +193,16 @@ export class SearchPanelComponent implements OnInit {
    * Clear query text input field
    */
   public clearQueryText(): void {
-    this.queryText = '';
+    this.queryText.set('');
     this.textQueryInput.nativeElement.focus();
   }
 
   /**
    * Display featured layers in search results
    */
-  private showFeaturedLayers(): void {
-    this.queryText = '';
-    this.searchResults = [];
+  public showFeaturedLayers(): void {
+    this.queryText.set('');
+    this.searchResults.set([]);
     const layers: SearchResult[] = [];
     this.layerHandlerService.getLayerRecord().pipe(take(1)).subscribe(records => {
       let totalLayerCount = 0;
@@ -219,35 +219,35 @@ export class SearchPanelComponent implements OnInit {
       // Sort alphabetically
       layers.sort((a, b) => a.layer.name.localeCompare(b.layer.name));
 
-      this.searchResults = layers;
+      this.searchResults.set(layers);
 
       // Select first result
-      if (this.searchResults.length > 0) {
-        this.selectSearchResult(this.searchResults[0]);
+      if (this.searchResults().length > 0) {
+        this.selectSearchResult(this.searchResults()[0]);
       }
 
-      this.showingAllLayers = true;
+      this.showingAllLayers.set(true);
     });
   }
 
   public setShowingResultsPanel(showingResults: boolean): void {
-    if (showingResults && this.showingKmlOgcOptions) {
-      this.showingKmlOgcOptions = false;
+    if (showingResults && this.showingKmlOgcOptions()) {
+      this.showingKmlOgcOptions.set(false);
     }
-    this.showingResultsPanel = showingResults;
-    if (this.selectedSearchResult) {
-      this.showingInfoPanel = showingResults;
+    this.showingResultsPanel.set(showingResults);
+    if (this.selectedSearchResult()) {
+      this.showingInfoPanel.set(showingResults);
     }
   }
 
   public setShowingKmlOgcOptions(showingOptions: boolean): void {
     if (showingOptions && this.showingResultsPanel) {
-      this.showingResultsPanel = false;
-      this.showingInfoPanel = false;
+      this.showingResultsPanel.set(false);
+      this.showingInfoPanel.set(false);
       // TODO: Kill searching if in the middle of one
       //this.searching = !this.searching
     }
-    this.showingKmlOgcOptions = showingOptions;
+    this.showingKmlOgcOptions.set(showingOptions);
   }
 
   /**
@@ -310,7 +310,7 @@ export class SearchPanelComponent implements OnInit {
   public paginatedSearchResults(): SearchResult[] {
     const startPos = (this.currentPage - 1) * this.RESULTS_PER_PAGE;
     const endPos = startPos + this.RESULTS_PER_PAGE;
-    return this.searchResults.slice(startPos, endPos);
+    return this.searchResults().slice(startPos, endPos);
   }
 
   /**
@@ -318,9 +318,9 @@ export class SearchPanelComponent implements OnInit {
    * @param searchResult the currently selected SearchResult
    */
   public selectSearchResult(searchResult: SearchResult) {
-    this.selectedSearchResult = searchResult;
-    if (this.showingResultsPanel) {
-      this.showingInfoPanel = true;
+    this.selectedSearchResult.set(searchResult);
+    if (this.showingResultsPanel()) {
+      this.showingInfoPanel.set(true);
     }
   }
 
@@ -410,7 +410,7 @@ export class SearchPanelComponent implements OnInit {
       let filename = typename + '.' + url0 + '.csv';
       filename = filename.replace(/:|\/|\\/g,'-');
       const ob = await this.http.get(url, { headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'), responseType: 'text' }).toPromise();
-      const blob = new Blob([ob], { type: 'application/csv' });
+      const blob = new Blob([ob ?? ''], { type: 'application/csv' });
       saveAs(blob, filename);
       me.completed++;
       me.mapDownloadLayers.get(layer.id).Ob.progress = Math.round(me.completed/me.total*100);
@@ -501,7 +501,7 @@ export class SearchPanelComponent implements OnInit {
    * @returns true if layer has been added to the map, false otherwise
    */
   isLayerAdded(layerId: string) {
-    return this.uiLayerModelService.getUILayerModel(layerId) && this.uiLayerModelService.getUILayerModel(layerId).statusMap.getRenderStarted();
+    return this.uiLayerModelService.getUILayerModel(layerId) && this.uiLayerModelService.getUILayerModel(layerId)?.statusMap.getRenderStarted();
   }
 
   /**
@@ -561,7 +561,7 @@ export class SearchPanelComponent implements OnInit {
    * Clear the bounding box
    */
   public clearBounds(): void {
-    this.bbox = null;
+    this.bbox.set(null);
     // clear rectangle on the map
     if (this.boundsRectangleObservable) {
       this.boundsRectangleObservable.dispose();
@@ -577,7 +577,7 @@ export class SearchPanelComponent implements OnInit {
    */
   public drawBounds(): void {
       this.clearBounds();
-      this.alertMessage = 'Click to start drawing bounds';
+      this.alertMessage.set('Click to start drawing bounds');
       this.restrictBounds = true;
       this.setShowingResultsPanel(false);
       setTimeout(() => this.drawBoundsStarted = true, 0);
@@ -592,15 +592,15 @@ export class SearchPanelComponent implements OnInit {
             || vector.points[0].getPosition().x === vector.points[1].getPosition().x
             || vector.points[0].getPosition().y === vector.points[1].getPosition().y) {
           // drawing hasn't finished
-          this.alertMessage = 'Click again to finish drawing bounds';
+          this.alertMessage.set('Click again to finish drawing bounds');
           return;
         }
         const points = vector.points;
 
         // Reproject to EPSG:4326
-        this.bbox = UtilitiesService.reprojectToWGS84(points);
+        this.bbox.set(UtilitiesService.reprojectToWGS84(points));
 
-        this.alertMessage = '';
+        this.alertMessage.set('');
         this.restrictBounds = true;
       });
   }
@@ -629,7 +629,7 @@ export class SearchPanelComponent implements OnInit {
    */
   public getSearchResultsTitle(): string {
     let title = '';
-    if (this.showingAllLayers) {
+    if (this.showingAllLayers()) {
       title = 'Featured Layers ';
     } else {
       title = 'Results ';
@@ -643,8 +643,8 @@ export class SearchPanelComponent implements OnInit {
    * (Note we could make this a form and use validation to highlight areas that are invalid before submission)
    */
   private validateSearchInputs(): boolean {
-    if (this.queryText === '' && (!this.restrictBounds || !this.bbox)) {
-      this.alertMessage = 'Please enter a search query, or to search by bounds ensure that Spatial Bounds is set in Advanced Options';
+    if (this.queryText() === '' && (!this.restrictBounds || !this.bbox())) {
+      this.alertMessage.set('Please enter a search query, or to search by bounds ensure that Spatial Bounds is set in Advanced Options');
       return false;
     }
     return true;
@@ -687,8 +687,8 @@ export class SearchPanelComponent implements OnInit {
    */
   public search(newSearch: boolean) {
 
-    this.selectedSearchResult = null;
-    this.showingAllLayers = false;
+    this.selectedSearchResult.set(null);
+    this.showingAllLayers.set(false);
 
     // Validate parameters before continuing
     if (!this.validateSearchInputs()) {
@@ -701,9 +701,9 @@ export class SearchPanelComponent implements OnInit {
     }
 
     this.resetSuggestedTerms();
-    this.searching = true;
-    this.searchResults = [];
-    this.alertMessage = '';
+    this.searching.set(true);
+    this.searchResults.set([]);
+    this.alertMessage.set('');
 
     const selectedSearchFields: string[] = [];
     for (const sField of this.searchFields.filter(f => f.checked === true)) {
@@ -724,15 +724,15 @@ export class SearchPanelComponent implements OnInit {
       }
     }
 
-    let westBounds: number = undefined;
-    let eastBounds: number = undefined;
-    let northBounds: number = undefined;
-    let southBounds: number = undefined;
+    let westBounds: number | undefined = undefined;
+    let eastBounds: number | undefined = undefined;
+    let northBounds: number | undefined = undefined;
+    let southBounds: number | undefined = undefined;
     if (this.restrictBounds && this.bbox) {
-      westBounds = this.bbox.westBoundLongitude;
-      eastBounds = this.bbox.eastBoundLongitude;
-      northBounds = this.bbox.northBoundLatitude;
-      southBounds = this.bbox.southBoundLatitude;
+      westBounds = this.bbox()?.westBoundLongitude;
+      eastBounds = this.bbox()?.eastBoundLongitude;
+      northBounds = this.bbox()?.northBoundLatitude;
+      southBounds = this.bbox()?.southBoundLatitude;
     }
 
     // Track search event
@@ -744,11 +744,11 @@ export class SearchPanelComponent implements OnInit {
     }
 
     // Search CSW records
-    this.searchService.searchCSWRecords(this.queryText, selectedSearchFields, null, null, selectedServices,
+    this.searchService.searchCSWRecords(this.queryText(), selectedSearchFields, null, null, selectedServices,
         this.boundsRelationship.toLowerCase(), westBounds, eastBounds,
-        southBounds, northBounds).subscribe(searchResponse => {
+        southBounds, northBounds).subscribe((searchResponse: SearchResponse)=> {
 
-      this.searchResults = [];
+      this.searchResults.set([]);
       this.totalSearchHits = searchResponse.totalCSWRecordHits;
 
       // Add KnownLayers to list first
@@ -757,19 +757,22 @@ export class SearchPanelComponent implements OnInit {
       }
 
       this.layerHandlerService.getLayerModelsForIds(searchResponse.knownLayerIds).subscribe(layers => {
+        if (!layers) {
+          return;
+        }
         for (const l of layers) {
-          this.searchResults.push(new SearchResult(l));
+          this.searchResults.update(results => [...results, new SearchResult(l)]);
         }
 
         // Now add CSWRecords
         for (const cswRecord of searchResponse.cswRecords) {
           const layerModel: LayerModel = this.createLayerModelForCSWRecord(cswRecord);
-          this.searchResults.push(new SearchResult(layerModel));
+          this.searchResults.update(results => [...results, new SearchResult(layerModel)]);
         }
-        this.searching = false;
-        this.showingAllLayers = false;
+        this.searching.set(false);
+        this.showingAllLayers.set(false);
 
-        if (this.searchResults.length === 0) {
+        if (this.searchResults().length === 0) {
           if (environment.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
             rudderanalytics.track('search_zero_results', {
               query: this.queryText,
@@ -779,17 +782,19 @@ export class SearchPanelComponent implements OnInit {
         }
 
         // Select first result
-        if (this.searchResults.length > 0) {
-          this.selectSearchResult(this.searchResults[0]);
+        if (this.searchResults().length > 0) {
+          this.selectSearchResult(this.searchResults()[0]);
         }
 
-        if (!this.showingResultsPanel) {
+        if (!this.showingResultsPanel()) {
           this.setShowingResultsPanel(true);
         }
+        this.changeDetectorRef.detectChanges();
       });
     }, error => {
-      this.alertMessage = error.error;
-      this.searching = false;
+      this.alertMessage.set(error.error);
+      this.searching.set(false);
+      this.changeDetectorRef.detectChanges();
     });
 
   }
@@ -830,7 +835,7 @@ export class SearchPanelComponent implements OnInit {
           return;
         case 'Enter':
           if (this.highlightedSuggestionIndex !== -1) {
-            this.queryText = this.suggestedTerms[this.highlightedSuggestionIndex];
+            this.queryText.set(this.suggestedTerms[this.highlightedSuggestionIndex]);
             this.autocompleteTrigger.closePanel();
             this.highlightedSuggestionIndex = -1;
           }
@@ -839,17 +844,17 @@ export class SearchPanelComponent implements OnInit {
     }
 
     // Search if user has pressed on a suggestion
-    if (event.key === 'Enter' && this.queryText !== '') {
+    if (event.key === 'Enter' && this.queryText() !== '') {
       this.search(true);
       return;
     }
 
-    if(this.queryText !== '') {
+    if(this.queryText() !== '') {
       // Populate suggester with query text
       if (this.suggesterSubscription && !this.suggesterSubscription.closed) {
         this.suggesterSubscription.unsubscribe();
       }
-      this.suggesterSubscription = this.searchService.suggestTerm(this.queryText.toLowerCase()/*, NUMBER_OF_SUGGESTIONS*/).subscribe(terms => {
+      this.suggesterSubscription = this.searchService.suggestTerm(this.queryText().toLowerCase()/*, NUMBER_OF_SUGGESTIONS*/).subscribe(terms => {
         this.suggestedTerms = terms;
         if (this.suggestedTerms.length > 0 && !this.autocompleteTrigger.panelOpen) {
           this.autocompleteTrigger.openPanel();
@@ -868,7 +873,7 @@ export class SearchPanelComponent implements OnInit {
   public suggestedTermSelected(term: string): void {
     this.autocompleteTrigger.closePanel();
     this.resetSuggestedTerms();
-    this.queryText = term;
+    this.queryText.set(term);
     this.search(true);
   }
 
@@ -894,7 +899,7 @@ export class SearchPanelComponent implements OnInit {
       height: '80vh',
       data: {
           layer: layer,
-          bbox: this.bbox
+          bbox: this.bbox()
           //polygon: this.polygonFilter;
       }
     });

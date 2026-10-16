@@ -1,7 +1,7 @@
-import { ComponentFactoryResolver, ComponentRef, Injectable, ViewContainerRef, inject } from '@angular/core';
+import { ComponentRef, Injectable, ViewContainerRef, inject } from '@angular/core';
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
-import { AdvancedMapComponent } from 'app/cesium-map/advanced/advanced-map.component';
-import { AdvancedFilterDirective } from 'app/menupanel/common/filterpanel/advance/advanced-filter.directive';
+import { AdvancedMapComponent } from '../../cesium-map/advanced/advanced-map.component';
+import { AdvancedFilterDirective } from '../../menupanel/common/filterpanel/advance/advanced-filter.directive';
 import { ref } from '../../../environments/ref';
 
 /**
@@ -9,10 +9,8 @@ import { ref } from '../../../environments/ref';
  */
 @Injectable({ providedIn: 'root' })
 export class AdvancedComponentService {
-  private componentFactoryResolver = inject(ComponentFactoryResolver);
 
-
-  private mapViewContainerRef: ViewContainerRef;
+  private mapViewContainerRef!: ViewContainerRef;
   private mapComponents: Map<string, ComponentRef<AdvancedMapComponent>[]> = new Map<string, ComponentRef<AdvancedMapComponent>[]>();
   private filterComponents: Map<string, ComponentRef<AdvancedFilterDirective>> = new Map<string, ComponentRef<AdvancedFilterDirective>>();
 
@@ -35,13 +33,15 @@ export class AdvancedComponentService {
       // Remove any existing components (addLayer may be called again to change style so removeLayer may not have been called)
       this.removeAdvancedMapComponents(layer.id);
       this.mapComponents.set(layer.id, []);
-      for (const mapComponent of ref.advancedMapComponent[layer.id]) {
-        const componentFactory = this.componentFactoryResolver.resolveComponentFactory<AdvancedMapComponent>(mapComponent);
-        const componentRef: ComponentRef<AdvancedMapComponent> = this.mapViewContainerRef.createComponent<AdvancedMapComponent>(componentFactory);
+      for (const mapComponent of ref.advancedMapComponent[layer.id as keyof typeof ref.advancedMapComponent] ?? []) {
+        const componentType = mapComponent;
+        const componentRef: ComponentRef<AdvancedMapComponent> = this.mapViewContainerRef.createComponent<AdvancedMapComponent>(componentType);
         componentRef.instance.layer = layer;
         const compArray = this.mapComponents.get(layer.id);
-        compArray.push(componentRef);
-        this.mapComponents.set(layer.id, compArray);
+        if (compArray) {
+          compArray.push(componentRef);
+          this.mapComponents.set(layer.id, compArray);
+        }
       }
     }
   }
@@ -54,8 +54,8 @@ export class AdvancedComponentService {
    */
    public addAdvancedFilterComponents(layer: LayerModel, layerFilterPanelViewContainerRef: ViewContainerRef): void {
     if (ref.advancedFilter && layer.id in ref.advancedFilter) {
-      const componentFactory = this.componentFactoryResolver.resolveComponentFactory<AdvancedFilterDirective>(ref.advancedFilter[layer.id]);
-      const componentRef: ComponentRef<AdvancedFilterDirective> = layerFilterPanelViewContainerRef.createComponent<AdvancedFilterDirective>(componentFactory);
+      const componentType = ref.advancedFilter[layer.id as keyof typeof ref.advancedFilter];
+      const componentRef: ComponentRef<AdvancedFilterDirective> = layerFilterPanelViewContainerRef.createComponent<AdvancedFilterDirective>(componentType);
       componentRef.instance.layer = layer;
       this.filterComponents.set(layer.id, componentRef);
     }
@@ -67,8 +67,9 @@ export class AdvancedComponentService {
    * @param layerId the ID of the layer being removed from the map advanced component list
    */
   public removeAdvancedMapComponents(layerId: string): void {
-    if (this.mapComponents.has(layerId)) {
-      for (const comp of this.mapComponents.get(layerId)) {
+    const components = this.mapComponents.get(layerId);
+    if (components) {
+      for (const comp of components) {
         comp.destroy();
       }
     }
@@ -81,9 +82,10 @@ export class AdvancedComponentService {
    * @param layerId the ID of the layer
    * @returns an AdvancedFilterComponent for the layer
    */
-  public getAdvancedFilterComponentForLayer(layerId: string): AdvancedFilterDirective {
-    if (this.filterComponents.get(layerId)) {
-      return this.filterComponents.get(layerId).instance;
+  public getAdvancedFilterComponentForLayer(layerId: string): AdvancedFilterDirective | null {
+    const filter = this.filterComponents.get(layerId);
+    if (filter) {
+      return filter.instance;
     }
     return null;
   }
@@ -96,8 +98,9 @@ export class AdvancedComponentService {
    */
   public getAdvancedMapComponentsForLayer(layerId: string): AdvancedMapComponent[] {
     const mapArray: AdvancedMapComponent[] = [];
-    if (this.mapComponents.get(layerId)) {
-      for (const m of this.mapComponents.get(layerId)) {
+    const components = this.mapComponents.get(layerId);
+    if (components) {
+      for (const m of components) {
         mapArray.push(m.instance);
       }
     }

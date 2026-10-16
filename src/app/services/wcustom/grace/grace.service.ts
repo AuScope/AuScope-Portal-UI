@@ -99,7 +99,7 @@ export class GraceService {
      * @param editVal the new value
      */
     public updateEditedGraceStyleSettings(editKey: string, editVal: string): void {
-        this.editedGraceStyleSettings[editKey] = editVal;
+        (this.editedGraceStyleSettings as any)[editKey] = editVal;
     }
 
     /**
@@ -118,7 +118,7 @@ export class GraceService {
             'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
             'xsi:schemaLocation': 'http://www.opengis.net/sld http://schemas.opengis.net/sld/1.0.0/StyledLayerDescriptor.xsd'
         };
-        const styledLayerDesc = (body: string[]) => ['sld:StyledLayerDescriptor', styledLayerAttrs, body]
+        const styledLayerDesc = (body: any[]) => ['sld:StyledLayerDescriptor', styledLayerAttrs, body]
         const namedLayer = (body: string) => ['sld:NamedLayer', null, body];
         const name = (nameStr: string) => ['sld:Name', null, nameStr];
         const userStyle = (body: string) => ['sld:UserStyle', null, body];
@@ -177,7 +177,7 @@ export class GraceService {
                 literalNeutralCol, literalMaxVal, literalMaxCol, literalColorType]];
         const fillCss = ['sld:CssParameter', { 'name': 'fill' }, func];
 
-        let fillCssOpacity = [];
+        let fillCssOpacity: any = [];
         if (styleSettings.transparentNeutralColor) {
             const literalOpaqueVal = ['ogc:Literal', null, 1];
             const literalTransparentVal = ['ogc:Literal', null, 0];
@@ -189,7 +189,7 @@ export class GraceService {
         }
         const fill = ['sld:Fill', null, [fillCss, fillCssOpacity]];
 
-        let stroke = [];
+        let stroke: any = [];
         if (styleSettings.transparentNeutralColor === false) {
             const strokeCss = ['sld:CssParameter', { 'name': 'stroke' }, func];
             const strokeWidthCss = ['sld:CssParameter', { 'name': 'stroke-width' }, 1];

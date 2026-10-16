@@ -1,8 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
-import { point } from '@turf/helpers';
-import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
-import bboxPolygon from '@turf/bbox-polygon';
+import * as turf from '@turf/turf';
 import { LayerModel } from '../../model/data/layer.model';
 import { ManageStateService } from '../permanentlink/manage-state.service';
 import { CsCSWService } from '../wcsw/cs-csw.service';
@@ -51,7 +49,7 @@ export class CsMapService {
 
   private clickedLayerListBS = new BehaviorSubject<any>({});
   // Cesium map
-  private map;
+  private map: any;
 
   // If the split map pane is visible or not
   private splitMapShown = false;
@@ -66,7 +64,11 @@ export class CsMapService {
     const eventRegistration: EventRegistrationInput = {
       event: CesiumEvent.LEFT_CLICK
     };
-    const mapEventManager = this.mapsManagerService.getMap().getMapEventsManager();
+    const map = this.mapsManagerService.getMap();
+    if (!map) {
+      throw new Error('Could not retrieve map');
+    }
+    const mapEventManager = map.getMapEventsManager();
     mapEventManager.register(eventRegistration).subscribe((result) => {
       this.mapClickHandler(result);
     });
@@ -78,7 +80,11 @@ export class CsMapService {
    * Fetches Cesium 'Viewer'
    */
   public getViewer() {
-    return this.mapsManagerService.getMap().getCesiumViewer();
+    const map = this.mapsManagerService.getMap();
+    if (!map) {
+      throw new Error('Could not retrieve map');
+    }
+    return map.getCesiumViewer();
   }
 
   /**
@@ -137,7 +143,7 @@ export class CsMapService {
 
       const clickCoord = new WebMercatorProjection().project(cartographic);
       // Create a GeoJSON point
-      const clickPoint = point([lonRounded, latRounded]);
+      const clickPoint = turf.point([lonRounded, latRounded]);
       // Compile a list of clicked on layers
       const clickedLayerList: LayerModel[] = [];
 
@@ -170,9 +176,9 @@ export class CsMapService {
           // 'margin' is used to expand the bbox slightly to make it easy to select features on the boundary
           const margin = 0.05;
           for (const bbox of bboxes) {
-            const poly = bboxPolygon([bbox.westBoundLongitude - margin, bbox.southBoundLatitude - margin,
+            const poly = turf.bboxPolygon([bbox.westBoundLongitude - margin, bbox.southBoundLatitude - margin,
             bbox.eastBoundLongitude + margin, bbox.northBoundLatitude + margin]);
-            if (booleanPointInPolygon(clickPoint, poly)) {
+            if (turf.booleanPointInPolygon(clickPoint, poly)) {
               // Add to list of clicked layers
               layerModel.clickPixel = [pixel.x, pixel.y];
               layerModel.clickCoord = [lon, lat];
@@ -229,7 +235,7 @@ export class CsMapService {
    * @param layerId id string of layer
    * @param optionalFilters list of optional filters to be enabled
    */
-  public updateFilterDisplay(layerId: string, optionalFilters) {
+  public updateFilterDisplay(layerId: string, optionalFilters: any) {
     const layer = this.getLayerModel(layerId);
     if (layer?.filterCollection) {
       // Optional filters
@@ -364,7 +370,7 @@ export class CsMapService {
    *  it can be handled by the clicked event handler.
    *  this is to support custom layer renderer such as iris that uses kml
    */
-  public appendToLayerModelList(layer) {
+  public appendToLayerModelList(layer: LayerModel) {
     this.cacheLayerModelList(layer);
   }
 
@@ -412,7 +418,7 @@ export class CsMapService {
    * Retrieve the layer model given an id string
    * @param layerId layer's id string
    */
-  public getLayerModel(layerId: string): LayerModel {
+  public getLayerModel(layerId: string): LayerModel | undefined {
     return this.layerModelList.find(layer => layer.id === layerId);
   }
 
@@ -429,7 +435,7 @@ export class CsMapService {
    * @param entity the Cesium.Entity
    * @returns the LayerModel containing the Cesium
    */
-  public getLayerForEntity(entity: Entity): LayerModel {
+  public getLayerForEntity(entity: Entity): LayerModel | null {
     for (const layer of this.layerModelList) {
       for (const csLayer of layer.csLayers) {
         /*
@@ -464,7 +470,7 @@ export class CsMapService {
       }
       // this gets set in cs-geojson.service - addLayer()
       // i.e. feature.properties._layerId = layer.id;
-      if (entity["_layerId"] && layer.id === entity["_layerId"]) {
+      if ((entity as any)._layerId && layer.id === (entity as any)._layerId) {
         return layer;
       }
     }
@@ -693,7 +699,7 @@ export class CsMapService {
     });
 
     // If base layer is removed and nothing replaces it shortly, fail to fallback
-    viewer.imageryLayers.layerRemoved.addEventListener((_layer, index) => {
+    viewer.imageryLayers.layerRemoved.addEventListener((_layer: any, index: any) => {
       if (index === 0) {
         setTimeout(() => {
           if (viewer.imageryLayers.length === 0) this.switchToFallbackProvider();
@@ -882,7 +888,11 @@ export class CsMapService {
    * @returns th eindex of the layer within the layerModelList, or -1 if the layer cannot be found
    */
   public getLayerIndex(layerId: string): number {
-    return this.layerModelList.indexOf(this.layerModelList.find(l => l.id === layerId));
+    const layerModel = this.layerModelList.find(l => l.id === layerId);
+    if (layerModel) {
+      return this.layerModelList.indexOf(layerModel);
+    }
+    return -1;
   }
 
   /**
@@ -950,7 +960,7 @@ export class CsMapService {
    * @param baseMapLayer the name of the base map layer
    */
   public setBaseMapLayer(baseMapLayer: string) {
-    const basemap = this.getViewer().baseLayerPicker.viewModel.imageryProviderViewModels.find(ipvm => ipvm.name === baseMapLayer);
+    const basemap = this.getViewer().baseLayerPicker.viewModel.imageryProviderViewModels.find((ipvm: any) => ipvm.name === baseMapLayer);
     if (basemap) {
       this.getViewer().baseLayerPicker.viewModel.selectedImagery = basemap;
     }

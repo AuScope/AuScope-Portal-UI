@@ -1,12 +1,17 @@
 <div class="modal-header">
+  userStates length = {{ userStates?.length }}
+  formArray length = {{ statesFormArray?.length }}
   <h4>States</h4><button class="btn btn-sm btn-outline pull-right" aria-label="Close" (click)="dialogRef.close()"><i class="fa fa-times"></i></button>
 </div>
 <mat-dialog-content>
   <div class="modal-body">
-    <form [formGroup]="statesFormArray" class="text-left">
+    <form [formGroup]="statesForm" class="text-left">
+
+      <div formArrayName="states">
+
       @for (state of statesFormArray.controls; track state; let i = $index) {
         <div class="state-group">
-          <div class="form-group" formGroupName="{{i}}">
+          <div class="form-group" [formGroupName]="i">
             <div class="form-pair">
               <label class="form-label" for="name">Name</label>
               <input id="name" formControlName="name" class="form-control checking-field" placeholder="Name" type="text">
@@ -24,7 +29,7 @@
               <div class="input-group">
                 <input id="link" formControlName="link" class="form-control checking-field" type="text">
                 <div class="input-group-append">
-                  <button for="link" class="btn btn-primary" title="Copy to Clipboard" ngxClipboard [cbContent]="state.get('link').value" type="button">
+                  <button for="link" class="btn btn-primary" title="Copy to Clipboard" ngxClipboard [cbContent]="state.get('link')?.value" type="button">
                     <i class="far fa-copy"></i>
                   </button>
                 </div>
@@ -45,6 +50,9 @@
           }
         </div>
       }
+
+      </div>
+
     </form>
   </div>
 </mat-dialog-content>

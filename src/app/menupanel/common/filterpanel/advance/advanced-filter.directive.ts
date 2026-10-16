@@ -8,7 +8,7 @@ import { LayerModel } from '../../../../lib/portal-core-ui/model/data/layer.mode
 @Directive()
  export abstract class AdvancedFilterDirective {
 
-  layer: LayerModel;
+  layer!: LayerModel;
   // This will be used when saving/fetching states, can be overridden in sub-classes if necessary
   public advancedParams = {};
 
@@ -40,6 +40,6 @@ import { LayerModel } from '../../../../lib/portal-core-ui/model/data/layer.mode
   /**
    * Optional method to supply any call parameters that an AdvancedFilter sub-class may require
    */
-  public getCallParams?();
+  public getCallParams?(): any;
 
 }

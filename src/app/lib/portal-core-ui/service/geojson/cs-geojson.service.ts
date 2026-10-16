@@ -28,7 +28,7 @@ export class CsGeoJsonService {
   private numberOfResourcesAdded: Map<string, number> = new Map<string, number>();
 
   // Cesium map
-  private map;
+  private map: any;
 
   public init() {
     this.map = this.mapsManagerService.getMap();
@@ -129,7 +129,7 @@ export class CsGeoJsonService {
           }
           layer.csLayers.push(pointCollection);
           const bboxDataset = Rectangle.fromDegrees(extentBB.minX, extentBB.minY, extentBB.maxX, extentBB.maxY);
-          const camera: Camera = this.mapsManagerService.getMap().getCameraService().getCamera();
+          const camera: Camera = this.mapsManagerService.getMap()?.getCameraService().getCamera();
           camera.flyTo({ destination: bboxDataset });
 
           me.incrementLayersAdded(layer, 1);
@@ -160,7 +160,7 @@ export class CsGeoJsonService {
     }
   }
 
-  private isPointLayer(layer): boolean {
+  private isPointLayer(layer: any): boolean {
     let status: boolean = false;
     if (layer.features) {
       const features = layer.features;
@@ -177,7 +177,7 @@ export class CsGeoJsonService {
     return status;
   }
 
-  private styleGeoJsonEntity(entity) {
+  private styleGeoJsonEntity(entity: any) {
     let dotColor = Color.YELLOW;
     if (entity.properties.Message) {
       const message = entity.properties.Message.getValue();
@@ -207,10 +207,11 @@ export class CsGeoJsonService {
    * @param totalLayers total number of layers for LayerModel
    */
   private incrementLayersAdded(layer: LayerModel, totalLayers: number) {
-    if (!this.numberOfResourcesAdded.get(layer.id)) {
-      this.numberOfResourcesAdded.set(layer.id, 0);
+    let numberOfResources = this.numberOfResourcesAdded.get(layer.id);
+    if (!numberOfResources) {
+      numberOfResources = 0;
     }
-    this.numberOfResourcesAdded.set(layer.id, this.numberOfResourcesAdded.get(layer.id) + 1);
+    this.numberOfResourcesAdded.set(layer.id, numberOfResources + 1);
     if (this.numberOfResourcesAdded.get(layer.id) === totalLayers) {
       this.cancelledLayers = this.cancelledLayers.filter(l => l !== layer.id);
     }

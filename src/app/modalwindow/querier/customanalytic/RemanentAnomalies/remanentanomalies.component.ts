@@ -24,10 +24,10 @@ export class RemanentAnomaliesComponent implements AfterViewInit {
   */
   public data = inject(MAT_DIALOG_DATA);
 
-  public anomaliesId: number;
-  public baseUrl: string;
-  public hasModel: boolean;
-  public hasAnalyses: boolean;
+  public anomaliesId!: number;
+  public baseUrl!: string;
+  public hasModel!: boolean;
+  public hasAnalyses!: boolean;
 
 
   ngAfterViewInit(): void {
