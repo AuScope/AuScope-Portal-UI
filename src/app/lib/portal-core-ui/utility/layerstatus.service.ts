@@ -72,7 +72,7 @@ export class LayerStatusService {
       })
     )
     .subscribe({
-      next: (response) => {
+      next: (response:any) => {
         const layerList = response['data'];
         if (!layerList) return;
 
@@ -97,7 +97,7 @@ export class LayerStatusService {
         this.currentLayerList = layerList; // Update the current layer list for future comparisons
         
         // Update the functional layer state registry mapping structure
-        layerList.forEach(function (item, _i) {
+        layerList.forEach(function (item:any, _i:any) {
           me.layerStatusMap.set(item.id, item.stackdriverFailingHosts);
         });
       },
