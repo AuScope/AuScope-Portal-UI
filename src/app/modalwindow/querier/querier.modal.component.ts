@@ -257,7 +257,6 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
       this.csClipboardService.clearClipboard();
       this.csClipboardService.addPolygon(polygon);
       this.csClipboardService.toggleClipboard(true);
-      this.appRef.tick();
     }
   }
 

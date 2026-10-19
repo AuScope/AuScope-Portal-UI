@@ -1,7 +1,7 @@
 import { config } from '../../environments/config';
 import { environment } from '../../environments/environment';
 import { QuerierModalComponent } from '../modalwindow/querier/querier.modal.component';
-import { AfterViewInit, Component, ElementRef, NgZone, ViewChild, ViewContainerRef, inject, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild, ViewContainerRef, inject, signal } from '@angular/core';
 import { ViewerConfiguration } from '@auscope/angular-cesium';
 import { CsMapService } from '../lib/portal-core-ui/service/cesium-map/cs-map.service';
 import { CSWRecordModel } from '../lib/portal-core-ui/model/data/cswrecord.model';
@@ -86,7 +86,6 @@ export class CsMapComponent implements AfterViewInit {
   private userStateService = inject(UserStateService);
   private nvclBoreholeAnalyticService = inject(NVCLBoreholeAnalyticService);
   private viewerConf = inject(ViewerConfiguration);
-  private ngZone = inject(NgZone);
 
 
   public static AUSTRALIA = Rectangle.fromDegrees(114.591, -45.837, 148.97, -5.73);
@@ -158,17 +157,15 @@ export class CsMapComponent implements AfterViewInit {
       handler.setInputAction((movement: any) => {
         const ellipsoid = this.viewer.scene.globe.ellipsoid;
         const cartesian = this.viewer.camera.pickEllipsoid(movement.endPosition, ellipsoid);
-        this.ngZone.run(() => {
-          if (cartesian) {
-            const cartographic = ellipsoid.cartesianToCartographic(cartesian);
-            this.mouseLongitude.set(Math.toDegrees(cartographic.longitude).toFixed(5));
-            this.mouseLatitude.set(Math.toDegrees(cartographic.latitude).toFixed(5));
-            //const elev = viewer.scene.globe.getHeight(cartographic); // In case we need 3D
-          } else {
-            this.mouseLongitude.set(undefined);
-            this.mouseLatitude.set(undefined);
-          }
-        });
+        if (cartesian) {
+          const cartographic = ellipsoid.cartesianToCartographic(cartesian);
+          this.mouseLongitude.set(Math.toDegrees(cartographic.longitude).toFixed(5));
+          this.mouseLatitude.set(Math.toDegrees(cartographic.latitude).toFixed(5));
+          //const elev = viewer.scene.globe.getHeight(cartographic); // In case we need 3D
+        } else {
+          this.mouseLongitude.set(undefined);
+          this.mouseLatitude.set(undefined);
+        }
       }, ScreenSpaceEventType.MOUSE_MOVE);
 
       // Look at Australia
