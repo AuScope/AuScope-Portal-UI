@@ -3,13 +3,13 @@
 
 User Interface component for the [AuScope Discovery Portal](http://portal.auscope.org.au/) 
 
-This project was generated with the [Angular CLI](https://github.com/angular/angular-cli).  It is now on version 20 of Angular.  For best results compile with Angular 20, node 24.10 and npm 11.6
+This project was generated with the [Angular CLI](https://github.com/angular/angular-cli).  It is now on version 22 of Angular.  For best results compile with Angular 22, node 24.10 and npm 11.6
 
 ## Prerequisites
 
 Install node v24.10 https://nodejs.org/en/download/ 
 Install npm v11.6 `npm install -g npm@11` 
-install the Angular CLI v20 `npm install -g @angular/cli@20`
+install the Angular CLI v22 `npm install -g @angular/cli@22`
 
 ## Development server
 
