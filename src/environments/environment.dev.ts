@@ -18,6 +18,8 @@ export const environment = {
   authBaseUrl: 'https://auportal-dev.geoanalytics.group/api/',
   hostUrl: 'https://auportal-dev.geoanalytics.group',
   nVCLAnalyticalUrl: 'https://nvclanalytics.azurewebsites.net/NVCLAnalyticalServices/',
+  // AUS-4681 We have moved 'https://research-community.geoanalytics.csiro.au/geoserver' to 'https://portal.auscope.org.au/geoserver/'
+  geoserverUrl: 'https://portal.auscope.org.au/geoserver/', 
   rudderStackWriteKey: null, // RudderStack write key
   rudderStackDataPlaneUrl: null, // RudderStack data plane URL
   bingMapsKey: 'Bing_Maps_Key',
