@@ -411,7 +411,8 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
                     this.outlineUrl = "";
                 } else {
                     this.wmsUrl = UtilitiesService.addUrlParameters(UtilitiesService.rmParamURL(wmsOnlineResource.url), params);
-                    this.outlineUrl = "https://research-community.geoanalytics.csiro.au/geoserver/auscope/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&LAYERS=auscope%3AStates-and-Territories&TRANSPARENT=TRUE&SRS=EPSG:4326&FORMAT=image%2Fpng&BBOX=" +
+                    // AUS-4681 We have moved 'https://research-community.geoanalytics.csiro.au/geoserver' to 'https://portal.auscope.org.au/geoserver/'
+                    this.outlineUrl = environment.geoserverUrl + "auscope/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&LAYERS=auscope%3AStates-and-Territories&TRANSPARENT=TRUE&SRS=EPSG:4326&FORMAT=image%2Fpng&BBOX=" +
                         + bbox.westBoundLongitude + ',' + bbox.southBoundLatitude
                         + ',' + bbox.eastBoundLongitude + ',' + bbox.northBoundLatitude + "&WIDTH=400&HEIGHT=400";
                 }
