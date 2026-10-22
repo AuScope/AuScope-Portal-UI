@@ -13,29 +13,18 @@
       "projectType": "application",
       "architect": {
         "build": {
-          "builder": "@angular-builders/custom-webpack:browser",
+          "builder": "@angular/build:application",
           "options": {
             "preserveSymlinks": true,
             "aot": true,
             "outputPath": "dist",
             "index": "src/index.html",
-            "main": "src/main.ts",
+            "browser": "src/main.ts",
             "tsConfig": "src/tsconfig.app.json",
-            "outputHashing": "all",
             "sourceMap": false,
-            "namedChunks": false,
             "extractLicenses": true,
-            "vendorChunk": false,
-            "optimization": {
-              "scripts": false,
-              "styles": {
-                "minify": true,
-                "inlineCritical": true
-              },
-              "fonts": true
-            },
-            "buildOptimizer": false,
-            "polyfills": "src/polyfills.ts",
+            "polyfills": ["zone.js"],
+            "allowedCommonJsDependencies": ["*"],
             "assets": [
               "src/contexts",
               "src/template",
@@ -74,17 +63,16 @@
               "src/extension/js/box.js",
               "src/extension/js/d3.legend.js",
               "src/extension/js/no-ie-support.js"
-            ],
-            "customWebpackConfig": {
-              "path": "./extra-webpack.config.js"
-            }
+            ]
           },
           "configurations": {
             "audev": {
+              "outputHashing": "all",
               "budgets": [
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "20kb"
+                  "maximumWarning": "80kb",
+                  "maximumError": "120kb"
                 }
               ],
               "fileReplacements": [
@@ -95,10 +83,12 @@
               ]
             },
             "production": {
+              "outputHashing": "all",
               "budgets": [
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "20kb"
+                  "maximumWarning": "80kb",
+                  "maximumError": "120kb"
                 }
               ],
               "fileReplacements": [
@@ -109,18 +99,16 @@
               ]
             },
             "development": {
-              "buildOptimizer": false,
+              "outputHashing": "none",
               "optimization": false,
-              "vendorChunk": true,
               "extractLicenses": false,
-              "sourceMap": true,
-              "namedChunks": true
+              "sourceMap": true
             }
           },
           "defaultConfiguration": "production"
         },
         "serve": {
-          "builder": "@angular-builders/custom-webpack:dev-server",
+          "builder": "@angular/build:dev-server",
           "options": {
             "buildTarget": "project:build",
             "proxyConfig": "./proxy.conf.json"
@@ -149,7 +137,7 @@
           "options": {
             "main": "src/test.ts",
             "karmaConfig": "./karma.conf.js",
-            "polyfills": "src/polyfills.ts",
+            "polyfills": ["zone.js"],
             "tsConfig": "src/tsconfig.spec.json",
             "scripts": [
               "node_modules/d3/d3.min.js",
