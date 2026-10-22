@@ -493,6 +493,10 @@ label {
 	font-size: 12px;
 }
 
+.form-group {
+    margin-bottom: 1rem;
+}
+
 .form-group > label {
     margin-left: 0.5em;
 }
@@ -505,11 +509,11 @@ label {
     margin: 0 0 0.5em 0.5em;
 }
 
-.btn-sm.float-right {
+.btn-sm.float-end {
     margin: 0 1.5em 0.5em 0;
 }
 
-.btn-xs.float-right {
+.btn-xs.float-end {
     margin: 0 0.5em 0.5em 0;
 }
 

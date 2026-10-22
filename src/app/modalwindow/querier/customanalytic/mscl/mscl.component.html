@@ -14,7 +14,7 @@
         </div>
         <fieldset class="show-fieldset-borders-whitebg mb-3">
           <legend><h6>Sensor</h6></legend>
-          <div class="form-row">
+          <div class="row g-2">
             @for (group of metricGroupList; track group) {
               <div>
                 <div class="checkbox col">
@@ -27,7 +27,7 @@
         </fieldset>
         <fieldset class="show-fieldset-borders-whitebg mb-3">
           <legend><h6>Metrics</h6></legend>
-          <div class="form-row">
+          <div class="row g-2">
             @for (pname of metricPNameList; track pname) {
               <div>
                 <div class="checkbox col">
@@ -41,12 +41,10 @@
       </fieldset>
       <fieldset class="show-fieldset-borders-whitebg mb-3">
         <legend><h6>Select Depth Range</h6></legend>
-        <div class="form-row justify-content-start mb-4">
+        <div class="row g-2 justify-content-start mb-4">
           <div class="col-md-3 input-group input-group-sm">
             <input id="roi-from" type="number" class="form-control"  [(ngModel)]="msclform.startDepth" name="startDepth" ngModel #startDepth="ngModel"  required min="0" max="9999">
-            <div class="input-group-append">
-              <span class="input-group-text">metres</span>
-            </div>
+            <span class="input-group-text">metres</span>
             @if (!startDepth.valid && startDepth.touched) {
               <span class="validity"></span>
             }
@@ -54,9 +52,7 @@
           <label for="roi-to" class="col-md-1">to</label>
           <div class="col-md-3 input-group input-group-sm">
             <input id="roi-to" type="number" class="form-control"  [(ngModel)]="msclform.endDepth" name="endDepth" ngModel #endDepth="ngModel" required min="0" max="9999">
-            <div class="input-group-append">
-              <span class="input-group-text">metres</span>
-            </div>
+            <span class="input-group-text">metres</span>
             @if (!endDepth.valid && endDepth.touched) {
               <span class="validity"></span>
             }
@@ -71,7 +67,7 @@
         }
       </fieldset>
       <fieldset>
-        <div class="float-left"><button (click)="createGraphModal()" class="btn btn-primary">Draw Graph</button></div>
+        <div class="float-start"><button (click)="createGraphModal()" class="btn btn-primary">Draw Graph</button></div>
       </fieldset>
     </div>
   </div>

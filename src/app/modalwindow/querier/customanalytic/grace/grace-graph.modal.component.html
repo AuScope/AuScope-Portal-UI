@@ -6,9 +6,7 @@
         <span>&nbsp;&nbsp;-&nbsp;&nbsp;Querying&nbsp;&nbsp;<i class="fa fa-spinner fa-spin"></i></span>
       }
     </h1>
-    <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="closeDialog()">
-      <span aria-hidden="true" class="visually-hidden">&times;</span>
-    </button>
+    <button type="button" class="btn-close float-end" aria-label="Close" (click)="closeDialog()"></button>
   </div>
   <div class="modal-body">
     @if (queryStatus===QueryStatus.error) {

@@ -7,7 +7,6 @@ import { LegendUiService } from '../legend/legend-ui.service';
 import { UILayerModelService } from './uilayer-model.service';
 import { environment } from '../../../environments/environment';
 import _ from 'lodash';
-import $ from 'jquery';
 import { SidebarService } from '../../portal/sidebar.service';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
@@ -172,8 +171,9 @@ export class LayerManagerService {
     );
 
     // If on a small screen, when a new layer is added, roll up the sidebar to expose the map */
-    if ($('#sidebar-toggle-btn').css('display') !== 'none') {
-      $('#sidebar-toggle-btn').click();
+    const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn');
+    if (sidebarToggleBtn && getComputedStyle(sidebarToggleBtn).display !== 'none') {
+      sidebarToggleBtn.click();
     }
 
     // Add any advanced map components defined in refs.ts
