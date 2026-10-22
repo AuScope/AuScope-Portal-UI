@@ -17,6 +17,20 @@
 
         <!-- ================== BEGIN BASE JS ================== -->
         <script src="https://apis.google.com/js/client.js"></script>
+        <!--
+          Legacy chart libraries (d3 v3 + Rickshaw) are UMD globals that require
+          a classic script context: they rely on `this === window` and must not
+          see a CommonJS module/exports scope, otherwise they fail to set
+          window.d3 / window.Rickshaw. Loading them as classic <script> tags
+          (rather than through the esbuild bundle) preserves that context.
+          Order matters: d3 -> rickshaw -> rickshaw plugins/d3 extensions.
+        -->
+        <script src="assets/vendor/d3.min.js"></script>
+        <script src="assets/vendor/rickshaw.min.js"></script>
+        <script src="extension/js/box.js"></script>
+        <script src="extension/js/d3.legend.js"></script>
+        <script src="extension/js/Rickshaw.Graph.RangeSlider.MultiPreview.min.js"></script>
+        <script src="extension/js/Rickshaw.Graph.SmootherPlus.min.js"></script>
         <!-- ================== END BASE JS ================== -->
 
         <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">

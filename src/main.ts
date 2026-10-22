@@ -3,7 +3,11 @@ import { platformBrowser } from '@angular/platform-browser';
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
 import { ContextService } from '@csiro-geoanalytics/ng';
-import * as Cesium from 'cesium';
+
+// Add global to window, assigning the value of window itself.
+// (Moved here from the former src/polyfills.ts, which Angular 22 no longer
+// supports as a TypeScript polyfills entry.)
+(window as any).global = window;
 
 ContextService.load()
 	.then(context => {
@@ -32,8 +36,6 @@ declare global {
   }
 }
 window.CESIUM_BASE_URL = '/assets/cesium/';
-
-(window as any).Cesium = Cesium;
 
 /*
 	To run the application under a different execution context provide a path to context
