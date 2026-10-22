@@ -35,6 +35,16 @@
                 "glob": "**/*",
                 "input": "./node_modules/cesium/Build/Cesium",
                 "output": "./assets/cesium"
+              },
+              {
+                "glob": "d3.min.js",
+                "input": "./node_modules/d3",
+                "output": "./assets/vendor"
+              },
+              {
+                "glob": "rickshaw.min.js",
+                "input": "./node_modules/rickshaw",
+                "output": "./assets/vendor"
               }
             ],
             "styles": [

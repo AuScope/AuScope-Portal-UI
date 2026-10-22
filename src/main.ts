@@ -3,18 +3,11 @@ import { platformBrowser } from '@angular/platform-browser';
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
 import { ContextService } from '@csiro-geoanalytics/ng';
-// Sets window.d3 / window.Rickshaw globals (see setup-charts.ts) and exposes a
-// loader for the legacy chart extension plugins.
-import { loadChartExtensions } from './setup-charts';
 
 // Add global to window, assigning the value of window itself.
 // (Moved here from the former src/polyfills.ts, which Angular 22 no longer
 // supports as a TypeScript polyfills entry.)
 (window as any).global = window;
-
-// Load legacy Rickshaw/d3 chart extension plugins (order-sensitive; runs after
-// the d3/Rickshaw globals have been assigned by the setup-charts import above).
-loadChartExtensions();
 
 ContextService.load()
 	.then(context => {
