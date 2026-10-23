@@ -389,8 +389,8 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
                 bbox.northBoundLatitude = -5;
             }
 
-            // Gather up lists of information URLs
-            if ((wmsOnlineResource) && (this.cswRecord.legendSupport)){
+            // Gather up lists of information URLs. The WMS preview only requires a WMS online resource.
+            if (wmsOnlineResource) {
                 let params = 'SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&STYLES=&FORMAT=image/png&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&LAYERS='
                     + encodeURIComponent(wmsOnlineResource.name) + '&SRS=EPSG:4326&BBOX=' + bbox.westBoundLongitude + ',' + bbox.southBoundLatitude
                     + ',' + bbox.eastBoundLongitude + ',' + bbox.northBoundLatitude

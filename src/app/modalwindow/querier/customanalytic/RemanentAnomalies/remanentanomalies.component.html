@@ -5,19 +5,19 @@
       <div class="modal-card-size">
         <div style="position: inherit;">
           <div class="d-none d-md-inline">
-            <a href="{{baseUrl}}getKml.aspx?anomalyid={{anomaliesId}}" data-toggle="tooltip"
+            <a href="{{baseUrl}}getKml.aspx?anomalyid={{anomaliesId}}"
               title="Download KML" class="btn btn-light btn-sm"> <i class="ti-download"></i> KML
             </a>
-            <a href="{{baseUrl}}getAnomalyData.ashx?anomalyid={{anomaliesId}}" data-toggle="tooltip"
+            <a href="{{baseUrl}}getAnomalyData.ashx?anomalyid={{anomaliesId}}"
               title="Download GRID" class="btn btn-light btn-sm"> <i class="ti-download"></i> GRID
             </a>
             @if (hasAnalyses) {
-              <a href="{{baseUrl}}getAllAnalysesForAnomaly.ashx?anomalyid={{anomaliesId}}" data-toggle="tooltip"
+              <a href="{{baseUrl}}getAllAnalysesForAnomaly.ashx?anomalyid={{anomaliesId}}"
                 title="Download Analyses" class="btn btn-light btn-sm"> <i class="ti-download"></i> Analyses
               </a>
             }
             @if (hasModel) {
-              <a href="{{baseUrl}}getAllModelsForAnomaly.ashx?anomalyid={{anomaliesId}}" data-toggle="tooltip"
+              <a href="{{baseUrl}}getAllModelsForAnomaly.ashx?anomalyid={{anomaliesId}}"
                 title="Download Models" class="btn btn-light btn-sm"> <i class="ti-download"></i> Models
               </a>
             }

@@ -22,6 +22,17 @@
     .custom-btn {
       line-height: 0.8em;
       width: 6.5rem;
+      white-space: nowrap;
+    }
+
+    /* Bootstrap 5 gives .btn-info dark text by default */
+    .btn-info.custom-btn {
+      &,
+      &:hover,
+      &:focus,
+      &:active {
+        color: #fff;
+      }
     }
   }
 }

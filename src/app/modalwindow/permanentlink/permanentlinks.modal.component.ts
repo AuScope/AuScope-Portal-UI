@@ -33,7 +33,7 @@ export class PermanentLinksModalComponent implements OnInit {
   statesForm!: UntypedFormGroup;
   statesFormArray!: UntypedFormArray;
 
-  editingState: number = -1; // Keep track of state being edited (-1 = none)
+  editingState = -1; // Keep track of state being edited (-1 = none)
 
   ngOnInit() {
     this.userStateService.user.subscribe(user => {
@@ -44,14 +44,6 @@ export class PermanentLinksModalComponent implements OnInit {
       }
     });
     this.userStateService.states.subscribe(states => {
-      /*
-      for (const state of states) {
-        console.log('State:', state);
-        console.log('Name:', state.name);
-        console.log('Description:', state.description);
-        console.log('Date:', state.creationDate);
-      }
-      */
       this.statesFormArray = new UntypedFormArray([]);
       this.statesForm = this.formBuilder.group({
         states: this.statesFormArray

@@ -1,8 +1,6 @@
 <div class="modal-header" style="background: #EEE">
   <h5 class="modal-title" id="exampleModalLongTitle">CSW Record Information</h5>
-  <button type="button" class="close" (click)="dialogRef.close('Cross click')" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
+  <button type="button" class="btn-close" (click)="dialogRef.close('Cross click')" aria-label="Close"></button>
 </div>
 
 <div id="previewMapElementContainer">
@@ -39,7 +37,7 @@
                 <div class="card card-bordered">
                   <div class="card-header">
                     <h4 class="card-title">
-                      <a class="accordion-link" data-toggle="collapse" href="#info-link{{i}}" (click)="cswRecord.expanded = !cswRecord.expanded" (mouseenter)="highlightOnPreviewMap(cswRecord.id)" (mouseleave)="lowlightOnPreviewMap(cswRecord.id)">
+                      <a class="accordion-link" data-bs-toggle="collapse" href="#info-link{{i}}" (click)="cswRecord.expanded = !cswRecord.expanded" (mouseenter)="highlightOnPreviewMap(cswRecord.id)" (mouseleave)="lowlightOnPreviewMap(cswRecord.id)">
                         @if (layerStatus.showInfoWarning(layer.id, cswRecord)) {
                           <i class="fa fa-warning text-warning"> </i>
                           }{{cswRecord.contactOrg !=='' && cswRecord.contactOrg!==null ? cswRecord.contactOrg : 'More Information'}}
