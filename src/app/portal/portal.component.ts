@@ -1,6 +1,5 @@
 import { AuthService } from '../services/auth/auth.service';
-import { Component, OnInit, OnDestroy, AfterViewInit, inject } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component, AfterViewInit, inject } from '@angular/core';
 import { SidebarService } from './sidebar.service';
 
 /**
@@ -12,30 +11,11 @@ import { SidebarService } from './sidebar.service';
     styleUrls: ['./portal.component.scss'],
     standalone: false
 })
-export class PortalComponent implements OnInit, OnDestroy, AfterViewInit {
+export class PortalComponent implements AfterViewInit {
   private authService = inject(AuthService);
   private sidebarService = inject(SidebarService);
-  private sidebarSubscription!: Subscription;
-  featuredLayersCheckbox: boolean = true;
-  isSidebarOpen = false;
-
-  /**
-   * Featured layers would not display after logging in due to a strange UI bug, so by binding
-   * the panel checkbox to a variable we can set it immediately after display to ensure the
-   * panel is always expanded after a page refresh
-   */
-  ngOnInit(): void {
-    this.sidebarSubscription = this.sidebarService.isSidebarOpen$.subscribe(isOpen => {
-      this.isSidebarOpen = isOpen;
-    });
-
-  }
-
-  ngOnDestroy(): void {
-    if (this.sidebarSubscription) {
-      this.sidebarSubscription.unsubscribe();
-    }
-  }
+  readonly isSidebarOpen = this.sidebarService.isSidebarOpen;
+  featuredLayersCheckbox = true;
 
   ngAfterViewInit(): void {
     setTimeout(() => {

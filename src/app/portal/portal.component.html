@@ -25,7 +25,7 @@
 <!-- END navbar -->
 
 <!-- BEGIN sidebar -->
-<nav id="sidebar" class="sidebar slimscroll sidebar-collapse show" [ngClass]="{'sidebar-show': isSidebarOpen, 'sidebar-close': !isSidebarOpen}"  style="overflow: auto;" >
+<nav id="sidebar" class="sidebar slimscroll sidebar-collapse show" [ngClass]="{'sidebar-show': isSidebarOpen(), 'sidebar-close': !isSidebarOpen()}"  style="overflow: auto;" >
   <!-- BEGIN Active Layers -->
   <h5 class="mb-1">
     <label style="font-size: larger;" id="activeLayersLink" for="activeLayersBtn" class="mb-2" title="Layers added to map">
@@ -34,9 +34,9 @@
     </label>
     <div app-active-layers></div>
   </h5>
-  @if (isSidebarOpen) {
+  @if (isSidebarOpen()) {
     <button mat-flat-button title="Close active layers panel" (click)="toggleSidebar()" class="close-sidebar-btn" color="warn">
-      <i class="fa fa-times close-sidebar-icon" aria-hidden="true"></i>
+      <i class="fa fa-chevron-left close-sidebar-icon" aria-hidden="true"></i>
     </button>
   }
   <!-- END Active Layers -->
@@ -44,7 +44,7 @@
 <!-- END sidebar -->
 
 <!-- BEGIN #map-area -->
-<div id="map-area" class="map-area" [ngClass]="{'sidebar-open': isSidebarOpen}">
+<div id="map-area" class="map-area" [ngClass]="{'sidebar-open': isSidebarOpen()}">
   <!-- BEGIN map-area-csmap -->
   <div class="map-area-csmap">
     <app-cs-map class="h-100 w-100"></app-cs-map>

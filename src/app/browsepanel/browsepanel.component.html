@@ -9,10 +9,10 @@
   }
 </button>
 <span class="sidebar-toggle" (click)="toggleSidebar()">
-  @if (isSidebarOpen) {
+  @if (isSidebarOpen()) {
     <i class="fa fa-angle-left fa-5x" title="Close active layers"></i>
   }
-  @if (!isSidebarOpen) {
+  @if (!isSidebarOpen()) {
     <i class="fa fa-angle-right fa-5x" title="Open active layers"></i>
   }
 </span>
