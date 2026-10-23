@@ -1,7 +1,7 @@
 <div cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-  <div class="modal-header" cdkDragHandle style="background: #EEE;">
-    <h5 class="modal-title" id="exampleModalLongTitle">Record Information</h5>
-    <button type="button" class="btn-close" (click)="dialogRef.close()" aria-label="Close"></button>
+  <div class="modal-header" cdkDragHandle style="background: #EEE;padding:1rem;">
+    <h4 class="modal-title" id="exampleModalLongTitle">Record Information</h4>
+    <button type="button" class="btn-close" style="margin-left:auto;" (click)="dialogRef.close()" aria-label="Close"></button>
   </div>
 
   <mat-dialog-content>
@@ -63,7 +63,7 @@
     </div>
   </mat-dialog-content>
 
-  <div class="modal-footer">
+  <div class="modal-footer" style="padding:1rem;">
     <button type="button" class="btn btn-light" (click)="dialogRef.close()">Close</button>
   </div>
 </div>

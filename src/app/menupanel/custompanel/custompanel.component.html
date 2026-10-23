@@ -61,32 +61,32 @@
                   <!-- Add Button Condition -->
                   @if ((node.cachedLayer || getCachedLayer(node.name)) && (!node.isAdded) && (!node.isImage &&
                   !isImageLayer(node.name))) {
-                  <button class="btn-sm btn-success custom-btn" (click)="handleAddLayer(node)">
-                    Add&nbsp;<i class="fa fa-plus"></i>
+                  <button class="btn btn-sm btn-success custom-btn" (click)="handleAddLayer(node)">
+                    <i class="fa fa-plus me-1"></i>Add
                     @if (loading()) { <i class="fa fa-spinner fa-spin fa-fw"></i> }
                   </button>
                   }
 
                   <!-- Image Warning Condition -->
                   @if ((node.cachedLayer || getCachedLayer(node.name)) && (node.isImage || isImageLayer(node.name))) {
-                  <button class="btn-sm btn-warning custom-btn"
+                  <button class="btn btn-sm btn-warning custom-btn"
                     title="non-earth [CRS:1] images are not supported">
-                    Image&nbsp;<i class="fa fa-ban"></i>
+                    <i class="fa fa-ban me-1"></i>Image
                   </button>
                   }
 
                   <!-- Remove Button Condition -->
                   @if ((node.cachedLayer || getCachedLayer(node.name)) && node.isAdded) {
-                  <button class="btn-sm btn-danger custom-btn" (click)="handleRemoveLayer(node)">
-                    Remove&nbsp;<i class="fa fa-trash"></i>
+                  <button class="btn btn-sm btn-danger custom-btn" (click)="handleRemoveLayer(node)">
+                    <i class="fa fa-trash me-1"></i>Remove
                   </button>
                   }
 
                   <!-- Info Button Condition -->
                   @if (node.isStandardGroup) {
-                  <button class="btn-sm btn-info custom-btn"
+                  <button class="btn btn-sm btn-info custom-btn"
                     (click)="displayRecordInfo(node.cachedLayer || getCachedLayer(node.name))">
-                    Info&nbsp;<i class="fa fa-info-circle"></i>
+                    <i class="fa fa-info-circle me-1"></i>Info
                   </button>
                   }
                 </td>
@@ -123,7 +123,7 @@
       <input type="file" accept=".kml, .kmz, .geojson, .shp, .zip" style="display:none" class="file-input"
         (change)="onFileSelected($event)" #customFileLoader>
       <button (click)="customFileLoader.click()" type="button" title="Load KML/KMZ/GeoJSON/SHP(zip) file"
-        class="btn-primary btn-sm">
+        class="btn btn-primary btn-sm" style="margin:0.5rem 0 0 1rem;">
         <i class="fa fa-lg fa-file" aria-hidden="true"></i>
         &nbsp;Load KML/KMZ/GeoJSON/SHP(zip)
         @if (!loading()) {
@@ -154,18 +154,18 @@
       </td>
       <td>
         @if (!uiLayerModelService.isLayerAdded(layer.id)) {
-        <button class="btn-sm btn-success custom-btn" (click)="addLayer(layer)">Add&nbsp;<i class="fa fa-plus"></i>
+        <button class="btn btn-sm btn-success custom-btn" (click)="addLayer(layer)"><i class="fa fa-plus me-1"></i>Add
           @if (loading()) {
           <i class="fa fa-spinner fa-spin fa-fw"></i>
           }</button>
         }
         @if (uiLayerModelService.isLayerAdded(layer.id)) {
-        <button class="btn-sm btn-danger custom-btn" (click)="removeLayer(layer)">Remove&nbsp;<i
-            class="fa fa-trash"></i></button>
+        <button class="btn btn-sm btn-danger custom-btn" (click)="removeLayer(layer)"><i
+            class="fa fa-trash me-1"></i>Remove</button>
         }
         @if (isStandardLayerGroup(layer.group)) {
-          <button class="btn-sm btn-info custom-btn" (click)="displayRecordInfo(layer)">Info&nbsp;<i
-                  class="fa fa-info-circle"></i></button>
+          <button class="btn btn-sm btn-info custom-btn" (click)="displayRecordInfo(layer)"><i
+                  class="fa fa-info-circle me-1"></i>Info</button>
         }
 
       </td>
