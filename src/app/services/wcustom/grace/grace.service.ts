@@ -22,7 +22,7 @@ export class GraceService {
         maxValue: 1,
         transparentNeutralColor: false
     };
-    public currentGraceStyleSettingsBS: BehaviorSubject<GraceStyleSettings> = new BehaviorSubject(this.currentGraceStyleSettings);
+    public currentGraceStyleSettingsBS = new BehaviorSubject<GraceStyleSettings>(this.currentGraceStyleSettings);
     // Editor GRACE style settings
     public editedGraceStyleSettings: GraceStyleSettings = {
         minColor: '#ff0000',
@@ -34,7 +34,7 @@ export class GraceService {
         transparentNeutralColor: false
     };
 
-    private _graceDate: BehaviorSubject<Date> = new BehaviorSubject(new Date());
+    private _graceDate = new BehaviorSubject<Date>(new Date());
     private readonly graceDate: Observable<Date> = this._graceDate.asObservable();
 
     constructor() {
@@ -49,8 +49,14 @@ export class GraceService {
      * @param y latitude
      * @returns GRACE data
      */
-    public getGraceTimeSeriesDataForPoint(x: number, y: number): Observable<GraceTimeSeriesResponse> {
-        return this.http.get<GraceTimeSeriesResponse>(environment.grace.hostUrl + '/graph/coord/' + x + '/' + y);
+    public getGraceTimeSeriesDataForPoint(x: number, y: number): Observable<GraceGraphResponse> {
+        return this.http.get<GraceGraphResponse>(environment.portalBaseUrl + 'grace/point',
+          {
+            params: {
+                lon: x,
+                lat: y
+            }
+          });
     }
 
     /**
@@ -59,9 +65,13 @@ export class GraceService {
      * @param y latitude
      * @returns GRACE data
      */
-    public getGraceTimeSeriesDataForPolygon(coordinateList: string[]): Observable<GraceTimeSeriesResponse> {
-        const coordinateQueryList: string = this.coordinateListToQueryString(coordinateList);
-        return this.http.get<GraceTimeSeriesResponse>(environment.grace.hostUrl + '/graph/poly?' + coordinateQueryList);
+    public getGraceTimeSeriesDataForPolygon(coordinateList: number[][]): Observable<GraceGraphResponse> {
+        return this.http.post<GraceGraphResponse>(environment.portalBaseUrl + 'grace/polygon',
+          {
+              type: 'Polygon',
+              coordinates: [coordinateList]
+          }
+        );
     }
 
     /**
@@ -69,9 +79,13 @@ export class GraceService {
      * @returns list of GRACE epochs
      */
     public getGraceDates(): Observable<Date[]> {
-        return this.http.get<Date[]>(environment.grace.hostUrl + '/dates');
+        return this.http.get<Date[]>(environment.portalBaseUrl + 'grace/dates');
     }
 
+    /**
+     * Set the current GRACE epoch date
+     * @param d the date
+     */
     public setGraceDate(d: Date): void {
         this._graceDate.next(d);
     }
@@ -125,22 +139,6 @@ export class GraceService {
         const body1 = serialize(name('grace_style')) + this.getFeatureTypeStyle(this.currentGraceStyleSettings);
         const body2 = serialize(name('grace:grace_view')) + serialize(userStyle(body1));
         return xmlHeader + serialize(styledLayerDesc(namedLayer(body2)));
-    }
-
-    /**
-     * Create a query string from a coordinate list for time series request
-     * @param coordinateList polygon coordinate list
-     * @returns query string
-     */
-    private coordinateListToQueryString(coordinateList: string[]): string {
-        let coordinateQueryString = 'p=';
-        for (let i = 0; i < coordinateList.length; i++) {
-            coordinateQueryString += coordinateList[i];
-            if (i !== coordinateList.length - 1) {
-                coordinateQueryString += '&p=';
-            }
-        }
-        return coordinateQueryString;
     }
 
     /**
@@ -205,17 +203,15 @@ export class GraceService {
  * Expected response from GRACE server for querying time series data,
  * used for plotting
  */
-export interface GraceTimeSeriesResponse {
-    response: {
-        // Values
-        graph_x: string[];
-        graph_y: number[];
-        error_y: number[];
-        // Point specific data
-        primary_mascon_id: number;
-        // Polygon specific data
-        centroid?: string;
-        primary_mascons?: string;
-        total_area?: number;
-    }
+export interface GraceGraphResponse {
+      // Values
+      graph_x: string[];
+      graph_y: number[];
+      error_y: number[];
+      // Point specific data
+      primary_mascon_id: number;
+      // Polygon specific data
+      centroid?: string;
+      primary_mascons?: number;
+      total_area?: number;
 }

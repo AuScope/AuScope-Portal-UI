@@ -1,11 +1,11 @@
 <div class="modal-header">
-		<h3>Add Registry</h3><button class="btn btn-sm btn-outline pull-right" aria-label="Close" (click)="dialogRef.close()"><i class="fa fa-times"></i></button>
+		<h3>Add Registry</h3><button class="btn btn-sm btn-outline float-end" aria-label="Close" (click)="dialogRef.close()"><i class="fa fa-times"></i></button>
 </div>
-<form [formGroup]="registryForm" class="text-left">
+<form [formGroup]="registryForm" class="text-start">
 	<div class="modal-body">
 			<div class="state-group">
 
-				<div class="row form-row">
+				<div class="row g-2">
 					<div class="col-label">
 						<label class="form-label" for="name">Name</label>
 					</div>
@@ -13,7 +13,7 @@
 						<input #nameField id="name" formControlName="name" class="form-control" placeholder="Enter name..." type="text" (keyup.enter)="onEnter()">
 					</div>
 				</div>
-				<div class="row form-row">
+				<div class="row g-2">
 					<div class="col-label">
 						<label class="form-label" for="serviceUrl">Service URL</label>
 					</div>
@@ -25,7 +25,7 @@
 					<div class="col-label"></div>
 					<div class="col form-tip">The Catalogue Service for the Web (CSW) URL.</div>
 				</div>
-				<div class="row form-row">
+				<div class="row g-2">
 					<div class="col-label">
 						<label class="form-label" for="recordUrl">Record URL</label>
 					</div>

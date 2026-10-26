@@ -36,3 +36,11 @@
     pointer-events: auto !important;
     z-index: 1000 !important;
 }
+
+#nvcl-dataset table {
+  margin: 0;
+
+  td {
+    vertical-align: middle;
+  }
+}

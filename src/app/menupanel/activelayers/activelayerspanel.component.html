@@ -101,7 +101,7 @@
                   @if (isMapSupportedLayer(layer) && isDownloadSupportedLayer(layer)) {
                     <li (click)="selectTabPanel(layer.id,'downloadpanel')" [ngClass]="{'active': !hasFilters(layer.id) || getUILayerModel(layer.id)?.tabpanel?.downloadpanel.expanded}" class="tab-item">
                       <a>
-                        <span class="d-none tab-link d-sm-inline ml-2" >Download</span>
+                        <span class="d-none tab-link d-sm-inline ms-2" >Download</span>
                       </a>
                     </li>
                   }

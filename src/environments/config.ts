@@ -351,7 +351,8 @@ export const config = {
     'Tas-250000-Geology-Map-Index',
     'Tas-25000-Geology-Map-Index',
     'Tas-50000-Geology-Map-Index',
-    'Tas-Published-3D-Model'
+    'Tas-Published-3D-Model',
+    'grace-mascons'
   ],
   // Layers that require a JSON response for WMS GetFeature requests
   wmsGetFeatureJSON: [

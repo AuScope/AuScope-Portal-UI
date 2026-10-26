@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, inject, signal } from '@angular/core';
+import { Component, OnInit, AfterViewInit, inject, signal } from '@angular/core';
 import { LayerHandlerService } from '../lib/portal-core-ui/service/cswrecords/layer-handler.service';
 import { RenderStatusService } from '../lib/portal-core-ui/service/cesium-map/renderstatus/render-status.service';
 import { UILayerModel } from '../menupanel/common/model/ui/uilayer.model';
@@ -7,7 +7,6 @@ import { LayerModel } from '../lib/portal-core-ui/model/data/layer.model';
 import { LayerManagerService } from '../services/ui/layer-manager.service';
 import { FilterService, LayerTimes } from '../services/filter/filter.service';
 import { SidebarService } from '../portal/sidebar.service';
-import { Subscription } from 'rxjs';
 import { UserStateService } from '../services/user/user-state.service';
 import { AuthService } from '../services/auth/auth.service';
 import { take, filter } from 'rxjs/operators';
@@ -21,7 +20,7 @@ import { SearchService } from '../services/search/search.service';
     styleUrls: ['./browsepanel.component.scss'],
     standalone: false
 })
-export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
+export class BrowsePanelComponent implements OnInit, AfterViewInit {
   private searchService = inject(SearchService);
   private layerHandlerService = inject(LayerHandlerService);
   private layerManagerService = inject(LayerManagerService);
@@ -41,10 +40,10 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
   public selectedLayer: any; /* Selected layer, assigned a layer object */
   public panelStayOpen = false; /* Checkbox state for user to keep panel open after adding a layer */
   public bShowBrowsePanel = false; /* If true menu panel is open */
-  public isSidebarOpen = false; /* If true sidebar is open */
-  public sidebarSubscription!: Subscription;
   public layerBookmarked: any = {}; /* Object stores which layers are bookmarked. key is layer id, value is boolean */
   public showOnlyBookmarked = false; /* When true only bookmarked layers are shown in the browse menu */
+
+  readonly isSidebarOpen = this.sidebarService.isSidebarOpen;
 
   /**
    * Toggle sidebar
@@ -57,11 +56,6 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
    * Initialise Component
    */
   public ngOnInit() {
-    this.sidebarSubscription = this.sidebarService.isSidebarOpen$.subscribe(
-      isOpen => {
-        this.isSidebarOpen = isOpen;
-      }
-    );
     // Initialise layers and groups in sidebar
     this.layerHandlerService.getLayerRecord().subscribe(
       response => {
@@ -139,15 +133,6 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * Called when component destroyed
-   */
-  ngOnDestroy(): void {
-    if (this.sidebarSubscription) {
-        this.sidebarSubscription.unsubscribe();
-    }
-  }
-
-  /**
    * Select a group
    *
    * @param layerGroup group
@@ -174,25 +159,24 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
    * @param layer LayerModel for layer to add
    */
   public addLayerToMap(layer: LayerModel): void {
-    // Query GetCapabilities for layers that need it
     if (Array.isArray(config.queryGetCapabilitiesTimes) && config.queryGetCapabilitiesTimes.indexOf(layer.id) !== -1) {
-      this.filterService.updateLayerTimes(layer, new LayerTimes());
-      this.filterService.getLayerTimesBS(layer.id).pipe(
-        filter(lt => !!(lt && (lt.currentTime || (lt.timeExtent && lt.timeExtent.length > 0))) || lt.loadingTimeExtent === false),
-        take(1)
-      ).subscribe(layerTimes => {
-        const timeParam = layerTimes?.currentTime ?? (layerTimes?.timeExtent?.length ? layerTimes.timeExtent[0] : undefined);
-        this.layerManagerService.addLayer(layer, [], null, timeParam);
-      });
+        this.filterService.updateLayerTimes(layer, new LayerTimes());
+
+        this.filterService.getLayerTimesBS(layer.id).pipe(
+            filter(lt => !lt.loadingTimeExtent && (!!lt.currentTime || lt.timeExtent.length > 0)),
+            take(1)
+        ).subscribe(layerTimes => {
+            const timeParam = layerTimes.currentTime ?? layerTimes.timeExtent[0];
+            this.layerManagerService.addLayer(layer, [], null, timeParam);
+        });
     } else {
-      this.layerManagerService.addLayer(layer, [], null, undefined);
+        this.layerManagerService.addLayer(layer, [], null, undefined);
     }
 
-    // Close panel once layer is added, unless user requests it stay open
     if (!this.panelStayOpen) {
-      this.toggleBrowsePanel(false);
+        this.toggleBrowsePanel(false);
     }
-  }
+}
 
   /**
    * Handle layer added from info subpanel.

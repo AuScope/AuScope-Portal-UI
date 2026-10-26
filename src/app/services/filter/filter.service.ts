@@ -44,7 +44,7 @@ export class FilterService {
     public registerLayerFilterCollection(layerId: string, filterCollection: any): Observable<any> {
         const existingFilterCollection = this.layerFilterCollections.get(layerId);
         if (!existingFilterCollection) {
-            const filterCollectionBS: BehaviorSubject<any> = new BehaviorSubject(filterCollection);
+            const filterCollectionBS = new BehaviorSubject<any>(filterCollection);
             this.layerFilterCollections.set(layerId, filterCollectionBS);
             return filterCollectionBS;
         }
@@ -71,7 +71,7 @@ export class FilterService {
      * @returns the existing providers as an Observable array if they have already been registered,
      *          or a new providers array otherwise
      */
-    public registerLayerProviders(layer: LayerModel): Observable<Array<object>> {
+    public registerLayerProviders(layer: LayerModel): Observable<object[]> {
         const existingLayerProviders = this.layerProviders.get(layer.id);
         if (!existingLayerProviders) {
             const layerProviders = [];
@@ -94,7 +94,7 @@ export class FilterService {
                     value: contactOrgsMap[key]
                 });
             }
-            const layerProvidersBS: BehaviorSubject<{ label: string; value: any; }[]> = new BehaviorSubject(layerProviders);
+            const layerProvidersBS = new BehaviorSubject<{ label: string; value: any; }[]>(layerProviders);
             this.layerProviders.set(layer.id, layerProvidersBS);
             return layerProvidersBS;
         }
@@ -166,18 +166,15 @@ export class FilterService {
             if (responseLayers[0]?.timeExtent?.length > 0) {
                 // Sort layer times: newest time is first, oldest time last
                 const strDateArr = responseLayers[0].timeExtent.sort((a: any, b: any) => {
-                        return <any>new Date(b) - <any>new Date(a);
+                    return new Date(b).getTime() - new Date(a).getTime();
                 });
-                layerTimes.timeExtent = []
-                for (const timeExt of strDateArr) {
-                    if (typeof timeExt === 'string') {
-                        layerTimes.timeExtent.push(new Date(timeExt));
-                    }
-                }
-                // Time may have already been set from retrieving state
-                if (!layerTimes.currentTime) {
-                    layerTimes.currentTime = layerTimes.timeExtent[0];
-                }
+                const newTimeExtent = strDateArr.filter((t: any) => typeof t === 'string').map((t: string) => new Date(t));
+                const newLayerTimes = new LayerTimes();
+                newLayerTimes.timeExtent = newTimeExtent;
+                newLayerTimes.currentTime = layerTimes.currentTime ??
+                newTimeExtent[0];
+                newLayerTimes.loadingTimeExtent = layerTimes.loadingTimeExtent;
+                return newLayerTimes;
             }
         }
         return layerTimes;
@@ -199,10 +196,11 @@ export class FilterService {
 
         // If WMS capability record not present
         if (!(layer.capabilityRecords?.length > 0)) {
-            // Call WMS GetCapabilites using layer info
-            layerTimes.loadingTimeExtent = true;
-            // Notify subscribers that loading has started
-            layerTimesBS.next(layerTimes);
+            // Call WMS GetCapabilites using layer info and notify subscribers that loading has started
+            layerTimesBS.next({
+              ...layerTimes,
+              loadingTimeExtent: true
+            });
             this.getCapabilityRecord(layer).subscribe(response => {
                 if (response) {
                     if (response.getCaps.data?.capabilityRecords.length === 1) {
@@ -213,8 +211,11 @@ export class FilterService {
                         layerTimes = this.extractLayerTimes(layer, layerTimes, response.layerName);
                     }
                 }
-                layerTimes.loadingTimeExtent = false;
-                layerTimesBS.next(layerTimes);
+
+                layerTimesBS.next({
+                  ...layerTimes,
+                  loadingTimeExtent: false
+                });
             }, () => { // If error still need to submit layerTimes
                 layerTimes.loadingTimeExtent = false;
                 layerTimesBS.next(layerTimes);

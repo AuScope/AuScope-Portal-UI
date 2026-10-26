@@ -3,7 +3,7 @@
     @if ((!bbox() && !drawBoundsStarted()) && (!polygonFilter() && !drawPolygonStarted())) {
       <div style="font-size:small;">
         <div class="alert alert-warning fade show">
-          <i class="ti-bell float-left"></i>
+          <i class="ti-bell float-start"></i>
           <p>Select an area of interest (bounding box or polygon) to reduce download time.</p>
         </div>
       </div>
@@ -11,7 +11,7 @@
     @if (drawBoundsStarted()) {
       <div>
         <div class="alert alert-primary fade show">
-          <i class="ti-bell float-left"></i>
+          <i class="ti-bell float-start"></i>
           <p>Click on the map to draw bounding box.</p>
         </div>
       </div>
@@ -19,7 +19,7 @@
     @if (drawPolygonStarted()) {
       <div>
         <div class="alert alert-primary fade show">
-          <i class="ti-bell float-left"></i>
+          <i class="ti-bell float-start"></i>
           <p>Click on the map to draw polygon, double-click to end.</p>
         </div>
       </div>
@@ -30,15 +30,15 @@
           <h4><span>Bounding Box</span></h4>
         </div>
         @if (bbox(); as bboxValue) {
-          <h5><span class="badge badge-secondary d-inline ml-5 line-height-1-8">North: {{bboxValue.northBoundLatitude | number:'1.0-4'}}</span></h5>
-          <h5><span class="badge badge-secondary d-inline line-height-1-8">West: {{bboxValue.westBoundLongitude | number:'1.0-4'}}</span>
-          <span class="badge badge-secondary d-inline ml-2 line-height-1-8">East: {{bboxValue.eastBoundLongitude | number:'1.0-4'}}</span></h5>
-          <h5><span class="badge badge-secondary d-inline ml-5 line-height-1-8">South: {{bboxValue.southBoundLatitude | number:'1.0-4'}}</span></h5>
+          <h5><span class="badge bg-secondary d-inline ms-5 line-height-1-8">North: {{bboxValue.northBoundLatitude | number:'1.0-4'}}</span></h5>
+          <h5><span class="badge bg-secondary d-inline line-height-1-8">West: {{bboxValue.westBoundLongitude | number:'1.0-4'}}</span>
+          <span class="badge bg-secondary d-inline ms-2 line-height-1-8">East: {{bboxValue.eastBoundLongitude | number:'1.0-4'}}</span></h5>
+          <h5><span class="badge bg-secondary d-inline ms-5 line-height-1-8">South: {{bboxValue.southBoundLatitude | number:'1.0-4'}}</span></h5>
         } @else if (polygonBbox() && !drawPolygonStarted()) {
-          <h5><span class="badge badge-secondary d-inline ml-5 line-height-1-8">North: {{polygonBboxValue.northBoundLatitude | number:'1.0-4'}}</span></h5>
-          <h5><span class="badge badge-secondary d-inline line-height-1-8">West: {{polygonBboxValue.westBoundLongitude | number:'1.0-4'}}</span>
-          <span class="badge badge-secondary d-inline ml-2 line-height-1-8">East: {{polygonBboxValue.eastBoundLongitude | number:'1.0-4'}}</span></h5>
-          <h5><span class="badge badge-secondary d-inline ml-5 line-height-1-8">South: {{polygonBboxValue.southBoundLatitude | number:'1.0-4'}}</span></h5>
+          <h5><span class="badge bg-secondary d-inline ms-5 line-height-1-8">North: {{polygonBboxValue.northBoundLatitude | number:'1.0-4'}}</span></h5>
+          <h5><span class="badge bg-secondary d-inline line-height-1-8">West: {{polygonBboxValue.westBoundLongitude | number:'1.0-4'}}</span>
+          <span class="badge bg-secondary d-inline ms-2 line-height-1-8">East: {{polygonBboxValue.eastBoundLongitude | number:'1.0-4'}}</span></h5>
+          <h5><span class="badge bg-secondary d-inline ms-5 line-height-1-8">South: {{polygonBboxValue.southBoundLatitude | number:'1.0-4'}}</span></h5>
         }
         <hr>
         </div>
@@ -182,7 +182,7 @@
         @if (!bbox() && !drawBoundsStarted()) {
           <div>
             <div class="alert alert-warning fade show">
-              <i class="ti-bell float-left"></i>
+              <i class="ti-bell float-start"></i>
               <p>Select an area to download @if (downloadSizeLimit > 0) {
                 <span>not exceeding {{downloadSizeLimit}} m<sup>2</sup>.</span>
               }</p>
@@ -192,7 +192,7 @@
         @if (drawBoundsStarted()) {
           <div>
             <div class="alert alert-primary fade show">
-              <i class="ti-bell float-left"></i>
+              <i class="ti-bell float-start"></i>
               <p>Click on the map to draw bounding box.</p>
             </div>
           </div>
@@ -202,10 +202,10 @@
             <div class="standard-title row">
               <h4><span>Bounding Box</span></h4>
             </div>
-            <h5><span class="badge badge-secondary d-inline ml-5 line-height-1-8">North: {{bboxValue.northBoundLatitude | number:'1.0-4'}}</span></h5>
-            <h5><span class="badge badge-secondary d-inline line-height-1-8">West: {{bboxValue.westBoundLongitude | number:'1.0-4'}}</span>
-            <span class="badge badge-secondary d-inline ml-2 line-height-1-8">East: {{bboxValue.eastBoundLongitude | number:'1.0-4'}}</span></h5>
-            <h5><span class="badge badge-secondary d-inline ml-5 line-height-1-8">South: {{bboxValue.southBoundLatitude | number:'1.0-4'}}</span></h5>
+            <h5><span class="badge bg-secondary d-inline ms-5 line-height-1-8">North: {{bboxValue.northBoundLatitude | number:'1.0-4'}}</span></h5>
+            <h5><span class="badge bg-secondary d-inline line-height-1-8">West: {{bboxValue.westBoundLongitude | number:'1.0-4'}}</span>
+            <span class="badge bg-secondary d-inline ms-2 line-height-1-8">East: {{bboxValue.eastBoundLongitude | number:'1.0-4'}}</span></h5>
+            <h5><span class="badge bg-secondary d-inline ms-5 line-height-1-8">South: {{bboxValue.southBoundLatitude | number:'1.0-4'}}</span></h5>
             <hr>
           </div>
         }

@@ -9,17 +9,17 @@
   }
 </button>
 <span class="sidebar-toggle" (click)="toggleSidebar()">
-  @if (isSidebarOpen) {
+  @if (isSidebarOpen()) {
     <i class="fa fa-angle-left fa-5x" title="Close active layers"></i>
   }
-  @if (!isSidebarOpen) {
+  @if (!isSidebarOpen()) {
     <i class="fa fa-angle-right fa-5x" title="Open active layers"></i>
   }
 </span>
 @if (bShowBrowsePanel) {
   <div class="browse-menu">
     <!-- Layer Groups column -->
-    <div class="container text-left browse-menu-col">
+    <div class="container text-start browse-menu-col">
       <div style="font-weight: bold; width: 22rem; margin-bottom: 10px;">Featured Layer Groups
         <!-- 'Bookmarked only' check box -->
         @if (isUserLoggedIn()) {
@@ -51,7 +51,7 @@
       }
     </div>
     <!-- Layers column -->
-    <div [style.display]="layerColumnHeader === '' && !panelStayOpen ? 'none' : 'block'" class="container text-left browse-menu-col">
+    <div [style.display]="layerColumnHeader === '' && !panelStayOpen ? 'none' : 'block'" class="container text-start browse-menu-col">
       <!-- 'Stay Open' check box -->
       <div style="float: right;" class="form-check">
         <input class="form-check-input" type="checkbox" value="" [(ngModel)]="panelStayOpen" id="flexCheckDefault">
