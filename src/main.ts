@@ -1,5 +1,6 @@
 import { enableProdMode, provideZoneChangeDetection } from '@angular/core';
 import { platformBrowser } from '@angular/platform-browser';
+import * as Cesium from 'cesium';
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
 import { ContextService } from '@csiro-geoanalytics/ng';
@@ -8,6 +9,15 @@ import { ContextService } from '@csiro-geoanalytics/ng';
 // (Moved here from the former src/polyfills.ts, which Angular 22 no longer
 // supports as a TypeScript polyfills entry.)
 (window as any).global = window;
+
+// Expose the bundled Cesium as a global. @auscope/angular-cesium builds some
+// property-assignment helpers dynamically via `new Function(...)` whose bodies
+// reference `Cesium.*` by name (e.g. Cesium.CallbackProperty). Functions created
+// with `new Function` execute in the GLOBAL scope, so they cannot see Cesium
+// imported as an ES module into this bundle — they require a real global.
+// Without this, the rectangle/polygon editors fail at runtime with
+// "Uncaught ReferenceError: Cesium is not defined".
+(window as any).Cesium = Cesium;
 
 ContextService.load()
 	.then(context => {
