@@ -63,8 +63,7 @@
             "scripts": [
               "node_modules/jquery/dist/jquery.min.js",
               "node_modules/jquery-ui/dist/jquery-ui.min.js",
-              "node_modules/popper.js/dist/umd/popper.min.js",
-              "node_modules/bootstrap/dist/js/bootstrap.min.js",
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
               "node_modules/d3/d3.min.js",
               "node_modules/rickshaw/rickshaw.min.js",
               "src/extension/js/extensions.js",
@@ -152,6 +151,7 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.spec.json",
             "scripts": [
+              "node_modules/jquery/dist/jquery.min.js",
               "node_modules/d3/d3.min.js",
               "node_modules/rickshaw/rickshaw.min.js",
               "src/extension/js/extensions.js",

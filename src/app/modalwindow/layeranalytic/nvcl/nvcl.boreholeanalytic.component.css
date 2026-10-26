@@ -58,6 +58,10 @@ input.custom-control-input {
 .page-header {
   width: 100%;
   cursor: move;
+
+  .title {
+    margin: 1rem 0 0 1rem;;
+  }
 }
 
 .nav-tabs > li.active > a span {

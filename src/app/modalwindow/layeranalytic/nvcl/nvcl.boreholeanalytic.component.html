@@ -1,7 +1,7 @@
 <!-- Modal for querier-->
 <div class="modal-header" cdkDrag cdkDragRootElement=".cdk-overlay-pane">
   <h1 class="page-header" cdkDragHandle>
-    Borehole <small>Analytics</small>
+    <div class="title">Borehole <small>Analytics</small></div>
   </h1>
 </div>
 <mat-dialog-content>
@@ -41,9 +41,9 @@
           <div class="card card-default card-with-tabs">
             <!-- BEGIN card-header -->
             <div class="card-header">
-              <ul class="nav nav-tabs float-right">
-                <li (click)="UItabpanel.algorithm = true;UItabpanel.checkprocess=false;" [ngClass]="{'active':UItabpanel.algorithm}"><a href="#nvcl-boreholeanalytic-tabpanel-algorithm" data-toggle="tab"><i class="fa fa-sliders"></i> <span class="d-none d-md-inline"> Algorithms</span></a></li>
-                <li (click)="UItabpanel.algorithm = false;UItabpanel.checkprocess=true;checkStatus()" [ngClass]="{'active':UItabpanel.checkprocess}"><a href="#nvcl-boreholeanalytic-tabpanel-checkprocess" data-toggle="tab"><i class="fa fa-tasks"></i> <span class="d-none d-md-inline"> Check Process</span></a></li>
+              <ul class="nav nav-tabs float-end">
+                <li (click)="UItabpanel.algorithm = true;UItabpanel.checkprocess=false;" [ngClass]="{'active':UItabpanel.algorithm}"><a href="#nvcl-boreholeanalytic-tabpanel-algorithm"><i class="fa fa-sliders"></i> <span class="d-none d-md-inline"> Algorithms</span></a></li>
+                <li (click)="UItabpanel.algorithm = false;UItabpanel.checkprocess=true;checkStatus()" [ngClass]="{'active':UItabpanel.checkprocess}"><a href="#nvcl-boreholeanalytic-tabpanel-checkprocess"><i class="fa fa-tasks"></i> <span class="d-none d-md-inline"> Check Process</span></a></li>
               </ul>
               <h4 class="card-title">Borehole Analytics</h4>
             </div>
@@ -165,13 +165,11 @@
                   <div class="alert alert-secondary">
                     Please select a borehole depth range and value (compared against the above algorithm) to filter NVCL boreholes.
                   </div>
-                  <div class="form-row justify-content-start mb-4">
+                  <div class="row g-2 justify-content-start mb-4">
                     <label for="roi-from" class="col-md-3">Region of interest:</label>
                     <div class="col-md-3 input-group input-group-sm">
                       <input id="roi-from" type="number" class="form-control"  [(ngModel)]="nvclform.startDepth" name="startDepth" ngModel #startDepth="ngModel"  required min="0" max="9999">
-                      <div class="input-group-append">
-                        <span class="input-group-text">metres</span>
-                      </div>
+                      <span class="input-group-text">metres</span>
                       @if (!startDepth.valid && startDepth.touched) {
                         <span class="validity"></span>
                       }
@@ -179,15 +177,13 @@
                     <label for="roi-to" class="col-md-1">to</label>
                     <div class="col-md-3 input-group input-group-sm">
                       <input id="roi-to" type="number" class="form-control"  [(ngModel)]="nvclform.endDepth" name="endDepth" ngModel #endDepth="ngModel" required min="0" max="9999"  >
-                      <div class="input-group-append">
-                        <span class="input-group-text">metres</span>
-                      </div>
+                      <span class="input-group-text">metres</span>
                       @if (!endDepth.valid && endDepth.touched) {
                         <span class="validity"></span>
                       }
                     </div>
                   </div>
-                  <div class="form-row justify-content-start mb-4">
+                  <div class="row g-2 justify-content-start mb-4">
                     <label class="col-md-2">Operator:</label>
                     <div class="col-md-2">
                       <select class="form-control form-control-sm" [(ngModel)]="nvclform.operator" name="operator" required ngModel #operator="ngModel">
@@ -217,19 +213,17 @@
                       }
                     </div>
                   </div>
-                  <div class="form-row justify-content-start mb-4">
+                  <div class="row g-2 justify-content-start mb-4">
                     <label for="eval-span" class="col-md-3">Evaluated over a span of:</label>
                     <div class="col-md-3 input-group input-group-sm">
                       <input id="eval-span" type="number" class="form-control" [(ngModel)]="nvclform.span" name="span" required min="0" max="9999" ngModel #span="ngModel">
-                      <div class="input-group-append">
-                        <span class="input-group-text">metres</span>
-                      </div>
+                      <span class="input-group-text">metres</span>
                       @if (!span.valid && span.touched) {
                         <span class="validity"></span>
                       }
                     </div>
                   </div>
-                  <div class="form-row">
+                  <div class="row g-2">
                     <div class="checkbox col-md-6">
                       <input id="apply-nvcl-filter" type="checkbox" [(ngModel)]="bApplyNvclFilter" name="bApplyNvclFilter" />
                       <label for="apply-nvcl-filter"  title="Tick it, if you want to limit the searching boreholes with the filter of Update Layer Button. Untick it, if you want to search all NVCL boreholes."> Apply Nvcl filters </label>
@@ -237,7 +231,7 @@
                   </div>
                 </fieldset>
 
-                <div class="float-left">
+                <div class="float-start">
                   <button class="btn btn-primary" (click) = "onSubmit()" [disabled]="!f.valid">Submit</button>
                 </div>
               </div>
@@ -261,9 +255,8 @@
                         <tr>
                           <td>{{status.jobDescription}}</td>
                           <td>
-                            <label class="custom-control custom-checkbox">
-                              <input type="checkbox" class="custom-control-input"  [checked]="status.published" (change)="changePublish(status)" >
-                              <span class="custom-control-indicator"></span>
+                            <label class="form-check">
+                              <input type="checkbox" class="form-check-input"  [checked]="status.published" (change)="changePublish(status)" >
                             </label>
                           </td>
                           <td>{{status.jmstimestamp}}</td>
@@ -281,7 +274,7 @@
                     </tbody>
                   </table>
                 </div>
-                <div class="float-left">
+                <div class="float-start">
                   @if (currentStatus.length===0) {
                     <button (click) = "checkStatus()" class="btn btn-primary" [disabled]="!nvclform.email" >Check status</button>
                   }

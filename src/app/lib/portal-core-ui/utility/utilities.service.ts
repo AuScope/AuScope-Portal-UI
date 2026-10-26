@@ -3,7 +3,6 @@ import { Bbox } from '../model/data/bbox.model';
 import { Injectable } from '@angular/core';
 import { HttpParams } from '@angular/common/http';
 import * as _ from 'lodash';
-import $ from 'jquery';
 import { ResourceType } from './constants.service';
 import { LayerModel } from '../model/data/layer.model';
 
@@ -33,7 +32,7 @@ export class UtilitiesService {
         if (obj instanceof Array || (typeof obj === 'string')) {
             return obj.length === 0;
         } else if (typeof obj === 'object') {
-            return $.isEmptyObject(obj);
+            return obj === null || Object.keys(obj).length === 0;
         } else {
             if (obj) {
                 return false;

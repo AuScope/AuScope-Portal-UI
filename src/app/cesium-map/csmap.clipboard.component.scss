@@ -22,12 +22,16 @@
 /* Remove gap between buttons and selected polygon bbox name */
 .table {
     margin-bottom: 0rem;
+    --bs-table-bg: transparent;
+    background-color: transparent;
 }
 
 /* Remove default white underline */
 .table td {
     color: #edffff;
+    background-color: transparent;
     border-top: none;
+    border-bottom: none;
     text-align: center;
     word-break: break-word;
 }

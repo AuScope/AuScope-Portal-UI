@@ -48,7 +48,7 @@
   @if ((!layerFilterCollection || layerFilterCollection.optionalFilters?.length === 0) && !layerHasAdvancedFilterComponent(layer.id)) {
     <div style="font-size: small;">
       <!-- <div class="alert alert-warning fade show">
-        <i class="ti-bell float-left"></i>
+        <i class="ti-bell float-start"></i>
         <p>There are no filters associated with this layer</p>
       </div> -->
     </div>
@@ -185,7 +185,7 @@
         @if (optionalFilter.type==='OPTIONAL.POLYGONBBOX') {
           <div class="d-block d-md-none">
             <div class="alert alert-warning fade show">
-              <i class="ti-bell float-left"></i>
+              <i class="ti-bell float-start"></i>
               <p>This filter is not supported on a small screen and would not return any results.</p>
             </div>
           </div>
@@ -273,7 +273,7 @@
     <!-- Update layer button -->
     @if (isMapSupportedLayer(layer) && (hasFilters(layer.id) || layerHasAdvancedFilterComponent(layer.id))) {
       <button type="button"
-        class="btn btn-primary btn-sm add-layer-btn float-right" (click)="addLayer(layer)">
+        class="btn btn-primary btn-sm add-layer-btn float-end" (click)="addLayer(layer)">
         <i class="fa fa-plus-circle" aria-hidden="true"></i>
         &nbsp;Apply Filter
       </button>

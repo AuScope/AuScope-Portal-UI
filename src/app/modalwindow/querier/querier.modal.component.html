@@ -14,9 +14,7 @@
         </p>
       </div>
       <div id="endContainer">
-        <button type="button" class="close" (click)="dialogRef.close()" title="Close" aria-label="Close">
-          <span aria-hidden="true" class="closeBtn">&times;</span>
-        </button>
+        <button type="button" class="btn-close" (click)="dialogRef.close()" title="Close" aria-label="Close"></button>
       </div>
     </div>
   </div>
@@ -28,7 +26,7 @@
         <div class="btn-group">
           @if (selectedLayer()) {
             <button type="button" class="btn btn-primary tablinks" title="{{selectedToolTip}}"
-              data-data-toggle-second="tooltip" (click)="analyticTab.set(false); openTab($event, 'wfs');">
+              (click)="analyticTab.set(false); openTab($event, 'wfs');">
               <span>{{selectedLayer()}}</span><br />
           <span style="
                           display: inline-block;
@@ -41,9 +39,9 @@
           }
           @if (data().docs.length + data().htmls.length > 1) {
             <button type="button"
-              class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"
+              class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"
               aria-haspopup="true" aria-expanded="false">
-              <span class="sr-only">Toggle Dropdown</span>
+              <span class="visually-hidden">Toggle Dropdown</span>
             </button>
           }
           <ul class="dropdown-menu">
@@ -51,8 +49,7 @@
             @for (doc of data().docs; track doc.key; let i = $index) {
               <li active>
                 @if (i < 10 && doc.node_name !== null) {
-                  <a class="dropdown-item" (click)="analyticTab.set(false); setWFS(doc, i);openTab($event, 'wfs');"
-                    data-toggle="collapse">
+                  <a class="dropdown-item" (click)="analyticTab.set(false); setWFS(doc, i);openTab($event, 'wfs');">
                     @if (doc.node_name) {
                       <div>
                         {{doc.layer.name}}{{doc.node_name ? ': ' + doc.node_name : ''}}
@@ -117,9 +114,6 @@
       </div>
     }
   </div>
-  <script>
-    $('[data-toggle-second="tooltip"]').tooltip();
-  </script>
 
   <mat-dialog-content>
 
@@ -173,9 +167,9 @@
                 @if (bToClipboard() || supportOpenInNewWindow(data().currentDoc)) {
                   <div
                     style="position: inherit;padding-top: unset;">
-                    <div class="float-left d-none d-md-inline mt-0 w-100">
+                    <div class="float-start d-none d-md-inline mt-0 w-100">
                       @if (bToClipboard()) {
-                        <div data-toggle="tooltip" title="Copy to Clipboard"
+                        <div title="Copy to Clipboard"
                           (click)="copyToClipboard(data().currentDoc)" class="btn btn-primary btn-sm">
                           <span><i class="ti-clip"></i>Copy to Clipboard</span>
                         </div>

@@ -1,20 +1,18 @@
 <div class="modal-header">
-  <h1 class="page-header">
+  <h1 class="page-header" style="padding:1rem;">
     MSCL <small>analytics</small>
   </h1>
 </div>
 <div class="modal-body">
   <div class="card card-default">
     <div class="card-header">
-      <h4 class="card-title pull-left">
+      <h4 class="card-title float-start">
         MSCL Analytics: Borehole {{ data.featureId }}<br>
         <h5>@if (processingData) {
           <span style="position:relative;top:7px;color:red;">Processing data (this may take a while)&nbsp;&nbsp;<i class="fa fa-spin fa-spinner"></i></span>
         }</h5>
       </h4>
-      <button type="button" class="close pull-right" aria-label="Close" (click)="data.closeGraphModal()">
-        <span aria-hidden="true">×</span>
-      </button>
+      <button type="button" class="btn-close float-end" aria-label="Close" (click)="data.closeGraphModal()"></button>
     </div>
     <div #error_display></div>
     <div class="card-body">
@@ -25,5 +23,5 @@
   </div>
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-light" (click)="data.closeGraphModal()">Close</button>
+  <button type="button" class="btn btn-light" style="margin:1rem;" (click)="data.closeGraphModal()">Close</button>
 </div>

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { UserStateService } from '../../services/user/user-state.service';
 import { User } from '../../models/user.model';
@@ -17,8 +17,8 @@ export class PermanentLinkComponent {
 
   public bShowDialog = false;
   public user?: User;
-  public permanentlink = "";
-  public shorteningMode = false;
+  public permanentlink = signal<string>("");
+  public shorteningMode = signal<boolean>(false);
 
   constructor() {
     this.userStateService.user.subscribe(user => {
@@ -51,15 +51,15 @@ export class PermanentLinkComponent {
    * Generate the permanent link
    */
   public generateAnonymousPermanentLink() {
-    this.shorteningMode = true;
+    this.shorteningMode.set(true);
 
     this.userStateService.addState(null, null, true, true).subscribe(response => {
       const link = environment.hostUrl + '?state=' + response;
-      this.permanentlink = link;
-      this.shorteningMode = false;
+      this.permanentlink.set(link);
+      this.shorteningMode.set(false);
     }, () => {
-      this.permanentlink = "Error retrieving permanent link."
-      this.shorteningMode = false;
+      this.permanentlink.set("Error retrieving permanent link.");
+      this.shorteningMode.set(false);
     });
 
   }

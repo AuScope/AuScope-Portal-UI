@@ -5,10 +5,26 @@ import { LayerModel } from '../../../model/data/layer.model';
 import { LayerHandlerService } from '../../cswrecords/layer-handler.service';
 import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import $ from 'jquery';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 declare let rudderanalytics: any;
+
+/**
+ * Serialise a flat object to an application/x-www-form-urlencoded query string,
+ * matching jQuery's $.param() output (spaces encoded as '+', null/undefined as empty).
+ * @param params flat key/value object
+ * @returns encoded query string
+ */
+function toQueryString(params: Record<string, string | number | boolean | null | undefined>): string {
+  return Object.keys(params)
+    .map(key => {
+      const value = params[key];
+      const strValue = value === null || value === undefined ? '' : String(value);
+      return encodeURIComponent(key) + '=' + encodeURIComponent(strValue);
+    })
+    .join('&')
+    .replace(/%20/g, '+');
+}
 
 /**
  * Service to download WFS data
@@ -144,7 +160,7 @@ export class DownloadWfsService {
             filter: polygonFilter ? polygonFilter: ''
           };
           const serviceUrl = this.env.portalBaseUrl + downloadUrl + '?';
-          httpParams = httpParams.append('serviceUrls', serviceUrl + $.param(filterParameters));
+          httpParams = httpParams.append('serviceUrls', serviceUrl + toQueryString(filterParameters));
         }
 
         return this.http.post(this.env.portalBaseUrl + 'downloadTsgFiles.do', httpParams.toString(), {
@@ -234,7 +250,7 @@ export class DownloadWfsService {
           filter: polygonFilter
         };
         const serviceUrl = this.env.portalBaseUrl + downloadUrl + '?';
-        httpParams = httpParams.append('serviceUrls', serviceUrl + $.param(filterParameters));
+        httpParams = httpParams.append('serviceUrls', serviceUrl + toQueryString(filterParameters));
       }
       let downloadObserver: Observable<Blob | string>;
       if (bZip) {

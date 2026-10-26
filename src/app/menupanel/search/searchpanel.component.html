@@ -1,28 +1,26 @@
 <div class="search-panel">
   <!-- Search bar and buttons -->
   <div class="input-group">
-    <div class="input-group-prepend">
-      <button
-        tabindex="-1"
-        class="btn btn-auscope-primary search-toggle-button"
-        type="button"
-        title="{{ showingResultsPanel() ? 'Hide results' : 'Show results' }}"
-        (click)="setShowingResultsPanel(!showingResultsPanel())"
-      >
-        @if (!showingResultsPanel()) {
-          <span class="fa-layers fa-fw">
-            <i class="fa fa-list"></i>
-            <i class="fa fa-caret-down caret-icon"></i>
-          </span>
-        }
-        @if (showingResultsPanel()) {
-          <span class="fa-layers fa-fw">
-            <i class="fa fa-list"></i>
-            <i class="fa fa-caret-up caret-icon"></i>
-          </span>
-        }
-      </button>
-    </div>
+    <button
+      tabindex="-1"
+      class="btn btn-auscope-primary search-toggle-button"
+      type="button"
+      title="{{ showingResultsPanel() ? 'Hide results' : 'Show results' }}"
+      (click)="setShowingResultsPanel(!showingResultsPanel())"
+    >
+      @if (!showingResultsPanel()) {
+        <span class="fa-layers fa-fw">
+          <i class="fa fa-list"></i>
+          <i class="fa fa-caret-down caret-icon"></i>
+        </span>
+      }
+      @if (showingResultsPanel()) {
+        <span class="fa-layers fa-fw">
+          <i class="fa fa-list"></i>
+          <i class="fa fa-caret-up caret-icon"></i>
+        </span>
+      }
+    </button>
 
     <div class="search-dropdown">
       <!-- Search text field -->
@@ -59,7 +57,7 @@
       </mat-autocomplete>
     </div>
 
-    <div class="input-group-append">
+    <div class="d-flex align-items-stretch">
       <!-- Search button -->
       @if (!searching()) {
         <button
@@ -121,9 +119,7 @@
     <div #alert class="search-alert">
       <label class="search-alert-label"
         >{{ alertMessage() }}
-        <button type="button" class="search-alert-button close" aria-label="Close" (click)="alertMessage.set('')">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="search-alert-button btn-close" aria-label="Close" (click)="alertMessage.set('')"></button>
       </label>
     </div>
   }
@@ -251,20 +247,20 @@
                   <label style="margin-left: 8px; margin-top: 4px"><strong>Bounding Box</strong></label>
                 </div>
                 <label
-                  ><span class="badge badge-secondary d-inline ml-5 line-height-1-8"
+                  ><span class="badge bg-secondary d-inline ms-5 line-height-1-8"
                     >North: {{ bbox()?.northBoundLatitude | number: '1.0-4' }}</span
                   ></label
                 >
                 <label
-                  ><span class="badge badge-secondary d-inline line-height-1-8"
+                  ><span class="badge bg-secondary d-inline line-height-1-8"
                     >West: {{ bbox()?.westBoundLongitude | number: '1.0-4' }}</span
                   >
-                  <span class="badge badge-secondary d-inline ml-3 line-height-1-8"
+                  <span class="badge bg-secondary d-inline ms-3 line-height-1-8"
                     >East: {{ bbox()?.eastBoundLongitude | number: '1.0-4' }}</span
                   ></label
                 >
                 <label
-                  ><span class="badge badge-secondary d-inline ml-5 line-height-1-8"
+                  ><span class="badge bg-secondary d-inline ms-5 line-height-1-8"
                     >South: {{ bbox()?.southBoundLatitude | number: '1.0-4' }}</span
                   ></label
                 >
