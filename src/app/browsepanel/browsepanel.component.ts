@@ -174,25 +174,24 @@ export class BrowsePanelComponent implements OnInit, AfterViewInit, OnDestroy {
    * @param layer LayerModel for layer to add
    */
   public addLayerToMap(layer: LayerModel): void {
-    // Query GetCapabilities for layers that need it
     if (Array.isArray(config.queryGetCapabilitiesTimes) && config.queryGetCapabilitiesTimes.indexOf(layer.id) !== -1) {
-      this.filterService.updateLayerTimes(layer, new LayerTimes());
-      this.filterService.getLayerTimesBS(layer.id).pipe(
-        filter(lt => !!(lt && (lt.currentTime || (lt.timeExtent && lt.timeExtent.length > 0))) || lt.loadingTimeExtent === false),
-        take(1)
-      ).subscribe(layerTimes => {
-        const timeParam = layerTimes?.currentTime ?? (layerTimes?.timeExtent?.length ? layerTimes.timeExtent[0] : undefined);
-        this.layerManagerService.addLayer(layer, [], null, timeParam);
-      });
+        this.filterService.updateLayerTimes(layer, new LayerTimes());
+
+        this.filterService.getLayerTimesBS(layer.id).pipe(
+            filter(lt => !lt.loadingTimeExtent && (!!lt.currentTime || lt.timeExtent.length > 0)),
+            take(1)
+        ).subscribe(layerTimes => {
+            const timeParam = layerTimes.currentTime ?? layerTimes.timeExtent[0];
+            this.layerManagerService.addLayer(layer, [], null, timeParam);
+        });
     } else {
-      this.layerManagerService.addLayer(layer, [], null, undefined);
+        this.layerManagerService.addLayer(layer, [], null, undefined);
     }
 
-    // Close panel once layer is added, unless user requests it stay open
     if (!this.panelStayOpen) {
-      this.toggleBrowsePanel(false);
+        this.toggleBrowsePanel(false);
     }
-  }
+}
 
   /**
    * Handle layer added from info subpanel.

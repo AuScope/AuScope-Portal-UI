@@ -99,7 +99,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
 
     // Subscribe to receiving the layer's time extent, if it has one
     this.filterService.getLayerTimesBS(this.layer.id).subscribe(times => {
-      this.layerTimes = times;
+      this.layerTimes = { ...times };
     });
 
     // Add any layer specific advanced filter components

@@ -37,9 +37,6 @@ export const environment = {
       tooltip: 'Natural Earth II, darkened for contrast.\nhttp://www.naturalearthdata.com/', layerType: 'NEII' },
     { value: '', viewValue: 'National Map', tooltip: 'Australia National Map', layerType: 'GA' }
   ],
-  grace: {
-    hostUrl: 'https://insargrace.geoanalytics.csiro.au:/grace/grace'
-  },
   urlNeedProxy: ['http://ogc-jdlc.curtin.edu.au:80',
                 'https://geossdi.dmp.wa.gov.au',
                 'https://geology.data.vic.gov.au',

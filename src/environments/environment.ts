@@ -36,14 +36,11 @@ export const environment = {
     { value: 'AerialWithLabels', viewValue: 'Bing Aerial With Labels', tooltip: 'Bing Maps Aerial with Labels', layerType: 'Bing' },
     { value: '', viewValue: 'National Map', tooltip: 'Australia National Map', layerType: 'GA' }
   ],
-  grace: {
-    hostUrl: 'https://insargrace.geoanalytics.csiro.au:/grace/grace'
-  },
   urlNeedProxy: ['http://ogc-jdlc.curtin.edu.au:80',
                 'https://geossdi.dmp.wa.gov.au',
                 'https://geology.data.vic.gov.au',
                 'http://geology.data.vic.gov.au',
-                'http://geoserver.octopusdata.org'],
+                'http://geoserver.octopusdata.org',
+                'https://insargrace.geoanalytics.csiro.au'],
   appVersion: packagejson.version
-
 }
