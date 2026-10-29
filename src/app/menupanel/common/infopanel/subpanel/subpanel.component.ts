@@ -357,7 +357,8 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
               });
             }
             const wmsOnlineResource = this.cswRecord.onlineResources.find(r => r.type.toLowerCase() === 'wms');
-            if ((wmsOnlineResource) && (this.cswRecord.legendSupport)){
+            // legendSupport is only set for layers added via GetCapabilities
+            if (wmsOnlineResource && this.cswRecord.legendSupport !== false) {
                const params = 'SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png'
                     + '&LAYER=' + wmsOnlineResource.name + '&LAYERS=' + wmsOnlineResource.name
                     + '&LEGEND_OPTIONS=forceLabels:on;minSymbolSize:16';
@@ -369,7 +370,6 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
                     this.legendUrl = this.layer.legendImg;
                 }
             }
-            //}
 
             // Gather up BBOX coordinates to calculate the centre and envelope. Use a copy of coords so they don't stay modified for the main map
             const bbox = { ...this.cswRecord.geographicElements[0] };

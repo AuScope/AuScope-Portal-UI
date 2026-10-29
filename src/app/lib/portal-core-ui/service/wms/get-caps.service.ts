@@ -83,23 +83,28 @@ export class GetCapsService {
    * @param nsResolver namespace resolver function
    * @returns applicationProfile boolean
    */
-  private isLegendSupported(doc: Document, nsResolver: (prefix: string | null) => string): boolean {
-    let legendFound: boolean = false;
-
-    const LEGEND_TEXT = "//xsi:WMS_Capabilities/xsi:Capability/xsi:Request/*";
-    const nodes = SimpleXMLService.evaluateXPathNodeArray(doc, doc, LEGEND_TEXT, nsResolver);
-    nodes.forEach((node: any) => {
-      const name = SimpleXMLService.getNodeLocalName(node);
-      if (name.toLowerCase().startsWith("GetLegendGraphic")) {
-        legendFound = true;
+  private isLegendSupported(doc: Document, _nsResolver: (prefix: string | null) => string): boolean {
+    // Look for a GetLegendGraphic request
+    const capabilityNodes = SimpleXMLService.getMatchingChildNodes(doc.documentElement, undefined, "Capability");
+    if (capabilityNodes.length > 0) {
+      const requestNodes = SimpleXMLService.getMatchingChildNodes(capabilityNodes[0], undefined, "Request");
+      if (requestNodes.length > 0) {
+        for (const requestChild of SimpleXMLService.getMatchingChildNodes(requestNodes[0])) {
+          const name = SimpleXMLService.getNodeLocalName(requestChild);
+          if (name.toLowerCase() === "getlegendgraphic") {
+            return true;
+          }
+        }
       }
-    });
+    }
 
-    const LEGEND_URL_TEXT = "//xsi:LegendURL";
-    const nodesUrl = SimpleXMLService.evaluateXPathNodeArray(doc, doc, LEGEND_URL_TEXT, nsResolver);
-    if (nodesUrl.length > 0) { legendFound = true; }
+    // Fall back to any LegendURL element anywhere in the document
+    const legendUrlNodes = doc.getElementsByTagNameNS("*", "LegendURL");
+    if (legendUrlNodes.length > 0) {
+      return true;
+    }
 
-    return legendFound;
+    return false;
   }
 
 

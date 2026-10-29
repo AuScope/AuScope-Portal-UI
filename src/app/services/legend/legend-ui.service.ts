@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
 import { Constants } from '../../lib/portal-core-ui/utility/constants.service';
 import { LayerModel } from '../../lib/portal-core-ui/model/data/layer.model';
@@ -25,7 +25,9 @@ export class LegendUiService {
 
 
   // Track which legends are open
-  displayedLegends: Map<string, MatDialogRef<LegendModalComponent>> = new Map<string, MatDialogRef<LegendModalComponent>>();
+  private readonly displayedLegends = signal<Map<string, MatDialogRef<LegendModalComponent>>>(
+    new Map<string, MatDialogRef<LegendModalComponent>>()
+  );
 
   /**
    * Get the first WMS OnlineResource for a layer
@@ -71,7 +73,7 @@ export class LegendUiService {
    * @param legendTitle the title for the dialog
    * @param legendRequestList list of image requests (either this or legendUrlList will be required)
    */
-  private displayLegendDialog(layerId: string, legendTitle: string, legendRequestList: Observable<any>[]) {
+  private displayLegendDialog(layerId: string, legendTitle: string, legendRequestList: Observable<Blob | undefined>[]) {
     const dialogConfig = new MatDialogConfig();
       dialogConfig.autoFocus = true;
       dialogConfig.hasBackdrop = false;
@@ -82,7 +84,11 @@ export class LegendUiService {
         legendRequestList: legendRequestList
       };
       const dialogRef = this.dialog.open(LegendModalComponent, dialogConfig);
-      this.displayedLegends.set(layerId, dialogRef);
+      this.displayedLegends.update(legends => {
+        const next = new Map(legends);
+        next.set(layerId, dialogRef);
+        return next;
+      });
       dialogRef.afterClosed().subscribe(() => {
         this.removeLegend(layerId);
       });
@@ -155,7 +161,34 @@ export class LegendUiService {
   }
 
   /**
-   * Method to display a legend for the layer
+   * Create a blob request
+   *
+   * @param url URL for blob request
+   * @returns an Observable for a blob or undefined
+   */
+  private createBlobRequest(url: string): Observable<Blob | undefined> {
+    return this.http.get(url, { responseType: 'blob' }).pipe(
+      catchError(() => of(undefined))
+    );
+  }
+
+  /**
+   * Creates a proxied blob request
+   *
+   * @param httpParams params for blob request
+   * @returns an Observable for a blob or undefined
+   */
+  private createProxyBlobRequest(httpParams: HttpParams): Observable<Blob | undefined> {
+    const proxyUrl = this.env.portalBaseUrl + Constants.PROXY_API;
+    return this.http.post(proxyUrl, httpParams, {
+      responseType: 'blob'
+    }).pipe(
+      catchError(() => of(undefined))
+    );
+  }
+
+  /**
+   * Display a legend for the layer
    *
    * @param layer the layer
    */
@@ -174,7 +207,7 @@ export class LegendUiService {
 
     // Get first WMS online resource for layer name
     const wmsOnlineResource = this.getWMSOnlineResource(layer);
-    if (!wmsOnlineResource || this.displayedLegends.has(layer.id)) {
+    if (!wmsOnlineResource || this.displayedLegends().has(layer.id)) {
       return;
     }
 
@@ -196,70 +229,44 @@ export class LegendUiService {
       if (sldBody) {
         const wmsOnlineResources = this.getWMSOnlineResources(layer);
         // Compile list of legend requests and/or URLs
-        const legendRequestList: Observable<any>[] = [];
+        const legendRequestList: Observable<Blob | undefined>[] = [];
         for (const resource of wmsOnlineResources) {
-          if (!this.layerStatusService.isEndpointFailing(layer.id, wmsOnlineResource)) {
+          if (!this.layerStatusService.isEndpointFailing(layer.id, resource)) {
             // Some GET URLs were being truncated at the server despite not being very long, other servers were outright rejecting POST
             // requests, so create lists of GET URLs and POST requests to throw everything at the wall and see what sticks.
 
             // Assemble params, including 'GetLegend' params
             const httpParams = this.getLegendHttpParams(this.trimUrl(resource.url), wmsOnlineResource.name, collatedParam, sldBody);
             // Make a POST request with proxy
-            const proxyUrl = this.env.portalBaseUrl + Constants.PROXY_API;
-            const postRequest = this.http.post(proxyUrl, httpParams, { responseType: 'blob' }).pipe(
-              catchError(() => {
-                return of(undefined);
-              })
-            );
-            legendRequestList.push(postRequest);
+            legendRequestList.push(this.createProxyBlobRequest(httpParams));
 
             // Make a GET request, no proxy
             const requestUrl = this.createLegendUrl(resource.url, resource.name, sldBody);
-            const getRequest = this.http.get(requestUrl, { responseType: 'blob' }).pipe(
-              catchError(() => {
-                return of(undefined);
-              })
-            );
-            legendRequestList.push(getRequest);
+            legendRequestList.push(this.createBlobRequest(requestUrl));
           }
         }
         this.displayLegendDialog(layer.id, layer.name, legendRequestList);
       } else {
         // It comes here when there is no SLD_BODY parameter
 
-        // Create a POST request with proxy, with the proxy this enables us to use HTTP services
-        // Assemble params, including 'GetLegend' params
-        const httpParams = this.getLegendHttpParams(this.trimUrl(wmsOnlineResource.url), wmsOnlineResource.name, collatedParam);
-        const proxyUrl = this.env.portalBaseUrl + Constants.PROXY_API;
-        const postRequest = this.http.post(proxyUrl, httpParams, { responseType: 'blob' }).pipe(
-          catchError(() => {
-            return of(undefined);
-          })
-        );
-
-        // Create a GET request, no proxy
+        // Create a POST request with proxy and GET request no proxy
         const requestUrl = this.createLegendUrl(wmsOnlineResource.url, wmsOnlineResource.name);
-        const getRequest = this.http.get(requestUrl, { responseType: 'blob' }).pipe(
-          catchError(() => {
-            return of(undefined);
-          })
-        );
+        const httpParams = this.getLegendHttpParams(this.trimUrl(wmsOnlineResource.url), wmsOnlineResource.name, collatedParam);
+        const legendRequestList: Observable<Blob | undefined>[] = [
+          this.createBlobRequest(requestUrl),
+          this.createProxyBlobRequest(httpParams)
+        ];
 
-        // Create a GET request, using the LegendURL
-        let getRequestLegendUrl: Observable<any> | undefined;
-        layer.capabilityRecords[0].layers.forEach((l: any) => {
-          if (l.name.startsWith(layer.id)) {
-            const requestLegendUrl = l.legendUrl;
-            getRequestLegendUrl = this.http.get(requestLegendUrl, { responseType: 'blob' }).pipe(
-              catchError(() => {
-                return of(undefined);
-              })
-            );
-          }
-        });
-        if (getRequestLegendUrl) {
-          this.displayLegendDialog(layer.id, layer.name, [getRequest, postRequest, getRequestLegendUrl]);
+        // Optionally add a GET request using the LegendURL from the GetCapabilities response
+        const capabilityLayers = layer.capabilityRecords?.[0]?.layers;
+        if (capabilityLayers) {
+          capabilityLayers.forEach((l: any) => {
+            if (l.name?.startsWith(layer.id) && l.legendUrl) {
+              legendRequestList.push(this.createBlobRequest(l.legendUrl));
+            }
+          });
         }
+        this.displayLegendDialog(layer.id, layer.name, legendRequestList);
       }
     });
   }
@@ -270,10 +277,14 @@ export class LegendUiService {
    * @param layerId ID of relevant layer
    */
   public removeLegend(layerId: string): void {
-    const legend = this.displayedLegends.get(layerId);
+    const legend = this.displayedLegends().get(layerId);
     if (legend) {
       legend.close();
-      this.displayedLegends.delete(layerId);
+      this.displayedLegends.update(legends => {
+        const next = new Map(legends);
+        next.delete(layerId);
+        return next;
+      });
     }
   }
 
@@ -284,7 +295,7 @@ export class LegendUiService {
    * @returns true if legend is displayed for layer, false otherwise
    */
   public isLegendDisplayed(layerId: string): boolean {
-    return this.displayedLegends.has(layerId);
+    return this.displayedLegends().has(layerId);
   }
 
 }
