@@ -17,7 +17,6 @@ import { LayerStatusService } from '../../utility/layerstatus.service';
 import { DeviceDetectorService } from 'ngx-device-detector';
 import * as turf from '@turf/turf';
 
-import * as when from 'when';
 import { TileProviderError } from 'cesium';
 import { SldService } from '../style/wms/sld.service';
 import { config } from '../../../../../../src/environments/config';
@@ -523,7 +522,18 @@ export class CsWMSService {
             .then(function (_supportsImageBitmap: any) {
               const responseType = "blob";
               const method = "POST";
-              const xhrDeferred = when.defer();
+              // Native-Promise deferred (replaces the legacy 'when' library's
+              // when.defer()). Cesium's loadWithXhr writes to .resolve/.reject,
+              // and we chain on .promise below.
+              const xhrDeferred: { promise: Promise<any>; resolve: (value?: any) => void; reject: (reason?: any) => void } = {
+                promise: undefined as any,
+                resolve: undefined as any,
+                reject: undefined as any
+              };
+              xhrDeferred.promise = new Promise<any>((resolve, reject) => {
+                xhrDeferred.resolve = resolve;
+                xhrDeferred.reject = reject;
+              });
               // Assemble parameters into a form for 'POST' request
               const postForm = new FormData();
               postForm.append('service', 'WMS');

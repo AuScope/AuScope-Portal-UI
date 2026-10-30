@@ -13,29 +13,18 @@
       "projectType": "application",
       "architect": {
         "build": {
-          "builder": "@angular-builders/custom-webpack:browser",
+          "builder": "@angular/build:application",
           "options": {
             "preserveSymlinks": true,
             "aot": true,
             "outputPath": "dist",
             "index": "src/index.html",
-            "main": "src/main.ts",
+            "browser": "src/main.ts",
             "tsConfig": "src/tsconfig.app.json",
-            "outputHashing": "all",
             "sourceMap": false,
-            "namedChunks": false,
             "extractLicenses": true,
-            "vendorChunk": false,
-            "optimization": {
-              "scripts": false,
-              "styles": {
-                "minify": true,
-                "inlineCritical": true
-              },
-              "fonts": true
-            },
-            "buildOptimizer": false,
-            "polyfills": "src/polyfills.ts",
+            "polyfills": ["zone.js"],
+            "allowedCommonJsDependencies": ["*"],
             "assets": [
               "src/contexts",
               "src/template",
@@ -46,6 +35,16 @@
                 "glob": "**/*",
                 "input": "./node_modules/cesium/Build/Cesium",
                 "output": "./assets/cesium"
+              },
+              {
+                "glob": "d3.min.js",
+                "input": "./node_modules/d3",
+                "output": "./assets/vendor"
+              },
+              {
+                "glob": "rickshaw.min.js",
+                "input": "./node_modules/rickshaw",
+                "output": "./assets/vendor"
               }
             ],
             "styles": [
@@ -64,26 +63,19 @@
               "node_modules/jquery/dist/jquery.min.js",
               "node_modules/jquery-ui/dist/jquery-ui.min.js",
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
-              "node_modules/d3/d3.min.js",
-              "node_modules/rickshaw/rickshaw.min.js",
               "src/extension/js/extensions.js",
-              "src/extension/js/Rickshaw.Graph.RangeSlider.MultiPreview.min.js",
-              "src/extension/js/Rickshaw.Graph.SmootherPlus.min.js",
               "node_modules/lzma/src/lzma_worker.js",
-              "src/extension/js/box.js",
-              "src/extension/js/d3.legend.js",
               "src/extension/js/no-ie-support.js"
-            ],
-            "customWebpackConfig": {
-              "path": "./extra-webpack.config.js"
-            }
+            ]
           },
           "configurations": {
             "audev": {
+              "outputHashing": "all",
               "budgets": [
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "20kb"
+                  "maximumWarning": "80kb",
+                  "maximumError": "120kb"
                 }
               ],
               "fileReplacements": [
@@ -94,10 +86,12 @@
               ]
             },
             "production": {
+              "outputHashing": "all",
               "budgets": [
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "20kb"
+                  "maximumWarning": "80kb",
+                  "maximumError": "120kb"
                 }
               ],
               "fileReplacements": [
@@ -108,18 +102,16 @@
               ]
             },
             "development": {
-              "buildOptimizer": false,
+              "outputHashing": "none",
               "optimization": false,
-              "vendorChunk": true,
               "extractLicenses": false,
-              "sourceMap": true,
-              "namedChunks": true
+              "sourceMap": true
             }
           },
           "defaultConfiguration": "production"
         },
         "serve": {
-          "builder": "@angular-builders/custom-webpack:dev-server",
+          "builder": "@angular/build:dev-server",
           "options": {
             "buildTarget": "project:build",
             "proxyConfig": "./proxy.conf.json"
@@ -148,18 +140,17 @@
           "options": {
             "main": "src/test.ts",
             "karmaConfig": "./karma.conf.js",
-            "polyfills": "src/polyfills.ts",
+            "polyfills": ["zone.js"],
             "tsConfig": "src/tsconfig.spec.json",
             "scripts": [
+<<<<<<< HEAD
+=======
               "node_modules/jquery/dist/jquery.min.js",
               "node_modules/d3/d3.min.js",
               "node_modules/rickshaw/rickshaw.min.js",
+>>>>>>> 592a57c3174f2b11cb257c9b9b38507ab953252c
               "src/extension/js/extensions.js",
-              "src/extension/js/Rickshaw.Graph.RangeSlider.MultiPreview.min.js",
-              "src/extension/js/Rickshaw.Graph.SmootherPlus.min.js",
-              "node_modules/lzma/src/lzma_worker-min.js",
-              "src/extension/js/box.js",
-              "src/extension/js/d3.legend.js"
+              "node_modules/lzma/src/lzma_worker-min.js"
             ],
             "styles": [
               "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",

@@ -13,13 +13,13 @@ import packagejson from '../../package.json';
 export const environment = {
   production: false,
   getCSWRecordEndP: 'getKnownLayers.do',
-  portalBaseUrl: 'http://localhost:8080/api/',
-  portalProxyUrl: '/api/',
-  authBaseUrl: 'http://localhost:8080/api/',
-  hostUrl: 'http://localhost:4200',
+  portalBaseUrl: 'https://auportal-dev.geoanalytics.group/api/',
+  portalProxyUrl: 'https://auportal-dev.geoanalytics.group/api/',
+  authBaseUrl: 'https://auportal-dev.geoanalytics.group/api/',
+  hostUrl: 'https://auportal-dev.geoanalytics.group',
   nVCLAnalyticalUrl: 'https://nvclanalytics.azurewebsites.net/NVCLAnalyticalServices/',
   // AUS-4681 We have moved 'https://research-community.geoanalytics.csiro.au/geoserver' to 'https://portal.auscope.org.au/geoserver/'
-  geoserverUrl: 'https://portal.auscope.org.au/geoserver/', 
+  geoserverUrl: 'https://portal.auscope.org.au/geoserver/',
   rudderStackWriteKey: null, // RudderStack write key
   rudderStackDataPlaneUrl: null, // RudderStack data plane URL
   bingMapsKey: '',
@@ -36,8 +36,7 @@ export const environment = {
     { value: 'AerialWithLabels', viewValue: 'Bing Aerial With Labels', tooltip: 'Bing Maps Aerial with Labels', layerType: 'Bing' },
     { value: '', viewValue: 'National Map', tooltip: 'Australia National Map', layerType: 'GA' }
   ],
-  urlNeedProxy: ['http://ogc-jdlc.curtin.edu.au:80',
-                'https://geossdi.dmp.wa.gov.au',
+  urlNeedProxy: ['https://geossdi.dmp.wa.gov.au',
                 'https://geology.data.vic.gov.au',
                 'http://geology.data.vic.gov.au',
                 'http://geoserver.octopusdata.org',

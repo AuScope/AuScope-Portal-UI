@@ -19,7 +19,7 @@ export const environment = {
   hostUrl: 'https://auportal-dev.geoanalytics.group',
   nVCLAnalyticalUrl: 'https://nvclanalytics.azurewebsites.net/NVCLAnalyticalServices/',
   // AUS-4681 We have moved 'https://research-community.geoanalytics.csiro.au/geoserver' to 'https://portal.auscope.org.au/geoserver/'
-  geoserverUrl: 'https://portal.auscope.org.au/geoserver/', 
+  geoserverUrl: 'https://portal.auscope.org.au/geoserver/',
   rudderStackWriteKey: null, // RudderStack write key
   rudderStackDataPlaneUrl: null, // RudderStack data plane URL
   bingMapsKey: 'Bing_Maps_Key',
@@ -37,8 +37,7 @@ export const environment = {
       tooltip: 'Natural Earth II, darkened for contrast.\nhttp://www.naturalearthdata.com/', layerType: 'NEII' },
     { value: '', viewValue: 'National Map', tooltip: 'Australia National Map', layerType: 'GA' }
   ],
-  urlNeedProxy: ['http://ogc-jdlc.curtin.edu.au:80',
-                'https://geossdi.dmp.wa.gov.au',
+  urlNeedProxy: ['https://geossdi.dmp.wa.gov.au',
                 'https://geology.data.vic.gov.au',
                 'http://geology.data.vic.gov.au',
                 'http://geoserver.octopusdata.org'],
