@@ -39,7 +39,6 @@ export const environment = {
   urlNeedProxy: ['https://geossdi.dmp.wa.gov.au',
                 'https://geology.data.vic.gov.au',
                 'http://geology.data.vic.gov.au',
-                'http://geoserver.octopusdata.org',
-                'https://insargrace.geoanalytics.csiro.au'],
+                'http://geoserver.octopusdata.org'],
   appVersion: packagejson.version
 }
