@@ -369,11 +369,11 @@ export class ActiveLayersPanelComponent implements AfterViewInit {
     if (layer.legendImg && layer.legendImg !== '') {
       return true;
     }
-    // Look for a WMS URL
+    // Look for a record with a WMS URL
     if (layer.cswRecords) {
       for (const record of layer.cswRecords) {
-        if (!record.legendSupport) { return false; }
-        if (record.onlineResources.find(r => r.type.toLowerCase() === 'wms')) {
+        if (record.legendSupport === false) { continue; }
+        if (record.onlineResources?.find(r => r.type.toLowerCase() === 'wms')) {
           return true;
         }
       }

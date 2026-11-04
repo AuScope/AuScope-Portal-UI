@@ -30,5 +30,7 @@ export class CSWRecordModel {
   temporalExtent?: TemporalExtentModel;
   knownLayerIds?: string[];
   layerSRS!: string[];
-  legendSupport! : boolean;
+  // Only populated for layers added via a WMS GetCapabilities request.
+  // Undefined for backend-registered layers (getKnownLayers.do).
+  legendSupport?: boolean;
 }
