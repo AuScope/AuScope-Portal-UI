@@ -226,7 +226,6 @@ export class NVCLService {
         return url
       }
     })).pipe(mergeMap((url: any) => {
-      console.log("Checking URL: " + url);
       // No cache URL for this dataset (service unavailable or no matching endpoint),
       // so don't send a HEAD request to "undefined" or "" (both resolve against the app origin)
       if (!url) {
