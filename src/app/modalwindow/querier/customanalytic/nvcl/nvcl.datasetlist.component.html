@@ -65,8 +65,11 @@
           }
           <!-- END Add definition -->
           <!-- Images -->
-          <iframe (load)="setImagesLoaded($event, nvclDataset.datasetId)" frameborder="0"
-          [src]="datasetImages[nvclDataset.datasetId] | trustResourceUrl"></iframe>
+          <!-- Only render once the mosaic URL is known, otherwise the iframe loads "<origin>/undefined" -->
+          @if (datasetImages[nvclDataset.datasetId]) {
+            <iframe (load)="setImagesLoaded($event, nvclDataset.datasetId)" frameborder="0"
+            [src]="datasetImages[nvclDataset.datasetId] | trustResourceUrl"></iframe>
+          }
         </div>
       </div>
       <!-- END IMAGE tabcontent -->

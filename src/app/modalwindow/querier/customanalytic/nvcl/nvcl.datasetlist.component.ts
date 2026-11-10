@@ -109,24 +109,28 @@ export class NVCLDatasetListComponent implements OnInit {
     }
 
     this.nvclService.getNVCLDatasets(this.onlineResource().url, this.featureId()).subscribe(result => {
-      for (const nvclDataset of result) {
-        this.nvclService.setScalarLoaded(false);
-        nvclDataset.image = true;
-        nvclDataset.scalar = false;
-        nvclDataset.download = false;
-        nvclDataset.TSGCacheDownloadurl = "";
-        if (this.nvclBoreholeAnalyticService.hasSavedEmail()) {
-          this.downloadEmail = this.nvclBoreholeAnalyticService.getUserEmail();
+      if (Array.isArray(result)) {
+        for (const nvclDataset of result) {
+          this.nvclService.setScalarLoaded(false);
+          nvclDataset.image = true;
+          nvclDataset.scalar = false;
+          nvclDataset.download = false;
+          nvclDataset.TSGCacheDownloadurl = "";
+          if (this.nvclBoreholeAnalyticService.hasSavedEmail()) {
+            this.downloadEmail = this.nvclBoreholeAnalyticService.getUserEmail();
+          }
+          this._getNVCLImage(this.onlineResource().url, nvclDataset.datasetId, undefined);
+          this._getNVCLScalar(this.onlineResource().url, nvclDataset.datasetId);
+          this.isCachedTSGFileAvailable(nvclDataset);
+          this.nvclDatasets.set([...this.nvclDatasets(), nvclDataset]);
         }
-        this._getNVCLImage(this.onlineResource().url, nvclDataset.datasetId, undefined);
-        this._getNVCLScalar(this.onlineResource().url, nvclDataset.datasetId);
-        this.isCachedTSGFileAvailable(nvclDataset);
-        this.nvclDatasets.set([...this.nvclDatasets(), nvclDataset]);
-      }
-      if (result.length === 0) {
-        this.nvclService.setAnalytic(false);
+        if (result.length === 0) {
+          this.nvclService.setAnalytic(false);
+        } else {
+          this.nvclService.setAnalytic(true);
+        }
       } else {
-        this.nvclService.setAnalytic(true);
+        this.nvclService.setAnalytic(false);
       }
     });
 
