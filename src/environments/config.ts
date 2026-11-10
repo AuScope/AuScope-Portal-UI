@@ -30,9 +30,7 @@ export const config = {
   // Layers that support downloads of an area bounded by a polygon
   polygonSupportedLayer: [
     'mineral-tenements',
-    'tima-geosample',
     'nvcl-v2-borehole',
-    'tima-shrimp-geosample',
     'erl-mineview',
     'erl-mineraloccurrenceview',
     'erl-commodityresourceview'
@@ -244,8 +242,6 @@ export const config = {
     'erml-mine',
     'erml-mineraloccurrence',
     'mineral-tenements',
-    'tima-geosample',
-    'tima-shrimp-geosample',
     'mineral-occ-view',
     'gsv-geological-unit-250k-',
     'gsv-geological-unit-contact-250k-',
@@ -375,8 +371,6 @@ export const config = {
     'nvcl-v2-borehole',
     'nvcl-borehole',
     'mineral-tenements',
-    'tima-geosample',
-    'tima-shrimp-geosample',
     'mscl-borehole',
     'mscl-gssa-borehole',
     'sf0-borehole-nvcl'
@@ -444,13 +438,6 @@ export const config = {
     },
     'remanent-anomalies-EMAG': {
         serviceName: 'RemanentAnomaliesStyleService'
-    },
-    // Add generic style service for layers that previously used doGenericFilterStyle.do
-    'tima-geosample': {
-      serviceName: 'GenericStyleService',
-    },
-    'tima-shrimp-geosample': {
-      serviceName: 'GenericStyleService',
     },
     'igsn-sample': {
       serviceName: 'GenericStyleService',
