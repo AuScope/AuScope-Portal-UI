@@ -26,13 +26,13 @@
                   </div>
                   @if (item.logName) {
                     <div class="col-4">
-                      @if (datasetScalarDefinition[item.logName]!==undefined) {
+                      @if (datasetScalarDefinition()[item.logName]!==undefined) {
                         <span
                           (mouseover)=onMouseoverScalarDefinition(item.logName)>
                           <div class="fake-link"> ? </div>
                         </span>
                       }
-                      @if (datasetScalarDefinition[item.logName] === undefined) {
+                      @if (datasetScalarDefinition()[item.logName] === undefined) {
                         <span>
                           <div class="fake-link" (mouseover)="getDefinition(item.logName)"> ? </div>
                         </span>
@@ -47,13 +47,13 @@
                     <div>{{item.logName}}</div>
                   </div>
                   <div class="col-4">
-                    @if (datasetScalarDefinition[item.logName]!==undefined) {
+                    @if (datasetScalarDefinition()[item.logName]!==undefined) {
                       <span
                         (mouseover)=onMouseoverScalarDefinition(item.logName)>
                         <div class="fake-link">?</div>
                       </span>
                     }
-                    @if (datasetScalarDefinition[item.logName] === undefined) {
+                    @if (datasetScalarDefinition()[item.logName] === undefined) {
                       <span>
                         <div class="fake-link" (mouseover)="getDefinition(item.logName)">?</div>
                       </span>
@@ -94,7 +94,7 @@
           <div class="container-fluid">
             <div class="row justify-content-between d-none d-md-flex">
               <div class="col-3">
-                @if (jobList[data.featureId] && jobList[data.featureId].length > 0) {
+                @if (jobList[featureId()] && jobList[featureId()].length > 0) {
                   <div
                     title="Job View" (click)="jobView=true;" class="btn btn-light btn-sm"
                     [ngClass]="{'lightgray-bg':jobView}">
@@ -152,9 +152,9 @@
                                 </td>
                                 <td>
                                   <div>{{datasetScalar.logName}}</div>
-                                  @if (datasetScalarDefinition[datasetScalar.logName]) {
+                                  @if (datasetScalarDefinition()[datasetScalar.logName]) {
                                     <div>
-                                      {{datasetScalarDefinition[datasetScalar.logName].definition}}
+                                      {{datasetScalarDefinition()[datasetScalar.logName].definition}}
                                     </div>
                                   }
                                 </td>
@@ -180,7 +180,7 @@
                       <!-- BEGIN container -->
                       <div class="container-fluid">
                         <!-- BEGIN row -->
-                        @for (job of jobList[data.featureId]; track job) {
+                        @for (job of jobList[featureId()]; track job) {
                           <div class="row rowScalar">
                             <div class="col-sm-1 checkbox">
                               <input type="checkbox" value="10"

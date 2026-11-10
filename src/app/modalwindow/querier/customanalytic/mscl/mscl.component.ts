@@ -1,7 +1,7 @@
-import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject, input } from '@angular/core';
 import { MSCLService } from '../../../layeranalytic/mscl/mscl.service';
 import { MSCLAnalyticComponent } from '../../../layeranalytic/mscl/mscl.analytic.component';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
     selector: 'app-mscl',
@@ -22,7 +22,10 @@ export class MSCLComponent implements OnInit {
      *   featureId: string;
      *   doc: QuerierInfoModel;
      */
-    public data = inject(MAT_DIALOG_DATA);
+    layer = input.required<any>();
+    onlineResource = input.required<any>();
+    featureId = input.required<string>();
+    doc = input.required<any>();
 
     public msclform: {
       startDepth: number,
@@ -57,11 +60,11 @@ export class MSCLComponent implements OnInit {
         // The members of the list take the form of XML element names  e.g. p_wave_velocity
         let metricList = [];
         // Find out if values are nested within GeoSciML observations
-        this.usesGMLObs = this.msclService.usesGMLObs(this.data.doc.raw);
+        this.usesGMLObs = this.msclService.usesGMLObs(this.doc().raw);
         if (this.usesGMLObs) {
-            metricList = this.msclService.findMetricTypes(this.data.doc.raw);
+            metricList = this.msclService.findMetricTypes(this.doc().raw);
         } else {
-            const searchResult = /<gsmlp:datasetProperties>[a-z_,]*<\/gsmlp:datasetProperties>/.exec(this.data.doc.raw);
+            const searchResult = /<gsmlp:datasetProperties>[a-z_,]*<\/gsmlp:datasetProperties>/.exec(this.doc().raw);
             if (searchResult) {
                 const metricsStr = searchResult.toString();
                 // Remove tags at ends and convert to a list
@@ -130,9 +133,9 @@ export class MSCLComponent implements OnInit {
                     'startDepth': this.msclform.startDepth,
                     'endDepth': this.msclform.endDepth,
                     'metricList': selecMetricList,
-                    'featureId': this.data.featureId,
+                    'featureId': this.featureId(),
                     'closeGraphModal': this.closeGraphModal.bind(this),
-                    'serviceUrl': this.data.onlineResource.url,
+                    'serviceUrl': this.onlineResource().url,
                     'usesGMLObs': this.usesGMLObs,
                 }
             });
