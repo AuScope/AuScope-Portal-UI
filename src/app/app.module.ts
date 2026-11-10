@@ -28,7 +28,6 @@ import { NVCLBoreholeAnalyticComponent } from './modalwindow/layeranalytic/nvcl/
 import { RemanentAnomaliesComponent } from './modalwindow/querier/customanalytic/RemanentAnomalies/remanentanomalies.component';
 import { DynamicAnalyticComponent } from './modalwindow/querier/dynamic.analytic.component';
 import { NVCLDatasetListComponent, NVCLDatasetListDialogComponent } from './modalwindow/querier/customanalytic/nvcl/nvcl.datasetlist.component';
-import { TIMAComponent } from './modalwindow/querier/customanalytic/tima/tima.component';
 import { CsMapSplitComponent } from './cesium-map/csmap.split.component';
 import { CsMapZoomComponent } from './cesium-map/csmap.zoom.component';
 import { NgbdModalStatusReportComponent } from './toppanel/renderstatus/renderstatus.component';
@@ -149,7 +148,6 @@ PlotlyModule.plotlyjs = PlotlyJS;
         DynamicAnalyticComponent,
         NVCLDatasetListComponent,
         NVCLDatasetListDialogComponent,
-        TIMAComponent,
         RemanentAnomaliesComponent,
         LayerAnalyticModalComponent,
         DynamicLayerAnalyticComponent,

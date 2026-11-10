@@ -44,20 +44,10 @@ export class DynamicAnalyticComponent implements OnChanges {
     // Default to MSCLComponent
     const component = this.layer.id in ref.analytic ? ref.analytic[this.layer.id as keyof typeof ref.analytic] : MSCLComponent;
     const componentRef = viewContainerRef.createComponent(component as Type<any>);
-
-    const instance = componentRef.instance as {
-      data: {
-        layer: LayerModel;
-        onlineResource: OnlineResourceModel;
-        featureId: string;
-        doc?: Document | QuerierInfoModel;
-      };
-    };
-
-    instance.data.layer = this.layer;
-    instance.data.onlineResource = this.onlineResource;
-    instance.data.featureId = this.featureId;
-    instance.data.doc = this.doc;
+    componentRef.setInput('layer', this.layer);
+    componentRef.setInput('onlineResource', this.onlineResource);
+    componentRef.setInput('featureId', this.featureId);
+    componentRef.setInput('doc', this.doc);
   }
 
 }

@@ -1,8 +1,7 @@
-import { Component, AfterViewInit, inject } from '@angular/core';
+import { Component, inject, input, computed } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { UtilitiesService } from '../../../../lib/portal-core-ui/utility/utilities.service';
 import { RemanentAnomaliesService } from './remanentanomalies.service';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 
 @Component({
@@ -11,7 +10,7 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
     styleUrls: ['../../../modalwindow.scss'],
     standalone: false
 })
-export class RemanentAnomaliesComponent implements AfterViewInit {
+export class RemanentAnomaliesComponent {
   remanentAnomaliesService = inject(RemanentAnomaliesService);
   domSanitizer = inject(DomSanitizer);
 
@@ -22,25 +21,28 @@ export class RemanentAnomaliesComponent implements AfterViewInit {
    *   featureId: string;
    *   doc: QuerierInfoModel;
   */
-  public data = inject(MAT_DIALOG_DATA);
+  layer = input.required<any>();
+  onlineResource = input.required<any>();
+  featureId = input.required<string>();
+  doc = input.required<any>();
 
-  public anomaliesId!: number;
-  public baseUrl!: string;
-  public hasModel!: boolean;
-  public hasAnalyses!: boolean;
+  public anomaliesId = computed(() => {
+    const docValue = this.doc().value;
+    return parseInt(
+      docValue.getAttribute('gml:id').replace('anomaly.', '')
+    );
+  });
 
+  public baseUrl = computed(() =>
+    UtilitiesService.getBaseUrl(this.onlineResource().url) + '/'
+  );
 
-  ngAfterViewInit(): void {
-    // the timeout fixes the - NG0100: ExpressionChangedAfterItHasBeenCheckedError error
-    // data fetching is asynchronous anyway, you can postpone it to be called in next
-    // macrotask (after ngAfterViewInit is finished) with a help of setTimeout with 0 time delay
-    setTimeout(() => {
-      const docValue = this.data.doc.value;
-      this.anomaliesId = docValue.getAttribute('gml:id').replace('anomaly.', '');
-      this.baseUrl = UtilitiesService.getBaseUrl(this.data.onlineResource.url) + '/';
-      this.hasModel = docValue.getElementsByTagName('RemAnom:modelCollection').length > 0;
-      this.hasAnalyses = docValue.getElementsByTagName('RemAnom:analysisCollection').length > 0;
-    });
-  }
+  public hasModel = computed(() =>
+    this.doc().value.getElementsByTagName('RemAnom:modelCollection').length > 0
+  );
+
+  public hasAnalyses = computed(() =>
+    this.doc().value.getElementsByTagName('RemAnom:analysisCollection').length > 0
+  );
 
 }

@@ -14,7 +14,7 @@
                 "background": {
                     "activeOnStart": true,
                     "beginsPattern": ".*",
-                    "endsPattern": "Compiled successfully\\."
+                    "endsPattern": "Watch mode enabled\\. Watching for file changes\\.?"
                 }
             }
         }
