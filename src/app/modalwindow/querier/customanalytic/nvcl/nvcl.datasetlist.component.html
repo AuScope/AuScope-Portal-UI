@@ -10,12 +10,12 @@
             <div class="loading-image"></div>
           }
           <!-- Add definition -->
-          <div style="width:500px;height:10px;overflow-wrap:break-word;">{{tipScalarDefinition}}</div>
+          <div style="width:500px;height:10px;overflow-wrap:break-word;">{{tipScalarDefinition()}}</div>
           <button class="float-end btn btn-lg btn-primary" mat-stroked-button
-          (click)="openLegend(nvclDataset.datasetId)" [disabled]="selectedScalar===null">Legend</button>
+          (click)="openLegend(nvclDataset.datasetId)" [disabled]="selectedScalar()===null">Legend</button>
           @if (nvclDataset.datasetId) {
             <ng-select style="z-index:10000;"
-              [items]="datasetScalars[nvclDataset.datasetId]" [multiple]="false" bindLabel="logName"
+              [items]="getDatasetScalars(nvclDataset.datasetId)" [multiple]="false" bindLabel="logName"
               bindValue="logId" placeholder="Select Scalar"
               (change)="changeScalarSelection(nvclDataset.datasetId)" (mouseout)=onMouseoutScalarDefinition()
               [(ngModel)]="selectedScalar">
@@ -65,8 +65,11 @@
           }
           <!-- END Add definition -->
           <!-- Images -->
-          <iframe (load)="setImagesLoaded($event, nvclDataset.datasetId)" frameborder="0"
-          [src]="datasetImages[nvclDataset.datasetId] | trustResourceUrl"></iframe>
+          <!-- Only render once the mosaic URL is known, otherwise the iframe loads "<origin>/undefined" -->
+          @if (getDatasetImages(nvclDataset.datasetId)) {
+            <iframe (load)="setImagesLoaded($event, nvclDataset.datasetId)" frameborder="0"
+            [src]="getDatasetImages(nvclDataset.datasetId) | trustResourceUrl"></iframe>
+          }
         </div>
       </div>
       <!-- END IMAGE tabcontent -->
@@ -76,7 +79,7 @@
         @if (nvclDataset) {
           <div>
             <div class="rowScalar" style="align-items: center;">
-              @if (drawGraphMode) {
+              @if (drawGraphMode()) {
                 <div title="close chart"
                   (click)="changeDrawGraphMode(false, nvclDataset.datasetId)" style="padding-right: 10px;">
                   <i class="fa fa-window-close fa-2x" aria-hidden="true"></i>
@@ -90,24 +93,24 @@
           </div>
         }
         <!-- BEGIN toolbar -->
-        @if (!drawGraphMode) {
+        @if (!drawGraphMode()) {
           <div class="container-fluid">
             <div class="row justify-content-between d-none d-md-flex">
               <div class="col-3">
                 @if (jobList[featureId()] && jobList[featureId()].length > 0) {
                   <div
-                    title="Job View" (click)="jobView=true;" class="btn btn-light btn-sm"
-                    [ngClass]="{'lightgray-bg':jobView}">
+                    title="Job View" (click)="jobView.set(true);" class="btn btn-light btn-sm"
+                    [ngClass]="{'lightgray-bg':jobView()}">
                     <span><i class="ti-flag-alt"></i>Job</span>
                   </div>
                 }
-                <div title="Scalar View" (click)="jobView=false;"
-                  class="btn btn-light btn-sm" [ngClass]="{'lightgray-bg':!jobView}">
+                <div title="Scalar View" (click)="jobView.set(false);"
+                  class="btn btn-light btn-sm" [ngClass]="{'lightgray-bg':!jobView()}">
                   <span><i class="ti-panel"></i> Scalar</span>
                 </div>
               </div>
               <div class="col-5">
-                @if (!jobView) {
+                @if (!jobView()) {
                   <div title="Download csv"
                     (click)="downloadCSV(nvclDataset.datasetId)" class="btn btn-light btn-sm">
                     <i class="ti-download"></i>
@@ -129,16 +132,16 @@
         <div class="modal-body">
           <div class="modal-card-size">
             <div class="container-fluid">
-              @if (drawGraphMode===false;) {
+              @if (drawGraphMode()===false;) {
                 <div style="width: 100%; height: 100%;">
                   <!-- overflow: auto;  -->
                   <div>
                     <!-- BEGIN jobView==false -->
-                    @if (jobView===false) {
+                    @if (jobView()===false) {
                       <div>
                         <!-- BEGIN container -->
                         <!-- BEGIN row -->
-                        @for (datasetScalar of datasetScalars[nvclDataset.datasetId]; track datasetScalar) {
+                        @for (datasetScalar of getDatasetScalars(nvclDataset.datasetId); track datasetScalar) {
                           <table class="table"
                             >
                             <tbody>
@@ -175,7 +178,7 @@
                   </div>
                   <!-- END jobView==false -->
                   <!-- BEGIN jobView==true -->
-                  @if (jobView===true) {
+                  @if (jobView()===true) {
                     <div>
                       <!-- BEGIN container -->
                       <div class="container-fluid">
@@ -205,19 +208,19 @@
                   <!-- END jobView==true -->
                 </div>
               }
-              @if (drawGraphMode===true;) {
+              @if (drawGraphMode()===true;) {
                 <div class="modal-card-size">
                   <div style="width: 100%; height: 100%;">
                     <div id="rickshawChart_outer">
                       <!-- Loading gif overlay if charts aren't done loading -->
-                      @if (processingGraph) {
+                      @if (processingGraph()) {
                         <div class="loading-chart"></div>
                       }
-                      @for (selectedLogName of selectedLogNames[nvclDataset.datasetId]; track selectedLogName; let j = $index) {
+                      @for (selectedLogName of getSelectedLogNames(nvclDataset.datasetId); track selectedLogName; let j = $index) {
                         <div
                           >
                           <div id="content_{{j}}" style="width: 900px; display: inline-flex;"
-                            [ngClass]="{'loading-iframe': processingGraph}">
+                            [ngClass]="{'loading-iframe': processingGraph()}">
                             <form
                               style="width: 220px; padding: 0px 0px 0px 0px; position: absolute; font-family:  Tahoma, Arial, Helvetica, sans-serif; font-size: 10pt;"
                               id="left_side_panel_{{j}}">
@@ -288,7 +291,7 @@
                             id="preview_last_{{j}}"></div> <!--  top: -122px; -->
                           </div>
                         </div>
-                        @if (j < selectedLogNames[nvclDataset.datasetId].length - 1) {
+                        @if (j < getSelectedLogNames(nvclDataset.datasetId)?.length - 1) {
                           <hr
                             style="margin-top: 20px; margin-bottom: 2rem;">
                         }
@@ -334,14 +337,14 @@
             <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
               <div class="btn-group">
                 <button type="button" class="btn btn-info btn-xs"
-                  (click)="downloadTSG(nvclDataset.datasetId)">@if (downloadingTSG) {
+                  (click)="downloadTSG(nvclDataset.datasetId)">@if (downloadingTSG()) {
                   <i
                   class="fa fa-spinner fa-spin fa-fw"></i>
                 }Prepare Tsg Dataset</button>
               </div>
               <div class="btn-group">
                 <button type="button" class="btn btn-info btn-xs" (click)="checkStatus()"
-                  [disabled]="!downloadEmail">@if (checkingTSG) {
+                  [disabled]="!downloadEmail()">@if (checkingTSG()) {
                   <i
                   class="fa fa-spinner fa-spin fa-fw"></i>
                 }Check status</button>

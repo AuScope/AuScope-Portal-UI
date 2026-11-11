@@ -1,5 +1,5 @@
 
-import { throwError as observableThrowError, Observable, BehaviorSubject } from 'rxjs';
+import { throwError as observableThrowError, Observable, BehaviorSubject, of } from 'rxjs';
 
 import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
 import { catchError, map, mergeMap } from 'rxjs/operators';
@@ -226,12 +226,16 @@ export class NVCLService {
         return url
       }
     })).pipe(mergeMap((url: any) => {
-      return this.http.head(url).pipe(map(_response => {
-        return url;
-      },() => {
-        url ="";
-        return url;
-      }));
+      // No cache URL for this dataset (service unavailable or no matching endpoint),
+      // so don't send a HEAD request to "undefined" or "" (both resolve against the app origin)
+      if (!url) {
+        return of("");
+      }
+      return this.http.head(url).pipe(
+        map(() => url),
+        // HEAD failed: the file is not cached
+        catchError(() => of(""))
+      );
     }));
 
   }

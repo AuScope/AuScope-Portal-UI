@@ -742,7 +742,7 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     }
 
     const csvContent = this.generateSimpleCSV();
-    const filename = `feature_${this.selectedLayer}_${this.selectedFeature}.csv`;
+    const filename = `feature_${this.selectedLayer()}_${this.selectedFeature}.csv`;
     this.downloadCSVFile(csvContent, filename);
   }
 
