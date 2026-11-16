@@ -277,7 +277,6 @@ export const config = {
     '500k_geol_4326',
     'bulkdensitypoint_4326',
     'waroxi_wa_4326_bed',
-    'sa-geochronology',
     'sa-field-observation-sites',
     'sa-surface-geology-7m',
     'sa-downhole-geochem-zinc',
