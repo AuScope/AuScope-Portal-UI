@@ -10,6 +10,7 @@ import { environment } from '../../../../../environments/environment';
 import { config } from '../../../../../environments/config';
 import { ResourceType } from '../../../../lib/portal-core-ui/utility/constants.service';
 import { take } from 'rxjs/operators';
+import { UILayerModelService } from '../../../../services/ui/uilayer-model.service';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 declare let rudderanalytics: any;
@@ -25,6 +26,7 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
     private filterService = inject(FilterService);
     private layerManagerService = inject(LayerManagerService);
     private layerHandlerService = inject(LayerHandlerService);
+    private uiLayerModelService = inject(UILayerModelService);
 
     @Input() cswRecord!: CSWRecordModel;
     @Input() layer!: LayerModel;
@@ -210,6 +212,16 @@ export class InfoPanelSubComponent implements OnInit, OnChanges {
         return true;
       }
       return false;
+    }
+
+    /**
+     * Is this layer added to the map?
+     *
+     * @param layer LayerModel for layer
+     * @returns true if this layer has been added to the map
+     */
+    public isLayerAdded(layer: LayerModel) {
+      return this.uiLayerModelService.isLayerAdded(layer.id);
     }
 
     /**
