@@ -30,8 +30,17 @@ interface OnlineResource {
   name: string;
 }
 
+interface GeographicElement {
+  type: string;
+  eastBoundLongitude?: number;
+  westBoundLongitude?: number;
+  southBoundLatitude?: number;
+  northBoundLatitude?: number;
+}
+
 interface CswRecord {
   name: string;
+  geographicElements?: GeographicElement[];
   onlineResources: OnlineResource[];
 }
 
@@ -148,6 +157,58 @@ function formatResult(r: E2EResult): string {
   const time = r.durationMs > 0 ? `${r.durationMs}ms` : '';
   const extra = r.errorMessage ? `  ${RED}${r.errorMessage}${RESET}` : '';
   return `  ${icon} ${pad(id, 30)}  ${pad(name, 30)}  ${pad(group, 24)}  ${time}${extra}`;
+}
+
+// ─── CSW record online resource validation ────────────────────────────────
+
+interface RecordIssue {
+  layerId: string;
+  layerName: string;
+  recordName: string;
+  message: string;
+}
+
+/**
+ * Every CSW record must expose one of: WMS+WFS, WMS+WCS, VMF, IRIS, WWW or WMTS,
+ * or have a "bbox" geographic element with all four bounds.
+ * A resource only counts if its URL is non-empty.
+ */
+function validateCswRecords(layers: Layer[]): RecordIssue[] {
+  const issues: RecordIssue[] = [];
+
+  for (const layer of layers) {
+    const records = layer.cswRecords ?? [];
+    if (records.length === 0) {
+      issues.push({ layerId: layer.id, layerName: layer.name, recordName: '(none)', message: 'Layer has no CSW records' });
+      continue;
+    }
+    for (const rec of records) {
+      const types = new Set(
+        (rec.onlineResources ?? [])
+          .filter(r => (r.url ?? '').trim() !== '')
+          .map(r => (r.type ?? '').toUpperCase()),
+      );
+      const hasBbox = (rec.geographicElements ?? []).some(g =>
+        g.type === 'bbox' &&
+        [g.eastBoundLongitude, g.westBoundLongitude, g.southBoundLatitude, g.northBoundLatitude]
+          .every(v => typeof v === 'number' && !isNaN(v)),
+      );
+      const ok =
+        hasBbox ||
+        (types.has('WMS') && (types.has('WFS') || types.has('WCS'))) ||
+        types.has('VMF') || types.has('IRIS') || types.has('WWW') || types.has('WMTS');
+      if (!ok) {
+        const found = types.size > 0 ? Array.from(types).join(', ') : 'none';
+        issues.push({
+          layerId: layer.id,
+          layerName: layer.name,
+          recordName: rec.name,
+          message: `Missing required onlineResources URLs (need WMS+WFS, WMS+WCS, VMF, IRIS, WWW, WMTS or a bbox geographic element; found: ${found})`,
+        });
+      }
+    }
+  }
+  return issues;
 }
 
 // ─── Browser test for a single layer ──────────────────────────────────────
@@ -334,6 +395,18 @@ async function main(): Promise<void> {
     }
   }
 
+  // 2b. Validate CSW records have the required online resource URLs
+  const recordIssues = validateCswRecords(layers);
+  if (recordIssues.length > 0) {
+    console.log(`${RED}${BOLD}CSW record errors (${recordIssues.length}):${RESET}`);
+    for (const i of recordIssues) {
+      console.log(`  ${RED}\u274c ${i.layerId} / ${trunc(i.recordName, 60)}: ${i.message}${RESET}`);
+    }
+    console.log();
+  } else {
+    console.log(`${GREEN}All CSW records have the required online resources${RESET}\n`);
+  }
+
   // 3. Keep only layers that have at least one WMS online resource
   const wmsLayers = layers.filter(layer =>
     (layer.cswRecords ?? []).some(rec =>
@@ -346,7 +419,7 @@ async function main(): Promise<void> {
 
   if (wmsLayers.length === 0) {
     console.log(`${YELLOW}Nothing to test.${RESET}`);
-    process.exit(0);
+    process.exit(recordIssues.length > 0 ? 1 : 0);
   }
 
   // 4. Launch browser
@@ -401,14 +474,15 @@ async function main(): Promise<void> {
   console.log(`  Failed                            : ${failCount}`);
   console.log(`  Skipped (failfast / no Add btn)   : ${skipCount}`);
   console.log(`  Layers with no WMS (skipped)      : ${skippedCount}`);
+  console.log(`  CSW record errors                 : ${recordIssues.length}`);
   console.log(`  Total elapsed                     : ${totalElapsed}s`);
   console.log(DIVIDER);
 
-  if (failCount === 0) {
+  if (failCount === 0 && recordIssues.length === 0) {
     console.log(`${GREEN}${BOLD}Result: PASSED${RESET}\n`);
     process.exit(0);
   } else {
-    console.log(`${RED}${BOLD}Result: FAILED (${failCount} layer${failCount !== 1 ? 's' : ''} failed)${RESET}\n`);
+    console.log(`${RED}${BOLD}Result: FAILED (${failCount} layer${failCount !== 1 ? 's' : ''} failed, ${recordIssues.length} CSW record error${recordIssues.length !== 1 ? 's' : ''})${RESET}\n`);
     process.exit(1);
   }
 }
