@@ -164,12 +164,13 @@ function formatResult(r: E2EResult): string {
 interface RecordIssue {
   layerId: string;
   layerName: string;
+  group: string;
   recordName: string;
   message: string;
 }
 
 /**
- * Every CSW record must expose one of: WMS+WFS, WMS+WCS, VMF, IRIS, WWW or WMTS,
+ * Every CSW record must expose one of: WMS, VMF, IRIS, WWW or WMTS,
  * or have a "bbox" geographic element with all four bounds.
  * A resource only counts if its URL is non-empty.
  */
@@ -179,7 +180,7 @@ function validateCswRecords(layers: Layer[]): RecordIssue[] {
   for (const layer of layers) {
     const records = layer.cswRecords ?? [];
     if (records.length === 0) {
-      issues.push({ layerId: layer.id, layerName: layer.name, recordName: '(none)', message: 'Layer has no CSW records' });
+      issues.push({ layerId: layer.id, layerName: layer.name, group: layer.group, recordName: '(none)', message: 'Layer has no CSW records' });
       continue;
     }
     for (const rec of records) {
@@ -195,15 +196,15 @@ function validateCswRecords(layers: Layer[]): RecordIssue[] {
       );
       const ok =
         hasBbox ||
-        (types.has('WMS') && (types.has('WFS') || types.has('WCS'))) ||
+        types.has('WMS') ||
         types.has('VMF') || types.has('IRIS') || types.has('WWW') || types.has('WMTS');
       if (!ok) {
         const found = types.size > 0 ? Array.from(types).join(', ') : 'none';
         issues.push({
           layerId: layer.id,
           layerName: layer.name,
-          recordName: rec.name,
-          message: `Missing required onlineResources URLs (need WMS+WFS, WMS+WCS, VMF, IRIS, WWW, WMTS or a bbox geographic element; found: ${found})`,
+          group: layer.group,          recordName: rec.name,
+          message: `Missing required onlineResources URLs (need WMS, VMF, IRIS, WWW, WMTS or a bbox geographic element; found: ${found})`,
         });
       }
     }
@@ -400,7 +401,7 @@ async function main(): Promise<void> {
   if (recordIssues.length > 0) {
     console.log(`${RED}${BOLD}CSW record errors (${recordIssues.length}):${RESET}`);
     for (const i of recordIssues) {
-      console.log(`  ${RED}\u274c ${i.layerId} / ${trunc(i.recordName, 60)}: ${i.message}${RESET}`);
+      console.log(`  ${RED}\u274c ${i.group} / ${i.layerName} (${i.layerId}) / ${trunc(i.recordName, 60)}: ${i.message}${RESET}`);
     }
     console.log();
   } else {
