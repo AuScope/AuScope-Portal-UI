@@ -4,27 +4,27 @@
 </button>
 <mat-menu #helpMenu="matMenu" style="margin-top: 12px;">
     <!-- About us -->
-    <button mat-menu-item class="mat-menu-link" (click)="openAuScope()">
+    <button mat-menu-item class="mat-menu-link menu-link" (click)="openAuScope()">
         <i class="ti-home menu-icon" aria-hidden="true"></i>
         <span>About</span>
     </button>
     <!-- User Guide -->
-    <button mat-menu-item class="mat-menu-link" (click)="openUserGuide()">
+    <button mat-menu-item class="mat-menu-link menu-link" (click)="openUserGuide()">
         <i class="ti-info-alt menu-icon" aria-hidden="true"></i>
         <span>User Guide</span>
     </button>
     <!-- Contact us -->
-    <button mat-menu-item class="mat-menu-link" (click)="openEmail()">
+    <button mat-menu-item class="mat-menu-link menu-link" (click)="openEmail()">
         <i class="ti-email menu-icon" aria-hidden="true"></i>
         <span>Contact us</span>
     </button>
     <!-- Cite us -->
-    <button mat-menu-item class="mat-menu-link" (click)="openCitation()">
+    <button mat-menu-item class="mat-menu-link menu-link" (click)="openCitation()">
         <i class="ti-pencil menu-icon" aria-hidden="true"></i>
         <span>Cite us</span>
     </button>
     <!-- AuScope-Cat -->
-    <button mat-menu-item class="mat-menu-link" (click)="openAuScopeCat()">
+    <button mat-menu-item class="mat-menu-link menu-link" (click)="openAuScopeCat()">
         <i class="fa fa-plug menu-icon" aria-hidden="true"></i>
         <div class="menu-text">
             <span class="menu-title">AuScope-Cat</span>
@@ -32,7 +32,7 @@
         </div>
     </button>
     <!-- App Store -->
-    <button mat-menu-item class="mat-menu-link" (click)="openAppStore()">
+    <button mat-menu-item class="mat-menu-link menu-link" (click)="openAppStore()">
         <i class="fa fa-th menu-icon" aria-hidden="true"></i>
         <div class="menu-text">
             <span class="menu-title">AuScope Tools</span>
@@ -44,8 +44,10 @@
       </button>
     <!-- Portal release version and link to disclaimer -->
     <button mat-menu-item class="portal-version" (click)="openDisclaimerModal()">
-        <span>Auscope Portal {{ currentVersion + devSuffix }}</span><br>
+      <div style="display:flex;flex-direction:column;">
+        <span>Auscope Portal {{ currentVersion + devSuffix }}</span>
         <span class="disclaimer-link">Disclaimer</span>
+      </div>
     </button>
 
 </mat-menu>
