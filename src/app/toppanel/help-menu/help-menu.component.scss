@@ -6,8 +6,8 @@
 
 .menu-link {
     color: globals.$auscope-royal-blue;
-    display: flex;
-    align-items: center;
+    display: flex !important;
+    align-items: center !important;
     text-decoration: none;
 }
 
@@ -27,9 +27,22 @@
 
 .menu-subtext {
     color: globals.$text-colour;
-    margin-top: -0.5rem;
     font-size: x-small;
-    line-height: 1.5rem;
+    line-height: 1.1rem;
+}
+
+.portal-version {
+    cursor: default;
+    text-align: center;
+    padding-top: 10px;
+    color: globals.$auscope-royal-blue;
+    a {
+        font-size: 12px;
+        display: inline;
+    }
+    .disclaimer-link {
+        cursor: pointer;
+    }
 }
 
 ::ng-deep {
@@ -39,5 +52,12 @@
 
     .mat-mdc-menu-content {
         background-color: globals.$background-colour;
+    }
+
+    .mat-mdc-menu-item .mat-mdc-menu-item-text {
+      color: globals.$auscope-royal-blue;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 }
