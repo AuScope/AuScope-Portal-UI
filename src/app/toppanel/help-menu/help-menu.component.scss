@@ -6,8 +6,8 @@
 
 .menu-link {
     color: globals.$auscope-royal-blue;
-    display: flex;
-    align-items: center;
+    display: flex !important;
+    align-items: center !important;
     text-decoration: none;
 }
 
@@ -53,5 +53,11 @@
 
     .mat-mdc-menu-content {
         background-color: globals.$background-colour;
+    }
+
+    .mat-mdc-menu-item .mat-mdc-menu-item-text {
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 }

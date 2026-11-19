@@ -22,7 +22,28 @@ export class HelpMenuComponent {
     });
   }
 
-  testClick() {
-    console.log("TESTIE TESTIE");
+  openAuScope() {
+    window.open("https://www.auscope.org.au/");
   }
+
+  openUserGuide() {
+    window.open("https://github.com/AuScope/AuScope-Portal-UI/raw/master/docs/AuScopeUserGuide.pdf");
+  }
+
+  openEmail() {
+    window.open("mailto:cg-admin@csiro.au?Subject=Auscope-portal");
+  }
+
+  openCitation() {
+    window.open("http://hdl.handle.net/102.100.100/483116?index=1");
+  }
+
+  openAuScopeCat() {
+    window.open("https://auscope.github.io/AuScope-Cat");
+  }
+
+  openAppStore() {
+    window.open("https://avre.auscope.org/");
+  }
+
 }
