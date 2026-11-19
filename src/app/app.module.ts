@@ -56,7 +56,6 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { CdkTableModule } from '@angular/cdk/table';
 
 import { DisclaimerModalComponent } from './modalwindow/disclaimer/disclaimer.modal.component';
-import { PortalDetailsPanelComponent } from './menupanel/portal-details-panel/portal-details-panel.component';
 
 // Portal Core UI Library
 import { PortalCoreModule } from './lib/portal-core-ui/portal-core.module';
@@ -159,7 +158,6 @@ PlotlyModule.plotlyjs = PlotlyJS;
         GraceGraphModalComponent,
         GraceLegendComponent,
         DisclaimerModalComponent,
-        PortalDetailsPanelComponent,
         MSCLComponent,
         MSCLAnalyticComponent,
         HelpMenuComponent,

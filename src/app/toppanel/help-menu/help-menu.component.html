@@ -4,35 +4,35 @@
 </button>
 <mat-menu #helpMenu="matMenu" style="margin-top: 12px;">
     <!-- About us -->
-    <h5 mat-menu-item>
+    <div mat-menu-item>
         <a class="menu-link" href="https://www.auscope.org.au/" target="href:blank">
             <i class="ti-home menu-icon" aria-hidden="true"></i>
             <span>About</span>
         </a>
-    </h5>
+    </div>
     <!-- User Guide -->
-    <h5 mat-menu-item>
+    <div mat-menu-item>
         <a class="menu-link" href="https://github.com/AuScope/AuScope-Portal-UI/raw/master/docs/AuScopeUserGuide.pdf" target="href:blank">
             <i class="ti-info-alt menu-icon" aria-hidden="true"></i>
             <span>User Guide</span>
         </a>
-    </h5>
+      </div>
     <!-- Contact us -->
-    <h5 mat-menu-item>
+    <div mat-menu-item>
         <a class="menu-link" href="mailto:cg-admin@csiro.au?Subject=Auscope-portal" target="href:blank">
             <i class="ti-email menu-icon" aria-hidden="true"></i>
             <span>Contact us</span>
         </a>
-    </h5>
+    </div>
     <!-- Cite us -->
-    <h5 mat-menu-item>
+    <div mat-menu-item>
         <a class="menu-link" href="http://hdl.handle.net/102.100.100/483116?index=1" target="href:blank">
             <i class="ti-pencil menu-icon" aria-hidden="true"></i>
             <span>Cite us</span>
         </a>
-    </h5>
+    </div>
     <!-- AuScope-Cat -->
-    <h5 mat-menu-item>
+    <div mat-menu-item>
         <a class="menu-link" href="https://auscope.github.io/AuScope-Cat" target="href:blank">
             <i class="fa fa-plug menu-icon" aria-hidden="true"></i>
             <div class="menu-text">
@@ -40,9 +40,9 @@
                 <span class="menu-subtext">Access data using a Python API</span>
             </div>
         </a>
-    </h5>
+    </div>
     <!-- App Store -->
-    <h5 mat-menu-item>
+    <div mat-menu-item>
         <a class="menu-link" href="https://avre.auscope.org.au" target="href:blank">
             <i class="fa fa-th menu-icon" aria-hidden="true"></i>
             <div class="menu-text">
@@ -51,9 +51,11 @@
                 <span class="menu-subtext">software and models</span>
             </div>
         </a>
-    </h5>
+    </div>
     <!-- Portal release version and link to disclaimer -->
-    <h5 mat-menu-item>
-        <li app-portal-details-panel></li>
-    </h5>
+    <button mat-menu-item class="portal-version" (click)="openDisclaimerModal()">
+        <span>Auscope Portal {{ currentVersion + devSuffix }}</span>
+        <span class="disclaimer-link">Disclaimer</span>
+    </button>
+
 </mat-menu>

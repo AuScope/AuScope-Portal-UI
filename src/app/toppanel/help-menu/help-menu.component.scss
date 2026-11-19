@@ -32,6 +32,20 @@
     line-height: 1.5rem;
 }
 
+.portal-version {
+    cursor: default;
+    text-align: center;
+        padding-top: 10px;
+        color: globals.$auscope-royal-blue;
+    a {
+        font-size: 12px;
+        display: inline;
+    }
+    .disclaimer-link {
+        cursor: pointer;
+    }
+}
+
 ::ng-deep {
     .mat-mdc-menu-panel {
         margin-top: 10px;
