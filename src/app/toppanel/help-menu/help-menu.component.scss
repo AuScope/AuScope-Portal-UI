@@ -27,9 +27,8 @@
 
 .menu-subtext {
     color: globals.$text-colour;
-    margin-top: -0.5rem;
     font-size: x-small;
-    line-height: 1.5rem;
+    line-height: 1.1rem;
 }
 
 .portal-version {
@@ -56,6 +55,7 @@
     }
 
     .mat-mdc-menu-item .mat-mdc-menu-item-text {
+      color: globals.$auscope-royal-blue;
         display: flex;
         align-items: center;
         gap: 8px;
