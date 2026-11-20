@@ -634,7 +634,7 @@ export class SearchPanelComponent implements OnInit {
     } else {
       title = 'Results ';
     }
-    title += '(' + this.totalSearchHits + ')';
+    title += '(' + this.totalSearchHits + ' Total)';
     return title;
   }
 

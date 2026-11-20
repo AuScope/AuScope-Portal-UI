@@ -292,9 +292,7 @@
           <!-- left column, search results and optional downloads -->
           <div class="results-column">
             <div class="search-results-title">
-              <label
-                ><strong>{{ getSearchResultsTitle() }}</strong></label
-              >
+              <label><strong>{{ getSearchResultsTitle() }}</strong></label>
               @if (!showingAllLayers()) {
                 <button
                   title="Show all layers"
@@ -312,8 +310,7 @@
                 <div [id]="searchResult.layer.id">
                   <span
                     [ngClass]="searchResult === selectedSearchResult() ? 'selected-layer-header' : 'layer-header'"
-                    (click)="selectSearchResult(searchResult)"
-                  >
+                    (click)="selectSearchResult(searchResult)">
                     <span class="layer-header-label" title="{{ searchResult.layer.name }}">{{
                       searchResult.layer.name
                     }}</span>
@@ -373,7 +370,7 @@
             </div>
             @if (searchResults().length > RESULTS_PER_PAGE) {
               <mat-paginator
-                [length]="totalSearchHits"
+                [length]="searchResults().length"
                 [pageSize]="RESULTS_PER_PAGE"
                 [pageSizeOptions]="[10, 20, 50]"
                 (page)="onPageChange($event)"
