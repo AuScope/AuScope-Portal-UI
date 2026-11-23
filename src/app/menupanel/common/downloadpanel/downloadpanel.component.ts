@@ -74,7 +74,7 @@ export class DownloadPanelComponent implements OnInit {
   wcsDownloadListOption: any;
   wcsDownloadForm: any;
 
-  irisDownloadListOption: any;
+  irisDownloadListOption = signal<any>(null);
   isIRISDownloadSupported: boolean;
   irisAllStationsMaxDate: any;
   irisAllStationsMinDate: any;
@@ -371,7 +371,7 @@ export class DownloadPanelComponent implements OnInit {
       stationLst = [{ 'code': this.SELECT_ALL_CODE, 'name': this.SELECT_ALL_STATION }].concat(stationLst);
       //sort for stationLst
       stationLst.sort((a: any, b: any) => a.name.charCodeAt(0) - b.name.charCodeAt(0));
-      this.irisDownloadListOption = {
+      this.irisDownloadListOption.set({
         serviceTypeList: serviceTypeList,
         stationLst: stationLst,
         channelLst: channelLst,
@@ -383,7 +383,7 @@ export class DownloadPanelComponent implements OnInit {
         maxDate: response['data'][0].maxDate,
         dateFrom: response['data'][0].minDate,
         dateTo: response['data'][0].maxDate,
-      };
+      });
       this.irisAllStationsMinDate = response['data'][0].minDate;
       this.irisAllStationsMaxDate = response['data'][0].maxDate;
     })
@@ -455,13 +455,13 @@ export class DownloadPanelComponent implements OnInit {
   /**
    * Use the rules present in the button options to determine if download button should be enabled.
    * Reduction of the multiple if statements that were in the HTML:
-   * - (this.bbox || this.irisDownloadListOption)
+   * - (this.bbox || this.irisDownloadListOption())
    * - (this.polygonFilter && this.isPolygonSupportedLayer)
    * - ((this.bbox || this.polygonFilter) && this.isWCSDownloadSupported)
    * - this.isTsgDownloadAvailable
    */
   downloadButtonEnabled(): boolean {
-    if (this.bbox() || this.isTsgDownloadAvailable || this.irisDownloadListOption ||
+    if (this.bbox() || this.isTsgDownloadAvailable || this.irisDownloadListOption() ||
         (this.polygonFilter() && (this.isPolygonSupportedLayer() || this.isWCSDownloadSupported))) {
       return true;
     }
@@ -526,16 +526,16 @@ export class DownloadPanelComponent implements OnInit {
       observableResponse = this.downloadWfsService.downloadDatasetURL(this.layer, bboxx, null, this.datasetUrl, this.omitGslmpShapeProperty);
 
     // Download IRIS datasets by constructing a data download URL. User can select the either Dataselect or Station
-    } else if (this.irisDownloadListOption) {
+    } else if (this.irisDownloadListOption()) {
       this.downloadStarted.set(true);
 
-      const start = (this.irisDownloadListOption.dateFrom !== null && this.irisDownloadListOption.dateFrom !== '') ? new Date(new Date(this.irisDownloadListOption.dateFrom)).toISOString().substring(0, 10) : null;
-      const end = (this.irisDownloadListOption.dateToTo !== null && this.irisDownloadListOption.dateTo !== '') ? new Date(new Date(this.irisDownloadListOption.dateTo)).toISOString().substring(0, 10) : null;
+      const start = (this.irisDownloadListOption().dateFrom !== null && this.irisDownloadListOption().dateFrom !== '') ? new Date(new Date(this.irisDownloadListOption().dateFrom)).toISOString().substring(0, 10) : null;
+      const end = (this.irisDownloadListOption().dateTo !== null && this.irisDownloadListOption().dateTo !== '') ? new Date(new Date(this.irisDownloadListOption().dateTo)).toISOString().substring(0, 10) : null;
 
-      const station = !this.irisDownloadListOption.selectedStations.includes(this.SELECT_ALL_CODE) ? this.irisDownloadListOption.selectedStations.join(",") : this.SELECT_ALL_CODE;
-      const channel = !this.irisDownloadListOption.selectedChannels.includes(this.SELECT_ALL_CHANNEL) ? this.irisDownloadListOption.selectedChannels.join(",") : this.SELECT_ALL_CODE;
+      const station = !this.irisDownloadListOption().selectedStations.includes(this.SELECT_ALL_CODE) ? this.irisDownloadListOption().selectedStations.join(",") : this.SELECT_ALL_CODE;
+      const channel = !this.irisDownloadListOption().selectedChannels.includes(this.SELECT_ALL_CHANNEL) ? this.irisDownloadListOption().selectedChannels.join(",") : this.SELECT_ALL_CODE;
 
-      if (this.irisDownloadListOption.selectedserviceType === 'Station') {
+      if (this.irisDownloadListOption().selectedserviceType === 'Station') {
         observableResponse = this.downloadIrisService.downloadIRISStation(this.layer, bboxx, station, channel, start, end);
       } else {
         observableResponse = this.downloadIrisService.downloadIRISDataselect(this.layer, station, channel, start, end);
@@ -572,7 +572,7 @@ export class DownloadPanelComponent implements OnInit {
       }
       // Content Too Large (413)
       else if (err.status === 413) {
-        if (this.irisDownloadListOption) {
+        if (this.irisDownloadListOption()) {
           alert('An error has occurred whilst attempting to download. Request entity is too large, please reduce the size by limiting the stations, channels, or time period.');
         } else {
           alert('An error has occurred whilst attempting to download. Request entity is too large, please reduce the size by limiting download bounds or features.');
@@ -852,27 +852,27 @@ export class DownloadPanelComponent implements OnInit {
    * on data type change construct the associated options
    */
   public onServiceTypeChange() {
-    this.irisDownloadListOption.displayBbox = config.datasetUrlAussPassLayer[<dsAusPassKey>this.layer.group.toLowerCase()]['serviceType']
-          [<dsAusPassSrvKey>this.irisDownloadListOption.selectedserviceType].isGeometryOptional;
+    this.irisDownloadListOption().displayBbox = config.datasetUrlAussPassLayer[<dsAusPassKey>this.layer.group.toLowerCase()]['serviceType']
+          [<dsAusPassSrvKey>this.irisDownloadListOption().selectedserviceType].isGeometryOptional;
   }
 
   /**
    * on selected station change construct the channel list which is the union of all available channels for the selected stations.
    */
   public onStationChange() {
-    this.irisDownloadListOption.channelLst.length = 0;
-    if (this.irisDownloadListOption.selectedStations.includes(this.SELECT_ALL_CODE)) {
+    this.irisDownloadListOption().channelLst.length = 0;
+    if (this.irisDownloadListOption().selectedStations.includes(this.SELECT_ALL_CODE)) {
       // Update the channel list
-      this.irisDownloadListOption.channelLst = this.getAvilChannel(this.irisDownloadListOption.stationLst);
+      this.irisDownloadListOption().channelLst = this.getAvilChannel(this.irisDownloadListOption().stationLst);
       // Update the to/from and start/end dates for all stations in the network
-      this.irisDownloadListOption.minDate = this.irisAllStationsMinDate;
-      this.irisDownloadListOption.maxDate = this.irisAllStationsMaxDate;
-      this.irisDownloadListOption.dateFrom = this.irisAllStationsMinDate;
-      this.irisDownloadListOption.dateTo = this.irisAllStationsMaxDate;
+      this.irisDownloadListOption().minDate = this.irisAllStationsMinDate;
+      this.irisDownloadListOption().maxDate = this.irisAllStationsMaxDate;
+      this.irisDownloadListOption().dateFrom = this.irisAllStationsMinDate;
+      this.irisDownloadListOption().dateTo = this.irisAllStationsMaxDate;
     } else {
-      const stations = this.irisDownloadListOption.stationLst.filter((station: any) => this.irisDownloadListOption.selectedStations.includes(station.code));
+      const stations = this.irisDownloadListOption().stationLst.filter((station: any) => this.irisDownloadListOption().selectedStations.includes(station.code));
       // Update the channel list
-      this.irisDownloadListOption.channelLst = this.getAvilChannel(stations);
+      this.irisDownloadListOption().channelLst = this.getAvilChannel(stations);
       // Update the to/from and start/end dates according to the channels selected
       let newStartDate = stations[0].startDate;
       let newEndDate = stations[0].endDate;
@@ -880,10 +880,10 @@ export class DownloadPanelComponent implements OnInit {
         newStartDate = station.startDate < newStartDate ? station.startDate : newStartDate;
         newEndDate = station.endDate > newEndDate ? station.endDate : newEndDate;
       }
-      this.irisDownloadListOption.minDate = newStartDate;
-      this.irisDownloadListOption.maxDate = newEndDate;
-      this.irisDownloadListOption.dateFrom = newStartDate;
-      this.irisDownloadListOption.dateTo = newEndDate;
+      this.irisDownloadListOption().minDate = newStartDate;
+      this.irisDownloadListOption().maxDate = newEndDate;
+      this.irisDownloadListOption().dateFrom = newStartDate;
+      this.irisDownloadListOption().dateTo = newEndDate;
     }
   }
 

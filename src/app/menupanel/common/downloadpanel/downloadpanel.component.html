@@ -49,33 +49,33 @@
       }
 
       <!-- AusPass Data Download -->
-      @if (irisDownloadListOption) {
+      @if (irisDownloadListOption()) {
         <div class="form-group  form-group-sm">
           <label>Service:</label>
-          <select class="form-control form-control-sm" [(ngModel)]="irisDownloadListOption.selectedserviceType" (ngModelChange)="onServiceTypeChange()" >
+          <select class="form-control form-control-sm" [(ngModel)]="irisDownloadListOption().selectedserviceType" (ngModelChange)="onServiceTypeChange()" >
             <option [ngValue]="" disabled>{{SELECT_DEFAULT_DATA_TYPE}}</option>
-            @for (serviceType of irisDownloadListOption.serviceTypeList; track serviceType) {
+            @for (serviceType of irisDownloadListOption().serviceTypeList; track serviceType) {
               <option>{{serviceType}}</option>
             }
           </select>
         </div>
       }
 
-      @if (irisDownloadListOption) {
+      @if (irisDownloadListOption()) {
         <div class="form-group  form-group-sm">
           <label>Station:</label>
-          <ng-select  [(ngModel)]="irisDownloadListOption.selectedStations" [multiple]="true" bindLabel="label" bindValue="value" placeholder="{{SELECT_DEFAULT_STATION}}" (ngModelChange)="onStationChange()">
-            @for (station of irisDownloadListOption.stationLst; track station) {
+          <ng-select  [(ngModel)]="irisDownloadListOption().selectedStations" [multiple]="true" bindLabel="label" bindValue="value" placeholder="{{SELECT_DEFAULT_STATION}}" (ngModelChange)="onStationChange()">
+            @for (station of irisDownloadListOption().stationLst; track station) {
               <ng-option  ng-if="station.code!=''" [value]="station.code" >{{station.name}} : {{station.code}}</ng-option>
             }
           </ng-select>
         </div>
       }
 
-      @if (irisDownloadListOption) {
+      @if (irisDownloadListOption()) {
         <div class="form-group form-group-sm">
           <label>Channel:</label>
-          <ng-select [items]="irisDownloadListOption.channelLst" bindLabel="code" bindValue="code" [(ngModel)]="irisDownloadListOption.selectedChannels" [multiple]="true"  placeholder="{{SELECT_DEFAULT_CHANNEL}}" >
+          <ng-select [items]="irisDownloadListOption().channelLst" bindLabel="code" bindValue="code" [(ngModel)]="irisDownloadListOption().selectedChannels" [multiple]="true"  placeholder="{{SELECT_DEFAULT_CHANNEL}}" >
             <ng-template ng-option-tmp let-item="item">
               <div title="Azimuth:{{item.azimuth}} , Dip:{{item.dip}} , SampleRate:{{item.sampleRate}}">{{item.code}}</div>
             </ng-template>
@@ -83,17 +83,17 @@
         </div>
       }
 
-      @if (irisDownloadListOption) {
+      @if (irisDownloadListOption()) {
         <div class="form-group form-group-sm">
-          <label>Start date: [from {{irisDownloadListOption.minDate}}]</label>
-          <input type="date" class="form-control form-control-sm" [(ngModel)]="irisDownloadListOption.dateFrom" placeholder="yyyy-mm-dd" dateFormat="yy-mm-dd" showIcon="true"/>
+          <label>Start date: [from {{irisDownloadListOption().minDate}}]</label>
+          <input type="date" class="form-control form-control-sm" [(ngModel)]="irisDownloadListOption().dateFrom" placeholder="yyyy-mm-dd" dateFormat="yy-mm-dd" showIcon="true"/>
         </div>
       }
 
-      @if (irisDownloadListOption ) {
+      @if (irisDownloadListOption()) {
         <div class="form-group form-group-sm">
-          <label>End date: [to {{irisDownloadListOption.maxDate}}]</label>
-          <input type="date" class="form-control form-control-sm" [(ngModel)]="irisDownloadListOption.dateTo" placeholder="yyyy-mm-dd" dateFormat="yy-mm-dd" showIcon="true"/>
+          <label>End date: [to {{irisDownloadListOption().maxDate}}]</label>
+          <input type="date" class="form-control form-control-sm" [(ngModel)]="irisDownloadListOption().dateTo" placeholder="yyyy-mm-dd" dateFormat="yy-mm-dd" showIcon="true"/>
         </div>
       }
       <!--End AusPass Data Download -->
@@ -102,8 +102,8 @@
       <div class="d-inline-block">
         @if (!bbox()) {
           <button type="button" class="btn btn-primary btn-xs bounds-btn" (click)="drawBounds()"
-            [title]="irisDownloadListOption?.selectedserviceType === 'Dataselect' ? 'Bounding box disabled for Dataselect' : 'Draw bounding box'"
-            [disabled]="downloadStarted() || download4pStarted() || download4PolygonKMLStarted() || drawBoundsStarted() || drawPolygonStarted() || irisDownloadListOption?.selectedserviceType === 'Dataselect'">
+            [title]="irisDownloadListOption()?.selectedserviceType === 'Dataselect' ? 'Bounding box disabled for Dataselect' : 'Draw bounding box'"
+            [disabled]="downloadStarted() || download4pStarted() || download4PolygonKMLStarted() || drawBoundsStarted() || drawPolygonStarted() || irisDownloadListOption()?.selectedserviceType === 'Dataselect'">
             <i class="fa fa-edit"></i>&nbsp;Draw Bounds
           </button>
         }
@@ -132,7 +132,7 @@
         }
       </div>
 
-      <!-- Download options for bounds, polygon or all (if irisDownloadListOption) -->
+      <!-- Download options for bounds, polygon or all (if irisDownloadListOption()) -->
       @if (downloadButtonEnabled()) {
         <button
             type="button"
@@ -150,7 +150,7 @@
             </button>
             <mat-menu #downloadDropdownMenu="matMenu">
               <!-- Note: If you add or modify conditions here, be sure to update the downloadButtonEnabled() method -->
-              @if (bbox() || irisDownloadListOption) {
+              @if (bbox() || irisDownloadListOption()) {
                 <button mat-menu-item title="Download data" (click)="download()">Download Data</button>
               }
               @if (polygonFilter() && isPolygonSupportedLayer()) {
