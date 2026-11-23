@@ -196,7 +196,7 @@ export class GraceGraphModalComponent implements AfterViewInit {
      * Download graph data to local device
      */
     public downloadData() {
-        const blob = new Blob([JSON.stringify(this.queriedData)], { type: 'text/plain;charset=utf-8' });
+        const blob = new Blob([JSON.stringify(this.queriedData())], { type: 'text/plain;charset=utf-8' });
         saveAs(blob, 'mascon_data.json');
     }
 
