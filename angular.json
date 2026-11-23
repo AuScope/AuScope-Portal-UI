@@ -144,12 +144,9 @@
             "polyfills": ["zone.js"],
             "tsConfig": "src/tsconfig.spec.json",
             "scripts": [
-<<<<<<< HEAD
-=======
               "node_modules/jquery/dist/jquery.min.js",
               "node_modules/d3/d3.min.js",
               "node_modules/rickshaw/rickshaw.min.js",
->>>>>>> 592a57c3174f2b11cb257c9b9b38507ab953252c
               "src/extension/js/extensions.js",
               "node_modules/lzma/src/lzma_worker-min.js"
             ],
