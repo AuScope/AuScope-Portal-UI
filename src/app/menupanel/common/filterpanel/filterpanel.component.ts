@@ -9,7 +9,7 @@ import { LayerStatusService } from '../../../lib/portal-core-ui/utility/layersta
 import { Polygon } from '../../../lib/portal-core-ui/service/cesium-map/cs-clipboard.service';
 import { UtilitiesService } from '../../../lib/portal-core-ui/utility/utilities.service';
 import { CsCSWService } from '../../../lib/portal-core-ui/service/wcsw/cs-csw.service';
-import { ApplicationRef, Component, Input, OnInit, AfterViewInit, ViewChild, ViewContainerRef, OnChanges, SimpleChanges, inject } from '@angular/core';
+import { ApplicationRef, Component, Input, OnInit, AfterViewInit, ViewChild, ViewContainerRef, OnChanges, SimpleChanges, inject, signal } from '@angular/core';
 import _ from 'lodash';
 import { config } from '../../../../environments/config';
 import { ref } from '../../../../environments/ref';
@@ -22,10 +22,10 @@ import { ChangeDetectorRef } from '@angular/core';
 
 
 @Component({
-    selector: 'app-filter-panel',
-    templateUrl: './filterpanel.component.html',
-    styleUrls: ['./filterpanel.component.scss', '../../menupanel.scss'],
-    standalone: false
+  selector: 'app-filter-panel',
+  templateUrl: './filterpanel.component.html',
+  styleUrls: ['./filterpanel.component.scss', '../../menupanel.scss'],
+  standalone: false
 })
 export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
   csMapService = inject(CsMapService);
@@ -50,7 +50,11 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
   public advancedFilterMap;
   public showAdvancedFilter = true;
   public bApplyClipboardBBox = true;
-  public layerTimes!: LayerTimes;
+  public layerTimes = signal<LayerTimes>({
+    timeExtent: [],
+    currentTime: new Date(),
+    loadingTimeExtent: false
+  });
   public layerFilterCollection: any; // List of all filters that maybe rendered by this component
 
   // Layer toolbar
@@ -102,7 +106,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
 
     // Subscribe to receiving the layer's time extent, if it has one
     this.filterService.getLayerTimesBS(this.layer.id).subscribe(times => {
-      this.layerTimes = { ...times };
+      this.layerTimes.set({ ...times });
     });
 
     // Add any layer specific advanced filter components
@@ -112,12 +116,12 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
   ngOnChanges(changes: SimpleChanges): void {
     // Will fire when a layer is added and remove all existing panel filters
     if (changes.layer && changes.layer.currentValue && !changes.layer.firstChange) { // take into account the first time
-        setTimeout(() => {
-            const hasPreselectedOptionalFilters = !!this.layer?.filterCollection?.optionalFilters?.some((f: any) => f.added === true);
-            if (!hasPreselectedOptionalFilters) {
-              this.refreshFilter();
-            }
-        }, 0);
+      setTimeout(() => {
+        const hasPreselectedOptionalFilters = !!this.layer?.filterCollection?.optionalFilters?.some((f: any) => f.added === true);
+        if (!hasPreselectedOptionalFilters) {
+          this.refreshFilter();
+        }
+      }, 0);
     }
   }
 
@@ -132,8 +136,8 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
   /**
    * Check if a layer has filters - filterList array
    */
-  public hasFilters(layerId : string): boolean {
-    let filterState: boolean = false;
+  public hasFilters(layerId: string): boolean {
+    let filterState = false;
     filterState = this.layerManagerService.getFilters(layerId);
     return filterState;
   }
@@ -145,11 +149,24 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
   public addLayerFromState(layerState: any) {
     // Populate layer times if necessary
     if (config.queryGetCapabilitiesTimes.indexOf(this.layer.id) > -1) {
-      this.filterService.updateLayerTimes(this.layer, this.layerTimes);
+      this.filterService.updateLayerTimes(this.layer, this.layerTimes());
     }
+
     // Current time
     if (layerState.time) {
-      this.layerTimes.currentTime = layerState.time;
+      const restoredDate = new Date(layerState.time);
+
+      const updatedTimes = {
+        ...this.layerTimes(),
+        currentTime: restoredDate
+      };
+
+      this.layerTimes.set(updatedTimes);
+
+      this.filterService.setLayerTimes(
+        this.layer.id,
+        updatedTimes
+      );
     }
     // Advanced filter
     if (layerState.advancedFilter) {
@@ -157,11 +174,11 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
     }
     // Merge state filters with optional filters
     this.optionalFilters = this.optionalFilters.map((optFilt: any) => {
-        const filt = layerState.optionalFilters.find((filt: any) => filt.label === optFilt['label']);
-        if (filt) {
-          return filt;
-        }
-        return optFilt;
+      const filt = layerState.optionalFilters.find((filt: any) => filt.label === optFilt['label']);
+      if (filt) {
+        return filt;
+      }
+      return optFilt;
     });
 
     setTimeout(() => {
@@ -169,10 +186,10 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
         if (optFilter['value'] && optFilter['type'] === 'OPTIONAL.POLYGONBBOX') {
           const geometry = optFilter['value'] as string;
           const swappedGeometry = this.csClipboardService.swapGeometry(geometry);
-          const strToday=new Date();
-          const dt= new Date(strToday).toISOString();
-          const name = 'Polygon-' + dt.slice(0,dt.lastIndexOf('.'));
-          const newPolygon:Polygon = {
+          const strToday = new Date();
+          const dt = new Date(strToday).toISOString();
+          const name = 'Polygon-' + dt.slice(0, dt.lastIndexOf('.'));
+          const newPolygon: Polygon = {
             name: name,
             srs: 'EPSG:4326',
             geometryType: GeometryType.POLYGON,
@@ -184,7 +201,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
           this.appRef.tick();
         }
       }
-      this.layerManagerService.addLayer(this.layer, this.optionalFilters, this.layerFilterCollection, this.layerTimes.currentTime);
+      this.layerManagerService.addLayer(this.layer, this.optionalFilters, this.layerFilterCollection, this.layerTimes().currentTime);
 
       // Set opacity of the layer on the map
       if (UtilitiesService.layerContainsResourceType(this.layer, ResourceType.WMS)) {
@@ -240,7 +257,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
    */
   public addLayer(layer: any): void {
     this.onApplyClipboardBBox();
-    this.layerManagerService.addLayer(layer, this.optionalFilters, this.layerFilterCollection, this.layerTimes.currentTime);
+    this.layerManagerService.addLayer(layer, this.optionalFilters, this.layerFilterCollection, this.layerTimes().currentTime);
   }
 
   /**
@@ -394,9 +411,9 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
     // Clear out filter values
     for (const filter of this.optionalFilters as Record<string, unknown>[]) {
       if (filter['type'] === 'OPTIONAL.DROPDOWNSELECTLIST' ||
-          filter['type'] === 'OPTIONAL.DATE' ||
-          filter['type'] === 'OPTIONAL.TEXT' ||
-          filter['type'] === 'OPTIONAL.DROPDOWNREMOTE') {
+        filter['type'] === 'OPTIONAL.DATE' ||
+        filter['type'] === 'OPTIONAL.TEXT' ||
+        filter['type'] === 'OPTIONAL.DROPDOWNREMOTE') {
         filter['value'] = null;
         if (filter['multiSelect']) {
           filter['boolOp'] = 'OR';
@@ -445,8 +462,8 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
    * Set layer time extent
    */
   public setLayerTimeExtent() {
-    if (this.layerTimes.timeExtent.length === 0 && config.queryGetCapabilitiesTimes.indexOf(this.layer.id) > -1) {
-      this.filterService.updateLayerTimes(this.layer, this.layerTimes);
+    if (this.layerTimes().timeExtent.length === 0 && config.queryGetCapabilitiesTimes.indexOf(this.layer.id) > -1) {
+      this.filterService.updateLayerTimes(this.layer, this.layerTimes());
     }
   }
 
@@ -456,8 +473,11 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
    * @param newDate new date chosen from time extent
    */
   public changeCurrentTime(newDate: Date) {
-    this.layerTimes.currentTime = newDate;
-    this.filterService.setLayerTimes(this.layer.id, this.layerTimes);
+    this.layerTimes.update(current => ({
+      ...current,
+      currentTime: newDate
+    }));
+    this.filterService.setLayerTimes(this.layer.id, this.layerTimes());
     // Re-add layer to map
     this.csMapService.removeLayerById(this.layer.id);
     this.addLayer(this.layer);

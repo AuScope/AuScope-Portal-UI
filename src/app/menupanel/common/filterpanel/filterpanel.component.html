@@ -205,7 +205,7 @@
   @if (hasFilters(layer.id) || (!hasFilters(layer.id) && layerHasAdvancedFilterComponent(layer.id))) {
     <div>
       <div class="time-extent-button">
-        @if (layerTimes && layerTimes.loadingTimeExtent) {
+        @if (layerTimes() && layerTimes().loadingTimeExtent) {
           <button
             type="button"
             class="btn btn-sm btn-primary unclickable-btn time-btn"
@@ -215,34 +215,34 @@
             &nbsp;&nbsp;Querying time
           </button>
         }
-        @if (layerTimes && layerTimes.currentTime) {
+        @if (layerTimes() && layerTimes().currentTime) {
           <!-- Single time (no dropdown) -->
-          @if (!layerTimes.loadingTimeExtent && layerTimes.timeExtent.length === 1) {
+          @if (!layerTimes().loadingTimeExtent && layerTimes().timeExtent.length === 1) {
             <button
               type="button"
               class="btn btn-sm btn-primary date-btn unclickable-btn"
               style="position:absolute; cursor:default;"
               disabled>
               <i class="fa fa-calendar"></i>
-              &nbsp;&nbsp;{{ layerTimes.currentTime | date }}
+              &nbsp;&nbsp;{{ layerTimes().currentTime | date }}
             </button>
           }
           <!-- Multiple times -->
-          @if (!layerTimes.loadingTimeExtent && layerTimes.timeExtent.length > 1) {
+          @if (!layerTimes().loadingTimeExtent && layerTimes().timeExtent.length > 1) {
             <button
               type="button"
               class="btn btn-sm btn-primary date-btn"
               style="position:absolute;"
               [matMenuTriggerFor]="timeMenu">
               <i class="fa fa-calendar"></i>
-              &nbsp;&nbsp;{{ layerTimes.currentTime | date }}
+              &nbsp;&nbsp;{{ layerTimes().currentTime | date }}
             </button>
 
             <mat-menu
               #timeMenu="matMenu"
               xPosition="after"
               yPosition="below">
-              @for (d of layerTimes.timeExtent; track d) {
+              @for (d of layerTimes().timeExtent; track d) {
                 <button
                   mat-menu-item
                   (click)="changeCurrentTime(d)">

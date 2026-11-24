@@ -489,9 +489,6 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
    * @param document server response object
    */
   public parseTree(document: any): void {
-
-    console.log("*** PARSE TREE ***");
-
     const name = document.key;
     const doc = document.value;
 
@@ -535,10 +532,6 @@ export class QuerierModalComponent implements OnInit, AfterViewInit {
     dataSource.data = data;
     this.flatTreeDataSource.update(current => ({...current, [name]: dataSource}));
     control.expandAll();
-
-    console.log('name', name);
-    console.log('flatTreeControl', this.flatTreeControl());
-    console.log('flatTreeDataSource', this.flatTreeDataSource());
 
     this.changeDetectorRef.detectChanges();
   }
