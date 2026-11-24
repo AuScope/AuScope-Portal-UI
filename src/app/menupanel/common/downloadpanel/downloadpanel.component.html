@@ -162,7 +162,8 @@
               @if (isTsgDownloadAvailable) {
                 <button mat-menu-item title="Download TSG files" (click)="popupTSGDownload()">Download TSG Files</button>
               }
-              @if (bbox() || (polygonFilter() && isPolygonSupportedLayer())) {
+              <!-- Download with AuScope-Cat is only available if there is no IRIS download option and either a bounding box or a polygon is selected -->
+              @if (!irisDownloadListOption() && (bbox() || (polygonFilter() && isPolygonSupportedLayer()))) {
                 <hr class="menu-hr">
                 <button mat-menu-item (click)="downloadWithAuScopeCat()">Download with AuScope-Cat&nbsp;<i class="fa fa-plug menu-icon"></i></button>
               }
