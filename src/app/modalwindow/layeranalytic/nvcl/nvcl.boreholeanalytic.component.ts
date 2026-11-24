@@ -160,11 +160,13 @@ export class NVCLBoreholeAnalyticComponent
   }
 
   public checkStatus() {
+    if (!this.nvclform.email || this.nvclform.email === '') {
+      throw 'No email provided';
+    }
     this.nvclBoreholeAnalyticService
       .checkNVCLAnalyticalJobStatus(this.nvclform.email)
       .subscribe(response => {
         this.currentStatus = response;
-
         this.nvclBoreholeAnalyticService.setUserEmail(this.nvclform.email);
         for (const i of this.currentStatus) {
           this.nvclBoreholeAnalyticService

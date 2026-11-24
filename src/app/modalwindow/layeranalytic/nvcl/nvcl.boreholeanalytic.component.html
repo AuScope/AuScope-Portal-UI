@@ -23,7 +23,7 @@
               <div class="col-md-6">
                 <input type="text" class="form-control form-control-sm" [(ngModel)]="nvclform.email" name="email" ngModel #email="ngModel" required pattern="([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$">
                 @if (!email.valid && email.touched) {
-                  <span class="validity"></span>
+                  <span class="validity text-danger">No email provided</span>
                 }
               </div>
             </div>
@@ -32,7 +32,7 @@
               <div class="col-md-6">
                 <input id="jobName" type="text" class="form-control form-control-sm"  [(ngModel)]="nvclform.jobName" name="jobName" required minlength="1" ngModel #jobName="ngModel" >
                 @if (!jobName.valid && jobName.touched) {
-                  <span class="validity"></span>
+                  <span class="validity text-danger">No job name provided</span>
                 }
               </div>
             </div>
@@ -42,8 +42,8 @@
             <!-- BEGIN card-header -->
             <div class="card-header">
               <ul class="nav nav-tabs float-end">
-                <li (click)="UItabpanel.algorithm = true;UItabpanel.checkprocess=false;" [ngClass]="{'active':UItabpanel.algorithm}"><a href="#nvcl-boreholeanalytic-tabpanel-algorithm"><i class="fa fa-sliders"></i> <span class="d-none d-md-inline"> Algorithms</span></a></li>
-                <li (click)="UItabpanel.algorithm = false;UItabpanel.checkprocess=true;checkStatus()" [ngClass]="{'active':UItabpanel.checkprocess}"><a href="#nvcl-boreholeanalytic-tabpanel-checkprocess"><i class="fa fa-tasks"></i> <span class="d-none d-md-inline"> Check Process</span></a></li>
+                <li (click)="UItabpanel.algorithm = true;UItabpanel.checkprocess=false;" [ngClass]="{'active':UItabpanel.algorithm}"><a role="tab" style="cursor:pointer"><i class="fa fa-sliders"></i> <span class="d-none d-md-inline"> Algorithms</span></a></li>
+                <li (click)="UItabpanel.algorithm = false;UItabpanel.checkprocess=true;checkStatus()" [ngClass]="{'active':UItabpanel.checkprocess}"><a role="tab" style="cursor:pointer"><i class="fa fa-tasks"></i> <span class="d-none d-md-inline"> Check Process</span></a></li>
               </ul>
               <h4 class="card-title">Borehole Analytics</h4>
             </div>
