@@ -750,7 +750,11 @@ export class UtilitiesService {
    * @param crs desired coord ref system e.g. 'EPSG:12345'
    * @returns Bbox
    */
-  public static coordConvBbox(bbox: Bbox, crs: string): Bbox {
+  public static coordConvBbox(bbox: Bbox | null, crs: string): Bbox | null {
+    if (!bbox) {
+      console.error('Bbox is null');
+      return null;
+    }
     // Create Proj object for Bbox CRS
     const fromProj = proj4.Proj(bbox.crs);
     // Register 'crs' Proj4 string with 'proj4', use EPSG:4326 as a fallback
@@ -767,7 +771,8 @@ export class UtilitiesService {
     const en = proj4.transform(fromProj, toProj, [bbox.eastBoundLongitude, bbox.northBoundLatitude], false);
     const sw = proj4.transform(fromProj, toProj, [bbox.westBoundLongitude, bbox.southBoundLatitude], false);
     if (!en || !sw) {
-      throw new Error('Invalid bbox coordinates');
+      console.error('Cannot convert invalid bbox coordinates');
+      return null;
     }
     // Create new Bbox and return it
     const bboxOut: Bbox = new Bbox();

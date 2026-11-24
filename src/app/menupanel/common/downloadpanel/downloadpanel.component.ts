@@ -369,8 +369,8 @@ export class DownloadPanelComponent implements OnInit {
 
       let stationLst = response['data'][0].stationLst;
       stationLst = [{ 'code': this.SELECT_ALL_CODE, 'name': this.SELECT_ALL_STATION }].concat(stationLst);
-      //sort for stationLst
-      stationLst.sort((a: any, b: any) => a.name.charCodeAt(0) - b.name.charCodeAt(0));
+      // Sort 'stationLst' by full name
+      stationLst.sort((a: any, b: any) => a.name.localeCompare(b.name));
       this.irisDownloadListOption.set({
         serviceTypeList: serviceTypeList,
         stationLst: stationLst,
@@ -477,7 +477,7 @@ export class DownloadPanelComponent implements OnInit {
       return;
     }
     const bboxx = this.bbox();
-    if (!bboxx) {
+    if (!bboxx && !(this.irisDownloadListOption()?.selectedserviceType === 'Dataselect')) {
       alert('A bounding box is required');
       return;
     }
@@ -487,7 +487,7 @@ export class DownloadPanelComponent implements OnInit {
     // WCS download
     if (this.isWCSDownloadSupported) {
       if (!this.bbox() || UtilitiesService.isEmpty(this.wcsDownloadForm)) {
-        alert('Required information missing. Make sure you have selected an area, crs and format for download.');
+        alert('Required information missing. Make sure you have selected an area, CRS and format for download.');
         return;
       }
       // Check that input values were selected
@@ -516,6 +516,11 @@ export class DownloadPanelComponent implements OnInit {
       const maxImageSize = config.wcsSupportedLayer[<wcsKey>this.layer.id].maxImageSize;
       // Convert BBox coords to the CRS of WCS layer 'inputCrs' parameter
       const bbox = UtilitiesService.coordConvBbox(bboxx, this.wcsDownloadForm.inputCrs);
+      if (!bbox) {
+        alert('Cannot download. Invalid bounding box.');
+        this.downloadStarted.set(false);
+        return;
+      }
       // Perform WCS download
       observableResponse = this.downloadWcsService.download(this.layer, bbox, this.wcsDownloadForm.inputCrs,
         this.wcsDownloadForm.downloadFormat, this.wcsDownloadForm.outputCrs, timePositions, maxImageSize);
