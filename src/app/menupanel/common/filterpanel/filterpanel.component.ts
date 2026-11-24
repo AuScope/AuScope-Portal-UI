@@ -18,6 +18,7 @@ import { AdvancedComponentService } from '../../../services/ui/advanced-componen
 import { FilterService, LayerTimes } from '../../../services/filter/filter.service';
 import { LayerManagerService } from '../../../services/ui/layer-manager.service';
 import { MatDialog } from '@angular/material/dialog';
+import { ChangeDetectorRef } from '@angular/core';
 
 
 @Component({
@@ -55,12 +56,14 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
   // Layer toolbar
   @ViewChild('advancedFilterComponents', { static: true, read: ViewContainerRef }) advancedFilterComponents!: ViewContainerRef;
 
+  cdr: ChangeDetectorRef;
 
   constructor() {
     this.providers = [];
     this.optionalFilters = [];
     this.analyticMap = ref.layeranalytic;
     this.advancedFilterMap = ref.advancedFilter;
+    this.cdr = inject(ChangeDetectorRef);
   }
 
   public ngOnInit(): void {
@@ -323,6 +326,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
     this.filterService.updateLayerFilterCollection(this.layer.id, this.layerFilterCollection);
   }
 
+  
   /**
    * Adds a new filter to be displayed in the panel
    * @method addFilter
@@ -333,12 +337,14 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
     if (filter == null) {
       return;
     }
+
     // If filter is already in panel
     for (const filterobject of this.optionalFilters) {
       if ((filterobject as any)['label'] === filter['label']) {
         return;
       }
     }
+
     // Initialise provider filter
     if (filter.type === 'OPTIONAL.PROVIDER') {
       filter.value = {};
@@ -346,17 +352,23 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
         filter.value[(provider as any)['value']] = false;
       }
     }
+
     // Fill up dropdown remote filter with values fetched from external service
     if (
       UtilitiesService.isEmpty(filter.options) &&
       filter.type === 'OPTIONAL.DROPDOWNREMOTE'
     ) {
+      // Add the filter immediately so the dropdown renders right away
+      this.updateFilter(filter, true);
+
+      // Fetch remote options and force Angular to update the view when they arrive
       this.filterPanelService.getFilterRemoteParam(filter.url)?.subscribe(response => {
         filter.options = response;
-        this.updateFilter(filter, true);
+        this.cdr.detectChanges();
       });
       return;
     }
+
     // For polygon filter make clipboard visible on map
     if (filter.type === 'OPTIONAL.POLYGONBBOX') {
       this.csClipboardService.toggleClipboard(true);
@@ -365,6 +377,7 @@ export class FilterPanelComponent implements OnChanges, OnInit, AfterViewInit {
         filter.value = polygon.coordinates;
       }
     }
+
     // Initialise multiselect boolean filter's radio button
     if (filter.type === 'OPTIONAL.DROPDOWNSELECTLIST' && filter.multiSelect) {
       filter.boolOp = 'OR';
