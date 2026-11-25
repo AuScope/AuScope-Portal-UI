@@ -74,7 +74,7 @@ export class CustomPanelComponent implements OnInit {
   statusMsg: string;
 
   // Displays custom layers for URLs in sidebar
-  urlLayers: LayerModel[] = [];
+  urlLayers = signal<LayerModel[]>([]);
 
   // Displays custom layers for KML file in sidebar
   fileLayers = signal<LayerModel[]>([]);
@@ -411,50 +411,62 @@ export class CustomPanelComponent implements OnInit {
       searchUrl = searchUrl.substring(0, searchUrl.indexOf('?'));
       this.searchUrl = searchUrl;
     }
-    this.layerHandlerService.getCustomLayerRecord(searchUrl).subscribe(layerRecs => {
-      this.loading.set(false);
-      if (layerRecs != null) {
-        if (layerRecs.LayerModel.length === 0) {
-          this.statusMsg = '<div class="text-danger">No valid layers could be found for this endpoint.</div>';
+    this.layerHandlerService.getCustomLayerRecord(searchUrl).subscribe({
+      next: (layerRecs) => {
+        this.loading.set(false);
+        if (layerRecs != null) {
+          if (layerRecs.LayerModel.length === 0) {
+            this.statusMsg = '<div class="text-danger">No valid layers could be found for this endpoint.</div>';
+          } else {
+            // Fully wipe the data source reference array and layer cache first
+            this.dataSource.data = [];
+            this.layerCacheMap.clear();
+
+            // Clear any old expansion track states before parsing the new WMS
+            if (this.tree && typeof this.tree.collapseAll === 'function') {
+              this.tree.collapseAll();
+            }
+
+            // Register UILayerModels and populate layerCacheMap BEFORE building the tree
+            for (const layerRec of layerRecs.LayerModel) {
+              if (layerRec.name) this.layerCacheMap.set(layerRec.name, layerRec);
+              if (layerRec.id) this.layerCacheMap.set(layerRec.id, layerRec);
+
+              // Match the raw WMS capability layer name (often what nestedLayers uses for node.name)
+              const capLayers = layerRec.capabilityRecords?.layers;
+              if (Array.isArray(capLayers)) {
+                for (const capLayer of capLayers) {
+                  if (capLayer?.name) this.layerCacheMap.set(capLayer.name, layerRec);
+                  if (capLayer?.title) this.layerCacheMap.set(capLayer.title, layerRec);
+                }
+              }
+
+              const uiLayerModel = new UILayerModel(layerRec.id, 100, this.renderStatusService.getStatusBSubject(layerRec));
+              this.uiLayerModelService.setUILayerModel(layerRec.id, uiLayerModel);
+            }
+
+            // Determine the child array and build the tree (getCachedLayer will now find every layer)
+            const rawArray = Array.isArray(layerRecs.nestedLayers)
+              ? layerRecs.nestedLayers
+              : [layerRecs.nestedLayers];
+
+            const optimizedLayers = this.prepareTreeData(rawArray);
+
+            // Assign the optimized data to the tree data source
+            this.dataSource.data = optimizedLayers;
+            this.cdr.markForCheck();
+          }
         } else {
-
-          //  Fully wipe the data source reference array first
-          this.dataSource.data = [];
-
-          //  Clear any old expansion track states before parsing the new WMS
-          if (this.tree && typeof this.tree.collapseAll === 'function') {
-            this.tree.collapseAll();
-          }
-
-          // Determine the child array based on available properties
-          const rawArray = Array.isArray(layerRecs.nestedLayers)
-            ? layerRecs.nestedLayers
-            : [layerRecs.nestedLayers];
-
-          const optimizedLayers = this.prepareTreeData(rawArray);
-          // Assign the optimized data to the tree data source
-          this.dataSource.data = optimizedLayers;
-          // Pass the optimized layers to your existing data loaded handler
-          this.onWmsDataLoaded(optimizedLayers);
-          this.cdr.markForCheck();
-
-          for (const layerRec of layerRecs.LayerModel) {
-            // Make the layer group listing visible in the UI
-            this.urlLayers.unshift(layerRec);
-
-            // Configure layers so they can be added to map
-            const uiLayerModel = new UILayerModel(layerRec.id, 100, this.renderStatusService.getStatusBSubject(layerRec));
-            this.uiLayerModelService.setUILayerModel(layerRec.id, uiLayerModel);
-          }
+          this.statusMsg = '<div class="text-danger">No viable OGC WMS found on the service endpoint. Kindly check your URL again.</div>';
         }
-      } else {
+      },
+      error: () => {
         this.statusMsg = '<div class="text-danger">No viable OGC WMS found on the service endpoint. Kindly check your URL again.</div>';
+        this.loading.set(false);
       }
-    }, () => {
-      this.statusMsg = '<div class="text-danger">No viable OGC WMS found on the service endpoint. Kindly check your URL again.</div>';
-      this.loading.set(false);
     });
   }
+
 
   /**
    * Search list of available WMS layers given an OGC WMS URL, or try to load a KML/KMZ URL
@@ -464,11 +476,14 @@ export class CustomPanelComponent implements OnInit {
       return;
     }
 
+    this.urlLayers.set([]);
+    this.dataSource.data = [];
+
     // Clear the status message
     this.statusMsg = '';
 
     // Clear the results from the previous search, start the loading spinner
-    this.urlLayers = [];
+    this.urlLayers.set([]);
     this.loading.set(true);
 
     // Check for empty URL
@@ -610,8 +625,8 @@ export class CustomPanelComponent implements OnInit {
     const uiLayerModel = new UILayerModel(layerRec.id, 100, me.renderStatusService.getStatusBSubject(layerRec));
     this.uiLayerModelService.setUILayerModel(layerRec.id, uiLayerModel);
     // Make the layer group listing visible in the UI
-    if (sourceType == "URL" && !this.recordsListContainsRecord(me.urlLayers, name, proxyUrl)) {
-      me.urlLayers.unshift(layerRec);
+    if (sourceType == "URL" && !this.recordsListContainsRecord(me.urlLayers(), name, proxyUrl)) {
+      me.urlLayers.update(layers => [layerRec!, ...layers]);
     } else if (!this.recordsListContainsRecord(me.fileLayers(), name, proxyUrl)) {
       me.fileLayers.set([layerRec, ...this.fileLayers()]);
     }
@@ -859,14 +874,14 @@ export class CustomPanelComponent implements OnInit {
   // Clear the custom layers from the panel and reset the state
   clearCustomLayer() {
     this.searchUrl = '';
-    this.urlLayers = [];
+    this.urlLayers.set([]);
     this.fileLayers.set([]);
     this.dataSource.data = [];
   }
 
   // get the layer given the name (from the nested layers)
   getLayer(layerName: String): LayerModel | null {
-    if (!this.urlLayers || this.urlLayers.length === 0) {
+    if (!this.urlLayers() || this.urlLayers().length === 0) {
       return null;
     }
 
@@ -874,7 +889,7 @@ export class CustomPanelComponent implements OnInit {
     var i = 0;
     let layerFnd: boolean = false;
     while (i < this.urlLayers.length && !layerFnd) {
-      const layer = this.urlLayers[i];
+      const layer = this.urlLayers()[i];
       if (layer.id === layerName) {
         layerFnd = true;
         fndLayer = layer;
@@ -938,7 +953,7 @@ export class CustomPanelComponent implements OnInit {
     }
 
     // If the master layer data array hasn't arrived yet, exit early!
-    if (!this.urlLayers || this.urlLayers.length === 0) {
+    if (!this.urlLayers() || this.urlLayers().length === 0) {
       return null;
     }
 

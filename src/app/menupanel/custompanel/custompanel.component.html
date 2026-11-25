@@ -5,14 +5,14 @@
         Service)</span></label>
     <div class="input-group" style="margin-left:1em;right:1em;">
       <input type="text" class="form-control" [(ngModel)]="searchUrl" (keyup)="onKeyUp($event)">
-      <div class="d-flex align-items-stretch" title="Add KML, KMZ, GeoJSON or OGC WMS service URL layer to map"
+      <div class="input-group-append" title="Add KML, KMZ, GeoJSON or OGC WMS service URL layer to map"
         (click)="search()">
         <button class="btn btn-auscope-primary" type="button" [disabled]="!searchUrl || searchUrl.trim() === ''">
           @if (!loading()) {
           <i class="fa fa-search"></i>
           @if (searchUrl) {
           <button title="Clear custom layer" class="btn btn-sm btn-danger clear-search-results-button" type="button"
-            (click)="clearCustomLayer()"><i class="fa fa-ban"></i>&nbsp;Clear&nbsp;</button>
+            (click)="$event.stopPropagation(); clearCustomLayer()"><i class="fa fa-ban"></i>&nbsp;Clear&nbsp;</button>
           }
           }
           @if (loading()) {
@@ -24,7 +24,64 @@
     <span class="help-block small" [innerHTML]="statusMsg">
     </span>
   </div>
-  @if (dataSource.data.length > 0) {
+
+  <div>
+    @if (urlLayers().length > 0) {
+    <!-- Once a URL has been selected and processed, its available layers are shown here -->
+    <table class="custom-table" style="width: 100%; table-layout: fixed;">
+      @for (layer of urlLayers(); track layer.id) {
+      <tr class="custom-result-row">
+        <td class="text-truncate" title="{{layer.name}}">
+          {{layer.name}}
+          @if (layer.capabilityRecords[0]?.layers[0]?.minScaleDenominator ||
+          layer.capabilityRecords[0]?.layers[0]?.maxScaleDenominator) {
+          <div class="scale-text">
+            This layer has scale constraints and may not display at certain zoom levels.<br>
+            Adjust zoom level if the data does not display.
+            @if (getUILayerModel(layer.id)?.statusMap.getRenderStarted() &&
+            !getUILayerModel(layer.id)?.statusMap.getRenderComplete()) {
+            <i class="float-right light-blue fa fa-spin fa-spinner"></i>
+            }
+            @if (getUILayerModel(layer.id)?.statusMap.getRenderStarted() &&
+            getUILayerModel(layer.id)?.statusMap.getContainsError()) {
+            <i class="fa fa-warning text-warning"></i>
+            }
+          </div>
+          }
+        </td>
+        <td style="vertical-align: middle; width: 14rem; text-align: right; white-space: nowrap;">
+          @if (!uiLayerModelService.isLayerAdded(layer.id) && !isImage(layer)) {
+          <button class="btn btn-sm btn-success custom-btn" style="margin-right: 12px;" (click)="addLayer(layer)">
+            <i class="fa fa-plus"></i>&nbsp;Add
+            @if (loading()) {
+            <i class="fa fa-spinner fa-spin fa-fw"></i>
+            }
+          </button>
+          }
+          @if (isImage(layer)) {
+          <button class="btn btn-sm btn-warning custom-btn" style="margin-right: 12px;" data-toggle="tooltip"
+            title="non-earth [CRS:1] images are not supported">
+            <i class="fa fa-ban"></i>&nbsp;Image
+          </button>
+          }
+          @if (uiLayerModelService.isLayerAdded(layer.id)) {
+          <button class="btn btn-sm btn-danger custom-btn" style="margin-right: 12px;" (click)="removeLayer(layer)">
+            <i class="fa fa-trash"></i>&nbsp;Remove
+          </button>
+          }
+          @if (!['kml-layer', 'kmz-layer', 'geojson-layer'].includes(layer.group) && !isImage(layer)) {
+          <button class="btn btn-sm btn-info custom-btn" (click)="displayRecordInfo(layer)">
+            <i class="fa fa-info-circle"></i>&nbsp;Info
+          </button>
+          }
+        </td>
+      </tr>
+      }
+    </table>
+    }
+  </div>
+
+  @if (dataSource.data?.length > 0) {
     <div class="scroll-container">
       <mat-tree #tree [dataSource]="dataSource" [childrenAccessor]="childrenAccessor" [trackBy]="trackByNodeName">
 
@@ -37,7 +94,7 @@
               <tr class="custom-result-row">
                 <td>
                   <span class="text-truncate" title="{{node.title}}">{{ node.title }}</span>
-                  <!--  for scale constraint checking -->
+                  <!-- for scale constraint checking -->
                   @if (node.hasScaleConstraints || hasScaleConstraints(node)) {
                   <div class="scale-text">
                     This layer has scale constraints and may not display at certain zoom levels.<br>
@@ -45,40 +102,39 @@
 
                     <!-- Dynamic fallback for real-time status tracker updates -->
                     @if (node.renderStatus || getLayerRenderStatus(node.name); as status) {
-                      @if (status.started && !status.complete) {
-                        <i class="float-end light-blue fa fa-spin fa-spinner"></i>
-                      }
-                      @if (status.started && status.error) {
-                        <i class="fa fa-warning text-warning"></i>
-                      }
+                    @if (status.started && !status.complete) {
+                    <i class="float-right light-blue fa fa-spin fa-spinner"></i>
+                    }
+                    @if (status.started && status.error) {
+                    <i class="fa fa-warning text-warning"></i>
+                    }
                     }
                   </div>
                   }
                 </td>
-                <td
-                  style="vertical-align: middle; display: inline-flex; justify-content: flex-end; gap: 8px; width: 100%;">
+                <td style="vertical-align: middle; width: 14rem; text-align: right; white-space: nowrap;">
 
                   <!-- Add Button Condition -->
                   @if ((node.cachedLayer || getCachedLayer(node.name)) && (!node.isAdded) && (!node.isImage &&
                   !isImageLayer(node.name))) {
-                  <button class="btn btn-sm btn-success custom-btn" (click)="handleAddLayer(node)">
-                    <i class="fa fa-plus me-1"></i>Add
+                  <button class="btn btn-sm btn-success custom-btn" style="margin-right: 12px;" (click)="handleAddLayer(node)">
+                    <i class="fa fa-plus"></i>&nbsp;Add
                     @if (loading()) { <i class="fa fa-spinner fa-spin fa-fw"></i> }
                   </button>
                   }
 
                   <!-- Image Warning Condition -->
                   @if ((node.cachedLayer || getCachedLayer(node.name)) && (node.isImage || isImageLayer(node.name))) {
-                  <button class="btn btn-sm btn-warning custom-btn"
+                  <button class="btn btn-sm btn-warning custom-btn" style="margin-right: 12px;" data-toggle="tooltip"
                     title="non-earth [CRS:1] images are not supported">
-                    <i class="fa fa-ban me-1"></i>Image
+                    <i class="fa fa-ban"></i>&nbsp;Image
                   </button>
                   }
 
                   <!-- Remove Button Condition -->
                   @if ((node.cachedLayer || getCachedLayer(node.name)) && node.isAdded) {
-                  <button class="btn btn-sm btn-danger custom-btn" (click)="handleRemoveLayer(node)">
-                    <i class="fa fa-trash me-1"></i>Remove
+                  <button class="btn btn-sm btn-danger custom-btn" style="margin-right: 12px;" (click)="handleRemoveLayer(node)">
+                    <i class="fa fa-trash"></i>&nbsp;Remove
                   </button>
                   }
 
@@ -86,7 +142,7 @@
                   @if (node.isStandardGroup) {
                   <button class="btn btn-sm btn-info custom-btn"
                     (click)="displayRecordInfo(node.cachedLayer || getCachedLayer(node.name))">
-                    <i class="fa fa-info-circle me-1"></i>Info
+                    <i class="fa fa-info-circle"></i>&nbsp;Info
                   </button>
                   }
                 </td>
@@ -123,60 +179,59 @@
       <input type="file" accept=".kml, .kmz, .geojson, .shp, .zip" style="display:none" class="file-input"
         (change)="onFileSelected($event)" #customFileLoader>
       <button (click)="customFileLoader.click()" type="button" title="Load KML/KMZ/GeoJSON/SHP(zip) file"
-        class="btn btn-primary btn-sm" style="margin:0.5rem 0 0 1rem;">
+        class="btn btn-primary btn-sm">
         <i class="fa fa-lg fa-file" aria-hidden="true"></i>
         &nbsp;Load KML/KMZ/GeoJSON/SHP(zip)
         @if (!loading()) {
-          <i class="fa"></i>
+        <i class="fa"></i>
         }
         @if (loading()) {
-          <i class="fa fa-spinner fa-spin fa-fw"></i>
+        <i class="fa fa-spinner fa-spin fa-fw"></i>
         }
       </button>
     </div>
   </div>
+
   <!-- Once a file has been uploaded, its layer is shown here -->
-  <table class="custom-table">
+  @if (fileLayers().length > 0) {
+  <table class="custom-table" style="width: 100%; table-layout: fixed;">
     @for (layer of fileLayers(); track layer.id) {
     <tr class="custom-result-row">
       <td>
         <div>
-          <div><span class="text-truncate" title="{{layer.name}}">{{ layer.name }}</span></div>
+          <div><span class="text-truncate" title="{{layer.name}}">{{layer.name}}</span></div>
           @if (getUILayerModel(layer.id)?.statusMap.getRenderStarted() &&
           !getUILayerModel(layer.id)?.statusMap.getRenderComplete()) {
-            <i class="float-end light-blue fa fa-spin fa-spinner"></i>
+          <i class="float-right light-blue fa fa-spin fa-spinner"></i>
           }
           @if (getUILayerModel(layer.id)?.statusMap.getRenderStarted() &&
           getUILayerModel(layer.id)?.statusMap.getContainsError()) {
-            <i class="fa fa-warning text-warning"></i>
+          <i class="fa fa-warning text-warning"></i>
           }
         </div>
       </td>
-      <td>
+      <td style="vertical-align: middle; width: 14rem; text-align: right; white-space: nowrap;">
         @if (!uiLayerModelService.isLayerAdded(layer.id)) {
-        <button class="btn btn-sm btn-success custom-btn" (click)="addLayer(layer)"><i class="fa fa-plus me-1"></i>Add
+        <button class="btn btn-sm btn-success custom-btn" style="margin-right: 12px;" (click)="addLayer(layer)">
+          <i class="fa fa-plus"></i>&nbsp;Add
           @if (loading()) {
           <i class="fa fa-spinner fa-spin fa-fw"></i>
-          }</button>
+          }
+        </button>
         }
         @if (uiLayerModelService.isLayerAdded(layer.id)) {
-        <button class="btn btn-sm btn-danger custom-btn" (click)="removeLayer(layer)"><i
-            class="fa fa-trash me-1"></i>Remove</button>
+        <button class="btn btn-sm btn-danger custom-btn" style="margin-right: 12px;" (click)="removeLayer(layer)">
+          <i class="fa fa-trash"></i>&nbsp;Remove
+        </button>
         }
         @if (isStandardLayerGroup(layer.group)) {
-          <button class="btn btn-sm btn-info custom-btn" (click)="displayRecordInfo(layer)"><i
-                  class="fa fa-info-circle me-1"></i>Info</button>
+        <button class="btn btn-sm btn-info custom-btn" (click)="displayRecordInfo(layer)">
+          <i class="fa fa-info-circle"></i>&nbsp;Info
+        </button>
         }
-
       </td>
-      <!--
-      @if (getUILayerModel(layer.id).statusMap.getRenderStarted()) {
-      <div class="progress progress-xs" style="height: 5px">
-        <div class="progress-bar bg-gradient-blue-purple" [style.width]="getUILayerModel(layer.id).statusMap.getCompletePercentage()" role="progressbar"></div>
-      </div>
-      }
-    -->
     </tr>
     }
   </table>
+  }
 </div>
