@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, OnInit, AfterContentChecked, inject } from '@angular/core';
+import { Component, AfterViewInit, OnInit, AfterContentChecked, inject, ChangeDetectorRef } from '@angular/core';
 import { DownloadWfsService } from '../../../lib/portal-core-ui/service/wfs/download/download-wfs.service';
 import { NVCLBoreholeAnalyticService } from './nvcl.boreholeanalytic.service';
 import { TSGDownloadService } from './tsgdownload.service';
@@ -22,7 +22,8 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
     providers: [NVCLBoreholeAnalyticService],
     standalone: false
 })
-export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewInit, OnInit {
+export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewInit, OnInit {  
+  private cdr = inject(ChangeDetectorRef);
   private downloadWfsService = inject(DownloadWfsService);
   private nvclBoreholeAnalyticService = inject(NVCLBoreholeAnalyticService);
   private tsgDownloadService = inject(TSGDownloadService);
@@ -38,6 +39,7 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
   public isDownloading = false;
   public urlsArray: any[] = [];
   public download1$!: Observable<Download>;
+  public downloadCompleted = false;
 
   constructor() {
     this.tsgform = {};
@@ -56,9 +58,13 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
    * use download1$ to show the downloading progress.
    */
   public BulkDownloadTsgFiles() {
+    console.log('BulkDownloadTsgFiles:urlsArray:' + this.urlsArray);
     const me = this;
     me.total = me.urlsArray.length;
     me.completed = 0;
+    me.downloadCompleted = false;
+    me.cdr.markForCheck();
+
     if (me.tsgDownloadService.downloadOneCompletBS) {
       me.tsgDownloadService.downloadOneCompletBS.unsubscribe();
       me.tsgDownloadService.downloadOneCompletBS = null;
@@ -67,24 +73,30 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
     me.tsgDownloadService.downloadOneCompletBS.subscribe(
       (message) => {
         if (message.startsWith('downloadOne')) {
-          if(me.completed<me.total){
+          if (me.completed < me.total) {
             const url = me.urlsArray[me.completed];
-            const filename = url.substring(url.lastIndexOf('/')+1);
+            const filename = url.substring(url.lastIndexOf('/') + 1);
             me.download1$ = me.tsgDownloadService.download(url, filename).pipe(shareReplay(1));
+            me.cdr.markForCheck();
             console.log('downloadOne:' + filename);
             me.download1$.subscribe(value => {
               if (value.state.startsWith('DONE')) {
+                console.log('downloadOne completed:' + filename);
                 me.completed++;
-                me.tsgDownloadService.downloadOneCompletBS?.next('downloadOne:'+me.completed);
+                me.cdr.markForCheck();
+                me.tsgDownloadService.downloadOneCompletBS?.next('downloadOne:' + me.completed);
               }
             });
           } else {
             me.downloadWfsService.tsgDownloadBS?.next('completed,completed');
             me.isDownloading = false;
+            me.downloadMsg = 'Download';
+            me.downloadCompleted = me.total > 0;
+            me.cdr.markForCheck();
           }
         }
       });
-      me.tsgDownloadService.downloadOneCompletBS.next('downloadOne:0');
+    me.tsgDownloadService.downloadOneCompletBS.next('downloadOne:0');
   }
 
   /**
@@ -92,22 +104,25 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
    */
   ngAfterViewInit(): void {
     this.downloadWfsService.resetTSGDownloads();
-    if (this.downloadWfsService.tsgDownloadBS){
+    if (this.downloadWfsService.tsgDownloadBS) {
       this.downloadWfsService.tsgDownloadBS.unsubscribe();
       this.downloadWfsService.tsgDownloadBS = null;
     }
     this.downloadWfsService.tsgDownloadBS = new Subject<string>();
     this.downloadWfsService.tsgDownloadBS.subscribe(
-        (message) => {
-          const progressData = message.split(',');
-          if ('completed'.match(progressData[0])) {
-            this.isDownloading = false;
-            this.downloadMsg = "Download";
-          }
+      (message) => {
+        console.log("TSG Download message: " + message);
+        const progressData = message.split(',');
+        if ('completed'.match(progressData[0])) {
+          this.isDownloading = false;
+          this.downloadMsg = "Download";
+          this.downloadCompleted = true;
+          this.cdr.markForCheck();
         }
+      }
     );
-
   }
+
   /**
    * Automatically update the param total to reflex on the UI.
    */
@@ -127,23 +142,23 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
     };
   }
 
-  public getCompletePercentage(): string{
-    if (Math.floor(this.completed / this.total * 100) > 100) {
-      this.completePercentage = '100%';
-    } else {
-      this.completePercentage = Math.floor(this.completed / this.total * 100) + '%';
+  public getCompletePercentage(): string {
+    if (!this.total || this.total <= 0) {
+      this.completePercentage = '0%';
+      return this.completePercentage;
     }
+    const pct = Math.min(100, Math.floor((this.completed / this.total) * 100));
+    this.completePercentage = pct + '%';
     return this.completePercentage;
   }
 
-  /**
-   * Called when the "Download" button is hit
-   */
   public onDownload() {
+    this.downloadCompleted = false;
     this.downloadWfsService.tsgDownloadStartBS?.next('start,' + this.tsgform.email);
     this.isDownloading = true;
     this.downloadMsg = "Downloading...";
     this.nvclBoreholeAnalyticService.setUserEmail(this.tsgform.email);
+    this.cdr.markForCheck();
   }
 
 }
