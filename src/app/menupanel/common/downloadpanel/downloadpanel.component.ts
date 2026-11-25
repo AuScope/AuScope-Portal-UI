@@ -743,6 +743,8 @@ export class DownloadPanelComponent implements OnInit {
 
     this.tsgDialogRef = this.dialog.open(NVCLTSGDownloadComponent, {
       width: '1000px',
+      maxWidth: '95vw',
+      panelClass: 'tsg-download-dialog',
       data: {
         layer: this.layer,
         tsgDownloadServiceMsg: this.tsgDownloadServiceMsg
