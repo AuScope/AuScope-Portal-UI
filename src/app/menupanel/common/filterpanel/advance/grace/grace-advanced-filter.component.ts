@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnInit, inject, signal } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { CsMapObject } from '../../../../../lib/portal-core-ui/service/cesium-map/cs-map-object';
 import { CsMapService } from '../../../../../lib/portal-core-ui/service/cesium-map/cs-map.service';
@@ -10,166 +10,176 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 
 @Component({
-    templateUrl: './grace-advanced-filter.component.html',
-    styleUrls: ['./grace-advanced-filter.component.scss'],
-    standalone: false
+  templateUrl: './grace-advanced-filter.component.html',
+  styleUrls: ['./grace-advanced-filter.component.scss'],
+  standalone: false
 
 })
-  export class GraceAdvancedFilterComponent extends AdvancedFilterDirective implements OnInit {
-    private csMapObject = inject<CsMapObject>(CsMapObject);
-    private csMapService = inject<CsMapService>(CsMapService);
-    private graceService = inject(GraceService);
-    private formBuilder = inject(UntypedFormBuilder);
-    private dialog = inject(MatDialog);
+export class GraceAdvancedFilterComponent extends AdvancedFilterDirective implements OnInit {
+  private csMapObject = inject<CsMapObject>(CsMapObject);
+  private csMapService = inject<CsMapService>(CsMapService);
+  private graceService = inject(GraceService);
+  private formBuilder = inject(UntypedFormBuilder);
+  private dialog = inject(MatDialog);
+  private changeDetectorRef = inject(ChangeDetectorRef);
 
+  timeSeriesGraphModalRef?: MatDialogRef<GraceGraphModalComponent>;
 
-    timeSeriesGraphModalRef?: MatDialogRef<GraceGraphModalComponent>;
+  DECIMAL_REGEX = '^-?\\d*\.{0,1}\\d+$';
+  styleGroup!: UntypedFormGroup;
+  public styleSettings = signal({
+    minColor: '#ff0000',
+    minValue: -1,
+    neutralColor: '#ffffff',
+    neutralValue: 0,
+    maxColor: '#0000ff',
+    maxValue: 1,
+    transparentNeutralColor: false
+  });
 
-    DECIMAL_REGEX = '^-?\\d*\.{0,1}\\d+$';
-    styleGroup!: UntypedFormGroup;
+  ngOnInit() {
+    // Construct form current GRACE style
+    this.styleGroup = this.formBuilder.group({
+      minColor: this.graceService.currentGraceStyleSettings().minColor,
+      minValue: [this.graceService.currentGraceStyleSettings().minValue, [Validators.required.bind(Validators), Validators.pattern(this.DECIMAL_REGEX)]],
+      neutralColor: this.graceService.currentGraceStyleSettings().neutralColor,
+      neutralValue: [this.graceService.currentGraceStyleSettings().neutralValue, [Validators.required.bind(Validators), Validators.pattern(this.DECIMAL_REGEX)]],
+      maxColor: this.graceService.currentGraceStyleSettings().maxColor,
+      maxValue: [this.graceService.currentGraceStyleSettings().maxValue, [Validators.required.bind(Validators), Validators.pattern(this.DECIMAL_REGEX)]],
+      transparentNeutralColor: this.graceService.currentGraceStyleSettings().transparentNeutralColor
+    });
+    this.styleGroup.valueChanges.subscribe(value => {
+      this.styleSettings.set(value as GraceStyleSettings);
+      const settings = value as GraceStyleSettings;
+      this.styleSettings.set(settings);
+      this.graceService.setEditedGraceStyleSettings(settings);
+    });
+  }
 
-    ngOnInit() {
-        // Construct form current GRACE style
-        this.styleGroup = this.formBuilder.group({
-            minColor: this.graceService.currentGraceStyleSettings.minColor,
-            minValue: [this.graceService.currentGraceStyleSettings.minValue, [Validators.required.bind(Validators), Validators.pattern(this.DECIMAL_REGEX)]],
-            neutralColor: this.graceService.currentGraceStyleSettings.neutralColor,
-            neutralValue: [this.graceService.currentGraceStyleSettings.neutralValue, [Validators.required.bind(Validators), Validators.pattern(this.DECIMAL_REGEX)]],
-            maxColor: this.graceService.currentGraceStyleSettings.maxColor,
-            maxValue: [this.graceService.currentGraceStyleSettings.maxValue, [Validators.required.bind(Validators), Validators.pattern(this.DECIMAL_REGEX)]],
-            transparentNeutralColor: this.graceService.currentGraceStyleSettings.transparentNeutralColor
+  /**
+   * Update the StyleGroup with the current GRACE style
+   */
+  private updateStyleGroup() {
+    const style = this.graceService.currentGraceStyleSettings();
+    this.styleGroup.patchValue({
+      minColor: style.minColor,
+      minValue: style.minValue,
+      neutralColor: style.neutralColor,
+      neutralValue: style.neutralValue,
+      maxColor: style.maxColor,
+      maxValue: style.maxValue,
+      transparentNeutralColor: style.transparentNeutralColor
+    });
+    this.changeDetectorRef.detectChanges();
+  }
+
+  /**
+   * Allows the user to select a point on the map and retrieve the time series primary mascon information for it.
+   */
+  public selectGraceDataPoint() {
+    this.csMapObject.getPointFromClick().subscribe(point => {
+      if (point) {
+        this.timeSeriesGraphModalRef = this.dialog.open(GraceGraphModalComponent, {
+          width: '1000px',
+          maxWidth: '1000px',
+          data: {
+            x: point.longitude,
+            y: point.latitude
+          }
         });
-    }
+      }
+    });
+  }
 
-    /**
-     * Update the StyleGroup with the current GRACE style
-     */
-    private updateStyleGroup() {
-        const graceStyleSettings = this.graceService.currentGraceStyleSettings;
-        this.styleGroup.controls['minColor'].setValue(graceStyleSettings.minColor);
-        this.styleGroup.controls['neutralColor'].setValue(graceStyleSettings.neutralColor);
-        this.styleGroup.controls['maxColor'].setValue(graceStyleSettings.maxColor);
-        this.styleGroup.controls['minValue'].setValue(graceStyleSettings.minValue);
-        this.styleGroup.controls['neutralValue'].setValue(graceStyleSettings.neutralValue);
-        this.styleGroup.controls['maxValue'].setValue(graceStyleSettings.maxValue);
-    }
-
-    /**
-     * Allows the user to select a point on the map and retrieve the time series primary mascon information for it.
-     */
-    public selectGraceDataPoint() {
-        this.csMapObject.getPointFromClick().subscribe(point => {
-            if (point) {
-                this.timeSeriesGraphModalRef = this.dialog.open(GraceGraphModalComponent, {
-                  width: '1000px',
-                  maxWidth: '1000px',
-                  data: {
-                    x: point.longitude,
-                    y: point.latitude
-                  }
-                });
-            }
-        });
-    }
-
-    /**
-     * Allows the user to select draw a polygon on the map and retrieve the time series primary mascon information for it.
-     */
-    public selectGraceDataPolygon() {
-        this.csMapObject.drawPolygon().subscribe(coords => {
-        if (coords) {
-            // grace-api is expecting an array of lon/lat coords, e.g. [[116.13,-22.25],[119.68,-22.05],[116.96,-23.19],[116.13,-22.25]]
-            const coordList = [];
-            const reversedCoordList = coords.split(' ');
-            for (const c of reversedCoordList) {
-                const singleCoord = c.split(',');
-                coordList.push([parseFloat(singleCoord[1]), parseFloat(singleCoord[0])]);
-            }
-            this.timeSeriesGraphModalRef = this.dialog.open(GraceGraphModalComponent, {
-              width: '800px',
-              maxWidth: '800px',
-              data: {
-                coords: coordList,
-                centroid: '(-45.0,144.0)'
-              }
-            });
-            setTimeout(() => {
-                this.csMapObject.clearPolygon();
-            }, 500);
+  /**
+   * Allows the user to select draw a polygon on the map and retrieve the time series primary mascon information for it.
+   */
+  public selectGraceDataPolygon() {
+    this.csMapObject.drawPolygon().subscribe(coords => {
+      if (coords) {
+        // grace-api is expecting an array of lon/lat coords, e.g. [[116.13,-22.25],[119.68,-22.05],[116.96,-23.19],[116.13,-22.25]]
+        const coordList = [];
+        const reversedCoordList = coords.split(' ');
+        for (const c of reversedCoordList) {
+          const singleCoord = c.split(',');
+          coordList.push([parseFloat(singleCoord[1]), parseFloat(singleCoord[0])]);
         }
+        this.timeSeriesGraphModalRef = this.dialog.open(GraceGraphModalComponent, {
+          width: '800px',
+          maxWidth: '800px',
+          data: {
+            coords: coordList,
+            centroid: '(-45.0,144.0)'
+          }
         });
-    }
+        setTimeout(() => {
+          this.csMapObject.clearPolygon();
+        }, 500);
+      }
+    });
+  }
 
-    /**
-     * Update the grace layer style with the current editor settings
-     */
-    setEditedStyleAsCurrent() {
-        this.graceService.setEditedGraceStyleSettings({
-            minColor: this.styleGroup.value.minColor,
-            minValue: this.styleGroup.value.minValue,
-            neutralColor: this.styleGroup.value.neutralColor,
-            neutralValue: this.styleGroup.value.neutralValue,
-            maxColor: this.styleGroup.value.maxColor,
-            maxValue: this.styleGroup.value.maxValue,
-            transparentNeutralColor: this.styleGroup.value.transparentNeutralColor
-        });
-    }
+  /**
+   * Update the grace layer style with the current editor settings
+   */
+  setEditedStyleAsCurrent() {
+    this.graceService.setEditedGraceStyleSettings({
+      minColor: this.styleGroup.value.minColor,
+      minValue: this.styleGroup.value.minValue,
+      neutralColor: this.styleGroup.value.neutralColor,
+      neutralValue: this.styleGroup.value.neutralValue,
+      maxColor: this.styleGroup.value.maxColor,
+      maxValue: this.styleGroup.value.maxValue,
+      transparentNeutralColor: this.styleGroup.value.transparentNeutralColor
+    });
+  }
 
-    /**
-     * Change detection for the edited GRACE style
-     * @param editKey the key of the StyleGroup that was changed
-     */
-    editedStyleChanged(editKey: string) {
-        const editVal = this.styleGroup.controls[editKey].value;
-        this.graceService.updateEditedGraceStyleSettings(editKey, editVal)
-    }
+  /**
+   * Check valid style inputs
+   * @returns is the style valid (only valid numbers for values)
+   */
+  isValidStyle(): boolean {
+    return this.styleGroup.valid;
+  }
 
-    /**
-     * Check valid style inputs
-     * @returns is the style valid (only valid numbers for values)
-     */
-    isValidStyle(): boolean {
-        return this.styleGroup.valid;
-    }
+  /**
+   * Check if layer has been added
+   * @returns True if layer added
+   */
+  layerAdded(): boolean {
+    return this.csMapService.layerExists(this.layer.id);
+  }
 
-    /**
-     * Check if layer has been added
-     * @returns True if layer added
-     */
-    layerAdded(): boolean {
-        return this.csMapService.layerExists(this.layer.id);
-    }
+  /**
+   * Override the abstract method so we can grab params from the GraceService
+   *
+   * @returns current style settings
+   */
+  public getAdvancedParams(): GraceStyleSettings {
+    this.graceService.setCurrentGraceStyleSettings(this.graceService.editedGraceStyleSettings());
+    return this.graceService.currentGraceStyleSettings();
+  }
 
-    /**
-     * Override the abstract method so we can grab params from the GraceService
-     *
-     * @returns current style settings
-     */
-    public getAdvancedParams(): GraceStyleSettings {
-        this.graceService.setCurrentGraceStyleSettings(this.graceService.editedGraceStyleSettings);
-        return this.graceService.currentGraceStyleSettings;
-    }
+  /**
+   * Set advanced parameters, overrideen from superclass to allow setting GRACE styles on load
+   *
+   * @param params the GraceStyleSettings parameters
+   */
+  public setAdvancedParams(params: any) {
+    this.graceService.setEditedGraceStyleSettings(params);
+    this.graceService.setCurrentGraceStyleSettings(params);
+    this.updateStyleGroup();
+  }
 
-    /**
-     * Set advanced parameters, overrideen from superclass to allow setting GRACE styles on load
-     *
-     * @param params the GraceStyleSettings parameters
-     */
-    public setAdvancedParams(params: any) {
-        this.graceService.setEditedGraceStyleSettings(params);
-        this.graceService.setCurrentGraceStyleSettings(params);
-        this.updateStyleGroup();
+  /**
+   * GRACE layers require a custom SLD_BODY parameter
+   *
+   * @returns the SLD_BODY parameter
+   */
+  public getCallParams(): any {
+    return {
+      'sld_body': this.graceService.getGraceSld()
     }
-
-    /**
-     * GRACE layers require a custom SLD_BODY parameter
-     *
-     * @returns the SLD_BODY parameter
-     */
-    public getCallParams(): any {
-        return {
-            'sld_body': this.graceService.getGraceSld()
-        }
-    }
+  }
 
 }
