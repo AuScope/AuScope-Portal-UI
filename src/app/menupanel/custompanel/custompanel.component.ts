@@ -87,7 +87,7 @@ export class CustomPanelComponent implements OnInit {
 
   constructor(private cdr: ChangeDetectorRef) {
     this.loading.set(false);
-    this.statusMsg = 'Enter your OGC WMS service endpoint</br>e.g. "https://server.gov.au/service/wms"</br>or KML/KMZ/GeoJSON URL and hit <i class="fa fa-search"></i>.';
+    this.statusMsg = 'Enter your OGC WMS service endpoint</br>e.g. "https://services.ga.gov.au/gis/services/AustraliasIdentifiedMineralResources/MapServer/WMSServer"</br>or KML/KMZ/GeoJSON URL and hit <i class="fa fa-search"></i>.';
   }
 
   ngOnInit() {
