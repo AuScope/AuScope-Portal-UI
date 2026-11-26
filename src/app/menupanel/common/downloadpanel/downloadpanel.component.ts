@@ -786,9 +786,9 @@ export class DownloadPanelComponent implements OnInit {
         return;
       }
       if (this.tsgDialogRef) {
-        this.tsgDialogRef.componentInstance.urlsArray = urlsArray;
-        this.tsgDialogRef.componentInstance.BulkDownloadTsgFiles();
+        this.downloadWfsService.tsgDownloadBS?.next('completed,completed');
       }
+
       /**
        * do not "log" the "email" to "RudderStack" - as this is an ethics issue
        *

@@ -156,7 +156,7 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
     this.downloadCompleted = false;
     this.downloadWfsService.tsgDownloadStartBS?.next('start,' + this.tsgform.email);
     this.isDownloading = true;
-    this.downloadMsg = "Downloading...";
+    this.downloadMsg = "Preparing...";
     this.nvclBoreholeAnalyticService.setUserEmail(this.tsgform.email);
     this.cdr.markForCheck();
   }

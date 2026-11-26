@@ -11,7 +11,7 @@
         <div class="alert alert-danger alert-dismissible">{{data.tsgDownloadServiceMsg}}</div>
 
         <div class="alert alert-danger alert-dismissible">
-          TSG Files download are run remotely and may take some time to complete. Please do not click ,close or refresh the browser while downloading. Otherwise you might lost your data.
+          TSG Files download are run remotely and may take some time to complete. Please do not click, close or refresh the browser while downloading. Otherwise you might lose your data.
         </div>
 
         <div class="alert alert-info alert-dismissible">
@@ -27,7 +27,7 @@
               <span class="validity flex-shrink-0"></span>
             </div>
           </div>
-
+          <!--
           <div class="form-group form-group-md row justify-content-start mb-3">
             <label class="col-md-2">Progress: {{completed}} of {{total}}</label>
             <div class="col-md-6">
@@ -39,11 +39,12 @@
               }
             </div>
           </div>
+          -->
         </div>
-
         @if (downloadCompleted) {
           <div class="alert alert-success">
-            TSG files download completed{{ total > 0 ? ' (' + completed + ' of ' + total + ' files)' : '' }}.
+            TSG files prepared{{ total > 0 ? ' (' + completed + ' of ' + total + ' files)' : '' }}. 
+            You should receive an email shortly with download links.
           </div>
         }
 
