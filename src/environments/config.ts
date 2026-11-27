@@ -43,10 +43,11 @@ export const config = {
   //
   // (Set 'downloadAreaMaxSize' to Number.MAX_SAFE_INTEGER to disable area download limits)
   wcsSupportedLayer: {
-    'regolith-depth-layer': {
-      downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
-      maxImageSize: 1024
-    },
+    // AUS-4737 - reinstate once the WCS service for regolith-depth-layer is fixed
+    //'regolith-depth-layer': {
+    //  downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
+    //  maxImageSize: 1024
+    //},
     'aster-aloh': {
       downloadAreaMaxSize: Number.MAX_SAFE_INTEGER,
       maxImageSize: 4096
