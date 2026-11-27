@@ -23,19 +23,19 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
     standalone: false
 })
 export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewInit, OnInit {  
-  private cdr = inject(ChangeDetectorRef);
   private downloadWfsService = inject(DownloadWfsService);
   private nvclBoreholeAnalyticService = inject(NVCLBoreholeAnalyticService);
   private tsgDownloadService = inject(TSGDownloadService);
 
   public data = inject(MAT_DIALOG_DATA);
   public dialogRef = inject(MatDialogRef<NVCLTSGDownloadComponent>);
+  public cdr = inject(ChangeDetectorRef);
   public tsgform: any;
   public ngSelectiveConfig = {};
   public total = 0;
   public completed = 0;
   public completePercentage!: string;
-  public downloadMsg = "Download";
+  public downloadMsg = "Send Download Links";
   public isDownloading = false;
   public urlsArray: any[] = [];
   public download1$!: Observable<Download>;
@@ -48,7 +48,7 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
       this.tsgform.email = this.nvclBoreholeAnalyticService.getUserEmail();
     }
     this.tsgform.ogcFilter = '';
-    this.downloadMsg = "Download";
+    this.downloadMsg = "Send Download Links";
     this.isDownloading = false;
   }
 
@@ -115,7 +115,7 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
         const progressData = message.split(',');
         if ('completed'.match(progressData[0])) {
           this.isDownloading = false;
-          this.downloadMsg = "Download";
+          this.downloadMsg = "Send Download Links";
           this.downloadCompleted = true;
           this.cdr.markForCheck();
         }
@@ -156,7 +156,7 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
     this.downloadCompleted = false;
     this.downloadWfsService.tsgDownloadStartBS?.next('start,' + this.tsgform.email);
     this.isDownloading = true;
-    this.downloadMsg = "Downloading...";
+    this.downloadMsg = "Preparing...";
     this.nvclBoreholeAnalyticService.setUserEmail(this.tsgform.email);
     this.cdr.markForCheck();
   }

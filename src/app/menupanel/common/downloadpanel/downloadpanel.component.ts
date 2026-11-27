@@ -771,36 +771,37 @@ export class DownloadPanelComponent implements OnInit {
       observableResponse = this.downloadWfsService.downloadTsgFileUrls(this.layer, this.bbox(), this.tsgDownloadEmail, null).pipe(shareReplay(1));
     }
     // Kick off the download process and save zip file in browser
-    observableResponse.subscribe(urls => {
-      let total = 0;
-      let urlsArray = [];
-      if (urls) {
-        urlsArray = urls.split(/\r?\n/g).filter(function(url: string) {
-          return url.match(/^http/g);
-        });
-        total = urlsArray.length;
-      }
-      if (!urls || total < 1) {
-        alert('TSGFilesDownload: No TSGFiles was found in the area. Please draw another boundary or polygon to search.');
-        this.downloadWfsService.tsgDownloadBS?.next('completed,completed');
+    observableResponse.subscribe((response: any) => {
+      const result = response?.data;
+
+      if (!response?.success || !result?.emailSent || result?.urlCount < 1) {
+        alert(result?.message ?? 'No TSG files were found in the selected area.');
+        if (this.tsgDialogRef) {
+          this.tsgDialogRef.componentInstance.isDownloading = false;
+          this.tsgDialogRef.componentInstance.downloadMsg = 'Send Download Links';
+          this.tsgDialogRef.componentInstance.downloadCompleted = false;
+          this.tsgDialogRef.componentInstance.cdr.markForCheck();
+        }
         return;
       }
-      if (this.tsgDialogRef) {
-        this.tsgDialogRef.componentInstance.urlsArray = urlsArray;
-        this.tsgDialogRef.componentInstance.BulkDownloadTsgFiles();
-      }
-      /**
-       * do not "log" the "email" to "RudderStack" - as this is an ethics issue
-       *
-       * console.log("environment.rudderStackWriteKey: "+environment.rudderStackWriteKey);
-       */
-      if (environment.rudderStackWriteKey && typeof rudderanalytics !== "undefined") {
+
+      this.downloadWfsService.tsgDownloadBS?.next('completed,completed');
+
+      if (environment.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
         rudderanalytics.track('dataset_download_started', {
           layer_id: this.layer.id,
           download_type: 'tsg'
         });
       }
+
     }, err => {
+      if (this.tsgDialogRef) {
+        this.tsgDialogRef.componentInstance.isDownloading = false;
+        this.tsgDialogRef.componentInstance.downloadMsg = 'Send Download Links';
+        this.tsgDialogRef.componentInstance.downloadCompleted = false;
+        this.tsgDialogRef.componentInstance.cdr.markForCheck();
+      }
+
       if (UtilitiesService.isEmpty(err.message)) {
         alert('An error has occurred whilst attempting to download. Please contact cg-admin@csiro.au');
       } else {
