@@ -776,23 +776,32 @@ export class DownloadPanelComponent implements OnInit {
 
       if (!response?.success || !result?.emailSent || result?.urlCount < 1) {
         alert(result?.message ?? 'No TSG files were found in the selected area.');
+        if (this.tsgDialogRef) {
+          this.tsgDialogRef.componentInstance.isDownloading = false;
+          this.tsgDialogRef.componentInstance.downloadMsg = 'Send Download Links';
+          this.tsgDialogRef.componentInstance.downloadCompleted = false;
+          this.tsgDialogRef.componentInstance.cdr.markForCheck();
+        }
         return;
       }
 
       this.downloadWfsService.tsgDownloadBS?.next('completed,completed');
 
-      /**
-       * do not "log" the "email" to "RudderStack" - as this is an ethics issue
-       *
-       * console.log("environment.rudderStackWriteKey: "+environment.rudderStackWriteKey);
-       */
-      if (environment.rudderStackWriteKey && typeof rudderanalytics !== "undefined") {
+      if (environment.rudderStackWriteKey && typeof rudderanalytics !== 'undefined') {
         rudderanalytics.track('dataset_download_started', {
           layer_id: this.layer.id,
           download_type: 'tsg'
         });
       }
+
     }, err => {
+      if (this.tsgDialogRef) {
+        this.tsgDialogRef.componentInstance.isDownloading = false;
+        this.tsgDialogRef.componentInstance.downloadMsg = 'Send Download Links';
+        this.tsgDialogRef.componentInstance.downloadCompleted = false;
+        this.tsgDialogRef.componentInstance.cdr.markForCheck();
+      }
+
       if (UtilitiesService.isEmpty(err.message)) {
         alert('An error has occurred whilst attempting to download. Please contact cg-admin@csiro.au');
       } else {

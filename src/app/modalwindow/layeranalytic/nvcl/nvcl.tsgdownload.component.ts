@@ -23,13 +23,13 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
     standalone: false
 })
 export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewInit, OnInit {  
-  private cdr = inject(ChangeDetectorRef);
   private downloadWfsService = inject(DownloadWfsService);
   private nvclBoreholeAnalyticService = inject(NVCLBoreholeAnalyticService);
   private tsgDownloadService = inject(TSGDownloadService);
 
   public data = inject(MAT_DIALOG_DATA);
   public dialogRef = inject(MatDialogRef<NVCLTSGDownloadComponent>);
+  public cdr = inject(ChangeDetectorRef);
   public tsgform: any;
   public ngSelectiveConfig = {};
   public total = 0;
