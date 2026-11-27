@@ -35,7 +35,7 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
   public total = 0;
   public completed = 0;
   public completePercentage!: string;
-  public downloadMsg = "Download";
+  public downloadMsg = "Send Download Links";
   public isDownloading = false;
   public urlsArray: any[] = [];
   public download1$!: Observable<Download>;
@@ -48,7 +48,7 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
       this.tsgform.email = this.nvclBoreholeAnalyticService.getUserEmail();
     }
     this.tsgform.ogcFilter = '';
-    this.downloadMsg = "Download";
+    this.downloadMsg = "Send Download Links";
     this.isDownloading = false;
   }
 
@@ -115,7 +115,7 @@ export class NVCLTSGDownloadComponent implements AfterContentChecked, AfterViewI
         const progressData = message.split(',');
         if ('completed'.match(progressData[0])) {
           this.isDownloading = false;
-          this.downloadMsg = "Download";
+          this.downloadMsg = "Send Download Links";
           this.downloadCompleted = true;
           this.cdr.markForCheck();
         }

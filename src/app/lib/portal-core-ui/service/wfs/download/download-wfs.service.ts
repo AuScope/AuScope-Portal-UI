@@ -165,7 +165,7 @@ export class DownloadWfsService {
 
         return this.http.post(this.env.portalBaseUrl + 'downloadTsgFiles.do', httpParams.toString(), {
           headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
-          responseType: 'text'
+          responseType: 'json'
         }).pipe(timeout({
           each: 360000,
           with: () => throwError(() => new Error('Request have timeout out after 6 minutes'))
